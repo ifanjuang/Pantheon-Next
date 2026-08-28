@@ -6,11 +6,7 @@ Doctor is a governance-support module for documentary and procedural audit.
 
 It is not an editor, fixer, promoter, approver, execution runtime, repository mutator, scheduler, queue, hidden workflow runner, memory engine or decision authority.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: Hermes/the external runtime may execute admitted audit preparation, optional compatible runtime clients may expose runtime interaction, Pantheon Cockpit projects governed audit status and decision material, and neither surface gains approval or governance authority.
 
 ## Purpose
 
@@ -112,7 +108,7 @@ summary:
 residual_uncertainties:
 ```
 
-The report may be displayed by the exposure surface or used by Zeus as review material.
+The report may be projected by Pantheon Cockpit, exposed as candidate material through a compatible runtime client, or used by Zeus as review material.
 
 The report is not, by itself, approval, correction, promotion, proof or memory.
 
@@ -182,13 +178,19 @@ When Hermes performs Doctor-like work, its output remains a candidate.
 
 Hermes must not use Doctor as permission to patch, merge, approve, promote memory or mutate doctrine.
 
-## Relationship to OpenWebUI
+## Relationship to runtime clients and Pantheon Cockpit
 
-OpenWebUI may expose Doctor reports, warnings, classifications and decision gates.
+A compatible runtime client may expose Doctor runtime interaction, report candidates, warnings or requests for review. It is not the governed decision surface.
 
-OpenWebUI may request review or revision from the user.
+Pantheon Cockpit may project Doctor reports, classifications, warnings and governed decision-gate state.
 
-OpenWebUI must not turn a Doctor report into approval, a Registre Probatoire entry, doctrine or an automatic repository modification.
+Neither a runtime client nor a Cockpit projection may turn a Doctor report into approval, a Registre Probatoire entry, doctrine or an automatic repository modification.
+
+```text
+runtime interaction != governed projection
+projection != approval
+projection != persistence
+```
 
 ## Relationship to operations
 
