@@ -6,11 +6,7 @@ This document defines how Pantheon Next allows useful AI autonomy without collap
 
 It does not implement an agent, router, scheduler, queue, approval engine, memory engine, runtime, connector, plugin, OpenWebUI function, Hermes skill, Revit add-in, schema, test or external action.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: optional compatible runtime clients expose runtime interaction only, Hermes/the external runtime executes admitted work as PEP, Pantheon Cockpit projects governed state, and Pantheon policy/governance remains the bounded PDP authority.
 
 ## Purpose
 
