@@ -18,12 +18,7 @@ If this roadmap conflicts with that spine, the status spine wins.
 
 ## Doctrine
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-The human decides.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: the Pantheon policy service is the bounded PDP interface, Hermes/the external runtime executes admitted work and enforces consequential effects as PEP, compatible runtime clients are optional interaction surfaces, Pantheon Cockpit projects governed state, Pantheon Next retains governance authority, and the human decides consequential effects when required.
 
 Pantheon may govern consequential status: truth, memory, evidence, approval, scope, external action, activation, proposed installation, update authorization, runtime-health visibility and rollback visibility.
 
@@ -205,20 +200,22 @@ architecture_devis_reprise
 Target loop:
 
 ```text
-OpenWebUI
--> bounded Task Contract
--> Hermes execution
+bounded Task Contract
+-> optional compatible runtime-client interaction, if a client is selected
+-> Hermes / external runtime execution
 -> Result Candidate + Evidence Pack Candidate
--> Pantheon read-only structural/status checks
+-> Pantheon read-only structural/status checks + governed Cockpit projection where used
 -> explicit human decision
 -> verified rollback
 ```
+
+The client step is optional and non-authoritative. A selected client may expose interaction with the run; it does not authorize the run or any consequential effect.
 
 Entry conditions:
 
 - audited Pantheon tag and MCP wheel;
 - isolated external environment;
-- exact Hermes, OpenWebUI and adapter versions recorded;
+- exact Hermes, selected runtime client if any, and adapter versions recorded;
 - fictional data only;
 - read-only Pantheon checkout;
 - separate credentials and rollback plan.
