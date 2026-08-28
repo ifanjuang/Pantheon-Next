@@ -6,11 +6,7 @@ This document defines how external systems that store, recall, rank, summarize, 
 
 It does not implement a runtime, memory backend, graph database, vector store, checkpoint engine, observability backend, MCP server, connector, schema, test, operation, platform component, Docker service, approval engine or automatic memory promotion.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: external runtime-memory systems remain runtime-side capabilities, optional compatible clients may expose runtime interaction, Pantheon Cockpit projects governed memory/evidence status, and neither retrieval nor client selection transfers Pantheon authority.
 
 ## Purpose
 

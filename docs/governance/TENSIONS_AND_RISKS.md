@@ -12,11 +12,7 @@ It does not define automatic enforcement.
 
 It does not create a scheduler, queue, message bus, hidden workflow runner, decision engine, approval engine or memory engine.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: optional compatible runtime clients expose runtime interaction only, Hermes/the external runtime executes admitted work, Pantheon Cockpit projects governed tensions and decision state, and Pantheon retains governance authority.
 
 ## Purpose
 
@@ -59,7 +55,7 @@ A hidden tension is a governance failure.
 | Generalization vs dossier specificity | reusable pattern may overreach | project fact becomes doctrine | scope review |
 | Local-first vs governance | self-hosting helps privacy | local data treated as safe by default | same evidence and memory rules |
 | Tool richness vs attack surface | more tools increase capability | uncontrolled execution surface | least capability principle |
-| Cockpit display vs authority | visible artifact feels official | OpenWebUI becomes source of truth | display is not authority |
+| Cockpit display vs authority | visible artifact feels official | runtime client or Cockpit projection becomes source of truth | projection is not authority |
 | Runtime completion vs validation | successful execution may look final | Hermes done equals approved | candidate status preserved |
 | Professional judgment vs automation | AI can draft expert-like output | professional responsibility outsourced | User Decision Gate |
 | Pattern distillation vs architecture import | references are useful | framework copied into Pantheon | Reference Boundary review |
