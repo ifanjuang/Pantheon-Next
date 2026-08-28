@@ -8,12 +8,14 @@ It does not define implementation.
 
 It does not add runtime behavior.
 
-It does not introduce an agent runtime, tool runtime, provider router, scheduler, queue, plugin marketplace, OpenWebUI replacement or Hermes replacement.
+It does not introduce an agent runtime, tool runtime, provider router, scheduler, queue, plugin marketplace, mandatory WebUI or Hermes replacement.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional runtime clients may expose interaction.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed Cards, decisions and status.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
 ## Core thesis
@@ -23,8 +25,8 @@ Pantheon Next should not differentiate by adding more agents, more workflow comp
 Pantheon Next differentiates by turning an AI stack into a governed professional method.
 
 ```text
-OpenWebUI + Hermes gives power.
-Pantheon gives professional control.
+Runtime clients + Hermes provide interaction and execution.
+Pantheon provides professional control.
 ```
 
 Market sentence:
@@ -38,7 +40,7 @@ Pantheon is the governed configuration layer between AI tools and professional r
 Pantheon Next is not:
 
 - another chat UI;
-- another OpenWebUI;
+- another mandatory WebUI;
 - another Hermes;
 - another RAG platform;
 - another agent builder;
@@ -47,7 +49,7 @@ Pantheon Next is not:
 - another plugin marketplace;
 - another autonomous execution system.
 
-If OpenWebUI or Hermes already does something well, Pantheon should not rebuild it.
+If a selected runtime client, Hermes or another external tool already does something well, Pantheon should not rebuild it.
 
 ## What Pantheon is
 
@@ -87,12 +89,12 @@ Most users can install AI tools.
 
 Few users can configure them into a controlled professional method.
 
-Pantheon should provide the missing configuration layer for OpenWebUI, Hermes and adjacent tools.
+Pantheon should provide the missing configuration layer for optional runtime clients, Hermes and adjacent tools without making any client authoritative or mandatory.
 
 Possible artifacts:
 
 ```text
-OpenWebUI Configuration Pack
+Runtime Client Configuration Guidance
 Hermes Profile Pack
 System Prompt Pack
 Knowledge Naming Guide
@@ -106,6 +108,8 @@ Setup Doctor Checklist
 Integration Boundary Checklist
 ```
 
+Hermes WebUI may be one optional/proposed runtime client when separately selected and qualified. This doctrine does not require it.
+
 These artifacts are not runtime behavior.
 
 They are reviewable configuration doctrine.
@@ -113,7 +117,7 @@ They are reviewable configuration doctrine.
 ### Configuration questions Pantheon should answer
 
 ```text
-Which Knowledge Bases are visible?
+Which knowledge collections are visible?
 Which model can call which tools?
 Which prompts require sources?
 When is validation required?
@@ -127,8 +131,8 @@ What must be logged?
 ### Configuration rule
 
 ```text
-Pantheon should not execute OpenWebUI or Hermes.
-Pantheon should make their configuration explicit, reusable, reviewable and auditable.
+Pantheon should not execute runtime clients or Hermes.
+Pantheon should make their governance-relevant configuration explicit, reusable, reviewable and auditable.
 ```
 
 ## Pillar 2 — Evidence-first workflow
@@ -337,11 +341,11 @@ Pantheon should eventually provide a Setup Doctor as a checklist first, optional
 Questions:
 
 ```text
-Is OpenWebUI configured correctly?
+Is the selected runtime client configured correctly?
 Are tools too broad?
-Are Knowledge Bases scoped?
+Are knowledge collections scoped?
 Can the model browse everything?
-Is memory enabled where it should not be?
+Is runtime memory enabled where it should not be?
 Are system prompts aligned with source discipline?
 Are Evidence Pack outputs visible?
 Are Hermes profiles candidate-only?
@@ -426,25 +430,33 @@ These are crowded, risky and easy to copy.
 
 Pantheon should differentiate through method, not spectacle.
 
-## Relationship to OpenWebUI and Hermes
+## Relationship to runtime clients, Hermes and Cockpit
 
-OpenWebUI answers:
+An optional runtime client answers:
 
 ```text
-Where does the user interact with AI?
+Where does the user interact with the execution runtime?
 ```
 
-Hermes answers:
+Hermes Agent answers:
 
 ```text
 Who performs the technical work?
 ```
 
-Pantheon answers:
+Pantheon Cockpit answers:
+
+```text
+Where are governed Cards, status, Evidence gaps and decisions projected?
+```
+
+Pantheon Next answers:
 
 ```text
 Under what rules can that work be trusted, reviewed, retained or rejected?
 ```
+
+Hermes WebUI may satisfy the optional runtime-client role if separately selected and qualified, but its selection does not transfer Pantheon authority.
 
 ## Product promise
 
@@ -474,7 +486,7 @@ No implementation.
 
 No dependency added.
 
-No OpenWebUI plugin.
+No mandatory WebUI.
 
 No Hermes tool.
 
