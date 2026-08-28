@@ -9,9 +9,11 @@ It does not implement rite execution.
 It does not create a runtime, scheduler, queue, hidden role debate, automatic trigger engine, approval callback or memory promotion pipeline.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional runtime clients may expose interaction.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed rite, review and decision state.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
 ## Purpose
@@ -38,8 +40,9 @@ A rite may be proposed by a role.
 ZEUS authorizes or rejects it.
 The Task Contract records why.
 The Evidence Pack records what changed.
-OpenWebUI may display the status.
-None of these executes the rite.
+An optional runtime client may expose technical interaction.
+Pantheon Cockpit may project governed rite status and linked decisions.
+None of these executes the rite for Pantheon.
 ```
 
 ## Invocation authority
@@ -55,7 +58,7 @@ A rite may be proposed by:
 A rite may not be triggered automatically by:
 
 - another rite;
-- OpenWebUI UI state;
+- runtime-client UI state;
 - a runtime trace;
 - a Knowledge Base retrieval;
 - an Evidence Pack entry;
@@ -274,7 +277,7 @@ When a rite affects output legitimacy, delivery posture, memory posture or user 
 
 A Rite Review Card is not a schema.
 
-It is a documentation format that may be embedded in an Evidence Pack or exposed in OpenWebUI.
+It is a documentation format that may be embedded in an Evidence Pack, surfaced by an optional runtime client as interaction context, or projected by Pantheon Cockpit as governed review state.
 
 Recommended format:
 
@@ -325,9 +328,11 @@ No contradiction may disappear without status.
 
 No user decision may be discarded silently.
 
-## OpenWebUI display boundary
+## Runtime-client and Cockpit display boundary
 
-OpenWebUI may display rite review status.
+Optional runtime clients may display technical interaction and rite review context. Hermes WebUI is one optional/proposed client if separately selected and qualified.
+
+Pantheon Cockpit may project governed rite review status, tensions, Evidence gaps and User Decision Gates.
 
 Prefer display labels that do not imply autonomous execution.
 
@@ -344,9 +349,16 @@ rite_superseded
 rite_escalated_to_user_decision_gate
 ```
 
-OpenWebUI may also display `self_review`, `independent_review`, `not_observed` or `not_verifiable` as review context.
+A surface may also display `self_review`, `independent_review`, `not_observed` or `not_verifiable` as review context.
 
 These labels do not confer authority.
+
+```text
+Hermes WebUI available != Hermes WebUI selected
+client selected != authority transfer
+projection != persistence
+rite visible != rite authorized
+```
 
 ## Hermes boundary
 
@@ -376,7 +388,7 @@ binding selected != dependency adopted
 - reviewer repairs work while claiming an independent verdict;
 - analogous search silently expands scope;
 - ZEUS closure omitted;
-- OpenWebUI display mistaken for execution;
+- client or Cockpit display mistaken for execution or approval;
 - Evidence Pack summary mistaken for proof;
 - role viewpoints mistaken for runtime agents;
 - Refoundation used to erase contradictions;
