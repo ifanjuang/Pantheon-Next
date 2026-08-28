@@ -2,36 +2,36 @@
 
 Status: active support doctrine — future bridge boundary and non-runtime adapter contract.
 
-This document defines the governance boundary for a future Pantheon Bridge between OpenWebUI, Pantheon doctrine, Hermes Agent and optional external systems such as Langflow, LangGraph, Langfuse or a provenance graph.
+This document defines the governance boundary for a future non-authoritative Pantheon Bridge between the Pantheon policy service, Hermes Agent / the external runtime, optional compatible runtime clients, Pantheon Cockpit projections and optional external systems such as Langflow, LangGraph, Langfuse or a provenance graph.
 
 It does not implement a bridge.
 
-It does not create an API, endpoint, scheduler, queue, message bus, provider router, tool runtime, workflow runtime, approval engine, memory engine, OpenWebUI Function, Hermes skill, Langflow flow, LangGraph runtime, Langfuse backend or GraphRAG runtime.
+It does not create an API, endpoint, scheduler, queue, message bus, provider router, tool runtime, workflow runtime, Policy Decision Point, Policy Enforcement Point, approval engine, memory engine, runtime-client component, Hermes skill, Langflow flow, LangGraph runtime, Langfuse backend or GraphRAG runtime.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: the Pantheon policy service is the bounded PDP, Hermes/the external runtime is the executor and PEP, optional runtime clients expose interaction only, Pantheon Cockpit projects governed state, and Pantheon retains governance authority.
 
 ## Purpose
 
-A bridge may later be needed because OpenWebUI should not speak directly to every execution system without governance context.
+A bridge may later be needed to adapt governed requests and policy decisions between Pantheon and external execution systems without making any client, adapter or transport layer authoritative.
 
 The bridge exists to preserve boundary discipline.
 
-It translates a governed request into an external execution request and translates the returned material back into reviewable candidates.
+It adapts a governed request into an external execution request, conveys the applicable Pantheon policy decision to the runtime/PEP, and translates returned material back into reviewable candidates.
 
 It does not execute the work itself.
+
+It does not decide whether a consequential effect is authorized.
 
 ## Core rule
 
 ```text
-The bridge may adapt a contract.
-The bridge must not become a runtime.
+The bridge may adapt and convey a contract or policy decision.
+The bridge must not become a runtime, PDP or PEP.
 ```
 
-A bridge may check whether required governance artifacts exist.
+A bridge may perform fail-closed structural preflight such as checking that required references are present before consulting policy.
+
+Only the Pantheon policy service may issue the bounded PDP disposition for a consequential effect. The bridge may narrow or block locally, but it must never widen that disposition.
 
 A bridge must not decide truth, grant approval, promote memory, broaden scope or authorize external effect by itself.
 
@@ -40,35 +40,36 @@ A bridge must not decide truth, grant approval, promote memory, broaden scope or
 A future bridge may:
 
 ```text
-receive a request from OpenWebUI
-verify Task Contract presence
-verify Context Pack presence
-verify scope labels
-verify approval ceiling
-verify memory rule
-verify expected evidence
-verify allowed output categories
-select an authorized external executor class
+receive a bounded execution request from an authorized caller or optional runtime client
+verify required request fields and governance references are present
+prepare a deterministic Pantheon policy-service request
+convey the Pantheon PDP disposition without widening it
+block locally when required policy is unavailable or structurally invalid
+select an executor class only within the returned policy constraints
 prepare a bounded Hermes request
 prepare a bounded Langflow request when explicitly allowed
 attach trace metadata for observability
 normalize returned candidates
-return status to OpenWebUI
+return runtime-interaction status to the requesting client when applicable
+provide governed status material for Pantheon Cockpit projection
 surface Capability Gap
 surface User Decision Gate need
 ```
 
 These are boundary checks and adapter operations.
 
-They are not autonomous execution.
+They are not autonomous execution or independent authorization.
 
 ## Forbidden bridge responsibilities
 
 A bridge must not:
 
 ```text
+act as a second Policy Decision Point
+widen a Pantheon policy disposition
 execute agent loops
 run tools directly
+perform the consequential effect as Policy Enforcement Point
 route providers as a sovereign layer
 schedule jobs by itself
 own queues
@@ -83,6 +84,8 @@ auto-install skills
 auto-enable plugins
 resolve role disagreement silently
 ```
+
+If the bridge independently decides that an effect may proceed, a competing PDP has been created.
 
 If the bridge owns durable execution state, governance drift has occurred.
 
@@ -108,13 +111,13 @@ user_decision_gate_policy
 trace_policy
 ```
 
-This envelope is not a runtime task.
+This envelope is not a runtime task or an authorization decision.
 
-It is a boundary declaration.
+It is a boundary declaration supplied to the Pantheon policy check and external execution adapter.
 
 ## Authorized executor classes
 
-Allowed executor classes may include:
+Candidate executor classes may include:
 
 ```text
 hermes_profile
@@ -125,9 +128,9 @@ read_only_provenance_query
 observability_trace_sink
 ```
 
-An executor class is not authorized merely because it is installed.
+An executor class is not authorized merely because it is installed or named in this document.
 
-Authorization remains task-bound.
+Task-bound eligibility comes from the applicable Pantheon PDP disposition and is enforced by the external runtime/PEP.
 
 ## Return envelope
 
@@ -143,16 +146,20 @@ risk_escalation
 user_decision_gate_needed
 trace_reference
 blocked_status
+outcome_observation_candidate
 ```
 
 Returned material remains candidate until governed review.
 
+A technically successful bridge/runtime return is not Evidence, approval or professional acceptance.
+
 ## Status vocabulary
 
-Recommended bridge statuses:
+Recommended bridge-facing statuses:
 
 ```text
-accepted_for_external_execution
+policy_check_required
+blocked_policy_unavailable
 blocked_missing_task_contract
 blocked_missing_context_pack
 blocked_scope_unclear
@@ -161,50 +168,61 @@ blocked_memory_rule_missing
 blocked_executor_not_authorized
 blocked_external_effect
 blocked_evidence_requirement_missing
+eligible_for_external_execution
+eligible_with_gate
 returned_candidate
 returned_with_risk
 returned_capability_gap
 human_decision_required
 ```
 
-These statuses are governance-facing.
+These statuses report policy or adapter state.
 
-They are not execution commands.
+They are not execution commands and they do not replace the canonical PDP disposition vocabulary.
 
-## OpenWebUI relationship
+## Runtime-client relationship
 
-OpenWebUI may request bridge action through a thin surface.
+An optional compatible runtime client may request a bounded bridge operation or display runtime-interaction state when a deployed binding supports it.
 
-The surface may expose:
+The client may expose:
 
 ```text
-request execution
+request candidate execution
 show blocked reason
-show run status label
-show Evidence Pack Candidate
-show User Decision Gate
+show runtime status label
+show returned candidate references
 show Capability Gap
 ```
 
-OpenWebUI must not use the bridge to bypass Pantheon doctrine.
+A runtime client must not use the bridge to bypass Pantheon policy or turn UI state into approval.
+
+Governed Evidence gaps, approval state and User Decision Gates belong to Pantheon Cockpit projection, not to client authority.
+
+## Pantheon Cockpit relationship
+
+Pantheon Cockpit may project governed Cards, blocked reasons, Evidence gaps, policy/gate state and human decision surfaces derived from governed artifacts.
+
+Cockpit projection does not execute the bridge, persist authority by itself or replace the Pantheon policy decision.
 
 ## Hermes relationship
 
-Hermes may receive bounded requests from the bridge.
+Hermes/the external runtime may receive bounded requests after the applicable Pantheon policy disposition permits the execution opportunity or required gate path.
 
-Hermes may return candidates, evidence notes, patch candidates, memory candidates, gaps and risks.
+The runtime/PEP is responsible for enforcing consequential-effect policy and performing the effect only when allowed.
 
-Hermes completion does not equal approval.
+Hermes may return candidates, evidence notes, patch candidates, memory candidates, gaps, risks and truthful technical outcome observations.
+
+Hermes completion does not equal approval or Evidence.
 
 ## Langflow relationship
 
-Langflow may be called by a future bridge only for deterministic preparation or extraction flows explicitly authorized by Task Contract.
+Langflow may be called by a future bridge only for deterministic preparation or extraction flows explicitly admitted by the applicable policy and Task Contract.
 
 Langflow output must remain candidate material.
 
 ## LangGraph relationship
 
-LangGraph may be used only for durable external execution when interruption, checkpoint or resume are explicitly required.
+LangGraph may be used only for durable external execution when interruption, checkpoint or resume are explicitly required and admitted.
 
 LangGraph state remains Runtime State.
 
@@ -225,8 +243,10 @@ Graph output remains Retrieved Knowledge or candidate evidence until selected in
 ## Final rule
 
 ```text
-The bridge checks whether execution is allowed.
-Hermes or another external runtime performs execution.
-Pantheon governs what the result means.
-OpenWebUI shows the result and captures the human decision.
+Pantheon policy service decides the bounded policy disposition as PDP.
+The bridge adapts and conveys without widening authority.
+Hermes or another admitted external runtime enforces and executes as PEP.
+Optional runtime clients expose interaction only.
+Pantheon Cockpit projects governed state.
+The human decides consequential effects when required.
 ```
