@@ -10,11 +10,7 @@ They are not schemas.
 
 They are not tests.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: optional compatible runtime clients expose runtime interaction only, Hermes/the external runtime executes admitted work, Pantheon Cockpit projects governed state, and Pantheon retains governance authority.
 
 ## Purpose
 

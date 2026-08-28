@@ -12,11 +12,7 @@ Discordia is not ZEUS.
 
 Discordia is not a runtime agent, worker, scheduler, queue, message bus, hidden debate system or autonomous contradiction engine.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: optional compatible runtime clients expose runtime interaction only, Hermes/the external runtime executes admitted work, Pantheon Cockpit projects governed state, and Pantheon retains governance authority.
 
 ## Purpose
 

@@ -12,7 +12,6 @@ KNOWN_CURRENT_AUTHORITY_OPENWEBUI_RESIDUES = {
     "docs/governance/ADAPTERS_AND_BINDINGS.md",
     "docs/governance/BRIDGE_CONTRACT.md",
     "docs/governance/CODE_AUDIT_POST_PIVOT.md",
-    "docs/governance/DISCORDIA.md",
     "docs/governance/DOCTOR_MODULE_SPEC.md",
     "docs/governance/EDITORIAL_LANGUAGE.md",
     "docs/governance/EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md",
@@ -26,9 +25,7 @@ KNOWN_CURRENT_AUTHORITY_OPENWEBUI_RESIDUES = {
     "docs/governance/REJECTED_PATTERNS.md",
     "docs/governance/ROADMAP.md",
     "docs/governance/SKILL_WATCHLIST.md",
-    "docs/governance/SOURCE_NEED_AND_REGISTRY.md",
     "docs/governance/TENSIONS_AND_RISKS.md",
-    "docs/governance/evidence_topology_antipatterns/README.md",
     "docs/governance/rites/RITE_EXAMPLES.md",
 }
 

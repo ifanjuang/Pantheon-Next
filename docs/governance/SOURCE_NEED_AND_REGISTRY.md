@@ -6,13 +6,9 @@ This document defines how Pantheon Next handles missing sources, trusted source 
 
 It is a governance method, not an implementation.
 
-It does not create a web search engine, source database, crawler, scraper, connector gateway, source validator, evidence engine, memory engine, approval engine, OpenWebUI action, Hermes skill, scheduler, queue or external action.
+It does not create a web search engine, source database, crawler, scraper, connector gateway, source validator, evidence engine, memory engine, approval engine, runtime-client action, Hermes skill, scheduler, queue or external action.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: optional compatible runtime clients expose runtime interaction only, Hermes/the external runtime executes retrieval handoffs, Pantheon Cockpit projects governed source/evidence status, and Pantheon retains governance authority.
 
 ## Core thesis
 
