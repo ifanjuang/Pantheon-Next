@@ -344,7 +344,7 @@ runtime success != Evidence admission
 
 ## Relationship to runtime clients and Cockpit
 
-Hermes Web/dashboard and compatible clients may expose task interaction, candidate outputs and technical runtime status.
+`nesquena/hermes-webui`, when selected, or another compatible client may expose task interaction, candidate outputs and technical runtime status. Hermes WebUI is optional/proposed and does not become a Pantheon requirement merely because it offers near-CLI web access.
 
 Pantheon Cockpit may project governed Evidence Packs, evidence gaps, review status, approval state and linked decisions.
 
@@ -356,7 +356,7 @@ Client display does not make evidence complete, approved or authoritative. Cockp
 runtime display != Evidence
 projection != persistence
 projection != approval
-client selected != authority transfer
+optional client selected != authority transfer
 ```
 
 ## Relationship to schemas
