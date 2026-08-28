@@ -59,6 +59,17 @@ def test_decision_learning_and_placement_surfaces_are_client_agnostic():
     assert "client selection does not transfer governance authority" in placement
 
 
+def test_agent_plugins_review_uses_current_client_agnostic_split():
+    review = _read(GOV / "AGENT_PLUGINS_INTEROPERABILITY.md")
+    assert "OpenWebUI" not in review
+    assert "Agent Plugins 1.0.0 — Published" in review
+    assert "Hermes Web/dashboard and compatible clients expose runtime interaction" in review
+    assert "Hermes Agent executes external admitted work" in review
+    assert "Pantheon Cockpit projects governed Cards" in review
+    assert "multi-target capability available != multi-target need demonstrated" in review
+    assert "hermes_runtime_adapter_required: not demonstrated" in review
+
+
 def test_governance_ci_no_longer_requires_removed_owner():
     workflow = _read(ROOT / ".github" / "workflows" / "governance-ci.yml")
     assert "docs/governance/OPENWEBUI_INTEGRATION.md" not in workflow
