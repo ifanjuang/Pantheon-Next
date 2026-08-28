@@ -10,13 +10,7 @@ It does not create a new Pantheon Role.
 
 It does not implement a runtime, connector, classifier, memory engine, workflow engine, Notion sync, approval engine or Registre Probatoire storage.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-The Registre Probatoire proves.
-The human decides.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: compatible runtime clients are optional interaction surfaces, external execution remains with Hermes/the runtime, and neither client selection nor runtime execution transfers Pantheon authority. Registre admission and consequential human decision remain separately governed.
 
 ## Terminology note
 
