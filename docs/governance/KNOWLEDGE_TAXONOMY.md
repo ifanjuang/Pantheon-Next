@@ -15,9 +15,11 @@ Indexed content is not truth.
 Repeated content is not truth.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional runtime clients may expose interaction and retrieved context.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed knowledge, Evidence and decision state.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
 ## Purpose
@@ -71,7 +73,7 @@ They are not runtime states.
 
 A Raw Source is information supplied, uploaded, discovered, retrieved or referenced before review.
 
-Examples include documents, web pages, emails, spreadsheets, repository files, images, meeting notes, chat messages, API results, OpenWebUI Knowledge Base documents and user uploads.
+Examples include documents, web pages, emails, spreadsheets, repository files, images, meeting notes, chat messages, API results, runtime-client knowledge collections and user uploads.
 
 A Raw Source may be useful.
 
@@ -93,7 +95,7 @@ It points to something that may support proof.
 
 A Knowledge Item is organized reference information that can be retrieved or consulted.
 
-Examples include OpenWebUI Knowledge Base entries, domain notes, policy excerpts, project reference documents, documentation excerpts and indexed source chunks.
+Examples include runtime-client knowledge entries, domain notes, policy excerpts, project reference documents, documentation excerpts and indexed source chunks.
 
 A Knowledge Item is usable information.
 
@@ -209,7 +211,7 @@ Doctrine changes require explicit governance review.
 
 Runtime State belongs to an execution system.
 
-Examples include Hermes internal state, worker state, queue state, tool cache, provider trace, scratchpad, retry state and OpenWebUI transient UI state.
+Examples include Hermes internal state, worker state, queue state, tool cache, provider trace, scratchpad, retry state and transient client UI state.
 
 Runtime State must not be treated as a Registre Probatoire entry.
 
@@ -239,9 +241,9 @@ This order is functional, not absolute.
 
 A higher layer can still be revised if evidence and approval justify it.
 
-## OpenWebUI Knowledge Base rule
+## Client knowledge-store rule
 
-OpenWebUI Knowledge Bases are Knowledge Items or Raw Sources depending on their review state.
+Knowledge collections exposed by a runtime client are Knowledge Items or Raw Sources depending on their review state.
 
 They are not a Registre Probatoire entry by default.
 
@@ -252,6 +254,12 @@ They may become Evidence Items when selected and recorded.
 They may become Register Candidates when explicitly proposed.
 
 They do not become memory because they were uploaded, indexed, embedded, retrieved, cited or repeatedly used.
+
+```text
+client selected != authority transfer
+knowledge available != knowledge adopted
+retrieved != true
+```
 
 ## Hermes output rule
 
