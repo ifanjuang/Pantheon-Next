@@ -31,12 +31,18 @@ def test_active_governance_does_not_assign_openwebui_architecture_ownership():
     forbidden = (
         "OpenWebUI owns the cockpit surface",
         "user visibility or decision capture -> OpenWebUI",
+        "OpenWebUI exposes.",
+        "OpenWebUI may expose",
+        "OpenWebUI may display",
+        "through Agora, OpenWebUI",
     )
     offenders = []
     for path in GOV.rglob("*.md"):
         if path == OBSOLETE:
             continue
         text = _read(path)
+        if "Status: active doctrine" not in text:
+            continue
         for phrase in forbidden:
             if phrase in text:
                 offenders.append((path.relative_to(ROOT).as_posix(), phrase))
@@ -72,12 +78,15 @@ def test_agent_plugins_review_uses_current_client_agnostic_split():
     assert "hermes_runtime_adapter_required: not demonstrated" in review
 
 
-def test_active_review_and_public_surfaces_are_client_agnostic():
+def test_core_review_and_public_surfaces_are_client_agnostic():
     paths = (
         ROOT / "docs" / "HTTP_API_CONTRACT.md",
+        ROOT / "mcp-server" / "docs" / "HTTP_API_CONTRACT.md",
         GOV / "APPROVALS.md",
         GOV / "RUN_GRAPH.md",
         GOV / "EVIDENCE_PACK.md",
+        GOV / "TASK_CONTRACTS.md",
+        GOV / "GOVERNANCE_COLLEGE.md",
         ROOT / "docs" / "intro-professionnelle.md",
     )
     for path in paths:
@@ -87,11 +96,17 @@ def test_active_review_and_public_surfaces_are_client_agnostic():
     approvals = _read(GOV / "APPROVALS.md")
     trace = _read(GOV / "RUN_GRAPH.md")
     evidence = _read(GOV / "EVIDENCE_PACK.md")
+    task_contracts = _read(GOV / "TASK_CONTRACTS.md")
+    college = _read(GOV / "GOVERNANCE_COLLEGE.md")
+    http_contract = _read(ROOT / "mcp-server" / "docs" / "HTTP_API_CONTRACT.md")
     intro = _read(ROOT / "docs" / "intro-professionnelle.md")
 
     assert "Hermes WebUI is optional/proposed" in approvals
     assert "Hermes WebUI is an optional/proposed external surface" in trace
     assert "Hermes WebUI is optional/proposed" in evidence
+    assert "Hermes WebUI available != Hermes WebUI selected" in task_contracts
+    assert "runtime client approval control != Pantheon approval" in college
+    assert "The external runtime Policy Enforcement Point remains responsible" in http_contract
     assert "Pantheon Cockpit projects governed approval state" in approvals
     assert "Pantheon Cockpit projects governed trace/review state" in trace
     assert "runtime output != Evidence" in evidence
