@@ -11,8 +11,9 @@ This pointer does not duplicate or override that contract. It exists so reposito
 ```text
 MCP helps agents consult and prepare.
 HTTP exposes deterministic policy/preflight data.
-Hermes enforces and executes outside Pantheon.
-OpenWebUI exposes.
+Hermes Agent executes admitted work outside Pantheon.
+Hermes Web/dashboard and compatible clients expose runtime interaction.
+Pantheon Cockpit projects governed Cards, decisions, navigation and status.
 The human decides consequential effects.
 ```
 
