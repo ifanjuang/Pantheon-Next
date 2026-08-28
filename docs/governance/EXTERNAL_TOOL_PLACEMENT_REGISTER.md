@@ -6,13 +6,9 @@ This register records placement decisions for external repositories and tools re
 
 It is a support register, not doctrine by itself.
 
-It does not install dependencies, create a runtime, create a connector, create a Hermes skill, create an OpenWebUI plugin, approve a tool for production use or promote any output to proof or memory.
+It does not install dependencies, create a runtime, create a connector, create a Hermes skill, create a runtime-client component, approve a tool for production use or promote any output to proof or memory.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: optional compatible runtime clients expose runtime interaction only, Hermes/the external runtime executes admitted work as PEP, Pantheon Cockpit projects governed state, and Pantheon policy/governance remains the bounded PDP authority.
 
 ## Purpose
 
@@ -57,13 +53,13 @@ Governing a capability is not implementing it.
 | `greensock/gsap-skills` | Official GSAP AI coding skill set for animation, timelines, ScrollTrigger and framework integration. | Hermes skill candidate, frontend / motion. | Candidate / to verify | Low | Accepté | Documented non implemented | Verify license, integration target and accessibility rules before use. |
 | `sujan1-3/browser-eyes-mcp` | MCP browser inspection and control layer using Chromium / CDP operations such as screenshots, DOM, network, storage and interaction. | Hermes MCP skill candidate with privileged modes. | Candidate / to verify | Medium to high | Accepté with constraints | Documented non implemented | Define read-only, interactive and mutation modes; require scope and approval for mutation, interception, cookies, storage and sensitive sessions. |
 | `rowboatlabs/rowboat` | Local-first AI coworker / external product with long-lived context, knowledge graph, local notes and tool integrations. | External reference, possible future adapter; not a Hermes skill and not Pantheon core. | Candidate / to verify | High if absorbed directly | À vérifier / À arbitrer | Documented non implemented | Study only as external reference for inspectable working memory and graph context; never import its memory as a Registre Probatoire entry without governed promotion. |
-| `Dyalwayshappy/Spice` | Decision-layer runtime above agents, with Decision Cards, read-only perception, decision guidance, approval checkpoints, executor handoff, outcomes and decision memory. | External reference only. May inspire OpenWebUI decision surfaces and Pantheon handoff vocabulary. Not a Hermes default runtime and not Pantheon core. | Reference / to verify | Critical if absorbed as decision authority | Refusé dans le core; à vérifier as UX/method reference | Documented non implemented | Distill compatible patterns only: Decision Card, sources/why/details/json inspection, unsupported-semantics reporting, read-only perception and approval-gated handoff. Do not install as governance runtime. |
+| `Dyalwayshappy/Spice` | Decision-layer runtime above agents, with Decision Cards, read-only perception, decision guidance, approval checkpoints, executor handoff, outcomes and decision memory. | External reference only. May inspire Pantheon Cockpit decision surfaces and governed handoff vocabulary. Not a Hermes default runtime and not Pantheon core. | Reference / to verify | Critical if absorbed as decision authority | Refusé dans le core; à vérifier as UX/method reference | Documented non implemented | Distill compatible patterns only: Decision Card, sources/why/details/json inspection, unsupported-semantics reporting, read-only perception and approval-gated handoff. Do not install as governance runtime. |
 | `PaddlePaddle/PaddleOCR` | OCR and document parsing toolkit for PDFs, images, layout, tables and structured extraction. | Hermes document-extraction capability candidate. Dashboard may expose install, configure, health and logs; Hermes owns installation and execution; Pantheon has no dependency. | Candidate / to verify | Medium to high if OCR output is treated as truth | Accepté with constraints | Documented non implemented | Add as dashboard-installable Hermes-managed capability only. Benchmark on CERFA, mairie arrêté, devis, chantier CR and surface tables. Outputs remain Extraction Candidates / Evidence Pack Candidates. |
 | `12britz/awesome-free-models` | Curated list of free AI models, API tiers, local inference tools, chatbot UIs, RAG/vector databases, agentic frameworks, fine-tuning tools, datasets, hosting platforms and learning resources. | External tooling watchlist source only. It may seed dashboard watchlist cards or Hermes capability review candidates, but it is not a catalogue of approved models, tools or providers. | External reference / candidate-only | Medium; high if free-tier, license, privacy, benchmark or availability claims are trusted without review | Accepté as watchlist only | Documented non implemented | Use only to discover candidates. Verify license, commercial terms, data policy, retention, local/cloud boundary, version/date, quota, stability and IFJ benchmark before any admission or configuration. |
-| `comet-ml/opik` | Open-source LLM observability, tracing, evaluation, datasets, online scoring and optimization platform. | External observability and evaluation layer; possible Hermes-side binding through a reviewed adapter or OpenTelemetry path if compatibility is proven. OpenWebUI may expose governed summaries only. Pantheon has no dependency. | Candidate / to verify | High if professional data is captured without minimization, traces are treated as proof, scores become approval or optimizers mutate prompts/tools automatically | Accepté with constraints as evaluation lab candidate; not selected as default observability binding | Documented non implemented; not installed; not approved; inactive | Compare with Langfuse on five governed Task Contracts after verifying Hermes instrumentation, data minimization, retention, access control, self-host footprint and rollback. |
+| `comet-ml/opik` | Open-source LLM observability, tracing, evaluation, datasets, online scoring and optimization platform. | External observability and evaluation layer; possible Hermes-side binding through a reviewed adapter or OpenTelemetry path if compatibility is proven. Pantheon Cockpit may project governed summaries; optional runtime clients may expose runtime interaction only. Pantheon has no dependency. | Candidate / to verify | High if professional data is captured without minimization, traces are treated as proof, scores become approval or optimizers mutate prompts/tools automatically | Accepté with constraints as evaluation lab candidate; not selected as default observability binding | Documented non implemented; not installed; not approved; inactive | Compare with Langfuse on five governed Task Contracts after verifying Hermes instrumentation, data minimization, retention, access control, self-host footprint and rollback. |
 | `ifixai-ai/iFixAi` | Open-source AI operational-misalignment diagnostic with provider adapters, structural and judge-based inspections, scorecards and content-addressed run manifests. | External evaluation-method reference and watchlist item only; possible bounded Hermes-side lab runner against fictional fixtures after separate review. Not a Pantheon approval, certification or production gate. | External reference / watchlist | High if full model I/O, multi-provider judging, persistent telemetry, public test corpora or aggregate grades are treated as safe evidence | Accepté as method reference only; installation and operational use not approved | Documented decision; not installed; not approved; inactive | Distill coverage-disclosure and declared-versus-observed patterns. Do not run on client or production data; revisit only through a separate data-handling, telemetry, provider, cost and reproducibility review. |
 | `Brescou/langgraph-agent-stack` | Deployable LangGraph and FastAPI multi-agent template with typed domain packs, version routing, memory, providers, connectors, evaluation, observability and deployment scaffolding. | External runtime reference only; possible specialized Hermes-side orchestration binding if a proven capability gap requires stateful graph execution. Not Pantheon core and not a default Hermes runtime. | External reference / watchlist | Critical if its control plane, memory, review queue, plugins or routing become Pantheon authority or duplicate Hermes | Refusé as Pantheon runtime; accepté as design reference only | Documented decision; not installed; not approved; inactive | Distill bounded pack-contract, evaluation, canary, budget, supply-chain and interrupt/resume patterns only. Revisit a binding only after an explicit Hermes capability gap and separate governed review. |
-| `mr-september/hermes-uplink` | Third-party mobile PWA / thin client that proxies Hermes sessions and capabilities through a loopback proxy and Tailscale Funnel. | External UX reference only. It may inspire mobile session-resume patterns, but it is not an OpenWebUI replacement, Pantheon cockpit, default Hermes client or governed action surface. | Reference only / refused for current architecture | Critical if it creates a direct Hermes bypass, exposes full sessions/capabilities through one shared credential or adds an ungoverned public endpoint | Refusé as integration; accepté as UX reference only | Documented decision; not installed; not approved; inactive | Do not adopt. Distill only bounded mobile and resumable-session UX patterns if they remain useful after comparison with official Hermes surfaces. |
+| `mr-september/hermes-uplink` | Third-party mobile PWA / thin client that proxies Hermes sessions and capabilities through a loopback proxy and Tailscale Funnel. | External UX reference only. It may inspire mobile session-resume patterns, but it is not a Pantheon Cockpit, selected/default Hermes client or governed action surface. | Reference only / refused for current architecture | Critical if it creates a direct Hermes bypass, exposes full sessions/capabilities through one shared credential or adds an ungoverned public endpoint | Refusé as integration; accepté as UX reference only | Documented decision; not installed; not approved; inactive | Do not adopt. Distill only bounded mobile and resumable-session UX patterns if they remain useful after comparison with official Hermes surfaces. |
 
 ## Tool notes
 
@@ -118,9 +114,10 @@ Spice is valuable because it makes the pre-execution decision visible: candidate
 The compatible pattern is not the Spice runtime. The compatible pattern is a displayable and reviewable decision surface:
 
 ```text
-Decision surface in OpenWebUI
+Governed decision surface in Pantheon Cockpit
 -> governed Task Contract / Context Pack / Evidence Pack Candidate
--> Hermes bounded execution if approved
+-> Pantheon policy disposition / human gate when required
+-> Hermes bounded execution through the external runtime/PEP when admitted
 -> Outcome Observation Candidate
 -> Pantheon status review
 ```
@@ -294,7 +291,7 @@ Placement:
 
 - Pantheon governs trace eligibility, purpose, scope, data class, redaction, sampling, retention, evaluation status, export status, activation, update and rollback gates.
 - Hermes may emit minimized traces through a reviewed adapter and may run bounded evaluation campaigns under Task Contract.
-- OpenWebUI may expose trace summaries, comparison results, limitations and links; it must not install the binding or silently intercept content.
+- Pantheon Cockpit may project governed trace summaries, comparison results, limitations and links. Optional runtime clients may expose runtime interaction state only; neither surface installs the binding or silently intercepts content.
 - Human approval is required before installation, activation, cloud transfer, raw-content capture, online evaluation, optimizer use or any prompt/tool mutation.
 - No native Hermes binding was verified during this review. Generic OpenTelemetry support or an SDK wrapper is a candidate path only, not an implemented integration.
 
@@ -511,7 +508,7 @@ Placement:
 
 - Pantheon governs binding eligibility, scope, evidence requirements, version admission, activation, update and rollback gates.
 - Hermes may execute a specialized binding only under Task Contract after a demonstrated capability gap and separate approval.
-- OpenWebUI may expose binding status, evaluation summaries, limitations and approval requests; it must not host the graph runtime or mutate traffic weights.
+- Pantheon Cockpit may project governed binding status, evaluation summaries, limitations and approval requests. Optional runtime clients may expose runtime interaction status only; neither surface hosts the graph runtime or mutates traffic weights.
 - Human approval is required before installation, activation, provider or connector configuration, professional-data use, plugin loading, traffic-shift mutation or external-effect execution.
 - The project remains a separate execution runtime. Calling one of its directories `control_plane` does not give it Pantheon governance authority.
 
@@ -580,7 +577,7 @@ Placement:
 
 - Pantheon may govern a remote-access policy, but it does not host or execute Uplink.
 - Hermes would remain the execution runtime reached by the client.
-- OpenWebUI remains the governed cockpit; Uplink must not become a parallel decision or approval surface.
+- Pantheon Cockpit remains the governed projection surface; Uplink must not become a parallel decision or approval surface, and no runtime client is selected by this register.
 - Human approval would be required before any remote endpoint, shared credential, gateway restart, automatic start or public tunnel.
 - The reviewed project is oriented toward native Windows and direct Hermes access. Compatibility with the current containerized architecture is not established.
 
