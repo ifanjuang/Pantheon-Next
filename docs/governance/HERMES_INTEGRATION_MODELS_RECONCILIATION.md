@@ -3,12 +3,7 @@
 Status: active support doctrine — integration boundary reconciliation.
 Boundary profile: candidate_support_note.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-The human decides consequential effects.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: the Pantheon policy service is the bounded PDP interface, Hermes/the external runtime enforces consequential effects as PEP, optional compatible runtime clients expose runtime interaction only, Pantheon Cockpit projects governed state, and the human decides consequential effects when required.
 
 Two Hermes-integration models now exist in the candidates. They are **layers,
 not competitors**. This note fixes how they compose so neither is mistaken for
