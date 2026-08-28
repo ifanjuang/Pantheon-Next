@@ -8,11 +8,7 @@ It is a method, not a workflow.
 
 It does not implement a runtime, agent loop, scheduler, queue, provider router, retrieval engine, source registry database, web search tool, context optimizer, approval engine, memory engine, OpenWebUI action, Hermes skill or external action.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: compatible runtime clients are optional interaction surfaces, Hermes/the external runtime executes admitted work, and client selection or runtime success does not transfer Pantheon governance authority.
 
 ## Core thesis
 
