@@ -10,6 +10,20 @@ def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def _is_current_authority(text: str) -> bool:
+    status = next(
+        (line for line in text.splitlines() if line.startswith("Status: ")),
+        "",
+    )
+    return status.startswith(
+        (
+            "Status: canonical doctrine",
+            "Status: active doctrine",
+            "Status: active support",
+        )
+    )
+
+
 def test_openwebui_integration_owner_is_removed():
     assert not REMOVED.exists()
     obsolete = _read(OBSOLETE)
@@ -41,7 +55,7 @@ def test_active_governance_does_not_assign_openwebui_architecture_ownership():
         if path == OBSOLETE:
             continue
         text = _read(path)
-        if "Status: active doctrine" not in text:
+        if not _is_current_authority(text):
             continue
         for phrase in forbidden:
             if phrase in text:
