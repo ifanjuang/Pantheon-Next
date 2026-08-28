@@ -66,7 +66,9 @@ Hermes executes admitted work externally.
 
 The external execution runtime enforces consequential-effect policy as the Policy Enforcement Point.
 
-Pantheon exposes deterministic policy/preflight decisions as the Policy Decision Point through the bounded service described by `mcp-server/docs/HTTP_API_CONTRACT.md`.
+The current Pantheon decision interface is the bounded policy service described by `mcp-server/docs/HTTP_API_CONTRACT.md`.
+
+That service exposes deterministic policy/preflight decisions as the Policy Decision Point; it does not perform the consequential effect.
 
 Optional runtime clients expose interaction with the execution runtime.
 
