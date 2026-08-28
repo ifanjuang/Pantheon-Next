@@ -9,9 +9,13 @@ It does not rename schemas, tests, runtime objects, APIs, tool contracts, databa
 It does not implement a runtime, workflow engine, scheduler, approval engine, memory engine, connector gateway, plugin manager, schema migration, automatic terminology linter, competence engine, skill generator or documentation-ingestion pipeline.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Optional compatible runtime client       -> runtime interaction
+Hermes Agent                             -> external execution runtime
+Runtime adapter / Hermes                 -> PEP for consequential effects
+Pantheon Cockpit                         -> governed Cards, status, Evidence gaps and decisions
+Pantheon policy service                  -> bounded deterministic PDP interface
+Pantheon Next                            -> governance, authority and PDP semantics
+Human                                    -> consequential decision when required
 ```
 
 ## Purpose
@@ -362,7 +366,19 @@ Do not use `Role Profile` as a canonical term. Use `Hermes profile aligned with 
 
 ## External system boundary vocabulary
 
-### OpenWebUI
+### Optional runtime clients
+
+| External term | Pantheon classification | Rule |
+|---|---|---|
+| Client | optional, replaceable runtime interaction surface | availability or selection does not transfer governance authority |
+| Approval control | runtime interaction control | not Pantheon human approval |
+| Session | runtime continuity | not Case or governed identity |
+| Attachment | runtime input material | not Evidence by itself |
+| Memory | Recall | not Register |
+
+### OpenWebUI — historical/refused integration vocabulary
+
+OpenWebUI is not a selected architecture component, target client or governance owner. The mappings below preserve the interpretation of terms found in historical integration material; they do not define current ownership or reinstate the product.
 
 | External term | Pantheon classification | Rule |
 |---|---|---|
@@ -494,7 +510,8 @@ Public-facing language may remain less technical, but must not create false auth
 ```text
 Pantheon governs Approaches, Competences, Assertions, Evidence, Gates, Approvals and Registers.
 Runtimes execute Workflows, Skills, Tools, Jobs and Actions.
-Surfaces expose Pages, Functions, Filters, Views and Cockpits.
+Optional runtime clients expose runtime interaction.
+Pantheon Cockpit projects governed Cards, status, Evidence gaps and decisions.
 Connectors produce Records and Recall.
 Memory systems produce Recall, not Register.
 Observability produces Trace, not Evidence.
@@ -508,7 +525,8 @@ French:
 ```text
 Pantheon gouverne les Démarches, Compétences, Assertions, Preuves, Seuils, Approbations et Registres.
 Les runtimes exécutent les Workflows, Skills, Outils, Jobs et Actions.
-Les surfaces exposent Pages, Fonctions, Filtres, Vues et Cockpits.
+Les clients runtime optionnels exposent l'interaction avec le runtime.
+Le Pantheon Cockpit projette les Cards, statuts, lacunes de preuve et décisions gouvernés.
 Les connecteurs produisent des Enregistrements et du Rappel.
 Les systèmes de mémoire produisent du Rappel, pas du Registre.
 L'observabilité produit des Traces, pas des Preuves.

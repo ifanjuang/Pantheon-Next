@@ -11,8 +11,6 @@ OBSOLETE = GOV / "authority" / "OBSOLETE_AND_ABSENT_INDEX.md"
 KNOWN_CURRENT_AUTHORITY_OPENWEBUI_RESIDUES = {
     "docs/governance/ADAPTERS_AND_BINDINGS.md",
     "docs/governance/ADAPTIVE_REQUEST_METHOD.md",
-    "docs/governance/AUTHORITY_INDEX.md",
-    "docs/governance/BOUNDARY_STANDARD.md",
     "docs/governance/BRIDGE_CONTRACT.md",
     "docs/governance/CODE_AUDIT_POST_PIVOT.md",
     "docs/governance/DISCORDIA.md",
@@ -37,7 +35,6 @@ KNOWN_CURRENT_AUTHORITY_OPENWEBUI_RESIDUES = {
     "docs/governance/SKILL_WATCHLIST.md",
     "docs/governance/SOURCE_NEED_AND_REGISTRY.md",
     "docs/governance/TENSIONS_AND_RISKS.md",
-    "docs/governance/TERMINOLOGY_BOUNDARIES.md",
     "docs/governance/UNIFORM_CAPABILITY_GOVERNANCE.md",
     "docs/governance/WORKFLOW_FORGING_PROTOCOL.md",
     "docs/governance/evidence_topology_antipatterns/README.md",
