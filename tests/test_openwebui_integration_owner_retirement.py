@@ -8,10 +8,7 @@ OBSOLETE = GOV / "authority" / "OBSOLETE_AND_ABSENT_INDEX.md"
 # Follow-up debt owner: #785. This exact set is intentionally machine-tracked so
 # no new current-authority OpenWebUI ownership residue can appear silently while
 # owner-coherent follow-up slices reduce the set to zero.
-KNOWN_CURRENT_AUTHORITY_OPENWEBUI_RESIDUES = {
-    "docs/governance/GOVERNED_AUTONOMY_GRADIENT.md",
-    "docs/governance/GOVERNED_METHOD_STANDARD.md",
-}
+KNOWN_CURRENT_AUTHORITY_OPENWEBUI_RESIDUES = set()
 
 
 def _read(path: Path) -> str:
