@@ -12,11 +12,7 @@ It does not approve external skills.
 
 It does not define a runtime, installer, scheduler, queue, MCP layer, plugin manager, automatic skill loader, automatic memory system or self-update mechanism.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: compatible runtime clients are optional interaction surfaces, Hermes/the external runtime executes admitted work, Pantheon Cockpit projects governed state, and Pantheon retains governance authority. A watched skill, catalogue or marketplace does not gain authority from being visible in any client.
 
 ## Purpose
 
