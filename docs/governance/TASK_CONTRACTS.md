@@ -13,8 +13,9 @@ A Task Contract is not a scheduler object.
 Execution happens outside Pantheon Next.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional Hermes WebUI or other compatible clients may expose runtime interaction.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed contract, review and decision state.
 Pantheon Next governs.
 ```
 
@@ -35,7 +36,7 @@ Pantheon Next defines what is legitimate.
 
 Hermes Agent decides how to execute within its own runtime, under the contract boundary.
 
-OpenWebUI may expose the contract, approval request, result and Evidence Pack to the user.
+Pantheon Cockpit may project the governed contract, approval request, result status and Evidence Pack state. `nesquena/hermes-webui`, when selected, or another compatible runtime client may expose the runtime interaction around that work, but client display does not become governance authority.
 
 ## Core principle
 
@@ -360,23 +361,20 @@ Hermes runtime behavior remains external.
 
 Pantheon governs the contract boundary only.
 
-## Relationship to OpenWebUI
+## Relationship to runtime clients and Cockpit
 
-OpenWebUI may expose:
+`nesquena/hermes-webui`, if selected, or another compatible runtime client may expose runtime interaction, technical status and candidate outputs.
 
-- approvals;
-- evidence;
-- reviews;
-- contracts;
-- recommended rites;
-- rite status labels;
-- Register Candidates.
+Pantheon Cockpit may project governed Task Contract state, approvals, evidence, reviews, recommended rites, rite status labels and Register Candidates.
 
-OpenWebUI does not trigger rites automatically.
+Neither runtime-client display nor Cockpit projection triggers rites automatically, canonizes governance automatically or becomes the source of truth.
 
-OpenWebUI does not canonize governance automatically.
-
-OpenWebUI does not become the source of truth.
+```text
+Hermes WebUI available != Hermes WebUI selected
+runtime display != approval
+projection != persistence
+optional client selected != authority transfer
+```
 
 ## Relationship to schemas
 
