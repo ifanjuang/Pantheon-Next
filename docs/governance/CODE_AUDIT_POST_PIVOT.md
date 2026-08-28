@@ -12,11 +12,7 @@ It is not an implementation plan.
 
 It does not reactivate legacy code.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: optional compatible runtime clients expose runtime interaction only, Hermes/the external runtime executes admitted work, Pantheon Cockpit projects governed audit state, and historical product references do not restore current ownership.
 
 ## Purpose
 
@@ -179,8 +175,8 @@ Forbidden current forms:
 - internal agent runtime;
 - automatic memory promotion;
 - automatic approval;
-- OpenWebUI plugin implementation;
-- Hermes bridge implementation;
+- runtime-client plugin implementation inside Pantheon;
+- Hermes bridge implementation inside Pantheon;
 - Docker runtime stack.
 
 ## Reclassification patterns
@@ -197,7 +193,7 @@ Forbidden current forms:
 | Patch auto-apply | Patch Candidate plus Evidence Pack plus approval. |
 | Memory consolidation job | Register Candidate plus C3+ promotion review. |
 | Plugin manager | External tool policy, allowlist/blocklist and review discipline. |
-| Dashboard runtime | OpenWebUI exposure or read-only governance display. |
+| Dashboard runtime | compatible runtime-client interaction or Pantheon Cockpit governed projection, depending the state being shown |
 | Runtime traces | Evidence Pack summary or Run Trace View. |
 | RAG engine | Knowledge retrieval capability, not memory or evidence by default. |
 | Ingestion job | Governed source preparation candidate, not automatic evidence or memory. |
@@ -229,7 +225,8 @@ schema-only
 read-only-tooling
 external-runtime-candidate
 Hermes-side candidate
-OpenWebUI-side candidate
+runtime-client-side candidate
+Pantheon-Cockpit-projection candidate
 blocked
 archive-only
 ```
@@ -298,7 +295,7 @@ When evaluating material inherited from the historical predecessor:
 2. Identify runtime-oriented claims.
 3. Convert useful content into governance language.
 4. Remove or invert obsolete runtime behavior.
-5. Preserve the OpenWebUI / Hermes / Pantheon boundary.
+5. Preserve the runtime-client / Pantheon Cockpit / Hermes / Pantheon authority boundaries.
 6. Record the transformation in an ai_log.
 7. Update status and migration mapping.
 8. Do not touch protected implementation areas without confirmation.
