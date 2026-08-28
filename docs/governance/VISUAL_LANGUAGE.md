@@ -11,9 +11,11 @@ It does not define implementation.
 It does not introduce a runtime.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional runtime clients may expose interaction.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed Cards, decisions and status.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
 ## Central image
