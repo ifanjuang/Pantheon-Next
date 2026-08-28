@@ -17,9 +17,11 @@ It does not add orchestration.
 It does not add a scheduler, queue, LangGraph runtime, hidden workflow runner, automatic approval system, automatic memory system or autonomous decision loop.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional runtime clients may expose interaction.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed decision gates, status and Evidence gaps.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
 ## Core rule
@@ -358,19 +360,27 @@ A user may authorize a Register Candidate review.
 
 The user decision does not automatically create a Registre Probatoire entry.
 
-## Relationship to approvals
+## Relationship to approvals and projection
 
 A User Decision Gate may lead to an approval request.
 
 It does not itself grant approval.
 
-OpenWebUI may expose the gate.
+An optional runtime client may expose technical interaction around the gate.
+
+Pantheon Cockpit may project the governed gate, disagreement, approval state and linked decision.
 
 Hermes may report the conflict.
 
 Pantheon governs the status.
 
 The human makes the decision when required.
+
+```text
+Hermes WebUI available != Hermes WebUI selected
+client display != approval
+projection != persistence
+```
 
 ## Anti-patterns
 
