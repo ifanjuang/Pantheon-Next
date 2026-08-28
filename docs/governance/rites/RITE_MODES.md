@@ -13,9 +13,11 @@ It does not create a runtime.
 It does not create automatic classification, scheduling, queueing, approval or memory promotion.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional runtime clients may expose interaction.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed rite, review and decision state.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
 ## Purpose
@@ -46,7 +48,7 @@ mode_full
 
 These are review intensity labels.
 
-They are not runtime modes, task runners or OpenWebUI pipeline states.
+They are not runtime modes, task runners or client pipeline states.
 
 ## Mode light
 
