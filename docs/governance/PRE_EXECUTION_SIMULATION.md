@@ -10,11 +10,7 @@ It does not add an agent.
 
 It does not add a simulator, evaluator, scheduler, queue, provider router, observability backend, MCP layer, A2A layer, hidden workflow runner, automatic approval system, automatic memory system or self-improvement loop.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: optional compatible runtime clients may expose runtime interaction, Hermes/the external runtime may execute admitted simulations, Pantheon Cockpit projects governed simulation status and decision state, and no runtime or client success transfers Pantheon authority.
 
 ## Purpose
 
@@ -197,30 +193,42 @@ broaden scope silently
 
 Hermes completion does not mean Pantheon approval.
 
-## OpenWebUI boundary
+## Runtime-client / Cockpit boundary
 
-OpenWebUI may expose:
+A compatible runtime client may expose runtime-interaction state such as:
 
 ```text
 simulation requested
-simulation not required
 simulation running externally
 simulation completed
 simulation failed
 simulation inconclusive
+runtime execution blocked by scope or policy
+```
+
+Pantheon Cockpit may project governed simulation state such as:
+
+```text
+simulation not required
 simulation risk detected
 simulation blocked by scope
 simulation blocked by approval
 User Decision Gate required
 ```
 
-OpenWebUI may display a simulation summary, scenario list, risk note, limitation, Evidence Pack Candidate reference and user decision options.
+The Cockpit may project a simulation summary, scenario list, risk note, limitation, Evidence Pack Candidate reference and governed decision options.
 
-OpenWebUI must not display simulation pass as approval.
+A runtime client or Cockpit projection must not present a simulation pass as approval.
 
-OpenWebUI must not run simulation by UI state alone.
+A runtime client must not run a consequential simulation merely because its UI state permits it; execution remains subject to Task Contract and the runtime/PEP boundary.
 
-OpenWebUI must not hide failed or inconclusive simulation results.
+Neither surface may hide failed or inconclusive simulation results when they are material to governed review.
+
+```text
+runtime interaction != governed projection
+projection != approval
+runtime approval UI != Pantheon human approval
+```
 
 ## Evidence Pack impact
 
@@ -484,7 +492,8 @@ If simulation failure mutates prompts, skills, memory, doctrine or workflows aut
 Simulation tests the candidate.
 Evidence frames the result.
 ZEUS arbitrates status and procedure.
-OpenWebUI exposes the decision surface.
+Pantheon Cockpit projects the governed decision state.
+A compatible runtime client may expose runtime interaction without owning the decision.
 The human decides when risk remains material.
 Only the validated remains.
 ```
