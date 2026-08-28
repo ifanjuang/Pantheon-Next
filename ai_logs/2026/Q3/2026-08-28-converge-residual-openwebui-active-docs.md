@@ -26,19 +26,42 @@ Demonstrated active drift:
 - `docs/governance/EVIDENCE_PACK.md` assigned Evidence Pack exposure/review to OpenWebUI;
 - `docs/intro-professionnelle.md` still publicly described an OpenWebUI cockpit as the visible Pantheon surface.
 
+## Hermes WebUI clarification
+
+During the slice, `nesquena/hermes-webui` was explicitly identified as an available Hermes web/mobile surface that should remain proposed/optional rather than mandatory.
+
+Upstream revalidation on 2026-08-28 observed:
+
+- public repository `nesquena/hermes-webui`;
+- MIT licence;
+- active upstream development;
+- near-CLI web/mobile interaction positioning;
+- chat runs Hermes Agent in-process by default, with an optional Gateway-backed chat mode documented separately.
+
+Therefore Hermes WebUI must not be collapsed into a generic mandatory `Hermes Web/dashboard` owner. If selected, it is a replaceable external runtime/client surface requiring its own deployment/security qualification.
+
+```text
+Hermes WebUI available != Hermes WebUI selected
+Hermes WebUI selected != Pantheon authority transferred
+Hermes WebUI runtime approval card != Pantheon human approval
+web interaction success != Evidence
+```
+
 ## Convergence
 
 Current split used consistently:
 
 ```text
-Hermes Web/dashboard + compatible clients = runtime interaction
-Hermes Agent                              = external execution
-Pantheon Cockpit                          = governed projections / Cards / decisions / status
-Pantheon Next                             = governance / authority
-human                                     = consequential decision
+Hermes WebUI (optional/proposed) or compatible clients = possible runtime interaction
+Hermes Agent                                         = external execution
+Pantheon Cockpit                                     = governed projections / Cards / decisions / status
+Pantheon Next                                        = governance / authority
+human                                                = consequential decision
 ```
 
 No capability is removed. Approval, Run Trace View, Evidence Pack, deterministic HTTP policy exposure and public professional explanation remain in their existing owners.
+
+`docs/governance/AGENT_PLUGINS_INTEROPERABILITY.md` is also corrected in this slice so its prior merged `Hermes Web/dashboard` wording does not accidentally make Hermes WebUI mandatory.
 
 ## Preserved invariants
 
@@ -48,17 +71,18 @@ runtime output != Evidence
 Evidence Pack Candidate != admitted Evidence
 projection != persistence
 projection != approval
-client selected != authority transfer
+optional client selected != authority transfer
 runtime success != Evidence
 ```
 
 ## Test
 
-`tests/test_openwebui_integration_owner_retirement.py` now protects these five active surfaces from regaining an OpenWebUI dependency while continuing to allow historical provenance elsewhere.
+`tests/test_openwebui_integration_owner_retirement.py` protects the corrected active surfaces from regaining an OpenWebUI dependency and now also protects the explicit optional Hermes WebUI posture, while continuing to allow historical provenance elsewhere.
 
 ## Finish criteria
 
-- no `OpenWebUI` occurrence in the five corrected active surfaces;
+- no `OpenWebUI` occurrence in the corrected active surfaces;
+- Hermes WebUI is described as optional/proposed, not required;
 - no new client/runtime/owner introduced;
 - Governance CI, Architecture Audit and Obsolete Authority green on exact PR head;
 - no unresolved review finding.
