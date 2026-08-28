@@ -2,15 +2,11 @@
 
 Status: active support doctrine — prompt placement, authority separation and non-runtime prompt architecture.
 
-This document defines where prompts, system prompts, profile prompts, skill prompts and flow prompts may live across Pantheon Next, OpenWebUI, Hermes Agent, Langflow, LangGraph and observability layers.
+This document defines where prompts, system prompts, profile prompts, skill prompts and flow prompts may live across Pantheon Next, Pantheon Cockpit, optional compatible runtime clients, Hermes Agent, Langflow, LangGraph and observability layers.
 
-It does not implement prompt injection, prompt routing, prompt registry, prompt versioning backend, provider routing, OpenWebUI Function, Hermes skill installation, Langflow flow, LangGraph runtime or Langfuse prompt management.
+It does not implement prompt injection, prompt routing, prompt registry, prompt versioning backend, provider routing, runtime-client Functions, Hermes skill installation, Langflow flow, LangGraph runtime or Langfuse prompt management.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: optional compatible runtime clients carry runtime interaction only, Hermes/the external runtime executes admitted work, Pantheon Cockpit projects governed state, and no prompt surface gains Pantheon authority by placement alone.
 
 ## Core rule
 
@@ -32,7 +28,8 @@ Found source is not proof.
 ```
 
 - in Pantheon doctrine, it is a canonical governance rule;
-- in OpenWebUI, it is a display and warning instruction;
+- in Pantheon Cockpit, it is a governed projection and warning instruction;
+- in an optional runtime client, it is a runtime-interaction warning only;
 - in Hermes, it is an execution constraint;
 - in Langflow, it is a bounded transformation constraint;
 - in Langfuse, it is trace metadata only.
@@ -51,23 +48,29 @@ They are not runtime prompts by default.
 
 They must not become agent runtime prompts, provider router prompts, auto-orchestration prompts, hidden workflow prompts, auto-approval prompts or auto-memory prompts.
 
-### OpenWebUI cockpit prompt
+### Pantheon Cockpit projection instruction
 
-OpenWebUI prompts should be short, user-facing and status-oriented.
+Pantheon Cockpit instructions should be short, status-oriented and limited to governed projection.
 
-They may instruct the cockpit to:
+They may instruct the Cockpit to:
 
 ```text
 display candidate status
 distinguish draft from deliverable
 distinguish retrieved knowledge from evidence
 distinguish Register Candidate from Registre Probatoire entry
-ask for approval before external effect
-open User Decision Gate when required
+project approval requirements before external effect
+open or project a User Decision Gate when required
 avoid presenting candidates as validated
 ```
 
-They must not decide approval, canonize memory, route providers, run tools freely, mutate a repository, execute the Governance College, silently rewrite user intent or become a source of truth.
+They must not execute tools, decide approval, canonize memory, route providers, mutate a repository or silently rewrite user intent. Projection is not approval and projection is not persistence.
+
+### Optional runtime-client prompt
+
+A compatible runtime client may carry short runtime-interaction instructions for runtime status, input capture and presentation of external execution results.
+
+It may not become the governance source of truth, the approval owner or the Registre Probatoire. A runtime-client approval control remains distinct from Pantheon human approval.
 
 ### Hermes profile prompt / soul
 
@@ -144,7 +147,8 @@ Graph retrieval becomes evidence only when selected and represented in an Eviden
 
 ```text
 Pantheon doctrine
--> OpenWebUI cockpit instruction
+-> Pantheon Cockpit projection instruction
+-> optional runtime-client interaction instruction when needed
 -> Hermes profile constraint
 -> Hermes skill instruction
 -> Langflow transformation prompt
@@ -181,7 +185,8 @@ They are not runtime configuration.
 | Prompt type | Where it belongs | Authority | Must not do |
 |---|---|---|---|
 | Doctrine prompt | Pantheon docs | Canonical governance | execute |
-| Cockpit prompt | OpenWebUI template | Display / decision capture | approve or execute |
+| Cockpit projection instruction | Pantheon Cockpit | Governed projection / decision visibility | approve, persist or execute |
+| Runtime-client prompt | compatible runtime client | Runtime interaction only | govern or capture authoritative approval |
 | Profile soul | Hermes profile | Candidate execution style | govern |
 | Skill prompt | Hermes skill candidate | Narrow execution constraint | canonize |
 | Flow prompt | Langflow candidate | Deterministic preparation | decide |
@@ -195,7 +200,8 @@ Reject:
 
 ```text
 single global Pantheon mega-prompt
-OpenWebUI system prompt as governance source of truth
+runtime-client system prompt as governance source of truth
+Cockpit projection instruction treated as approval authority
 Hermes soul redefining Pantheon Role authority
 skill prompt approving its own output
 Langflow prompt performing final judgment
@@ -212,10 +218,16 @@ Canonical Pantheon doctrine:
 Retrieved knowledge is not evidence.
 ```
 
-OpenWebUI cockpit distillation:
+Pantheon Cockpit distillation:
 
 ```text
 Show retrieved material as retrieved until it is selected into an Evidence Pack.
+```
+
+Optional runtime-client distillation, if the client displays the runtime result:
+
+```text
+Mark retrieved runtime material as candidate; do not present it as approved Evidence.
 ```
 
 Hermes Argos distillation:
