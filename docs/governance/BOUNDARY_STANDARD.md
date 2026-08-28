@@ -3,9 +3,13 @@
 Status: active support doctrine — the single reference for the standard non-implementation boundary. Consolidation support; it changes no rule.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Optional compatible runtime client       -> runtime interaction
+Hermes Agent                             -> external execution runtime
+Runtime adapter / Hermes                 -> PEP for consequential effects
+Pantheon Cockpit                         -> governed Cards, status, Evidence gaps and decisions
+Pantheon policy service                  -> bounded deterministic PDP interface
+Pantheon Next                            -> governance, authority and PDP semantics
+Human                                    -> consequential decision when required
 ```
 
 ## Purpose
