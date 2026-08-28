@@ -8,13 +8,7 @@ This document defines how a professional Workflow Candidate may be generated on 
 
 It does not implement a workflow engine, scheduler, queue, bridge, connector, approval engine, memory engine, Registre Probatoire storage, Hermes skill or OpenWebUI plugin.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-The Registre Probatoire proves.
-The human decides.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: compatible runtime clients are optional interaction surfaces, Hermes/the external runtime executes admitted work, and neither client selection nor runtime execution transfers Pantheon authority. Registre admission and consequential human decision remain separately governed.
 
 ## Terminology note
 
