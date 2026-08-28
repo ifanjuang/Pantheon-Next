@@ -12,11 +12,7 @@ It does not create an enforcement engine.
 
 It does not authorize automatic blocking, scheduling, routing, tool execution or memory mutation.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: compatible runtime clients may expose runtime interaction only, Hermes/the external runtime executes admitted work, Pantheon Cockpit projects governed state, and rejected-product examples do not become current architecture owners.
 
 ## Purpose
 
@@ -51,7 +47,7 @@ review_notes
 rejected
 rejected_as_pantheon_core
 hermes_only_possible_under_contract
-openwebui_exposure_only_possible
+runtime_client_exposure_only_possible
 method_review_required
 archived
 superseded
@@ -84,7 +80,7 @@ superseded
 | Graph as truth | GraphRAG and knowledge graph systems | extracted relationships are generated and scoped | graph as retrieved context or Evidence Candidate |
 | Generated graph as architecture truth | Understand-Anything, GraphRAG, repository maps | visual clarity can be mistaken for validated architecture | structural graph as candidate evidence with Task Contract and Evidence Pack review |
 | Graph as a Registre Probatoire entry | graph memory systems | breaks approval and scope requirements | Register Candidate from graph only with review |
-| OpenWebUI as source of truth | cockpit and KB surfaces | display and upload do not canonize | OpenWebUI exposes governed artifacts |
+| OpenWebUI as source of truth | cockpit and KB surfaces | display and upload do not canonize | Pantheon Cockpit projects governed artifacts; compatible clients expose runtime interaction only |
 | OpenWebUI global knowledge bridge | direct KB/vector access | grants Hermes unbounded data access | scoped Context Pack or read-only governed gateway |
 | Hermes free browsing of OpenWebUI storage | integration shortcuts | bypasses Task Contract scope | authorized knowledge IDs and selected excerpts |
 | Automatic external action | email, calendar, publishing, deployment agents | creates third-party effect without approval | draft first, approval before send/write |
