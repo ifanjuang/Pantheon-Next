@@ -22,8 +22,6 @@ KNOWN_CURRENT_AUTHORITY_OPENWEBUI_RESIDUES = {
     "docs/governance/HERMES_INTEGRATION_MODELS_RECONCILIATION.md",
     "docs/governance/MODULAR_DOMAIN_REORIENTATION.md",
     "docs/governance/MODULE_ACTIVATION.md",
-    "docs/governance/PRE_EXECUTION_SIMULATION.md",
-    "docs/governance/PROMPT_PLACEMENT.md",
     "docs/governance/REFERENCE_BOUNDARIES.md",
     "docs/governance/REJECTED_PATTERNS.md",
     "docs/governance/ROADMAP.md",
