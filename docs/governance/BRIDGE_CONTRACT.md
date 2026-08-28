@@ -29,9 +29,9 @@ The bridge may adapt and convey a contract or policy decision.
 The bridge must not become a runtime, PDP or PEP.
 ```
 
-A bridge may perform fail-closed structural preflight such as checking that required references are present before consulting policy.
+A bridge may perform non-authorizing structural preflight such as checking that required request fields and references are present before consulting policy. It may refuse to forward a malformed or structurally incomplete adapter request.
 
-Only the Pantheon policy service may issue the bounded PDP disposition for a consequential effect. The bridge may narrow or block locally, but it must never widen that disposition.
+Only the Pantheon policy service may issue the bounded PDP disposition for a consequential effect. The bridge may report that disposition unchanged and must never widen it. If policy is unavailable or invalid, the bridge reports that state; the external runtime/PEP remains responsible for fail-closed enforcement of the consequential effect.
 
 A bridge must not decide truth, grant approval, promote memory, broaden scope or authorize external effect by itself.
 
@@ -42,9 +42,10 @@ A future bridge may:
 ```text
 receive a bounded execution request from an authorized caller or optional runtime client
 verify required request fields and governance references are present
+refuse to forward a malformed or structurally incomplete adapter request
 prepare a deterministic Pantheon policy-service request
+report policy unavailable or invalid without converting that state into allow
 convey the Pantheon PDP disposition without widening it
-block locally when required policy is unavailable or structurally invalid
 select an executor class only within the returned policy constraints
 prepare a bounded Hermes request
 prepare a bounded Langflow request when explicitly allowed
@@ -58,7 +59,7 @@ surface User Decision Gate need
 
 These are boundary checks and adapter operations.
 
-They are not autonomous execution or independent authorization.
+They are not autonomous execution, policy decision or consequential-effect enforcement.
 
 ## Forbidden bridge responsibilities
 
@@ -67,6 +68,7 @@ A bridge must not:
 ```text
 act as a second Policy Decision Point
 widen a Pantheon policy disposition
+claim fail-closed enforcement of the consequential effect
 execute agent loops
 run tools directly
 perform the consequential effect as Policy Enforcement Point
@@ -86,6 +88,8 @@ resolve role disagreement silently
 ```
 
 If the bridge independently decides that an effect may proceed, a competing PDP has been created.
+
+If the bridge claims responsibility for enforcing the consequential effect, a competing PEP has been created.
 
 If the bridge owns durable execution state, governance drift has occurred.
 
@@ -145,7 +149,7 @@ capability_gap
 risk_escalation
 user_decision_gate_needed
 trace_reference
-blocked_status
+adapter_status
 outcome_observation_candidate
 ```
 
@@ -159,16 +163,11 @@ Recommended bridge-facing statuses:
 
 ```text
 policy_check_required
-blocked_policy_unavailable
-blocked_missing_task_contract
-blocked_missing_context_pack
-blocked_scope_unclear
-blocked_approval_ceiling_unclear
-blocked_memory_rule_missing
-blocked_executor_not_authorized
-blocked_external_effect
-blocked_evidence_requirement_missing
-eligible_for_external_execution
+policy_unavailable
+policy_invalid
+request_not_forwarded_structural_invalid
+pdp_disposition_received
+eligible_for_executor_handoff
 eligible_with_gate
 returned_candidate
 returned_with_risk
@@ -176,9 +175,9 @@ returned_capability_gap
 human_decision_required
 ```
 
-These statuses report policy or adapter state.
+These statuses report adapter or policy-observation state.
 
-They are not execution commands and they do not replace the canonical PDP disposition vocabulary.
+They are not execution commands, they do not replace the canonical PDP disposition vocabulary, and they do not claim PEP enforcement. Detailed deny, revision, evidence or gate reasons should be conveyed from the Pantheon policy result rather than reinvented by the bridge.
 
 ## Runtime-client relationship
 
@@ -188,7 +187,7 @@ The client may expose:
 
 ```text
 request candidate execution
-show blocked reason
+show policy or adapter reason
 show runtime status label
 show returned candidate references
 show Capability Gap
@@ -200,7 +199,7 @@ Governed Evidence gaps, approval state and User Decision Gates belong to Pantheo
 
 ## Pantheon Cockpit relationship
 
-Pantheon Cockpit may project governed Cards, blocked reasons, Evidence gaps, policy/gate state and human decision surfaces derived from governed artifacts.
+Pantheon Cockpit may project governed Cards, policy/gate reasons, Evidence gaps, policy/gate state and human decision surfaces derived from governed artifacts.
 
 Cockpit projection does not execute the bridge, persist authority by itself or replace the Pantheon policy decision.
 
@@ -208,7 +207,7 @@ Cockpit projection does not execute the bridge, persist authority by itself or r
 
 Hermes/the external runtime may receive bounded requests after the applicable Pantheon policy disposition permits the execution opportunity or required gate path.
 
-The runtime/PEP is responsible for enforcing consequential-effect policy and performing the effect only when allowed.
+The runtime/PEP is responsible for fail-closed behavior when required policy is unavailable or invalid, enforcing consequential-effect policy, and performing the effect only when allowed.
 
 Hermes may return candidates, evidence notes, patch candidates, memory candidates, gaps, risks and truthful technical outcome observations.
 
@@ -244,8 +243,8 @@ Graph output remains Retrieved Knowledge or candidate evidence until selected in
 
 ```text
 Pantheon policy service decides the bounded policy disposition as PDP.
-The bridge adapts and conveys without widening authority.
-Hermes or another admitted external runtime enforces and executes as PEP.
+The bridge adapts, reports and conveys without widening authority.
+Hermes or another admitted external runtime fail-closes, enforces and executes as PEP.
 Optional runtime clients expose interaction only.
 Pantheon Cockpit projects governed state.
 The human decides consequential effects when required.
