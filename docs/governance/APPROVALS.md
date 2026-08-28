@@ -13,7 +13,7 @@ Approval is not automation.
 Approval is not a runtime callback.
 
 ```text
-Hermes Web/dashboard and compatible clients expose runtime interaction.
+Optional Hermes WebUI or other compatible clients may expose runtime interaction.
 Hermes Agent executes external admitted work.
 Pantheon Cockpit projects governed approval state and decision surfaces.
 Pantheon Next governs.
@@ -77,7 +77,7 @@ Memory promotion remains a distinct governance act.
 
 Pantheon Cockpit may project approval information and decision state.
 
-Hermes Web/dashboard or another compatible runtime client may expose interaction around the task, but client display does not grant approval or transfer authority.
+`nesquena/hermes-webui`, when selected, or another compatible runtime client may expose interaction around the task, but client display does not grant approval or transfer authority. Hermes WebUI is optional/proposed, not required by Pantheon.
 
 Hermes Agent may report technical status relevant to an approval review.
 
