@@ -5,11 +5,15 @@ Status: implementation candidate — implemented read-only / partial / internal-
 This document defines the HTTP projection of the transport-neutral Pantheon policy service.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes and enforces.
+Optional Hermes WebUI or other compatible clients may expose runtime interaction.
+Hermes Agent executes external admitted work.
+The runtime Policy Enforcement Point enforces consequential preflight outcomes.
 Pantheon Next governs.
+Pantheon Cockpit may project governed state and decision surfaces.
 The human decides consequential effects.
 ```
+
+`nesquena/hermes-webui`, when selected, remains an optional/proposed runtime interaction surface. Its own runtime approval UI or technical success does not replace the Pantheon human-decision boundary.
 
 The API is a Policy Decision Point projection. It returns policy, validation and candidate data. It is not an execution runtime, Policy Enforcement Point, approval engine, evidence store, memory engine, scheduler, queue, provider router, installer, updater, MCP host or connector gateway.
 
@@ -338,7 +342,7 @@ Returns HTTP `501 contract_not_defined`. `snapshot` is intentionally not treated
 
 ## Failure posture in Hermes
 
-The API itself returns policy data. Hermes remains the Policy Enforcement Point.
+The API itself returns policy data. The external runtime Policy Enforcement Point remains responsible for blocking or allowing the consequential effect. In the selected Hermes execution path, Hermes-side runtime logic may implement that PEP responsibility; this does not make Hermes governance authority.
 
 Recommended adapter behavior:
 
@@ -441,9 +445,11 @@ A breaking payload-contract change requires its own reviewed contract migration;
 
 ```text
 MCP helps the agent understand and prepare.
-HTTP lets the runtime enforce a deterministic preflight.
-Hermes performs the work outside Pantheon.
-OpenWebUI exposes the state and decision surface.
+HTTP exposes a deterministic PDP/preflight projection.
+The external runtime PEP enforces consequential-effect eligibility.
+Hermes performs admitted work outside Pantheon.
+Optional Hermes WebUI or another compatible client may expose runtime interaction.
+Pantheon Cockpit may project governed state and decision surfaces.
 The human decides consequential effects.
-Neither transport becomes authority, evidence or runtime.
+Neither transport nor client becomes authority, Evidence or runtime truth.
 ```
