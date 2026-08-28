@@ -72,7 +72,7 @@ ZEUS_status: rite_completed_with_reserve
 role_viewpoints_involved: ATHENA, APOLLO, THEMIS, IRIS, ZEUS
 inputs_considered: Pantheon Cockpit boundary, optional runtime-client boundary, rites doctrine, invocation policy, anti-patterns
 outputs_retained: project rite review only as governance status, not runtime state
-option_clusters: hidden-only, visible-status, Evidence-Pack-only, User-Decision-Gate-only
+option_clusters: hidden-only, visible-status, Evidence-Pack-only, User-Decision-Gate-only, runtime-client-mirror
 traps_detected: `rite_active` may imply a process is running; `rite_completed` may imply approval
 blocked_claims: a runtime client or Cockpit projection can execute or complete a rite by UI state
 User_Decision_Gate: not required if wording is changed to non-runtime labels
