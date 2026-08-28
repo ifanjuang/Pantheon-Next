@@ -12,11 +12,7 @@ It does not add implementation.
 
 It does not replace governance doctrine.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+When technical placement must be explained, inherit it from `HERMES_INTEGRATION.md`: compatible runtime clients are optional interaction surfaces, Hermes/the external runtime executes admitted work, Pantheon Cockpit projects governed state, and Pantheon retains governance authority. Public-facing copy should not turn a client or UI into the governance owner.
 
 ## Core editorial problem
 

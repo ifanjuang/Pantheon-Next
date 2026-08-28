@@ -11,7 +11,6 @@ OBSOLETE = GOV / "authority" / "OBSOLETE_AND_ABSENT_INDEX.md"
 KNOWN_CURRENT_AUTHORITY_OPENWEBUI_RESIDUES = {
     "docs/governance/ADAPTERS_AND_BINDINGS.md",
     "docs/governance/BRIDGE_CONTRACT.md",
-    "docs/governance/EDITORIAL_LANGUAGE.md",
     "docs/governance/EXTERNAL_TOOL_PLACEMENT_REGISTER.md",
     "docs/governance/GOVERNED_AUTONOMY_GRADIENT.md",
     "docs/governance/GOVERNED_METHOD_STANDARD.md",
