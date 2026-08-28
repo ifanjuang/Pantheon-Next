@@ -37,7 +37,7 @@ The files are edited together because they explicitly reference one another and 
 
 ## Convergence
 
-The binding registry now records no selected runtime client, Hermes Agent as selected external execution runtime, and Pantheon Cockpit as the governed projection owner. Module activation separates runtime administration from governed Cockpit projection and makes activation/task authorization subordinate to applicable Pantheon policy. Adapter doctrine treats runtime clients as optional and replaceable. The bridge is explicitly neither PDP nor PEP: it may structurally preflight, consult/convey Pantheon policy, block or narrow locally, and must never widen a PDP disposition.
+The binding registry now records no selected runtime client, Hermes Agent as selected external execution runtime, and Pantheon Cockpit as the governed projection owner. Module activation separates runtime administration from governed Cockpit projection and makes activation/task authorization subordinate to applicable Pantheon policy. Adapter doctrine treats runtime clients as optional and replaceable. The bridge is explicitly neither PDP nor PEP: it may structurally validate and refuse to forward malformed adapter requests, consult and convey Pantheon policy without widening it, and report unavailable or invalid policy. Fail-closed enforcement of any consequential effect remains exclusively the external runtime/PEP responsibility.
 
 ## Migration and rollback
 
@@ -53,7 +53,7 @@ These labels describe review context only and create no runtime state.
 
 ## Authority impact
 
-No authority transfer. Pantheon policy remains the bounded PDP; Hermes/the external runtime remains PEP/executor for consequential effects; optional runtime clients expose interaction only; Pantheon Cockpit projects governed state; a bridge or activation record cannot independently authorize or execute an effect.
+No authority transfer. Pantheon policy remains the bounded PDP; Hermes/the external runtime remains the fail-closed PEP/executor for consequential effects; optional runtime clients expose interaction only; Pantheon Cockpit projects governed state; a bridge or activation record cannot independently authorize or enforce a consequential effect.
 
 ## Runtime impact
 
@@ -70,6 +70,7 @@ module detected != module enabled
 module enabled != task/effect authorized
 PDP decision != PEP execution
 bridge adaptation != policy decision
+bridge report != PEP enforcement
 runtime success != Evidence
 ```
 
@@ -77,7 +78,11 @@ runtime success != Evidence
 
 Documentation and regression-only convergence. The existing canonical implementation contracts and schemas are not changed.
 
-The four documents were read from the exact merged base before editing. Compare statistics show bounded semantic reconciliation rather than truncation: adapters -3 lines net, module activation -6, bridge +20, modular reorientation +17. `.github/scripts/truncation_ack.txt` is unchanged.
+The four documents were read from the exact merged base before editing. Current compare statistics show bounded semantic reconciliation rather than truncation: adapters -3 lines net, module activation -6, bridge +19, modular reorientation +17. `.github/scripts/truncation_ack.txt` is unchanged.
+
+## Review correction
+
+The first exact-head validation was green, but a late review correctly identified that `BRIDGE_CONTRACT.md` still assigned policy-unavailable blocking to the bridge. That wording was corrected: the bridge now reports unavailable/invalid policy and may refuse malformed forwarding, while the external runtime/PEP owns fail-closed enforcement of consequential effects. All earlier checks are invalid for merge after this correction.
 
 ## Verification rule
 
