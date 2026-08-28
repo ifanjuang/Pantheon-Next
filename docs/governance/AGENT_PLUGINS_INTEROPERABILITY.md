@@ -1,9 +1,9 @@
 # Agent Plugins interoperability
 
-Status: candidate external-interoperability review — documented, not implemented, installed, activated or task-authorized.
+Status: candidate external-interoperability review — documented, not installed, activated, adopted or task-authorized.
 Boundary profile: external_reference_review.
-Reviewed specification: Agent Plugins 1.0.0 Working Draft.
-Reviewed Hermes target: Hermes Agent 0.20.0, as already recorded by `HERMES_RUNTIME_SURFACE_REVIEW.md`.
+Reviewed specification: Agent Plugins 1.0.0 — Published.
+External currentness revalidated: 2026-08-28.
 
 ## Purpose
 
@@ -12,30 +12,40 @@ This document classifies the Agent Plugins specification against Pantheon Next's
 It does not create a Pantheon plugin format, plugin manager, installer, runtime, registry, package resolver, MCP runtime, skill runtime or approval mechanism.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Hermes Web/dashboard and compatible clients expose runtime interaction.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed Cards, decisions, navigation and status.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
 The objective is convergence: reuse a portable external package format where it fits, while keeping Pantheon concepts authoritative and tool-agnostic.
 
 ## Reviewed upstream contract
 
-Upstream source reviewed on 2026-08-07:
+Current upstream state revalidated on 2026-08-28:
 
 ```text
 specification: https://agent-plugins.org/specification
 spec_version: 1.0.0
-status: Working Draft
+status: Published
 portable_manifest: plugin.json
 portable_component_types:
   - Agent Skills under skills/*/SKILL.md
   - MCP servers declared in mcp.json
 ```
 
-The normative specification defines a `Client` as the tool that discovers, installs, loads and executes plugin components. Agent Skills remain governed by the Agent Skills specification; Agent Plugins only defines their fixed discovery location. MCP wire behavior remains governed by MCP; Agent Plugins defines the portable `mcp.json` configuration that a client maps into its native configuration.
+The normative specification defines a `Client` as the tool that discovers, installs, loads and executes plugin components. Agent Skills remain governed by the Agent Skills specification; Agent Plugins defines their fixed discovery location. MCP wire behavior remains governed by MCP; Agent Plugins defines the portable `mcp.json` configuration that a client maps into its native configuration.
 
 This places the Agent Plugins client responsibility in the execution/runtime layer, not in Pantheon governance.
+
+The 1.0.0 format uses canonical versioned schemas. The portable root manifest is closed and client-specific metadata belongs under namespaced `extensions`. Published format status does not itself establish support in any selected runtime.
+
+```text
+specification published != client support
+client support != plugin adopted
+manifest valid != package trusted
+```
 
 ## Canonical placement
 
@@ -46,13 +56,17 @@ Agent Plugin package
 external portable packaging
         |
         v
-Hermes-side client / installer / translator candidate
+Hermes-side native support or external translator, only when required
         |
         v
 existing Pantheon capability and binding governance
         |
+        +--> Hermes Web/dashboard runtime interaction
+        |
+        +--> Pantheon Cockpit governed projection
+        |
         v
-OpenWebUI / Cockpit exposure and human decision
+human decision for consequential effects
 ```
 
 Pantheon must not become an Agent Plugins conformant runtime merely to govern packages that another runtime can consume.
@@ -60,12 +74,15 @@ Pantheon must not become an Agent Plugins conformant runtime merely to govern pa
 The existing responsibility split remains sufficient:
 
 ```text
-Agent Plugins -> describes and packages portable runtime components
-Hermes        -> discovers / installs / maps / loads / executes runtime components
-Pantheon      -> governs eligibility, scope, binding legitimacy, approval and Evidence status
-OpenWebUI     -> exposes state, warnings and decision surfaces
-human         -> decides consequential effects
+Agent Plugins    -> describes and packages portable runtime components
+Hermes Agent     -> executes admitted runtime components through supported surfaces
+Hermes clients   -> expose runtime interaction
+Pantheon         -> governs eligibility, scope, binding legitimacy, approval and Evidence status
+Pantheon Cockpit -> projects governed state and decisions
+human            -> decides consequential effects
 ```
+
+No client selection transfers authority to that client.
 
 ## Mapping to existing Pantheon concepts
 
@@ -88,12 +105,12 @@ The preferred convergence path is therefore:
 plugin.json / skills / mcp.json
         -> external observation
         -> candidate capability bindings
-        -> existing Capability Slot / passport / Task Contract machinery
+        -> existing Capability / binding / Task Contract machinery
         -> governed execution handoff
         -> Result Candidate / Evidence Pack Candidate
 ```
 
-No `PantheonPlugin`, `PantheonPluginManifest` or parallel plugin lifecycle is justified by the reviewed specification.
+No `PantheonPlugin`, `PantheonPluginManifest` or parallel plugin lifecycle is justified by the published specification.
 
 ## Required non-equivalences
 
@@ -109,6 +126,7 @@ runtime scan passed != safe for professional data
 runtime success != Evidence
 PLUGIN_DATA persisted != Pantheon memory
 client extension present != Pantheon authority
+provider selected != authority transfer
 ```
 
 These are applications of existing Pantheon invariants, not new kernel rules.
@@ -137,11 +155,11 @@ portable plugin metadata
 separate Pantheon-side observation / qualification / binding records
 ```
 
-A future Pantheon-specific Agent Plugins extension namespace is not required by the current need. It should be introduced only if a concrete client-side interoperability requirement cannot be represented through existing Pantheon records without duplicating authority into the package.
+A Pantheon-specific Agent Plugins extension namespace is not required by the current need. It should be introduced only if a concrete client-side interoperability requirement cannot be represented through existing Pantheon records without duplicating authority into the package.
 
 ## Security boundary
 
-Agent Plugins constrains package-relative paths to the plugin root, but the specification explicitly does not sandbox plugin subprocesses or runtime-supplied paths.
+Agent Plugins constrains package-relative paths to the plugin root, but package containment is not process isolation and portable metadata does not authorize external effects.
 
 For Pantheon this means:
 
@@ -151,15 +169,14 @@ valid stdio command != safe command
 valid remote MCP URL != approved external destination
 configured header != secret mechanism
 transport supported != transport authorized
+plugin installed != task authorized
 ```
 
-Agent Plugins v1 also does not define portable OAuth configuration or portable credential-reference fields. Credential discovery, storage and authorization remain client responsibilities.
-
-Therefore secrets, credentials, network exposure, subprocess sandboxing, installation integrity, update policy and rollback remain Hermes/deployment concerns governed by existing Pantheon eligibility and external-effect rules; they must not be absorbed into `plugin.json`.
+Credential discovery, storage, runtime sandboxing, installation integrity, update policy and rollback remain client/deployment concerns governed by existing Pantheon eligibility and external-effect rules; they must not be absorbed into `plugin.json`.
 
 ## Failure isolation
 
-The specification deliberately separates failure boundaries: an invalid skill can be skipped while other components continue; an invalid MCP server entry can be rejected without invalidating unrelated servers; an absent component location is not itself a plugin error.
+Agent Plugins separates component failure boundaries: one invalid or unavailable component must not silently turn unrelated components into accepted or rejected capability state.
 
 Pantheon should preserve that granularity rather than projecting a single coarse `plugin healthy` state.
 
@@ -177,27 +194,29 @@ capability_gaps
 
 A package-level health label must not collapse component validity, runtime reachability, security qualification, governance approval and task authorization.
 
-## Hermes 0.20.0 fit
+## Hermes fit and currentness
 
-`HERMES_RUNTIME_SURFACE_REVIEW.md` already reviews Hermes Agent 0.20.0 and classifies MCP and plugin surfaces as replaceable execution bindings. It also concludes:
+The original review used Hermes Agent 0.20.0 as an observed baseline. That version remains historical qualification context, not a permanent current-runtime claim.
+
+Current upstream Hermes exposes first-class Skills, MCP and plugin surfaces. That reduces the demonstrated need for a Pantheon-owned translation layer even further: portable components should map through runtime-native surfaces where practical, and any external translator remains replaceable dev/runtime tooling.
 
 ```text
-kernel_change_required: false
-run_binding_change_required: false
+native Skills available != Agent Plugins conformance
+native MCP available != Agent Plugins conformance
+native plugin API available != portable package adopted
 ```
 
-That existing conclusion remains valid for Agent Plugins.
+Exact operational compatibility must still be checked against the deployed Hermes release before claiming that a full Agent Plugins package can be consumed directly.
 
-Hermes already has first-class skill and MCP management surfaces. The upstream Microsoft APM project also documents an experimental Hermes target that deploys Agent Skills into Hermes skill locations and writes MCP servers into Hermes `mcp_servers` configuration. This is evidence that portable-to-Hermes translation can remain outside Pantheon; it is not evidence that Agent Plugins itself is natively supported by Hermes or that APM is adopted.
-
-Observed external compatibility evidence therefore supports this sequence:
+The current evidence supports this sequence:
 
 ```text
 1. do not change Pantheon kernel;
 2. do not create a Pantheon plugin manager;
-3. prefer an external Agent Plugins -> Hermes mapping when needed;
-4. qualify the resulting Hermes skill/MCP binding through existing Pantheon governance;
-5. require a real-instance observation before claiming operational compatibility.
+3. prefer Hermes native Skill / MCP / plugin surfaces;
+4. use an external translator only when a real portability gap is demonstrated;
+5. qualify resulting bindings through existing Pantheon governance;
+6. require a real-instance observation before claiming operational compatibility.
 ```
 
 ## Adapter decision
@@ -205,48 +224,65 @@ Observed external compatibility evidence therefore supports this sequence:
 Current decision:
 
 ```text
-agent_plugins_specification: 1.0.0-working-draft
+agent_plugins_specification: 1.0.0-published
 placement: external interoperability format candidate
 pantheon_kernel_change_required: false
 pantheon_schema_change_required: false
 pantheon_plugin_registry_required: false
 pantheon_installer_required: false
 hermes_runtime_adapter_required: not demonstrated
-external_translation_or_client_support: candidate / to verify
-real_instance_observation_required: true
+external_translation_or_client_support: optional / need-driven
+real_instance_observation_required: true before operational compatibility claim
 installation_effect: none
 activation_effect: none
 task_authorization_effect: none
 ```
 
-An Agent Plugins-specific adapter becomes justified only if a real package cannot be represented by Hermes's existing Agent Skills and MCP configuration surfaces without losing a material capability or provenance distinction.
+An Agent Plugins-specific adapter becomes justified only if a real package cannot be represented by the selected Hermes runtime's existing Skill, MCP and plugin surfaces without losing a material capability or provenance distinction.
 
-Until such a gap is demonstrated, adding an adapter would be speculative duplication.
+Until such a gap is demonstrated, adding an adapter or compiler to Pantheon would be speculative duplication.
 
 ## Minimum future acceptance test
 
-Before claiming that Agent Plugins is operationally consumable in the Pantheon/Hermes stack, use one synthetic package containing one harmless Agent Skill and one read-only MCP server, then verify:
+If a concrete portable-package need appears, use one synthetic package containing one harmless Agent Skill and one read-only MCP server, then verify:
 
-1. the exact package source, version and digest are recorded;
-2. the manifest and component schemas validate at the pinned Agent Plugins version;
-3. the skill maps to Hermes without changing Pantheon doctrine or schemas;
-4. the MCP server maps to Hermes without embedding credentials in package metadata;
+1. exact package source, version and digest are recorded;
+2. manifest and component schemas validate at the pinned Agent Plugins version;
+3. skill maps to the exact selected Hermes release without changing Pantheon doctrine or schemas;
+4. MCP server maps without embedding governance authority or credentials in portable metadata;
 5. Hermes exposes only the expected read-only tools;
-6. Pantheon still requires the existing Task Contract / capability admission path for consequential use;
+6. Pantheon still requires existing Task Contract / capability admission for consequential use;
 7. component failure remains isolated and visible as a Capability Gap;
-8. runtime output returns as candidate output / candidate evidence only;
+8. runtime output remains candidate output / candidate evidence only;
 9. uninstall or rollback removes runtime availability without mutating Pantheon canonical state.
 
-Synthetic acceptance is deliberately postponed until an actual Agent Plugins-to-Hermes client or translator is selected. No custom adapter should be written merely to make this test possible.
+Synthetic acceptance remains need-driven. No custom adapter should be written merely to manufacture a reason for this test.
+
+## Compiler / translator posture
+
+A compiler such as Kitbash can be useful when one source Skill must actually be projected into several agent-client formats or emitted as an Agent Plugins package.
+
+That is a tooling responsibility, not a Pantheon governance responsibility.
+
+Current repository review does not demonstrate a multi-client compilation requirement. Hermes remains the selected execution runtime and already exposes native Skill, MCP and plugin surfaces. Therefore no Kitbash binding, registry entry, schema, runtime dependency or adapter is selected by this document.
+
+```text
+multi-target capability available != multi-target need demonstrated
+compiler useful != compiler adopted
+compiled != authorized
+portable package emitted != plugin adopted
+```
+
+If a future multi-agent requirement appears, an external compiler may be re-evaluated against the exact then-current formats and clients without reopening Pantheon kernel architecture.
 
 ## Decision
 
-Accepted with constraints as an external interoperability format candidate.
+Accepted with constraints as an external interoperability format.
 
 Accepted:
 
 ```text
-portable packaging concept
+published portable packaging concept
 Agent Skills reuse
 portable MCP configuration concept
 failure isolation
@@ -262,15 +298,16 @@ Pantheon-owned plugin installer or plugin manager
 root plugin.json governance fields
 automatic capability adoption from package presence
 automatic authorization from installation or health
+compiler adoption without a demonstrated multi-client need
 ```
 
-To verify:
+To verify only when an operational need appears:
 
 ```text
-native Hermes 0.20.0 Agent Plugins package support
-candidate external translator/client behavior
+Agent Plugins conformance/support in the exact deployed Hermes release
+selected external translator behavior if native support is insufficient
 one synthetic package acceptance run
-supply-chain and rollback posture of the selected client
+supply-chain and rollback posture of the selected runtime/client
 ```
 
 ## Relationship to existing doctrine
