@@ -17,8 +17,9 @@ It does not add orchestration.
 It does not add a scheduler, queue, LangGraph runtime, hidden workflow runner, automatic memory system or autonomous decision loop.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional Hermes WebUI or other compatible clients may expose runtime interaction.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed deliberation, review and decision state.
 Pantheon Next governs.
 ```
 
@@ -600,7 +601,7 @@ They do not self-approve.
 
 There is no requirement for a dedicated Hermes profile for every Pantheon Role. MNEMOSYNE canonization does not create or install a memory profile or provider.
 
-## Relationship to Rites
+## Relationship to Rites and visible surfaces
 
 Rites may coordinate several roles around a recurring methodological tension.
 
@@ -614,7 +615,14 @@ They are not executable workflow manifests.
 
 They are not Run Trace Views.
 
-A rite may be exposed through Agora, OpenWebUI or an Evidence Pack when its result affects review, delivery, memory or arbitration.
+A rite result that affects review, delivery, memory or arbitration may be projected through Agora or Pantheon Cockpit. An optional Hermes WebUI or another runtime client may expose the surrounding runtime interaction, but it does not become the governed deliberation owner.
+
+```text
+runtime client display != Agora
+runtime client approval control != Pantheon approval
+projection != persistence
+optional client selected != authority transfer
+```
 
 ## Final rule
 
