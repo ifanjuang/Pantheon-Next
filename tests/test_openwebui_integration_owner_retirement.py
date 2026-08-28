@@ -63,7 +63,9 @@ def test_agent_plugins_review_uses_current_client_agnostic_split():
     review = _read(GOV / "AGENT_PLUGINS_INTEROPERABILITY.md")
     assert "OpenWebUI" not in review
     assert "Agent Plugins 1.0.0 — Published" in review
-    assert "Hermes Web/dashboard and compatible clients expose runtime interaction" in review
+    assert "Optional Hermes WebUI or other compatible clients may expose runtime interaction" in review
+    assert "Hermes WebUI available != Hermes WebUI selected" in review
+    assert "hermes_webui_required: false" in review
     assert "Hermes Agent executes external admitted work" in review
     assert "Pantheon Cockpit projects governed Cards" in review
     assert "multi-target capability available != multi-target need demonstrated" in review
@@ -87,12 +89,15 @@ def test_active_review_and_public_surfaces_are_client_agnostic():
     evidence = _read(GOV / "EVIDENCE_PACK.md")
     intro = _read(ROOT / "docs" / "intro-professionnelle.md")
 
+    assert "Hermes WebUI is optional/proposed" in approvals
+    assert "Hermes WebUI is an optional/proposed external surface" in trace
+    assert "Hermes WebUI is optional/proposed" in evidence
     assert "Pantheon Cockpit projects governed approval state" in approvals
     assert "Pantheon Cockpit projects governed trace/review state" in trace
     assert "runtime output != Evidence" in evidence
     assert "projection != persistence" in evidence
-    assert "Hermes Web/dashboard et clients compatibles = interaction runtime." in intro
-    assert "Pantheon Cockpit                             = projections gouvernées." in intro
+    assert "Hermes WebUI optionnelle / clients compatibles = interaction runtime possible." in intro
+    assert "Pantheon Cockpit                               = projections gouvernées." in intro
 
 
 def test_governance_ci_no_longer_requires_removed_owner():
