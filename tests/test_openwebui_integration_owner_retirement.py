@@ -70,6 +70,31 @@ def test_agent_plugins_review_uses_current_client_agnostic_split():
     assert "hermes_runtime_adapter_required: not demonstrated" in review
 
 
+def test_active_review_and_public_surfaces_are_client_agnostic():
+    paths = (
+        ROOT / "docs" / "HTTP_API_CONTRACT.md",
+        GOV / "APPROVALS.md",
+        GOV / "RUN_GRAPH.md",
+        GOV / "EVIDENCE_PACK.md",
+        ROOT / "docs" / "intro-professionnelle.md",
+    )
+    for path in paths:
+        text = _read(path)
+        assert "OpenWebUI" not in text, path.relative_to(ROOT).as_posix()
+
+    approvals = _read(GOV / "APPROVALS.md")
+    trace = _read(GOV / "RUN_GRAPH.md")
+    evidence = _read(GOV / "EVIDENCE_PACK.md")
+    intro = _read(ROOT / "docs" / "intro-professionnelle.md")
+
+    assert "Pantheon Cockpit projects governed approval state" in approvals
+    assert "Pantheon Cockpit projects governed trace/review state" in trace
+    assert "runtime output != Evidence" in evidence
+    assert "projection != persistence" in evidence
+    assert "Hermes Web/dashboard et clients compatibles = interaction runtime." in intro
+    assert "Pantheon Cockpit                             = projections gouvernées." in intro
+
+
 def test_governance_ci_no_longer_requires_removed_owner():
     workflow = _read(ROOT / ".github" / "workflows" / "governance-ci.yml")
     assert "docs/governance/OPENWEBUI_INTEGRATION.md" not in workflow
