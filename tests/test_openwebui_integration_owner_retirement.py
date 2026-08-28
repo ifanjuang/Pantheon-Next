@@ -18,11 +18,9 @@ KNOWN_CURRENT_AUTHORITY_OPENWEBUI_RESIDUES = {
     "docs/governance/GOVERNED_METHOD_STANDARD.md",
     "docs/governance/MODULAR_DOMAIN_REORIENTATION.md",
     "docs/governance/MODULE_ACTIVATION.md",
-    "docs/governance/REFERENCE_BOUNDARIES.md",
     "docs/governance/REJECTED_PATTERNS.md",
     "docs/governance/ROADMAP.md",
     "docs/governance/SKILL_WATCHLIST.md",
-    "docs/governance/rites/RITE_EXAMPLES.md",
 }
 
 
