@@ -2,11 +2,7 @@
 
 Status: active support doctrine — the keystone that unifies how Pantheon governs every added capability. It coordinates existing canonical doctrine (capability passport, the two gates, the placement test); it does not replace it.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: compatible runtime clients are optional interaction surfaces, Hermes/the external runtime executes admitted work and enforces consequential effects as PEP, Pantheon Cockpit projects governed state, and Pantheon retains governance/PDP authority.
 
 ## The principle
 
@@ -24,7 +20,7 @@ A capability's specifics live in its passport (data). The governance logic stays
 
 ## The universal envelope
 
-Whatever a capability is, and whatever runtime hosts it (Hermès, Langfuse, OpenWebUI, an MCP server), every consequential use passes through the same envelope:
+Whatever a capability is, and whatever external surface hosts or exposes it (Hermes, an observability layer, an optional runtime client, an MCP server), every consequential use passes through the same envelope:
 
 ```text
 Task Contract
@@ -66,17 +62,20 @@ A consequential effect that reaches the world without passing the gate is a bypa
 A bypassable gate makes Pantheon master only in advice, not in fact.
 ```
 
-So "Pantheon remains master" is a property of the runtime honouring the gate, not of where code lives. The implemented Pantheon policy boundary is described by `mcp-server/docs/HTTP_API_CONTRACT.md`; enforcement remains on the runtime/PEP side as governed by `HERMES_INTEGRATION.md`. A capability may be installed into Hermès, Langfuse or OpenWebUI; the moment it would produce a consequential effect, it resolves through Pantheon.
+So "Pantheon remains master" is a property of the runtime honouring the gate, not of where code lives. The implemented Pantheon policy boundary is described by `mcp-server/docs/HTTP_API_CONTRACT.md`; enforcement remains on the runtime/PEP side as governed by `HERMES_INTEGRATION.md`. A capability may be installed or exposed by Hermes, another external runtime, an observability surface or an optional runtime client; the moment it would produce a consequential effect, it resolves through Pantheon.
 
 ## Named architecture (PDP / PEP)
 
 This is a known, validated pattern. In Policy Decision Point / Policy Enforcement Point terms:
 
 ```text
-Pantheon Next  = the Policy Decision Point (PDP) — it decides; it does not execute.
-Hermes Agent   = the Policy Enforcement Point (PEP) — it enforces and executes the decision.
-OpenWebUI      = the exposure surface — it displays decisions and User Decision Gates.
-Pantheon Control = the eyes and hands — it installs, updates, preflights and shows state.
+Pantheon policy service = bounded Policy Decision Point (PDP) interface.
+Hermes / external runtime = Policy Enforcement Point (PEP) for consequential effects.
+Optional runtime client   = replaceable runtime interaction surface.
+Pantheon Cockpit          = governed projection of decisions, Evidence gaps and status.
+Pantheon Next             = governance and authority semantics.
+Human                     = consequential decision when required.
+Pantheon Control          = bounded operational eyes and hands; it does not decide legitimacy.
 ```
 
 External grounding (distilled, not imported): the PDP/PEP separation (XACML), policy-as-data decision engines (Open Policy Agent and admission control such as Gatekeeper), signed provenance/attestation (in-toto, SLSA) for the evidence side, and software-catalog + golden-path templates (Backstage) for Control. Pantheon adopts the *vocabulary and the chokepoint pattern*; it imports no runtime.
@@ -113,5 +112,5 @@ This document is the governance contract for capability uniformity. It adds no r
 
 ```text
 One law, one passport per capability, an unbypassable gate for consequential effects.
-Pantheon decides. The runtime enforces. The surface displays. The human engages.
+Pantheon decides. The runtime enforces. The governed projection exposes status. The human engages.
 ```
