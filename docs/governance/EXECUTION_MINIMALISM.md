@@ -2,15 +2,11 @@
 
 Status: active support doctrine — reliability-first execution growth and anti-overengineering rules.
 
-This document defines how Pantheon Next should prevent agentic overengineering when integrating Hermes Agent, OpenWebUI, Langflow, LangGraph, Langfuse, GraphRAG or future external capabilities.
+This document defines how Pantheon Next should prevent agentic overengineering when integrating Hermes Agent, runtime clients, Langflow, LangGraph, Langfuse, GraphRAG or future external capabilities.
 
-It does not implement workflows, agents, skills, tools, schedulers, queues, provider routers, OpenWebUI Functions, Hermes skills, Langflow flows, LangGraph runtimes or observability backends.
+It does not implement workflows, agents, skills, tools, schedulers, queues, provider routers, runtime-client functions, Hermes skills, Langflow flows, LangGraph runtimes or observability backends.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: compatible runtime clients are optional interaction surfaces, Hermes/the external runtime executes admitted work, Pantheon Cockpit projects governed state, and client selection does not transfer governance authority.
 
 ## Core principle
 
@@ -33,7 +29,7 @@ It is justified only when the task cannot be reliably handled by deterministic c
 | High-stakes output | Reflection / review with explicit rubric | Pantheon evidence and approval doctrine, Hermes review candidate |
 | Massive scale | Deterministic sharding and routing before multi-agent decomposition | External runtime candidate only |
 | Long-running work | Checkpointed execution, not open-ended autonomy | Hermes / LangGraph candidate under bridge contract |
-| Human conflict | User Decision Gate | OpenWebUI exposes, Pantheon governs |
+| Human conflict | User Decision Gate | Pantheon Cockpit projects governed gate state; compatible runtime clients remain non-authoritative interaction surfaces |
 
 ## Minimalism rules
 
@@ -58,7 +54,7 @@ one Task Contract shape
 one Context Pack shape
 one Hermes profile or skill candidate
 one Evidence Pack Candidate return
-one OpenWebUI display surface
+one compatible runtime interaction surface or governed Cockpit projection, as appropriate
 one human approval path
 ```
 
