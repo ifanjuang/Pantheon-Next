@@ -6,11 +6,7 @@ This document defines the moments a request passes through, who holds the goal (
 
 It does not add a runtime, an agent, a scheduler, a message bus, a workflow engine or an orchestration loop. These are governance moments, not an execution pipeline. Only the execution runtime executes, externally.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: compatible runtime clients are optional interaction surfaces, external execution remains with Hermes/the runtime, and client selection does not transfer Pantheon governance authority.
 
 ## Core thesis
 
