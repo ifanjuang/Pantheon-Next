@@ -19,9 +19,11 @@ Pantheon Next must remain governance-first.
 ## Core doctrine
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional runtime clients may expose interaction.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed Cards, decisions and status.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
 ## Non goals
@@ -135,11 +137,19 @@ A stub is not canonical governance content.
 
 Pantheon Next governs.
 
-Hermes executes.
+Hermes Agent executes external admitted work.
 
-OpenWebUI exposes.
+Optional runtime clients expose interaction when selected; Hermes WebUI is one optional/proposed candidate, not a requirement.
+
+Pantheon Cockpit projects governed status and decisions.
 
 No repository simplification effort may violate this separation.
+
+```text
+client selected != authority transfer
+projection != persistence
+runtime success != Evidence
+```
 
 ## Phase 1 target state
 
