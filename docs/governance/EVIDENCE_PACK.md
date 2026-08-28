@@ -324,9 +324,9 @@ Do not rewrite proof invisibly.
 
 ## Relationship to Hermes Agent
 
-Hermes Agent executes tasks and may produce Evidence Packs.
+Hermes Agent executes tasks and may produce Evidence Pack Candidates or evidence-relevant outputs.
 
-Pantheon Next governs the expected evidence structure.
+Pantheon Next governs the expected evidence structure and any admission/review state.
 
 Pantheon Next does not store Hermes runtime state.
 
@@ -336,17 +336,28 @@ Pantheon Next does not control Hermes workers, queues, tools or provider routing
 
 If Hermes performs work associated with a rite, the Evidence Pack should summarize the governance-relevant rite output without importing Hermes runtime state.
 
-## Relationship to OpenWebUI
+```text
+runtime output != Evidence
+Evidence Pack Candidate != admitted Evidence Pack
+runtime success != Evidence admission
+```
 
-OpenWebUI may expose Evidence Packs to users.
+## Relationship to runtime clients and Cockpit
 
-OpenWebUI may support review and approval flows.
+Hermes Web/dashboard and compatible clients may expose task interaction, candidate outputs and technical runtime status.
 
-OpenWebUI may display rite summaries when they affect status, risk, delivery or User Decision Gate escalation.
+Pantheon Cockpit may project governed Evidence Packs, evidence gaps, review status, approval state and linked decisions.
 
-OpenWebUI does not canonize Evidence Packs automatically.
+Neither a runtime client nor the Cockpit canonizes Evidence automatically.
 
-OpenWebUI does not become the source of truth.
+Client display does not make evidence complete, approved or authoritative. Cockpit projection does not replace the persisted governance owner.
+
+```text
+runtime display != Evidence
+projection != persistence
+projection != approval
+client selected != authority transfer
+```
 
 ## Relationship to schemas
 
@@ -367,7 +378,7 @@ The schema may validate:
 - Register Candidates;
 - approval references.
 
-The current protected schema may still expose legacy field names pending the separate schema-cleanup change. That compatibility state does not restore the retired terminology as doctrine.
+The current protected schema may still expose legacy field names pending the separate schema-cleanup change. That compatibility state does not restore retired terminology as doctrine.
 
 The schema must not define:
 
