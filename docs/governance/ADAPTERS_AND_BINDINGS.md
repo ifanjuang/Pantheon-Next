@@ -4,19 +4,15 @@ Status: active support doctrine — blueprint-in-Pantheon and adapter-outside mo
 
 This document defines where tool-specific configuration lives and how it stays adapted to Pantheon without coupling Pantheon to any tool.
 
-This document is part of the bindings and adapters exception. Because its subject is the binding to specific tools, it names products (the exposure surface, the execution runtime, the observability layer and their current bindings) where the generic doctrine body would not. The bindings-registry rule and this exception are defined in `MODULAR_DOMAIN_REORIENTATION.md`.
+This document is part of the bindings and adapters exception. Because its subject is binding to specific tools, it may name selected or candidate products where the generic doctrine body would not. The bindings-registry rule and this exception are defined in `MODULAR_DOMAIN_REORIENTATION.md`.
 
-It does not implement a configuration, an OpenWebUI Function, a Hermes skill, a Langfuse project, a runtime, a bridge or any executable artifact.
+It does not implement a configuration, a runtime-client component, a Hermes skill, a Langfuse project, a runtime, a bridge or any executable artifact.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: runtime clients are optional and replaceable interaction surfaces, Hermes Agent is the selected external execution runtime and PEP, Pantheon Cockpit is the governed projection surface, and Pantheon retains PDP/governance responsibility.
 
 ## Purpose
 
-Using the strengths of OpenWebUI, Hermes, Langfuse or any other tool requires real, runnable configuration. That configuration must not live inside Pantheon, but it must stay adapted to Pantheon.
+Using the strengths of Hermes, an optional compatible runtime client, Langfuse or any other tool requires real, runnable configuration. That configuration must not live inside Pantheon, but it must stay adapted to Pantheon.
 
 This document answers one question:
 
@@ -34,7 +30,7 @@ Adapter    -> lives outside Pantheon as the real, runnable configuration.
 ```
 
 - **Blueprint (in Pantheon):** the manifest shape, the envelope, the contract shapes, the domain-pack rules and the non-executable templates under `templates/`. These are plans, not running things.
-- **Adapter (outside Pantheon):** the actual OpenWebUI Function, the actual Hermes skill, the actual Langfuse project configuration. These are running things, adapted to Pantheon by conforming to its blueprints.
+- **Adapter (outside Pantheon):** the actual selected runtime-client component if any, the actual Hermes skill, the actual Langfuse project configuration. These are running things, adapted to Pantheon by conforming to its blueprints.
 
 Pantheon defines the port. The adapter is what plugs into it.
 
@@ -59,7 +55,8 @@ A tool update must not drag product-specific vocabulary into the framework body.
 |---|---|---|
 | New governance distinction | Pantheon kernel | update doctrine only if the distinction is tool-agnostic |
 | New Hermes skill, profile, channel, subagent or blueprint feature | Hermes adapter / integration note | map to existing Task Contract, Evidence Pack, approval, memory and scope rules |
-| New OpenWebUI action, template, form or cockpit affordance | exposure-surface adapter | display or capture only; do not create authority |
+| New runtime-client action, template, form or interaction affordance | runtime-client adapter | expose runtime interaction only; do not create authority |
+| New Pantheon Cockpit card or governed decision projection | Pantheon Cockpit implementation / projection contract | project governed state only; projection is not persistence or approval |
 | New observability or trace capability | observability adapter | trace support only; not Evidence Pack or approval |
 | New external tool connector | connector adapter | classify external effect, approval need, idempotency and scope |
 
@@ -134,18 +131,18 @@ Tool update -> adapter review.
 Kernel update -> only if the abstract governance model is missing a rule.
 ```
 
-This prevents every Hermes, OpenWebUI, Langfuse or connector release from rewriting Pantheon doctrine while still allowing each tool to express its full power behind the governed boundary.
+This prevents every Hermes, selected runtime-client, Langfuse or connector release from rewriting Pantheon doctrine while still allowing each tool to express its full power behind the governed boundary.
 
 ## Relationship to existing structure
 
 ```text
-templates/                 -> blueprints in Pantheon, non-executable.
-bindings registry          -> the only place a tool is named, in
-                              MODULAR_DOMAIN_REORIENTATION.md.
+templates/                  -> blueprints in Pantheon, non-executable.
+bindings registry           -> current selected/candidate bindings in
+                               MODULAR_DOMAIN_REORIENTATION.md.
 adapters (outside Pantheon) -> the real configurations that conform to the blueprints.
 ```
 
-The `templates/` directory is the blueprint layer. The bindings registry maps abstract roles to current tools. Adapters are the built configurations that realize a blueprint for a specific tool, and they live outside this repository.
+The `templates/` directory is the blueprint layer. The bindings registry maps abstract roles to current selected or candidate tools without making an optional client mandatory. Adapters are the built configurations that realize a blueprint for a specific tool, and they live outside this repository.
 
 ## Boundary phrase
 
