@@ -19,8 +19,9 @@ It is not an observability backend.
 It is not a mechanism to resume execution.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional Hermes WebUI or other compatible clients may expose runtime interaction.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed trace/review state.
 Pantheon Next governs.
 ```
 
@@ -190,13 +191,21 @@ Pantheon Next does not replay Hermes execution.
 
 Pantheon Next does not resume Hermes tasks from a trace view.
 
-## Relationship to OpenWebUI
+## Relationship to runtime clients and Cockpit
 
-OpenWebUI may display Run Trace Views.
+`nesquena/hermes-webui`, if selected, or another compatible client may expose runtime interaction and technical run information. Hermes WebUI is an optional/proposed external surface, not a required Pantheon component.
 
-OpenWebUI display does not canonize a trace.
+Pantheon Cockpit may project a governed Run Trace View, review status and linked decision state.
 
-OpenWebUI display does not make a trace complete, approved or authoritative.
+Client or Cockpit display does not canonize a trace, make it complete, grant approval, resume execution or transfer authority.
+
+```text
+runtime display != governed trace
+trace projected != trace persisted
+projection != approval
+projection != authority
+optional client selected != authority transfer
+```
 
 ## Relationship to schemas
 

@@ -17,9 +17,11 @@ It describes how a class of work should be governed, reviewed, evidenced and app
 It does not make Pantheon Next execute that work.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional runtime clients may expose interaction.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed workflow, review and decision state.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
 ## Naming and compatibility
@@ -394,13 +396,19 @@ Pantheon Next does not define how Hermes executes internally.
 
 Pantheon Next does not install, schedule or run workflows.
 
-## Relationship to OpenWebUI
+## Relationship to runtime clients and Cockpit
 
-OpenWebUI may expose workflow descriptions, approval prompts, evidence and outputs.
+An optional runtime client, including Hermes WebUI if separately selected and qualified, may expose workflow descriptions, approval prompts, evidence and outputs.
 
-OpenWebUI does not make the workflow canonical by displaying it.
+Pantheon Cockpit may project governed workflow status, evidence gaps, approvals and linked decisions.
 
-OpenWebUI does not execute the workflow for Pantheon Next.
+Neither client display nor Cockpit projection makes the workflow canonical, executes it for Pantheon Next, grants approval or transfers authority.
+
+```text
+Hermes WebUI available != Hermes WebUI selected
+client display != authority
+projection != persistence
+```
 
 ## Relationship to schemas
 

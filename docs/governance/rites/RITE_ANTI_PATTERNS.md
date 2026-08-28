@@ -9,9 +9,11 @@ It protects Pantheon Next from turning governed methods into hidden workflows, a
 It does not implement any runtime behavior.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional runtime clients may expose interaction.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed rite, review and decision state.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
 ## Purpose
@@ -41,8 +43,7 @@ A rite is treated as an executable sequence, hidden process, runtime graph or au
 
 ### Symptoms
 
-- rite steps become mandatory execution order;
-- OpenWebUI labels imply the rite is running;
+- runtime-client or Cockpit labels imply the rite is running;
 - a Task Contract launches a rite instead of recommending it;
 - an Evidence Pack records workflow state rather than governance result;
 - a rite triggers the next rite.
@@ -274,7 +275,7 @@ A third rite requires User Decision Gate, task split, scope narrowing or explici
 
 ### Drift
 
-OpenWebUI display makes a rite appear to be running or completed as a process.
+A runtime-client or Cockpit display makes a rite appear to be running or completed as a process.
 
 ### Symptoms
 
@@ -285,9 +286,11 @@ OpenWebUI display makes a rite appear to be running or completed as a process.
 
 ### Boundary
 
-OpenWebUI exposes.
+Optional runtime clients expose interaction only.
 
-It does not execute, approve, close or canonize rites.
+Pantheon Cockpit projects governed rite status and decisions.
+
+Neither executes, approves, closes or canonizes rites by display.
 
 ### Correction
 
@@ -299,7 +302,13 @@ rite_under_governance_review
 rite_review_closed
 ```
 
-Display ZEUS status separately from UI display state.
+Display ZEUS status separately from client or Cockpit display state.
+
+```text
+Hermes WebUI available != Hermes WebUI selected
+client selected != authority transfer
+projection != persistence
+```
 
 ## Anti-pattern: Zeus as truth oracle
 

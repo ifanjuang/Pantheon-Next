@@ -15,9 +15,11 @@ They are not a runtime.
 They are not a scheduler, queue, message bus, workflow engine, provider router, plugin manager, skill installer, MCP layer, observability backend or hidden debate system.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional runtime clients may expose interaction.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed rite, review and decision state.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
 ## Core distinction
@@ -77,8 +79,9 @@ A rite may be proposed by a role.
 ZEUS authorizes or rejects it.
 The Task Contract records why.
 The Evidence Pack records what changed.
-OpenWebUI may display the status.
-None of these executes the rite.
+An optional runtime client may expose technical interaction.
+Pantheon Cockpit may project the governed rite status and linked decision.
+None of these executes the rite for Pantheon.
 ```
 
 ## Anti-chaining rule
@@ -174,7 +177,7 @@ Choose the smallest rite mode that can safely expose the useful tension.
 
 Rites are also supported by fictional examples:
 
-- `RITE_EXAMPLES.md` - tests how rites behave in realistic situations without creating prompts, schemas, runtime, OpenWebUI components or Hermes skills.
+- `RITE_EXAMPLES.md` - tests how rites behave in realistic situations without creating prompts, schemas, runtime-client components or Hermes skills.
 
 Core examples rule:
 
@@ -345,6 +348,19 @@ Forbidden content:
 - automatic approval event;
 - automatic memory promotion event.
 
+## Runtime-client projection boundary
+
+Optional runtime clients may expose interaction around a rite but do not own rite status, authority or approval. Hermes WebUI is one optional/proposed client if separately selected and qualified.
+
+Pantheon Cockpit may project governed Rite Review Cards, tensions, status and linked User Decision Gates.
+
+```text
+Hermes WebUI available != Hermes WebUI selected
+client selected != authority transfer
+projection != persistence
+rite visible != rite authorized
+```
+
 ## Forbidden drift
 
 Rites must never become:
@@ -359,7 +375,7 @@ Rites must never become:
 - LangGraph runtime substitutes;
 - approval callbacks;
 - memory promotion pipelines;
-- OpenWebUI plugins;
+- client-specific governance plugins;
 - Hermes skill auto-installers.
 
 If a rite becomes executable by Pantheon itself, governance drift has occurred.

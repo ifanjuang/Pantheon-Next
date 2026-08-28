@@ -21,9 +21,11 @@ It is not a workflow runner.
 It is not a LangGraph runtime.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional runtime clients may expose interaction.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed intake, review and decision state.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
 ## Purpose
@@ -314,13 +316,19 @@ Pantheon Next does not spawn Hermes workers.
 
 Pantheon Next does not run the coordination path.
 
-## Relationship to OpenWebUI
+## Relationship to runtime clients and Cockpit
 
-OpenWebUI may expose intake questions, approval prompts, coordination notes, Evidence Packs and outputs.
+An optional runtime client, including Hermes WebUI if separately selected and qualified, may expose intake questions, technical interaction and candidate outputs.
 
-OpenWebUI does not become the coordinator of canonical truth.
+Pantheon Cockpit may project governed coordination notes, Evidence gaps, approval prompts and linked decisions.
 
-OpenWebUI display does not canonize the coordination result.
+Neither client display nor Cockpit projection canonizes the coordination result, grants approval or transfers authority.
+
+```text
+Hermes WebUI available != Hermes WebUI selected
+client display != authority
+projection != persistence
+```
 
 ## Relationship to schemas
 

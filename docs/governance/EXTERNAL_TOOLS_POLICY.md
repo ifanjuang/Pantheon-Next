@@ -1,6 +1,7 @@
 # External Tools Policy
 
-Status: active doctrine — external capability governance.
+Status: active support doctrine — external capability review and risk policy.
+Boundary profile: external_capability_review.
 
 External tools are capabilities.
 
@@ -13,100 +14,142 @@ They are not memory.
 They are not proof by themselves.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Optional runtime client     -> interaction / exposure only
+External runtime / tool PEP -> performs admitted effects
+Pantheon Cockpit            -> governed projection
+Pantheon Next               -> governance / policy decision
+human                       -> consequential decision
 ```
-
-## Purpose
-
-This document defines how Pantheon Next governs external tools and capability surfaces.
-
-It does not define a tool runtime.
-
-It does not define a provider router.
-
-It does not define a plugin manager.
-
-It does not define installation behavior.
-
-It does not authorize hidden execution.
-
-## Definition
-
-An external tool is any capability outside the canonical Pantheon governance documents that can read, transform, generate, write, send, publish, delete, install, configure, execute, retrieve, call another service, alter a repository, alter a project artifact, affect a user-visible output or influence memory.
-
-This includes but is not limited to:
-
-- web search;
-- browser retrieval;
-- file read and write tools;
-- repository tools;
-- email tools;
-- calendar tools;
-- document tools;
-- spreadsheet tools;
-- diagram tools;
-- image tools;
-- code execution;
-- controlled terminal use;
-- MCP servers;
-- OpenWebUI functions, tools, pipes, filters, actions or pipelines;
-- Hermes tools and skills;
-- provider gateways;
-- cloud APIs;
-- local services;
-- import, export or conversion tools;
-- installers and configuration tools.
-
-A capability being available does not mean it is authorized.
-
-## Core rule
-
-Tool use must be justified by the task.
-
-Tool use must stay inside the Task Contract when a Task Contract is required.
-
-Tool output must be treated as candidate evidence until reviewed.
-
-Tool availability must never bypass approval.
-
-## Default posture
-
-Default posture:
 
 ```text
-not authorized unless scope, evidence and approval allow it
+tool available != tool authorized
+runtime success != Evidence
+client selected != authority transfer
+projection != persistence
 ```
 
-This default protects Pantheon Next from becoming a free tool runtime.
+## 1. Purpose
 
-It also protects the user from silent external effects.
+This document owns the tool-agnostic governance policy for external capabilities, mixed AI workspaces and privileged execution surfaces.
 
-## Tool risk classes
+It defines:
 
-Tool risk is evaluated by capability effect.
+- what counts as an external tool;
+- effect/risk classes;
+- minimum authorization questions;
+- least-capability discipline;
+- Evidence expectations;
+- external-runtime threat review;
+- host-control, untrusted-content and prompt-injection posture;
+- permission and exposure review;
+- safe defaults, revocation and rollback.
 
-These classes guide approval expectations.
+It does not define:
 
-Final approval remains governed by `APPROVALS.md`.
+- a tool runtime;
+- a provider router;
+- an installer;
+- a plugin manager;
+- a scheduler or queue;
+- an MCP host;
+- a browser-control runtime;
+- an observability backend;
+- an automatic approval or memory system;
+- a product catalogue.
 
-### T0 — no external effect
+Tool- or project-specific evaluations belong to their reference reviews, capability/binding owners, `WATCHLIST.md`, `DISTILLATION_REGISTRY.md`, `EXTERNAL_TOOL_PLACEMENT_REGISTER.md` or other explicit candidate owners.
+
+Historical inspiration catalogues formerly absorbed into this file remain available in Git history and dated `ai_logs/`; they are not current policy authority.
+
+## 2. Definition
+
+An external tool is any capability outside Pantheon governance that can materially:
+
+```text
+read
+retrieve
+transform
+generate
+write
+send
+publish
+delete
+install
+configure
+execute
+call another service
+alter repository or project state
+store or recall information
+influence a professional output
+```
+
+Examples include:
+
+- web and browser retrieval;
+- file/document/spreadsheet/image tools;
+- repository tools;
+- email, calendar and messaging tools;
+- code execution and controlled terminal use;
+- MCP servers;
+- runtime-client functions, actions, plugins, pipes or pipelines;
+- Hermes skills, tools and plugins;
+- provider gateways;
+- cloud APIs and local services;
+- import/export/conversion tools;
+- installers and configuration tools;
+- connector gateways and browser-control adapters.
+
+A capability being present, installed, reachable or displayed does not make it authorized.
+
+## 3. Core rule
+
+Tool use must be justified by the task and bounded by the applicable governance artifacts.
+
+When a Task Contract or execution admission is required, the tool use must stay within it.
+
+Tool output remains candidate material until its relevant status is reviewed.
+
+```text
+tool discovery != adoption
+tool installed != approval
+tool reachable != authorization
+tool output != Evidence
+```
+
+## 4. Default posture
+
+Default posture for consequential or insufficiently classified capability use:
+
+```text
+not authorized until scope, effect, Evidence and approval requirements are satisfied
+```
+
+Low-risk read-only capability may use lighter review when doctrine explicitly permits it.
+
+Uncertainty about effect class must not silently widen authority.
+
+## 5. Effect and risk classes
+
+Risk is classified by possible effect, not product name.
+
+Final approval remains governed by `APPROVALS.md` and the applicable capability/Task Contract path.
+
+### T0 — no external or durable effect
 
 Examples:
 
 ```text
 local display
 formatting without persistence
-local non-sensitive transformation
-read-only review of already supplied content
+non-sensitive local transformation
+read-only review of already supplied material
 ```
 
-Expected governance:
+Expected posture:
 
 ```text
-low evidence burden
-no durable effect
+low Evidence burden
+no durable mutation
 no memory promotion
 ```
 
@@ -120,19 +163,19 @@ repository read
 document read
 email read
 calendar read
-Knowledge Base retrieval
+bounded Knowledge/source retrieval
 ```
 
-Expected governance:
+Expected posture:
 
 ```text
-source recorded
-freshness considered
+source/provenance recorded when material
+freshness and coverage considered
 sensitive access checked
 no write effect
 ```
 
-### T2 — transformation or candidate artifact generation
+### T2 — transformation or candidate generation
 
 Examples:
 
@@ -142,110 +185,113 @@ classification
 diagram draft
 document draft
 patch draft
-local file generation
+local artifact generation
 ```
 
-Expected governance:
+Expected posture:
 
 ```text
-output marked candidate
+output remains candidate
 sources and assumptions recorded when relevant
-no external publication
+no automatic external publication
 no automatic memory promotion
 ```
 
-### T3 — governed project mutation candidate
+### T3 — governed project/repository mutation candidate
 
 Examples:
 
 ```text
-repository file update candidate
-governance document update
+repository update candidate
+governance document change
 project artifact revision
-structured data transformation that may affect later decisions
+structured-data transformation affecting later decisions
 ```
 
-Expected governance:
+Expected posture:
 
 ```text
-Task Contract expected
-Evidence Pack expected
-diff or output review expected
-approval checked
-protected areas checked
+Task Contract normally expected
+Evidence Pack / review evidence expected
+actual diff or changed-object review
+protected-area checks
+appropriate approval
+rollback path
 ```
 
-### T4 — external write or communication effect
+### T4 — external write or communication
 
 Examples:
 
 ```text
-send email
-create calendar event
-publish document
-write to external system
-delete or archive external content
-share file
+send email or message
+create external calendar event
+publish or share artifact
+write external system state
+delete/archive external content
 change live configuration
+submit a form
 ```
 
-Expected governance:
+Expected posture:
 
 ```text
-explicit user intent
-approval required
-evidence recorded
-rollback or correction path considered
+explicit effect and destination
+human intent / approval when required
+Evidence and exact revision awareness
+idempotency when retries can duplicate effects
+rollback or correction path
 ```
 
-### T5 — privileged, irreversible or doctrine-sensitive effect
+### T5 — privileged, irreversible or governance-sensitive effect
 
 Examples:
 
 ```text
-credential handling
-secret access
+credential or secret access
 production configuration
-runtime installation
-plugin installation
-provider routing change
-memory promotion
+runtime/plugin/provider installation
+provider-routing change
+canonical memory/Register promotion
 doctrine mutation
 protected repository area
 irreversible deletion
-financial or legal external effect
+financial/legal/professional consequence
+host administration
 ```
 
-Expected governance:
+Expected posture:
 
 ```text
+explicit narrow scope
+strong Evidence requirement
 high approval burden
-scope must be explicit
-evidence must be strong
-rollback or mitigation must be addressed
-no silent execution
+reversibility/mitigation reviewed
+no silent or inferred execution
 ```
 
-## Authorization gates
+## 6. Authorization questions
 
-Before using an external tool, check:
+Before consequential capability use, answer as applicable:
 
 ```text
-purpose
-scope
-risk class
-input sensitivity
-external effect
-write effect
-memory implication
-approval need
-evidence need
-rollback need
+What purpose does the tool serve?
+What exact scope may it access?
+What effect class can it produce?
+What data is exposed?
+What source/target is involved?
+Can it write or transmit?
+Can it affect memory or durable state?
+What approval is required?
+What Evidence must return?
+What is the stop condition?
+Can a retry duplicate the effect?
+What rollback/mitigation exists?
 ```
 
-For governed work, these checks should appear in the Task Contract or Evidence Pack.
+For governed work, these answers belong in the Task Contract, capability/binding qualification, decision gate or Evidence Pack as appropriate.
 
-## Least capability principle
+## 7. Least capability
 
 Use the smallest capability that can satisfy the task.
 
@@ -253,40 +299,55 @@ Prefer:
 
 ```text
 read before write
+bounded scope before broad access
 candidate before mutation
 local transformation before external write
-explicit approval before external effect
+explicit destination before transmission
+explicit approval before consequential effect
 source reference before memory proposal
 ```
 
-Do not use a broad tool when a narrow tool is sufficient.
+Do not use a write-capable or admin-capable tool when a read-only capability is sufficient.
 
-Do not use a write-capable tool for a read-only task.
+```text
+more capability != better governance
+```
 
-## Evidence requirements
+## 8. Evidence discipline
 
-Tool output that affects a decision must be recorded as evidence.
+A tool result that materially supports a decision must remain traceable.
 
-Evidence should identify:
+Record as applicable:
 
-- tool category;
-- purpose;
-- source or target when relevant;
-- assumptions;
-- output reference;
-- risk note;
-- approval state;
-- limitation or uncertainty.
+```text
+capability / binding identity
+purpose
+source or target
+source version / locator
+inputs or scope
+material actions
+output reference
+limitations
+risk
+approval state
+technical outcome
+```
 
-Tool output must not be presented as self-validating truth.
+Tool output must not be self-validating.
 
-## Read tools
+```text
+command succeeded != claim proven
+HTTP 200 != professional success
+trace exists != Evidence admitted
+```
+
+## 9. Read tools
 
 Read tools may retrieve sources, project data or operational context.
 
-Read access must still be governed when content is sensitive, private, stale, privileged or decision-critical.
+Read access can still be consequential when the material is sensitive, private, stale, privileged or decision-critical.
 
-Read output should be marked when it is:
+Read results should preserve statuses such as:
 
 ```text
 partial
@@ -295,18 +356,17 @@ contradicted
 unverified
 sensitive
 private
-retrieved only
+retrieved_only
+coverage_unknown
 ```
 
-Read access does not authorize write access.
+Read access never implies write access.
 
-## Write tools
+Absence from a bounded read must not be interpreted as real-world absence unless declared coverage supports that inference.
 
-Write tools can create external effects.
+## 10. Write and mutation tools
 
-They require stronger governance than read tools.
-
-Write tools include actions such as:
+Write tools include:
 
 ```text
 send
@@ -319,1650 +379,179 @@ share
 commit
 configure
 install
+submit
+approve in an external system
 ```
 
-A write action should not occur from hidden workflow logic.
+A write action must not occur merely because a runtime has the button/tool/API available.
 
-A write action should be traceable in evidence.
+Consequential mutation should preserve:
 
-## Repository tools
+```text
+exact target
+effect type
+approved revision/digest when content matters
+Task Contract / decision reference
+idempotency key when needed
+technical result
+changed / unchanged objects when useful
+```
 
-Repository tools are high-risk when they mutate canonical documents, code or protected areas.
+```text
+prepared != applied
+applied != approved
+```
 
-Repository mutation requires:
+## 11. Repository tools
+
+Repository mutation is high risk when it touches canonical doctrine, code, schemas, CI or other protected areas.
+
+Repository mutation requires the applicable protected-path discipline plus:
 
 - scope clarity;
-- protected-area check;
+- current-state verification;
 - actual diff awareness;
-- evidence record;
-- rollback or correction awareness;
-- approval level appropriate to the touched area.
-
-Patch Candidates are not merge decisions.
-
-Commits are not doctrine validation by themselves.
-
-## Communication tools
-
-Communication tools include email, chat, calendar, messaging and publication channels.
-
-They create external effects.
-
-They should preserve:
-
-- recipient or destination;
-- exact content or summary;
-- intent;
-- approval state;
-- send or publication status.
-
-Drafting is lower risk than sending.
-
-Sending is a governed external effect.
-
-## Code and terminal tools
-
-Code execution and controlled terminal use may be useful but risky.
-
-They must not create an internal Pantheon runtime.
-
-They must not bypass repository policy.
-
-They must not install dependencies, services, plugins, skills or providers without explicit authorization and the relevant approval level.
-
-Generated outputs should remain candidates unless reviewed.
-
-## MCP, gateways and provider-facing tools
-
-MCP servers, provider gateways and model routing surfaces are external capability surfaces.
-
-Pantheon Next must not become their router.
-
-Pantheon Next may govern their authorization, evidence expectations and approval requirements.
-
-It must not implement hidden routing, hidden dispatch, hidden scheduling or hidden provider selection.
-
-## Installation and configuration tools
-
-Installation and configuration tools are privileged by default.
-
-They may alter runtime behavior, security posture, provider behavior, tool availability or execution boundaries.
-
-They require explicit scope and approval.
-
-Pantheon Next must not automatically install skills, plugins, tools, providers or runtimes.
-
-## Memory-affecting tools
-
-A tool that stores, indexes, retrieves, ranks, promotes or modifies long-lived information has memory implications.
-
-Such tools must not promote a Registre Probatoire entry automatically.
-
-They may produce Register Candidates only when allowed by Task Contract and approval policy.
-
-Memory promotion remains governed by `MEMORY.md`.
-
-## Secrets and private data
-
-Secrets, credentials, tokens, private data and sensitive project information require strict handling.
-
-External tools must not expose secrets in outputs, logs, prompts, context packs, Evidence Packs or public artifacts.
-
-If secret exposure is suspected, the tool result must be treated as a security risk, not a normal evidence item.
-
-## Revocation and rollback
-
-Tool authorization can be revoked.
-
-A tool may be blocked when it becomes unsafe, stale, misconfigured, overbroad, unreviewable or incompatible with Pantheon doctrine.
-
-For high-risk tool use, rollback or mitigation should be considered before execution.
-
-## Forbidden drift
-
-External tool governance must never become:
-
-- tool runtime;
-- provider router;
-- automatic installer;
-- free plugin manager;
-- hidden workflow runner;
-- hidden scheduler;
-- autonomous execution engine;
-- automatic skill installer;
-- automatic memory promoter;
-- self-evolution loop;
-- approval bypass.
-
-If tool availability becomes authorization, the boundary has failed.
-
-If a tool can canonize memory or doctrine without approval, the boundary has failed.
-
-## Implementation note
-
-This policy intentionally avoids tool-specific endpoint, environment variable, Docker, provider, plugin, function, pipe, filter, action, MCP or skill installation details.
-
-Those details must be verified against current official documentation before operational configuration is proposed.
-
-## Final rule
-
-A tool may help produce an output.
-
-A tool may help produce evidence.
-
-A tool does not decide whether the output is legitimate.
-
-Pantheon Next governs that decision.
-
----
-
-## Absorbed: External Agentic Inspirations (2026-07-07)
-
-Formerly `docs/governance/EXTERNAL_TOOLS_POLICY.md`; absorbed verbatim during the governance cleanup (pass B). Headings demoted one level; content unchanged.
-
-Original status: active support appendix — inspiration and distillation only.
-
-This document extends `EXTERNAL_TOOLS_POLICY.md` for agentic runtimes, observability systems, graph-based RAG and skill ecosystems.
-
-It does not add dependencies.
-
-It does not approve implementation.
-
-It does not define runtime integration.
-
-It does not authorize a LangGraph runtime, agent runtime, MCP layer, observability backend, skill installer, scheduler, queue, provider router, automatic memory system or hidden workflow runner inside Pantheon Next.
+- Evidence/review record;
+- rollback/correction awareness;
+- approval appropriate to affected authority.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Patch Candidate != merge decision
+commit created != doctrine validated
+CI green != deployment authorized
 ```
 
-### Purpose
+## 12. Communication tools
 
-Agentic and observability systems show what modern AI stacks can execute, trace, evaluate, remember or automate.
+Email, chat, calendar, messaging, publication and filing channels create external effects when they reach another party/system.
 
-Pantheon Next must not copy those systems.
-
-Pantheon Next should distill their useful patterns into governance vocabulary:
+A consequential send should preserve:
 
 ```text
-scope
-source status
-evidence status
-approval threshold
-memory status
-auditability
-runtime drift risk
+recipient or destination
+exact content revision/digest or bounded payload
+intent/effect
+approval reference when required
+idempotency / duplicate-send protection when relevant
+send status / technical outcome
 ```
 
-The governing rule is:
-
 ```text
-External systems show capabilities.
-Pantheon defines the governance conditions under which those capabilities may be used.
+drafted != sent
+sent != true
+channel proximity != approval
 ```
 
-### Distillation grid
+## 13. Code and terminal tools
 
-Every external agentic pattern should be reviewed through the same grid.
+Code execution and controlled shell/terminal use belong to the external execution environment.
 
-| Field | Purpose |
-|---|---|
-| External system | The project, product or repository being studied. |
-| Capability shown | What the system can do operationally. |
-| Pantheon concern | Which governance concern the capability touches. |
-| Allowed distillation | What Pantheon may learn from it. |
-| External execution surface | Where implementation may belong, usually Hermes or another external runtime. |
-| OpenWebUI exposure surface | What the cockpit may display or capture. |
-| Evidence expectation | What must be reviewable. |
-| Approval implication | Which approval threshold may be involved. |
-| Memory implication | Whether the output may only become a Register Candidate. |
-| Forbidden import | What must not enter Pantheon Next. |
-| Status | Inspiration only, candidate proposal, deferred or rejected. |
+They must not turn Pantheon into an execution runtime.
 
-### LangGraph
+They must not bypass repository, host, secret or capability policy.
 
-Source: official LangGraph documentation.
+Installation, privileged commands, dependency changes or service configuration require separate authorization appropriate to their effect.
 
-LangGraph is a low-level orchestration framework and runtime for long-running, stateful agents. Its documented capabilities include durable execution, streaming, human-in-the-loop, persistence, memory and subgraphs.
+## 14. MCP, gateways, plugins and provider-facing tools
 
-Useful patterns:
+MCP servers, connector gateways, plugins and provider/model surfaces are external capability bindings.
 
-- explicit state transitions;
-- human-in-the-loop interruption points;
-- resumable long-running work;
-- graph-shaped execution traces;
-- subgraph decomposition;
-- runtime state visibility.
+Pantheon may govern:
 
-Pantheon distillation:
+- eligibility;
+- scope;
+- binding qualification;
+- allowed effects;
+- Evidence expectations;
+- approval requirements.
+
+Pantheon must not become their hidden router, scheduler, dispatcher or installer.
 
 ```text
-Use LangGraph as an external runtime reference for Hermes-side execution patterns.
-Do not introduce LangGraph as a Pantheon runtime.
+MCP tool listed != MCP tool authorized
+plugin loaded != plugin adopted
+provider configured != data exposure approved
 ```
 
-Potential Pantheon relevance:
+## 15. Installation and configuration
 
-- Run Trace View vocabulary;
-- approval interruption semantics;
-- capability-gap reporting;
-- external runtime evidence summaries;
-- anti-runtime drift tests.
+Installation/configuration can alter runtime behavior, tool reach, security posture and external effects.
 
-Risks:
+It is privileged by default when it changes a consequential runtime.
 
-- turning Workflow Manifest into an executable graph;
-- treating runtime state as Evidence Pack;
-- treating LangGraph memory as a Registre Probatoire entry;
-- making Pantheon depend on graph execution;
-- introducing a central LangGraph runtime.
-
-Forbidden import:
+Pantheon must not automatically install external runtimes, clients, skills, plugins, providers or services merely because a candidate review accepts their conceptual placement.
 
 ```text
-LangGraph runtime
-StateGraph execution
-checkpoint memory
-scheduler or retry semantics
-worker state
-subgraph runtime
-provider orchestration
+review accepted != installed
+installed != activated
+activated != task-authorized
 ```
 
-### LangSmith
+## 16. Memory-affecting tools
 
-Source: official LangSmith documentation.
+Any capability that stores, indexes, retrieves, ranks, summarizes, synchronizes or edits long-lived information has memory implications.
 
-LangSmith is a framework-agnostic platform for building, debugging and deploying AI agents and LLM applications. It supports tracing, evaluation, prompt testing, deployment, audit logs and platform setup.
+Runtime/client memory remains distinct from Pantheon governed retention.
 
-Useful patterns:
+Such tools may produce Register Candidates when explicitly allowed.
 
-- trace inspection;
-- prompt versioning;
-- evaluation datasets;
-- experiment comparison;
-- audit logs;
-- deployment visibility;
-- debugging workflow.
-
-Pantheon distillation:
+They must not promote a Registre Probatoire entry automatically.
 
 ```text
-Use LangSmith as inspiration for observability summaries, eval reports and AI usage registers.
-Do not treat LangSmith traces or evals as Pantheon approval.
+stored != remembered by Pantheon
+recalled != verified
+repeated != promoted
 ```
 
-Potential Pantheon relevance:
+## 17. Secrets and private data
 
-- Evidence Pack support material;
-- AI usage register;
-- prompt review record;
-- quality review report;
-- regression report for Hermes-side skills;
-- audit-ready export vocabulary.
+Secrets, credentials, tokens, private data and sensitive professional information require strict minimization and custody boundaries.
 
-Risks:
+External tools must not expose secrets in:
 
-- trace equals evidence fallacy;
-- eval pass equals approval fallacy;
-- deployment surface becomes Pantheon runtime;
-- prompt version treated as doctrine;
-- cloud observability treated as canonical record.
+- prompts;
+- client-visible traces;
+- Evidence Packs;
+- public artifacts;
+- repository files;
+- ordinary logs.
 
-Forbidden import:
+If secret exposure is suspected, treat it as a security incident/capability risk, not a normal Evidence Item.
 
-```text
-LangSmith deployment
-LangSmith as source of truth
-trace store as Evidence Pack
-experiment pass as approval
-prompt registry as doctrine
-```
+Credential availability never grants task authorization.
 
-### Langfuse
+## 18. External runtime review
 
-Source: official Langfuse documentation.
-
-Langfuse is an open-source, self-hostable and extensible LLM engineering platform for debugging, analyzing and iterating on LLM applications. It includes observability, prompt management, evaluation, metrics and API/data platform features.
-
-Useful patterns:
-
-- self-hostable LLM observability;
-- trace logging;
-- cost and latency visibility;
-- prompt version control;
-- evaluation workflows;
-- production health monitoring;
-- data export posture;
-- session and user tracking;
-- agent graph representation.
-
-Pantheon distillation:
+A fuller external-runtime review is required when a runtime, client, mixed workspace, plugin/tool host or connector surface can materially touch:
 
 ```text
-Use Langfuse as the preferred observability inspiration when local-first or self-hostable posture matters.
-Do not make Langfuse a memory authority, approval authority or Evidence Pack replacement.
-```
-
-Potential Pantheon relevance:
-
-- Hermes-side observability candidate;
-- OpenWebUI display of trace summaries;
-- audit-ready export support;
-- quality and cost review;
-- prompt change review;
-- AI usage register;
-- Setup Doctor observability checklist.
-
-Risks:
-
-- observability dashboard mistaken for governance dashboard;
-- traces mistaken for proof;
-- prompt management mistaken for doctrine management;
-- eval scores mistaken for professional validation;
-- user/session tracking leaking into memory without approval.
-
-Forbidden import:
-
-```text
-Langfuse as a Registre Probatoire entry
-Langfuse as approval authority
-Langfuse as Pantheon dashboard runtime
-Langfuse trace store as Evidence Pack
-automatic trace-to-memory promotion
-```
-
-### GraphRAG and graph-based RAG
-
-Source: Microsoft GraphRAG documentation and research.
-
-GraphRAG is a structured and hierarchical approach to retrieval-augmented generation. It extracts a knowledge graph from raw text, builds community hierarchies, generates community summaries and uses global, local or DRIFT-style query modes.
-
-Useful patterns:
-
-- text units with fine-grained references;
-- entity extraction;
-- relationship extraction;
-- claim extraction;
-- graph community detection;
-- community summaries;
-- global search for corpus-level questions;
-- local search for entity-level questions;
-- DRIFT search combining local and community context;
-- graph visualization of corpus structure.
-
-Pantheon distillation:
-
-```text
-Use GraphRAG as inspiration for structured corpus preparation and graph-based retrieved context.
-Do not treat a generated graph as proof, memory or doctrine.
-```
-
-Potential Pantheon relevance:
-
-- RAG Ingestion Pipeline extension;
-- source graph manifest;
-- contradiction graph;
-- evidence candidate selection;
-- project dossier map;
-- corpus-level synthesis with visible limits;
-- retrieval quality review.
-
-Risks:
-
-- knowledge graph equals truth fallacy;
-- community summary equals evidence fallacy;
-- graph centrality equals authority fallacy;
-- generated relationship becomes a Registre Probatoire entry;
-- graph pipeline becomes Pantheon runtime.
-
-Forbidden import:
-
-```text
-GraphRAG indexing runtime
-GraphRAG query runtime
-automatic graph-to-evidence conversion
-automatic graph-to-memory promotion
-graph database as governance source of truth
-```
-
-Governed chain:
-
-```text
-Raw Source
-→ structured source graph
-→ retrieved graph context
-→ Evidence Candidate
-→ Evidence Pack
-→ Approval Event
-→ Register Candidate
-→ Registre Probatoire entry
-```
-
-### GenAI_Agents
-
-Source: `NirDiamant/GenAI_Agents`.
-
-GenAI_Agents is a large educational and implementation repository for generative AI agents. It includes examples across LangGraph, LangChain, MCP, RAG, memory, multi-agent collaboration, contract analysis, browser automation, email, self-improvement, testing and content generation.
-
-Useful patterns:
-
-- broad agent-pattern catalog;
-- tutorial structure;
-- professional use-case examples;
-- contract analysis pattern;
-- system-inspector pattern;
-- RAG evaluation pattern;
-- visual explanation discipline;
-- comparison between implementations.
-
-Pantheon distillation:
-
-```text
-Use GenAI_Agents as a catalog of external patterns that Pantheon should know how to govern.
-Do not use it as Pantheon architecture.
-```
-
-Potential Pantheon relevance:
-
-- professional dossier pattern library;
-- Hermes skill candidate review;
-- Governance Doctor inspiration;
-- Evidence Pack completeness checks;
-- retrieval evaluation signals;
-- pattern cards for external capabilities.
-
-Risks:
-
-- tutorial code mistaken for production architecture;
-- agent roles confused with Pantheon Roles;
-- LangGraph centrality;
-- autonomous research drift;
-- self-improvement mistaken for governance;
-- memory loops mistaken for a Registre Probatoire entry.
-
-Forbidden import:
-
-```text
-agent runtime
-notebook execution dependency
-LangGraph workflow core
-self-improving agent
-memory-enhanced agent
-browser automation agent
-email agent
-provider wiring
-```
-
-### Shokunin
-
-Source: `EliasOulkadi/shokunin`.
-
-Shokunin is a developer-oriented AI ecosystem built around persistent memory, `SKILL.md` files, multi-strategy recall, ChromaDB, MCP servers, OpenCode configuration, scripts, subagents, dashboards and declarative self-updates.
-
-Useful patterns:
-
-- `SKILL.md` anatomy;
-- YAML frontmatter with name and description;
-- trigger-focused skill descriptions;
-- progressive disclosure;
-- bundled scripts and references;
-- production checklists;
-- anti-patterns;
-- cited sources;
-- skill creation lifecycle;
-- skill evals;
-- benchmark with and without skill;
-- human feedback loop;
-- package and compatibility thinking.
-
-Pantheon distillation:
-
-```text
-Use Shokunin as strong inspiration for Skill Candidate lifecycle and Hermes skill pack design.
-Reject its memory, MCP, auto-save, scheduler and self-update mechanisms as Pantheon core patterns.
-```
-
-Potential Pantheon relevance:
-
-- future `SKILL_LIFECYCLE.md` reconciliation;
-- Skill Candidate review checklist;
-- Hermes Profile Pack conventions;
-- skill eval report;
-- skill source requirements;
-- skill anti-pattern library;
-- Setup Doctor checklist for skill sprawl.
-
-Risks:
-
-- persistent ChromaDB memory mistaken for a Registre Probatoire entry;
-- auto-save wrapper causing accidental memory capture;
-- MCP servers becoming hidden runtime;
-- one-command installer drift;
-- scheduler and dashboard drift;
-- declarative self-updates becoming self-evolution;
-- skills auto-activating without Task Contract.
-
-Forbidden import:
-
-```text
-ChromaDB memory as Pantheon memory
-context search on every start as governance rule
-auto-save to memory
-MCP server installation
-one-command install scripts
-scheduler
-dashboard runtime
-declarative self-updates
-skill auto-installer
-subagent runtime
-```
-
-Governed chain:
-
-```text
-External skill idea
-→ Skill Candidate
-→ Task Contract fit
-→ evidence and source review
-→ eval report
-→ human review
-→ approved governance wrapper
-→ optional Hermes execution skill
-```
-
-### Priority ranking
-
-Recommended inspiration priority for Pantheon Next:
-
-```text
-1. Shokunin
-   Best inspiration for Skill Candidate lifecycle, but highest memory/runtime drift risk.
-
-2. Langfuse
-   Best observability inspiration for local-first and self-hostable posture.
-
-3. GraphRAG
-   Best inspiration for complex corpus structure and graph-based retrieval status.
-
-4. GenAI_Agents
-   Best broad catalog for pattern cards and professional use-case discovery.
-
-5. LangGraph
-   Important external runtime reference, mainly for Hermes boundary doctrine.
-
-6. LangSmith
-   Useful observability and eval reference, strongest when LangChain/LangGraph is already used.
-```
-
-### Candidate future pattern cards
-
-A future follow-up may define pattern cards for:
-
-```text
-Contract Analysis Pattern
-Governance Doctor Pattern
-Retrieval Evaluation Pattern
-Skill Candidate Lifecycle Pattern
-Observability-to-Evidence Summary Pattern
-GraphRAG Source Graph Pattern
-```
-
-Each card must remain support doctrine until a separate governed adoption decision exists.
-
-### Status
-
-Research and support doctrine only.
-
-No dependency added.
-
-No implementation started.
-
-No OpenWebUI plugin added.
-
-No Hermes tool added.
-
-No observability backend added.
-
-No GraphRAG runtime added.
-
-No LangGraph runtime added.
-
-No MCP server added.
-
-No skill installer added.
-
-No memory system added.
-
-No schema added.
-
-No tests added.
-
-No operations tooling added.
-
----
-
-## Absorbed: External Ai Option Reviews (2026-07-07)
-
-Formerly `docs/governance/EXTERNAL_TOOLS_POLICY.md`; absorbed verbatim during the governance cleanup (pass B). Headings demoted one level; content unchanged.
-
-Original status: stub — partially implemented.
-
-This document tracks external AI projects, frameworks and architectures evaluated during Pantheon Next development.
-
-The purpose is:
-
-- architectural comparison;
-- doctrine validation;
-- runtime drift detection;
-- inspiration tracking;
-- integration risk analysis.
-
-External projects are references only.
-
-They are not canonical Pantheon Next architecture.
-
-### Evaluation rules
-
-Every external project should be evaluated against the doctrine:
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
-
-Any project introducing:
-
-- hidden runtime orchestration;
-- autonomous scheduling;
-- auto-promoted memory;
-- hidden workflow engines;
-- implicit provider routing;
-- self-modifying governance;
-- agent self-approval;
-- uncontrolled plugin execution;
-
-must be classified as runtime-drift risk.
-
----
-
-## Duskript/Pantheon
-
-Repository:
-
-- `https://github.com/Duskript/Pantheon`
-
-### Classification
-
-```text
-Useful inspiration.
-High runtime-drift risk.
-Do not import directly.
-```
-
-### Positive aspects
-
-- strong user-facing architecture presentation;
-- specialized AI profile concept;
-- Hermes Agent clearly identified as runtime;
-- good explanation of multi-profile interaction;
-- good UX narrative around persistent context;
-- useful inspiration for Hermes profile ergonomics.
-
-### Incompatible aspects for Pantheon Next
-
-The project includes or proposes:
-
-- shared evolving memory;
-- background scheduler agents;
-- cron execution;
-- webhook execution;
-- plugin runtime system;
-- sub-agent runtime orchestration;
-- automatic installers;
-- direct provider routing;
-- self-learning behavior;
-- runtime-centric architecture.
-
-These concepts are incompatible with Pantheon Next phase 1 governance boundaries.
-
-### Pantheon Next position
-
-Pantheon Next may study:
-
-- profile ergonomics;
-- UX concepts;
-- Hermes profile decomposition;
-- documentation structure;
-- role specialization patterns.
-
-Pantheon Next must not import:
-
-- runtime orchestration;
-- scheduler systems;
-- autonomous memory evolution;
-- plugin runtimes;
-- hidden execution workflows;
-- automatic profile deployment.
-
----
-
-## Absorbed: External Method Reviews (2026-07-07)
-
-Formerly `docs/governance/EXTERNAL_TOOLS_POLICY.md`; absorbed verbatim during the governance cleanup (pass B). Headings demoted one level; content unchanged.
-
-Original status: active support doctrine — method review only.
-
-This document reviews external reasoning, prompting, evaluation and workflow methods as governance inputs.
-
-It does not define hidden orchestration.
-
-It does not implement methods.
-
-It does not approve autonomous agents.
-
-It does not authorize a planner, executor, debate runtime, reflection loop, LLM judge, scheduler, queue, message bus, runtime graph or automatic approval mechanism inside Pantheon Next.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
-
-### Purpose
-
-Methods can improve output quality.
-
-They can also hide authority drift.
-
-This document answers:
-
-```text
-Does this method improve governance review, or does it merely improve autonomous performance?
-```
-
-Pantheon may borrow method vocabulary only when it strengthens visibility, evidence, review, scope or approval.
-
-### Method review record format
-
-Recommended fields:
-
-```text
-method_name
-method_family
-capability_summary
-governance_value
-risk_surface
-allowed_distillation
-forbidden_import
-related_roles
-related_artifacts
-status
-review_notes
-```
-
-### Status values
-
-```text
-observe
-allowed_as_review_pattern
-allowed_as_hermes_candidate_method
-boundary_required
-rejected_as_hidden_runtime
-rejected_as_approval_drift
-rejected_as_memory_drift
-archived
-```
-
-### Current method reviews
-
-| Method | Governance value | Main risk | Pantheon posture |
-|---|---|---|---|
-| ReAct | separates reasoning-style steps from action-style steps conceptually | hidden tool loop or tool autonomy | use only as inspiration for action/evidence separation |
-| Chain-of-thought prompting | may improve model reasoning internally | storing or exposing hidden reasoning as evidence | do not store hidden chain-of-thought; use concise rationale and assumptions |
-| Self-critique | useful for draft revision and limitation detection | model self-approval | allow as candidate review signal only |
-| Reflection loops | can catch errors over iterations | endless self-improvement loop | allow only bounded Hermes-side candidate method under Task Contract |
-| Debate | can surface disagreement | hidden multi-agent theater or collusion | replace with visible Governance College role statuses |
-| Tree of Thoughts | explores alternatives | uncontrolled branching and session bloat | allow as bounded option exploration, not runtime graph |
-| Planner/executor | separates plan and action | Pantheon becomes orchestrator | plan may inform Task Contract; execution remains Hermes-side |
-| LLM-as-judge | useful pre-score or consistency signal | score becomes approval | judge output is signal, never final validation |
-| Constitutional prompting | explicit rule layer | prompt rules mistaken for Pantheon doctrine | useful as reminder; Pantheon doctrine remains canonical |
-| Retrieval-augmented generation | connects answer to sources | retrieval becomes evidence or truth | retrieval is candidate support only |
-| GraphRAG-style synthesis | improves corpus-level view | graph/community summary treated as authority | graph output is retrieved context or Evidence Candidate |
-| Multi-agent team | role specialization | autonomous hidden agent team | Governance College is role separation, not team runtime |
-| Autonomous research agent | breadth of search | source sprawl and unapproved external browsing | Argos-style source review under scope, not autonomy |
-| Memory-enhanced agent | continuity | memory without approval and scope | Register Candidate discipline only |
-| Browser automation | action capability | external effect without approval | Hermes-only under tool policy and Task Contract |
-
-### Allowed distillation patterns
-
-#### Method as review lens
-
-A method may become a review lens when it helps classify:
-
-- source gaps;
-- assumptions;
-- contradictions;
-- risk;
-- missing scope;
-- delivery readiness;
-- approval need;
-- memory implication.
-
-#### Method as Hermes candidate constraint
-
-A method may belong to Hermes or another external runtime when it controls execution technique, provided Pantheon receives only:
-
-- Task Contract fit;
-- evidence summary;
-- assumptions;
-- risks;
-- output candidate;
-- capability gaps;
-- approval implications.
-
-#### Method as User Decision Gate trigger
-
-A method may reveal conflict that should be exposed to the user.
-
-Example:
-
-```text
-self-critique finds unsupported claim
-→ ARGOS source_insufficient
-→ THEMIS risk_detected
-→ ZEUS request_source or human_decision_required
-```
-
-### Forbidden method imports
-
-Pantheon must not import:
-
-- hidden reasoning traces;
-- autonomous debate loops;
-- hidden planner/executor loops;
-- agent self-reflection as approval;
-- LLM judge as final authority;
-- self-improvement loops;
-- automatic retry loops;
-- background research loops;
-- unbounded option exploration;
-- automatic external action;
-- automatic memory update.
-
-### Role mapping
-
-| Method pressure | Pantheon role that can expose it |
-|---|---|
-| structure, decomposition, plan | ATHENA |
-| source adequacy and provenance | ARGOS |
-| risk, policy, approval boundary | THEMIS |
-| clarity and delivery readiness | APOLLO |
-| artifact or patch preparation | HEPHAISTOS |
-| recipient and transmission framing | IRIS |
-| status and next procedure | ZEUS |
-
-A method may help one role produce a candidate view.
-
-It must not create autonomous role execution inside Pantheon.
-
-### Evidence rule
-
-Method output may appear in an Evidence Pack only as governance-relevant summary.
-
-Allowed:
-
-```text
-assumption noted
-source gap found
-contradiction detected
-variant compared
-risk escalated
-approval required
-```
-
-Forbidden:
-
-```text
-raw chain-of-thought
-private scratchpad
-hidden debate transcript
-unbounded reasoning trace
-agent deliberation archive
-```
-
-### Approval rule
-
-No method approves its own result.
-
-A method can produce:
-
-```text
-signal
-reserve
-candidate review
-risk note
-contradiction note
-next action recommendation
-```
-
-It cannot produce:
-
-```text
-final approval
-memory promotion
-external transmission authorization
-protected file mutation authorization
-professional reliance authorization
-```
-
-### Memory rule
-
-Method outputs are not memory.
-
-A repeated critique, score, judgment, plan or conclusion may become a Register Candidate only if it satisfies `MEMORY.md` and `SCOPE_ISOLATION.md`.
-
-### Review questions
-
-Before using a method as inspiration, ask:
-
-```text
-What does this method make visible?
-What does it hide?
-Does it improve evidence or only confidence?
-Does it preserve human decision?
-Does it create hidden execution state?
-Does it expand scope?
-Does it imply memory?
-Does it require tool access?
-Does it create external effect?
-```
-
-### Relationship to Watchlist
-
-Unreviewed methods belong on `WATCHLIST.md`.
-
-Reviewed methods belong here.
-
-Distilled method patterns may move to `DISTILLATION_REGISTRY.md`.
-
-Rejected method patterns should be recorded in `REJECTED_PATTERNS.md`.
-
-### Forbidden drift
-
-This document must never become:
-
-- prompt library;
-- hidden workflow specification;
-- autonomous reasoning engine;
-- debate runtime;
-- LLM judge policy;
-- self-improvement loop;
-- planner/executor implementation;
-- approval automation;
-- memory promotion system.
-
-### Final rule
-
-```text
-A method is useful when it improves reviewability.
-It is dangerous when it replaces review.
-```
-
----
-
-## Absorbed: External Repo Inspirations (2026-07-07)
-
-Formerly `docs/governance/EXTERNAL_TOOLS_POLICY.md`; absorbed verbatim during the governance cleanup (pass B). Headings demoted one level; content unchanged.
-
-Original status: active support doctrine — inspiration map only.
-
-This document records external open-source repositories that may inspire Pantheon Next governance design.
-
-It does not add dependencies.
-
-It does not authorize implementation.
-
-It does not define runtime integration.
-
-It does not approve plugins, connectors, tools, schedulers, queues, provider routers, workflow engines, agent runtimes or memory systems.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
-
-### Purpose
-
-Pantheon Next should learn from existing open-source systems without becoming a clone of them.
-
-The market already contains:
-
-- RAG platforms;
-- enterprise search systems;
-- chat-with-docs tools;
-- agent builders;
-- workflow canvases;
-- authorization services;
-- versioned data stores;
-- output validation libraries.
-
-Pantheon Next should not compete by becoming another one of these.
-
-Pantheon Next should distill useful patterns into governance doctrine while keeping its own differentiator:
-
-```text
-source ≠ retrieved knowledge ≠ evidence ≠ approval ≠ memory
-```
-
-### Core rule
-
-External repositories are inspirations.
-
-They are not Pantheon doctrine by themselves.
-
-They are not dependencies by default.
-
-They are not implementation decisions.
-
-They are not authority.
-
-Any future adoption, wrapper or integration must pass through:
-
-- Task Contract scope;
-- External Tools Policy;
-- Evidence Pack expectations;
-- approval requirements;
-- memory rules;
-- anti-runtime drift review.
-
-### Evaluation lens
-
-External repositories should be evaluated by asking:
-
-| Question | Why it matters |
-|---|---|
-| What problem does this project solve well? | Avoid copying the whole system when only one pattern is useful. |
-| Does it reinforce or weaken Pantheon doctrine? | Keep governance separate from execution. |
-| Does it blur source, evidence, approval or memory? | Reject patterns that collapse the trust chain. |
-| Does it require runtime ownership? | Reject runtime drift into Pantheon. |
-| Can it inspire a modular optional component? | Prefer replaceable edges over core dependency. |
-| Is it useful for MVP or only advanced scale? | Avoid overbuilding before proof. |
-
-### Inspiration map
-
-#### RAGFlow
-
-Repository: `infiniflow/ragflow`
-
-Useful patterns:
-
-- deep document understanding;
-- document parsing;
-- template-based chunking;
-- visible and explainable chunking;
-- traceable citations;
-- heterogeneous source ingestion;
-- enterprise-scale RAG workflow.
-
-Pantheon distillation:
-
-```text
-Use as inspiration for ingestion transparency, chunk provenance and citation display.
-Do not import RAGFlow as Pantheon runtime.
-```
-
-Potential Pantheon relevance:
-
-- future retrieval backend comparison;
-- source lineage model;
-- citation UX;
-- chunk visualization;
-- document parsing quality criteria.
-
-Risks:
-
-- turning Pantheon into a RAG engine;
-- treating retrieval as proof;
-- merging agentic RAG with governance authority.
-
-#### Onyx
-
-Repository: `onyx-dot-app/onyx`
-
-Useful patterns:
-
-- enterprise search;
-- many indexing connectors;
-- RAG and web search;
-- deep research workflow;
-- custom agents;
-- artifacts;
-- actions and MCP;
-- role-based access control;
-- analytics and query history;
-- enterprise deployment posture.
-
-Pantheon distillation:
-
-```text
-Use as inspiration for enterprise search, access control, connector posture and audit surfaces.
-Do not turn Pantheon into the enterprise search platform.
-```
-
-Potential Pantheon relevance:
-
-- connector inventory thinking;
-- RBAC and team access concepts;
-- query audit ideas;
-- artifact display patterns;
-- enterprise vocabulary.
-
-Risks:
-
-- broad automatic knowledge exposure;
-- tool and connector sprawl;
-- query history treated as memory;
-- custom agents treated as governance roles.
-
-#### AnythingLLM
-
-Repository: `Mintplex-Labs/anything-llm`
-
-Useful patterns:
-
-- local-first positioning;
-- simple chat-with-docs adoption;
-- workspaces;
-- multi-user access;
-- source citations;
-- no-friction setup;
-- broad vector database and provider support.
-
-Pantheon distillation:
-
-```text
-Use as inspiration for MVP simplicity and user-facing trust language.
-Do not confuse workspace convenience with governed dossier state.
-```
-
-Potential Pantheon relevance:
-
-- first-use simplicity;
-- workspace mental model;
-- local-first communication;
-- source citation affordances;
-- professional onboarding flow.
-
-Risks:
-
-- workspace equals dossier fallacy;
-- local-first overpromise if external providers are used;
-- document upload treated as validation.
-
-#### Khoj
-
-Repository: `khoj-ai/khoj`
-
-Useful patterns:
-
-- personal-to-enterprise knowledge assistant;
-- multi-surface access;
-- browser, desktop, mobile and messaging surfaces;
-- Obsidian and editor-like workflows;
-- custom agents with knowledge, persona and tools;
-- semantic search across documents and web.
-
-Pantheon distillation:
-
-```text
-Use as inspiration for multi-surface cockpit thinking.
-Do not treat second-brain recall as a Registre Probatoire entry.
-```
-
-Potential Pantheon relevance:
-
-- future Google Docs, Obsidian, desktop or messaging cockpit mapping;
-- personal-to-organization scaling narrative;
-- assistant surfaces beyond OpenWebUI.
-
-Risks:
-
-- uncontrolled personal memory drift;
-- recall treated as truth;
-- agent persona confused with Pantheon Role.
-
-#### Dify
-
-Repository: `langgenius/dify`
-
-Useful patterns:
-
-- visual workflow canvas;
-- RAG pipeline;
-- agent capabilities;
-- model management;
-- observability integrations;
-- application logs and annotations;
-- API-first integration posture.
-
-Pantheon distillation:
-
-```text
-Use as inspiration for workflow visualization and observability.
-Do not import workflow execution into Pantheon.
-```
-
-Potential Pantheon relevance:
-
-- Run Trace View presentation;
-- workflow diagram ideas;
-- production observation concepts;
-- annotation of results and model behavior.
-
-Risks:
-
-- hidden workflow runtime;
-- provider router drift;
-- visual workflow treated as governance truth.
-
-#### Flowise
-
-Repository: `FlowiseAI/Flowise`
-
-Useful patterns:
-
-- visual AI agent construction;
-- node/component decomposition;
-- low-code experimentation;
-- visible agent flow diagrams.
-
-Pantheon distillation:
-
-```text
-Use for visual and modular thinking only.
-Do not adopt a hidden graph runtime or plugin marketplace model.
-```
-
-Potential Pantheon relevance:
-
-- diagrams for explaining modular pipelines;
-- component boundary inspiration;
-- optional visual workflow illustrations.
-
-Risks:
-
-- LangGraph-like runtime drift;
-- node sprawl;
-- plugin-manager temptation;
-- execution semantics leaking into governance docs.
-
-#### Permify, Ory Keto and Casbin
-
-Repositories:
-
-- `Permify/permify`;
-- `ory/keto`;
-- `apache/casbin`.
-
-Useful patterns:
-
-- fine-grained authorization;
-- RBAC, ABAC and ReBAC models;
-- resource-level access checks;
-- tenant isolation;
-- centralized authorization reasoning;
-- policy-based access control.
-
-Pantheon distillation:
-
-```text
-Use as inspiration for future scoped Knowledge access and dossier authorization.
-Do not add a full authorization service before the MVP needs it.
-```
-
-Potential Pantheon relevance:
-
-- KnowledgeSelection permissions;
-- project/dossier scope checks;
-- read-only gateway authorization;
-- tenant or organization isolation.
-
-Risks:
-
-- overbuilding the MVP;
-- adding an authorization runtime inside Pantheon;
-- confusing runtime permissions with approval legitimacy.
-
-#### TerminusDB and Dolt
-
-Repositories:
-
-- `terminusdb/terminusdb`;
-- `dolthub/dolt`.
-
-Useful patterns:
-
-- versioned data;
-- commits;
-- diffs;
-- time-travel queries;
-- data provenance;
-- reviewable data evolution.
-
-Pantheon distillation:
-
-```text
-Use as inspiration for evidence, deliverable and memory versioning semantics.
-Do not replace Postgres early or make specialized versioned databases a prerequisite.
-```
-
-Potential Pantheon relevance:
-
-- Register Candidate supersession;
-- a Registre Probatoire entry revocation;
-- deliverable version history;
-- Evidence Pack lineage;
-- diff-based review.
-
-Risks:
-
-- premature database replacement;
-- versioned storage confused with governance approval;
-- data commits treated as professional validation.
-
-#### Guardrails AI
-
-Repository: `guardrails-ai/guardrails`
-
-Useful patterns:
-
-- structured output validation;
-- validators;
-- schema-like response checks;
-- guardrail patterns;
-- claim or field-level validation thinking.
-
-Pantheon distillation:
-
-```text
-Use as inspiration for structured checks.
-Do not treat validator success as human approval.
-```
-
-Potential Pantheon relevance:
-
-- citation-required checks;
-- unsupported-claim flags;
-- output candidate format checks;
-- coherence review scaffolding;
-- Evidence Pack completeness checks.
-
-Risks:
-
-- validator pass mistaken for validation;
-- hidden validation logic;
-- loss of professional review threshold.
-
-#### Open Policy Agent
-
-Repository: `open-policy-agent/opa`
-
-Useful patterns:
-
-- policy-as-code;
-- decision separation;
-- auditable policy checks;
-- centralized policy evaluation;
-- deny-by-default posture.
-
-Pantheon distillation:
-
-```text
-Use as conceptual inspiration for policy checks.
-Do not embed a policy engine into Pantheon before there is a clear governance need.
-```
-
-Potential Pantheon relevance:
-
-- future policy evaluation;
-- allowed tool checks;
-- external action gates;
-- scope and approval policy checks.
-
-Risks:
-
-- turning Pantheon into policy runtime;
-- adding operational complexity too early;
-- policy pass treated as approval.
-
-### Mapping to Pantheon modules
-
-| Pantheon concern | Useful inspirations | Preferred posture |
-|---|---|---|
-| Ingestion and parsing | RAGFlow, Dify, AnythingLLM | external capability or inspiration only |
-| Retrieval quality | RAGFlow, Onyx, Khoj, AnythingLLM | external execution capability under scope |
-| Workspace UX | OpenWebUI, AnythingLLM, Khoj | cockpit surface, not source of truth |
-| Connectors | Onyx, Dify, Khoj | optional external capabilities under policy |
-| Scoped authorization | Permify, Ory Keto, Casbin, OPA | future optional guardrail, not MVP dependency |
-| Workflow visualization | Dify, Flowise | explanatory surface, not runtime |
-| Versioning and provenance | TerminusDB, Dolt | semantic inspiration, not early database replacement |
-| Validation checks | Guardrails AI, OPA | candidate checks, not approval |
-| Audit and observability | Onyx, Dify | evidence and review support, not runtime state ownership |
-
-### MVP versus optional advanced path
-
-#### MVP inspiration path
-
-The first practical path should remain simple:
-
-```text
-OpenWebUI selection
-→ Pantheon Task Contract
-→ Context Pack with authorized excerpts
-→ Hermes execution
-→ sourced candidate output
-→ user validation
-```
-
-Relevant inspiration:
-
-- AnythingLLM for simple document workspace UX;
-- OpenWebUI for cockpit behavior;
-- RAGFlow for source/chunk transparency;
-- Onyx for audit vocabulary;
-- Guardrails-style checks for optional structured review.
-
-#### Optional advanced path
-
-Advanced capabilities remain optional:
-
-```text
-shared Postgres
-→ separated governance domains
-→ scoped read-only functions
-→ hybrid retrieval
-→ audit lineage
-→ evidence candidate links
-→ memory review workflow
-```
-
-Relevant inspiration:
-
-- Onyx for enterprise connectors and audit;
-- Permify/Ory/Casbin for scoped authorization;
-- TerminusDB/Dolt for provenance and versioning;
-- Dify for observability concepts;
-- RAGFlow for high-quality parsing and retrieval.
-
-### What Pantheon must not copy
-
-Pantheon Next must not copy these patterns into its governance core:
-
-- full RAG platform;
-- agent builder;
-- visual workflow runtime;
-- provider router;
-- plugin marketplace;
-- free connector layer;
-- hidden scheduler;
-- queue manager;
-- automatic memory system;
-- autonomous research agent;
-- runtime authorization service;
-- database runtime;
-- validation system that bypasses human approval.
-
-### Stable differentiator
-
-Pantheon Next should remain the governance grammar around AI work.
-
-```text
-Raw Source
-→ Source Reference
-→ Retrieved Knowledge
-→ Working Context
-→ Evidence Candidate
-→ Evidence Item
-→ Evidence Pack
-→ Output Candidate
-→ Approval Event
-→ Register Candidate
-→ Registre Probatoire entry
-```
-
-This chain is the differentiator.
-
-Existing tools can help at different steps.
-
-None of them should collapse the chain.
-
-### Decision rule for future adoption
-
-Before adopting an external repository, component or pattern, ask:
-
-```text
-Does it improve scope control?
-Does it improve source traceability?
-Does it improve evidence quality?
-Does it improve approval clarity?
-Does it improve memory discipline?
-Does it improve auditability?
-Can it remain optional?
-Can it be replaced later?
-Does it avoid runtime drift?
-```
-
-If the answer is no, do not adopt.
-
-If the answer is yes, create a Task Contract or governance proposal before implementation.
-
-### Status
-
-Research and support doctrine only.
-
-No dependency added.
-
-No implementation started.
-
-No OpenWebUI plugin added.
-
-No Hermes tool added.
-
-No gateway added.
-
-No schema added.
-
-No authorization service added.
-
-No external repository adopted.
-
----
-
-## Absorbed: External Runtime Threat Model Review (2026-07-07)
-
-Formerly `docs/governance/EXTERNAL_TOOLS_POLICY.md`; absorbed verbatim during the governance cleanup (pass B). Headings demoted one level; content unchanged.
-
-Original status: active support doctrine — review method for external runtimes and privileged AI workspaces.
-
-This document defines how Pantheon Next reviews an external runtime, AI workspace, tool host, connector host or model-serving surface before it is used around consequential professional work.
-
-It is a review method, not an implementation.
-
-It does not create a runtime, scanner, sandbox, firewall, installer, scheduler, queue, provider router, connector gateway, MCP host, approval engine, memory engine, OpenWebUI configuration, Hermes skill, Docker configuration or external action.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
-
-### Purpose
-
-External AI systems increasingly combine capabilities that were previously separate:
-
-```text
-chat surface
-agent execution
-tool calling
-file access
-repository access
-email / calendar access
-local model serving
-memory / retrieval
-scheduled tasks
-MCP or connector surfaces
-administration settings
-```
-
-Pantheon must review that combined surface before treating it as safe to use in a professional dossier.
-
-The review answers one question:
-
-```text
-What consequential power does this runtime expose, and which Pantheon gate must constrain it?
-```
-
-### Core rule
-
-```text
-Runtime power is not governance authority.
-```
-
-An external runtime may expose powerful capabilities. It may execute. It may observe. It may prepare candidates. It may carry a task.
-
-It must not approve, validate, canonize, promote memory, authorize external effects, alter doctrine or silently expand scope.
-
-### When this review is required
-
-Run this review when a system, adapter, plugin, tool host or workspace can touch one of the following:
-
-```text
-private or client material
+private/client material
 professional source interpretation
-project files or repository content
-email, calendar or messaging channels
-long-lived memory, index or recall
-model serving or provider selection
-scheduled or background tasks
-runtime installation or configuration
-privileged local or host-control surfaces
-MCP, gateway or connector access
+repository/project files
+email/calendar/messaging
+long-lived memory or recall
+provider/model selection
+scheduled/background tasks
+runtime installation/configuration
+privileged local/host surfaces
+MCP/gateway/connector access
+external publication or mutation
 ```
 
-If the system is read-only, low-risk and non-consequential, a light review is sufficient.
-
-If the system can create a false truth, wrong memory, unapproved external effect, invalid approval, unauthorized action or scope expansion, the full review is required.
-
-### Review record
-
-Minimum fields:
+The review asks:
 
 ```text
+What consequential power does this surface expose,
+and which Pantheon gate constrains it?
+```
+
+A low-risk, read-only, non-consequential surface may use a lighter review.
+
+## 19. Review record
+
+A review may use the following conceptual record or an equivalent governed template:
+
+```yaml
 external_runtime_review:
   runtime_name:
   reviewed_ref:
@@ -1970,8 +559,6 @@ external_runtime_review:
   reviewed_by:
   system_role: exposure_surface | execution_runtime | observability_layer | connector_gateway | model_runtime | mixed_workspace | other
   binding_status: unbound | candidate | sandbox | project_scoped | organization_scoped | refused
-  trusted_user_assumption:
-  exposure_posture:
   privileged_capabilities:
   data_access:
   external_effects:
@@ -1981,7 +568,8 @@ external_runtime_review:
   host_control_surface:
   untrusted_content_paths:
   prompt_injection_posture:
-  token_or_permission_granularity:
+  permission_granularity:
+  exposure_posture:
   auditability:
   reversibility_or_mitigation:
   pantheon_gate_required:
@@ -1989,94 +577,64 @@ external_runtime_review:
   evidence_expectation:
   safe_default:
   decision: accepted | refused | to_verify | to_arbitrate
-  repo_state: documented_non_implemented | adapter_outside_pantheon | implemented_elsewhere | refused
 ```
 
-This is a governance record. It does not authorize runtime installation by itself.
+This is review information, not installation or runtime authorization.
 
-### Capability surface checklist
+The reusable candidate template may live outside this policy; template conformance does not make a runtime accepted.
 
-The review must identify whether the runtime can:
+## 20. Host-control surface
+
+Host-control power is stronger than ordinary tool availability.
+
+Use a vocabulary such as:
 
 ```text
-read private material
-write or modify durable material
-send, publish or notify externally
-store, index, rank or recall long-lived information
-execute code or commands
-alter runtime configuration
-select or serve models
-schedule or resume work
-call connectors, MCP tools or provider gateways
-alter a repository or project artifact
-produce user-visible professional output
+none
+scoped_filesystem
+broad_filesystem
+shell_user
+shell_admin
+container_host_control
+remote_host_control
+cloud_admin
 ```
 
-Each positive answer must be mapped to:
+Default posture:
 
 ```text
-risk class
-scope
-approval need
-evidence need
-safe fallback
+none                  -> ordinary capability review
+scoped_filesystem     -> review scope/minimization
+broad_filesystem      -> high risk
+shell_user            -> high risk
+shell_admin           -> critical risk
+container_host_control-> critical risk
+remote_host_control   -> critical risk
+cloud_admin           -> critical risk
 ```
 
-### Host-control surface classification
-
-Host-control power is a stronger concern than ordinary tool availability.
-
-Use this vocabulary:
+Critical host-control power requires, at minimum:
 
 ```text
-host_control_surface:
-  none
-  scoped_filesystem
-  broad_filesystem
-  shell_user
-  shell_admin
-  container_host_control
-  remote_host_control
-  cloud_admin
-```
-
-Default classification:
-
-```text
-none -> not a host-control concern
-scoped_filesystem -> review scope and minimization
-broad_filesystem -> high risk
-shell_user -> high risk
-shell_admin -> critical risk
-container_host_control -> critical risk
-remote_host_control -> critical risk
-cloud_admin -> critical risk
-```
-
-Critical host-control power must not be treated as a normal skill, plugin or workspace option.
-
-It requires at minimum:
-
-```text
-explicit scope
+explicit bounded scope
 explicit approval path
-strong evidence expectation
-sandbox or isolation posture where relevant
-reversibility or mitigation note
+strong Evidence expectation
+isolation/sandbox posture when relevant
+reversibility or mitigation
 human-visible gate before consequential use
 ```
 
-### Untrusted content paths
+A runtime profile or client setting is not OS isolation.
 
-External runtime review must identify untrusted content paths.
+## 21. Untrusted-content paths
 
-Common paths:
+Review untrusted data paths such as:
 
 ```text
 web results
 fetched pages
 uploaded files
-read emails
+email bodies
 notes
 runtime memory
 retrieved knowledge
@@ -2086,50 +644,54 @@ model output reused as context
 third-party tool output
 ```
 
-Pantheon rule:
+Core rule:
 
 ```text
 Untrusted content enters as data.
-It must not become instruction, proof, approval or memory by proximity.
+It does not become instruction, proof, approval or memory by proximity.
 ```
 
-Any adapter may wrap, label or isolate untrusted content. That adapter behavior lives outside Pantheon. Pantheon governs the requirement and the output status.
+An external adapter may wrap, delimit or sanitize content. Pantheon governs the requirement and the returned status; it does not implement the adapter merely by documenting the rule.
 
-### Prompt-injection posture
+## 22. Prompt-injection posture
 
-The review must record whether the runtime distinguishes:
+A reviewed execution/client surface should distinguish, where applicable:
 
 ```text
-instructions from trusted operator
-instructions from system / policy
-content from external source
-content from retrieved memory
-content from tool output
+trusted operator/system instruction
+Pantheon governance artifact
+external source content
+retrieved memory/knowledge
+connector/tool output
+model-generated content
 ```
 
-If the runtime cannot preserve that distinction, its outputs remain higher-risk candidates and must not be used for consequential delivery without stricter human review.
-
-### Permission and token granularity
-
-The review must classify permission posture:
+If a runtime cannot preserve those distinctions, consequential outputs require a stricter posture or the binding must remain refused/limited.
 
 ```text
-permission_granularity:
-  coarse
-  role_based
-  capability_scoped
-  task_scoped
-  dossier_scoped
-  unknown
+content says "do X" != X authorized
 ```
 
-Coarse permissions are not forbidden, but they raise the approval burden when a broad token or session can reach more capability than the Task Contract requires.
+## 23. Permission granularity
 
-Least capability remains the default.
+Record whether permissions are approximately:
 
-### Exposure posture
+```text
+coarse
+role_based
+capability_scoped
+task_scoped
+dossier_scoped
+unknown
+```
 
-The review must distinguish:
+Coarse permissions are not automatically forbidden, but they increase exposure and approval burden.
+
+The runtime/PEP must still constrain each consequential action to the admitted task/effect.
+
+## 24. Exposure posture
+
+Distinguish deployment exposure such as:
 
 ```text
 local_only
@@ -2140,29 +702,50 @@ public_internet
 unknown
 ```
 
-Exposure posture does not authorize use. It only informs risk.
+Exposure state is risk information.
 
-A public or unclear exposure posture blocks professional dossier use until reviewed.
+It does not authorize use.
 
-### Relationship to existing doctrine
+Public or unknown exposure can block sensitive professional use until appropriately qualified.
 
-This review applies:
+## 25. Runtime clients and Hermes WebUI
+
+A runtime client is one possible external capability surface.
+
+It may expose chat, workspace files, session state, runtime controls, tool cards, attachments or runtime-side approval affordances.
+
+Those features are reviewed under the same policy as any other capability.
+
+Hermes WebUI is one optional/proposed client. If selected, its actual deployment/runtime behavior must be qualified rather than assumed from its UI role.
 
 ```text
-EXTERNAL_TOOLS_POLICY.md     -> external tools are capabilities, not authority
-CAPABILITY_PLACEMENT.md      -> consequential effects pass through Pantheon
-ADAPTERS_AND_BINDINGS.md     -> runnable configuration lives outside Pantheon
-UNIFORM_CAPABILITY_GOVERNANCE.md -> one law, one passport, one gate
-TASK_CONTRACTS.md            -> task scope and allowed outputs
-EVIDENCE_PACK.md             -> reviewable evidence and limitations
-APPROVALS.md                 -> approval level
-MEMORY.md                    -> no automatic memory promotion
-SCOPE_ISOLATION.md           -> no silent scope expansion
+Hermes WebUI available != Hermes WebUI selected
+Hermes WebUI selected != Pantheon authority transferred
+runtime approval card != human Pantheon approval
+client workspace access != source admission
 ```
 
-### Outcomes
+Pantheon Cockpit remains the governed projection owner for Cards, Evidence gaps, decisions and status. It is not a substitute generic runtime client.
 
-Allowed review outcomes:
+## 26. PDP / PEP relationship
+
+Pantheon policy decisions are data.
+
+The external runtime/adapter that can cause the effect remains the Policy Enforcement Point.
+
+For consequential effects, the PEP is responsible for enforcing the applicable policy/gate immediately before the effect and for fail-closed behavior when required policy is unavailable.
+
+```text
+PDP allow != effect executed
+PEP executed != Evidence
+technical success != professional acceptance
+```
+
+The protected HTTP policy contract is documented in `mcp-server/docs/HTTP_API_CONTRACT.md`.
+
+## 27. Review outcomes
+
+Useful outcomes include:
 
 ```text
 accepted_for_reference
@@ -2177,28 +760,106 @@ blocked
 refused
 ```
 
-An outcome may approve documentation or adapter design. It does not approve execution unless the separate Task Contract and approval path allow it.
+An accepted review outcome may justify continued evaluation or an adapter design.
 
-### Safe defaults
+It does not automatically install, activate or task-authorize a capability.
 
-If the review is incomplete:
+## 28. Safe defaults
+
+If capability review is incomplete:
 
 ```text
 no external effect
 no canonical effect
 no memory promotion
 no privileged execution
-no client-data use
+no sensitive client-data use
 candidate-only output
-surface the capability gap
+surface the Capability Gap
 ```
 
-### Boundary phrase
+When a safer read-only or draft-only mode exists, prefer it over silent failure or broader authority.
+
+## 29. Revocation and rollback
+
+Tool/binding qualification can be revoked or narrowed.
+
+A capability may be blocked when it becomes:
+
+- unsafe;
+- stale;
+- misconfigured;
+- overbroad;
+- unreviewable;
+- incompatible with current doctrine;
+- unexpectedly more privileged;
+- operationally different from its reviewed artifact.
+
+For consequential capability use, rollback or mitigation should be considered before execution.
 
 ```text
-The runtime may be powerful.
-The review makes the power legible.
-Pantheon governs the consequence.
-The human decides.
-Only the validated remains.
+previously qualified != permanently qualified
 ```
+
+## 30. External inspiration and adoption boundary
+
+External projects, methods and repositories may inform Pantheon but do not govern it.
+
+Their detailed comparison belongs outside this policy in the relevant watchlist, reference review, distillation or capability owner.
+
+Before adopting a concrete external tool, ask:
+
+```text
+Does it solve a demonstrated need?
+Can an existing owner/binding already solve it?
+Can it remain optional and replaceable?
+Does it preserve source/Evidence/approval/memory distinctions?
+What consequential effects can it produce?
+Can the PEP enforce the required gates?
+What does rollback look like?
+```
+
+Do not add a component merely because its architecture is interesting.
+
+## 31. Forbidden drift
+
+External-tool governance must never become:
+
+- a tool runtime;
+- provider router;
+- automatic installer;
+- unrestricted plugin manager;
+- hidden workflow runner;
+- scheduler or queue;
+- autonomous execution engine;
+- automatic skill installer;
+- automatic memory promoter;
+- self-evolution loop;
+- approval bypass;
+- product-specific UI authority;
+- a catalogue that silently selects dependencies.
+
+If tool availability becomes authorization, the boundary has failed.
+
+If a runtime or client can canonize memory/doctrine by itself, the boundary has failed.
+
+If Pantheon must execute the tool to govern the tool, the placement boundary has failed.
+
+## 32. Final invariants
+
+```text
+external capability != authority
+tool available != tool authorized
+read != write
+write prepared != write approved
+runtime output != Evidence
+trace != proof
+retrieved != true
+runtime/client memory != Registre Probatoire
+client selected != authority transfer
+projection != persistence
+PDP decision != PEP execution
+runtime success != professional acceptance
+```
+
+External tools may extend reach. Pantheon governs the conditions and status of that reach without becoming the execution engine.

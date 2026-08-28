@@ -4,14 +4,16 @@ Status: active doctrine — memory and context compartmentalization.
 
 Scope isolation is the governance rule that prevents information from leaking between sessions, tasks, dossiers, projects, users, domains and system doctrine.
 
-This document is inspired by folder-scoped memory isolation patterns in OpenWebUI, but it does not import an OpenWebUI filter, plugin or runtime behavior.
+This doctrine can be projected through folder-, workspace- or session-scoping features in external clients, but it does not import any client filter, plugin or runtime behavior.
 
 It defines Pantheon governance doctrine only.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional runtime clients may expose interaction and working-scope controls.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed scope, warnings and decisions.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
 ## Purpose
@@ -20,13 +22,13 @@ Pantheon Next must prevent accidental cross-contamination between contexts.
 
 A memory-like item must never be globally reusable by default.
 
-A source uploaded in one folder must not silently affect another folder.
+A source uploaded in one client workspace must not silently affect another workspace.
 
 A project fact must not become organization doctrine.
 
 A session assumption must not become project memory.
 
-A retrieved Knowledge Base item must not become a Registre Probatoire entry.
+A retrieved Knowledge Item must not become a Registre Probatoire entry.
 
 Scope isolation makes those boundaries explicit.
 
@@ -63,7 +65,7 @@ These scope types are governance categories.
 
 They are not storage backends.
 
-They are not OpenWebUI implementation details.
+They are not client implementation details.
 
 They are not runtime partitions.
 
@@ -98,8 +100,8 @@ session -> project requires review
 project -> domain requires review
 domain -> system requires review
 user -> organization requires review
-folder -> project requires mapping
-Knowledge Base -> memory requires approval
+client workspace -> project requires mapping
+Knowledge Item -> memory requires approval
 ```
 
 Scope expansion is a governance act.
@@ -110,30 +112,38 @@ It is not a UI effect.
 
 It is not a runtime effect.
 
-## OpenWebUI folders
+## Runtime-client workspaces and folders
 
-OpenWebUI folders may provide useful UI scoping.
+External runtime clients may provide useful workspace, folder, project, chat or knowledge-collection scoping.
 
-A folder can help identify a working perimeter.
+Hermes WebUI is one optional/proposed client that may expose such runtime organization if separately selected and qualified. This doctrine does not require it.
 
-A folder can help select relevant Knowledge Base material.
+A client workspace can help identify a working perimeter.
 
-A folder can help separate chats, files and project contexts.
+A client workspace can help select relevant Knowledge Items.
 
-But an OpenWebUI folder is not a Registre Probatoire entry.
+A client workspace can help separate chats, files and project contexts.
 
-An OpenWebUI folder is not a governance scope by itself until mapped into a Pantheon scope.
+But a client workspace is not a Registre Probatoire entry.
+
+A client workspace is not a governance scope by itself until mapped into a Pantheon scope.
 
 The mapping must be explicit when the distinction matters.
 
-Recommended mapping:
+Recommended conceptual mapping:
 
 ```text
-OpenWebUI folder -> dossier or project scope
-OpenWebUI chat -> session scope
-OpenWebUI Knowledge Base -> Knowledge Item scope
-OpenWebUI upload -> Raw Source or Source Reference
-OpenWebUI memory-like feature -> Register Candidate at most
+client workspace/folder -> dossier or project scope
+client chat/session -> session scope
+client knowledge collection -> Knowledge Item scope
+client upload -> Raw Source or Source Reference
+client memory-like feature -> Register Candidate at most
+```
+
+```text
+Hermes WebUI available != Hermes WebUI selected
+client scope != governed scope
+client selected != authority transfer
 ```
 
 ## Chat scope
@@ -218,7 +228,7 @@ They include:
 
 System or governance scope changes require strong evidence and explicit approval.
 
-No session, project, folder, runtime output or repeated observation may mutate these scopes automatically.
+No session, project, client workspace, runtime output or repeated observation may mutate these scopes automatically.
 
 ## Context Packs
 
@@ -294,7 +304,7 @@ project fact -> reusable domain rule
 user preference -> organization practice
 session insight -> project memory
 project method -> system doctrine
-folder context -> canonical project memory
+client workspace context -> canonical project memory
 ```
 
 Scope expansion should produce an Evidence Pack or review note.
@@ -358,19 +368,15 @@ instead of silent deletion.
 
 If a UI or runtime cleanup mechanism removes items, the governance record must preserve what matters.
 
-## Relationship to OpenWebUI
+## Relationship to runtime clients and Cockpit
 
-OpenWebUI may expose folder, chat and Knowledge Base boundaries.
+Optional runtime clients may expose workspace, folder, chat and knowledge-collection boundaries and may help a user select a working scope.
 
-OpenWebUI may help users select the active scope.
+Pantheon Cockpit may project the governed scope, warnings, evidence gaps and decisions attached to that scope.
 
-OpenWebUI may display scope labels and warnings.
+Client scope controls must not canonize scope, promote runtime memory into Pantheon memory or delete governed memory without a governance record.
 
-OpenWebUI must not canonize scope.
-
-OpenWebUI must not promote folder memory into Pantheon memory by itself.
-
-OpenWebUI must not delete governed memory without a governance record.
+Neither client display nor Cockpit projection is the persistence owner.
 
 ## Relationship to Hermes Agent
 
@@ -409,17 +415,17 @@ Scope isolation must never become:
 - automatic memory promotion;
 - hidden user profiling;
 - silent cross-project context sharing;
-- automatic folder memory canonization;
+- automatic client-workspace memory canonization;
 - UI-driven source of truth;
 - runtime-managed a Registre Probatoire entry;
 - silent deletion of governance history;
 - global memory by convenience.
 
-If folder scoping becomes canonical memory without approval, the boundary has failed.
+If client workspace scoping becomes canonical memory without approval, the boundary has failed.
 
 If one project silently changes another project’s context, the boundary has failed.
 
-If OpenWebUI or Hermes can broaden scope without Pantheon approval, the boundary has failed.
+If a runtime client or Hermes can broaden governed scope without Pantheon approval, the boundary has failed.
 
 ## Final rule
 

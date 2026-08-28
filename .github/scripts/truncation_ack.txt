@@ -146,3 +146,19 @@ docs/governance/DOCUMENT_LIFECYCLE_GOVERNANCE.md
 # speculative client-specific distillation text are removed. Existing Cockpit,
 # Hermes, Evidence and Knowledge owners retain their respective responsibilities.
 docs/governance/AI_LEARNING_REPOS_DISTILLATION.md
+
+# Deliberate Hermes integration convergence: the prior active file concatenated
+# the stable Pantheon/Hermes boundary with stale release reviews and absorbed
+# Kanban, simulation and Page-Agent candidate notes. HERMES_INTEGRATION.md now
+# owns only the stable PDP/PEP, Task Contract, Evidence, memory, client/Cockpit,
+# tool/effect and currentness boundaries. Release-specific review remains with
+# HERMES_RUNTIME_SURFACE_REVIEW.md and candidate history remains in Git/ai_logs.
+docs/governance/HERMES_INTEGRATION.md
+
+# Deliberate external-tools policy convergence: the prior file combined the
+# tool-agnostic T0-T5 policy/threat-review method with large absorbed catalogues
+# of frameworks, methods and repositories. The retained owner keeps effect risk,
+# least capability, Evidence, host-control, untrusted-content, prompt-injection,
+# permission/exposure, PDP/PEP and rollback rules. Product comparisons remain
+# with watchlist/distillation/reference-review/placement owners and Git history.
+docs/governance/EXTERNAL_TOOLS_POLICY.md

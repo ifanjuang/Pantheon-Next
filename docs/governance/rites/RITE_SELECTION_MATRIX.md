@@ -13,9 +13,11 @@ It is not a runtime policy.
 It is not an automatic classifier.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional runtime clients may expose interaction.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed rite, review and decision state.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
 ## Purpose

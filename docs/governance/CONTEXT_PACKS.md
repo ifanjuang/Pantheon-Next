@@ -19,9 +19,11 @@ It is not runtime state.
 It is not a system prompt dump.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional runtime clients may expose interaction and bounded context.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed context, review and decision state.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
 ## Purpose
@@ -34,7 +36,8 @@ They can support:
 
 - Claude Code through `CLAUDE.md` or imported instructions;
 - ChatGPT through project instructions or pinned context;
-- OpenWebUI through system prompts, folders, Knowledge Bases and cockpit display;
+- optional runtime clients through system prompts, workspaces, knowledge collections and interaction surfaces;
+- Hermes WebUI when separately selected and qualified, without making it mandatory;
 - Hermes Agent through profiles, Task Contracts and scoped context;
 - other external assistants through adapter-specific instructions.
 
@@ -91,7 +94,7 @@ The identifier is a governance identifier.
 
 It is not a runtime session ID.
 
-It is not an OpenWebUI folder ID.
+It is not a runtime-client workspace ID.
 
 It is not a Claude session ID.
 
@@ -106,7 +109,7 @@ Good examples:
 ```text
 prepare Claude Code to work safely on governance Markdown
 prepare Hermes Agent to execute under a Task Contract
-prepare OpenWebUI to expose project-scoped Knowledge without canonizing it
+prepare an optional runtime client to expose project-scoped Knowledge without canonizing it
 prepare ChatGPT to answer according to Pantheon doctrine
 ```
 
@@ -150,8 +153,9 @@ Examples:
 ```text
 Claude Code
 ChatGPT project
-OpenWebUI folder
-OpenWebUI Knowledge Base
+optional runtime-client workspace
+optional runtime-client knowledge surface
+Hermes WebUI when selected
 Hermes profile
 Hermes Task Contract
 external assistant
@@ -169,8 +173,9 @@ A Context Pack may include excerpts or references to active Pantheon doctrine.
 Examples:
 
 ```text
-OpenWebUI exposes
+optional runtime clients expose interaction only
 Hermes Agent executes
+Pantheon Cockpit projects governed state
 Pantheon Next governs
 approval rules
 memory rules
@@ -341,7 +346,7 @@ A Context Pack should make forbidden assumptions explicit.
 Examples:
 
 ```text
-Do not assume OpenWebUI is memory.
+Do not assume a runtime client is memory.
 Do not assume Hermes can canonize outputs.
 Do not assume retrieved knowledge is evidence.
 Do not assume evidence is approval.
@@ -380,8 +385,8 @@ Examples:
 CLAUDE.md
 AGENTS.md import
 ChatGPT project instructions
-OpenWebUI system prompt
-OpenWebUI folder description
+optional runtime-client system prompt
+optional runtime-client workspace description
 Hermes profile note
 Hermes Task Contract appendix
 human checklist
@@ -429,19 +434,27 @@ It should preserve:
 
 It must not treat prior conversation memory as a Registre Probatoire entry unless the claim is approved and scoped.
 
-## OpenWebUI adapter
+## Optional runtime-client adapter
 
-An OpenWebUI-facing adapter may use system prompts, folder scope, Knowledge Bases and visible approval surfaces.
+An optional runtime-client adapter may use system prompts, workspace scope, knowledge collections and visible interaction surfaces.
 
-OpenWebUI folders may help define working scope.
+Hermes WebUI is one possible external client if it is separately selected and qualified. This doctrine does not require or install it.
 
-OpenWebUI Knowledge Bases may provide Knowledge Items.
+Client workspaces may help define working scope.
+
+Client knowledge collections may provide Knowledge Items.
 
 Neither becomes a Registre Probatoire entry by default.
 
-OpenWebUI exposes.
+A client exposes interaction.
 
-It does not canonize.
+It does not canonize, approve or become Pantheon authority.
+
+```text
+Hermes WebUI available != Hermes WebUI selected
+client selected != authority transfer
+client knowledge available != memory
+```
 
 ## Hermes adapter
 

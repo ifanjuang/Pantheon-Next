@@ -13,9 +13,11 @@ Approval is not automation.
 Approval is not a runtime callback.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional Hermes WebUI or other compatible clients may expose runtime interaction.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed approval state and decision surfaces.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
 ## Purpose
@@ -73,9 +75,11 @@ Evidence Packs support approval decisions.
 
 Memory promotion remains a distinct governance act.
 
-OpenWebUI may expose approval information.
+Pantheon Cockpit may project approval information and decision state.
 
-Hermes Agent may report approval status.
+`nesquena/hermes-webui`, when selected, or another compatible runtime client may expose interaction around the task, but client display does not grant approval or transfer authority. Hermes WebUI is optional/proposed, not required by Pantheon.
+
+Hermes Agent may report technical status relevant to an approval review.
 
 Pantheon Next remains the governance authority.
 

@@ -116,21 +116,27 @@ Dans les deux cas, la règle reste la même : le moteur reçoit seulement ce qui
 
 ## Depuis les canaux habituels
 
-Pantheon ne demande pas de remplacer les outils de travail. Il peut être projeté vers un cockpit OpenWebUI, une messagerie, un e-mail ou une autre surface d’exposition.
+Pantheon ne demande pas de remplacer tous les outils de travail. L’interaction avec Hermes peut rester en terminal/messagerie ou passer, si on le souhaite, par `nesquena/hermes-webui`, une WebUI Hermes optionnelle proposée, ou par un autre client compatible et remplaçable. Les états professionnels gouvernés peuvent être projetés dans Pantheon Cockpit sous forme de Cards, navigation, décisions et statuts.
+
+Ces surfaces restent distinctes : Hermes WebUI n’est pas obligatoire, un client de conversation n’est pas l’autorité de gouvernance, et le Cockpit n’est pas un second WebUI/chat générique.
 
 La distinction centrale reste stable : répondre n’est pas agir. Préparer un mail n’est pas l’envoyer. Proposer une décision n’est pas l’approuver. Retrouver une source n’est pas la prouver.
 
 ## Sous le capot
 
 ```text
-OpenWebUI expose.
-Hermes Agent exécute.
-Pantheon Next gouverne.
+Hermes WebUI optionnelle / clients compatibles = interaction runtime possible.
+Hermes Agent                                   = exécution externe.
+Pantheon Cockpit                               = projections gouvernées.
+Pantheon Next                                  = gouvernance et autorité.
+L’humain                                       = décision conséquente.
 ```
 
-OpenWebUI est la surface visible : demande, dossier, sources, statuts, validation.
+Hermes WebUI est une surface web/mobile optionnelle autour d’Hermes Agent. Elle peut offrir chat, sessions, workspace et contrôles runtime, mais elle n’est ni requise par Pantheon ni une autorité de gouvernance. D’autres clients Hermes peuvent rester utilisés.
 
 Hermes Agent est l’atelier d’exécution externe : recherche, extraction, comparaison, conversion, rédaction, outils et production de candidats.
+
+Pantheon Cockpit affiche les éléments qui nécessitent une lecture gouvernée : Cards, états, décisions, risques, Evidence et navigation professionnelle. Une projection n’est pas une persistance ni une autorité.
 
 Pantheon Next est le noyau de gouvernance : ce qui entre, ce qui peut sortir, ce qui demande preuve, ce qui exige approbation, ce qui peut rester.
 

@@ -15,9 +15,11 @@ It is not a runtime event.
 It is not a scheduler item, queue message, bus message, tool call, hidden debate or automatic approval.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional runtime clients may expose interaction.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed signal, approval and decision state.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
 ## Core doctrine
@@ -99,7 +101,8 @@ Role Signals do not implement:
 | Prepare implementation or patch candidate signals | HEPHAISTOS |
 | Frame memory-oriented retrieval, continuity, supersession and retention review | MNEMOSYNE |
 | Execute operational work under Task Contract | Hermes Agent |
-| Display signals, approvals and decisions | OpenWebUI |
+| Expose runtime interaction when selected | Optional runtime client |
+| Project governed signals, approvals and decisions | Pantheon Cockpit |
 | Govern signal schema, status and limits | Pantheon Next |
 
 Canonical split:
@@ -114,7 +117,8 @@ IRIS formats and transmits.
 HEPHAISTOS prepares candidates.
 MNEMOSYNE governs continuity, memory-oriented retrieval framing and placement proposals.
 Hermes executes externally under Task Contract.
-OpenWebUI exposes.
+Optional runtime clients expose interaction only.
+Pantheon Cockpit projects governed signal, approval and decision state.
 Pantheon governs.
 ```
 
@@ -516,9 +520,11 @@ Persistence does not imply canonization.
 
 Canonization follows the relevant approval and memory policy.
 
-## OpenWebUI boundary
+## Runtime-client and Cockpit boundary
 
-OpenWebUI may expose public summaries of Role Signals.
+Optional runtime clients may expose public summaries of Role Signals and technical interaction state. Hermes WebUI is one optional/proposed client if separately selected and qualified.
+
+Pantheon Cockpit may project governed Role Signal summaries, approval state and linked decisions.
 
 Allowed public summaries:
 
@@ -533,9 +539,13 @@ Forbidden public summary:
 raw internal reasoning, hidden prompt, private file path, secret, raw source dump
 ```
 
-OpenWebUI displays signal status.
+Neither client display nor Cockpit projection becomes signal authority, runtime governance, memory or approval.
 
-It does not become signal authority, runtime, memory or approval system.
+```text
+Hermes WebUI available != Hermes WebUI selected
+client selected != authority transfer
+projection != persistence
+```
 
 ## Hermes boundary
 
@@ -576,7 +586,8 @@ THEMIS blocks risk.
 APOLLO validates readiness.
 IRIS formats without changing substance.
 Hermes executes externally under Task Contract.
-OpenWebUI exposes.
+Optional runtime clients expose interaction only.
+Pantheon Cockpit projects governed signal, approval and decision state.
 Pantheon governs.
 ```
 

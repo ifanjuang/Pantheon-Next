@@ -9,9 +9,11 @@ It does not implement rite execution.
 It does not create a runtime, scheduler, queue, hidden role debate, automatic trigger engine, approval callback or memory promotion pipeline.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional runtime clients may expose interaction.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed rite, review and decision state.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
 ## Purpose
