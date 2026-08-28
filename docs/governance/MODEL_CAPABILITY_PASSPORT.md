@@ -8,13 +8,9 @@ It specializes the general capability-passport rule. It does not replace `UNIFOR
 
 It is a declaration and review shape, not an implementation.
 
-It does not create a provider router, model router, benchmark runner, model registry, evaluation harness, runtime, MCP host, OpenWebUI configuration, Hermes skill, scheduler, queue, installer, approval engine, memory engine or external action.
+It does not create a provider router, model router, benchmark runner, model registry, evaluation harness, runtime, MCP host, runtime-client configuration, Hermes skill, scheduler, queue, installer, approval engine, memory engine or external action.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: compatible runtime clients are optional interaction surfaces, Hermes/the external runtime executes admitted work, Pantheon Cockpit projects governed state, and model or client selection does not transfer Pantheon authority.
 
 ## Purpose
 
@@ -337,8 +333,8 @@ model serving -> runtime / adapter
 model routing -> runtime / adapter
 provider key handling -> runtime / adapter
 benchmark execution -> runtime / adapter
-UI selection -> exposure surface
-passport display -> exposure surface
+UI selection -> interaction/projection surface
+passport display -> governed projection surface
 passport decision -> Pantheon gate
 ```
 
