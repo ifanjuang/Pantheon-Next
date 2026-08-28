@@ -17,9 +17,11 @@ It is not an autonomous agent loop.
 It is not a scheduler, queue, retry system, provider router or self-healing runtime.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Optional runtime clients may expose interaction.
+Hermes Agent executes external admitted work.
+Pantheon Cockpit projects governed review and decision state.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
 ## Principle
@@ -274,7 +276,7 @@ Stop or escalate when:
 - sources conflict materially;
 - private or identifiable data would enter the repository;
 - Hermes would need broader access than granted;
-- OpenWebUI would be treated as memory or runtime;
+- a runtime client would be treated as memory, governance authority or persistence owner;
 - Pantheon would become an execution surface.
 
 Stopping is not failure when continuation would violate governance.
@@ -303,26 +305,41 @@ Hermes must not:
 - bypass User Decision Gates;
 - treat tool availability as tool authorization.
 
-## OpenWebUI exposure discipline
+## Runtime-client and Cockpit exposure discipline
 
-OpenWebUI may expose:
+An optional runtime client may expose:
 
 - user intent;
-- files and Knowledge Bases selected by the user;
+- files and knowledge collections selected by the user;
 - Task Contracts;
 - candidate outputs;
-- Evidence Packs;
+- technical runtime status.
+
+Hermes WebUI is one optional/proposed runtime client if separately selected and qualified. Its availability does not make it required.
+
+Pantheon Cockpit may project:
+
+- governed Task Contract state;
+- Evidence Packs and evidence gaps;
 - approval prompts;
 - User Decision Gates;
-- Register Candidates.
+- Register Candidates;
+- governed review status.
 
-OpenWebUI must not become:
+Neither a runtime client nor the Cockpit becomes:
 
-- a Registre Probatoire entry;
-- runtime authority;
+- a Registre Probatoire entry by display;
 - approval authority by itself;
 - hidden source of truth;
-- automatic promotion mechanism.
+- automatic promotion mechanism;
+- a replacement for the persisted governance owner.
+
+```text
+Hermes WebUI available != Hermes WebUI selected
+client selected != authority transfer
+projection != persistence
+runtime display != Evidence
+```
 
 ## Claude and coding-agent discipline
 
@@ -333,7 +350,7 @@ It must:
 - stay inside the assigned scope;
 - avoid unrelated refactors;
 - avoid inventing implementation details not requested;
-- preserve the OpenWebUI / Hermes / Pantheon boundary;
+- preserve the optional-client / Hermes Agent / Pantheon Cockpit / Pantheon Next boundary;
 - log significant interventions in `ai_logs/`;
 - state when tests were not run;
 - avoid modifying protected areas without confirmation.
@@ -348,7 +365,7 @@ Before accepting a contribution, check:
 Does it solve the stated objective?
 Does it touch only necessary files?
 Does it avoid runtime drift?
-Does it preserve OpenWebUI / Hermes / Pantheon boundaries?
+Does it preserve optional-client / Hermes Agent / Pantheon Cockpit / Pantheon Next boundaries?
 Does it avoid private or identifiable data?
 Does it mark candidate status where appropriate?
 Does it specify evidence and approvals where consequential?
