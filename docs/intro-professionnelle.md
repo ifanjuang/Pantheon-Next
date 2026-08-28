@@ -116,23 +116,23 @@ Dans les deux cas, la règle reste la même : le moteur reçoit seulement ce qui
 
 ## Depuis les canaux habituels
 
-Pantheon ne demande pas de remplacer tous les outils de travail. L’interaction runtime peut passer par Hermes Web/dashboard ou par des clients compatibles et remplaçables. Les états professionnels gouvernés peuvent être projetés dans Pantheon Cockpit sous forme de Cards, navigation, décisions et statuts.
+Pantheon ne demande pas de remplacer tous les outils de travail. L’interaction avec Hermes peut rester en terminal/messagerie ou passer, si on le souhaite, par `nesquena/hermes-webui`, une WebUI Hermes optionnelle proposée, ou par un autre client compatible et remplaçable. Les états professionnels gouvernés peuvent être projetés dans Pantheon Cockpit sous forme de Cards, navigation, décisions et statuts.
 
-Ces surfaces restent distinctes : un client de conversation n’est pas l’autorité de gouvernance, et le Cockpit n’est pas un second WebUI/chat générique.
+Ces surfaces restent distinctes : Hermes WebUI n’est pas obligatoire, un client de conversation n’est pas l’autorité de gouvernance, et le Cockpit n’est pas un second WebUI/chat générique.
 
 La distinction centrale reste stable : répondre n’est pas agir. Préparer un mail n’est pas l’envoyer. Proposer une décision n’est pas l’approuver. Retrouver une source n’est pas la prouver.
 
 ## Sous le capot
 
 ```text
-Hermes Web/dashboard et clients compatibles = interaction runtime.
-Hermes Agent                                 = exécution externe.
-Pantheon Cockpit                             = projections gouvernées.
-Pantheon Next                                = gouvernance et autorité.
-L’humain                                     = décision conséquente.
+Hermes WebUI optionnelle / clients compatibles = interaction runtime possible.
+Hermes Agent                                   = exécution externe.
+Pantheon Cockpit                               = projections gouvernées.
+Pantheon Next                                  = gouvernance et autorité.
+L’humain                                       = décision conséquente.
 ```
 
-Hermes Web/dashboard porte le chat, les sessions et l’interaction avec le runtime. Les clients compatibles restent optionnels et remplaçables.
+Hermes WebUI est une surface web/mobile optionnelle autour d’Hermes Agent. Elle peut offrir chat, sessions, workspace et contrôles runtime, mais elle n’est ni requise par Pantheon ni une autorité de gouvernance. D’autres clients Hermes peuvent rester utilisés.
 
 Hermes Agent est l’atelier d’exécution externe : recherche, extraction, comparaison, conversion, rédaction, outils et production de candidats.
 
