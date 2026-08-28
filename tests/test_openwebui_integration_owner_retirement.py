@@ -20,7 +20,6 @@ KNOWN_CURRENT_AUTHORITY_OPENWEBUI_RESIDUES = {
     "docs/governance/GOVERNED_AUTONOMY_GRADIENT.md",
     "docs/governance/GOVERNED_METHOD_STANDARD.md",
     "docs/governance/HERMES_INTEGRATION_MODELS_RECONCILIATION.md",
-    "docs/governance/MODEL_CAPABILITY_PASSPORT.md",
     "docs/governance/MODULAR_DOMAIN_REORIENTATION.md",
     "docs/governance/MODULE_ACTIVATION.md",
     "docs/governance/PRE_EXECUTION_SIMULATION.md",
@@ -31,7 +30,6 @@ KNOWN_CURRENT_AUTHORITY_OPENWEBUI_RESIDUES = {
     "docs/governance/SKILL_WATCHLIST.md",
     "docs/governance/SOURCE_NEED_AND_REGISTRY.md",
     "docs/governance/TENSIONS_AND_RISKS.md",
-    "docs/governance/UNIFORM_CAPABILITY_GOVERNANCE.md",
     "docs/governance/evidence_topology_antipatterns/README.md",
     "docs/governance/rites/RITE_EXAMPLES.md",
 }
