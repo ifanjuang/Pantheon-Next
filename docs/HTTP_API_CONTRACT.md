@@ -12,9 +12,11 @@ This pointer does not duplicate or override that contract. It exists so reposito
 MCP helps agents consult and prepare.
 HTTP exposes deterministic policy/preflight data.
 Hermes Agent executes admitted work outside Pantheon.
-Hermes Web/dashboard and compatible clients expose runtime interaction.
+Optional Hermes WebUI or other compatible clients may expose runtime interaction.
 Pantheon Cockpit projects governed Cards, decisions, navigation and status.
 The human decides consequential effects.
 ```
+
+`nesquena/hermes-webui` is an optional/proposed external Hermes interaction surface, not a required Pantheon component or authority owner.
 
 Implementation present does not mean installed, connected, enforced, activated, approved for real data or production-authorized.
