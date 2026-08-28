@@ -14,11 +14,7 @@ It does not implement runtime behavior.
 
 It does not authorize automatic installation, automatic activation, automatic execution, automatic approval or automatic memory promotion.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: compatible runtime clients expose optional runtime interaction, Hermes/the external runtime detects and executes capabilities as the PEP, Pantheon Cockpit projects governed activation and decision state, and Pantheon policy remains the PDP/governance authority.
 
 ## Purpose
 
@@ -26,7 +22,7 @@ Pantheon Next should remain modular without becoming a plugin manager.
 
 Future UI work may need to show whether a capability is available, disabled, enabled for a scope, suspended, rejected or authorized for a specific task.
 
-This document defines the governance vocabulary for that UI.
+This document defines the governance vocabulary for that UI and for non-authoritative runtime administration surfaces.
 
 It answers:
 
@@ -42,7 +38,7 @@ Enabled does not mean authorized for a task.
 Authorized for a task does not mean sovereign.
 ```
 
-A capability may exist in Hermes, OpenWebUI or an external environment without being governed for use by Pantheon.
+A capability may exist in Hermes, a compatible runtime client or an external environment without being governed for use by Pantheon.
 
 ## Module meaning
 
@@ -71,7 +67,8 @@ A module may define:
 - risk classes;
 - UI exposure expectations;
 - Hermes candidate constraints;
-- OpenWebUI cockpit controls;
+- runtime-client interaction constraints;
+- Pantheon Cockpit projection expectations;
 - evidence expectations;
 - memory implications.
 
@@ -92,7 +89,7 @@ Detection reports that a capability exists somewhere.
 Examples:
 
 - Hermes detects that LangGraph is installed in a sandbox;
-- OpenWebUI has a Function available;
+- a compatible runtime client exposes an action or function;
 - a Knowledge Base exists;
 - a connector is configured;
 - a candidate skill is present in a Hermes directory;
@@ -119,11 +116,13 @@ Activation must define mandatory rules and optional switches.
 
 ### 3. Task authorization
 
-Task authorization means a specific Task Contract permits use of the capability for a specific task.
+Task authorization means a specific Task Contract and applicable Pantheon policy disposition permit use of the capability for a specific task.
 
 A capability may be detected and enabled but still unauthorized for the current task.
 
 Task authorization requires scope fit, approval fit, allowed tool fit, memory fit and evidence fit.
+
+The runtime/PEP enforces consequential-effect policy; module activation itself is not execution authorization.
 
 ## Status vocabulary
 
@@ -160,7 +159,7 @@ rejected
 | dossier_enabled | allowed for a named dossier under conditions |
 | domain_enabled | allowed for a domain of work under conditions |
 | organization_enabled | allowed broadly, rare and high-governance |
-| task_authorized | allowed for the current Task Contract only |
+| task_authorized | allowed for the current Task Contract only, subject to applicable policy/gates |
 | suspended | temporarily blocked pending review |
 | deprecated | should be phased out |
 | rejected | forbidden under current doctrine |
@@ -292,53 +291,54 @@ optional_rules:
 
 forbidden:
   pantheon_runtime: true
-  openwebui_runtime: true
+  runtime_client_governance_authority: true
   canonical_memory_write: true
   auto_approval: true
 ```
 
 Effective Policy is a governance artifact.
 
-It is not a runtime engine.
+It is not a runtime engine or a substitute for an operation-specific PDP disposition.
 
 ## UI control model
 
-A future OpenWebUI cockpit may expose module controls.
+Pantheon Cockpit may project governed module status and decision controls. Optional operator/runtime clients may expose runtime administration controls separately.
 
-Allowed controls:
+Allowed governed Cockpit projections or requests:
 
 - view detection status;
 - view effective policy;
-- enable for sandbox;
-- enable for project;
-- enable for dossier;
-- disable;
-- suspend;
+- request enablement for sandbox;
+- request enablement for project;
+- request enablement for dossier;
+- request disable or suspension;
 - request review;
-- require approval;
+- show approval requirement;
 - show evidence;
 - show risk;
 - show capability gaps;
 - show last Evidence Pack;
-- restore previous governance status.
+- show previous governance status for a reviewed rollback decision.
 
-Forbidden controls:
+These controls project or request governance state. They do not perform runtime installation or external effects by themselves.
+
+Forbidden controls or interpretations:
 
 - bypass mandatory rules;
 - grant automatic approval;
 - promote memory;
 - mutate doctrine;
-- install plugins automatically;
-- install skills automatically;
+- install plugins automatically from Pantheon Cockpit;
+- install skills automatically from Pantheon Cockpit;
 - start hidden runtime jobs;
-- grant broad OpenWebUI Knowledge access;
+- grant broad runtime-client Knowledge/storage access as governance authority;
 - grant write tools without approval;
-- turn detection into authorization.
+- turn detection into authorization;
+- treat a Cockpit click as the consequential effect itself.
 
 ### Explicit Hermes administration requests
 
-An operator-facing UI may submit a one-shot request to an already authenticated
-native Hermes administration API when all of the following are true:
+An operator-facing runtime client or administration UI may submit a one-shot request to an already authenticated native Hermes administration API when all of the following are true:
 
 - a human selects the exact module and action;
 - the target, source and material effect are visible before confirmation;
@@ -348,15 +348,12 @@ native Hermes administration API when all of the following are true:
 - failure stays failure and is not converted into an enabled state;
 - no retry, follow-on action or task execution starts automatically.
 
-This can cover an operator-selected catalog install, provider selection,
-enable/disable change or connectivity probe. It does not make Pantheon a plugin
-manager or provider router because Pantheon neither performs the runtime work
-nor owns the external configuration.
+This can cover an operator-selected catalog install, provider selection, enable/disable change or connectivity probe. It does not make Pantheon a plugin manager or provider router because Pantheon neither performs the runtime work nor owns the external configuration.
 
 The state transition must remain explicit:
 
 ```text
-human-confirmed request
+human-confirmed administration request
 → Hermes native operation
 → observed Hermes state
 ```
@@ -367,17 +364,16 @@ It must never be shortened to:
 detection → installation → governance activation → task use
 ```
 
-Installation and Hermes runtime enablement remain operational facts. A separate
-governance activation record and a matching Task Contract are still required
-where doctrine calls for them.
+Installation and Hermes runtime enablement remain operational facts. A separate governance activation record and a matching Task Contract plus applicable policy/gates are still required where doctrine calls for them.
 
 ## Layer split
 
 | Layer | Role in activation |
 |---|---|
-| Pantheon | defines statuses, mandatory rules, optional rules, scopes, approvals and effective policy |
-| Hermes | detects and executes capabilities only when task-authorized |
-| OpenWebUI | displays status, controls, evidence, approvals and User Decision Gates |
+| Pantheon policy/governance | defines statuses, mandatory rules, optional rules, scopes, approvals and effective policy; provides bounded PDP decisions |
+| Hermes / external runtime | detects capabilities, enforces consequential policy as PEP and executes admitted work |
+| compatible runtime client | optional runtime interaction and operator administration only; no governance authority |
+| Pantheon Cockpit | projects governed status, evidence gaps, approvals and User Decision Gates; projection only |
 
 ## Capability classes
 
@@ -387,8 +383,9 @@ Recommended classes:
 governance_module
 hermes_runtime_candidate
 hermes_skill_candidate
-openwebui_cockpit_template
-openwebui_capability_surface
+runtime_client_template
+runtime_client_capability_surface
+pantheon_cockpit_projection
 evidence_template
 memory_policy
 approval_gate
@@ -418,8 +415,8 @@ evidence_pack_return_required: true
 approval_ceiling_required: true
 memory_promotion_forbidden: true
 pantheon_runtime_forbidden: true
-openwebui_runtime_forbidden: true
-direct_openwebui_db_access_forbidden: true
+runtime_client_as_governance_runtime_forbidden: true
+direct_runtime_client_storage_access_forbidden: true
 raw_trace_is_not_evidence: true
 graph_state_is_runtime_state: true
 user_decision_gate_required_for_unresolved_conflict: true
@@ -446,7 +443,7 @@ Enable LangGraph for project
 must mean:
 
 ```text
-Hermes may use LangGraph only for task-authorized work in this project, under mandatory Pantheon rules.
+Hermes may use LangGraph only for task-authorized work in this project, under mandatory Pantheon rules and applicable policy decisions.
 ```
 
 It must not mean:
@@ -457,10 +454,7 @@ LangGraph becomes Pantheon workflow engine.
 
 ## n8n example
 
-n8n is an optional Hermes-side automation MCP candidate. It is useful for
-deterministic integrations and repeatable workflow operations once a concrete
-need exists. It is not required for the Pantheon MVP and must not duplicate
-Hermes reasoning, Pantheon approvals or Task Contract checks.
+n8n is an optional Hermes-side automation MCP candidate. It is useful for deterministic integrations and repeatable workflow operations once a concrete need exists. It is not required for the Pantheon MVP and must not duplicate Hermes reasoning, Pantheon approvals or Task Contract checks.
 
 The audited Hermes catalog entry exposes a read-mostly default selection:
 
@@ -475,9 +469,7 @@ recent_failures
 export_workflow
 ```
 
-The bridge also contains `activate_workflow`, `deactivate_workflow` and
-`container_logs`, which the catalog excludes by default because they mutate
-live workflow state or expose operational data.
+The bridge also contains `activate_workflow`, `deactivate_workflow` and `container_logs`, which the catalog excludes by default because they mutate live workflow state or expose operational data.
 
 Recommended initial posture:
 
@@ -498,9 +490,7 @@ mandatory_rules:
   reasoning_delegation_to_n8n_forbidden: true
 ```
 
-Installing, enabling or probing the n8n MCP does not authorize a workflow
-activation. Any concrete external effect is reviewed under
-`EXTERNAL_TOOLS_POLICY.md` according to its actual target and risk.
+Installing, enabling or probing the n8n MCP does not authorize a workflow activation. Any concrete external effect is reviewed under `EXTERNAL_TOOLS_POLICY.md` and the applicable Pantheon policy decision according to its actual target and risk.
 
 ## Suspension
 
@@ -583,6 +573,8 @@ required_return:
   - memory_candidates_if_any
 ```
 
+The record does not self-authorize a consequential effect; it must remain consistent with the applicable Pantheon PDP disposition and PEP enforcement.
+
 ## Relationship to MODULES.md
 
 `MODULES.md` defines governance areas.
@@ -641,13 +633,15 @@ Module activation must never become:
 - hidden agent loop;
 - automatic approval engine;
 - automatic memory engine;
-- OpenWebUI capability sprawl;
+- runtime-client capability sprawl that bypasses governance;
+- Pantheon Cockpit runtime drift;
 - Hermes authority bypass;
 - Pantheon runtime migration.
 
 ## Final rule
 
 ```text
-Pantheon detects capabilities to apply policy.
-It does not detect capabilities to execute them.
+Pantheon detects and qualifies capabilities to apply policy.
+Detection and activation do not execute them.
+The external runtime/PEP executes only admitted work under the applicable policy decision.
 ```
