@@ -12,11 +12,7 @@ It does not define runtime adoption.
 
 It does not authorize a LangGraph runtime, GraphRAG runtime, observability backend, MCP layer, skill marketplace, provider router, scheduler, queue, tool runtime, automatic memory system or hidden workflow runner inside Pantheon Next.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: optional compatible runtime clients expose runtime interaction only, Hermes/the external runtime executes admitted work, Pantheon Cockpit projects governed state, and external references cannot transfer authority to any tool or surface.
 
 ## Purpose
 
@@ -48,7 +44,8 @@ A reference may inform:
 - role review responsibilities;
 - User Decision Gate triggers;
 - Hermes candidate constraints;
-- OpenWebUI exposure requirements;
+- runtime-client interaction requirements;
+- Pantheon Cockpit projection requirements;
 - rejected-pattern memory.
 
 A reference must not authorize:
@@ -140,7 +137,8 @@ Does it preserve Evidence Pack discipline?
 Does it preserve candidate versus canonical distinction?
 Does it preserve scope isolation?
 Does it keep execution outside Pantheon?
-Does it keep OpenWebUI as cockpit rather than authority?
+Does it keep runtime clients as non-authoritative interaction surfaces?
+Does it keep Pantheon Cockpit as projection rather than authority or persistence?
 Does it keep Hermes as runtime rather than governance authority?
 ```
 
