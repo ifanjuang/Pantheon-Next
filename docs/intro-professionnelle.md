@@ -116,21 +116,27 @@ Dans les deux cas, la règle reste la même : le moteur reçoit seulement ce qui
 
 ## Depuis les canaux habituels
 
-Pantheon ne demande pas de remplacer les outils de travail. Il peut être projeté vers un cockpit OpenWebUI, une messagerie, un e-mail ou une autre surface d’exposition.
+Pantheon ne demande pas de remplacer tous les outils de travail. L’interaction runtime peut passer par Hermes Web/dashboard ou par des clients compatibles et remplaçables. Les états professionnels gouvernés peuvent être projetés dans Pantheon Cockpit sous forme de Cards, navigation, décisions et statuts.
+
+Ces surfaces restent distinctes : un client de conversation n’est pas l’autorité de gouvernance, et le Cockpit n’est pas un second WebUI/chat générique.
 
 La distinction centrale reste stable : répondre n’est pas agir. Préparer un mail n’est pas l’envoyer. Proposer une décision n’est pas l’approuver. Retrouver une source n’est pas la prouver.
 
 ## Sous le capot
 
 ```text
-OpenWebUI expose.
-Hermes Agent exécute.
-Pantheon Next gouverne.
+Hermes Web/dashboard et clients compatibles = interaction runtime.
+Hermes Agent                                 = exécution externe.
+Pantheon Cockpit                             = projections gouvernées.
+Pantheon Next                                = gouvernance et autorité.
+L’humain                                     = décision conséquente.
 ```
 
-OpenWebUI est la surface visible : demande, dossier, sources, statuts, validation.
+Hermes Web/dashboard porte le chat, les sessions et l’interaction avec le runtime. Les clients compatibles restent optionnels et remplaçables.
 
 Hermes Agent est l’atelier d’exécution externe : recherche, extraction, comparaison, conversion, rédaction, outils et production de candidats.
+
+Pantheon Cockpit affiche les éléments qui nécessitent une lecture gouvernée : Cards, états, décisions, risques, Evidence et navigation professionnelle. Une projection n’est pas une persistance ni une autorité.
 
 Pantheon Next est le noyau de gouvernance : ce qui entre, ce qui peut sortir, ce qui demande preuve, ce qui exige approbation, ce qui peut rester.
 
