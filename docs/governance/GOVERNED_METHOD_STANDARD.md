@@ -6,11 +6,7 @@ This document defines a reusable method discipline for professional work governe
 
 It does not implement a workflow engine, agent, scheduler, queue, approval engine, memory engine, OpenWebUI plugin, Hermes skill, connector, runtime, UI renderer or external action.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: optional compatible runtime clients expose runtime interaction only, Hermes/the external runtime executes admitted work as PEP, Pantheon Cockpit projects governed state, and Pantheon policy/governance remains the bounded PDP authority.
 
 ## Purpose
 
