@@ -292,6 +292,8 @@ Workspace exposes configured human filesystem trees through the read-only Worksp
 
 It is deliberately weak semantically: directory structure is useful for navigation but cannot determine governed identity.
 
+The architecture-agency recommended organization profile is owned by `docs/domain-packs/architecture/DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md`. `Affaires` and `Connaissances` are Cockpit Space projections, not required physical root-folder names. A differently organized tree remains usable and may be mapped or classified without being moved.
+
 Workspace Cards are ephemeral projections and expose no implicit mutation, classification, approval or Evidence action.
 
 ### Outils
