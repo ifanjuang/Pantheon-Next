@@ -167,9 +167,13 @@ Escalation is appropriate when, for example:
 - a technical score is being used as if it were approval;
 - the output has material legal, contractual, financial, safety or professional effect.
 
-## Relationship to `RAG_INGESTION_PIPELINE.md`
+## Relationship to source and retrieval owners
 
-`RAG_INGESTION_PIPELINE.md` owns provider-agnostic preparation/retrieval invariants and records the currently demonstrated implementation profiles.
+`SOURCE_INGESTION_RETRIEVAL_MODEL.md` owns the provider-agnostic source-access, derivation, scope, provenance and retrieval-progression doctrine.
+
+`SOURCE_RETRIEVAL_IMPLEMENTATION_COVERAGE.md` is the descriptive inventory for observed implementation coverage; it does not create doctrine or adoption.
+
+The retained `RAG_INGESTION_PIPELINE.md` path is only a compatibility/profile pointer and owns no independent doctrine.
 
 This document owns only the interpretation after/around retrieval:
 

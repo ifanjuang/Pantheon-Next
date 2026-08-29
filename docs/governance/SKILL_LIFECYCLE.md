@@ -1,12 +1,9 @@
 # Skill Lifecycle
 
 Status: candidate support doctrine — to verify. Written fresh by distillation; replaces an earlier placeholder.
+Boundary profile: candidate_support_note.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: optional compatible runtime clients expose interaction, Hermes Agent executes admitted external work, Pantheon Cockpit projects governed state, and Pantheon Next retains governance authority.
 
 ## Purpose
 
@@ -140,7 +137,7 @@ an installed skill != a usable skill
 
 ## Boundary
 
-The standard non-implementation boundary applies — see `BOUNDARY_STANDARD.md`. In addition, this document specifically does not implement a skill installer, a marketplace, automatic admission, on-the-flow skill recorder, skill distiller, custom skill builder or any lifecycle automation: every transition above is a human-reviewed decision recorded as data.
+The `candidate_support_note` profile from `BOUNDARY_PROFILES.md` applies. In addition, this document specifically does not implement a skill installer, marketplace, automatic admission, on-the-flow skill recorder, skill distiller, custom skill builder, provider router, scheduler, queue or lifecycle automation. Every transition above is a human-reviewed decision recorded as data.
 
 ## Relationship to existing doctrine
 
@@ -152,4 +149,4 @@ The standard non-implementation boundary applies — see `BOUNDARY_STANDARD.md`.
 | Invocation preflight | `MODULE_INVOCATION_PREFLIGHT.md` |
 | Per-task authorization | `TASK_CONTRACTS.md`, `APPROVALS.md` |
 | Workflow trace | `ROLE_DIALOGUE_TRACE.md` |
-| Watch on external skills | `SKILL_WATCHLIST.md` |
+| Watch on external skills | `WATCHLIST.md`; `SKILL_WATCHLIST.md` is a specialized reference view only |
