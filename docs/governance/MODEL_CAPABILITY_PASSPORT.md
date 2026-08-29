@@ -1,213 +1,154 @@
 # Model Capability Passport
 
-Status: active support doctrine — model-specific passport specialization under uniform capability governance.
+Status: active support doctrine — model-specific review specialization under uniform capability governance; documented non-implemented.
 
-This document defines the governance passport for a model, model provider, model-serving surface or model-selection adapter when it is used for consequential professional work.
+Boundary profile: active_support_doctrine.
 
-It specializes the general capability-passport rule. It does not replace `UNIFORM_CAPABILITY_GOVERNANCE.md`, `CAPABILITY_PLACEMENT.md`, `EXTERNAL_TOOLS_POLICY.md`, `TASK_CONTRACTS.md`, `EVIDENCE_PACK.md`, `APPROVALS.md` or `MEMORY.md`.
+This document owns only the model-specific review seam needed before a model, model provider, model-serving surface or model-selection adapter supports consequential professional work.
 
-It is a declaration and review shape, not an implementation.
+General capability eligibility, passport governance, scoped activation, task authorization, consequential-effect admission, Evidence, approvals, memory and runtime/client placement remain owned by `UNIFORM_CAPABILITY_GOVERNANCE.md`, `schemas/capability_passport.schema.yaml`, `MODULE_ACTIVATION.md`, `TASK_CONTRACTS.md`, `EVIDENCE_PACK.md`, `APPROVALS.md`, `MEMORY.md` and `HERMES_INTEGRATION.md`.
 
-It does not create a provider router, model router, benchmark runner, model registry, evaluation harness, runtime, MCP host, runtime-client configuration, Hermes skill, scheduler, queue, installer, approval engine, memory engine or external action.
+## Owner boundary
 
-Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: compatible runtime clients are optional interaction surfaces, Hermes/the external runtime executes admitted work, Pantheon Cockpit projects governed state, and model or client selection does not transfer Pantheon authority.
-
-## Purpose
-
-A model being available does not mean it is appropriate for every professional task.
-
-The same question may carry different risk depending on:
+A model-specific review answers questions that the universal capability passport does not currently express directly:
 
 ```text
-model source
-local or external processing
-data exposure
-retention unknowns
-context capacity
-modality
-known failure modes
-cost / latency constraints
-professional-use ceiling
-source and evidence requirements
-approval requirement
+which exact model/release is being considered?
+how and where is it served?
+what data may leave the governed boundary?
+what retention/training uncertainty exists?
+which modalities and task families were reviewed?
+what professional-use ceiling is appropriate?
+which known failure modes matter?
+when is comparison or extra human review required?
 ```
 
-The Model Capability Passport makes those conditions explicit before a runtime uses a model for consequential work.
-
-## Core rule
+It does not authorize a task, activate a capability, select a provider, serve a model, lower an approval ceiling or validate model output.
 
 ```text
-Model available does not mean model appropriate.
-Model selected does not mean output approved.
-Model confidence does not mean evidence.
+model available != model reviewed
+model reviewed != model activated
+model selected != task authorized
+model confidence != Evidence
+model output != professional validation
 ```
 
-A model may produce a Result Candidate. It may help prepare an Evidence Pack Candidate. It must not approve, validate, canonize, promote memory, resolve professional responsibility or authorize external action.
+## Relationship to the universal Capability Passport
 
-## Relationship to the universal capability passport
+`UNIFORM_CAPABILITY_GOVERNANCE.md` remains the rulebook. A runtime, tool or adapter that serves or selects a model still requires the ordinary governed capability path.
 
-Pantheon uses one rulebook and one passport concept for every capability. A model is a capability.
+The executable `schemas/capability_passport.schema.yaml` is the current universal Capability Passport schema. It currently has no `model` primitive and no fields for model identity, modality, context window, serving posture or model-specific failure modes.
 
-The model passport adds model-specific fields to the uniform capability passport:
+Therefore the structure in this document is a **documentary model-review specialization**, not an extension of that executable schema and not valid schema input by implication.
 
 ```text
-base capability passport
-+ model identity
-+ serving posture
-+ data exposure
-+ modality
-+ context limits
-+ task-family suitability
-+ professional-use ceiling
-+ known failure modes
-+ evidence and approval requirements
+universal Capability Passport
++ documentary model-specific review
++ applicable Capability Activation
++ Task Contract / Execution Admission
+= governed model use candidate
 ```
 
-The governance gate remains the same:
+If executable model-specific fields are later needed, they require an explicit schema change and migration review. This document does not create that change.
+
+## When the specialization is required
+
+Use a model-specific review when model choice can materially affect:
 
 ```text
-Task Contract
--> runtime uses model
--> Result Candidate + Evidence Pack Candidate
--> passport check + evidence + scope + approval ceiling
--> human decision
+professional or regulatory interpretation
+source-dependent analysis
+client-facing or external communication
+confidential or sensitive-data processing
+repository / governed-record mutation support
+code or tool-use reasoning
+image / plan / document interpretation
+financial, legal, architectural, engineering or safety-relevant judgment
 ```
 
-## When a model passport is required
+Low-risk rewriting, formatting or brainstorming may use a lighter declaration when the applicable Task Contract and capability policy permit it.
 
-A model passport is required when model use may affect:
+## Minimum model-review record
 
-```text
-a professional answer
-source interpretation
-document analysis
-regulatory or contractual claim
-client-facing draft
-external communication
-memory proposal
-repository or dossier mutation
-financial, legal, architectural, medical, engineering or safety-relevant judgment
-```
-
-For low-risk drafting or formatting with no external effect and no truth claim, a light model declaration may be sufficient.
-
-## Passport fields
-
-Minimum fields:
+Recommended documentary shape:
 
 ```text
-model_capability_passport:
+model_capability_review:
   model_id:
   display_name:
   version_or_release:
-  provider_or_runtime:
-  local_or_external:
+  provider:
+  serving_posture: local_only | external_api | self_hosted_remote | organization_hosted | hybrid | unknown
   serving_surface:
-  adapter_ref:
-  status: candidate | sandbox | project_enabled | organization_enabled | deprecated | rejected
-  modality:
-  context_window:
-  input_classes_allowed:
-  input_classes_forbidden:
-  output_classes_allowed:
-  output_classes_forbidden:
-  data_exposure:
-  retention_or_training_unknowns:
-  sensitive_data_allowed: false by default
-  authorized_task_families:
+  adapter_or_binding_ref:
+
+  review_status: candidate | reviewed | suspended | rejected
+  reviewed_at:
+  reviewed_by:
+
+  modalities:
+  context_window_or_limit:
+  reviewed_task_families:
   forbidden_task_families:
   professional_use_ceiling:
-  evidence_expectation:
-  citation_or_source_expectation:
+
+  data_exposure_classes_allowed:
+  sensitive_data_allowed: false
+  retention_or_training_posture:
+  source_grounding_expectation:
+
   known_failure_modes:
   uncertainty_behavior:
-  comparison_required:
-  approval_ceiling:
-  memory_behavior:
+  comparison_required_when:
   fallback_model_or_path:
-  review_date:
-  reviewed_by:
-  decision: accepted | refused | to_verify | to_arbitrate
 ```
 
-This is not an executable schema. If a schema is later needed, it belongs under `schemas/` and requires explicit approval before modification.
+`review_status` is review state, not activation state. `reviewed_task_families` records evaluated suitability; it is not task authorization. The applicable universal passport, activation record and Task Contract remain authoritative for an actual use.
 
-## Local, external and hybrid posture
+## Serving and data posture
 
-Model processing posture must be classified:
+Serving posture is a risk input, not a truth or authorization signal.
 
 ```text
-processing_posture:
-  local_only
-  external_api
-  self_hosted_remote
-  organization_hosted
-  hybrid
-  unknown
+local model != automatically safe
+external model != automatically unsuitable
+self-hosted != automatically authorized
+provider selected != authority transfer
 ```
 
-The posture affects data minimization and approval, not truth.
-
-A local model can still be wrong. An external model can still be useful. A self-hosted model can still be overbroad or unsafe. Processing posture is a risk signal, not a validation signal.
-
-## Data exposure
-
-Minimum data-exposure classes:
+The review should record the smallest relevant data-exposure classes, for example:
 
 ```text
-data_exposure:
-  public_only
-  supplied_non_sensitive
-  project_sensitive
-  client_private
-  regulated_or_confidential
-  secrets_or_credentials
-  unknown
+public_only
+supplied_non_sensitive
+project_sensitive
+client_private
+regulated_or_confidential
+secrets_or_credentials
+unknown
 ```
 
-Default rule:
+Secrets and unnecessary private material remain excluded by default. Any broader data use must be justified by the applicable Task Contract and policy; this review cannot grant that permission.
+
+## Task-family suitability and professional-use ceiling
+
+Model review should name the task families actually assessed rather than imply general competence. Useful families may include:
 
 ```text
-Use the smallest context that can satisfy the Task Contract.
-Do not send secrets or unnecessary private material to a model.
-Do not treat local processing as automatic permission to over-share.
+rewriting / translation
+summarization
+source extraction
+document review
+plan or image interpretation
+code generation / review
+regulatory research
+contractual analysis
+professional risk review
+client-facing draft support
+external-action preparation
 ```
 
-## Task-family suitability
-
-The passport must declare task families.
-
-Example vocabulary:
-
-```text
-task_family:
-  brainstorming
-  rewriting
-  summarization
-  translation
-  source_extraction
-  document_review
-  plan_or_image_interpretation
-  code_generation
-  professional_risk_review
-  regulatory_research
-  contractual_analysis
-  client_facing_draft
-  external_action_preparation
-  memory_candidate_preparation
-```
-
-Each task family should map to:
-
-```text
-allowed | allowed_with_evidence | allowed_with_human_review | sandbox_only | forbidden
-```
-
-## Professional-use ceiling
-
-A model passport must state the highest status the model output may reach without additional review.
-
-Allowed ceilings:
+A professional-use ceiling describes the maximum status the review supports before other governance is applied, for example:
 
 ```text
 draft_only
@@ -218,148 +159,77 @@ reviewed_support
 never_final_by_model
 ```
 
-Default:
+Default: `never_final_by_model`.
 
-```text
-never_final_by_model
-```
-
-No model output becomes professional validation by model choice alone.
-
-## Evidence expectation
-
-The passport must say what a reviewable model output must carry.
-
-Minimum expectation for consequential work:
-
-```text
-source references where applicable
-assumptions
-uncertainties
-known limits
-freshness requirement where applicable
-contradictions surfaced
-output status
-human review requirement
-```
-
-For source-dependent answers:
-
-```text
-retrieval is not evidence
-citation display is not proof
-evidence supports
-approval validates
-```
+The model review cannot lower Evidence requirements, approval requirements or human-decision requirements owned elsewhere.
 
 ## Known failure modes
 
-The passport must name known failure modes relevant to use.
-
-Examples:
+Record failure modes relevant to the reviewed model/release and intended modality. Examples include:
 
 ```text
-hallucinated citations
+hallucinated or fabricated citations
 overconfident synthesis
+weak numerical reliability
 poor table extraction
-weak spatial reasoning
-weak code execution reasoning
-poor legal freshness
-poor numerical reliability
+weak spatial / plan interpretation
+weak legal or regulatory freshness
 language mismatch
 privacy exposure risk
-instruction-following over source discipline
 prompt-injection susceptibility through untrusted context
+instruction-following that overrides source discipline
 ```
 
-This list is not exhaustive. It is a review prompt.
+This is a review prompt, not an exhaustive taxonomy and not proof that unlisted failure modes are absent.
 
 ## Comparison and escalation
 
-A passport may require comparison when stakes are high.
-
-Comparison is required when:
+The review may require comparison or stronger human review when, for example:
 
 ```text
-the answer affects professional responsibility;
-the source set is contradictory;
-the model is outside its proven task family;
-the result will support external communication;
-the output may become a Register Candidate;
-the model has known weakness for the requested modality.
+the result materially affects professional responsibility
+the source set is contradictory
+the model is outside a reviewed task family
+the modality matches a known weakness
+the result supports external communication or consequential action
+model/provider posture changes materially
 ```
 
-Comparison produces a Comparison Candidate. It does not validate the result.
+Comparison produces another candidate signal; it does not validate the result.
 
-## Approval behavior
+## Runtime and governance handoff
 
-Approval ceiling must align with `APPROVALS.md` and the Task Contract.
-
-Default mapping:
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`.
 
 ```text
-C0 -> casual drafting / no consequence
-C1 -> internal candidate preparation
-C2 -> source-grounded internal review
-C3 -> professional draft needing explicit human review
-C4 -> external communication or project mutation support
-C5 -> doctrine-sensitive, confidential, privileged or high-stakes use
+model download / serving / routing / provider keys / benchmark execution
+  -> runtime or adapter concern
+
+model-specific review
+  -> Pantheon governance declaration
+
+passport / activation / task admission
+  -> their existing Pantheon owners
+
+model execution
+  -> admitted external runtime / PEP
+
+result
+  -> candidate until Evidence / approval / human-decision rules are satisfied
 ```
 
-The model passport never lowers the approval required by the task.
+A Cockpit or compatible client may project the review state but does not become its authority or persistence owner.
 
-## Memory behavior
+## Safe fallback
 
-Default memory behavior:
+If the required model-specific review is absent, stale or materially incomplete, the safe posture is to narrow the use rather than infer permission:
 
 ```text
-model output may become Register Candidate only if the Task Contract allows it
-model output does not become canonical memory
-model choice does not validate memory
-model conversation history is not Registre Probatoire
+no new sensitive-data exposure
+no widening of reviewed task family
+no elevation of output status
+no consequential external effect based on model suitability alone
+surface the capability gap for review
 ```
 
-Any memory promotion remains governed by `MEMORY.md` and the applicable approval path.
-
-## Runtime and adapter placement
-
-The passport lives in Pantheon as governance declaration.
-
-Runnable configuration lives outside Pantheon:
-
-```text
-model download -> runtime / adapter
-model serving -> runtime / adapter
-model routing -> runtime / adapter
-provider key handling -> runtime / adapter
-benchmark execution -> runtime / adapter
-UI selection -> interaction/projection surface
-passport display -> governed projection surface
-passport decision -> Pantheon gate
-```
-
-Pantheon defines whether the model is admissible for a task. It does not serve the model.
-
-## Safe defaults
-
-If the model passport is missing or incomplete:
-
-```text
-candidate-only output
-no external effect
-no memory promotion
-no professional finalization
-no sensitive data by default
-comparison or human review required when consequential
-surface the capability gap
-```
-
-## Boundary phrase
-
-```text
-The model proposes.
-The passport constrains.
-The evidence supports.
-The approval validates.
-The human decides.
-```
+This specialization constrains model suitability. It does not replace the universal capability gate.
