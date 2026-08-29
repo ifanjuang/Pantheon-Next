@@ -1,165 +1,153 @@
 # Bridge Contract
 
-Status: active support doctrine — future bridge boundary and non-runtime adapter contract.
+Status: active support doctrine — future non-authoritative bridge adapter seam — documented non-implemented.
+Boundary profile: active_support_doctrine.
 
-This document defines the governance boundary for a future non-authoritative Pantheon Bridge between the Pantheon policy service, Hermes Agent / the external runtime, optional compatible runtime clients, Pantheon Cockpit projections and optional external systems such as Langflow, LangGraph, Langfuse or a provenance graph.
+This document specializes the adapter boundary for a future bridge that may translate between Pantheon policy contracts and an admitted external runtime without becoming authoritative itself.
 
-It does not implement a bridge.
-
-It does not create an API, endpoint, scheduler, queue, message bus, provider router, tool runtime, workflow runtime, Policy Decision Point, Policy Enforcement Point, approval engine, memory engine, runtime-client component, Hermes skill, Langflow flow, LangGraph runtime, Langfuse backend or GraphRAG runtime.
-
-Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: the Pantheon policy service is the bounded PDP, Hermes/the external runtime is the executor and PEP, optional runtime clients expose interaction only, Pantheon Cockpit projects governed state, and Pantheon retains governance authority.
-
-## Purpose
-
-A bridge may later be needed to adapt governed requests and policy decisions between Pantheon and external execution systems without making any client, adapter or transport layer authoritative.
-
-The bridge exists to preserve boundary discipline.
-
-It adapts a governed request into an external execution request, conveys the applicable Pantheon policy decision to the runtime/PEP, and translates returned material back into reviewable candidates.
-
-It does not execute the work itself.
-
-It does not decide whether a consequential effect is authorized.
+Generic runtime/client/PDP/PEP/Cockpit placement remains owned by `HERMES_INTEGRATION.md`. Generic blueprint-versus-adapter placement remains owned by `ADAPTERS_AND_BINDINGS.md`. Task, Evidence, approval, memory and capability rules remain with their respective owners.
 
 ## Core rule
 
 ```text
-The bridge may adapt and convey a contract or policy decision.
-The bridge must not become a runtime, PDP or PEP.
+The bridge may adapt and convey.
+The bridge may refuse malformed adapter input.
+The bridge must not decide, widen or enforce authority.
 ```
 
-A bridge may perform non-authorizing structural preflight such as checking that required request fields and references are present before consulting policy. It may refuse to forward a malformed or structurally incomplete adapter request.
+A bridge is an adapter seam, not a second control plane.
 
-Only the Pantheon policy service may issue the bounded PDP disposition for a consequential effect. The bridge may report that disposition unchanged and must never widen it. If policy is unavailable or invalid, the bridge reports that state; the external runtime/PEP remains responsible for fail-closed enforcement of the consequential effect.
+It may translate an admitted request into the shape required by an external runtime and normalize returned material into Pantheon-readable candidates. It must preserve the applicable Pantheon policy result without broadening it.
 
-A bridge must not decide truth, grant approval, promote memory, broaden scope or authorize external effect by itself.
+## Parent boundaries
+
+The bridge composes existing owners rather than restating them:
+
+```text
+HERMES_INTEGRATION.md       -> runtime/client/PDP/PEP/Cockpit placement
+ADAPTERS_AND_BINDINGS.md   -> dependency direction and external adapter placement
+TASK_CONTRACTS.md          -> task scope and delegation boundary
+UNIFORM_CAPABILITY_GOVERNANCE.md -> capability/effect eligibility
+EVIDENCE_PACK.md           -> Evidence Pack Candidate semantics
+APPROVALS.md / USER_DECISION_GATE.md -> consequential approval/human decision
+MEMORY.md                  -> durable-retention boundary
+```
+
+If one of those owners changes, the bridge adapts to that owner. It does not maintain a competing copy of the rule.
 
 ## Allowed bridge responsibilities
 
 A future bridge may:
 
 ```text
-receive a bounded execution request from an authorized caller or optional runtime client
-verify required request fields and governance references are present
-refuse to forward a malformed or structurally incomplete adapter request
-prepare a deterministic Pantheon policy-service request
-report policy unavailable or invalid without converting that state into allow
-convey the Pantheon PDP disposition without widening it
-select an executor class only within the returned policy constraints
-prepare a bounded Hermes request
-prepare a bounded Langflow request when explicitly allowed
-attach trace metadata for observability
-normalize returned candidates
-return runtime-interaction status to the requesting client when applicable
-provide governed status material for Pantheon Cockpit projection
-surface Capability Gap
-surface User Decision Gate need
+receive a bounded adapter request
+check that required structural fields and references are present
+refuse malformed or structurally incomplete adapter input
+prepare a deterministic request for the Pantheon policy service
+convey the returned PDP disposition without widening it
+translate eligible request material into an admitted external-runtime envelope
+attach non-authoritative trace metadata
+normalize runtime-return material into existing candidate object families
+report adapter availability or structural failure
+surface Capability Gap or human-decision need already implied by governed state
 ```
 
-These are boundary checks and adapter operations.
+These are translation, structural validation and normalization operations.
 
-They are not autonomous execution, policy decision or consequential-effect enforcement.
+They are not execution or authorization.
 
 ## Forbidden bridge responsibilities
 
 A bridge must not:
 
 ```text
-act as a second Policy Decision Point
-widen a Pantheon policy disposition
-claim fail-closed enforcement of the consequential effect
-execute agent loops
-run tools directly
-perform the consequential effect as Policy Enforcement Point
-route providers as a sovereign layer
-schedule jobs by itself
-own queues
-own workflow state
-own memory
+act as a second PDP
+reinterpret deny as allow
+widen scope, approval ceiling or effect class
+claim PEP authority over a consequential effect
+execute the governed work itself
+own provider-routing policy
+own scheduler, queue or workflow state
+own memory or Evidence admission
 approve output
-promote a Registre Probatoire entry
-merge code
-deploy systems
-send external communications
-auto-install skills
-auto-enable plugins
-resolve role disagreement silently
+promote Registre Probatoire material
+send, publish, merge or deploy by its own authority
+silently resolve a human or governance disagreement
 ```
 
-If the bridge independently decides that an effect may proceed, a competing PDP has been created.
+```text
+bridge structural preflight != policy decision
+bridge handoff != runtime authorization beyond the returned policy result
+bridge return != Evidence admission
+bridge success != professional acceptance
+```
 
-If the bridge claims responsibility for enforcing the consequential effect, a competing PEP has been created.
+## Input seam
 
-If the bridge owns durable execution state, governance drift has occurred.
+The bridge consumes existing governed references rather than inventing a second task contract.
 
-If the bridge is necessary to understand why a result is valid, the Evidence Pack is insufficient.
-
-## Required input envelope
-
-A governed bridge call should include or reference:
+Minimum adapter-facing information should identify or reference:
 
 ```text
 request_id
 task_contract_id
-context_pack_id
-requested_executor_class
-allowed_outputs
-forbidden_outputs
-scope
-approval_ceiling
-memory_rule
-expected_evidence
-external_effect_policy
-user_decision_gate_policy
+requested_executor_or_binding
+scope_reference
+requested_effect_class
+policy_context_or_gate_signals
 trace_policy
 ```
 
-This envelope is not a runtime task or an authorization decision.
+Any detailed scope, approval, memory, Evidence or effect rule remains in the owning governance object.
 
-It is a boundary declaration supplied to the Pantheon policy check and external execution adapter.
+The bridge may reject structurally incomplete input before policy consultation. Such rejection is an adapter result, not a Pantheon policy denial.
 
-## Authorized executor classes
+## PDP disposition seam
 
-Candidate executor classes may include:
+Only the Pantheon policy service may issue the bounded PDP disposition for a consequential effect.
 
-```text
-hermes_profile
-hermes_skill_candidate
-langflow_flow_candidate
-langgraph_runtime_candidate
-read_only_provenance_query
-observability_trace_sink
-```
-
-An executor class is not authorized merely because it is installed or named in this document.
-
-Task-bound eligibility comes from the applicable Pantheon PDP disposition and is enforced by the external runtime/PEP.
-
-## Return envelope
-
-A bridge return should normalize external output into:
+The bridge may:
 
 ```text
-result_candidate
-evidence_pack_candidate
-memory_candidate
-patch_candidate
-capability_gap
-risk_escalation
-user_decision_gate_needed
-trace_reference
-adapter_status
-outcome_observation_candidate
+submit the normalized policy request
+receive the disposition
+verify it is structurally readable
+convey it unchanged to the admitted runtime boundary
 ```
 
-Returned material remains candidate until governed review.
+It must never convert unavailable, malformed, expired or negative policy material into permission.
 
-A technically successful bridge/runtime return is not Evidence, approval or professional acceptance.
+The external runtime/PEP remains responsible for fail-closed enforcement of the consequential effect as defined by `HERMES_INTEGRATION.md` and the canonical policy-service contract.
 
-## Status vocabulary
+## Executor or binding selection seam
 
-Recommended bridge-facing statuses:
+A bridge may target only an executor/binding already admissible under existing capability and binding governance.
+
+The bridge must not create eligibility merely because an adapter is installed, reachable or named.
+
+Concrete products, provider choices and version compatibility belong to the applicable bindings/placement owners, not to this generic bridge contract.
+
+## Return seam
+
+A bridge may normalize returned material into references or candidates already owned elsewhere, for example:
+
+```text
+Result Candidate
+Evidence Pack Candidate
+patch or artifact candidate
+memory candidate
+Capability Gap
+risk escalation
+human-decision-needed signal
+trace reference
+outcome observation candidate
+```
+
+The bridge does not determine the governed status of those objects beyond truthful adapter/runtime observation.
+
+## Adapter status vocabulary
+
+Bridge-specific operational statuses may include:
 
 ```text
 policy_check_required
@@ -168,84 +156,54 @@ policy_invalid
 request_not_forwarded_structural_invalid
 pdp_disposition_received
 eligible_for_executor_handoff
-eligible_with_gate
 returned_candidate
 returned_with_risk
 returned_capability_gap
 human_decision_required
+adapter_failed
 ```
 
-These statuses report adapter or policy-observation state.
+These statuses describe adapter progress or failure only.
 
-They are not execution commands, they do not replace the canonical PDP disposition vocabulary, and they do not claim PEP enforcement. Detailed deny, revision, evidence or gate reasons should be conveyed from the Pantheon policy result rather than reinvented by the bridge.
+They must not replace canonical PDP disposition vocabulary, approval status, Evidence status, runtime execution status or human-decision status.
 
-## Runtime-client relationship
+## Failure posture
 
-An optional compatible runtime client may request a bounded bridge operation or display runtime-interaction state when a deployed binding supports it.
-
-The client may expose:
+A future bridge must fail conservatively when it cannot preserve the boundary.
 
 ```text
-request candidate execution
-show policy or adapter reason
-show runtime status label
-show returned candidate references
-show Capability Gap
+missing required reference       -> do not forward
+unreadable policy result          -> do not reinterpret
+policy unavailable               -> report unavailable; no implied allow
+binding not admissible            -> do not select it
+runtime return structurally invalid -> return adapter failure/candidate gap
 ```
 
-A runtime client must not use the bridge to bypass Pantheon policy or turn UI state into approval.
+Failure to adapt is not authority to improvise.
 
-Governed Evidence gaps, approval state and User Decision Gates belong to Pantheon Cockpit projection, not to client authority.
-
-## Pantheon Cockpit relationship
-
-Pantheon Cockpit may project governed Cards, policy/gate reasons, Evidence gaps, policy/gate state and human decision surfaces derived from governed artifacts.
-
-Cockpit projection does not execute the bridge, persist authority by itself or replace the Pantheon policy decision.
-
-## Hermes relationship
-
-Hermes/the external runtime may receive bounded requests after the applicable Pantheon policy disposition permits the execution opportunity or required gate path.
-
-The runtime/PEP is responsible for fail-closed behavior when required policy is unavailable or invalid, enforcing consequential-effect policy, and performing the effect only when allowed.
-
-Hermes may return candidates, evidence notes, patch candidates, memory candidates, gaps, risks and truthful technical outcome observations.
-
-Hermes completion does not equal approval or Evidence.
-
-## Langflow relationship
-
-Langflow may be called by a future bridge only for deterministic preparation or extraction flows explicitly admitted by the applicable policy and Task Contract.
-
-Langflow output must remain candidate material.
-
-## LangGraph relationship
-
-LangGraph may be used only for durable external execution when interruption, checkpoint or resume are explicitly required and admitted.
-
-LangGraph state remains Runtime State.
-
-It is not Evidence Pack, approval or memory.
-
-## Langfuse relationship
-
-Langfuse may receive trace metadata.
-
-Trace metadata can help review, but it does not replace Evidence Pack structure.
-
-## Graph relationship
-
-A graph layer may answer read-only provenance or relationship queries.
-
-Graph output remains Retrieved Knowledge or candidate evidence until selected into an Evidence Pack.
-
-## Final rule
+## Dependency direction
 
 ```text
-Pantheon policy service decides the bounded policy disposition as PDP.
-The bridge adapts, reports and conveys without widening authority.
-Hermes or another admitted external runtime fail-closes, enforces and executes as PEP.
-Optional runtime clients expose interaction only.
-Pantheon Cockpit projects governed state.
-The human decides consequential effects when required.
+Pantheon governance contracts
+        ↓
+bridge adapter
+        ↓
+external runtime / binding
+```
+
+The dependency must not reverse. Pantheon doctrine must remain understandable without a bridge implementation.
+
+A bridge can be replaced without changing governance semantics as long as the replacement conforms to the same owners and policy boundary.
+
+## Boundary
+
+`active_support_doctrine` boundary profile applies.
+
+This document creates no API, endpoint, queue, scheduler, message bus, provider router, runtime, workflow engine, PDP, PEP, approval engine, memory engine or product-specific adapter implementation.
+
+```text
+Pantheon owners define the governed contracts and policy result.
+The bridge adapts and conveys without widening authority.
+The external runtime/PEP enforces and executes when allowed.
+Returned material remains candidate until its owning governance path resolves status.
 ```
