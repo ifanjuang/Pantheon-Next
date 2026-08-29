@@ -23,6 +23,7 @@ Not changed:
 
 - `schemas/capability_passport.schema.yaml`
 - `UNIFORM_CAPABILITY_GOVERNANCE.md`
+- tests
 - runtime, provider, binding, Cockpit or policy implementation
 - governance checker logic
 
@@ -85,6 +86,8 @@ The dependent template now removes `sandbox`, `project_enabled` and `organizatio
 
 The validation-only promotion document now validates a `Model Capability Review Candidate`, not a pseudo second Capability Passport. It preserves its legacy template path only for path compatibility and makes any future executable model-review schema a separate explicit decision.
 
+The existing test `test_runtime_review_validation_status.py` protects the older proposal names `validate_model_capability_passport` and `classify_model_passport_gate` as proposal-only strings. Rather than modifying protected tests or pretending those functions exist, the validation note retains those two names explicitly as **legacy proposal aliases** while naming `validate_model_capability_review` / `classify_model_review_gate` as the preferred future proposal vocabulary. No MCP function is created.
+
 The Governance Authority Index now describes the owner as model-specific review only; universal Capability Passport, activation, task/run legitimacy, Evidence and approval remain with their existing owners.
 
 ## Quantitative convergence
@@ -120,6 +123,8 @@ Documentation/template convergence only. There is no executable model-review sch
 
 The legacy template filename is deliberately retained to avoid unnecessary path churn; the current root record is `model_capability_review_candidate` and the validation proposal documents that compatibility fact.
 
+The two legacy MCP proposal names are retained only as compatibility vocabulary for repository checks/history; they remain explicitly non-implemented.
+
 If an executable model-specific contract is later required, it must be proposed explicitly under `schemas/` with migration and consumer review; this documentation change does not pre-authorize it.
 
 Rollback is a normal Git revert.
@@ -149,6 +154,7 @@ model selected != task authorized
 model confidence != Evidence
 reviewed task family != task authorization
 documentary specialization != executable schema
+proposal name != implemented MCP function
 provider selected != authority transfer
 runtime success != authorization
 projection != persistence
@@ -160,7 +166,7 @@ PDP decision != PEP execution
 Before merge:
 
 - inspect all exact PR patches, including the late-review corrections;
-- confirm no executable schema/runtime/checker-logic change is present;
+- confirm no executable schema/runtime/test/checker-logic change is present;
 - confirm the Authority Index diff is limited to the model owner row;
 - run Governance CI, Pantheon Architecture Audit and Obsolete Authority Consistency on the exact final HEAD/current merge candidate;
 - reread reviews, review threads and PR comments after the final HEAD;
