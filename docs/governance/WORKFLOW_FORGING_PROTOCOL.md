@@ -35,6 +35,38 @@ The workflow is born as a `Workflow Candidate`.
 
 It may be launched only under a declared mode, a declared authority ceiling and a visible approval path.
 
+## Execution topology minimalism
+
+A Workflow Candidate should use the least agentic execution topology that can satisfy the required result and governance boundary.
+
+```text
+Boring reliability before expanded execution complexity.
+```
+
+Selection precedence:
+
+| Observed need | Preferred candidate topology |
+|---|---|
+| Known, repeatable transformation | deterministic workflow or script, with bounded LLM interpretation only where needed |
+| Dynamic exploration | bounded Hermes / ReAct-style execution with explicit stop conditions |
+| Critique or reflection | reflection only when an explicit review rubric exists |
+| Large independent partitions | deterministic sharding before multi-agent decomposition |
+| Distinct scale, context or permission boundaries | multi-agent only when the separation is demonstrated rather than merely available |
+| Long-running work | checkpointed external execution rather than open-ended autonomy |
+
+An increase in topology complexity must be justified by at least one material requirement such as a different permission boundary, tool boundary, memory boundary, model requirement, runtime requirement, context limit or demonstrated scale constraint.
+
+Pre-launch forging must prefer a bounded topology that can stop cleanly:
+
+```text
+continue only through already admitted scope;
+do not silently widen tools, provider, data scope or effect class;
+stop at declared checkpoints;
+return blockers or capability gaps instead of improvising authority.
+```
+
+Topology selection does not determine output status, Evidence status, approval, memory admission or autonomy. Those rules remain with the Task Contract, `GOVERNED_AUTONOMY_GRADIENT.md`, Evidence, approval, memory and `HERMES_INTEGRATION.md` owners.
+
 ## Position in the request lifecycle
 
 ```text
