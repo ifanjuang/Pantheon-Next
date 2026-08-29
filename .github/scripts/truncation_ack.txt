@@ -162,3 +162,9 @@ docs/governance/HERMES_INTEGRATION.md
 # permission/exposure, PDP/PEP and rollback rules. Product comparisons remain
 # with watchlist/distillation/reference-review/placement owners and Git history.
 docs/governance/EXTERNAL_TOOLS_POLICY.md
+
+# Deliberate model-passport convergence: generic capability, Task Contract,
+# Evidence, approval, memory and runtime-placement doctrine is removed. The
+# retained owner now covers model-specific review only and explicitly remains
+# documentary rather than an implicit extension of the executable passport schema.
+docs/governance/MODEL_CAPABILITY_PASSPORT.md
