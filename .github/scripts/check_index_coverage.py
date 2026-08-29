@@ -9,13 +9,19 @@ Prose mentions do not count: indexing is a deliberate row, not a passing
 reference. The master index alone still defines the authority vocabulary;
 sub-indexes only list placement.
 
-Coverage policy:
-- every current-authority governance document (Status beginning with
-  ``canonical`` or ``active``) must be indexed now; existing gaps on the PR
-  base are not grandfathered;
-- candidate coverage keeps the historical dated baseline policy: when
-  GOVERNANCE_BASE_REF is set, candidate coverage violations already present on
-  that ref remain baseline exceptions and only new candidate violations fail.
+Coverage policy during #787 convergence:
+- current-authority governance documents (Status beginning with ``canonical``
+  or ``active``) are checked as well as candidate documents;
+- when GOVERNANCE_BASE_REF is set, violations already present on that exact base
+  remain explicit baseline debt, while any *new* unindexed current-authority or
+  candidate document fails the check;
+- once #787 has reduced the current-authority baseline debt to zero, this guard
+  can be tightened to strict no-baseline current-authority coverage in a small
+  follow-up change.
+
+This staged rule prevents new owner debt without forcing unrelated changes to
+mechanically index existing documents whose responsibility still needs an owner
+test.
 
 Sub-index policy, dated 2026-07-05 (decomposition plan step PR C, explicitly
 approved): a sub-index under docs/governance/authority/ that is itself
@@ -182,9 +188,6 @@ def _grouped_covers(groups: set[str], rel: str) -> bool:
 
 def violations(ref: str | None) -> dict[str, str]:
     paths = indexed_paths(ref)
-    # Grouped rows are directory/glob entries *under* the governance docs tree and
-    # strictly deeper than its root, so a prose mention of the root itself
-    # (`docs/governance/`) never masks every document.
     group_root = DOCS_PREFIX + "/"
     groups = {
         p
@@ -212,7 +215,6 @@ def violations(ref: str | None) -> dict[str, str]:
             if ref is None:
                 ok = (ROOT / target).is_dir()
             else:
-                # Git cannot cat-file an empty directory; treat grouped slash paths as covered above.
                 ok = target in FUTURE_OR_GROUPED
             if not ok:
                 found[f"missing-dir|{target}"] = (
@@ -233,15 +235,7 @@ def main() -> int:
     base_ref = os.environ.get("GOVERNANCE_BASE_REF") or None
     current = violations(None)
     baseline = violations(base_ref) if base_ref and base_ref != "HEAD" else {}
-
-    # Current-authority coverage is an invariant, not a grandfathered debt. The
-    # historical baseline remains only for candidate/missing-path violations so
-    # this stronger rule can expose and close any existing active-owner gaps.
-    failing_keys = sorted(
-        key
-        for key in current
-        if key.startswith("current-authority-not-indexed|") or key not in baseline
-    )
+    failing_keys = sorted(set(current) - set(baseline))
 
     if args.list:
         print("Current-authority docs:")
@@ -257,8 +251,8 @@ def main() -> int:
         print("Authority index coverage check failed:", file=sys.stderr)
         if base_ref:
             print(
-                "Baseline candidate/missing-path violations remain ignored; "
-                "current-authority coverage is enforced without grandfathering.",
+                "Baseline authority/candidate/missing-path violations remain visible but "
+                "grandfathered during #787; new violations fail.",
                 file=sys.stderr,
             )
         for key in failing_keys:
