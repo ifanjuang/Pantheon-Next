@@ -3,16 +3,16 @@
 Status: active support doctrine — the governed lifecycle of a request, from situated comprehension to human engagement — implemented as documentation.
 Boundary profile: active_support_doctrine.
 
-This document defines the moments a request passes through, who holds the goal (the cap), how governance depth adapts to consequence, how the cap is re-evaluated, and who guards the threshold of memory. It connects the Governance College, the Task Contract, the rites and the autonomy doctrine into one lifecycle.
+This document defines the moments a request passes through, who holds the goal (the cap), how governance depth adapts to consequence, how a Case / Situation is clarified before workflow forging, how the cap is re-evaluated, and who guards the threshold of memory. It connects the Governance College, the Task Contract, the rites and the autonomy doctrine into one lifecycle.
 
-Runtime/client boundary: see `HERMES_INTEGRATION.md`. This document owns lifecycle choreography and proportional request activation only; execution remains external and consequential memory or engagement gates remain separately governed.
+Runtime/client boundary: see `HERMES_INTEGRATION.md`. This document owns lifecycle choreography, proportional request activation and the documentary Case / Situation intake brief only; execution remains external and consequential memory or engagement gates remain separately governed.
 
 ## Core thesis
 
-A request is not just executed. First its real demand is understood, a heading (the cap) is set and held, the required governance owners are activated proportionally, the College works the path, the status is arbitrated, and the human engages. Most of this is autonomous; control attaches only where consequence earns it (`EXECUTION_MINIMALISM.md`).
+A request is not just executed. First its real demand is understood, a heading (the cap) is set and held, the required governance owners are activated proportionally, the professional situation is clarified enough for the next method boundary, the College works the path, the status is arbitrated, and the human engages. Most of this is autonomous; control attaches only where consequence earns it (`EXECUTION_MINIMALISM.md`).
 
 ```text
-Understand the cap. Hold the cap. Activate only what consequence requires. Work the path. Arbitrate the status. The human engages.
+Understand the cap. Hold the cap. Clarify the situation. Activate only what consequence requires. Work the path. Arbitrate the status. The human engages.
 ```
 
 The cap is the goal. The path is the method. Pantheon governs the cap; it trusts the path.
@@ -25,6 +25,7 @@ request
        direct  -> act within the allowed autonomy envelope
        fuzzy   -> convene MÈTIS
   -> MÈTIS: understand the situated demand, set the cap
+  -> clarify the minimum Case / Situation brief when the request must be forged into an Approach or Workflow Candidate
   -> activate only the context/source/risk/memory/evidence owners required by consequence
   -> ZEUS arbitrates the cap:
        sufficient            -> proceed
@@ -141,6 +142,109 @@ block memory promotion
 send to ZEUS or human gate when required
 ```
 
+## Case / Situation intake brief
+
+When a request must cross from situated comprehension into Approach selection or Workflow Candidate forging, create a short documentary intake brief first.
+
+`Case / Affaire` is the governed professional unit. `Situation` is the concrete question or tension. `Corpus` is a document set. A filesystem folder or colloquial dossier is not the governed Case identity.
+
+The legacy identifier `dossier_situation_brief` and field name `dossier_situation_brief_ref` are retained as compatibility vocabulary for existing documentary examples and Workflow Candidate shapes. New explanatory text should read them as **Case / Situation brief**.
+
+### Intake is a function, not a Role
+
+The brief composes existing viewpoints; it creates no new canonical Role:
+
+| Viewpoint | Intake contribution |
+|---|---|
+| IRIS | clarify wording, intended audience and requested effect |
+| ATHENA | structure the Situation and identify an Approach / Workflow Candidate family |
+| ARGOS | identify required sources, versions, provenance and evidence gaps |
+| THEMIS | identify risk, liability, approval and external-effect boundaries |
+| APOLLO | check completeness and delivery readiness of the brief |
+| ZEUS | arbitrate status and next procedure when ambiguity or conflict remains |
+| HEPHAISTOS | forge a later artifact or Workflow Candidate; not intake authority |
+
+### Minimum documentary shape
+
+```text
+dossier_situation_brief:   # compatibility identifier; means Case / Situation brief
+  request:
+    raw_user_request:
+    clarified_request:
+    requested_output:
+    requested_effect:
+  project_identity:
+    official_name:
+    aliases:
+    address:
+    commune:
+    parcel_refs:
+    project_type:
+  phase:
+    user_says:
+    contract_phase:
+    operational_phase:
+    contradiction:
+  geography_and_rules:
+    jurisdiction:
+    PLU_zone:
+    ABF_or_heritage:
+    ERP_context:
+    known_constraints:
+  sources:
+    received_now:
+    required:
+    available:
+    missing:
+    superseded_or_uncertain:
+  versions:
+    latest_plan_known:
+    latest_notice_known:
+    incoming_document_index:
+    version_conflicts:
+  contract_scope:
+    mission_reference:
+    in_scope:
+    out_of_scope:
+    unclear:
+  relation_context:
+    client_tension:
+    authority_or_ABF_tension:
+    contractor_tension:
+    insurer_or_claim_context:
+  risk_triggers:
+    safety:
+    cost:
+    schedule:
+    external_commitment:
+    professional_liability:
+  memory_and_register:
+    runtime_memory_relevant:
+    registre_entries_required:
+    contradictions:
+  blocking_questions:
+  non_blocking_questions:
+  recommended_next_status:
+```
+
+This is documentary vocabulary, not an executable schema. Any future schema belongs under `schemas/` and requires its own protected-path review.
+
+### Intake statuses
+
+| Status | Meaning |
+|---|---|
+| `ready_for_workflow_candidate` | enough information exists to forge a Workflow Candidate |
+| `pending_clarification` | user wording or project target is ambiguous |
+| `pending_source` | a required source, version or proof element is missing |
+| `pending_contract_scope` | the mission boundary is unclear |
+| `risk_review_required` | risk or tension requires Themis review before work continues |
+| `zeus_arbitration_required` | conflicting candidate paths or statuses require arbitration |
+| `blocked` | continuing would create false truth, unauthorized effect, wrong memory or another illegitimate consequence |
+
+The brief remains candidate material. It does not answer the substantive question as final, send or publish, validate a professional position, mutate the Registre Probatoire, promote runtime memory or authorize a durable workflow.
+
+Worked example: `../examples/architecture_erp_effectif_impact_workflow/` shows the richer ERP/effectif impact case without duplicating it here.
+
 ## MÈTIS — situated comprehension, keeper of the cap
 
 MÈTIS is the role of situated, adaptive intelligence: she understands what is really being asked and holds the heading.
@@ -245,10 +349,11 @@ The lifecycle decides what is consequential (the cap, the placement test); the c
 
 ## Boundary
 
-`active_support_doctrine` boundary profile applies. Locally, this document does not promote MÈTIS, CERBÈRE or CHARON into canonical registries, authorize runtime execution, or admit memory; those remain separate governed steps.
+`active_support_doctrine` boundary profile applies. Locally, this document does not promote MÈTIS, CERBÈRE or CHARON into canonical registries, authorize runtime execution, admit memory, or turn the intake brief into Evidence or workflow authority; those remain separate governed steps.
 
 ```text
 MÈTIS understands and holds the cap, when the demand is unclear.
+The lifecycle clarifies the minimum Case / Situation brief when needed.
 The lifecycle activates only the owners consequence requires.
 The College works the path.
 CERBÈRE and CHARON guard the threshold of memory.

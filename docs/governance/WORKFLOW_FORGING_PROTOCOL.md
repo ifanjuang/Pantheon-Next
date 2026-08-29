@@ -39,7 +39,7 @@ It may be launched only under a declared mode, a declared authority ceiling and 
 
 ```text
 raw user request
-→ Case / Situation Intake
+→ Case / Situation intake brief (`REQUEST_LIFECYCLE.md`)
 → Approach selection
 → Workflow Candidate
 → role review
@@ -53,7 +53,7 @@ raw user request
 
 The protocol starts only after a minimum situation has been clarified.
 
-If the system cannot build a usable `Dossier Situation Brief`, the correct output is `pending_clarification`, `pending_source`, `pending_contract_scope` or `blocked`, not an improvised workflow.
+If the system cannot build a usable Case / Situation brief (compatibility identifier `dossier_situation_brief`, owned by `REQUEST_LIFECYCLE.md`), the correct output is `pending_clarification`, `pending_source`, `pending_contract_scope` or `blocked`, not an improvised workflow.
 
 ## Role sequence
 
