@@ -104,7 +104,7 @@ class TestArchitectureExplanation(unittest.TestCase):
         self.assertEqual(report["result"], "unknown_topic")
         self.assertNotIn("openwebui", report["known_topics"])
 
-    def test_unindexed_source_keeps_its_declared_status_header(self):
+    def test_indexed_source_keeps_its_declared_status_header(self):
         report = consultation.explain_architecture("pantheon")
         architecture = next(
             source
@@ -112,7 +112,7 @@ class TestArchitectureExplanation(unittest.TestCase):
             if source["source_file"] == "docs/governance/ARCHITECTURE.md"
         )
 
-        self.assertEqual(architecture["authority"], "not indexed")
+        self.assertEqual(architecture["authority"], "active doctrine")
         self.assertIn("active doctrine", architecture["declared_status"])
         self.assertEqual(len(architecture["content_sha256"]), 64)
 

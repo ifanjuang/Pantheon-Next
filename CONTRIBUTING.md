@@ -45,7 +45,7 @@ Do not let examples, comments, diagrams, static prototypes, watchlists or candid
 
 ## New current-authority documents are a last resort
 
-Before adding a new Markdown document under `docs/governance/` with a `canonical*` or `active support*` status, record the owner test in the PR or dated `ai_logs/`:
+Before adding a new Markdown document under `docs/governance/` with a `canonical*` or `active*` status, record the owner test in the PR or dated `ai_logs/`:
 
 1. Which existing owner(s) were searched and read?
 2. Why can the responsibility not be an edit, section or local delta of an existing owner?
