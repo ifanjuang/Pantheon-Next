@@ -68,7 +68,7 @@ runtime support != governance requirement
 
 | Pattern | Source reference | Pantheon distillation | Destination | Status |
 |---|---|---|---|---|
-| Human-owned contract boundary | contracts-skill | separate human intent from machine-maintained mapping | `TASK_CONTRACTS.md`, future `SKILL_LIFECYCLE.md` reconciliation | active_support_pattern |
+| Human-owned contract boundary | contracts-skill | separate human intent from machine-maintained mapping | `TASK_CONTRACTS.md` | active_support_pattern |
 | Preflight before mutation | contracts-skill, coding agent practice | check scope, constraints, protected files, evidence need and approval before changes | `EXECUTION_DISCIPLINE.md`, `EXTERNAL_TOOLS_POLICY.md` | active_support_pattern |
 | Acceptance and verification trace | contracts-skill | record acceptance and verification expectations without claiming implementation | `EVIDENCE_PACK.md`, `APPROVALS.md` | active_support_pattern |
 | Interruptible workflow point | LangGraph | treat human-in-the-loop as approval interruption vocabulary, not runtime graph | `TASK_CONTRACTS.md`, `USER_DECISION_GATE.md` | candidate |
@@ -83,10 +83,10 @@ runtime support != governance requirement
 | Prompt version as review artifact | LangSmith, Langfuse | preserve prompt/config version when it affects output legitimacy | `EVIDENCE_PACK.md`, `CONTEXT_PACKS.md` | candidate |
 | Source graph candidate | GraphRAG | represent corpus structure and relationships as retrieved context, not truth | `RAG_INGESTION_PIPELINE.md`, `KNOWLEDGE_TAXONOMY.md` | candidate |
 | Contradiction graph | GraphRAG, Governance College doctrine | map conflicting claims and sources without smoothing them into consensus | `GOVERNANCE_COLLEGE.md`, `EVIDENCE_PACK.md` | candidate |
-| Skill anatomy card | Shokunin, Agensi | skill records need trigger, scope, anti-patterns, evidence, risk and compatibility notes | `SKILL_WATCHLIST.md`, future `SKILL_LIFECYCLE.md` | active_support_pattern |
-| Skill anti-pattern library | Shokunin | record when a skill should not activate | `SKILL_WATCHLIST.md`, `REJECTED_PATTERNS.md` | active_support_pattern |
-| Skill eval report | Shokunin | skill quality must be reviewed through evidence and task fit | `SKILL_WATCHLIST.md`, `EVIDENCE_PACK.md` | candidate |
-| Marketplace signal demotion | Agensi | popularity, price, votes and installs are signals, not approval | `SKILL_WATCHLIST.md`, `REFERENCE_BOUNDARIES.md` | active_governance_pattern |
+| Skill anatomy card | Shokunin, Agensi | Skill/package records need trigger, scope, anti-patterns, evidence, risk and compatibility notes without creating a separate governance lifecycle | `WATCHLIST.md`, `CAPABILITY_REGISTRY.md`, `schemas/skill_manifest.schema.yaml` | active_support_pattern |
+| Skill anti-pattern library | Shokunin | record when a Skill/package pattern should not be considered or activated | `WATCHLIST.md`, `REJECTED_PATTERNS.md` | active_support_pattern |
+| Skill eval report | Shokunin | Skill-backed capability quality must be reviewed through evidence and task fit; evaluation is a signal, not admission | `PRE_EXECUTION_SIMULATION.md`, `EVIDENCE_PACK.md` | candidate |
+| Marketplace signal demotion | Agensi | popularity, price, votes and installs are signals, not approval | `WATCHLIST.md`, `REFERENCE_BOUNDARIES.md` | active_governance_pattern |
 | Least capability principle | external tools and connector ecosystems | use the narrowest tool and avoid write-capable surfaces for read-only tasks | `EXTERNAL_TOOLS_POLICY.md` | active_governance_pattern |
 | External PEP enforcement gateway | `prabindersinghh/agent-passport` `v0.2.0` (`640b4c5`) | intercept consequential tool calls before upstream execution; bind the request to an explicit runtime principal; fail closed when the Pantheon PDP cannot validate the effect; consume one-use decisions at the PEP; derive execution traces from actual tool outcomes; keep Pantheon as the sole policy decision authority | `HERMES_INTEGRATION.md`, `HERMES_EXECUTION_ADMISSION_BRIDGE.md`, `HERMES_EXECUTION_TRACE_SUMMARY.md`, `mcp-server/docs/HTTP_API_CONTRACT.md` | active_support_pattern |
 | Draft-only professional posture | professional vertical assistants | regulated or liability-sensitive outputs remain drafts until review | `USER_DECISION_GATE.md`, examples | active_support_pattern |
@@ -100,7 +100,7 @@ runtime support != governance requirement
 | Evidence Page and Modality Mapping | MMLongBench-Doc | document answers should preserve page-level and source-type evidence metadata | `EVIDENCE_PACK.md`, `KNOWLEDGE_TAXONOMY.md`, governed Card/projection owners | candidate |
 | Unanswerable Question Testing | MMLongBench-Doc | document QA systems should test refusal when available evidence is insufficient | `USER_DECISION_GATE.md`, `EVIDENCE_PACK.md`, `TENSIONS_AND_RISKS.md` | candidate |
 | Memory Curation Report | agent_memory_curator_agent | memory proposals should report accepted, proposed, rejected, redacted, conflict and deprecation status | `MEMORY.md`, `EVIDENCE_PACK.md`, `SCOPE_ISOLATION.md` | candidate |
-| Skill Manager Demotion | skillsgate | skill inventory and compatibility UX may inform governed projection but not installation authority | `SKILL_WATCHLIST.md`, `REJECTED_PATTERNS.md`, `REFERENCE_BOUNDARIES.md` | governed_projection_candidate |
+| Skill Manager Demotion | skillsgate | skill inventory and compatibility UX may inform governed projection but not installation authority | `WATCHLIST.md`, `REJECTED_PATTERNS.md`, `REFERENCE_BOUNDARIES.md` | governed_projection_candidate |
 | Profile identity layer | SOUL.md, Hermes Personality & SOUL.md | stabilize Hermes execution posture without granting governance authority | `HERMES_INTEGRATION.md`, `reference_reviews/SOUL_MD_HERMES_PROFILE.md`, future `hermes/profiles` writing guidance | hermes_candidate_constraint |
 
 ## Candidate future pattern cards
@@ -113,7 +113,7 @@ Retrieval Evaluation Pattern
 Observability-to-Evidence Summary Pattern
 GraphRAG Source Graph Pattern
 Contradiction Ledger Pattern
-Skill Candidate Lifecycle Pattern
+Capability Evaluation Pattern
 Professional Dossier Preflight Pattern
 Governed User Decision Projection Pattern
 Hermes Capability Gap Pattern
