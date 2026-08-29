@@ -115,7 +115,7 @@ A project-specific contract, estimate, CCTP, DPGF, report, notice, study, letter
 
 ## Project originals on the NAS
 
-Each project uses one shallow phase hierarchy:
+The following shallow phase hierarchy is the recommended IFJA profile when a human wants a common organization:
 
 ```text
 00_Gestion/
@@ -128,7 +128,17 @@ Each project uses one shallow phase hierarchy:
 90_Sinistres/
 ```
 
-No mandatory subfolder exists inside these phase folders. Classification relies on the phase folder and a strict filename.
+This profile is a navigation convention, not a Pantheon requirement. A deployment may keep another existing filesystem organization without blocking Workspace navigation, bounded Hermes access or qualified retrieval. No mandatory subfolder exists inside these phase folders. When this profile is selected, classification may use the phase folder and the filename convention below.
+
+```text
+recommended structure != mandatory structure
+folder/path != governed identity
+unclassified folder != invalid folder
+Hermes classification proposal != filesystem mutation
+Cockpit Space != required physical root folder
+```
+
+Hermes may propose a mapping, classification, rename or move with its basis and affected references. It must not silently apply that proposal. A consequential filesystem mutation follows the applicable authorization boundary.
 
 The selected filename pattern is:
 
@@ -160,7 +170,7 @@ The original file is preserved. Hermes may propose a classification or rename, b
 
 ## Reusable Markdown knowledge corpus
 
-The human-facing corpus uses exactly five first-level families:
+The recommended IFJA human-facing corpus profile uses five first-level families:
 
 ```text
 KNOWLEDGE/
@@ -171,7 +181,7 @@ KNOWLEDGE/
 └── Réglementations/
 ```
 
-These folders are navigation aids, not authority levels, security boundaries or memory states.
+These folders are navigation aids, not required physical Cockpit roots, authority levels, security boundaries or memory states. Another existing organization remains usable; qualification may propose a mapping without silently reorganizing it.
 
 ### Référentiels
 

@@ -120,6 +120,8 @@ sync success != Evidence
 
 Do **not** require a manifest for every file or folder.
 
+Architecture-agency folder conventions and their optional posture are owned by `docs/domain-packs/architecture/DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md`. The Inspector must accept another existing organization as usable. It may expose a mapping or reclassification proposal, but neither manifest absence nor divergence from the recommended profile makes an ordinary folder invalid or authorizes a move.
+
 One candidate document package may contain several physical entries:
 
 ```text
