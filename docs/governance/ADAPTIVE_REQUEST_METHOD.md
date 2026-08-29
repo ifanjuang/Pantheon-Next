@@ -1,14 +1,13 @@
 # Adaptive Request Method
 
-Status: active support doctrine — adaptive governance method for any request. Documented non-implemented.
+Status: active support doctrine — adaptive governance method for any request — documented non-implemented.
+Boundary profile: active_support_doctrine.
 
 This document defines how Pantheon Next handles a user request proportionally, from light direct handling to governed context expansion, source need, evidence review, output gating and human decision.
 
 It is a method, not a workflow.
 
-It does not implement a runtime, agent loop, scheduler, queue, provider router, retrieval engine, source registry database, web search tool, context optimizer, approval engine, memory engine, OpenWebUI action, Hermes skill or external action.
-
-Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: compatible runtime clients are optional interaction surfaces, Hermes/the external runtime executes admitted work, and client selection or runtime success does not transfer Pantheon governance authority.
+Runtime/client boundary: see `HERMES_INTEGRATION.md`. This method governs proportional handling and candidate status only; execution remains external and client or runtime success transfers no Pantheon authority.
 
 ## Core thesis
 
@@ -266,9 +265,7 @@ send to ZEUS or human gate
 
 ## Boundary
 
-This document is not a workflow engine.
-
-It is the grammar for adaptive governance.
+`active_support_doctrine` boundary profile applies. This document owns the grammar for adaptive request governance; it does not become a workflow engine or execution authority.
 
 ```text
 The request opens the situation.
