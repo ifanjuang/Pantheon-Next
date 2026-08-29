@@ -80,14 +80,14 @@ healthy != safe
 
 Before proposing or changing governance or implementation architecture, read the relevant current source of truth first, inspect current `main`, recent commits, branches, PRs, issues, schemas, tests and registries, and check whether parallel work already covers the responsibility.
 
-Before proposing or changing workspace organization, Obsidian/vault layout, project folders, `Affaires`, `Connaissances`, folder manifests or Hermes-assisted reclassification, read the current owners together:
+Before proposing or changing workspace organization, Obsidian/vault layout, project folders, `Affaires`, `Connaissances`, folder manifests, Hermes Obsidian skills, optional second-brain behavior or Hermes-assisted reclassification, read the current owners together:
 
 - `docs/domain-packs/architecture/DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md` for the optional architecture-agency organization profile;
 - `docs/architecture/WORKSPACE_MANIFEST_INSPECTOR_CANDIDATE.md` for manifestability and local workspace-package health;
 - `docs/governance/PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md` for Cockpit Space projection;
-- `docs/governance/OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md` for the qualified external workspace/retrieval composition.
+- `docs/governance/OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md` for the qualified external workspace/retrieval composition and the optional Hermes Obsidian skill / second-brain boundary.
 
-Preserve arbitrary filesystem organization as usable. A recommended folder convention is not mandatory, a path is not governed identity, a missing manifest is not an error by default, a Cockpit Space is not a required physical root folder, and a Hermes classification proposal is not authorization to move or rename files.
+Preserve arbitrary filesystem organization as usable. A recommended folder convention is not mandatory, a path is not governed identity, a missing manifest is not an error by default, a Cockpit Space is not a required physical root folder, an Obsidian/second-brain skill is not a workspace prerequisite, and a Hermes classification proposal is not authorization to move or rename files.
 
 Before creating a new Markdown governance document under `docs/governance/`, first verify that no existing canonical, active or candidate owner can absorb the responsibility. Prefer updating, merging, promoting or archiving existing doctrine. A new `candidate support doctrine` document must name a genuinely distinct responsibility, identify its relationship to the existing concept/authority owner and state its intended convergence or retirement path. `ai_logs/`, generated reports and required conformance fixtures are intervention or validation artifacts, not doctrine expansion.
 

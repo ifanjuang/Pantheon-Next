@@ -50,3 +50,20 @@ def test_manifest_and_cockpit_consumers_preserve_optional_layout() -> None:
     assert "another existing organization as usable" in inspector
     assert owner_ref in cockpit
     assert "not required physical root-folder names" in cockpit
+
+
+def test_obsidian_second_brain_remains_optional_and_subordinate() -> None:
+    obsidian = OBSIDIAN.read_text(encoding="utf-8")
+    inspector = INSPECTOR.read_text(encoding="utf-8")
+    instructions = REPOSITORY_INSTRUCTIONS.read_text(encoding="utf-8")
+
+    for invariant in (
+        "Neither is a Pantheon prerequisite, workspace owner, memory authority or manifest authority.",
+        "Each layer is independently optional.",
+        "silently mutate manifest or move files   = forbidden",
+        "A missing manifest remains neutral",
+    ):
+        assert invariant in obsidian
+
+    assert "consumers of this posture, not alternative manifest owners" in inspector
+    assert "an Obsidian/second-brain skill is not a workspace prerequisite" in instructions
