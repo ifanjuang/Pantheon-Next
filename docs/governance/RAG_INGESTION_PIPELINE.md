@@ -1,6 +1,6 @@
 # RAG / Retrieval Ingestion Pipeline — compatibility profile
 
-Status: reference / compatibility profile — non-authoritative; superseded as a doctrine owner.
+Status: reference / compatibility profile — non-authoritative; no independent doctrine ownership.
 Boundary profile: documentation_only.
 
 This retained path preserves compatibility for older links while the current responsibilities are owned elsewhere.
