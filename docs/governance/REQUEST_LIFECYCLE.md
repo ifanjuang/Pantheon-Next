@@ -1,12 +1,11 @@
 # Request Lifecycle
 
-Status: active support doctrine — the governed lifecycle of a request, from situated comprehension to human engagement.
+Status: active support doctrine — the governed lifecycle of a request, from situated comprehension to human engagement — implemented as documentation.
+Boundary profile: active_support_doctrine.
 
 This document defines the moments a request passes through, who holds the goal (the cap), how the cap is re-evaluated, and who guards the threshold of memory. It connects the Governance College, the Task Contract, the rites and the autonomy doctrine into one lifecycle.
 
-It does not add a runtime, an agent, a scheduler, a message bus, a workflow engine or an orchestration loop. These are governance moments, not an execution pipeline. Only the execution runtime executes, externally.
-
-Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: compatible runtime clients are optional interaction surfaces, external execution remains with Hermes/the runtime, and client selection does not transfer Pantheon governance authority.
+Runtime/client boundary: see `HERMES_INTEGRATION.md`. This document owns lifecycle choreography only; execution remains external and consequential memory or engagement gates remain separately governed.
 
 ## Core thesis
 
@@ -143,7 +142,7 @@ The lifecycle decides what is consequential (the cap, the placement test); the c
 
 ## Boundary
 
-Documentation only. These are governance moments. They do not implement a runtime, scheduler, message bus, workflow engine, orchestration loop, automatic approval or automatic memory promotion. Execution remains external.
+`active_support_doctrine` boundary profile applies. Locally, this document does not promote MÈTIS, CERBÈRE or CHARON into canonical registries, authorize runtime execution, or admit memory; those remain separate governed steps.
 
 ```text
 MÈTIS understands and holds the cap, when the demand is unclear.

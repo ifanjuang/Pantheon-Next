@@ -1,16 +1,13 @@
 # Dossier Situation Intake
 
-Status: active support doctrine — intake object for ambiguous professional requests.
-
-Runtime status: non-executable.
+Status: active support doctrine — intake object for ambiguous professional requests — documented non-implemented.
+Boundary profile: active_support_doctrine.
 
 This document defines a governed intake function used before a professional Approach or Workflow Candidate is forged, executed or presented as ready.
 
 It does not create a new Pantheon Role.
 
-It does not implement a runtime, connector, classifier, memory engine, workflow engine, Notion sync, approval engine or Registre Probatoire storage.
-
-Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: compatible runtime clients are optional interaction surfaces, external execution remains with Hermes/the runtime, and neither client selection nor runtime execution transfers Pantheon authority. Registre admission and consequential human decision remain separately governed.
+Runtime/client boundary: see `HERMES_INTEGRATION.md`. This intake produces candidate material only; Registre admission and consequential human decision remain separately governed.
 
 ## Terminology note
 
