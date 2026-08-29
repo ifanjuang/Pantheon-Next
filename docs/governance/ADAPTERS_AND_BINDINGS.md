@@ -105,6 +105,65 @@ For example, a Hermes adapter is adapted when a new runtime feature such as back
    references rather than restates.
 ```
 
+## Prompt distillation and placement
+
+Prompts follow the same blueprint/adapter rule. Canonical governance may supply the source rule, but a runtime prompt receives only the minimum instruction needed by its layer.
+
+```text
+Pantheon doctrine
+-> governed projection instruction where needed
+-> runtime-client interaction instruction where needed
+-> Hermes profile / skill constraint
+-> external flow or runtime prompt when admitted
+-> observability metadata when useful
+```
+
+Distillation is intentionally lossy. Do not copy the whole doctrine into every prompt.
+
+A prompt never gains more authority than the layer where it runs:
+
+- Pantheon doctrine may define the canonical rule but is not a runtime prompt by default;
+- Pantheon Cockpit instructions may project governed state but do not approve, persist or execute;
+- runtime-client prompts may shape interaction but do not govern or capture authoritative approval;
+- Hermes profile or skill prompts may constrain execution but do not inherit Pantheon Role or approval authority;
+- external flow/runtime prompts remain external execution configuration;
+- observability prompt records remain trace metadata, not Evidence or approval.
+
+A non-trivial prompt blueprint should identify at least:
+
+```text
+owner_layer
+purpose
+allowed_inputs
+allowed_outputs
+forbidden_outputs
+scope_behavior
+approval_behavior
+memory_behavior
+escalation_behavior
+status
+```
+
+These declarations are blueprint metadata until realized by an external adapter or runtime configuration.
+
+Reject prompt architectures that collapse layers, including:
+
+```text
+single global Pantheon mega-prompt
+runtime-client prompt as governance source of truth
+Cockpit instruction as approval authority
+Hermes prompt redefining Pantheon Role authority
+skill or flow prompt approving its own output
+runtime checkpoint promoted to memory
+trace prompt record treated as Evidence
+```
+
+```text
+Doctrine governs.
+Prompts operationalize only the part their layer may carry.
+Prompt placement does not transfer authority.
+```
+
 ## Version-change discipline
 
 A bound tool update is classified before any adaptation work starts.
