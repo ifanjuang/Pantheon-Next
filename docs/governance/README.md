@@ -91,7 +91,7 @@ human approval
 ## Governed professional work
 
 ```text
-DOSSIER_SITUATION_INTAKE.md
+REQUEST_LIFECYCLE.md        -> request/cap lifecycle, proportional activation and Case / Situation intake brief
 -> TASK_CONTRACTS.md
 -> CONTEXT_PACKS.md
 -> HERMES_INTEGRATION.md
