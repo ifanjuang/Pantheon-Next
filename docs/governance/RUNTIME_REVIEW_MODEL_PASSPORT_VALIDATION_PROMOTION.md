@@ -252,7 +252,14 @@ classify_runtime_review_gate
 classify_model_review_gate
 ```
 
-These names are proposal names only. They do not create MCP tools by themselves, and no such functions currently exist in the repository.
+The earlier proposal names are retained below as legacy proposal aliases so existing repository checks and historical references remain intelligible during this documentary rename:
+
+```text
+validate_model_capability_passport
+classify_model_passport_gate
+```
+
+Preferred proposal names are the `*_model_capability_review` / `*_model_review_*` forms above. Neither preferred nor legacy names create MCP tools by themselves, and no such functions currently exist in the repository.
 
 The functions, if later implemented, must:
 
