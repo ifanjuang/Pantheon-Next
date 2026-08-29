@@ -8,7 +8,7 @@ It is a governance method, not an implementation.
 
 It does not create a web search engine, source database, crawler, scraper, connector gateway, source validator, evidence engine, memory engine, approval engine, runtime-client action, Hermes skill, scheduler, queue or external action.
 
-Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: optional compatible runtime clients expose runtime interaction only, Hermes/the external runtime executes retrieval handoffs, Pantheon Cockpit projects governed source/evidence status, and Pantheon retains governance authority.
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: optional compatible runtime clients expose runtime interaction only, Hermes/the external runtime executes retrieval or query handoffs, Pantheon Cockpit projects governed source/evidence status, and Pantheon retains governance authority.
 
 ## Core thesis
 
@@ -67,12 +67,15 @@ ask_user
 search_registered_sources
 use_official_web_route
 consult_project_corpus
+query_operational_owner
 consult_professional_method
 consult_technical_competence_documentation
 consult_memory_or_register
 allow_draft_only
 block_external_action
 ```
+
+`query_operational_owner` is an acquisition route, not a source family. Use it when current structured or operational state is already owned by an admitted system or service. Prefer querying that existing owner over creating an AI-specific indexed copy merely to make the state easier for a model to access. The returned observation remains candidate material; ownership of operational state does not make it professional truth or Evidence.
 
 It must not lead directly to truth, approval, external action or memory promotion.
 
@@ -276,16 +279,15 @@ approval
 memory_promotion
 ```
 
-## Search and evidence chain
+## Acquisition and evidence chain
 
 Pantheon uses this chain:
 
 ```text
 Source Need Candidate
--> permitted source route
--> external search / retrieval handoff
--> Search Result Candidate
--> Source Candidate
+-> permitted source or acquisition route
+-> external direct access / search / retrieval / typed query handoff
+-> Source or Observation Candidate
 -> Evidence Candidate
 -> Evidence Pack Candidate
 -> Gate / Approval
@@ -294,6 +296,8 @@ Source Need Candidate
 Do not collapse steps.
 
 A search result is not a source.
+
+An operational observation is not Evidence by itself.
 
 A source is not evidence by itself.
 
