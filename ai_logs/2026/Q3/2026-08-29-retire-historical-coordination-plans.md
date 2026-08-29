@@ -31,11 +31,13 @@ Observed state:
 - the file itself says the filename is historical compatibility vocabulary and renames the concept to Request Coordination;
 - it classifies intent/scope/domain/risk, role viewpoints, Task Contract need, Evidence expectations, approval, memory, output and escalation;
 - current `REQUEST_LIFECYCLE.md` already owns proportional request activation, Case/Situation intake, request decomposition, source/context seams, output consequence, risk/escalation and the handoff toward Task Contract / Evidence / approval owners;
-- exact filename search found no current consumer outside historical `ai_logs`.
+- exact filename search found no current Markdown consumer outside historical `ai_logs`.
 
 Owner test:
 
 No independent current responsibility survives. Keeping a second active document for the same intake/coordination path would recreate the parallel-owner pattern #787 is removing.
+
+The first PR validation exposed one machine-readable consumer: `schemas/workflow_manifest.schema.yaml` still listed the compatibility path in `governance_refs.default`. That reference was migrated to `docs/governance/REQUEST_LIFECYCLE.md`. The schema shape and behavior are unchanged; only the governance-owner pointer moves to the surviving owner.
 
 Disposition: remove the compatibility document; Git history preserves the former vocabulary and rationale.
 
@@ -57,7 +59,7 @@ runtime success != authorization
 projection != persistence
 ```
 
-No new owner, schema, runtime path, router, workflow engine or authority concept is introduced.
+No new owner, runtime path, router, workflow engine or authority concept is introduced. The Workflow Manifest schema is modified only to replace a dead governance reference with the existing request-lifecycle owner.
 
 ## Validation
 
