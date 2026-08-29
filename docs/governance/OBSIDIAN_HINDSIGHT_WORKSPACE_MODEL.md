@@ -156,6 +156,12 @@ Markdown note -> workspace source note when intentionally authored
 
 Hindsight in this reference implementation is a derivative index/memory, not the canonical store for professional source bytes.
 
+An optional human-maintained workspace source notebook is governed by
+`SOURCE_NEED_AND_REGISTRY.md`. It may group Source Leads and working annotations,
+but it is not the Source Registry or an Evidence store. Its name and location are
+workspace choices; no Hermes consumer or generic Pantheon contract may require a
+fixed Obsidian folder path.
+
 ## Retrieval rule
 
 Retrieval should remain bounded by the active task/source scope.
