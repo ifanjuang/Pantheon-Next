@@ -9,19 +9,17 @@ Prose mentions do not count: indexing is a deliberate row, not a passing
 reference. The master index alone still defines the authority vocabulary;
 sub-indexes only list placement.
 
-Coverage policy during #787 convergence:
-- current-authority governance documents (Status beginning with ``canonical``
-  or ``active``) are checked as well as candidate documents;
-- when GOVERNANCE_BASE_REF is set, violations already present on that exact base
-  remain explicit baseline debt, while any *new* unindexed current-authority or
-  candidate document fails the check;
-- once #787 has reduced the current-authority baseline debt to zero, this guard
-  can be tightened to strict no-baseline current-authority coverage in a small
-  follow-up change.
+Coverage policy after #787 convergence:
+- every current-authority governance document (Status beginning with
+  ``canonical`` or ``active``) must be indexed now; current-authority gaps are
+  not grandfathered by GOVERNANCE_BASE_REF;
+- candidate coverage keeps the historical baseline policy: when
+  GOVERNANCE_BASE_REF is set, candidate or missing-path violations already
+  present on that exact base remain baseline exceptions and only new violations
+  fail the check.
 
-This staged rule prevents new owner debt without forcing unrelated changes to
-mechanically index existing documents whose responsibility still needs an owner
-test.
+This closes the staged owner-debt guard introduced during #787: once an owner is
+current authority, its Authority Index placement must be explicit and reviewable.
 
 Sub-index policy, dated 2026-07-05 (decomposition plan step PR C, explicitly
 approved): a sub-index under docs/governance/authority/ that is itself
@@ -235,7 +233,11 @@ def main() -> int:
     base_ref = os.environ.get("GOVERNANCE_BASE_REF") or None
     current = violations(None)
     baseline = violations(base_ref) if base_ref and base_ref != "HEAD" else {}
-    failing_keys = sorted(set(current) - set(baseline))
+    failing_keys = sorted(
+        key
+        for key in current
+        if key.startswith("current-authority-not-indexed|") or key not in baseline
+    )
 
     if args.list:
         print("Current-authority docs:")
@@ -251,8 +253,8 @@ def main() -> int:
         print("Authority index coverage check failed:", file=sys.stderr)
         if base_ref:
             print(
-                "Baseline authority/candidate/missing-path violations remain visible but "
-                "grandfathered during #787; new violations fail.",
+                "Baseline candidate/missing-path violations remain ignored; "
+                "current-authority coverage is enforced without grandfathering.",
                 file=sys.stderr,
             )
         for key in failing_keys:
