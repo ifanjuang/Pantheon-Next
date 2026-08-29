@@ -519,7 +519,7 @@ properties:
     default:
       - docs/governance/WORKFLOW_SCHEMA.md
       - docs/governance/CAPABILITY_REGISTRY.md
-      - docs/governance/REQUEST_ORCHESTRATION.md
+      - docs/governance/REQUEST_LIFECYCLE.md
       - docs/governance/TASK_CONTRACTS.md
       - docs/governance/EVIDENCE_PACK.md
       - docs/governance/EVIDENCE_TOPOLOGY.md
