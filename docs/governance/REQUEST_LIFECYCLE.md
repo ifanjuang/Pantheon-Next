@@ -9,7 +9,7 @@ Runtime/client boundary: see `HERMES_INTEGRATION.md`. This document owns lifecyc
 
 ## Core thesis
 
-A request is not just executed. First its real demand is understood, a heading (the cap) is set and held, the required governance owners are activated proportionally, the professional situation is clarified enough for the next method boundary, the College works the path, the status is arbitrated, and the human engages. Most of this is autonomous; control attaches only where consequence earns it (`EXECUTION_MINIMALISM.md`).
+A request is not just executed. First its real demand is understood, a heading (the cap) is set and held, the required governance owners are activated proportionally, the professional situation is clarified enough for the next method boundary, the College works the path, the status is arbitrated, and the human engages. Most of this is autonomous; the permitted freedom envelope and consequential gate boundary are owned by `GOVERNED_AUTONOMY_GRADIENT.md`.
 
 ```text
 Understand the cap. Hold the cap. Clarify the situation. Activate only what consequence requires. Work the path. Arbitrate the status. The human engages.
