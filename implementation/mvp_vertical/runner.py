@@ -15,10 +15,7 @@ The runner produces exactly two kinds of output, both as data:
 - a refusal / capability-gap report, when the request falls outside the
   contract's perimeter or the perimeter cannot support an answer.
 
-It approves nothing, sends nothing, remembers nothing. Drafting goes through
-a seam (Block 2): run() takes a Drafter, defaulting to a deterministic,
-dossier-general one (mvp_vertical/drafting.py). The LLM slot is a Hermes-side
-Drafter injected here — this repository never wires or routes a provider.
+It approves nothing, sends nothing, remembers nothing.
 """
 
 from __future__ import annotations
@@ -35,19 +32,18 @@ from .contract import TaskContract, _schema
 from .drafting import (
     Drafter,
     DeterministicDrafter,
+    claim_support_review,
     duty_of_care_flags,
     grounding_review,
     review_flags,
     verify_draft,
 )
 from .retrieval import HybridRetrievedChunk, retrieve_hybrid_scoped
-from .store import retrieve_scoped
+from .store import RetrievedChunk, retrieve_scoped
 
 
 class RunnerInvariantError(RuntimeError):
-    """The runner was about to emit an object that breaks a governance
-    invariant (e.g. authorizing an external action). Raised as a hard stop,
-    never returned as data — a broken cage is a bug, not a candidate."""
+    """The runner was about to emit an object that breaks a governance invariant."""
 
 
 COMMITMENT_PATTERNS = (
@@ -88,12 +84,7 @@ def _now() -> str:
 
 
 def _request_scope_digest(contract: TaskContract, question: str) -> str:
-    """Bind one candidate stream to the exact bounded request it executed.
-
-    The digest is provenance/correlation only. It does not score the request,
-    authorize an action, validate retrieved material or turn a candidate into
-    Evidence. Canonical JSON keeps the digest stable across Python processes.
-    """
+    """Bind one candidate stream to the exact bounded request it executed."""
     payload = {
         "contract_id": contract.contract_id,
         "question": question,
@@ -211,13 +202,7 @@ def _metric_profile(hit: HybridRetrievedChunk) -> str:
 
 
 def _retrieve_hits(conn, contract: TaskContract, question: str) -> list[HybridRetrievedChunk]:
-    """Use hybrid retrieval while retaining the former injectable test seam.
-
-    Existing callers and tests may replace ``runner.retrieve_scoped``. When that
-    seam is replaced, its scoped semantic results are wrapped as a one-method
-    ranking rather than silently ignored. Normal execution always uses the new
-    hybrid path.
-    """
+    """Use hybrid retrieval while retaining the former injectable test seam."""
     if retrieve_scoped is not _ORIGINAL_RETRIEVE_SCOPED:
         chunks = retrieve_scoped(conn, contract, question)
         return [
@@ -237,6 +222,36 @@ def _retrieve_hits(conn, contract: TaskContract, question: str) -> list[HybridRe
         candidate_k=HYBRID_CANDIDATE_K,
         rrf_k=HYBRID_RRF_K,
     )
+
+
+def _evidence_id(chunk: RetrievedChunk) -> str:
+    stem = chunk.source_ref.rsplit("/", 1)[-1].rsplit(".", 1)[0]
+    digest = (chunk.source_digest or "legacy-no-digest")[:12]
+    return f"ei-{stem}-{chunk.chunk_no}-{digest}"
+
+
+def _bind_evidence_refs(claim_review: dict, chunks: list[RetrievedChunk]) -> list[dict]:
+    evidence_ids = {
+        (chunk.source_ref, chunk.chunk_no, chunk.source_digest): _evidence_id(chunk)
+        for chunk in chunks
+    }
+    bindings: list[dict] = []
+    for claim in claim_review["supported_claims"]:
+        supports = []
+        for support in claim["supports"]:
+            enriched = dict(support)
+            enriched["evidence_item_ref"] = evidence_ids[
+                (support["source_ref"], support["chunk_no"], support["source_digest"])
+            ]
+            supports.append(enriched)
+        bindings.append(
+            {
+                "claim": claim["claim"],
+                "support_status": "sourced_not_verified",
+                "supports": supports,
+            }
+        )
+    return bindings
 
 
 def run(
@@ -281,11 +296,21 @@ def _run(
 
     draft = drafter.draft(intent=contract.intent, question=question, chunks=useful)
     verify_draft(draft, useful)
+    claim_review = claim_support_review(draft, useful)
+    if claim_review["unsupported_claims"]:
+        return _refusal(
+            contract,
+            question,
+            "unsupported_claim",
+            "the draft contains an assertive claim without exact retrieved support; "
+            "the runner refuses rather than fill the gap from model knowledge",
+        )
 
     now = _now()
     request_provenance = _request_provenance(contract, question)
     rc_id = f"{contract.contract_id}.rc-001"
     ep_id = f"{contract.contract_id}.ep-001"
+    claim_bindings = _bind_evidence_refs(claim_review, useful)
     result_candidate = {
         "object_type": "result_candidate",
         "object_id": rc_id,
@@ -297,6 +322,13 @@ def _run(
         "body": draft,
         "external_action_authorized": False,
         "citation_integrity_verified": True,
+        "claim_support_review": {
+            "status": claim_review["status"],
+            "supported_claim_count": len(claim_bindings),
+            "unsupported_claim_count": 0,
+            "evidence_pack_ref": ep_id,
+            "note": claim_review["note"],
+        },
         "commitment_flags": _detect_commitments(draft),
         "professional_assertion_flags": review_flags(draft),
         "duty_of_care_flags": duty_of_care_flags(draft),
@@ -304,6 +336,7 @@ def _run(
         "governance_refs": [
             "docs/governance/MVP_GOVERNED_TASK_LOOP.md",
             "docs/governance/PROFESSIONAL_DUTY_OF_CARE.md",
+            "docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md",
         ],
     }
     evidence_pack = {
@@ -317,10 +350,7 @@ def _run(
         "created_at": now,
         "evidence_items": [
             {
-                "evidence_id": (
-                    f"ei-{hit.chunk.source_ref.rsplit('/', 1)[-1].split('.')[0]}-"
-                    f"{hit.chunk.chunk_no}"
-                ),
+                "evidence_id": _evidence_id(hit.chunk),
                 "claim": hit.chunk.body[:160],
                 "source_ref": hit.chunk.source_ref,
                 "retrieval_trace": hit.chunk.retrieval_trace,
@@ -338,12 +368,14 @@ def _run(
             }
             for rank, hit in enumerate(useful_hits, start=1)
         ],
+        "claim_support_bindings": claim_bindings,
         "assumptions": [
             "aucune hypothèse ajoutée par le runner ; toute hypothèse relève de la décision humaine"
         ],
         "limitations": [
             "seuls les extraits déclarés au contrat ont été lus",
             "le classement hybride combine des rangs lexicaux et sémantiques ; son score ne mesure ni la vérité ni la qualité d'une Evidence",
+            "une liaison claim/support prouve seulement l'origine récupérée ; elle ne vaut ni validation ni admission comme Evidence",
         ],
         "contradictions_preserved": [
             "le runner restitue les passages sans arbitrer entre eux ; toute contradiction entre sources est conservée pour la décision humaine, non résolue"
@@ -355,6 +387,9 @@ def _run(
             "request_revision",
             "request_more_evidence",
         ],
-        "governance_refs": ["docs/governance/MVP_GOVERNED_TASK_LOOP.md"],
+        "governance_refs": [
+            "docs/governance/MVP_GOVERNED_TASK_LOOP.md",
+            "docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md",
+        ],
     }
     return RunOutput(kind="candidates", documents=[result_candidate, evidence_pack])
