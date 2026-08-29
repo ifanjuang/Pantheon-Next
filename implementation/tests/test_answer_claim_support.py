@@ -57,16 +57,18 @@ def test_claim_support_binding_keeps_digest_and_exact_locator_without_promoting_
     review = claim_support_review(draft, [chunk])
 
     assert review["status"] == "sourced_not_verified"
+    assert review["status"] != "verified"
     assert review["unsupported_claims"] == []
     binding = review["supported_claims"][0]
     assert binding["support_status"] == "sourced_not_verified"
+    assert binding["support_status"] != "verified"
     support = binding["supports"][0]
     assert support["source_digest"] == "a" * 64
     assert support["page_start"] == 7
     assert support["page_end"] == 7
     assert support["structural_locator"] == "section:CCTP/lot-06"
     assert support["support_status"] == "sourced_not_verified"
-    assert "verified" not in review["status"]
+    assert support["support_status"] != "verified"
 
 
 def test_missing_page_is_visible_and_never_fabricated() -> None:
@@ -111,19 +113,23 @@ def test_runner_emits_exact_claim_to_evidence_binding_but_not_verification(monke
     assert output.kind == "candidates"
     result_candidate, evidence_pack = output.documents
     assert result_candidate["claim_support_review"]["status"] == "sourced_not_verified"
+    assert result_candidate["claim_support_review"]["status"] != "verified"
     assert result_candidate["citation_integrity_verified"] is True
     assert "grounding_verified" not in result_candidate
 
     item = evidence_pack["evidence_items"][0]
     assert item["support_status"] == "sourced_not_verified"
+    assert item["support_status"] != "verified"
     assert item["retrieval_metrics"]["distance"] == 0.01
     assert item["retrieval_metrics"]["interpretation"] == "lower_is_closer_not_truth_probability"
 
     binding = evidence_pack["claim_support_bindings"][0]
     assert binding["support_status"] == "sourced_not_verified"
+    assert binding["support_status"] != "verified"
     support = binding["supports"][0]
+    assert support["support_status"] == "sourced_not_verified"
+    assert support["support_status"] != "verified"
     assert support["source_digest"] == "a" * 64
     assert support["evidence_item_ref"] == item["evidence_id"]
     assert support["page_start"] == 7
     assert support["structural_locator"] == "section:CCTP/lot-06"
-    assert all("verified" not in str(value) for value in (binding["support_status"], support["support_status"]))
