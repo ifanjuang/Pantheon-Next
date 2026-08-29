@@ -1,16 +1,11 @@
 # Evidence Topology Anti-patterns
 
-Status: active support cards — documentation-level governance support.
+Status: reference — implemented as documentation.
+Boundary profile: documentation_only.
 
-These cards support `EVIDENCE_TOPOLOGY_GATE.md` (removed; git history) and `EVIDENCE_TOPOLOGY_CHECKLIST.md` (removed; git history).
+These cards are non-authoritative examples of failure modes already governed by `EVIDENCE_TOPOLOGY.md`.
 
-They are not runtime rules.
-
-They are not schemas.
-
-They are not tests.
-
-Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: optional compatible runtime clients expose runtime interaction only, Hermes/the external runtime executes admitted work, Pantheon Cockpit projects governed state, and Pantheon retains governance authority.
+They do not own topology policy, Evidence semantics, runtime rules, schemas or tests. Their former links to `EVIDENCE_TOPOLOGY_GATE.md` and `EVIDENCE_TOPOLOGY_CHECKLIST.md` remain historical provenance in Git history.
 
 ## Purpose
 
@@ -20,7 +15,7 @@ They may show many agents, many messages, many summaries, a visible canvas or an
 
 That activity does not prove the result.
 
-These cards define recurring failure patterns and the correction expected by Pantheon.
+These cards illustrate recurring failure patterns and the correction expected by the current Evidence Topology owner.
 
 ## Cards
 
@@ -34,7 +29,7 @@ These cards define recurring failure patterns and the correction expected by Pan
 
 ## Correction pattern
 
-Use this correction sequence:
+Use the owner doctrine rather than these examples as the normative source:
 
 ```text
 identify topology drift
@@ -47,7 +42,8 @@ escalate to User Decision Gate if stakes remain unresolved
 ## Final rule
 
 ```text
-Activity is not evidence.
-Continuity is not authority.
-Visibility is not validation.
+example card != authority
+activity != evidence
+continuity != authority
+visibility != validation
 ```
