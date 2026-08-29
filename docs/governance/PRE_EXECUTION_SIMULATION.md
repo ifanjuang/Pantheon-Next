@@ -1,146 +1,75 @@
 # Pre-Execution Simulation
 
-Status: active support doctrine — governed pre-execution stress test pattern.
+Status: active support doctrine — specialized pre-execution stress test within the governed method — documented non-implemented.
+Boundary profile: active_support_doctrine.
 
-This document defines how Pantheon Next may use simulation results before high-risk execution or delivery.
+This document specializes Movement 6 — `Test` of `GOVERNED_METHOD_STANDARD.md` for cases where a candidate should be stress-tested through bounded simulation before consequential use.
 
-It does not add a runtime.
-
-It does not add an agent.
-
-It does not add a simulator, evaluator, scheduler, queue, provider router, observability backend, MCP layer, A2A layer, hidden workflow runner, automatic approval system, automatic memory system or self-improvement loop.
-
-Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: optional compatible runtime clients may expose runtime interaction, Hermes/the external runtime may execute admitted simulations, Pantheon Cockpit projects governed simulation status and decision state, and no runtime or client success transfers Pantheon authority.
-
-## Purpose
-
-Pre-execution simulation is a governed method for stress-testing a candidate action before it becomes execution, delivery, transmission, memory or doctrine.
-
-It is useful when an output may look correct but fail under realistic pressure:
-
-```text
-ambiguous client interpretation
-contradictory third-party response
-missing source
-scope expansion
-external transmission risk
-professional liability
-memory overreach
-repository mutation risk
-prompt, skill or workflow change
-```
-
-Pantheon uses simulation to reveal risk before action.
-
-Pantheon does not use simulation to replace approval.
+It owns the simulation-specific method seam only. Generic Task Contract, Evidence, approval, memory, User Decision Gate, Hermes/runtime and Cockpit rules remain with their existing owners.
 
 ## Core rule
 
 ```text
-A simulation can reveal failure modes.
-It cannot authorize execution.
+Simulation may reveal failure modes.
+Simulation does not authorize the real action.
 ```
 
-Simulation output is a candidate signal.
+A simulation result is candidate review material. It may affect status, Evidence expectations or the need for a human decision, but it is not approval, proof, memory or execution authority by itself.
 
-It may support an Evidence Pack.
+## Parent-method placement
 
-It may trigger a User Decision Gate.
-
-It must not approve, execute, transmit, merge, promote memory or mutate doctrine by itself.
-
-## Relationship to Future AGI
-
-This pattern is partly inspired by Future AGI's reliability framing around simulation, evaluation, guardrails, tracing and optimization.
-
-The Pantheon interpretation is intentionally narrower:
+`GOVERNED_METHOD_STANDARD.md` owns the generic method movement:
 
 ```text
-simulate -> evaluate -> summarize -> expose -> decide
+Produce Candidate -> Test -> Status
 ```
 
-Not:
+Pre-execution simulation is one optional Test technique when ordinary review is insufficient to expose material consequence.
+
+Use the smallest test that can reveal the relevant failure mode. Do not turn simulation into a mandatory ritual for every request.
+
+## When simulation is justified
+
+Consider bounded simulation when a candidate may carry material risk such as:
 
 ```text
-simulate -> optimize -> auto-improve -> auto-promote
-```
-
-Future AGI may inspire external Hermes-side simulation or evaluation candidates.
-
-It must not become a Pantheon runtime, gateway, observability backend, provider router, self-improvement loop or approval authority.
-
-See `FUTURE_AGI.md` (removed; git history).
-
-## When to use
-
-Pre-execution simulation should be considered when a task touches:
-
-```text
-C3 canonical governance review
-C4 trust-boundary review
-C5 critical review
-external write or transmission
-professional responsibility
-repository mutation
-protected governance files
-memory promotion
+recipient misinterpretation
+unsupported or weakly supported claim
+contradictory reply
 scope expansion
-provider or gateway configuration
-prompt, skill or workflow update
+external transmission or write
+professional liability
+privacy or sensitive-context leak
+memory or Registre overreach
+repository or protected-file mutation
+prompt, skill or workflow regression
+provider / gateway configuration change
 high-risk automation proposal
 ```
 
-It is especially useful when the main risk is not whether the candidate is fluent, but how it behaves under pressure.
+A fluent or technically successful candidate is not sufficient reason to skip this test when consequence is material.
 
-## Professional examples
+## Simulation request seam
 
-Architecture and project-management examples:
-
-```text
-A client email may be read as approval of a disputed quote.
-A contractor may answer a clarification request by expanding scope.
-A CCTP gap may make a draft look stronger than the evidence allows.
-A recovery-work note may imply acceptance of defective work.
-A site-meeting summary may create unintended contractual framing.
-```
-
-Governance and repository examples:
+`TASK_CONTRACTS.md` owns the delegated task boundary. When simulation is non-trivial, the Task Contract or equivalent governed review note should bound at least:
 
 ```text
-A documentation patch may imply implementation.
-A reference review may be mistaken for dependency adoption.
-A score may be treated as approval.
-A trace may be treated as proof.
-A recurring observation may be treated as a Registre Probatoire entry.
-```
-
-## Simulation inputs
-
-A simulation request should be bounded by a Task Contract or review note when the task is non-trivial.
-
-Recommended inputs:
-
-```text
-candidate_action
-candidate_output
-intended_recipient_or_effect
-task_scope
-excluded_scope
-allowed_sources
+candidate_action_or_output
+simulation_goal
 risk_level
+allowed_context
+excluded_context
+scenario_set
 approval_ceiling
 memory_rule
-simulation_goal
-personas_or_scenarios
-success_and_failure_conditions
-expected Evidence Pack summary
+expected_result_summary
 ```
 
-Inputs must not include secrets, private payloads, credentials or broad dossier material unless explicitly scoped and approved.
+The simulation request must not silently broaden project, source, private-data, provider or repository scope.
 
-## Simulation scenarios
+## Scenario set
 
-Useful scenario types:
+Useful bounded scenario families include:
 
 ```text
 recipient_misinterpretation
@@ -158,132 +87,51 @@ prompt_or_skill_regression
 unanswerable_question
 ```
 
-Simulation should use the smallest scenario set that can reveal the material risk.
+Scenario sets are test devices, not users, Roles, Evidence or authority.
 
-It should not become an unlimited adversarial theatre.
+Prefer the smallest scenario set that can expose the material risk.
 
-## Hermes boundary
+## Hermes execution seam
 
-Hermes may execute a simulation only as an external runtime capability under Task Contract.
+Pantheon does not execute simulations.
 
-Hermes may produce:
+A future Hermes-side capability candidate is described in:
 
-```text
-Simulation Result Candidate
-Trajectory Evaluation Candidate
-Guardrail Signal
-Risk Note
-Capability Gap
-Improvement Candidate
-Evidence Pack Candidate
-```
+`hermes/profiles/_base/EVALUATION_AND_SIMULATION_CANDIDATE.md`
 
-Hermes must not:
+That profile owns candidate execution-shape detail such as runner, persona/scenario support, trajectory evaluation, guardrail signals and runtime return formatting. It does not acquire Pantheon authority.
 
 ```text
-approve the candidate
-execute the real action because simulation passed
-send or publish the output
-merge repository changes
-promote memory
-mutate doctrine
-install tools or skills
-broaden scope silently
+Task Contract bounds the simulation.
+Hermes may execute the admitted simulation externally.
+Simulation output returns as candidate material.
+Pantheon owners determine what that material means.
 ```
 
-Hermes completion does not mean Pantheon approval.
+Runtime/client completion, a guardrail pass or a good score never authorizes the real consequential action.
 
-## Runtime-client / Cockpit boundary
+## Simulation Result Candidate
 
-A compatible runtime client may expose runtime-interaction state such as:
-
-```text
-simulation requested
-simulation running externally
-simulation completed
-simulation failed
-simulation inconclusive
-runtime execution blocked by scope or policy
-```
-
-Pantheon Cockpit may project governed simulation state such as:
-
-```text
-simulation not required
-simulation risk detected
-simulation blocked by scope
-simulation blocked by approval
-User Decision Gate required
-```
-
-The Cockpit may project a simulation summary, scenario list, risk note, limitation, Evidence Pack Candidate reference and governed decision options.
-
-A runtime client or Cockpit projection must not present a simulation pass as approval.
-
-A runtime client must not run a consequential simulation merely because its UI state permits it; execution remains subject to Task Contract and the runtime/PEP boundary.
-
-Neither surface may hide failed or inconclusive simulation results when they are material to governed review.
-
-```text
-runtime interaction != governed projection
-projection != approval
-runtime approval UI != Pantheon human approval
-```
-
-## Evidence Pack impact
-
-When simulation affects legitimacy, the Evidence Pack may include a simulation entry.
-
-Recommended structure:
+A reviewable simulation result should make visible at least:
 
 ```text
 simulation_id
 linked_task_contract
 simulation_goal
 candidate_tested
-scenario_set
-persona_or_edge_case_summary
-inputs_considered
-excluded_inputs
+scenario_set_used
 result_status
 risks_detected
 limitations
-trajectory_notes
 approval_impact
 memory_impact
-User_Decision_Gate_impact
+external_effect_impact
 recommended_next_action
 ```
 
-Allowed evidence:
+The shape is documentary, not an executable schema.
 
-```text
-scenario summary
-failure modes
-risk notes
-capability gaps
-concise rationale
-result status
-approval implication
-memory implication
-```
-
-Forbidden evidence:
-
-```text
-hidden chain-of-thought
-raw scratchpad
-raw autonomous debate
-unredacted private payloads
-secrets or credentials
-runtime state required to resume execution
-provider routing logs as proof
-simulation transcript as approval
-```
-
-## Result statuses
-
-Recommended simulation statuses:
+Recommended result statuses remain:
 
 ```text
 not_required
@@ -303,17 +151,11 @@ failed
 superseded
 ```
 
-These statuses are governance signals.
+`ready_for_external_execution` means the **simulation run** is sufficiently bounded for external runtime execution. It never means the real candidate action is authorized.
 
-They are not runtime states.
+## Interpreting evaluation signals
 
-They do not execute anything.
-
-## Evaluation and scoring
-
-Simulation may include evaluation scores, guardrail results or trajectory checks.
-
-Those signals must be interpreted conservatively:
+Simulation may include scores, trajectory checks or guardrail signals. Interpret them only as review signals:
 
 ```text
 evaluation score -> review signal
@@ -323,22 +165,22 @@ simulation pass -> candidate confidence only
 simulation failure -> possible escalation trigger
 ```
 
-They must not become:
+Never collapse them into:
 
 ```text
-C0-C5 approval
-proof by themselves
+approval
+Evidence by themselves
 delivery authorization
 memory promotion
 doctrine mutation
-provider routing authority
+provider-routing authority
 ```
 
-## Improvement Candidates
+The relevant Evidence semantics remain with `EVIDENCE_PACK.md`; approval semantics remain with `APPROVALS.md` and `USER_DECISION_GATE.md`.
 
-A simulation may produce an Improvement Candidate.
+## Improvement Candidate
 
-An Improvement Candidate should identify:
+A simulation may produce an Improvement Candidate describing:
 
 ```text
 observed_failure
@@ -349,39 +191,46 @@ expected_benefit
 risk_note
 affected_scope
 approval_requirement
-memory_implication
 rollback_or_supersession_path
 ```
 
-An Improvement Candidate must not become:
+An Improvement Candidate is a proposal for review. It must not automatically:
 
 ```text
-automatic merge
-automatic prompt promotion
-automatic skill activation
-automatic workflow update
-automatic doctrine mutation
-automatic memory promotion
-automatic provider change
+merge repository changes
+promote prompts
+activate skills
+change workflows or doctrine
+change providers
+promote memory
 ```
 
-## User Decision Gate triggers
+Provenance for the external pattern is maintained by `DISTILLATION_REGISTRY.md`; this document does not need to repeat vendor/reference history.
 
-A simulation should trigger or support a User Decision Gate when:
+## Handoffs to existing owners
+
+Simulation-specific method stops at the candidate result and its local interpretation.
+
+Downstream responsibilities stay separated:
+
+- `EVIDENCE_PACK.md` owns whether and how attributable simulation observations support an Evidence Pack Candidate;
+- `APPROVALS.md` owns approval legitimacy and ceilings;
+- `USER_DECISION_GATE.md` owns consequential human escalation;
+- `MEMORY.md` and `SCOPE_ISOLATION.md` own durable-retention boundaries;
+- `HERMES_INTEGRATION.md` owns runtime/client/PDP/PEP/Cockpit placement;
+- `GOVERNED_METHOD_STANDARD.md` owns the generic Test -> Status movement.
 
 ```text
-simulation detects material risk
-simulation contradicts apparent output quality
-simulation is inconclusive but external effect remains high
-simulation suggests scope expansion
-simulation suggests memory promotion
-simulation suggests prompt, skill, policy or workflow change
-simulation result conflicts with available evidence
-simulation score is being treated as approval
-simulation requires private data outside current scope
+simulation result != Evidence admission
+simulation pass != approval
+simulation repetition != Registre Probatoire entry
+runtime success != authorization
+projection != approval
 ```
 
-User-facing options may include:
+## Safe outcomes
+
+A simulation may support outcomes such as:
 
 ```text
 continue_as_draft
@@ -391,109 +240,25 @@ narrow_scope
 split_into_variants
 revise_candidate
 run_bounded_followup_simulation
-escalate_approval
-block_delivery
-block_transmission
+open_user_decision_gate
+block_delivery_or_transmission
 reject_memory_candidate
-allow_improvement_candidate_review
+review_improvement_candidate
 ```
 
-## Relationship to Task Contracts
+The applicable owner determines the actual governed status and gate.
 
-A Task Contract may require pre-execution simulation for high-risk tasks.
+## Boundary
 
-It may define:
+`active_support_doctrine` boundary profile applies.
 
-```text
-simulation_required
-simulation_goal
-scenario_set
-allowed_inputs
-excluded_inputs
-approval_ceiling
-expected Evidence Pack entry
-User Decision Gate triggers
-memory rule
-optimization_candidate_rule
-```
+This document does not create a simulator, evaluator, workflow runner, scheduler, queue, provider router, observability backend, MCP/A2A layer, approval engine, memory engine or self-improvement loop.
 
-It must not define:
+It does not authorize Hermes, a client or Pantheon Cockpit to execute or approve the real action because a simulation passed.
 
 ```text
-automatic simulation execution inside Pantheon
-scheduler behavior
-queue behavior
-provider routing
-hidden workflow execution
-automatic approval after simulation pass
-automatic memory promotion from simulation
-```
-
-## Relationship to approvals
-
-Simulation can support approval review.
-
-It does not grant approval.
-
-C3 and above should treat simulation as one possible evidence input when the task risk justifies it.
-
-C4 and C5 should require explicit human or governed approval when simulation affects external effect, trust boundary, professional liability, protected files, runtime configuration, memory or doctrine.
-
-## Relationship to memory
-
-Simulation output is not memory.
-
-A simulation may support a Register Candidate only when:
-
-```text
-the claim is explicit
-the scope is defined
-the evidence link is clear
-the risk is recorded
-the approval path is declared
-```
-
-Simulation repetition does not create a Registre Probatoire entry.
-
-Simulation confidence does not create a Registre Probatoire entry.
-
-Simulation-derived memory must follow `MEMORY.md` and `SCOPE_ISOLATION.md`.
-
-## Forbidden drift
-
-Pre-execution simulation must never become:
-
-```text
-Pantheon runtime
-simulation backend
-agent runtime
-hidden workflow runner
-scheduler
-queue
-provider router
-automatic approval engine
-automatic memory promoter
-self-improvement loop
-prompt auto-optimizer
-guardrail authority
-observability backend
-MCP or A2A layer
-```
-
-If simulation pass becomes permission to act, the boundary has failed.
-
-If simulation output becomes proof without governed evidence, the boundary has failed.
-
-If simulation failure mutates prompts, skills, memory, doctrine or workflows automatically, the boundary has failed.
-
-## Final rule
-
-```text
-Simulation tests the candidate.
-Evidence frames the result.
-ZEUS arbitrates status and procedure.
-Pantheon Cockpit projects the governed decision state.
-A compatible runtime client may expose runtime interaction without owning the decision.
-The human decides when risk remains material.
-Only the validated remains.
+Simulation stress-tests the candidate.
+Evidence owners qualify attributable observations.
+Status and approval owners govern consequential use.
+The human decides where required.
 ```
