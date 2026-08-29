@@ -1,15 +1,17 @@
-# Model Capability Passport Candidate Template
+# Model Capability Review Candidate Template
 # Status: template — non-executable.
 # Repo state: documented non-implemented.
 # Authority: support scaffold only.
-# This template helps fill a Model Passport Candidate before read-only validation.
-# It is not a schema, benchmark, model registry, model router, provider selector, runtime, approval engine or memory engine.
-# It does not authorize model use by itself.
+# Legacy filename retained to avoid unnecessary path churn.
+# This template helps record a documentary model-specific review before any
+# universal Capability Passport, Capability Activation or Task Contract decision.
+# It is not a schema, benchmark, model registry, model router, provider selector,
+# runtime, approval engine or memory engine. It authorizes nothing by itself.
 
-model_capability_passport_candidate:
-  passport_id: ""
-  status: "candidate" # candidate | sandbox | project_enabled | organization_enabled | deprecated | rejected | unknown
-  validation_level: "L0" # L0_document_exists | L1_required_fields_present | L2_internally_coherent | L3_gate_recommendation_possible
+model_capability_review_candidate:
+  record_kind: "model_capability_review"
+  review_status: "candidate" # candidate | reviewed | suspended | rejected
+  validation_level: "L0" # L0_document_exists | L1_required_fields_present | L2_internally_coherent | L3_review_recommendation_possible
   reviewed_at: ""
   reviewed_by: ""
 
@@ -18,62 +20,43 @@ model_capability_passport_candidate:
       - "docs/governance/MODEL_CAPABILITY_PASSPORT.md"
       - "docs/governance/RUNTIME_REVIEW_MODEL_PASSPORT_VALIDATION_PROMOTION.md"
       - "docs/governance/UNIFORM_CAPABILITY_GOVERNANCE.md"
+    universal_capability_passport_ref: ""
+    capability_activation_ref: ""
+    task_contract_ref: ""
     model_ref: ""
-    provider_ref: ""
-    adapter_ref: ""
-    version_or_release: ""
+    adapter_or_binding_ref: ""
     notes: ""
 
   model_identity:
     model_id: ""
     display_name: ""
-    provider_or_runtime: ""
-    processing_posture: "unknown" # local_only | external_api | self_hosted_remote | organization_hosted | hybrid | unknown
-    serving_surface: "unknown" # exposure_surface | execution_runtime | model_runtime | connector_gateway | unknown
-    modality: [] # text | image | audio | video | code | tabular | multimodal | other
-    context_window: "unknown"
+    version_or_release: ""
+    provider: ""
+    serving_posture: "unknown" # local_only | external_api | self_hosted_remote | organization_hosted | hybrid | unknown
+    serving_surface: "unknown"
+    modalities: []
+    context_window_or_limit: "unknown"
 
-  data_and_context:
-    data_exposure: "unknown" # public_only | supplied_non_sensitive | project_sensitive | client_private | confidential | secrets_or_credentials | unknown
-    retention_or_training_unknowns: "unknown" # none_known | possible | present | unknown
+  data_posture:
+    data_exposure_classes_allowed: []
     sensitive_data_allowed: false
-    context_minimization_required: true
-    input_classes_allowed: []
-    input_classes_forbidden:
-      - "secrets_or_credentials_unless_explicitly_approved"
-      - "unnecessary_private_material"
-    output_classes_allowed:
-      - "draft"
-      - "candidate"
-      - "evidence_pack_candidate_support"
-    output_classes_forbidden:
-      - "canonical_approval"
-      - "memory_promotion"
-      - "professional_validation_by_model"
-      - "external_action_authorization"
+    retention_or_training_posture: "unknown"
+    source_grounding_expectation: "required_when_source_dependent"
+    notes: ""
 
-  task_family_suitability:
-    brainstorming: "allowed" # allowed | allowed_with_evidence | allowed_with_human_review | sandbox_only | forbidden | unknown
-    rewriting: "allowed"
-    summarization: "allowed_with_human_review"
-    translation: "allowed_with_human_review"
-    source_extraction: "allowed_with_evidence"
-    document_review: "allowed_with_evidence"
-    plan_or_image_interpretation: "allowed_with_human_review"
-    code_generation: "allowed_with_human_review"
-    professional_risk_review: "allowed_with_evidence"
-    regulatory_research: "allowed_with_evidence"
-    contractual_analysis: "allowed_with_evidence"
-    client_facing_draft: "allowed_with_human_review"
-    external_action_preparation: "allowed_with_human_review"
-    memory_candidate_preparation: "allowed_with_evidence"
+  task_family_review:
+    # Suitability review is observational metadata, not task authorization.
+    # Example item:
+    # - family: "regulatory_research"
+    #   observed_suitability: "limited" # adequate | limited | weak | unknown
+    #   notes: "Requires current authoritative sources and human review."
+    reviewed_task_families: []
+    forbidden_task_families: []
 
-  professional_use:
+  professional_review:
     professional_use_ceiling: "never_final_by_model" # draft_only | candidate_only | to_verify | supporting_analysis | reviewed_support | never_final_by_model
-    evidence_expectation: []
-    citation_or_source_expectation: "required_when_source_dependent" # none | optional | required_when_source_dependent | always_required
-    uncertainty_behavior: "must_surface_uncertainty" # must_surface_uncertainty | may_summarize | unknown
-    comparison_required: "conditional" # never | conditional | always | unknown
+    uncertainty_behavior: "must_surface_uncertainty"
+    comparison_required_when: []
     fallback_model_or_path: "human_review"
 
   failure_modes:
@@ -85,31 +68,21 @@ model_capability_passport_candidate:
     numerical_reliability: "unknown" # low | medium | high | unknown
     freshness_reliability: "unknown" # low | medium | high | unknown
 
-  pantheon_gate:
-    approval_ceiling: "C3" # C0 | C1 | C2 | C3 | C4 | C5 | unknown
-    memory_behavior: "candidate_only" # none | candidate_only | never_canonical | unknown
-    required_envelope: "task_contract_in__candidate_out__evidence_pack_out"
-    gate_recommendation: "needs_human_review" # allow_read_only | allow_candidate_only | needs_approval | needs_more_evidence | needs_human_review | needs_security_review | needs_adapter_review | block
-
   validation_notes:
     missing_fields: []
     contradictions: []
     capability_gaps: []
     assumptions: []
     limitations: []
-
-  decision:
-    accepted: []
-    refused: []
-    to_verify: []
-    to_arbitrate: []
-    zeus_decision: "to_arbitrate" # accepted | refused | to_verify | to_arbitrate | non_applicable
-    human_decision_required: true
+    review_recommendation: "needs_more_information" # review_complete | needs_more_information | needs_human_review | needs_security_review | needs_adapter_review | reject_review_record
 
   boundary:
-    candidate_only: true
-    canonical_effect: false
+    documentary_review_only: true
+    capability_activation: false
+    task_authorization: false
+    evidence_admission: false
+    approval_effect: false
     runtime_effect: false
     external_action: false
     memory_promotion: false
-    statement: "Model available does not mean model appropriate. Model selected does not mean output approved."
+    statement: "Model reviewed does not mean model activated; model selected does not mean task authorized."
