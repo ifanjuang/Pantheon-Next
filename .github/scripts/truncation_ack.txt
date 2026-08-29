@@ -162,3 +162,9 @@ docs/governance/HERMES_INTEGRATION.md
 # permission/exposure, PDP/PEP and rollback rules. Product comparisons remain
 # with watchlist/distillation/reference-review/placement owners and Git history.
 docs/governance/EXTERNAL_TOOLS_POLICY.md
+
+# Deliberate method-owner convergence: PRE_EXECUTION_SIMULATION.md now keeps only
+# the simulation-specific specialization of Governed Method Standard Movement 6.
+# Generic Task Contract, Evidence, approval, memory, User Decision Gate and
+# Hermes/runtime/Cockpit rules remain with their existing owners.
+docs/governance/PRE_EXECUTION_SIMULATION.md
