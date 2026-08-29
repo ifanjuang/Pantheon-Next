@@ -87,6 +87,14 @@ existing owner first
 new current-authority Markdown = exceptional
 ```
 
+## MCP consumer alignment
+
+After `ARCHITECTURE.md` became explicitly indexed, one MCP consultation test still encoded the former transitional state by expecting that source to report `authority: not indexed`.
+
+`mcp-server/tests/test_consultation.py` is updated only to assert the new real state (`active doctrine`) while continuing to verify that the file's own declared `Status:` and content digest are exposed. The authority resolver's separate tests continue to cover missing/unregistered paths explicitly.
+
+No MCP production code or consultation behavior is changed. The test update is a consumer-alignment change required by the authority-map correction.
+
 ## Preserved boundaries
 
 ```text
