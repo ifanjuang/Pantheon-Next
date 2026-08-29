@@ -123,8 +123,15 @@ def _document_row(conn: psycopg.Connection, document_id: str) -> dict:
 def _chunk_refs(conn: psycopg.Connection, document: dict) -> list[str]:
     with conn.cursor() as cur:
         cur.execute(
-            "SELECT chunk_no FROM chunks WHERE dossier = %s AND source_ref = %s ORDER BY chunk_no",
-            (document["dossier"], document["source_ref"]),
+            """
+            SELECT chunk_no
+              FROM chunks
+             WHERE dossier = %s
+               AND source_ref = %s
+               AND source_digest = %s
+             ORDER BY chunk_no
+            """,
+            (document["dossier"], document["source_ref"], document["source_digest"]),
         )
         if not document.get("compilation_id"):
             return []
@@ -292,10 +299,13 @@ def publish_knowledge(
                   LEFT JOIN retrieval_chunk_projections p
                     ON p.dossier = c.dossier
                    AND p.source_ref = c.source_ref
+                   AND p.source_digest = c.source_digest
                    AND p.chunk_no = c.chunk_no
-                 WHERE c.dossier = %s AND c.source_ref = %s
+                 WHERE c.dossier = %s
+                   AND c.source_ref = %s
+                   AND c.source_digest = %s
                 """,
-                (document["dossier"], document["source_ref"]),
+                (document["dossier"], document["source_ref"], document["source_digest"]),
             )
             chunks = {
                 chunk_ref(document["compilation_id"], number):
