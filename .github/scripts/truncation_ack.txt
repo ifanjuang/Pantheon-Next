@@ -162,3 +162,9 @@ docs/governance/HERMES_INTEGRATION.md
 # permission/exposure, PDP/PEP and rollback rules. Product comparisons remain
 # with watchlist/distillation/reference-review/placement owners and Git history.
 docs/governance/EXTERNAL_TOOLS_POLICY.md
+
+# Deliberate capability-owner convergence: MODULE_ACTIVATION.md now owns only
+# detection -> governance activation -> task authorization, activation scope/status,
+# Effective Policy composition and suspension semantics. Universal passport,
+# Evidence, approval, memory, binding, Cockpit and runtime rules stay with their owners.
+docs/governance/MODULE_ACTIVATION.md
