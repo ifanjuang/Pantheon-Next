@@ -35,7 +35,7 @@ def _connect_or_skip():
 def _contract(project_id: str, source_ref: str) -> TaskContract:
     return TaskContract(
         raw={
-            "task_contract_id": _id("task"),
+            "contract_id": _id("task"),
             "scope": {
                 "parent_project_id": project_id,
                 "declared_sources": [source_ref],
