@@ -92,6 +92,43 @@ def test_package_provenance_reuses_agent_plugin_vocabulary() -> None:
     ).issubset(provenance)
 
 
+def test_same_agent_plugin_package_keeps_component_identity_separate() -> None:
+    package_digest = "sha256:" + "d" * 64
+    skill = _load(EXAMPLE_PATH)
+    skill["passport_id"] = "capability.agent-plugin.inspect-project"
+    skill["capability"]["name"] = "inspect-project"
+    skill["implementation_provenance"] = {
+        "source_kind": "agent_plugin",
+        "package_name": "example-plugin",
+        "package_version": "1.2.3",
+        "package_digest": package_digest,
+        "component_id": "agent-plugin-component-skill",
+        "component_kind": "skill",
+        "component_ref": "skills/inspect-project/SKILL.md",
+        "observed_at": "2026-08-29T13:30:00Z",
+    }
+
+    mcp = copy.deepcopy(skill)
+    mcp["passport_id"] = "capability.agent-plugin.project-reader"
+    mcp["capability"]["name"] = "project-reader"
+    mcp["implementation_provenance"]["component_id"] = "agent-plugin-component-mcp"
+    mcp["implementation_provenance"]["component_kind"] = "mcp_server"
+    mcp["implementation_provenance"]["component_ref"] = "mcp.json#mcpServers/project-reader"
+
+    validator = _validator()
+    validator.validate(skill)
+    validator.validate(mcp)
+
+    skill_provenance = skill["implementation_provenance"]
+    mcp_provenance = mcp["implementation_provenance"]
+    assert skill_provenance["package_digest"] == mcp_provenance["package_digest"]
+    assert skill_provenance["component_id"] != mcp_provenance["component_id"]
+    assert skill_provenance["component_ref"] != mcp_provenance["component_ref"]
+    assert skill["status"] == mcp["status"] == "candidate"
+    assert skill["governance"]["task_authorization"] == "unauthorized"
+    assert mcp["governance"]["task_authorization"] == "unauthorized"
+
+
 def test_provenance_rejects_unknown_fields_instead_of_becoming_runtime_inventory() -> None:
     passport = _load(EXAMPLE_PATH)
     passport["implementation_provenance"]["installed_path"] = "/runtime/skills/example"
