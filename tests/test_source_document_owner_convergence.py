@@ -59,3 +59,17 @@ def test_layered_record_model_preserves_seven_distinct_layers():
     assert "projection != persistence" in text
     assert "retrieval score != authority" in text
     assert "runtime completion != authorization" in text
+
+
+def test_information_acquisition_reuses_existing_owners_without_new_router():
+    lifecycle = _read("docs/governance/REQUEST_LIFECYCLE.md")
+    sources = _read("docs/governance/SOURCE_NEED_AND_REGISTRY.md")
+    adapters = _read("docs/governance/ADAPTERS_AND_BINDINGS.md")
+
+    assert "least indirect admitted route" in lifecycle
+    assert "typed query against its existing operational owner" in lifecycle
+    assert "creates no Pantheon router" in lifecycle
+    assert "query_operational_owner" in sources
+    assert "an acquisition route, not a source family" in sources
+    assert "AI-specific shadow store" in adapters
+    assert "runtime -> typed adapter -> existing operational owner" in adapters
