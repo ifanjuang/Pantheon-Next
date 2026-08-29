@@ -41,14 +41,11 @@ _CITATION_RE = re.compile(r"\[([^\]#]+)#chunk-(\d+)\]")
 
 # Heuristic proxy for a draft asserting a professional conclusion — the runner
 # must not validate professional truth. Advisory only (keyword-based, so
-# false-positive-prone): surfaced to the gate, NEVER an auto-reject. The real
-# semantic check is the human gate (or, later, a Hermes-side LLM judge). Do not
-# mistake this list for the guarantee — that lesson is Gate 6.
-#
-# The legal-qualification tournures were added after the SPS case (a DCE clause
-# asserting "le maître d'ouvrage est exempté des obligations SPS … relève de la
-# catégorie 3"): asserting a point of law is exactly what objectivité/équité
-# forbids the architect from doing lightly (docs/governance/PROFESSIONAL_DUTY_OF_CARE.md).
+# false-positive-prone): surfaced to the gate, NEVER an auto-reject by itself.
+# The real semantic check remains the human gate. When the same heuristic finds
+# an assertion with no retrieved support, however, the runner may refuse to emit
+# that unsupported text as a governed candidate; that is a sourcing boundary,
+# not a truth decision.
 _VERDICT_PATTERNS = (
     r"est conforme", r"n'est pas conforme", r"est valide", r"est invalide",
     r"doit être (accepté|rejeté|refusé|validé|approuvé)",
@@ -61,9 +58,6 @@ _VERDICT_PATTERNS = (
 
 # A judgment on, or selection of, an ENTREPRISE — the case where objectivité et
 # équité (Code de déontologie) and the MAF duty-of-conseil verifications apply.
-# Each pattern requires a judgment/selection word near "entreprise"/"offre", so
-# neutral restitution of passages that merely mention "les entreprises" does not
-# trip it. Advisory only, like every flag here.
 _COMPANY_JUDGMENT_PATTERNS = (
     r"\b(retenir|retenue|retenu|écarter|écartée|écarté)\b[^.]*\bentreprise\b",
     r"\bentreprise\b[^.]*\b(retenue|retenu|écartée|écarté|recommandée|recommandé|"
@@ -73,7 +67,6 @@ _COMPANY_JUDGMENT_PATTERNS = (
     r"\bmeilleur\s+rapport\s+qualité[- ]prix\b",
 )
 
-# The duty-of-conseil verifications the cage can never assert from its sources.
 _DUTY_OF_CARE_CHECKS = (
     "assurance décennale / RC pro vérifiée",
     "qualifications métier vérifiées",
@@ -82,32 +75,44 @@ _DUTY_OF_CARE_CHECKS = (
 )
 
 
-def verify_draft(draft: str, chunks: Sequence[RetrievedChunk]) -> None:
-    """Structural safety check on a drafter's output, before it becomes a
-    candidate. Raises DraftRejected on failure.
-
-    Enforced (structural, complete): every source reference in the draft must
-    correspond to a chunk actually retrieved in-perimeter — no fabricated
-    citations, no citing a source outside the declared scope. This is what
-    lets an untrusted Drafter fill the seam: it cannot invent evidence.
-
-    NOT enforced here: whether the prose asserts a professional conclusion or
-    resolves a contradiction. Those are semantic and remain the human gate's
-    job (see review_flags for advisory, non-blocking detection). This is a
-    sourcing check, not a truth check — do not conflate the two.
-    """
-    provided = {(c.source_ref, c.chunk_no) for c in chunks}
-    provided_refs = {c.source_ref for c in chunks}
-    for match in _CITATION_RE.finditer(draft):
-        ref, chunk_no = match.group(1), int(match.group(2))
-        if ref not in provided_refs:
+def _resolve_citation(
+    ref: str,
+    chunk_no: int,
+    chunks: Sequence[RetrievedChunk],
+) -> RetrievedChunk:
+    matches = [c for c in chunks if c.source_ref == ref and c.chunk_no == chunk_no]
+    if not matches:
+        if not any(c.source_ref == ref for c in chunks):
             raise DraftRejected(
                 f"draft cites a source outside the retrieved perimeter: {ref!r}"
             )
-        if (ref, chunk_no) not in provided:
-            raise DraftRejected(
-                f"draft cites {ref}#chunk-{chunk_no}, which was not among the retrieved chunks"
-            )
+        raise DraftRejected(
+            f"draft cites {ref}#chunk-{chunk_no}, which was not among the retrieved chunks"
+        )
+
+    identities = {
+        (c.source_ref, c.chunk_no, c.source_digest, c.retrieval_trace)
+        for c in matches
+    }
+    if len(identities) > 1:
+        raise DraftRejected(
+            f"draft citation {ref}#chunk-{chunk_no} is ambiguous across retrieved source revisions"
+        )
+    return matches[0]
+
+
+def verify_draft(draft: str, chunks: Sequence[RetrievedChunk]) -> None:
+    """Structural safety check on a drafter's output before candidacy.
+
+    Every citation must resolve to one exact retrieved chunk. Once historical
+    revisions can coexist, ``source_ref + chunk_no`` is not necessarily unique;
+    an ambiguous textual citation is therefore rejected rather than guessed.
+
+    This remains a sourcing check, not a truth check. A valid citation does not
+    make the cited prose Evidence, verified, applicable or professionally true.
+    """
+    for match in _CITATION_RE.finditer(draft):
+        _resolve_citation(match.group(1), int(match.group(2)), chunks)
 
 
 def review_flags(draft: str) -> list[dict]:
@@ -124,18 +129,7 @@ def review_flags(draft: str) -> list[dict]:
 
 
 def duty_of_care_flags(draft: str) -> list[dict]:
-    """Advisory, non-blocking flags for the gate: prose that judges or selects an
-    ENTREPRISE — where objectivité/équité and the MAF duty-of-conseil apply.
-
-    When a draft evaluates or retains a company, the architect's written duty of
-    care attaches: verifying insurance (décennale/RC pro), qualifications and
-    references, and motivating a negative opinion in writing. The cage has NO
-    source for those verifications, so it never asserts them done — it surfaces
-    them as unestablished, for the human MOE to carry (and motivate in writing).
-    Heuristic and advisory only; absence of a flag proves nothing.
-
-    See docs/governance/PROFESSIONAL_DUTY_OF_CARE.md.
-    """
+    """Advisory, non-blocking flags for prose judging/selecting an ENTREPRISE."""
     flags = []
     for pattern in _COMPANY_JUDGMENT_PATTERNS:
         for match in re.finditer(pattern, draft, re.IGNORECASE):
@@ -149,29 +143,104 @@ def duty_of_care_flags(draft: str) -> list[dict]:
     return flags
 
 
-def grounding_review(draft: str, chunks: Sequence[RetrievedChunk]) -> dict:
-    """Advisory grounding visibility for the gate (issue #13, P5) — before a
-    real Hermes-side LLM drafter fills the seam.
+def _sentences(draft: str) -> list[str]:
+    return [
+        sentence.strip()
+        for sentence in re.split(r"(?<=[.!?])\s+|\n+", draft)
+        if sentence.strip()
+    ]
 
-    Reports how much of the draft is cited and flags *assertive prose that
-    carries no citation in its own sentence*. It is advisory only: NOT a score,
-    NOT an approval, and NOT a professional-truth verdict. Crucially, the
-    absence of a flag does not mean the draft is grounded or true — that
-    remains the human gate's judgement. (This is the Gate 6 discipline: a
-    heuristic is never the guarantee.)
+
+def _is_assertive(sentence: str) -> bool:
+    return any(re.search(pattern, sentence, re.IGNORECASE) for pattern in _VERDICT_PATTERNS)
+
+
+def claim_support_review(draft: str, chunks: Sequence[RetrievedChunk]) -> dict:
+    """Bind detected assertive prose to exact retrieved source identities.
+
+    This is deliberately narrower than semantic fact checking. The existing
+    conservative verdict heuristic identifies prose consequential enough to
+    require explicit support. Each citation in such a sentence is resolved to
+    the exact retrieved digest and locator. Missing support is surfaced for a
+    fail-closed runner refusal. Present support remains ``sourced_not_verified``.
+
+    Page coordinates are copied only when extraction supplied them. They are
+    never fabricated; exact digest + chunk identity remains visible even when a
+    non-paginated source has no page number.
+    """
+    supported_claims: list[dict] = []
+    unsupported_claims: list[str] = []
+
+    for sentence in _sentences(draft):
+        if not _is_assertive(sentence):
+            continue
+        citations = list(_CITATION_RE.finditer(sentence))
+        if not citations:
+            unsupported_claims.append(sentence[:500])
+            continue
+
+        supports: list[dict] = []
+        seen: set[tuple[str, int, str]] = set()
+        for citation in citations:
+            ref = citation.group(1)
+            chunk_no = int(citation.group(2))
+            chunk = _resolve_citation(ref, chunk_no, chunks)
+            identity = (chunk.source_ref, chunk.chunk_no, chunk.source_digest)
+            if identity in seen:
+                continue
+            seen.add(identity)
+            supports.append(
+                {
+                    "citation": citation.group(0),
+                    "source_ref": chunk.source_ref,
+                    "chunk_no": chunk.chunk_no,
+                    "source_digest": chunk.source_digest,
+                    "retrieval_trace": chunk.retrieval_trace,
+                    "page_start": chunk.page_start,
+                    "page_end": chunk.page_end,
+                    "page_locator_available": chunk.page_start is not None,
+                    "structural_locator": chunk.structural_locator,
+                    "section_path": list(chunk.section_path),
+                    "support_status": "sourced_not_verified",
+                }
+            )
+        supported_claims.append(
+            {
+                "claim": sentence[:500],
+                "support_status": "sourced_not_verified",
+                "supports": supports,
+            }
+        )
+
+    if unsupported_claims:
+        status = "unsupported_claim"
+    elif supported_claims:
+        status = "sourced_not_verified"
+    else:
+        status = "no_assertive_claims"
+    return {
+        "status": status,
+        "supported_claims": supported_claims,
+        "unsupported_claims": unsupported_claims,
+        "note": "citation/support binding only — not truth verification, Evidence admission, "
+                "professional validation or approval",
+    }
+
+
+def grounding_review(draft: str, chunks: Sequence[RetrievedChunk]) -> dict:
+    """Advisory grounding visibility for the human gate.
+
+    Reports citation counts and uncited assertive prose. It remains advisory:
+    NOT a score, NOT an approval and NOT a truth verdict. The enforceable
+    sourcing boundary for assertive prose is exposed separately by
+    ``claim_support_review``.
     """
     uncited_claim_flags = []
-    for sentence in re.split(r"(?<=[.!?])\s+|\n+", draft):
-        stripped = sentence.strip()
-        if not stripped or _CITATION_RE.search(stripped):
-            continue  # empty, or the sentence carries its own citation
-        for pattern in _VERDICT_PATTERNS:
-            if re.search(pattern, stripped, re.IGNORECASE):
-                # The vendored schema's grounding_review def types
-                # uncited_claim_flags as an array of strings (see canonical governed-loop schema),
-                # so each flag is the offending sentence itself.
-                uncited_claim_flags.append(stripped[:200])
-                break
+    for sentence in _sentences(draft):
+        if _CITATION_RE.search(sentence):
+            continue
+        if _is_assertive(sentence):
+            uncited_claim_flags.append(sentence[:200])
     return {
         "citation_count": len(_CITATION_RE.findall(draft)),
         "retrieved_chunk_count": len(chunks),
@@ -183,10 +252,7 @@ def grounding_review(draft: str, chunks: Sequence[RetrievedChunk]) -> dict:
 
 
 class Drafter(Protocol):
-    """The seam a Hermes-side LLM drafter implements. Given the contract's
-    intent, the question, and the in-perimeter chunks, return a draft body.
-    It receives only already-scoped material and returns text — it cannot
-    widen the perimeter, send, or approve."""
+    """The seam a Hermes-side LLM drafter implements."""
 
     def draft(
         self,
@@ -199,11 +265,7 @@ class Drafter(Protocol):
 
 
 class DeterministicDrafter:
-    """Dossier-general, offline, deterministic default (no LLM, no provider).
-
-    Assembles the retrieved passages and defers every judgement to the human
-    gate. Works for any dossier because it authors no domain content.
-    """
+    """Dossier-general, offline, deterministic default (no LLM, no provider)."""
 
     def draft(
         self,
