@@ -1,212 +1,167 @@
 # Reference Boundaries
 
-Status: active support doctrine — external reference boundary control.
+Status: active support doctrine — external reference interpretation boundary; implemented as documentation.
+Boundary profile: active_support_doctrine.
 
-This document defines what Pantheon Next may learn from external systems and what it must not import from them.
+This document owns the boundary between learning from an external reference and adopting its architecture or runtime responsibilities.
 
-It does not approve dependencies.
+It does not approve dependencies, integrations, capabilities, runtimes, clients, persistence systems or implementation.
 
-It does not approve integrations.
+Runtime/client placement is inherited from `HERMES_INTEGRATION.md`. Reading or reviewing an external reference does not transfer Pantheon governance responsibility to the referenced system.
 
-It does not define runtime adoption.
+## Owner boundary
 
-It does not authorize a LangGraph runtime, GraphRAG runtime, observability backend, MCP layer, skill marketplace, provider router, scheduler, queue, tool runtime, automatic memory system or hidden workflow runner inside Pantheon Next.
-
-Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: optional compatible runtime clients expose runtime interaction only, Hermes/the external runtime executes admitted work, Pantheon Cockpit projects governed state, and external references cannot transfer authority to any tool or surface.
-
-## Purpose
-
-External references are useful because they reveal patterns, failure modes and vocabulary.
-
-They are dangerous when they silently become architecture.
-
-This document answers:
+The external-reference family has four complementary owners:
 
 ```text
-What may Pantheon learn from a reference without absorbing its runtime responsibilities?
+WATCHLIST.md
+  -> observe and triage external references
+
+REFERENCE_BOUNDARIES.md
+  -> define what may be learned without importing the referenced system's responsibilities
+
+DISTILLATION_REGISTRY.md
+  -> record patterns actually extracted, their destination and status
+
+REJECTED_PATTERNS.md
+  -> retain patterns explicitly refused under current doctrine
 ```
 
-## Canonical boundary rule
+When an external capability is considered for actual use, `EXTERNAL_TOOLS_POLICY.md` and the applicable capability/binding owners govern that separate review.
 
 ```text
-External references may inspire governance patterns.
-They do not authorize importing runtime responsibility into Pantheon.
+observed != adopted
+reference != authority
+pattern extracted != doctrine adopted
+tool available != tool authorized
+runtime success != Evidence
 ```
 
-A reference may inform:
+## Core rule
 
-- doctrine;
-- Task Contract vocabulary;
-- Evidence Pack expectations;
-- approval thresholds;
-- memory boundaries;
-- scope isolation;
-- role review responsibilities;
-- User Decision Gate triggers;
-- Hermes candidate constraints;
-- runtime-client interaction requirements;
-- Pantheon Cockpit projection requirements;
-- rejected-pattern memory.
+```text
+External references may inform Pantheon governance.
+They do not authorize importing runtime responsibility, persistence ownership or decision responsibility into Pantheon.
+```
 
-A reference must not authorize:
+A reference may inform an existing owner about scope, provenance, Task Contract constraints, Evidence expectations, review boundaries, memory distinctions, role/rite pressures, interaction requirements, governed projection needs, failure modes or rejected patterns.
 
-- execution engine;
-- agent runtime;
-- tool runtime;
-- provider router;
-- scheduler;
-- queue;
-- message bus;
-- hidden workflow runner;
-- LangGraph central runtime;
-- GraphRAG runtime;
-- observability backend;
-- MCP server layer inside Pantheon;
-- skill installer;
-- plugin marketplace;
-- automatic memory promotion;
-- automatic approval;
-- self-evolution.
+The destination owner remains responsible for deciding whether the extracted pattern belongs in its doctrine.
 
-## Reference classification
+## Reference classes
 
-| Reference class | Allowed use | Forbidden use |
+Classify a reference by the responsibility it demonstrates, not by vendor name.
+
+| Reference class | Legitimate learning | Boundary to preserve |
 |---|---|---|
-| Runtime framework | vocabulary for external execution boundaries | Pantheon execution engine |
-| Observability system | trace summary and evaluation inspiration | Pantheon observability backend or approval authority |
-| Graph/RAG system | provenance and corpus-structure inspiration | graph truth or memory runtime |
-| Skill ecosystem | skill anatomy and lifecycle inspiration | marketplace, installer or auto-loader |
-| Connector ecosystem | least-capability and scoped-access inspiration | plugin manager or provider router |
-| Coding agent | patch-candidate and controlled-terminal discipline | internal coding runtime |
-| Professional vertical agent | domain review gates and source discipline | autonomous professional authority |
-| Prompting method | review method or signal pattern | hidden orchestration or self-approval loop |
-
-## Current boundary notes
-
-| Reference | Legitimate Pantheon distillation | Boundary |
-|---|---|---|
-| LangGraph | interruption points, state visibility vocabulary, resumable external work as evidence surface | no LangGraph runtime or executable graph inside Pantheon |
-| LangSmith | trace inspection, evaluation reports, audit logs as support signals | traces and evals are not Evidence Pack approval |
-| Langfuse | self-hostable observability inspiration, prompt and evaluation review signals | no Langfuse-backed Pantheon memory or approval authority |
-| GraphRAG | structured corpus preparation, graph-aware retrieval status, contradiction maps | graph output is not proof, doctrine or a Registre Probatoire entry |
-| GenAI_Agents | broad pattern catalog and professional-use-case discovery | tutorial code is not Pantheon architecture |
-| Shokunin | `SKILL.md` anatomy, skill lifecycle, checklists, anti-patterns | no memory, MCP, auto-save, scheduler or self-update import |
-| Agensi skills | market and skill discovery signal | popularity, price, rating or install count is not approval |
-| contracts-skill | contract preflight, acceptance and verification traces | no external skill dependency or contract file as governance authority |
-| Hermes Workspace | external runtime cockpit and execution reference | not a Pantheon model, not an OpenWebUI replacement |
-| SmallCode | small-model/coding-agent discipline and controlled execution | no coding runtime inside Pantheon |
-| Glia-like shared memory | local-first memory and retrieval tension | shared memory is not a Registre Probatoire entry |
-| contextschema-py | context sufficiency, freshness, provenance and invalidation vocabulary | context sufficiency score is not C0-C5 approval |
-| chunk-norris | chunking fitness evaluation before Knowledge ingestion | selected chunker is not global KB doctrine or evidence authority |
-| MMLongBench-Doc | long-document, multimodal, cross-page and unanswerable QA evaluation | benchmark score is not professional validation or delivery approval |
-| Medium RAG 10M+ article | large-scale RAG reliability vocabulary and caution signal | near-zero hallucination claim is not evidence without benchmark and audit |
-| Reddit r/RAG discussions | practitioner weak signals and recurring failure vocabulary | anecdote is not doctrine, benchmark or implementation basis |
-| agent_memory_curator_agent | memory event emission and curation-report vocabulary | curator must not become a Registre Probatoire entry authority |
-| skillsgate | skill inventory and compatibility UX signal | no skill marketplace, installer, remote sync or OpenWebUI plugin surface |
-
-## RAG evidence boundary notes
-
-RAG references may help Pantheon define:
-
-- source preparation expectations;
-- chunking fitness vocabulary;
-- retrieval limitation disclosure;
-- context sufficiency status;
-- evidence page and modality mapping;
-- unanswerable question handling;
-- User Decision Gate triggers.
-
-They must not authorize:
-
-- automatic Knowledge Base rewrite;
-- automatic source validation;
-- retrieval score as proof;
-- benchmark score as approval;
-- OpenWebUI ingestion runtime;
-- Hermes sovereign ingestion policy;
-- Pantheon parsing, chunking or retrieval runtime.
+| Runtime / agent framework | interruption, handoff, bounded execution and state visibility | no Pantheon execution engine or hidden orchestration |
+| Observability / evaluation system | trace, evaluation and regression-review signals | trace or score is not Evidence admission or approval |
+| Retrieval / graph / knowledge system | provenance, corpus structure, retrieval and contradiction patterns | retrieval or graph output is not truth, Evidence or governed memory |
+| Skill / plugin ecosystem | capability anatomy, compatibility, lifecycle and anti-patterns | no marketplace, installer or auto-loader by implication |
+| Connector / gateway ecosystem | scoped access, least capability and effect interception | no provider router or plugin manager by implication |
+| Coding / terminal agent | patch candidates, bounded execution and verification discipline | no coding runtime inside Pantheon by reference alone |
+| Professional vertical assistant | source discipline, domain checks and review gates | no autonomous professional authority |
+| Prompting / reasoning method | reasoning or review motifs | no hidden workflow or self-approval loop |
+| Memory / context system | recall, freshness and invalidation tensions | runtime/shared memory is not Registre Probatoire |
+| Client / dashboard surface | interaction, review and projection patterns | client/projection is not persistence or governance authority |
 
 ## Boundary test
 
-Before citing or importing a reference, ask:
+Before distilling a reference, answer:
 
 ```text
-Does this pattern improve governance visibility?
-Does it preserve human approval?
-Does it preserve Evidence Pack discipline?
-Does it preserve candidate versus canonical distinction?
-Does it preserve scope isolation?
-Does it keep execution outside Pantheon?
-Does it keep runtime clients as non-authoritative interaction surfaces?
-Does it keep Pantheon Cockpit as projection rather than authority or persistence?
-Does it keep Hermes as runtime rather than governance authority?
+What concrete governance problem does this reference illuminate?
+Which existing Pantheon owner should receive the useful pattern?
+What responsibility must remain outside Pantheon?
+Does the pattern preserve human consequential decision where required?
+Does it preserve candidate versus admitted/canonical status?
+Does it preserve source/provenance and scope isolation?
+Does it preserve memory != Evidence?
+Does it preserve runtime/client/provider != governance authority?
+Does it avoid creating a duplicate owner or hidden implementation commitment?
 ```
 
-If the answer is unclear, the reference must remain on `WATCHLIST.md` or move to `EXTERNAL_TOOLS_POLICY.md` before distillation.
+If the destination or boundary is unclear, keep the item in `WATCHLIST.md` with an appropriate review status rather than creating doctrine.
 
-## Distillation permission levels
+## Routing outcomes
 
-| Level | Meaning | Allowed destination |
-|---|---|---|
-| R0 observe | reference is interesting but unreviewed | `WATCHLIST.md` |
-| R1 boundary | reference requires explicit limit | `REFERENCE_BOUNDARIES.md` |
-| R2 method review | reference is a reasoning or workflow method | `EXTERNAL_TOOLS_POLICY.md` |
-| R3 pattern candidate | reference yields a possible governance pattern | `DISTILLATION_REGISTRY.md` |
-| R4 doctrine candidate | pattern may update active doctrine | relevant governance document with approval |
-| R5 rejected | pattern would violate doctrine | `REJECTED_PATTERNS.md` |
+Use existing owner vocabularies instead of introducing a parallel reference lifecycle.
 
-## Relationship to external agentic inspiration
+| Review outcome | Destination |
+|---|---|
+| Interesting but insufficiently reviewed | `WATCHLIST.md` |
+| Boundary identified; pattern not yet extracted | keep the watch item and reference this owner |
+| Useful governance pattern extracted | `DISTILLATION_REGISTRY.md` |
+| Reasoning/tool method needs risk review | `EXTERNAL_TOOLS_POLICY.md` |
+| Skill-specific signal | `SKILL_WATCHLIST.md` |
+| Explicitly incompatible pattern | `REJECTED_PATTERNS.md` |
+| Pattern changes active doctrine | the existing destination owner through its normal review path |
+| Actual tool/runtime adoption considered | capability/binding review plus `EXTERNAL_TOOLS_POLICY.md` |
 
-`EXTERNAL_TOOLS_POLICY.md` contains detailed review notes for specific systems.
+A routing outcome is not implementation approval.
 
-This document defines the boundary rule that applies across those notes.
+## Distillation discipline
 
-If the two documents appear to conflict, the stricter anti-runtime interpretation wins until a governed review resolves the conflict.
+A valid distillation identifies:
 
-## Relationship to Skill Watchlist
+```text
+source reference
+problem observed
+useful pattern
+existing destination owner
+responsibility that must not be imported
+status of the extracted pattern
+```
 
-`SKILL_WATCHLIST.md` is the specialized watchlist for external skill ecosystems.
+Prefer the smallest useful pattern. Do not copy an external architecture wholesale because several parts look useful.
 
-This document controls the boundary around how those ecosystems may be interpreted.
+```text
+reuse a pattern, not a product topology
+reuse a constraint, not a foreign authority model
+reuse a review signal, not its vendor-specific runtime
+```
 
-A watched skill can become a pattern candidate.
+Concrete product/repository evaluations belong in `WATCHLIST.md`, `SKILL_WATCHLIST.md`, `DISTILLATION_REGISTRY.md`, `reference_reviews/`, `EXTERNAL_TOOL_PLACEMENT_REGISTER.md` or dated ai_logs as appropriate. They are not maintained here as a second catalogue.
 
-It cannot become a Pantheon dependency, runtime capability or approved skill without separate review.
+## Evidence and memory boundary
 
-## Relationship to Evidence Packs
+An external reference may be cited as a source, comparison, limitation or rationale, but its existence does not validate a claim.
 
-An external reference can support an Evidence Pack only when it is cited as a source, limitation, comparison or rationale.
+```text
+reference retrieved != Evidence admitted
+citation displayed != claim validated
+benchmark score != professional validation
+popularity != authority
+```
 
-The reference itself does not validate the output.
+Any durable memory or Register Candidate produced from reference analysis remains governed by `MEMORY.md`, scope rules and the applicable Evidence/approval path. Repetition, embedding or retrieval does not promote it.
 
-Evidence must still identify claim, scope, source, assumptions, risk and approval state.
+## Runtime and projection boundary
 
-## Relationship to Memory
+External runtime/client patterns may influence interface requirements, but they do not change the established placement:
 
-An external reference may produce a Register Candidate only when the claim, scope, evidence and approval path are explicit.
+```text
+Pantheon policy service -> bounded PDP
+external runtime / Hermes -> execution and PEP
+compatible runtime clients -> optional interaction
+Pantheon Cockpit -> governed projection
+human -> consequential decision where required
+```
 
-A reference must not become a Registre Probatoire entry because it is popular, repeated, embedded, retrieved or technically impressive.
+A reference that combines these responsibilities does not require Pantheon to combine them.
 
 ## Forbidden drift
 
-Reference use must never become:
+This owner must not become a vendor catalogue, dependency list, product ranking, implementation backlog, runtime roadmap, second Watchlist, second Distillation Registry, proof-of-safety register or adoption shortcut.
 
-- appeal to authority;
-- vendor endorsement;
-- dependency commitment;
-- implementation approval;
-- architecture import;
-- hidden runtime migration;
-- skill marketplace approval;
-- memory promotion shortcut;
-- automatic approval shortcut;
-- professional liability substitute.
-
-If a reference is cited as proof that Pantheon should implement a runtime feature, the boundary has failed.
+Historical product-specific boundary notes remain available through Git history and dated ai_logs; current product observations belong with their present owners.
 
 ## Final rule
 
 ```text
-Pattern distillation is allowed.
-Runtime migration is not.
+Observe in the Watchlist.
+Interpret through the reference boundary.
+Record extracted patterns in the Distillation Registry.
+Reject explicitly when required.
+Adopt nothing by implication.
 ```
