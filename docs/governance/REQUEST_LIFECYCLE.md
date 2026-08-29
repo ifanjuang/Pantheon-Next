@@ -3,16 +3,16 @@
 Status: active support doctrine — the governed lifecycle of a request, from situated comprehension to human engagement — implemented as documentation.
 Boundary profile: active_support_doctrine.
 
-This document defines the moments a request passes through, who holds the goal (the cap), how the cap is re-evaluated, and who guards the threshold of memory. It connects the Governance College, the Task Contract, the rites and the autonomy doctrine into one lifecycle.
+This document defines the moments a request passes through, who holds the goal (the cap), how governance depth adapts to consequence, how the cap is re-evaluated, and who guards the threshold of memory. It connects the Governance College, the Task Contract, the rites and the autonomy doctrine into one lifecycle.
 
-Runtime/client boundary: see `HERMES_INTEGRATION.md`. This document owns lifecycle choreography only; execution remains external and consequential memory or engagement gates remain separately governed.
+Runtime/client boundary: see `HERMES_INTEGRATION.md`. This document owns lifecycle choreography and proportional request activation only; execution remains external and consequential memory or engagement gates remain separately governed.
 
 ## Core thesis
 
-A request is not just executed. First its real demand is understood, a heading (the cap) is set and held, the College works the path, the status is arbitrated, and the human engages. Most of this is autonomous; control attaches only where consequence earns it (`EXECUTION_MINIMALISM.md`).
+A request is not just executed. First its real demand is understood, a heading (the cap) is set and held, the required governance owners are activated proportionally, the College works the path, the status is arbitrated, and the human engages. Most of this is autonomous; control attaches only where consequence earns it (`EXECUTION_MINIMALISM.md`).
 
 ```text
-Understand the cap. Hold the cap. Work the path. Arbitrate the status. The human engages.
+Understand the cap. Hold the cap. Activate only what consequence requires. Work the path. Arbitrate the status. The human engages.
 ```
 
 The cap is the goal. The path is the method. Pantheon governs the cap; it trusts the path.
@@ -22,9 +22,10 @@ The cap is the goal. The path is the method. Pantheon governs the cap; it trusts
 ```text
 request
   -> triage: direct or fuzzy?
-       direct  -> act (autonomy); no MÈTIS
+       direct  -> act within the allowed autonomy envelope
        fuzzy   -> convene MÈTIS
   -> MÈTIS: understand the situated demand, set the cap
+  -> activate only the context/source/risk/memory/evidence owners required by consequence
   -> ZEUS arbitrates the cap:
        sufficient            -> proceed
        insufficient / fuzzy  -> back to MÈTIS to deepen (bounded)
@@ -36,6 +37,108 @@ request
   -> the execution runtime executes, outside Pantheon
   -> the human decides at cliffs and engages
 CERBÈRE and CHARON guard the threshold of memory throughout.
+```
+
+## Proportional activation
+
+The lifecycle is always the governing frame, but every request does not need every governance owner.
+
+Use the smallest owner set that matches the request and its possible consequence:
+
+```text
+simple, clear, low-consequence request -> light handling inside the autonomy envelope
+unclear cap or multi-intent request      -> MÈTIS / cap clarification
+context dependency or missing context    -> CONTEXT_STACK.md
+source dependency or freshness gap       -> SOURCE_NEED_AND_REGISTRY.md / ARGOS
+liability or external effect             -> THEMIS + policy / approval / human gate as applicable
+memory or durable-retention effect        -> MEMORY.md and applicable memory gates
+candidate output                          -> Evidence and approval posture appropriate to intended use
+```
+
+Proportional activation must not become a hidden router or workflow engine. It is a method rule for deciding which existing owners are relevant.
+
+### Request decomposition
+
+When the request needs more than light handling, separate the candidates before composing them:
+
+```text
+Request Candidate           -> what the user asked, as received
+Cap Candidate               -> the situated aim proposed from the request
+Expected Context Profile    -> context expected to safely proceed
+Input Admission Candidate   -> what was supplied, retrieved, recalled or is absent
+Source Need Candidate       -> what source is missing and why it matters
+Output Intent Candidate     -> what kind of output is expected and under what status
+Situated Approach Candidate -> what method motifs are composed for this situation
+Result Candidate            -> output produced by a role, runtime or adapter
+Evidence Pack Candidate     -> review material supporting or contradicting assertions
+Gate / Decision             -> accepted, refused, to_verify, to_arbitrate or blocked
+```
+
+These are governance objects or documentary candidates. They do not execute.
+
+Their detailed contracts remain with their existing owners.
+
+### Input is not output
+
+Pantheon keeps available input separate from intended output:
+
+```text
+Input describes what is available.
+Output describes what is requested.
+The governed approach constrains the transformation.
+```
+
+Input availability never authorizes final output by itself. The same corpus may support an internal orientation but remain insufficient for a source-backed claim, external transmission, durable memory or another consequential effect.
+
+### Complexity drivers
+
+Governance depth increases when a material driver increases, including:
+
+```text
+cap ambiguity
+multi-intent request
+project-specific fact
+context or source dependency
+evidence dependency
+freshness dependency
+contradiction
+regulatory or contractual effect
+professional responsibility
+external visibility or action
+memory or register effect
+sensitive input
+```
+
+### Owned context and source seams
+
+This lifecycle activates, but does not redefine, the specialist owners:
+
+- `CONTEXT_STACK.md` owns context composition, sufficiency states, Context Stack Change Candidates and the candidate HESTIA boundary;
+- `SOURCE_NEED_AND_REGISTRY.md` owns Source Need Candidate structure, source families, source routes, registry semantics and freshness policy;
+- Evidence, approval and memory remain with their respective owners.
+
+```text
+missing context -> consult context sufficiency -> narrow, request context or escalate
+missing source  -> Source Need Candidate -> permitted retrieval handoff -> source/evidence review
+```
+
+Retrieved material remains candidate until the applicable source and Evidence owners qualify it.
+
+### Output consequence and safe defaults
+
+Output intent determines how much governance is needed. Typical output families include orientation, internal draft, extraction candidate, source-backed claim, document/comparison candidate, pre-transmission candidate, external-action preparation, memory candidate and register candidate.
+
+When cap, context, source status or output consequence is unclear, prefer:
+
+```text
+allow orientation only
+allow draft only
+mark missing source or context
+surface assumptions
+request source or context
+block external action
+block memory promotion
+send to ZEUS or human gate when required
 ```
 
 ## MÈTIS — situated comprehension, keeper of the cap
@@ -146,6 +249,7 @@ The lifecycle decides what is consequential (the cap, the placement test); the c
 
 ```text
 MÈTIS understands and holds the cap, when the demand is unclear.
+The lifecycle activates only the owners consequence requires.
 The College works the path.
 CERBÈRE and CHARON guard the threshold of memory.
 ZEUS arbitrates the status, on evidence.
