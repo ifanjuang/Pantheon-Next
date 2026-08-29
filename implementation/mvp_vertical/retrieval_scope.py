@@ -8,6 +8,8 @@ an answer.
 A resolved source identity deliberately includes dossier, source ref, digest and
 source version. Reducing it to ``source_ref`` before retrieval would lose the
 applicable revision whenever the same path has been ingested more than once.
+The existing digest-exact retrieval owner accepts that immutable identity, so
+this seam may delegate ranking only after access and currentness have resolved it.
 """
 
 from __future__ import annotations
@@ -17,7 +19,7 @@ from typing import Iterable
 
 import psycopg
 
-from . import human_access, project_document_currentness, project_documents
+from . import human_access, project_document_currentness, project_documents, retrieval
 from .contract import TaskContract
 
 
@@ -68,7 +70,6 @@ class RetrievalScopeResolution:
     project_id: str
     principal_ref: str
     sources: tuple[ResolvedRetrievalSource, ...]
-
 
 
 def _required(value: object, field: str) -> str:
@@ -147,7 +148,7 @@ def resolve_accessible_applicable_sources(
     project_id: str,
     requested_documents: Iterable[tuple[str, str]],
 ) -> RetrievalScopeResolution:
-    """Resolve exact source identities eligible for a future retrieval call.
+    """Resolve exact source identities eligible for retrieval.
 
     Order is deliberate and fail-closed:
 
@@ -160,11 +161,9 @@ def resolve_accessible_applicable_sources(
     7. require the source dossier to equal the Task Contract dossier;
     8. require the source ref to already be declared by the Task Contract.
 
-    The returned identity MUST NOT be collapsed to ``source_ref`` for retrieval.
-    Current retrieval filters only by dossier + source ref and therefore cannot
-    yet distinguish an older applicable digest from newer content at the same
-    path. Wiring this result into retrieval requires a digest-aware retrieval
-    slice first.
+    The returned identity MUST NOT be collapsed to ``source_ref``. Digest-exact
+    semantic and lexical retrieval already exist and can consume the preserved
+    ``(source_ref, source_digest)`` pair directly.
 
     Nothing here widens the Task Contract or changes any persisted authority.
     """
@@ -273,6 +272,51 @@ def resolve_accessible_applicable_sources(
         principal_ref=principal.principal_ref,
         sources=tuple(resolved_sources),
     )
+
+
+def retrieve_accessible_applicable_hybrid(
+    conn: psycopg.Connection,
+    principal: human_access.PrincipalContext,
+    *,
+    contract: TaskContract,
+    project_id: str,
+    requested_documents: Iterable[tuple[str, str]],
+    query: str,
+    top_k: int = 4,
+    candidate_k: int = 12,
+    rrf_k: int = 60,
+    semantic_weight: float = 1.0,
+    lexical_weight: float = 1.0,
+) -> tuple[RetrievalScopeResolution, list[retrieval.HybridRetrievedChunk]]:
+    """Resolve access/applicability first, then delegate exact ranking.
+
+    The composition owner does not rank. It passes only the already-authorized,
+    already-resolved immutable identities to the existing retrieval owner. Empty
+    exact retrieval stays empty; there is no fallback to current-path content.
+    """
+
+    resolution = resolve_accessible_applicable_sources(
+        conn,
+        principal,
+        contract=contract,
+        project_id=project_id,
+        requested_documents=requested_documents,
+    )
+    exact_sources = tuple(
+        (source.source_ref, source.source_digest) for source in resolution.sources
+    )
+    hits = retrieval.retrieve_hybrid_exact_scoped(
+        conn,
+        contract,
+        query,
+        sources=exact_sources,
+        top_k=top_k,
+        candidate_k=candidate_k,
+        rrf_k=rrf_k,
+        semantic_weight=semantic_weight,
+        lexical_weight=lexical_weight,
+    )
+    return resolution, hits
 
 
 AUTHORITY = {
