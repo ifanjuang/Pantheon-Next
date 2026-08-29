@@ -82,15 +82,18 @@ External grounding (distilled, not imported): the PDP/PEP separation (XACML), po
 
 ## What this means for modules, skills, functions and domains
 
-The activation, lifecycle and placement documents project this single law onto their area; they must not invent competing per-capability rules:
+Activation, review and placement owners project this single law onto their area; they must not invent competing per-capability rules:
 
 ```text
 MODULE_ACTIVATION / ROLE_ACTIVATION  -> status and task-authorization axes; defer to the passport.
-SKILL_LIFECYCLE / SKILL_WATCHLIST    -> a skill is a capability with a passport.
+CAPABILITY_REGISTRY                  -> declaration/admission metadata; a Skill is only one Capability primitive.
+WATCHLIST / REFERENCE_BOUNDARIES     -> external Skill/package observation and interpretation, without adoption.
 EXTERNAL_TOOLS_POLICY / placement    -> an external tool is a capability with a passport.
 CAPABILITY_PLACEMENT (placement test) -> decides whether an effect is consequential, hence gated.
 DOMAIN_PACK_SPEC                     -> projects the method; the envelope stays the same.
 ```
+
+Skill discovery, package installation, runtime loading and execution remain operational/runtime concerns. They do not create a parallel Pantheon Skill lifecycle.
 
 The placement test (`AUTHORITY_INDEX.md`, `CAPABILITY_PLACEMENT.md`) decides the one thing that matters: is the effect consequential? If yes, the gate applies; if no, it is a feature of the runtime.
 
