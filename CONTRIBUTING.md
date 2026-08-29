@@ -43,6 +43,31 @@ Use `docs/governance/STATUS_HEADER_RULES.md` for Markdown `Status:` headers.
 
 Do not let examples, comments, diagrams, static prototypes, watchlists or candidate notes imply live behavior.
 
+## New current-authority documents are a last resort
+
+Before adding a new Markdown document under `docs/governance/` with a `canonical*` or `active support*` status, record the owner test in the PR or dated `ai_logs/`:
+
+1. Which existing owner(s) were searched and read?
+2. Why can the responsibility not be an edit, section or local delta of an existing owner?
+3. What distinct responsibility will the new document own?
+4. Which authority class does that responsibility require?
+5. Why is an independent owner necessary rather than merely convenient?
+6. Which Authority Index row will make the owner discoverable?
+
+Default preference:
+
+```text
+edit existing owner
+-> add section / local delta
+-> reference existing owner
+-> issue / PR / ai_log / reference review
+-> new current-authority document only when responsibility is genuinely distinct
+```
+
+A new current-authority document without an Authority Index row is invalid repository topology. Indexing makes the owner visible; it does not prove that the owner is necessary or promote its content by itself.
+
+Do not satisfy this rule by creating a second owner and then cross-linking it to the first. The responsibility test comes before the new file.
+
 ## Keep the boundary
 
 Pantheon Next may govern consequential decisions:
