@@ -322,7 +322,7 @@ send to ZEUS or human gate
 This document applies:
 
 ```text
-ADAPTIVE_REQUEST_METHOD.md -> when a source need appears during a request
+REQUEST_LIFECYCLE.md       -> proportional request handling activates source need
 CONTEXT_STACK.md           -> HESTIA context sufficiency and source gaps
 DOMAIN_PACK_SPEC.md        -> source policy per professional domain
 EVIDENCE_PACK.md           -> evidence candidate packaging
