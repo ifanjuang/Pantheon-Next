@@ -105,6 +105,16 @@ For example, a Hermes adapter is adapted when a new runtime feature such as back
    references rather than restates.
 ```
 
+### Existing-owner reuse
+
+When a tool or query adapter exposes operational state or business logic already owned by an admitted system or service, reuse that owner rather than creating an AI-specific shadow store, duplicated business rule or parallel state path merely for model access.
+
+```text
+runtime -> typed adapter -> existing operational owner
+```
+
+Adapter convenience does not justify a second owner. The returned material keeps the source, Evidence and approval status defined by the existing governance boundaries.
+
 ## Prompt distillation and placement
 
 Prompts follow the same blueprint/adapter rule. Canonical governance may supply the source rule, but a runtime prompt receives only the minimum instruction needed by its layer.
