@@ -162,3 +162,9 @@ docs/governance/HERMES_INTEGRATION.md
 # permission/exposure, PDP/PEP and rollback rules. Product comparisons remain
 # with watchlist/distillation/reference-review/placement owners and Git history.
 docs/governance/EXTERNAL_TOOLS_POLICY.md
+
+# Deliberate skill-watchlist convergence: the former active-support document
+# repeated the general watch policy while also carrying long source reviews.
+# WATCHLIST.md remains the policy/status/routing owner; SKILL_WATCHLIST.md is now
+# only a compact non-authoritative reference view over skill-ecosystem signals.
+docs/governance/SKILL_WATCHLIST.md
