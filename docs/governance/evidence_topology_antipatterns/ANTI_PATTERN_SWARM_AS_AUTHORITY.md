@@ -1,6 +1,6 @@
 # Anti-pattern: Swarm as Authority
 
-Status: active support card.
+Status: reference — implemented as documentation.
 
 A swarm is useful for distributed execution.
 

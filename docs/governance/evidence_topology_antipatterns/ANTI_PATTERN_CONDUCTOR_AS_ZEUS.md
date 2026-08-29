@@ -1,6 +1,6 @@
 # Anti-pattern: Conductor as Zeus
 
-Status: active support card.
+Status: reference — implemented as documentation.
 
 A runtime conductor may coordinate execution.
 

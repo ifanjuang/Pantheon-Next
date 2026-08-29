@@ -1,6 +1,6 @@
 # Anti-pattern: Role Memory as a Registre Probatoire entry
 
-Status: active support card.
+Status: reference — implemented as documentation.
 
 Role memory can help continuity.
 

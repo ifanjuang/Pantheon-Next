@@ -1,6 +1,6 @@
 # Anti-pattern: Summary-only Handoff
 
-Status: active support card.
+Status: reference — implemented as documentation.
 
 A handoff that contains only a prose summary is not enough for consequential work.
 

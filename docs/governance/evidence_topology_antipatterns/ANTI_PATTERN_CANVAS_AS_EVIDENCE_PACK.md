@@ -1,6 +1,6 @@
 # Anti-pattern: Canvas as Evidence Pack
 
-Status: active support card.
+Status: reference — implemented as documentation.
 
 A visible canvas can improve supervision.
 
