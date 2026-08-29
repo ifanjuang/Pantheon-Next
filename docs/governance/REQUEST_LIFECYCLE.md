@@ -58,6 +58,20 @@ candidate output                          -> Evidence and approval posture appro
 
 Proportional activation must not become a hidden router or workflow engine. It is a method rule for deciding which existing owners are relevant.
 
+### Information acquisition route
+
+When required information is available, use the least indirect admitted route that preserves source identity, scope and provenance:
+
+```text
+known exact source                                  -> direct source/context access
+unknown location inside an admitted documentary corpus -> search / retrieval
+current structured or operational state             -> typed query against its existing operational owner
+past conversational or workstream context            -> runtime memory
+missing external or project source                   -> Source Need Candidate -> permitted source route
+```
+
+This classifies acquisition, not authority. It creates no Pantheon router and does not change source, Evidence or approval rules. Hermes or another admitted external runtime may choose and compose capabilities inside the Task Contract; consequential use remains governed separately.
+
 ### Request decomposition
 
 When the request needs more than light handling, separate the candidates before composing them:
