@@ -11,11 +11,7 @@ docs/governance/MODEL_CAPABILITY_PASSPORT.md
 
 It defines how those two support-doctrine objects may become validation-checkable without turning Pantheon Next into a runtime, model router, scanner, installer, provider gateway, scheduler, queue, approval engine or memory engine.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`; validation here does not transfer authority to a client, runtime or provider.
 
 ## Current implementation boundary
 
@@ -27,7 +23,9 @@ templates/model_capability_passport_candidate.yaml
 templates/validation_report_candidate.yaml
 ```
 
-Those templates materialize the L0–L3 vocabulary, gate-recommendation vocabulary, candidate-only boundaries and review fields described below. They remain declarative scaffolds: template presence is not schema validation, a validator, an MCP tool, approval, runtime execution or production activation.
+The model template keeps its legacy filename but now contains the documentary `model_capability_review_candidate` shape owned by `MODEL_CAPABILITY_PASSPORT.md`. It is separate from the executable universal Capability Passport schema.
+
+Those templates materialize the L0–L3 vocabulary, candidate-only boundaries and review fields described below. They remain declarative scaffolds: template presence is not schema validation, a validator, an MCP tool, approval, runtime execution or production activation.
 
 The protected validation step remains unimplemented. There is currently no dedicated schema for these three candidate objects, no validation test/validator implementing the L0–L3 checks, and no MCP validation functions for them.
 
@@ -37,7 +35,7 @@ Accepted:
 
 ```text
 Promote External Runtime Threat Model Review toward read-only validation.
-Promote Model Capability Passport toward read-only validation.
+Promote the documentary Model Capability Review toward read-only validation.
 Use human-fillable candidate templates before protected validation work.
 Use the MCP Policy Server only as a read-only policy / validation surface if implementation is later approved.
 Keep schemas, validation tests and MCP validation functions blocked until explicitly approved.
@@ -52,7 +50,7 @@ No automatic sandbox.
 No model router.
 No benchmark runner.
 No provider selection engine.
-No OpenWebUI configuration.
+No runtime-client configuration.
 No Hermes skill.
 No automatic adapter installation.
 No automatic approval.
@@ -85,10 +83,12 @@ The target is not implementation.
 The target is this governed capability:
 
 ```text
-Given a Runtime Review Candidate or Model Passport Candidate,
+Given a Runtime Review Candidate or Model Capability Review Candidate,
 Pantheon can classify whether the declaration is complete enough to be reviewed,
 and whether it should be accepted, refused, sent to verification or sent to arbitration.
 ```
+
+For the model-specific object, "accepted" means the review record is complete/coherent enough for its documentary purpose. It does not activate the model, authorize a task or lower any universal Capability Passport, Task Contract, Evidence or approval requirement.
 
 The expected output remains data:
 
@@ -121,19 +121,19 @@ Use four levels:
 L0 — document exists
 L1 — required fields present
 L2 — field values are internally coherent
-L3 — gate recommendation can be produced
+L3 — gate/review recommendation can be produced
 ```
 
 Meaning:
 
 | Level | Meaning | Allowed result |
 |---|---|---|
-| L0 | A review/passport record exists. | candidate only |
+| L0 | A review record exists. | candidate only |
 | L1 | Required fields are present. | completeness report |
 | L2 | Values do not contradict declared scope, risk and effect. | to_verify / blocked / needs_review |
-| L3 | A gate recommendation can be stated. | allow_read_only / candidate_only / needs_approval / block |
+| L3 | A gate or review recommendation can be stated. | candidate recommendation only |
 
-L3 is still not approval. It is a recommendation for a visible gate.
+L3 is still not approval. It is a recommendation for a visible gate or review path.
 
 ## Candidate object — runtime review
 
@@ -178,52 +178,48 @@ runtime power treated as normal skill
 insufficient safe default
 ```
 
-## Candidate object — model passport
+## Candidate object — model-specific review
 
-A Model Passport Candidate is checkable when it declares at least:
+A Model Capability Review Candidate is checkable when it declares at least:
 
 ```text
 model_id
 display_name
 version_or_release
-provider_or_runtime
-processing_posture
+provider
+serving_posture
 serving_surface
-status
-modality
-context_window
-input_classes_allowed
-input_classes_forbidden
-output_classes_allowed
-output_classes_forbidden
-data_exposure
-retention_or_training_unknowns
-authorized_task_families
+modalities
+context_window_or_limit
+review_status
+reviewed_at
+reviewed_by
+data_exposure_classes_allowed
+sensitive_data_allowed
+retention_or_training_posture
+source_grounding_expectation
+reviewed_task_families
 forbidden_task_families
 professional_use_ceiling
-evidence_expectation
 known_failure_modes
 uncertainty_behavior
-comparison_required
-approval_ceiling
-memory_behavior
+comparison_required_when
 fallback_model_or_path
-review_date
-reviewed_by
-decision
 ```
+
+These are model-suitability review fields. `review_status` is not Capability Activation and `reviewed_task_families` is not task authorization. Universal capability, activation and task/run legitimacy remain with their existing owners.
 
 Validation may identify:
 
 ```text
 missing mandatory field
-unknown processing posture
-sensitive data allowed without approval ceiling
-professional-use ceiling too high for evidence expectation
-task family allowed despite declared failure mode
-memory behavior inconsistent with Memory doctrine
-external model with unclear retention status
+unknown serving posture
+sensitive-data posture not justified
+professional-use ceiling inconsistent with known failure modes
+reviewed task family contradicted by a declared weakness
+external model with unclear retention/training posture
 model treated as final validator
+review state confused with activation or task authorization
 ```
 
 ## Gate recommendation vocabulary
@@ -241,7 +237,9 @@ needs_adapter_review
 block
 ```
 
-The recommendation is not enforcement unless an approved external runtime honors it.
+For a Model Capability Review Candidate these recommendations remain advisory outputs of the validation proposal; they do not themselves populate activation, Task Contract or approval state. The template uses a narrower `review_recommendation` vocabulary for the model-specific review record.
+
+The recommendation is not enforcement unless an approved external runtime honors an applicable Pantheon policy decision through its PEP boundary.
 
 ## MCP Policy Server promotion path
 
@@ -249,9 +247,9 @@ If implementation is later approved, the MCP Policy Server may expose read-only 
 
 ```text
 validate_external_runtime_review
-validate_model_capability_passport
+validate_model_capability_review
 classify_runtime_review_gate
-classify_model_passport_gate
+classify_model_review_gate
 ```
 
 These names are proposal names only. They do not create MCP tools by themselves, and no such functions currently exist in the repository.
@@ -288,9 +286,11 @@ If approved later, the schema work package should create separate declarative co
 
 ```text
 external_runtime_review_candidate
-model_capability_passport_candidate
+model_capability_review_candidate
 validation_report_candidate
 ```
+
+A future `model_capability_review_candidate` schema would remain distinct from `schemas/capability_passport.schema.yaml`; adding a `model` primitive or model-specific fields to the universal Capability Passport is a separate migration decision.
 
 Any schema must include boundary metadata equivalent to:
 
@@ -312,7 +312,7 @@ templates/model_capability_passport_candidate.yaml
 templates/validation_report_candidate.yaml
 ```
 
-They carry the candidate structures and boundary vocabulary for review. Templates are not schemas and not validators. Their existence does not authorize the protected validation step.
+The model template path is retained for compatibility, but its current root object is `model_capability_review_candidate`. Templates are not schemas and not validators. Their existence does not authorize the protected validation step.
 
 ## Control / dashboard projection
 
@@ -320,13 +320,13 @@ Pantheon Control or any exposure surface may later display:
 
 ```text
 review exists / missing
-passport exists / missing
+model-specific review exists / missing
 completeness level L0-L3
 risk class
 host-control surface
 data exposure
-approval ceiling
-gate recommendation
+approval ceiling from the applicable universal governance object
+gate/review recommendation
 human decision required
 ```
 
@@ -341,7 +341,7 @@ No dedicated schema for the three candidate objects.
 No schema-backed/read-only validator.
 No MCP validation function.
 No runtime.
-No OpenWebUI configuration.
+No runtime-client configuration.
 No Hermes skill.
 No external action.
 No memory promotion.
@@ -366,8 +366,8 @@ Docker changes
 ## Boundary phrase
 
 ```text
-The passport declares.
-The review qualifies.
+The universal passport declares capability constraints.
+The model review qualifies model-specific suitability.
 The validator reports.
 The gate recommends.
 Zeus arbitrates status.
