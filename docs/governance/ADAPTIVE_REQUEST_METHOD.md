@@ -26,7 +26,7 @@ ZEUS arbitrates status.
 The human decides at consequential cliffs.
 ```
 
-This method extends `REQUEST_LIFECYCLE.md` and `CONTEXT_STACK.md` without replacing them.
+This method extends `REQUEST_LIFECYCLE.md` and consumes context/source owners without replacing them.
 
 ## Why this exists
 
@@ -49,10 +49,10 @@ Use proportional activation.
 ```text
 simple, clear, low-consequence request -> light handling
 a request with unclear cap -> MÈTIS
-a request with context dependency -> HESTIA
-a request with source dependency -> ARGOS
+a request with context dependency -> context-sufficiency review
+a request with source dependency -> source-need / ARGOS review
 a request with liability / external effect -> THEMIS + ZEUS / human gate
-a request with memory effect -> CERBÈRE / CHARON + ZEUS / human gate
+a request with memory effect -> memory gates + ZEUS / human gate
 a request with candidate output -> evidence and approval posture
 ```
 
@@ -65,19 +65,21 @@ It becomes stricter when the situation demands it.
 A request is decomposed into separate candidates:
 
 ```text
-Request Candidate          -> what the user asked, as received
-Cap Candidate              -> what MÈTIS understands as the real aim
-Expected Context Profile   -> what HESTIA expects to safely proceed
-Input Admission Candidate  -> what was supplied, retrieved, recalled or is absent
-Source Need Candidate      -> what source is missing and why it matters
-Output Intent Candidate    -> what kind of output is expected and under what status
+Request Candidate           -> what the user asked, as received
+Cap Candidate               -> what MÈTIS understands as the real aim
+Expected Context Profile    -> context expected to safely proceed
+Input Admission Candidate   -> what was supplied, retrieved, recalled or is absent
+Source Need Candidate       -> what source is missing and why it matters
+Output Intent Candidate     -> what kind of output is expected and under what status
 Situated Approach Candidate -> what motifs are composed to handle this situation
-Result Candidate           -> output produced by a role, runtime or adapter
-Evidence Pack Candidate    -> review material supporting or contradicting assertions
-Gate / Decision            -> accepted, refused, to_verify, to_arbitrate or blocked
+Result Candidate            -> output produced by a role, runtime or adapter
+Evidence Pack Candidate     -> review material supporting or contradicting assertions
+Gate / Decision             -> accepted, refused, to_verify, to_arbitrate or blocked
 ```
 
 These are governance objects. They do not execute.
+
+The specific contracts and status rules of Context Stack, source need, Evidence, approval and memory remain with their own owners.
 
 ## Input is not output
 
@@ -126,106 +128,36 @@ missing context
 sensitive input
 ```
 
-## HESTIA and context sufficiency
+## Context-sufficiency seam
 
-HESTIA defines expected context after the cap is understood.
+`CONTEXT_STACK.md` owns Context Stack composition, context-sufficiency states, Context Stack Change Candidates and the candidate HESTIA context-watch boundary.
 
-She does not validate sources.
-
-She does not produce evidence.
-
-She does not approve, transmit, canonize, promote memory or execute.
-
-She compares:
+This method only determines when that responsibility should be activated during request handling:
 
 ```text
-expected context
-vs
-available admitted input
-vs
-requested output status
+context dependency or missing context
+-> consult context sufficiency
+-> consume the resulting candidate / limitation signal
+-> narrow output, request context or escalate when consequence requires it
 ```
 
-She may produce:
+It does not redefine HESTIA, Context Card families or Context Stack status vocabulary.
+
+## Source-need seam
+
+`SOURCE_NEED_AND_REGISTRY.md` owns Source Need Candidate structure, source families, legitimate routes, source registry semantics and freshness policy.
+
+When request handling reveals a source dependency, this method applies that owner rather than defining a second source policy:
 
 ```text
-Context Stack Change Candidate
-Source Need Candidate
-scope limit proposal
-allow draft only signal
-block external action signal
-request role review signal
+missing or insufficient source
+-> Source Need Candidate under SOURCE_NEED_AND_REGISTRY.md
+-> permitted external retrieval handoff when applicable
+-> Source Candidate / Evidence Candidate review
+-> output status narrowed or blocked if sufficiency is not reached
 ```
 
-Final arbitration remains with ZEUS.
-
-## Source absence
-
-When information is missing, Pantheon creates a Source Need Candidate before any external search.
-
-```text
-missing information
--> why it is needed
--> needed for which output status
--> source family needed
--> permitted source routes
--> freshness requirement
--> fallback if not found
-```
-
-External search is a handoff, not an authority.
-
-Search results are candidates.
-
-A read source is still only a Source Candidate until Argos qualifies authority, scope, freshness and applicability.
-
-Evidence supports; approval validates.
-
-## Source families
-
-Pantheon distinguishes source families because they have different authority and allowed uses:
-
-```text
-project_source
-external_official_source
-professional_method_source
-agency_method_source
-technical_competence_source
-stable_knowledge_source
-volatile_source
-memory_or_recall_source
-registered_source
-absent_source
-```
-
-A method source guides treatment; it does not prove project facts.
-
-A competence source enables a capability; it does not validate the returned content.
-
-A volatile source must be checked at use time or at the relevant project date.
-
-## Source routes
-
-A Source Need Candidate may propose routes such as:
-
-```text
-project_corpus
-source_registry
-official_web_route
-professional_method_reference
-agency_method_reference
-technical_competence_documentation
-memory_or_register_review
-user_request_for_missing_source
-```
-
-The route does not validate the source.
-
-The registry does not validate the source.
-
-ARGOS reviews source status.
-
-ZEUS arbitrates sufficiency when consequential.
+External search or retrieval is a handoff, not authority. Retrieved material remains candidate until the applicable source and Evidence owners qualify it.
 
 ## Output consequence
 
@@ -265,11 +197,12 @@ send to ZEUS or human gate
 
 ## Boundary
 
-`active_support_doctrine` boundary profile applies. This document owns the grammar for adaptive request governance; it does not become a workflow engine or execution authority.
+`active_support_doctrine` boundary profile applies. This document owns proportional activation and output-consequence adaptation for request handling; it does not own Context Stack semantics, source policy, Evidence, approval, memory, workflow execution or runtime authority.
 
 ```text
 The request opens the situation.
 The method adapts to consequence.
+Owned context/source rules are composed when needed.
 The runtime may execute externally.
 The candidate returns.
 The gate decides status.
