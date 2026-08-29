@@ -1,136 +1,92 @@
 # Module Activation
 
-Status: active support doctrine — modular activation and effective policy only.
+Status: active support doctrine — capability activation and effective-policy specialization — documented non-implemented.
+Boundary profile: active_support_doctrine.
 
-This document defines how Pantheon Next should reason about detected, enabled and task-authorized modules or capabilities.
+This document owns the governance semantics between **capability detection**, **governance activation** and **task authorization**.
 
-It does not implement a UI.
-
-It does not implement a module registry.
-
-It does not implement plugin loading.
-
-It does not implement runtime behavior.
-
-It does not authorize automatic installation, automatic activation, automatic execution, automatic approval or automatic memory promotion.
-
-Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: compatible runtime clients expose optional runtime interaction, Hermes/the external runtime detects and executes capabilities as the PEP, Pantheon Cockpit projects governed activation and decision state, and Pantheon policy remains the PDP/governance authority.
+It does not own the universal capability law, runtime execution, Cockpit product behavior, external binding selection, Evidence, approval or memory rules. Those remain with their existing owners.
 
 ## Purpose
 
-Pantheon Next should remain modular without becoming a plugin manager.
+Pantheon must be able to say that a capability exists without silently enabling it, and that a capability is enabled for a scope without silently authorizing every task that could use it.
 
-Future UI work may need to show whether a capability is available, disabled, enabled for a scope, suspended, rejected or authorized for a specific task.
-
-This document defines the governance vocabulary for that UI and for non-authoritative runtime administration surfaces.
-
-It answers:
+The activation seam is:
 
 ```text
-If a capability is detected, what rules become effective before it can be used?
+capability detected
+-> governance activation for an explicit scope
+-> task authorization under Task Contract + applicable policy
+-> runtime/PEP may execute admitted work
 ```
 
-## Core distinction
+The three stages must remain distinct.
+
+## Parent governance
+
+`UNIFORM_CAPABILITY_GOVERNANCE.md` owns the common law and passport rule for capabilities.
+
+`MODULE_ACTIVATION.md` specializes that law for activation state only:
 
 ```text
-Detected does not mean enabled.
-Enabled does not mean authorized for a task.
-Authorized for a task does not mean sovereign.
+Uniform Capability Governance
+  -> what every capability must satisfy
+
+Module Activation
+  -> whether that capability is enabled for this scope now
+
+Task Contract + Pantheon policy
+  -> whether this task may use it
+
+Hermes / external runtime as PEP
+  -> whether admitted work/effects are actually executed
 ```
 
-A capability may exist in Hermes, a compatible runtime client or an external environment without being governed for use by Pantheon.
+Product-specific optional bindings remain with `HERMES_CAPABILITY_BINDINGS.md` and related binding records. Cockpit lifecycle projection/action boundaries remain with `COCKPIT_CAPABILITY_MANAGEMENT.md` and the applicable Cockpit owners.
 
-## Module meaning
+## Core non-equivalence
 
-A Pantheon module is a governance area or governed capability declaration.
+```text
+detected != activated
+installed != activated
+activated != task-authorized
+task-authorized != approved
+activation != execution authorization
+runtime enabled != governance activated
+Cockpit projection != activation persistence
+```
 
-It is not:
-
-- runtime package;
-- plugin;
-- installed skill;
-- autonomous agent;
-- tool dispatcher;
-- scheduler;
-- queue;
-- provider router;
-- memory engine;
-- approval engine.
-
-A module may define:
-
-- status;
-- scope;
-- rules;
-- required artifacts;
-- forbidden actions;
-- risk classes;
-- UI exposure expectations;
-- Hermes candidate constraints;
-- runtime-client interaction constraints;
-- Pantheon Cockpit projection expectations;
-- evidence expectations;
-- memory implications.
+A capability may exist in Hermes, a runtime client or another environment without being governed for Pantheon use.
 
 ## Three-stage model
 
-Every activable capability should be evaluated through three stages.
-
-```text
-capability detection
-→ governance activation
-→ task authorization
-```
-
 ### 1. Capability detection
 
-Detection reports that a capability exists somewhere.
+Detection is factual observation that a capability or surface exists somewhere.
 
-Examples:
+A detection observation may include:
 
-- Hermes detects that LangGraph is installed in a sandbox;
-- a compatible runtime client exposes an action or function;
-- a Knowledge Base exists;
-- a connector is configured;
-- a candidate skill is present in a Hermes directory;
-- a reference review exists.
+```text
+capability_id
+capability_class
+detected
+detected_by
+detected_where
+version
+health
+last_checked
+notes
+```
 
-Detection must not authorize use.
+Detection does not enable, approve or authorize use.
 
 ### 2. Governance activation
 
-Activation means Pantheon has a governed policy for using a detected capability within a defined scope.
+Activation records that Pantheon has a governed posture for using the capability within an explicit scope.
 
-Activation may be:
-
-- disabled;
-- sandbox only;
-- project-scoped;
-- dossier-scoped;
-- domain-scoped;
-- organization-scoped;
-- suspended;
-- rejected.
-
-Activation must define mandatory rules and optional switches.
-
-### 3. Task authorization
-
-Task authorization means a specific Task Contract and applicable Pantheon policy disposition permit use of the capability for a specific task.
-
-A capability may be detected and enabled but still unauthorized for the current task.
-
-Task authorization requires scope fit, approval fit, allowed tool fit, memory fit and evidence fit.
-
-The runtime/PEP enforces consequential-effect policy; module activation itself is not execution authorization.
-
-## Status vocabulary
-
-Recommended statuses:
+Typical activation postures include:
 
 ```text
-unavailable
-detected
 disabled
 watch
 candidate
@@ -139,36 +95,61 @@ project_enabled
 dossier_enabled
 domain_enabled
 organization_enabled
-task_authorized
 suspended
 deprecated
 rejected
 ```
 
-## Status semantics
+Activation must identify its scope and must remain compatible with the capability passport and universal governance rules.
+
+An activation may narrow a capability. It must not widen the passport, lower an approval ceiling or bypass a mandatory gate.
+
+### 3. Task authorization
+
+Task authorization is specific to a Task Contract and the applicable Pantheon policy disposition.
+
+A capability may be detected and activated while still unauthorized for the current task.
+
+Task authorization must preserve at least:
+
+```text
+task_contract identity
+scope fit
+capability/passport fit
+allowed and forbidden effects
+approval ceiling
+required return/evidence posture
+applicable policy disposition
+```
+
+Task authorization does not self-authorize a consequential effect. The external runtime/PEP still enforces the applicable policy decision.
+
+## Activation status vocabulary
 
 | Status | Meaning |
 |---|---|
-| unavailable | not detected or not available |
-| detected | available somewhere, not enabled |
-| disabled | deliberately unavailable for use |
-| watch | interesting but not ready for activation |
-| candidate | reviewed as possible future activation |
-| sandbox_enabled | allowed only for sandbox or fictional/non-critical tasks |
-| project_enabled | allowed for a named project under conditions |
-| dossier_enabled | allowed for a named dossier under conditions |
-| domain_enabled | allowed for a domain of work under conditions |
-| organization_enabled | allowed broadly, rare and high-governance |
-| task_authorized | allowed for the current Task Contract only, subject to applicable policy/gates |
-| suspended | temporarily blocked pending review |
-| deprecated | should be phased out |
-| rejected | forbidden under current doctrine |
+| `unavailable` | capability is not currently observed as available |
+| `detected` | capability exists somewhere; no activation implied |
+| `disabled` | explicitly unavailable for governed use |
+| `watch` | observed but not ready for activation |
+| `candidate` | reviewed as possible future activation |
+| `sandbox_enabled` | enabled only for bounded sandbox use |
+| `project_enabled` | enabled for an identified project scope |
+| `dossier_enabled` | enabled for an identified dossier/case scope |
+| `domain_enabled` | enabled for a professional/domain scope |
+| `organization_enabled` | broadly enabled; exceptional and high-governance |
+| `task_authorized` | current Task Contract may use the capability, subject to policy/effects |
+| `suspended` | temporarily blocked pending review |
+| `deprecated` | retained only for transition/compatibility |
+| `rejected` | forbidden under current doctrine |
+
+`task_authorized` is a task-facing status, not a replacement for operation-specific PDP/PEP enforcement.
 
 ## Activation scope
 
 Activation must be scoped.
 
-Allowed scope levels:
+Supported conceptual scope levels include:
 
 ```text
 session
@@ -187,461 +168,177 @@ Default posture:
 no global activation by default
 ```
 
-System-level activation should remain rare and should not disable mandatory rules.
+Broader scope requires stronger justification. A system-level activation must not disable universal capability rules.
 
-## Mandatory rules
+## Mandatory versus optional activation conditions
 
-Mandatory rules are automatically effective when a capability is enabled.
+Universal mandatory constraints remain owned by the capability passport, Task Contract, Evidence, approval, memory, external-tool and policy owners.
 
-They are not optional UI switches.
+An activation record references those owners; it does not duplicate their rulebooks.
 
-They cannot be disabled merely for convenience.
+Local optional switches may narrow runtime affordances when useful, for example:
 
-Common mandatory rules:
-
-```yaml
-mandatory_rules:
-  task_contract_required: true
-  context_pack_required_when_external_execution: true
-  evidence_pack_return_required: true
-  approval_ceiling_required: true
-  scope_required: true
-  memory_rule_required: true
-  external_tool_policy_required: true
-  canonical_memory_write_forbidden_by_default: true
-  automatic_approval_forbidden: true
-  automatic_memory_promotion_forbidden: true
-  doctrine_mutation_forbidden_without_review: true
-  raw_runtime_trace_is_not_evidence: true
-  runtime_state_is_not_canonical_memory: true
-  user_decision_gate_required_for_unresolved_conflict: true
+```text
+checkpoint/resume permitted
+streaming status permitted
+human interruption permitted
+bounded retry permitted
+read-only tools permitted
+write tools permitted only behind applicable gates
+sandbox execution permitted
+project execution permitted
 ```
 
-## Optional rules
-
-Optional rules may be activated or deactivated within a governed scope.
-
-They must not override mandatory rules.
-
-Examples:
-
-```yaml
-optional_rules:
-  allow_checkpoint_resume: true_or_false
-  allow_streaming_status: true_or_false
-  allow_human_interrupts: true_or_false
-  allow_limited_retry: true_or_false
-  allow_read_only_tools: true_or_false
-  allow_write_tools: true_or_false_with_approval
-  allow_patch_candidate_workflow: true_or_false
-  allow_rag_ingestion_workflow: true_or_false
-  allow_repo_analysis_workflow: true_or_false
-  allow_sandbox_execution: true_or_false
-  allow_project_execution: true_or_false
-```
+An optional switch may only narrow or configure an already-admissible capability. It must not override a mandatory rule or convert a denied effect into an allowed one.
 
 ## Effective Policy
 
-An Effective Policy is the computed governance posture for a capability at a given moment.
+An **Effective Policy** is the composed governance view for one capability in one current context.
 
 It answers:
 
 ```text
-Given what is detected, enabled, scoped and requested, what is actually allowed now?
+Given what is detected, activated, scoped and requested,
+what is the current governed posture for this capability?
 ```
 
-Recommended structure:
-
-```yaml
-module_id: langgraph_runtime_candidate
-capability_class: hermes_runtime_candidate
-
-detection:
-  detected: true
-  detected_by: hermes
-  version: unknown
-  health: unknown
-  last_checked: null
-
-governance_activation:
-  status: sandbox_enabled
-  scope: project
-  approved_by: user_or_admin
-  approval_level: C2
-  review_after: null
-
-task_authorization:
-  task_contract_required: true
-  context_pack_required: true
-  allowed_for_current_task: false
-  denial_reason: no_task_contract
-
-mandatory_rules:
-  task_contract_required: true
-  context_pack_required: true
-  evidence_pack_required: true
-  memory_candidate_only: true
-  automatic_approval_forbidden: true
-
-optional_rules:
-  checkpoint_resume: false
-  streaming_status: true
-  human_interrupts: true
-  limited_retry: false
-
-forbidden:
-  pantheon_runtime: true
-  runtime_client_governance_authority: true
-  canonical_memory_write: true
-  auto_approval: true
-```
-
-Effective Policy is a governance artifact.
-
-It is not a runtime engine or a substitute for an operation-specific PDP disposition.
-
-## UI control model
-
-Pantheon Cockpit may project governed module status and decision controls. Optional operator/runtime clients may expose runtime administration controls separately.
-
-Allowed governed Cockpit projections or requests:
-
-- view detection status;
-- view effective policy;
-- request enablement for sandbox;
-- request enablement for project;
-- request enablement for dossier;
-- request disable or suspension;
-- request review;
-- show approval requirement;
-- show evidence;
-- show risk;
-- show capability gaps;
-- show last Evidence Pack;
-- show previous governance status for a reviewed rollback decision.
-
-These controls project or request governance state. They do not perform runtime installation or external effects by themselves.
-
-Forbidden controls or interpretations:
-
-- bypass mandatory rules;
-- grant automatic approval;
-- promote memory;
-- mutate doctrine;
-- install plugins automatically from Pantheon Cockpit;
-- install skills automatically from Pantheon Cockpit;
-- start hidden runtime jobs;
-- grant broad runtime-client Knowledge/storage access as governance authority;
-- grant write tools without approval;
-- turn detection into authorization;
-- treat a Cockpit click as the consequential effect itself.
-
-### Explicit Hermes administration requests
-
-An operator-facing runtime client or administration UI may submit a one-shot request to an already authenticated native Hermes administration API when all of the following are true:
-
-- a human selects the exact module and action;
-- the target, source and material effect are visible before confirmation;
-- a separate confirmation occurs immediately before the request;
-- credentials are passed only to Hermes and are not retained by the UI;
-- the resulting operational state is re-read from Hermes;
-- failure stays failure and is not converted into an enabled state;
-- no retry, follow-on action or task execution starts automatically.
-
-This can cover an operator-selected catalog install, provider selection, enable/disable change or connectivity probe. It does not make Pantheon a plugin manager or provider router because Pantheon neither performs the runtime work nor owns the external configuration.
-
-The state transition must remain explicit:
+A reviewable Effective Policy should identify or reference at least:
 
 ```text
-human-confirmed administration request
-→ Hermes native operation
-→ observed Hermes state
+capability/module identity
+capability class
+detection observation
+activation status
+activation scope
+passport reference
+Task Contract reference when task-specific
+task-authorization status
+applicable approval ceiling
+allowed/forbidden effects or tool classes
+required return/evidence posture
+local optional switches
+blocking reason when not usable
+review/suspension state
 ```
 
-It must never be shortened to:
+Effective Policy is a governance artifact. It is not a policy engine and does not replace an operation-specific PDP disposition.
 
 ```text
-detection → installation → governance activation → task use
+Effective Policy describes current capability posture.
+PDP decides the bounded policy question.
+PEP enforces the consequential effect.
 ```
 
-Installation and Hermes runtime enablement remain operational facts. A separate governance activation record and a matching Task Contract plus applicable policy/gates are still required where doctrine calls for them.
+## Activation record seam
 
-## Layer split
-
-| Layer | Role in activation |
-|---|---|
-| Pantheon policy/governance | defines statuses, mandatory rules, optional rules, scopes, approvals and effective policy; provides bounded PDP decisions |
-| Hermes / external runtime | detects capabilities, enforces consequential policy as PEP and executes admitted work |
-| compatible runtime client | optional runtime interaction and operator administration only; no governance authority |
-| Pantheon Cockpit | projects governed status, evidence gaps, approvals and User Decision Gates; projection only |
-
-## Capability classes
-
-Recommended classes:
+A governance activation record should remain small and scoped. Conceptually it needs:
 
 ```text
-governance_module
-hermes_runtime_candidate
-hermes_skill_candidate
-runtime_client_template
-runtime_client_capability_surface
-pantheon_cockpit_projection
-evidence_template
-memory_policy
-approval_gate
-external_tool_candidate
-reference_review
-read_only_doctor_candidate
+capability_or_module_id
+activation_status
+scope_type
+scope_id
+passport_ref
+reviewed_by / decision_ref when required
+approval_ceiling_ref
+local_optional_switches
+review_after
+suspension_or_rejection_reason
 ```
 
-Each class may have its own mandatory rules.
+This is documentary vocabulary, not a new executable schema. Existing machine-checkable capability activation/binding contracts remain the machine owners where implemented.
 
-## LangGraph example
+## Runtime and administration boundary
 
-LangGraph is a Hermes runtime candidate.
+Runtime availability, installation and native enablement are operational facts.
 
-Detection:
+They are not governance activation.
+
+An operator-facing client may perform an explicitly human-confirmed one-shot administration request against an authenticated native runtime interface when the target and effect are visible. The observed runtime state must then be re-read truthfully.
+
+That operation must remain distinct from Pantheon activation and task use:
 
 ```text
-Hermes may detect LangGraph availability.
+human-confirmed runtime administration request
+-> native runtime operation
+-> observed runtime state
+
+observed runtime state
+!= governance activation
+!= task authorization
 ```
 
-Mandatory rules if enabled:
+No hidden retry, follow-on task or automatic activation is implied.
 
-```yaml
-task_contract_required: true
-context_pack_required: true
-evidence_pack_return_required: true
-approval_ceiling_required: true
-memory_promotion_forbidden: true
-pantheon_runtime_forbidden: true
-runtime_client_as_governance_runtime_forbidden: true
-direct_runtime_client_storage_access_forbidden: true
-raw_trace_is_not_evidence: true
-graph_state_is_runtime_state: true
-user_decision_gate_required_for_unresolved_conflict: true
-```
+Detailed runtime/client/Cockpit placement remains owned by `HERMES_INTEGRATION.md` and the applicable Cockpit/runtime configuration owners.
 
-Optional rules:
+## Cockpit projection boundary
 
-```yaml
-allow_checkpoint_resume: true_or_false
-allow_streaming_status: true_or_false
-allow_human_interrupts: true_or_false
-allow_limited_retry: true_or_false
-allow_patch_candidate_workflow: true_or_false
-allow_rag_ingestion_workflow: true_or_false
-allow_repo_analysis_workflow: true_or_false
-```
-
-UI meaning:
+Pantheon Cockpit may project:
 
 ```text
-Enable LangGraph for project
+detection status
+activation status and scope
+Effective Policy summary
+blocking reason
+approval/evidence gaps from their owners
+review, suspend or enablement-request actions
 ```
 
-must mean:
+A projected control may request a governance transition. Projection itself does not perform the runtime effect, persist authority by itself or authorize a consequential task.
+
+## Suspension and review
+
+Activation should be suspended or reviewed when evidence shows that the activation assumptions are no longer reliable, including material changes such as:
 
 ```text
-Hermes may use LangGraph only for task-authorized work in this project, under mandatory Pantheon rules and applicable policy decisions.
+scope breach
+unapproved external effect
+material capability/version change
+runtime behavior incompatible with the passport
+unexplained or misleading operational state
+required policy/evidence/approval boundary violated
+security or professional-risk regression
 ```
 
-It must not mean:
+Suspension is a governance status. Runtime disablement may be a separate operational response.
+
+## Handoffs to existing owners
+
+This document stops at activation semantics.
+
+- `UNIFORM_CAPABILITY_GOVERNANCE.md` owns the universal law/passport envelope;
+- `CAPABILITY_PLACEMENT.md` owns generic capability/effect placement;
+- `TASK_CONTRACTS.md` owns task scope;
+- `APPROVALS.md` owns approval legitimacy and ceilings;
+- `EVIDENCE_PACK.md` owns Evidence packaging/admission semantics;
+- `MEMORY.md` owns Register/memory boundaries;
+- `EXTERNAL_TOOLS_POLICY.md` owns external capability review/effect risk;
+- `HERMES_CAPABILITY_BINDINGS.md` owns product-specific optional binding posture;
+- `HERMES_INTEGRATION.md` owns runtime/client/PDP/PEP/Cockpit placement;
+- Cockpit capability owners own governed projection and supported management actions.
 
 ```text
-LangGraph becomes Pantheon workflow engine.
+reference reviewed != activated
+binding selected != activated
+activated != task-authorized
+task-authorized != approved
+runtime success != authorization
+memory != Evidence
 ```
 
-## n8n example
+## Boundary
 
-n8n is an optional Hermes-side automation MCP candidate. It is useful for deterministic integrations and repeatable workflow operations once a concrete need exists. It is not required for the Pantheon MVP and must not duplicate Hermes reasoning, Pantheon approvals or Task Contract checks.
+`active_support_doctrine` boundary profile applies.
 
-The audited Hermes catalog entry exposes a read-mostly default selection:
-
-```text
-health
-list_workflows
-get_workflow
-find_workflows
-list_executions
-get_execution
-recent_failures
-export_workflow
-```
-
-The bridge also contains `activate_workflow`, `deactivate_workflow` and `container_logs`, which the catalog excludes by default because they mutate live workflow state or expose operational data.
-
-Recommended initial posture:
-
-```yaml
-module_id: n8n_automation_candidate
-capability_class: external_tool_candidate
-governance_activation:
-  status: candidate
-  scope: sandbox
-task_authorization:
-  allowed_for_current_task: false
-  denial_reason: no_task_contract
-mandatory_rules:
-  explicit_user_intent_for_external_effect: true
-  evidence_pack_return_required: true
-  automatic_approval_forbidden: true
-  canonical_memory_write_forbidden: true
-  reasoning_delegation_to_n8n_forbidden: true
-```
-
-Installing, enabling or probing the n8n MCP does not authorize a workflow activation. Any concrete external effect is reviewed under `EXTERNAL_TOOLS_POLICY.md` and the applicable Pantheon policy decision according to its actual target and risk.
-
-## Suspension
-
-A capability should be suspended when:
-
-- evidence is missing;
-- scope was exceeded;
-- external effect occurred without approval;
-- memory boundary was violated;
-- runtime trace cannot be explained;
-- tool behavior changed;
-- dependency changed materially;
-- user trust or professional risk is affected;
-- a User Decision Gate blocks continuation.
-
-Suspension is reversible only through governed review.
-
-## Detection record
-
-A detection record should be factual and non-authorizing.
-
-Recommended fields:
-
-```yaml
-capability_id: langgraph
-capability_class: hermes_runtime_candidate
-detected: true
-detected_by: hermes
-detected_where: hermes_sandbox
-version: unknown
-health: unknown
-last_checked: null
-notes: available_but_not_task_authorized
-```
-
-## Activation record
-
-An activation record should be scoped and reviewable.
-
-Recommended fields:
-
-```yaml
-module_id: langgraph_runtime_candidate
-status: sandbox_enabled
-scope_type: project
-scope_id: example_project
-approved_by: user_or_admin
-approval_level: C2
-mandatory_rules_ref: docs/governance/MODULE_ACTIVATION.md
-optional_rules:
-  checkpoint_resume: false
-  streaming_status: true
-  human_interrupts: true
-review_after: null
-```
-
-## Task authorization record
-
-A task authorization record should be specific to a Task Contract.
-
-Recommended fields:
-
-```yaml
-task_contract_id: TC-000
-module_id: langgraph_runtime_candidate
-authorized: true
-reason: long_running_interruptible_evidence_workflow
-scope_match: true
-approval_ceiling: C3
-allowed_tools:
-  - read_only_repo_inspection
-forbidden_tools:
-  - external_write
-  - canonical_memory_write
-  - doctrine_mutation
-required_return:
-  - output_candidate
-  - run_trace_summary
-  - evidence_notes
-  - memory_candidates_if_any
-```
-
-The record does not self-authorize a consequential effect; it must remain consistent with the applicable Pantheon PDP disposition and PEP enforcement.
-
-## Relationship to MODULES.md
-
-`MODULES.md` defines governance areas.
-
-This document defines activation semantics for capabilities that may be detected, enabled, disabled or task-authorized.
-
-A module remains governance-first even when a related external capability is enabled.
-
-## Relationship to external references
-
-External references may suggest module candidates or optional capabilities.
-
-They must pass through:
-
-```text
-WATCHLIST.md
-REFERENCE_BOUNDARIES.md
-ECOSYSTEM_MAP.md
-DISTILLATION_REGISTRY.md or REJECTED_PATTERNS.md
-TENSIONS_AND_RISKS.md when needed
-```
-
-A reference review is not an activation.
-
-## Relationship to approvals
-
-Activation may require approval depending on scope and risk.
-
-Task authorization may require a different approval depending on the concrete action.
-
-Approval to enable a capability does not approve every future use.
-
-## Relationship to memory
-
-No module activation may create a Registre Probatoire entry by itself.
-
-A capability may produce Register Candidates only when allowed by Task Contract and memory policy.
-
-## Relationship to evidence
-
-No module activation may treat logs, traces, scores, retrieved sources or successful completion as Evidence Pack by themselves.
-
-Activated capabilities must return evidence material in a reviewable form.
-
-## Forbidden drift
-
-Module activation must never become:
-
-- plugin marketplace;
-- skill marketplace;
-- automatic installer;
-- provider router;
-- workflow runtime;
-- scheduler;
-- queue;
-- hidden agent loop;
-- automatic approval engine;
-- automatic memory engine;
-- runtime-client capability sprawl that bypasses governance;
-- Pantheon Cockpit runtime drift;
-- Hermes authority bypass;
-- Pantheon runtime migration.
+This document creates no registry, installer, plugin manager, provider router, workflow engine, scheduler, queue, runtime, approval engine or memory engine.
 
 ## Final rule
 
 ```text
-Pantheon detects and qualifies capabilities to apply policy.
-Detection and activation do not execute them.
-The external runtime/PEP executes only admitted work under the applicable policy decision.
+Detection says the capability exists.
+Activation says Pantheon permits a bounded scope under declared conditions.
+Task authorization says this Task Contract may use it.
+Policy and the external PEP govern consequential effects.
+None of those states collapse into the next one automatically.
 ```
