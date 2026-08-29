@@ -41,19 +41,17 @@ from .structured_extraction import (
 STRUCTURED_EXTRACTION_DDL = (
     Path(__file__).resolve().parent / "sql" / "008_structured_extraction.sql"
 ).read_text(encoding="utf-8")
+VERSIONED_RETRIEVAL_DDL = (
+    Path(__file__).resolve().parent / "sql" / "035_versioned_retrieval_chunks.sql"
+).read_text(encoding="utf-8")
 
 # Audit identity (external review, finding #6): every chunk carries enough to
 # prove, at retrieval time, exactly what produced it — which contract version
 # (contract_id + contract_digest), which ingestion run (ingestion_id, an
 # injectable nonce, finding #8), and which source version (source_digest).
 #
-# This DDL runs on EVERY connect(), so it must stay lock-light: CREATE TABLE IF
-# NOT EXISTS is a no-op when the table is present. We deliberately do NOT ALTER
-# here — an ALTER … ADD COLUMN takes an ACCESS EXCLUSIVE lock on every connect,
-# which deadlocks against a long-lived session connection holding chunks (that
-# hung a CI run). A pre-existing table from before this change must be dropped
-# and re-created (DROP TABLE chunks); the DEFAULT '' keeps a legacy partial
-# INSERT that omits the columns valid.
+# DDL runs on EVERY connect(), so fresh-table definitions stay lock-light and
+# pre-existing schema evolution is isolated in a catalog-guarded migration.
 DDL = f"""
 CREATE EXTENSION IF NOT EXISTS vector;
 CREATE TABLE IF NOT EXISTS chunks (
@@ -67,7 +65,8 @@ CREATE TABLE IF NOT EXISTS chunks (
     contract_digest TEXT NOT NULL DEFAULT '',
     ingestion_id    TEXT NOT NULL DEFAULT '',
     source_digest   TEXT NOT NULL DEFAULT '',
-    UNIQUE (dossier, source_ref, chunk_no)
+    CONSTRAINT chunks_retrieval_identity_key
+        UNIQUE (dossier, source_ref, source_digest, chunk_no)
 );
 CREATE TABLE IF NOT EXISTS source_documents (
     document_id TEXT PRIMARY KEY,
@@ -236,7 +235,7 @@ BEGIN
     END IF;
 END;
 $$;
-""" + STRUCTURED_EXTRACTION_DDL
+""" + STRUCTURED_EXTRACTION_DDL + VERSIONED_RETRIEVAL_DDL
 
 
 def _sha256(text: str) -> str:
@@ -667,8 +666,12 @@ def ingest(
     Every chunk is stamped with its audit identity (finding #6): the contract
     id and digest, the ingestion id (a per-run nonce — injectable for tests and
     replay, finding #8; defaults to a fresh uuid), and the digest of the exact
-    source content it came from. Re-ingesting replaces the dossier's chunks with
-    a new ingestion_id, so what is retrievable is always provably from one run.
+    source content it came from. Re-ingesting refreshes only the same immutable
+    digest; older digests remain indexed for exact governed retrieval.
+
+    ``replace_dossier`` is retained for API compatibility. It no longer deletes
+    historical chunk versions; current-version retrieval follows the digest on
+    ``source_documents`` instead.
     """
     ingestion_id = ingestion_id or uuid.uuid4().hex
     cdigest = contract_digest(contract)
@@ -762,17 +765,17 @@ def ingest(
     conn.commit()
     total = 0
     with conn.transaction():
-        if replace_dossier:
-            conn.execute("DELETE FROM chunks WHERE dossier = %s", (contract.dossier,))
-        else:
-            conn.execute(
-                "DELETE FROM chunks WHERE dossier = %s AND source_ref = ANY(%s)",
-                (contract.dossier, list(selected_sources)),
-            )
         for (
             source_ref, path, sdigest, converted, compiled, naming,
             observation_kind, reused_extraction_id, analysis_status, subject_tags,
         ) in prepared:
+            # Replaying the same immutable source is idempotent while other
+            # digests at the same path remain available for exact retrieval.
+            conn.execute(
+                "DELETE FROM chunks "
+                "WHERE dossier = %s AND source_ref = %s AND source_digest = %s",
+                (contract.dossier, source_ref, sdigest),
+            )
             document_id = _document_id(contract.dossier, source_ref)
             extraction_id = reused_extraction_id or _extraction_id(ingestion_id, document_id)
             media_type = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
@@ -872,13 +875,13 @@ def ingest(
                 conn.execute(
                     """
                     INSERT INTO retrieval_chunk_projections (
-                        dossier, source_ref, chunk_no, compilation_id, content_type,
-                        text_digest, page_start, page_end, structural_locator,
+                        dossier, source_ref, source_digest, chunk_no, compilation_id,
+                        content_type, text_digest, page_start, page_end, structural_locator,
                         parent_heading, section_path, quality_flags
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb, %s::jsonb)
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb, %s::jsonb)
                     """,
                     (
-                        contract.dossier, source_ref, i, compilation_ref,
+                        contract.dossier, source_ref, sdigest, i, compilation_ref,
                         projection.content_type, projection.text_digest,
                         projection.page_start, projection.page_end,
                         projection.structural_locator, projection.parent_heading,
@@ -890,11 +893,11 @@ def ingest(
                     conn.execute(
                         """
                         INSERT INTO retrieval_chunk_units (
-                            dossier, source_ref, chunk_no, unit_id, unit_order
-                        ) VALUES (%s, %s, %s, %s, %s)
+                            dossier, source_ref, source_digest, chunk_no, unit_id, unit_order
+                        ) VALUES (%s, %s, %s, %s, %s, %s)
                         """,
                         (
-                            contract.dossier, source_ref, i,
+                            contract.dossier, source_ref, sdigest, i,
                             unit_id(compilation_ref, ordinal), member_order,
                         ),
                     )
@@ -953,7 +956,8 @@ def get_document_card(conn: psycopg.Connection, dossier: str, source_ref: str) -
                    (SELECT COUNT(*)
                       FROM chunks current_chunk
                      WHERE current_chunk.dossier = d.dossier
-                       AND current_chunk.source_ref = d.source_ref),
+                       AND current_chunk.source_ref = d.source_ref
+                       AND current_chunk.source_digest = d.source_digest),
                    (SELECT COUNT(*)
                       FROM retrieval_chunk_projections flagged_chunk
                      WHERE flagged_chunk.compilation_id = sc.compilation_id
@@ -1138,7 +1142,7 @@ def get_document_chunks(
     with conn.cursor() as cur:
         cur.execute(
             """
-            SELECT d.dossier, d.source_ref, cb.compilation_id
+            SELECT d.dossier, d.source_ref, d.source_digest, cb.compilation_id
               FROM source_documents d
               JOIN document_compilation_bindings cb ON cb.document_id = d.document_id
              WHERE d.document_id = %s
@@ -1149,13 +1153,14 @@ def get_document_chunks(
     if document is None:
         raise KeyError(f"unknown compiled document: {document_id}")
 
-    dossier, source_ref, compilation_ref = document
+    dossier, source_ref, source_digest, compilation_ref = document
     predicates = [
         "c.dossier = %s",
         "c.source_ref = %s",
+        "c.source_digest = %s",
         "p.compilation_id = %s",
     ]
-    params: list[object] = [dossier, source_ref, compilation_ref]
+    params: list[object] = [dossier, source_ref, source_digest, compilation_ref]
     if content_type:
         predicates.append("p.content_type = %s")
         params.append(content_type)
@@ -1171,6 +1176,7 @@ def get_document_chunks(
               JOIN retrieval_chunk_projections p
                 ON p.dossier = c.dossier
                AND p.source_ref = c.source_ref
+               AND p.source_digest = c.source_digest
                AND p.chunk_no = c.chunk_no
              WHERE {where}
             """,
@@ -1187,6 +1193,7 @@ def get_document_chunks(
               JOIN retrieval_chunk_projections p
                 ON p.dossier = c.dossier
                AND p.source_ref = c.source_ref
+               AND p.source_digest = c.source_digest
                AND p.chunk_no = c.chunk_no
              WHERE {where}
              ORDER BY c.chunk_no
@@ -1232,7 +1239,7 @@ def retrieve_scoped(
     query: str,
     top_k: int = 4,
 ) -> list[RetrievedChunk]:
-    """Scope filter in SQL first, vector ranking second."""
+    """Scope current source versions in SQL first, then vector-rank them."""
     qvec = to_pgvector(embed(query))
     with conn.cursor() as cur:
         cur.execute(
@@ -1243,13 +1250,84 @@ def retrieve_scoped(
             "       COALESCE(p.section_path, '[]'::jsonb),"
             "       COALESCE(p.quality_flags, '[]'::jsonb)"
             " FROM chunks c"
+            " JOIN source_documents d"
+            "   ON d.dossier = c.dossier AND d.source_ref = c.source_ref"
+            "  AND d.source_digest = c.source_digest"
             " LEFT JOIN retrieval_chunk_projections p"
             "   ON p.dossier = c.dossier AND p.source_ref = c.source_ref"
-            "  AND p.chunk_no = c.chunk_no"
-            " WHERE c.dossier = %s AND c.source_ref = ANY(%s)"   # the boundary
+            "  AND p.source_digest = c.source_digest AND p.chunk_no = c.chunk_no"
+            " WHERE c.dossier = %s AND c.source_ref = ANY(%s)"
             " ORDER BY distance ASC"
             " LIMIT %s",
             (qvec, contract.dossier, list(contract.sources), top_k),
+        )
+        return [
+            RetrievedChunk(
+                *row[:-2],
+                section_path=tuple(row[-2] or ()),
+                quality_flags=tuple(row[-1] or ()),
+            )
+            for row in cur.fetchall()
+        ]
+
+
+def retrieve_exact_scoped(
+    conn: psycopg.Connection,
+    contract: TaskContract,
+    query: str,
+    *,
+    sources: tuple[tuple[str, str], ...],
+    top_k: int = 4,
+) -> list[RetrievedChunk]:
+    """Vector-rank only exact ``(source_ref, source_digest)`` identities.
+
+    Exact identities may point at a preserved historical digest, but each path
+    must still already belong to the Task Contract perimeter. An unknown digest
+    yields no candidates; it never falls forward to the current path content.
+    """
+    if top_k < 1 or top_k > 100:
+        raise ValueError("top_k must be between 1 and 100")
+    if not sources:
+        return []
+
+    source_refs: list[str] = []
+    source_digests: list[str] = []
+    seen: set[tuple[str, str]] = set()
+    for source_ref, source_digest in sources:
+        assert_source_in_scope(contract, source_ref)
+        digest = str(source_digest or "").strip()
+        if not digest:
+            raise ValueError("exact retrieval source_digest is required")
+        key = (source_ref, digest)
+        if key in seen:
+            continue
+        seen.add(key)
+        source_refs.append(source_ref)
+        source_digests.append(digest)
+
+    qvec = to_pgvector(embed(query))
+    with conn.cursor() as cur:
+        cur.execute(
+            "WITH allowed AS ("
+            " SELECT * FROM unnest(%s::text[], %s::text[])"
+            " AS exact_source(source_ref, source_digest)"
+            ")"
+            " SELECT c.source_ref, c.chunk_no, c.body, c.embedding <=> %s::vector AS distance,"
+            "        c.contract_id, c.contract_digest, c.ingestion_id, c.source_digest,"
+            "        COALESCE(p.content_type, ''), p.page_start, p.page_end,"
+            "        COALESCE(p.structural_locator, ''), p.parent_heading,"
+            "        COALESCE(p.section_path, '[]'::jsonb),"
+            "        COALESCE(p.quality_flags, '[]'::jsonb)"
+            " FROM chunks c"
+            " JOIN allowed a"
+            "   ON a.source_ref = c.source_ref AND a.source_digest = c.source_digest"
+            " LEFT JOIN retrieval_chunk_projections p"
+            "   ON p.dossier = c.dossier AND p.source_ref = c.source_ref"
+            "  AND p.source_digest = c.source_digest AND p.chunk_no = c.chunk_no"
+            " WHERE c.dossier = %s"
+            " ORDER BY distance ASC"
+            " LIMIT %s",
+            (source_refs, source_digests, qvec, contract.dossier, top_k),
         )
         return [
             RetrievedChunk(

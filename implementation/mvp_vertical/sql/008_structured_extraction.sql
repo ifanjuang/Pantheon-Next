@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS document_compilation_bindings (
 CREATE TABLE IF NOT EXISTS retrieval_chunk_projections (
     dossier TEXT NOT NULL,
     source_ref TEXT NOT NULL,
+    source_digest TEXT NOT NULL,
     chunk_no INT NOT NULL CHECK (chunk_no >= 0),
     compilation_id TEXT NOT NULL REFERENCES structured_compilations(compilation_id) ON DELETE CASCADE,
     content_type TEXT NOT NULL CHECK (
@@ -74,20 +75,23 @@ CREATE TABLE IF NOT EXISTS retrieval_chunk_projections (
     parent_heading TEXT,
     section_path JSONB NOT NULL DEFAULT '[]'::jsonb,
     quality_flags JSONB NOT NULL DEFAULT '[]'::jsonb,
-    PRIMARY KEY (dossier, source_ref, chunk_no),
-    FOREIGN KEY (dossier, source_ref, chunk_no)
-        REFERENCES chunks(dossier, source_ref, chunk_no) ON DELETE CASCADE
+    PRIMARY KEY (dossier, source_ref, source_digest, chunk_no),
+    FOREIGN KEY (dossier, source_ref, source_digest, chunk_no)
+        REFERENCES chunks(dossier, source_ref, source_digest, chunk_no) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS retrieval_chunk_units (
     dossier TEXT NOT NULL,
     source_ref TEXT NOT NULL,
+    source_digest TEXT NOT NULL,
     chunk_no INT NOT NULL CHECK (chunk_no >= 0),
     unit_id TEXT NOT NULL REFERENCES extraction_units(unit_id) ON DELETE CASCADE,
     unit_order INT NOT NULL CHECK (unit_order >= 0),
-    PRIMARY KEY (dossier, source_ref, chunk_no, unit_id),
-    FOREIGN KEY (dossier, source_ref, chunk_no)
-        REFERENCES retrieval_chunk_projections(dossier, source_ref, chunk_no) ON DELETE CASCADE
+    PRIMARY KEY (dossier, source_ref, source_digest, chunk_no, unit_id),
+    FOREIGN KEY (dossier, source_ref, source_digest, chunk_no)
+        REFERENCES retrieval_chunk_projections(
+            dossier, source_ref, source_digest, chunk_no
+        ) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS structured_compilation_lookup

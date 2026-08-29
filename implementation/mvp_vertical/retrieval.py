@@ -12,8 +12,8 @@ from dataclasses import dataclass
 
 import psycopg
 
-from .contract import TaskContract
-from .store import RetrievedChunk, retrieve_scoped
+from .contract import TaskContract, assert_source_in_scope
+from .store import RetrievedChunk, retrieve_exact_scoped, retrieve_scoped
 
 
 @dataclass(frozen=True)
@@ -44,13 +44,34 @@ def _validate_limits(top_k: int, candidate_k: int) -> None:
         raise ValueError("candidate_k must not exceed 100")
 
 
+def _exact_scope_columns(
+    contract: TaskContract,
+    sources: tuple[tuple[str, str], ...],
+) -> tuple[list[str], list[str]]:
+    source_refs: list[str] = []
+    source_digests: list[str] = []
+    seen: set[tuple[str, str]] = set()
+    for source_ref, source_digest in sources:
+        assert_source_in_scope(contract, source_ref)
+        digest = str(source_digest or "").strip()
+        if not digest:
+            raise ValueError("exact retrieval source_digest is required")
+        key = (source_ref, digest)
+        if key in seen:
+            continue
+        seen.add(key)
+        source_refs.append(source_ref)
+        source_digests.append(digest)
+    return source_refs, source_digests
+
+
 def retrieve_lexical_scoped(
     conn: psycopg.Connection,
     contract: TaskContract,
     query: str,
     top_k: int = 8,
 ) -> list[RetrievedChunk]:
-    """Retrieve lexical candidates inside the declared perimeter only.
+    """Retrieve lexical candidates from current source versions in scope.
 
     PostgreSQL full-text ranking is used as a replaceable candidate capability.
     The returned ``distance`` is ``1 - normalized lexical rank`` so existing
@@ -71,9 +92,14 @@ def retrieve_lexical_scoped(
                        p.quality_flags,
                        websearch_to_tsquery('simple', %s) AS lexical_query
                   FROM chunks c
+                  JOIN source_documents d
+                    ON d.dossier = c.dossier
+                   AND d.source_ref = c.source_ref
+                   AND d.source_digest = c.source_digest
                   LEFT JOIN retrieval_chunk_projections p
                     ON p.dossier = c.dossier
                    AND p.source_ref = c.source_ref
+                   AND p.source_digest = c.source_digest
                    AND p.chunk_no = c.chunk_no
                  WHERE c.dossier = %s
                    AND c.source_ref = ANY(%s)
@@ -93,10 +119,78 @@ def retrieve_lexical_scoped(
                    COALESCE(section_path, '[]'::jsonb),
                    COALESCE(quality_flags, '[]'::jsonb)
               FROM ranked
-             ORDER BY lexical_rank DESC, source_ref ASC, chunk_no ASC
+             ORDER BY lexical_rank DESC, source_ref ASC, source_digest ASC, chunk_no ASC
              LIMIT %s
             """,
             (query, contract.dossier, list(contract.sources), top_k),
+        )
+        return [
+            RetrievedChunk(
+                *row[:-2],
+                section_path=tuple(row[-2] or ()),
+                quality_flags=tuple(row[-1] or ()),
+            )
+            for row in cur.fetchall()
+        ]
+
+
+def retrieve_lexical_exact_scoped(
+    conn: psycopg.Connection,
+    contract: TaskContract,
+    query: str,
+    *,
+    sources: tuple[tuple[str, str], ...],
+    top_k: int = 8,
+) -> list[RetrievedChunk]:
+    """Rank lexical candidates only inside exact source-ref/digest identities."""
+    if top_k < 1 or top_k > 100:
+        raise ValueError("top_k must be between 1 and 100")
+    if not query.strip() or not sources:
+        return []
+    source_refs, source_digests = _exact_scope_columns(contract, sources)
+
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            WITH allowed AS (
+                SELECT *
+                  FROM unnest(%s::text[], %s::text[])
+                       AS exact_source(source_ref, source_digest)
+            ), bounded AS (
+                SELECT c.*, p.content_type, p.page_start, p.page_end,
+                       p.structural_locator, p.parent_heading, p.section_path,
+                       p.quality_flags,
+                       websearch_to_tsquery('simple', %s) AS lexical_query
+                  FROM chunks c
+                  JOIN allowed a
+                    ON a.source_ref = c.source_ref
+                   AND a.source_digest = c.source_digest
+                  LEFT JOIN retrieval_chunk_projections p
+                    ON p.dossier = c.dossier
+                   AND p.source_ref = c.source_ref
+                   AND p.source_digest = c.source_digest
+                   AND p.chunk_no = c.chunk_no
+                 WHERE c.dossier = %s
+            ), ranked AS (
+                SELECT *,
+                       ts_rank_cd(
+                           to_tsvector('simple', body), lexical_query, 32
+                       ) AS lexical_rank
+                  FROM bounded
+                 WHERE to_tsvector('simple', body) @@ lexical_query
+            )
+            SELECT source_ref, chunk_no, body,
+                   1.0 - LEAST(1.0, lexical_rank) AS distance,
+                   contract_id, contract_digest, ingestion_id, source_digest,
+                   COALESCE(content_type, ''), page_start, page_end,
+                   COALESCE(structural_locator, ''), parent_heading,
+                   COALESCE(section_path, '[]'::jsonb),
+                   COALESCE(quality_flags, '[]'::jsonb)
+              FROM ranked
+             ORDER BY lexical_rank DESC, source_ref ASC, source_digest ASC, chunk_no ASC
+             LIMIT %s
+            """,
+            (source_refs, source_digests, query, contract.dossier, top_k),
         )
         return [
             RetrievedChunk(
@@ -129,10 +223,10 @@ def reciprocal_rank_fusion(
 
     semantic = semantic[:candidate_k]
     lexical = lexical[:candidate_k]
-    by_key: dict[tuple[str, int], dict] = {}
+    by_key: dict[tuple[str, str, int], dict] = {}
 
     for rank, chunk in enumerate(semantic, start=1):
-        key = (chunk.source_ref, chunk.chunk_no)
+        key = (chunk.source_ref, chunk.source_digest, chunk.chunk_no)
         item = by_key.setdefault(
             key,
             {"chunk": chunk, "score": 0.0, "semantic_rank": None, "lexical_rank": None},
@@ -141,7 +235,7 @@ def reciprocal_rank_fusion(
         item["score"] += semantic_weight / (rrf_k + rank)
 
     for rank, chunk in enumerate(lexical, start=1):
-        key = (chunk.source_ref, chunk.chunk_no)
+        key = (chunk.source_ref, chunk.source_digest, chunk.chunk_no)
         item = by_key.setdefault(
             key,
             {"chunk": chunk, "score": 0.0, "semantic_rank": None, "lexical_rank": None},
@@ -164,6 +258,7 @@ def reciprocal_rank_fusion(
             hit.semantic_rank if hit.semantic_rank is not None else candidate_k + 1,
             hit.lexical_rank if hit.lexical_rank is not None else candidate_k + 1,
             hit.chunk.source_ref,
+            hit.chunk.source_digest,
             hit.chunk.chunk_no,
         )
     )
@@ -181,10 +276,49 @@ def retrieve_hybrid_scoped(
     semantic_weight: float = 1.0,
     lexical_weight: float = 1.0,
 ) -> list[HybridRetrievedChunk]:
-    """Run scoped semantic and lexical retrieval, then fuse transparently."""
+    """Run current-version scoped semantic and lexical retrieval, then fuse."""
     _validate_limits(top_k, candidate_k)
     semantic = retrieve_scoped(conn, contract, query, top_k=candidate_k)
     lexical = retrieve_lexical_scoped(conn, contract, query, top_k=candidate_k)
+    return reciprocal_rank_fusion(
+        semantic,
+        lexical,
+        top_k=top_k,
+        candidate_k=candidate_k,
+        rrf_k=rrf_k,
+        semantic_weight=semantic_weight,
+        lexical_weight=lexical_weight,
+    )
+
+
+def retrieve_hybrid_exact_scoped(
+    conn: psycopg.Connection,
+    contract: TaskContract,
+    query: str,
+    *,
+    sources: tuple[tuple[str, str], ...],
+    top_k: int = 4,
+    candidate_k: int = 12,
+    rrf_k: int = 60,
+    semantic_weight: float = 1.0,
+    lexical_weight: float = 1.0,
+) -> list[HybridRetrievedChunk]:
+    """Run semantic and lexical ranking only inside exact immutable identities."""
+    _validate_limits(top_k, candidate_k)
+    semantic = retrieve_exact_scoped(
+        conn,
+        contract,
+        query,
+        sources=sources,
+        top_k=candidate_k,
+    )
+    lexical = retrieve_lexical_exact_scoped(
+        conn,
+        contract,
+        query,
+        sources=sources,
+        top_k=candidate_k,
+    )
     return reciprocal_rank_fusion(
         semantic,
         lexical,

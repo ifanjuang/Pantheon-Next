@@ -141,8 +141,17 @@ def test_incremental_intake_preserves_other_documents_and_enriches_card(conn, tm
     ]
     with conn.cursor() as cur:
         cur.execute(
-            "SELECT source_ref, count(*) FROM chunks WHERE dossier = %s "
-            "GROUP BY source_ref ORDER BY source_ref",
+            """
+            SELECT c.source_ref, count(*)
+              FROM chunks c
+              JOIN source_documents d
+                ON d.dossier = c.dossier
+               AND d.source_ref = c.source_ref
+               AND d.source_digest = c.source_digest
+             WHERE c.dossier = %s
+             GROUP BY c.source_ref
+             ORDER BY c.source_ref
+            """,
             (dossier,),
         )
         assert cur.fetchall() == [(cctp, 1), (courrier, 1)]

@@ -145,9 +145,9 @@ def test_lexical_and_hybrid_paths_reject_planted_scope_markers(
     with conn.cursor() as cur:
         cur.execute(
             """
-            INSERT INTO chunks (dossier, source_ref, chunk_no, body, embedding)
-            VALUES (%s, %s, 910, %s, %s::vector)
-            ON CONFLICT (dossier, source_ref, chunk_no) DO UPDATE SET
+            INSERT INTO chunks (dossier, source_ref, source_digest, chunk_no, body, embedding)
+            VALUES (%s, %s, '', 910, %s, %s::vector)
+            ON CONFLICT (dossier, source_ref, source_digest, chunk_no) DO UPDATE SET
                 body = EXCLUDED.body,
                 embedding = EXCLUDED.embedding
             """,
@@ -160,9 +160,9 @@ def test_lexical_and_hybrid_paths_reject_planted_scope_markers(
         )
         cur.execute(
             """
-            INSERT INTO chunks (dossier, source_ref, chunk_no, body, embedding)
-            VALUES (%s, %s, 911, %s, %s::vector)
-            ON CONFLICT (dossier, source_ref, chunk_no) DO UPDATE SET
+            INSERT INTO chunks (dossier, source_ref, source_digest, chunk_no, body, embedding)
+            VALUES (%s, %s, '', 911, %s, %s::vector)
+            ON CONFLICT (dossier, source_ref, source_digest, chunk_no) DO UPDATE SET
                 body = EXCLUDED.body,
                 embedding = EXCLUDED.embedding
             """,
