@@ -28,7 +28,7 @@ Source classes:
 | Source | Authority for Pantheon | Use here |
 |---|---|---|
 | Official Hermes installation documentation | external reference | Confirms setup surfaces, installer posture, Tool Gateway, `hermes setup --portal`, `hermes doctor`, update/config commands and profile-local memory status. |
-| Official Hermes release source | external reference | Latest reviewed release is v0.20.0 (2026.8.3, "The Herald Release"). The stable bounded surface review is `HERMES_RUNTIME_SURFACE_REVIEW.md`; historical 0.19 mapping remains in `HERMES_INTEGRATION.md`. |
+| Official Hermes release source | external reference | The current reviewed release identity and release-specific qualification facts are owned by `HERMES_RUNTIME_SURFACE_REVIEW.md`. |
 | Community beginner setup guide | external reference / field report | Identifies user pitfalls, first-run mental model, and runtime-status signals worth exposing. |
 
 No external source governs Pantheon. External references may inform adapter placement, evidence expectations, card fields, gates and risk warnings only.
@@ -364,7 +364,7 @@ Current decision:
 
 ```text
 review_result: candidate / to_verify
-latest_reviewed_runtime: 0.20.0
+release_review_owner: HERMES_RUNTIME_SURFACE_REVIEW.md
 runtime_impact: none
 protected_paths_touched: no
 schema_test_ci_impact: documentation and existing ecosystem tests only
