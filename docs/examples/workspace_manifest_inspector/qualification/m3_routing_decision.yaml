@@ -1,7 +1,7 @@
 decision_status: repository_qualification
 issue: 859
 tranche: M3
-baseline: cf2083450c86fd3c9db4821d8fa40ed2d757f3ed
+baseline: 54043409746ba7dc28185c2f0e5c21795ad5e950
 classification: routing_converged_without_production_sidecar_schema_change
 
 observed:
