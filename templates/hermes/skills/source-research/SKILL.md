@@ -83,11 +83,13 @@ A task may combine these modes without creating separate skills:
 
 Use only capabilities allowed by the Task Contract.
 
-Before an external retrieval query, minimize unnecessary private, local or dossier-specific detail. Prefer an abstracted or sanitized query when it can answer the same research need. Do not transmit names, identifiers, secrets, document text or project-specific detail merely because they are present in local context. When exact private detail is materially necessary, it must be within the authorized task/context scope and the resulting exposure remains a research limitation to disclose when relevant.
+Before an external retrieval query, minimize unnecessary private, local or dossier-specific detail. Prefer an abstracted or sanitized query when it can answer the same research need. Do not transmit names, identifiers, document text or project-specific detail merely because they are present in local context. Secrets must never be sent to an external retrieval surface. Any remaining exact private detail requires explicit authorization for transmission of that data to that external destination; task/context access alone does not authorize disclosure. If such transmission is authorized and materially necessary, expose the resulting data-exposure limitation when relevant.
 
 ```text
 local context available != external disclosure required
+task/context access != external transmission authorization
 query usefulness != authorization to disclose private detail
+secrets != externally transmissible research context
 ```
 
 When an authorized workspace source notebook is available, use it as a bounded
