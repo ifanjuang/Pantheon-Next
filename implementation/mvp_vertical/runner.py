@@ -24,10 +24,12 @@ import datetime as _dt
 import hashlib
 import json
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass
 
 import yaml
 
+from . import human_access, retrieval_scope
 from .contract import TaskContract, _schema
 from .drafting import (
     Drafter,
@@ -254,6 +256,47 @@ def _bind_evidence_refs(claim_review: dict, chunks: list[RetrievedChunk]) -> lis
     return bindings
 
 
+def _preflight_refusal(contract: TaskContract, question: str) -> RunOutput | None:
+    lowered = question.lower()
+    if "external_send" in contract.forbidden and any(
+        term in lowered for term in SEND_INTENT_TERMS
+    ):
+        return _refusal(
+            contract,
+            question,
+            "forbidden_scope",
+            "external_send is forbidden by the contract; transmission is a human decision",
+        )
+    return None
+
+
+def _scope_resolution_projection(
+    resolution: retrieval_scope.RetrievalScopeResolution,
+) -> dict:
+    """Project resolved applicability as provenance, never as approval."""
+    return {
+        "project_id": resolution.project_id,
+        "resolution_status": "resolved_for_retrieval",
+        "sources": [
+            {
+                "document_id": source.document_id,
+                "purpose": source.purpose,
+                "document_version_id": source.document_version_id,
+                "source_ref": source.source_ref,
+                "source_digest": source.source_digest,
+                "source_version": source.source_version,
+                "basis_refs": list(source.basis_refs),
+            }
+            for source in resolution.sources
+        ],
+        "authority": {
+            "decides_professional_approval": False,
+            "admits_evidence": False,
+            "widens_task_contract": False,
+        },
+    }
+
+
 def run(
     conn,
     contract: TaskContract,
@@ -266,24 +309,110 @@ def run(
     return output
 
 
+def run_accessible_applicable(
+    conn,
+    principal: human_access.PrincipalContext,
+    contract: TaskContract,
+    question: str,
+    *,
+    project_id: str,
+    requested_documents: Iterable[tuple[str, str]],
+    drafter: Drafter | None = None,
+) -> RunOutput:
+    """Run the same candidate path after access + professional currentness.
+
+    This entry point is the project-aware composition for #827-style review. It
+    delegates access and applicability to their existing owners, then delegates
+    ranking to the existing exact hybrid retrieval path. A resolved source is
+    recorded as provenance only: resolved for retrieval does not mean approved,
+    admitted as Evidence, or professionally validated.
+    """
+    preflight = _preflight_refusal(contract, question)
+    if preflight is not None:
+        output = preflight
+    else:
+        try:
+            resolution, hits = retrieval_scope.retrieve_accessible_applicable_hybrid(
+                conn,
+                principal,
+                contract=contract,
+                project_id=project_id,
+                requested_documents=requested_documents,
+                query=question,
+                top_k=HYBRID_TOP_K,
+                candidate_k=HYBRID_CANDIDATE_K,
+                rrf_k=HYBRID_RRF_K,
+            )
+        except retrieval_scope.RetrievalScopeUndeclared:
+            output = _refusal(
+                contract,
+                question,
+                "outside_perimeter",
+                "the resolved applicable source is outside the Task Contract declared perimeter; "
+                "widening the perimeter is a contract revision, not a runner decision",
+            )
+        except retrieval_scope.RetrievalScopeUnresolved:
+            output = _refusal(
+                contract,
+                question,
+                "applicability_unresolved",
+                "no applicable document revision is resolved for the requested purpose",
+            )
+        except retrieval_scope.RetrievalScopeConflicting:
+            output = _refusal(
+                contract,
+                question,
+                "applicability_conflicting",
+                "applicable document revision is conflicting for the requested purpose",
+            )
+        except retrieval_scope.RetrievalScopeDenied:
+            output = _refusal(
+                contract,
+                question,
+                "forbidden_scope",
+                "the requested project/document retrieval scope is not accessible",
+            )
+        except retrieval_scope.RetrievalScopeError:
+            output = _refusal(
+                contract,
+                question,
+                "retrieval_scope_unavailable",
+                "the project/document retrieval scope could not be resolved safely",
+            )
+        else:
+            output = _run_with_hits(
+                contract,
+                question,
+                drafter or DeterministicDrafter(),
+                hits,
+                scope_resolution=resolution,
+            )
+
+    _assert_no_external_authorization(output.documents)
+    _assert_conforms_to_schema(output.documents)
+    return output
+
+
 def _run(
     conn,
     contract: TaskContract,
     question: str,
     drafter: Drafter,
 ) -> RunOutput:
-    lowered = question.lower()
-    if "external_send" in contract.forbidden and any(
-        term in lowered for term in SEND_INTENT_TERMS
-    ):
-        return _refusal(
-            contract,
-            question,
-            "forbidden_scope",
-            "external_send is forbidden by the contract; transmission is a human decision",
-        )
+    preflight = _preflight_refusal(contract, question)
+    if preflight is not None:
+        return preflight
+    return _run_with_hits(contract, question, drafter, _retrieve_hits(conn, contract, question))
 
-    hits = _retrieve_hits(conn, contract, question)
+
+def _run_with_hits(
+    contract: TaskContract,
+    question: str,
+    drafter: Drafter,
+    hits: list[HybridRetrievedChunk],
+    *,
+    scope_resolution: retrieval_scope.RetrievalScopeResolution | None = None,
+) -> RunOutput:
     useful_hits = [hit for hit in hits if _is_useful(hit)]
     useful = [hit.chunk for hit in useful_hits]
     if not useful:
@@ -392,4 +521,9 @@ def _run(
             "docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md",
         ],
     }
+    if scope_resolution is not None:
+        evidence_pack["source_scope_resolution"] = _scope_resolution_projection(scope_resolution)
+        evidence_pack["limitations"].append(
+            "la résolution de currentness borne la révision interrogée ; elle ne vaut ni approbation professionnelle ni admission comme Evidence"
+        )
     return RunOutput(kind="candidates", documents=[result_candidate, evidence_pack])
