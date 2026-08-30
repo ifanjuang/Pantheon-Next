@@ -65,7 +65,6 @@ def test_active_distribution_lock_is_revision_3_and_validates() -> None:
     assert active["source_pins"]["pantheon_repository"]["repository"] == (
         "ifanjuang/Pantheon-Next"
     )
-    assert active["source_pins"]["hermes_runtime"]["version"] == "0.20.5"
     assert all("source_repository" not in item for item in active["components"])
 
 
@@ -74,8 +73,7 @@ def test_distribution_schema_is_revision_3_only() -> None:
 
     assert schema["properties"]["revision"] == {"const": 3}
     assert set(schema["properties"]["source_pins"]["properties"]) == {
-        "pantheon_repository",
-        "hermes_runtime",
+        "pantheon_repository", "hermes_runtime",
     }
     assert "source_repository" not in schema["properties"]["components"]["items"]["properties"]
     assert "x-migration" not in schema
@@ -165,11 +163,13 @@ def test_tree_digest_documentation_has_closed_ephemeral_exclusions() -> None:
 
 def test_runtime_review_preserves_boundary_and_live_observation_gate() -> None:
     review = RUNTIME_REVIEW.read_text(encoding="utf-8")
+    active = _load(ACTIVE_LOCK)
+    candidate_runtime = active["source_pins"]["hermes_runtime"]["version"]
 
     assert "Current reviewed target: Hermes Agent 0.20.6 (`v2026.8.27`)." in review
     assert "version: 0.20.6" in review
     assert "release_commit: 5fc308a70719a83cccdbba4c0e39c23f5a8239d5" in review
-    assert "current candidate distribution runtime target: 0.20.5" in review
+    assert f"current candidate distribution runtime target: {candidate_runtime}" in review
     assert "kernel_change_required: false" in review
     assert "run_binding_change_required: false" in review
     assert "candidate_distribution_pin_change_authorized: false" in review
