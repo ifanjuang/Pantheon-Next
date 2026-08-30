@@ -14,6 +14,11 @@ OBSIDIAN = ROOT / "docs" / "governance" / "OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md
 AUTHORITY = ROOT / "docs" / "governance" / "authority" / "ARCHITECTURE_AUTHORITY_INDEX.md"
 REPOSITORY_INSTRUCTIONS = ROOT / "CLAUDE.md"
 GRAPH_HEALTH_FIXTURE = ROOT / "tests" / "fixtures" / "obsidian_graph_health_pilot.json"
+PIN_REGISTRY = ROOT / "implementation" / "qualification" / "external-pins.json"
+
+
+def _numeric_version(value: str) -> tuple[int, ...]:
+    return tuple(int(part) for part in value.removeprefix("v").split("."))
 
 
 def test_workspace_organization_profile_remains_optional() -> None:
@@ -109,6 +114,8 @@ def test_obsidian_distillation_reuses_existing_owners_and_keeps_maintenance_repo
 def test_obsidian_graph_health_qualification_is_advisory_and_bounded() -> None:
     obsidian = OBSIDIAN.read_text(encoding="utf-8")
     fixture = json.loads(GRAPH_HEALTH_FIXTURE.read_text(encoding="utf-8"))
+    registry = json.loads(PIN_REGISTRY.read_text(encoding="utf-8"))
+    pin = registry["pins"]["obsidian-wiki"]
 
     for invariant in (
         "upstream graph query != replacement for bounded Hindsight retrieval",
@@ -128,9 +135,9 @@ def test_obsidian_graph_health_qualification_is_advisory_and_bounded() -> None:
     ]
 
     reference = fixture["reference_candidate"]
-    assert reference["repository"] == "Ar9av/obsidian-wiki"
-    assert reference["reviewed_release"] == "v2026.08.6"
-    assert reference["reviewed_release_sha"] == "8b5859d0f895e51e785d3ba22ed8008297e8d367"
+    assert reference["repository"] == pin["repository"]
+    assert _numeric_version(reference["reviewed_release"]) == _numeric_version(pin["version"])
+    assert reference["reviewed_release_sha"] == pin["ref"]
     assert reference["current_main_observation"]["sha"] == "37596cffeef43faecd9b61246b0b119b11a87bc4"
     assert reference["current_main_observation"]["multilingual_graph_query_fix"] == "427a9016b6aea04625133bd1a4ee00238c8c8518"
     assert "memory server" in reference["excluded_surfaces"]

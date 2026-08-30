@@ -54,6 +54,13 @@
       "repository": "obsidianmd/obsidian-releases",
       "version": "1.13.7"
     },
+    "obsidian-wiki": {
+      "kind": "git",
+      "env_prefix": "OBSIDIAN_WIKI",
+      "repository": "Ar9av/obsidian-wiki",
+      "version": "2026.8.6",
+      "ref": "8b5859d0f895e51e785d3ba22ed8008297e8d367"
+    },
     "couchdb": {
       "kind": "container",
       "env_prefix": "COUCHDB",
