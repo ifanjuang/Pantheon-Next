@@ -25,6 +25,14 @@ What have we actually extracted, where does it belong, and what remains forbidde
 
 It prevents vague inspiration from turning into architecture by implication.
 
+The registry is transitional. Once a pattern is explicitly adopted by its real destination owner, rejected, superseded or no longer materially distinct, remove it from the current registry rather than preserving a duplicate rule here. Git history, issues, reference reviews and `ai_logs` retain provenance when needed.
+
+```text
+pattern learned != permanent registry entry
+pattern adopted by owner -> remove duplicate registry entry
+historical provenance != current authority
+```
+
 ## Registry record format
 
 Recommended fields:
@@ -100,9 +108,6 @@ runtime support != governance requirement
 | Private-query minimization | Scoville Research | external retrieval queries should disclose no more private/local/dossier detail than necessary; abstract or sanitize the query when the same research need can be met with less exposure | `EXTERNAL_TOOLS_POLICY.md`, `templates/hermes/skills/source-research/SKILL.md` | active_governance_pattern |
 | Memory candidate discipline | shared memory and persistent agent systems | every durable memory-like claim requires claim, scope, evidence, risk and approval | `MEMORY.md`, `SCOPE_ISOLATION.md` | active_governance_pattern |
 | Context pack as adapter-safe bundle | assistant instruction ecosystems | bounded task context can travel, but does not become doctrine or memory | `CONTEXT_PACKS.md` | active_governance_pattern |
-| Bounded handoff with current-state revalidation | Scoville Handoff, planning-with-files | hand off objective, exact observed state, checks/evidence, blockers, hazards, unresolved decisions and next safe action; on resume re-read current authority/current state before trusting the handoff | `WORK_ISSUE_AND_DELEGATED_MERGE_MODEL.md`, `CONTEXT_PACKS.md` | candidate |
-| Working-plan persistence demotion | Scoville Plan, planning-with-files | a durable plan/findings/progress file may help resume work but remains working state; it does not become governed project identity, current truth, Evidence or authorization | `WORK_ISSUE_AND_DELEGATED_MERGE_MODEL.md`, `REJECTED_PATTERNS.md` | active_support_pattern |
-| External second opinion as dissent signal | `ask-claude-for-codex`, `ask-claude-and-sol-for-codex` | a fresh external model opinion may expose blind spots or dissent, but agreement between models is not independent evidentiary corroboration and cannot authorize a decision | `GOVERNANCE_COLLEGE.md`, `EVIDENCE_PACK.md`, `REJECTED_PATTERNS.md` | candidate |
 | Anti-collusion role separation | multi-agent frameworks as counter-models | roles must preserve distinct review pressures, not simulate a hidden agent team | `GOVERNANCE_COLLEGE.md` | active_governance_pattern |
 | User Decision Gate | professional workflow risk patterns | unresolved high-impact tension must be exposed to the human | `USER_DECISION_GATE.md` | active_governance_pattern |
 | Context Sufficiency Gate | contextschema-py | retrieved context should be checked for required fields, source, freshness and invalidation before action | `TASK_CONTRACTS.md`, `EVIDENCE_PACK.md`, `KNOWLEDGE_TAXONOMY.md` | candidate |
@@ -112,43 +117,6 @@ runtime support != governance requirement
 | Memory Curation Report | agent_memory_curator_agent | memory proposals should report accepted, proposed, rejected, redacted, conflict and deprecation status | `MEMORY.md`, `EVIDENCE_PACK.md`, `SCOPE_ISOLATION.md` | candidate |
 | Skill Manager Demotion | skillsgate | skill inventory and compatibility UX may inform governed projection but not installation authority | `WATCHLIST.md`, `REJECTED_PATTERNS.md`, `REFERENCE_BOUNDARIES.md` | governed_projection_candidate |
 | Profile identity layer | SOUL.md, Hermes Personality & SOUL.md | stabilize Hermes execution posture without granting governance authority | `HERMES_INTEGRATION.md`, `reference_reviews/SOUL_MD_HERMES_PROFILE.md`, future `hermes/profiles` writing guidance | hermes_candidate_constraint |
-
-## Candidate future pattern cards
-
-The following patterns deserve future cards or checklists, but they are not implementation plans:
-
-```text
-Governance Doctor Pattern
-Retrieval Evaluation Pattern
-Observability-to-Evidence Summary Pattern
-GraphRAG Source Graph Pattern
-Contradiction Ledger Pattern
-Capability Evaluation Pattern
-Professional Dossier Preflight Pattern
-Governed User Decision Projection Pattern
-Hermes Capability Gap Pattern
-Context Sufficiency Gate
-Chunking Fitness Evaluation
-Long Document Evidence Locality Pattern
-Unanswerable Question Testing
-Pre-Execution Simulation Pattern
-Trajectory Evaluation Pattern
-Improvement Candidate Pattern
-Profile Identity Layer Checklist
-```
-
-Each future card must define:
-
-```text
-FOR
-NOT FOR
-required evidence
-approval implication
-memory implication
-runtime boundary
-failure modes
-related documents
-```
 
 ## Distillation rules
 
@@ -160,7 +128,8 @@ A distilled pattern must:
 - preserve forbidden imports;
 - avoid vendor or framework lock-in;
 - stay compatible with Task Contracts, Evidence Packs, approvals and memory policy;
-- preserve the separation between runtime interaction, external execution, governed projection and Pantheon authority.
+- preserve the separation between runtime interaction, external execution, governed projection and Pantheon authority;
+- leave this registry when the destination owner has absorbed the rule and no distinct cross-cutting review purpose remains.
 
 ## What does not count as distillation
 
@@ -225,6 +194,6 @@ If a registry entry is treated as permission to implement runtime behavior, the 
 ## Final rule
 
 ```text
-Distillation records what Pantheon learned.
-It does not grant Pantheon new runtime power.
+Distillation records what Pantheon is still evaluating or transferring into its owners.
+Adopted rules live with their owners, not here.
 ```
