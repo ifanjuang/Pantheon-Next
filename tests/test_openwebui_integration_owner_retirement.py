@@ -113,6 +113,8 @@ def test_core_review_and_public_surfaces_are_client_agnostic():
         GOV / "TASK_CONTRACTS.md",
         GOV / "GOVERNANCE_COLLEGE.md",
         ROOT / "docs" / "intro-professionnelle.md",
+        ROOT / "docs" / "index.html",
+        ROOT / "docs" / "index-en.html",
     )
     for path in paths:
         text = _read(path)
@@ -138,6 +140,25 @@ def test_core_review_and_public_surfaces_are_client_agnostic():
     assert "projection != persistence" in evidence
     assert "Hermes WebUI optionnelle / clients compatibles = interaction runtime possible." in intro
     assert "Pantheon Cockpit                               = projections gouvernées." in intro
+
+
+def test_public_entrypoints_match_current_monorepo_and_transport_posture():
+    landing_fr = _read(ROOT / "docs" / "index.html")
+    landing_en = _read(ROOT / "docs" / "index-en.html")
+    implementation = _read(ROOT / "implementation" / "README.md")
+    mcp_readme = _read(ROOT / "mcp-server" / "README.md")
+
+    assert "Ils vivent dans un dépôt séparé" not in landing_fr
+    assert "They live in a separate repository" not in landing_en
+    assert "implementation/" in landing_fr
+    assert "implementation/" in landing_en
+
+    assert "| `paperless` |" not in implementation
+
+    assert "A future HTTP projection may reuse it" not in mcp_readme
+    assert "No HTTP API" not in mcp_readme
+    assert "pantheon-policy-api" in mcp_readme
+    assert "`implementation/` is a separate Python project" in mcp_readme
 
 
 def test_governance_ci_no_longer_requires_removed_owner():
