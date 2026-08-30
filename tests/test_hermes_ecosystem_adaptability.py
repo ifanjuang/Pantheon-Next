@@ -20,7 +20,7 @@ def _text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def test_governed_hermes_profile_excludes_all_runtime_memory_inputs() -> None:
+def test_runtime_review_keeps_governed_profile_and_release_sensitive_constraints() -> None:
     review = _text(RUNTIME_REVIEW)
 
     assert "profile: pantheon-governed" in review
@@ -29,17 +29,14 @@ def test_governed_hermes_profile_excludes_all_runtime_memory_inputs() -> None:
     assert "built_in_user_profile_injection: off" in review
     assert "memory_tool: off" in review
     assert "session_memory_key: forbidden" in review
-    assert "automatic_runtime_recall: forbidden" in review
-    assert "automatic_runtime_memory_write: forbidden" in review
-    assert "OpenWebUI_memory_injection: forbidden" in review
-    assert "OpenWebUI_automatic_RAG: forbidden" in review
-    assert "profile: assistant-personal" in review
-    assert "external_memory_provider: optional_one_only" in review
-    assert "observer_contract_change_required: true" in review
-    assert "hermes memory off != built-in memory injection off" in review
-    assert "memory tool absent != memory injection disabled" in review
-    assert "provider selected != memory admitted" in review
-    assert "memory recalled != truth" in review
+    assert "real_browser_profile: disabled unless separately qualified" in review
+    assert "browser_extension_control: disabled unless separately qualified" in review
+    assert "remote_admin_update_surface: outside governed task path" in review
+    assert "terminal_environment_backend: exact observed backend required" in review
+    assert "existing runtime observer already records route/tool/memory posture" in review
+    assert "profile: assistant-personal" not in review
+    assert "OpenWebUI_memory_injection" not in review
+    assert "OpenWebUI_automatic_RAG" not in review
 
 
 def test_functional_profiles_inherit_one_governed_runtime_mode() -> None:
@@ -145,9 +142,12 @@ def test_langfuse_runbook_requires_live_path_evidence_and_no_deleted_review() ->
 def test_runtime_review_does_not_change_distribution_or_authority() -> None:
     review = _text(RUNTIME_REVIEW)
 
-    assert "standard_distribution_components_change_required: false" in review
+    assert "current candidate distribution runtime target: 0.20.5" in review
+    assert "candidate_distribution_pin_change_authorized: false" in review
+    assert "new_runtime_owner_required: false" in review
+    assert "new_client_owner_required: false" in review
     assert "installation_effect: none" in review
     assert "activation_effect: none" in review
     assert "task_authorization_effect: none" in review
-    assert "trace recorded != Evidence" in review
-    assert "runtime success != Evidence" in review
+    assert "release reviewed != distribution pin changed" in review
+    assert "runtime approval endpoint != Pantheon approval" in review
