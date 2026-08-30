@@ -83,6 +83,15 @@ A task may combine these modes without creating separate skills:
 
 Use only capabilities allowed by the Task Contract.
 
+Before an external retrieval query, minimize unnecessary private, local or dossier-specific detail. Prefer an abstracted or sanitized query when it can answer the same research need. Do not transmit names, identifiers, document text or project-specific detail merely because they are present in local context. Secrets must never be sent to an external retrieval surface. Any remaining exact private detail requires explicit authorization for transmission of that data to that external destination; task/context access alone does not authorize disclosure. If such transmission is authorized and materially necessary, expose the resulting data-exposure limitation when relevant.
+
+```text
+local context available != external disclosure required
+task/context access != external transmission authorization
+query usefulness != authorization to disclose private detail
+secrets != externally transmissible research context
+```
+
 When an authorized workspace source notebook is available, use it as a bounded
 discovery aid for relevant routes. Never hard-code its filename or Obsidian path,
 infer authorization from its workspace location, or treat a listed domain as a
@@ -151,14 +160,25 @@ Assess only factors material to the question, such as:
 
 Do not force a generic framework when it does not improve the answer.
 
-### 6. Reconcile
+### 6. Challenge material claims
+
+For important or consequential claim candidates, do not search only for support. Run targeted challenge searches when useful for contrary evidence, later versions, failure reports, known exceptions, competing explanations or materially different applicable sources.
+
+Challenge effort should be proportional to consequence and uncertainty. It is not a requirement to manufacture artificial disagreement or to keep searching after the decision-relevant picture has stabilized.
+
+```text
+support found != challenge completed
+second source agrees != contradiction ruled out
+```
+
+### 7. Reconcile
 
 - distinguish real contradiction from differences of scope, date, definition or method;
 - preserve material minority/conflicting findings;
 - prefer stronger applicable evidence over majority vote;
 - state when available sources do not support a conclusion candidate.
 
-### 7. Synthesize
+### 8. Synthesize
 
 Distinguish:
 
@@ -172,7 +192,18 @@ uncertainty
 
 Retrieved statements do not become professional, legal, contractual or project truth.
 
-### 8. Validate
+### 9. Stop proportionally
+
+Stop bounded research when targeted gap and challenge searches no longer materially change the decision-relevant synthesis and the remaining uncertainty is explicit.
+
+A fixed source count, model confidence, citation count or elapsed effort alone does not establish sufficiency. A Task Contract limit may end further work earlier; if so, expose the resulting limitation rather than treating the stop as evidentiary completeness.
+
+```text
+research stopped != uncertainty resolved
+more searching possible != more searching decision-relevant
+```
+
+### 10. Validate
 
 Before return, verify that:
 
@@ -180,6 +211,8 @@ Before return, verify that:
 - citations point to the intended source/locator when available;
 - relevant dates and versions fit the question;
 - important contradictions and limitations are visible;
+- material claim candidates received proportionate challenge where useful;
+- remaining uncertainty is explicit at the stopping point;
 - scope has not silently widened;
 - no output has been promoted into Evidence, Decision, Knowledge or a Registre Probatoire entry.
 

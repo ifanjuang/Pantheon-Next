@@ -28,6 +28,15 @@ def test_source_research_is_single_surviving_research_skill_candidate():
     assert "Never hard-code its filename or Obsidian path" in text
     assert "`source_addition_candidate`" in text
 
+    assert "Before an external retrieval query, minimize unnecessary private" in text
+    assert "task/context access != external transmission authorization" in text
+    assert "Secrets must never be sent to an external retrieval surface" in text
+    assert "local context available != external disclosure required" in text
+    assert "### 6. Challenge material claims" in text
+    assert "support found != challenge completed" in text
+    assert "### 9. Stop proportionally" in text
+    assert "more searching possible != more searching decision-relevant" in text
+
     registry = REGISTRY.read_text(encoding="utf-8")
     skill_path = "templates/hermes/skills/source-research/SKILL.md"
     assert registry.count(skill_path) == 1
