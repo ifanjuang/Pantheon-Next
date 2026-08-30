@@ -1,0 +1,143 @@
+{
+  "pilot_id": "obsidian-graph-health-001",
+  "execution_status": "executed_partial_not_accepted",
+  "provider_acceptance": "not_accepted",
+  "provider": {
+    "repository": "Ar9av/obsidian-wiki",
+    "stable_release": "v2026.08.6",
+    "stable_release_sha": "8b5859d0f895e51e785d3ba22ed8008297e8d367",
+    "current_main_observed_sha": "37596cffeef43faecd9b61246b0b119b11a87bc4",
+    "source_blobs": {
+      "graph_analysis.py": "9e2ff9be961f4149aa09d490e10089fb1d700c69",
+      "lint.py": "09a2b8207e02296455fd4d9a9401e6aa1fbdd66d"
+    },
+    "current_main_uses_same_deterministic_blobs": true
+  },
+  "execution_scope": {
+    "included": [
+      "graph page selection",
+      "wikilink graph parsing",
+      "degree ranking",
+      "isolated-page detection",
+      "shortest-path calculation",
+      "lint wikilink parsing",
+      "broken-link classification",
+      "orphan classification",
+      "read-only mutation check"
+    ],
+    "not_executed": [
+      "memory server",
+      "capture hooks",
+      "provider trust ledger",
+      "provider lifecycle",
+      "provider manifest semantics",
+      "semantic LLM duplicate detection",
+      "semantic LLM contradiction detection"
+    ],
+    "method": "The exact relevant deterministic function logic from the pinned graph_analysis.py and lint.py blobs was executed in a disposable local harness against a materialized form of the Pantheon corpus. Network access was unavailable in the execution sandbox, so the upstream package was not installed as a wheel and excluded server/trust surfaces were not started. Results are therefore qualification evidence for the named deterministic source surfaces, not for the whole provider package."
+  },
+  "raw_observations": {
+    "graph_nodes_full_vault": [
+      "cctp",
+      "chauffage",
+      "chauffage-notes",
+      "decisions",
+      "liens-valides",
+      "programme",
+      "question-ouverte",
+      "sentinel-hors-perimetre"
+    ],
+    "god_nodes": [
+      {"page": "cctp", "degree": 5, "in_degree": 5, "out_degree": 0},
+      {"page": "chauffage", "degree": 5, "in_degree": 4, "out_degree": 1},
+      {"page": "liens-valides", "degree": 4, "in_degree": 0, "out_degree": 4},
+      {"page": "decisions", "degree": 3, "in_degree": 1, "out_degree": 2},
+      {"page": "programme", "degree": 3, "in_degree": 1, "out_degree": 2},
+      {"page": "sentinel-hors-perimetre", "degree": 1, "in_degree": 0, "out_degree": 1},
+      {"page": "chauffage-notes", "degree": 1, "in_degree": 0, "out_degree": 1},
+      {"page": "question-ouverte", "degree": 0, "in_degree": 0, "out_degree": 0}
+    ],
+    "isolated": ["question-ouverte"],
+    "shortest_programme_cctp": ["programme", "chauffage", "cctp"],
+    "broken_links": [
+      {"page": "projects/maison/liens-valides.md", "target": "plan.pdf"},
+      {"page": "projects/maison/liens-valides.md", "target": "perspective.png"},
+      {"page": "projects/maison/liens-valides.md", "target": "planning.base"},
+      {"page": "projects/maison/liens-valides.md", "target": "schema.canvas"},
+      {"page": "projects/maison/liens-valides.md", "target": "cctp.md"},
+      {"page": "projects/maison/liens-valides.md", "target": "chauffage\\"},
+      {"page": "projects/maison/cctp.md", "target": "details-menuiseries"}
+    ],
+    "orphan_pages": ["projects/maison/question-ouverte.md"],
+    "write_check": {
+      "changed": false,
+      "added_removed_or_modified": []
+    }
+  },
+  "case_results": {
+    "bookkeeping_not_hub": {"status": "pass"},
+    "raw_staging_excluded": {"status": "pass"},
+    "bounded_shortest_path": {"status": "pass"},
+    "isolated_question": {"status": "pass"},
+    "broken_menuiseries_link": {"status": "pass"},
+    "valid_obsidian_links_not_broken": {
+      "status": "fail",
+      "false_positive_count": 6,
+      "false_positive_targets": [
+        "plan.pdf",
+        "perspective.png",
+        "planning.base",
+        "schema.canvas",
+        "cctp.md",
+        "chauffage\\"
+      ]
+    },
+    "heating_duplicate_candidate": {
+      "status": "not_demonstrated",
+      "reason": "No near-duplicate semantic detector is present in the deterministic graph_analysis.py/lint.py core exercised by this qualification."
+    },
+    "heating_contradiction_candidate": {
+      "status": "not_demonstrated",
+      "reason": "No semantic contradiction detector is present in the deterministic graph_analysis.py/lint.py core exercised by this qualification."
+    },
+    "bounded_scope": {
+      "status": "fail",
+      "native_scope_parameter": false,
+      "sentinel_in_full_vault_graph": true,
+      "reason": "The graph parser traverses all non-skipped Markdown pages under the supplied vault root; task-prefix scope must be enforced by the caller or an adapter."
+    },
+    "protected_material_no_mutation": {"status": "pass"}
+  },
+  "qualification_decision": {
+    "accepted_now": [
+      "root bookkeeping exclusion",
+      "_raw staging exclusion",
+      "basic wikilink structural parsing",
+      "shortest path",
+      "isolated-page observation",
+      "true broken-link detection as a signal",
+      "read-only execution of the tested surfaces"
+    ],
+    "not_accepted_now": [
+      "broken-link health as a reliable whole-vault check",
+      "native task/project scope enforcement",
+      "near-duplicate semantic qualification",
+      "contradiction semantic qualification",
+      "automatic repair",
+      "provider-wide adoption"
+    ],
+    "blocking_observations": [
+      "six valid Obsidian link forms were reported as broken",
+      "the out-of-scope sentinel entered the full-vault graph because no native task-prefix scope parameter exists"
+    ],
+    "next_action": "Keep obsidian-wiki as a replaceable partial capability reference. Re-test after upstream link-resolution and scope-boundary behavior changes; do not bind or enable automatic writes from this result."
+  },
+  "invariants": [
+    "observed result != provider-wide truth",
+    "partial capability pass != provider adoption",
+    "read-only success != authorization",
+    "graph relation != Evidence",
+    "health finding != defect confirmed",
+    "provider output != governed Knowledge"
+  ]
+}

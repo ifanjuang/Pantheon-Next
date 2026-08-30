@@ -104,20 +104,100 @@ valid link != safe automatic rewrite target
 
 No provider binding, runtime activation, automatic maintenance path or professional authority changes through this qualification.
 
+## Executed qualification after #854
+
+#854 merged on Pantheon `main` as `c351b12f2b6167865d62b5a008c7e670f79bd0da`. The prepared corpus was then executed against the deterministic graph/link-health surfaces pinned by the qualification.
+
+Upstream pins inspected immediately before execution:
+
+- stable baseline: `Ar9av/obsidian-wiki` `v2026.08.6`, commit `8b5859d0f895e51e785d3ba22ed8008297e8d367`;
+- current upstream `main`: `37596cffeef43faecd9b61246b0b119b11a87bc4`;
+- `graph_analysis.py` blob on both stable and current main: `9e2ff9be961f4149aa09d490e10089fb1d700c69`;
+- `lint.py` blob on both stable and current main: `09a2b8207e02296455fd4d9a9401e6aa1fbdd66d`.
+
+The current-main multilingual graph-query fix therefore does not alter the deterministic graph parser or lint resolver exercised here.
+
+The execution sandbox had no outbound DNS access, so the upstream wheel was not installed from the network. Instead, the exact relevant deterministic function logic from the pinned source blobs was exercised in a disposable local harness. No memory server, capture hook, trust ledger, lifecycle, manifest or write path was started. This is qualification evidence for the named source surfaces only, not for the whole provider package.
+
+Observed result:
+
+```text
+PASS
+- root bookkeeping index exclusion
+- _raw staging exclusion
+- programme -> chauffage -> cctp shortest path
+- isolated question detection
+- true missing details-menuiseries link detection
+- no mutation of the disposable workspace
+
+FAIL
+- valid Obsidian link precision: 6 false positives
+- bounded scope: out-of-scope sentinel entered the full-vault graph
+
+NOT DEMONSTRATED
+- near-duplicate semantic detection
+- semantic contradiction detection
+```
+
+The six valid-link false positives were:
+
+```text
+plan.pdf
+perspective.png
+planning.base
+schema.canvas
+cctp.md
+chauffage\
+```
+
+The scope failure is structural rather than semantic: the upstream graph parser walks all non-skipped Markdown below the supplied vault root and exposes no task/project prefix parameter. A caller or adapter can pass a narrower materialized root, but that is external scope enforcement and must not be misreported as provider-native scope safety.
+
+The duplicate and contradiction cases are marked `not_demonstrated`, not failed, because the deterministic `graph_analysis.py` / `lint.py` surfaces exercised here do not contain the corresponding semantic detectors. Missing implementation is not converted into an invented behavioral result.
+
+Qualification decision:
+
+```text
+partial capability observations accepted
+!= provider accepted
+
+obsidian-wiki provider-wide qualification = not accepted
+binding change = none
+automatic writes = not approved
+```
+
+Reusable observations remain valid for the tested blobs: bookkeeping and `_raw` exclusion, basic structural graph parsing, shortest paths, isolates and true broken-link signals. Whole-vault link health, native task/project scoping, semantic duplicate/contradiction quality and automatic repair remain unqualified or blocked.
+
+The raw observed result is retained separately in `tests/fixtures/obsidian_graph_health_observed_v2026.08.6.json`; the original prepared fixture remains unchanged as `prepared_not_executed`, preserving expectation versus observation.
+
+```text
+observed result != provider-wide truth
+partial capability pass != provider adoption
+read-only success != authorization
+graph relation != Evidence
+health finding != defect confirmed
+provider output != governed Knowledge
+```
+
 ## Changed paths
 
-Final #854 reconstruction changes only:
+The #854 reconstruction changed:
 
 - `tests/fixtures/obsidian_graph_health_pilot.json`;
 - `tests/test_workspace_organization_routing.py`;
+- this existing intervention log.
+
+The executed-qualification follow-up adds:
+
+- `tests/fixtures/obsidian_graph_health_observed_v2026.08.6.json`;
+- `tests/test_obsidian_graph_health_observed.py`;
 - this existing intervention log.
 
 No new doctrine owner or generated index entry is required.
 
 ## Verification target
 
-Reconstruct #854 as one commit above exact current `main`, run the focused workspace-organization regression and normal governance CI, and inspect exact-head mergeability/reviews before merge.
+Keep the observed result separate from the prepared expectations, pin the exact upstream source surfaces, run the focused observed-result regression and normal governance CI, and inspect exact-head mergeability before merge.
 
 ## Status
 
-Doctrine ownership is unchanged. The qualification surface is smaller and more discriminating; runtime status, authority ownership and external bindings remain unchanged.
+The qualification is executed for the named deterministic surfaces and is partial/not accepted provider-wide. Doctrine ownership, runtime status, professional authority and external bindings are unchanged. Re-test only after an upstream change relevant to link resolution, scope enforcement or the undemonstrated semantic capabilities.
