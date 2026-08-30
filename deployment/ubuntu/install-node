@@ -1,0 +1,532 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+TOOL_VERSION="0.1.0"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -f "$SCRIPT_DIR/release.env" ]]; then
+  # shellcheck disable=SC1091
+  source "$SCRIPT_DIR/release.env"
+fi
+TARGET_UBUNTU="${RELEASE_UBUNTU:-26.04}"
+PANTHEON_REPOSITORY="${PANTHEON_REPOSITORY:-}"
+HERMES_IMAGE="${RELEASE_HERMES_IMAGE:-nousresearch/hermes-agent:v2026.8.27}"
+HINDSIGHT_IMAGE="${RELEASE_HINDSIGHT_IMAGE:-ghcr.io/vectorize-io/hindsight:0.9.2}"
+COUCHDB_IMAGE="${RELEASE_COUCHDB_IMAGE:-couchdb:3.5.0}"
+OLLAMA_VERSION="${RELEASE_OLLAMA_VERSION:-0.33.2}"
+COMFYUI_REF="${RELEASE_COMFYUI_REF:-v0.34.0}"
+UV_VERSION="${RELEASE_UV_VERSION:-0.12.7}"
+COMFYUI_PYTHON="${RELEASE_COMFYUI_PYTHON:-3.13}"
+TORCH_VERSION="${RELEASE_TORCH_VERSION:-2.13.0}"
+TORCH_INDEX="${RELEASE_TORCH_INDEX:-https://download.pytorch.org/whl/cu132}"
+LIVESYNC_REPOSITORY="https://github.com/vrtmrz/obsidian-livesync.git"
+LIVESYNC_REF="${RELEASE_LIVESYNC_REF:-32e827692f1a552cd581de9da45cecd0711573d3}"
+LIVESYNC_IMAGE="${RELEASE_LIVESYNC_IMAGE:-pantheon-node/livesync-cli:1.0.18-cli}"
+
+STATE_ROOT="/srv/pantheon"
+AI_ROOT="/srv/ai"
+APP_ROOT="/opt/pantheon-node"
+CONFIG_ROOT="/etc/pantheon-node"
+PANTHEON_ROOT="/opt/pantheon"
+
+APPLY=1
+ASSUME_YES=0
+INSTALL_NVIDIA_DRIVER=1
+ENABLE_HINDSIGHT=0
+ENABLE_LIVESYNC=1
+NODE_BIND_ADDRESS="127.0.0.1"
+COMFYUI_BIND_ADDRESS="127.0.0.1"
+
+log() { printf '[pantheon-node] %s\n' "$*"; }
+warn() { printf '[pantheon-node] WARNING: %s\n' "$*" >&2; }
+die() { printf '[pantheon-node] ERROR: %s\n' "$*" >&2; exit 1; }
+have() { command -v "$1" >/dev/null 2>&1; }
+
+usage() {
+  cat <<'USAGE'
+Usage:
+  ./install-node --doctor
+  sudo ./install-node [--yes]
+
+Options:
+  --doctor                 Read-only preflight only.
+  --apply                  Apply installation (default; kept for explicit automation).
+  --yes                    Do not ask for final confirmation.
+  --bind ADDRESS           Bind Hermes/CouchDB to this host address (default 127.0.0.1).
+  --comfy-bind ADDRESS     Bind ComfyUI to this address (default 127.0.0.1).
+  --with-hindsight         Pull/prepare the Hindsight profile; do not start it automatically.
+  --without-livesync       Do not build/install the qualified LiveSync headless daemon.
+  --without-nvidia-driver  Do not attempt Ubuntu's NVIDIA driver installation when missing.
+  -h, --help               Show this help.
+
+The script installs technical components only. Installed != activated != task-authorized.
+USAGE
+}
+
+while (($#)); do
+  case "$1" in
+    --doctor) APPLY=0; ASSUME_YES=1 ;;
+    --apply) APPLY=1 ;;
+    --yes) ASSUME_YES=1 ;;
+    --bind) shift; NODE_BIND_ADDRESS="${1:?missing address}" ;;
+    --comfy-bind) shift; COMFYUI_BIND_ADDRESS="${1:?missing address}" ;;
+    --with-hindsight) ENABLE_HINDSIGHT=1 ;;
+    --without-livesync) ENABLE_LIVESYNC=0 ;;
+    --without-nvidia-driver) INSTALL_NVIDIA_DRIVER=0 ;;
+    -h|--help) usage; exit 0 ;;
+    *) die "unknown argument: $1" ;;
+  esac
+  shift
+done
+
+if [[ ${EUID:-$(id -u)} -eq 0 && -z ${SUDO_USER:-} ]]; then
+  OPERATOR_USER="root"
+else
+  OPERATOR_USER="${SUDO_USER:-${USER:-root}}"
+fi
+
+read_os() {
+  [[ -r /etc/os-release ]] || die "/etc/os-release is missing"
+  # shellcheck disable=SC1091
+  source /etc/os-release
+  [[ "${ID:-}" == "ubuntu" ]] || die "Ubuntu is required; detected ${ID:-unknown}"
+  OS_VERSION="${VERSION_ID:-unknown}"
+}
+
+resolve_pantheon_commit() {
+  local repo_root
+  repo_root="$(cd "$SCRIPT_DIR/../.." 2>/dev/null && pwd || true)"
+  if [[ -n "$repo_root" ]] && git -C "$repo_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    if [[ -z "$PANTHEON_REPOSITORY" ]]; then
+      PANTHEON_REPOSITORY="$(git -C "$repo_root" remote get-url origin 2>/dev/null || true)"
+    fi
+    RESOLVED_PANTHEON_COMMIT="${PANTHEON_COMMIT:-$(git -C "$repo_root" rev-parse HEAD)}"
+    return
+  fi
+  RESOLVED_PANTHEON_COMMIT="${PANTHEON_COMMIT:-}"
+}
+
+preflight() {
+  read_os
+  resolve_pantheon_commit
+  log "installer $TOOL_VERSION"
+  log "OS: Ubuntu $OS_VERSION (target $TARGET_UBUNTU LTS)"
+  [[ "$OS_VERSION" == "$TARGET_UBUNTU"* ]] || warn "this candidate is reviewed for Ubuntu $TARGET_UBUNTU; continuing requires operator review"
+
+  local arch mem_kb disk_kb
+  arch="$(uname -m)"
+  log "architecture: $arch"
+  [[ "$arch" == "x86_64" ]] || warn "the intended RTX/NVIDIA profile is x86_64; this host is $arch"
+
+  mem_kb="$(awk '/MemTotal/ {print $2}' /proc/meminfo 2>/dev/null || echo 0)"
+  disk_kb="$(df -Pk / | awk 'NR==2 {print $4}')"
+  log "RAM: $((mem_kb / 1024 / 1024)) GiB"
+  log "free root filesystem: $((disk_kb / 1024 / 1024)) GiB"
+  ((mem_kb >= 16 * 1024 * 1024)) || warn "less than 16 GiB RAM detected"
+  ((disk_kb >= 80 * 1024 * 1024)) || warn "less than 80 GiB free on root filesystem; models should live on a dedicated NVMe"
+
+  if have lspci && lspci | grep -qi nvidia; then
+    log "NVIDIA hardware detected"
+  else
+    warn "no NVIDIA PCI device detected"
+  fi
+
+  if have nvidia-smi; then
+    nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv,noheader || true
+  else
+    warn "nvidia-smi is not available"
+  fi
+
+  if have mokutil; then
+    mokutil --sb-state 2>/dev/null || true
+  fi
+
+  for port in 5984 8642 9119 8188 8888 9999; do
+    if have ss && ss -ltn "sport = :$port" | tail -n +2 | grep -q .; then
+      warn "TCP port $port is already listening"
+    fi
+  done
+
+  if [[ -n "$RESOLVED_PANTHEON_COMMIT" ]]; then
+    log "Pantheon checkout pin: $RESOLVED_PANTHEON_COMMIT"
+  else
+    warn "no Pantheon commit pin resolved; set PANTHEON_COMMIT=<full sha> before --apply"
+  fi
+
+  log "defaults: Hermes/CouchDB bind=$NODE_BIND_ADDRESS, ComfyUI bind=$COMFYUI_BIND_ADDRESS"
+  log "Hindsight=$ENABLE_HINDSIGHT; LiveSync headless=$ENABLE_LIVESYNC"
+}
+
+confirm_apply() {
+  ((APPLY == 1)) || return 1
+  [[ -n "$RESOLVED_PANTHEON_COMMIT" ]] || die "PANTHEON_COMMIT is required when install-node is not run from a Pantheon Git checkout"
+  [[ -n "$PANTHEON_REPOSITORY" ]] || die "PANTHEON_REPOSITORY is required when no Git remote can be resolved from the current checkout"
+  if ((ASSUME_YES == 1)); then return 0; fi
+  [[ -t 0 ]] || die "non-interactive install requires --yes"
+  printf '\nThis will modify packages, systemd, Docker, /opt, /srv and /etc. Continue? [y/N] '
+  read -r answer
+  [[ "$answer" =~ ^[Yy]$ ]] || exit 0
+}
+
+apt_base() {
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update
+  apt-get install -y --no-install-recommends \
+    ca-certificates curl gnupg git jq openssl rsync zstd unzip \
+    pciutils mokutil ubuntu-drivers-common python3 python3-venv
+}
+
+ensure_nvidia() {
+  if have nvidia-smi; then return 0; fi
+  ((INSTALL_NVIDIA_DRIVER == 1)) || { warn "NVIDIA driver installation skipped"; return 0; }
+  if ! lspci | grep -qi nvidia; then return 0; fi
+  log "installing Ubuntu-recommended NVIDIA driver"
+  ubuntu-drivers install
+  warn "NVIDIA driver changed. Reboot, then rerun install-node. GPU-dependent installation is deferred until nvidia-smi works."
+  touch "$CONFIG_ROOT/reboot-required"
+  exit 20
+}
+
+ensure_docker() {
+  if have docker && docker compose version >/dev/null 2>&1; then
+    log "Docker already available: $(docker --version)"
+    return
+  fi
+  install -m 0755 -d /etc/apt/keyrings
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+  chmod a+r /etc/apt/keyrings/docker.asc
+  # shellcheck disable=SC1091
+  source /etc/os-release
+  printf 'Types: deb\nURIs: https://download.docker.com/linux/ubuntu\nSuites: %s\nComponents: stable\nSigned-By: /etc/apt/keyrings/docker.asc\n' "$VERSION_CODENAME" \
+    > /etc/apt/sources.list.d/docker.sources
+  apt-get update
+  apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  systemctl enable --now docker
+}
+
+prepare_layout() {
+  install -d -m 0750 "$CONFIG_ROOT" "$APP_ROOT" "$PANTHEON_ROOT"
+  install -d -m 0755 "$STATE_ROOT" "$AI_ROOT"
+  install -d -m 0750 \
+    "$STATE_ROOT/hermes" "$STATE_ROOT/couchdb" "$STATE_ROOT/hindsight" \
+    "$STATE_ROOT/livesync/db" "$STATE_ROOT/obsidian" "$STATE_ROOT/backups" \
+    "$AI_ROOT/models" "$AI_ROOT/comfyui-output" "$AI_ROOT/cache"
+}
+
+prepare_service_permissions() {
+  # Official images/users write these bind mounts. Keep permissions narrow but usable.
+  chown -R 5984:5984 "$STATE_ROOT/couchdb" 2>/dev/null || warn "could not set CouchDB bind-mount ownership to uid 5984"
+  if ((ENABLE_HINDSIGHT == 1)); then
+    chown -R 1000:1000 "$STATE_ROOT/hindsight" 2>/dev/null || warn "could not set Hindsight bind-mount ownership to uid 1000"
+  fi
+}
+
+ensure_secrets() {
+  local secret_file="$CONFIG_ROOT/secrets.env"
+  if [[ ! -f "$secret_file" ]]; then
+    umask 077
+    cat > "$secret_file" <<EOF_SECRETS
+COUCHDB_USER=syncadmin
+COUCHDB_PASSWORD=$(openssl rand -hex 24)
+HERMES_API_SERVER_KEY=$(openssl rand -hex 32)
+HERMES_DASHBOARD_BASIC_AUTH_USERNAME=admin
+HERMES_DASHBOARD_BASIC_AUTH_PASSWORD=$(openssl rand -hex 24)
+HERMES_DASHBOARD_BASIC_AUTH_SECRET=$(openssl rand -hex 32)
+EOF_SECRETS
+    chmod 600 "$secret_file"
+  fi
+}
+
+write_node_config() {
+  cat > "$CONFIG_ROOT/node.env" <<EOF_CONFIG
+NODE_BIND_ADDRESS=$NODE_BIND_ADDRESS
+COMFYUI_BIND_ADDRESS=$COMFYUI_BIND_ADDRESS
+ENABLE_HINDSIGHT=$ENABLE_HINDSIGHT
+ENABLE_LIVESYNC=$ENABLE_LIVESYNC
+EOF_CONFIG
+  chmod 640 "$CONFIG_ROOT/node.env"
+
+  cat > "$CONFIG_ROOT/versions.env" <<EOF_VERSIONS
+# Operational deployment candidate. This is not Pantheon qualification or authorization truth.
+PANTHEON_COMMIT=$RESOLVED_PANTHEON_COMMIT
+HERMES_IMAGE=$HERMES_IMAGE
+HINDSIGHT_IMAGE=$HINDSIGHT_IMAGE
+COUCHDB_IMAGE=$COUCHDB_IMAGE
+OLLAMA_VERSION=$OLLAMA_VERSION
+COMFYUI_REF=$COMFYUI_REF
+UV_VERSION=$UV_VERSION
+COMFYUI_PYTHON=$COMFYUI_PYTHON
+TORCH_VERSION=$TORCH_VERSION
+TORCH_INDEX=$TORCH_INDEX
+LIVESYNC_REF=$LIVESYNC_REF
+LIVESYNC_IMAGE=$LIVESYNC_IMAGE
+EOF_VERSIONS
+  chmod 640 "$CONFIG_ROOT/versions.env"
+}
+
+write_compose() {
+  cat > "$APP_ROOT/compose.yaml" <<'EOF_COMPOSE'
+services:
+  couchdb:
+    image: ${COUCHDB_IMAGE}
+    container_name: pantheon-couchdb
+    restart: unless-stopped
+    environment:
+      COUCHDB_USER: ${COUCHDB_USER}
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
+    volumes:
+      - /srv/pantheon/couchdb:/opt/couchdb/data
+    ports:
+      - "${NODE_BIND_ADDRESS}:5984:5984"
+
+  hermes:
+    image: ${HERMES_IMAGE}
+    container_name: pantheon-hermes
+    restart: unless-stopped
+    command: gateway run
+    volumes:
+      - /srv/pantheon/hermes:/opt/data
+    ports:
+      - "${NODE_BIND_ADDRESS}:8642:8642"
+      - "${NODE_BIND_ADDRESS}:9119:9119"
+    environment:
+      HERMES_DASHBOARD: "1"
+      API_SERVER_ENABLED: "true"
+      API_SERVER_HOST: "0.0.0.0"
+      API_SERVER_KEY: ${HERMES_API_SERVER_KEY}
+      HERMES_DASHBOARD_BASIC_AUTH_USERNAME: ${HERMES_DASHBOARD_BASIC_AUTH_USERNAME}
+      HERMES_DASHBOARD_BASIC_AUTH_PASSWORD: ${HERMES_DASHBOARD_BASIC_AUTH_PASSWORD}
+      HERMES_DASHBOARD_BASIC_AUTH_SECRET: ${HERMES_DASHBOARD_BASIC_AUTH_SECRET}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  hindsight:
+    image: ${HINDSIGHT_IMAGE}
+    container_name: pantheon-hindsight
+    restart: unless-stopped
+    profiles: ["hindsight"]
+    volumes:
+      - /srv/pantheon/hindsight:/home/hindsight/.pg0
+    ports:
+      - "${NODE_BIND_ADDRESS}:8888:8888"
+      - "${NODE_BIND_ADDRESS}:9999:9999"
+    environment:
+      HINDSIGHT_API_WORKER_ID: "pantheon-node"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+EOF_COMPOSE
+
+  cat > "$APP_ROOT/compose-env" <<EOF_ENV
+NODE_BIND_ADDRESS=$NODE_BIND_ADDRESS
+HERMES_IMAGE=$HERMES_IMAGE
+HINDSIGHT_IMAGE=$HINDSIGHT_IMAGE
+COUCHDB_IMAGE=$COUCHDB_IMAGE
+EOF_ENV
+  cat "$CONFIG_ROOT/secrets.env" >> "$APP_ROOT/compose-env"
+  chmod 600 "$APP_ROOT/compose-env"
+}
+
+compose() {
+  docker compose --env-file "$APP_ROOT/compose-env" -f "$APP_ROOT/compose.yaml" "$@"
+}
+
+install_ollama() {
+  log "installing Ollama $OLLAMA_VERSION"
+  curl -fsSL https://ollama.com/install.sh | OLLAMA_VERSION="$OLLAMA_VERSION" sh
+  install -d -m 0755 /etc/systemd/system/ollama.service.d
+  cat > /etc/systemd/system/ollama.service.d/pantheon-node.conf <<EOF_OLLAMA
+[Service]
+Environment="OLLAMA_HOST=$NODE_BIND_ADDRESS:11434"
+Environment="OLLAMA_MODELS=$AI_ROOT/models/ollama"
+Environment="OLLAMA_KEEP_ALIVE=1m"
+Environment="OLLAMA_NUM_PARALLEL=1"
+Environment="OLLAMA_MAX_LOADED_MODELS=1"
+EOF_OLLAMA
+  install -d -m 0755 "$AI_ROOT/models/ollama"
+  if id -u ollama >/dev/null 2>&1; then chown -R ollama:ollama "$AI_ROOT/models/ollama"; fi
+  systemctl daemon-reload
+  systemctl enable --now ollama
+}
+
+install_uv() {
+  if [[ -x "$APP_ROOT/uv/bin/uv" ]]; then return; fi
+  python3 -m venv "$APP_ROOT/uv"
+  "$APP_ROOT/uv/bin/python" -m pip install --upgrade pip
+  "$APP_ROOT/uv/bin/python" -m pip install "uv==$UV_VERSION"
+}
+
+install_comfyui() {
+  log "installing ComfyUI $COMFYUI_REF with Python $COMFYUI_PYTHON"
+  id -u comfyui >/dev/null 2>&1 || useradd --system --home-dir /var/lib/comfyui --create-home --shell /usr/sbin/nologin comfyui
+  install_uv
+  local src="$APP_ROOT/ComfyUI"
+  if [[ ! -d "$src/.git" ]]; then
+    git clone https://github.com/Comfy-Org/ComfyUI.git "$src"
+  fi
+  git -C "$src" fetch --tags --force
+  git -C "$src" checkout --detach "$COMFYUI_REF"
+  "$APP_ROOT/uv/bin/uv" python install "$COMFYUI_PYTHON"
+  rm -rf "$src/.venv"
+  "$APP_ROOT/uv/bin/uv" venv --python "$COMFYUI_PYTHON" "$src/.venv"
+  "$APP_ROOT/uv/bin/uv" pip install --python "$src/.venv/bin/python" "torch==$TORCH_VERSION" torchvision torchaudio --index-url "$TORCH_INDEX"
+  "$APP_ROOT/uv/bin/uv" pip install --python "$src/.venv/bin/python" -r "$src/requirements.txt"
+  install -d -o comfyui -g comfyui -m 0755 "$AI_ROOT/comfyui-output"
+  install -d -o comfyui -g comfyui -m 0755 "$AI_ROOT/cache/huggingface"
+  chown -R comfyui:comfyui "$src" "$AI_ROOT/comfyui-output" "$AI_ROOT/cache/huggingface"
+  cat > /etc/systemd/system/comfyui.service <<EOF_COMFY
+[Unit]
+Description=ComfyUI
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=comfyui
+Group=comfyui
+WorkingDirectory=$src
+Environment="HF_HOME=$AI_ROOT/cache/huggingface"
+ExecStart=$src/.venv/bin/python main.py --listen $COMFYUI_BIND_ADDRESS --port 8188 --output-directory $AI_ROOT/comfyui-output
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF_COMFY
+  systemctl daemon-reload
+  systemctl enable --now comfyui
+}
+
+install_pantheon_checkout() {
+  local short target
+  short="${RESOLVED_PANTHEON_COMMIT:0:12}"
+  target="$PANTHEON_ROOT/Pantheon-Next-$short"
+  if [[ ! -d "$target/.git" ]]; then
+    git clone "$PANTHEON_REPOSITORY" "$target"
+  fi
+  git -C "$target" fetch origin "$RESOLVED_PANTHEON_COMMIT"
+  git -C "$target" checkout --detach "$RESOLVED_PANTHEON_COMMIT"
+  ln -sfn "$target" "$PANTHEON_ROOT/current"
+
+  install_uv
+  rm -rf "$STATE_ROOT/policy-venv"
+  "$APP_ROOT/uv/bin/uv" venv --python "$COMFYUI_PYTHON" "$STATE_ROOT/policy-venv"
+  "$APP_ROOT/uv/bin/uv" pip install --python "$STATE_ROOT/policy-venv/bin/python" "$target/mcp-server"
+  "$STATE_ROOT/policy-venv/bin/pantheon-mcp-server" --help >/dev/null
+}
+
+install_livesync() {
+  ((ENABLE_LIVESYNC == 1)) || return 0
+  log "building qualified LiveSync CLI source at $LIVESYNC_REF"
+  local src="$APP_ROOT/obsidian-livesync"
+  if [[ ! -d "$src/.git" ]]; then git clone "$LIVESYNC_REPOSITORY" "$src"; fi
+  git -C "$src" fetch origin "$LIVESYNC_REF"
+  git -C "$src" checkout --detach "$LIVESYNC_REF"
+  docker build -f "$src/src/apps/cli/Dockerfile" -t "$LIVESYNC_IMAGE" "$src"
+
+  cat > /usr/local/bin/livesync-cli-node <<EOF_WRAPPER
+#!/bin/sh
+exec docker run --rm --network host \\
+  -v $STATE_ROOT/livesync/db:/data/db \\
+  -v $STATE_ROOT/obsidian:/data/vault \\
+  $LIVESYNC_IMAGE /data/db --vault /data/vault "\$@"
+EOF_WRAPPER
+  chmod 755 /usr/local/bin/livesync-cli-node
+
+  cat > /etc/systemd/system/livesync-headless.service <<EOF_LIVESYNC
+[Unit]
+Description=Self-hosted LiveSync headless daemon
+After=docker.service network-online.target
+Requires=docker.service
+Wants=network-online.target
+ConditionPathExists=$STATE_ROOT/livesync/db/settings.json
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/docker run --rm --name pantheon-livesync-headless --network host -v $STATE_ROOT/livesync/db:/data/db -v $STATE_ROOT/obsidian:/data/vault $LIVESYNC_IMAGE /data/db --vault /data/vault daemon --interval 30
+ExecStop=-/usr/bin/docker stop -t 20 pantheon-livesync-headless
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF_LIVESYNC
+  systemctl daemon-reload
+  systemctl disable livesync-headless.service >/dev/null 2>&1 || true
+}
+
+start_containers() {
+  compose pull couchdb hermes
+  compose up -d couchdb
+  if [[ -t 0 && ! -f "$STATE_ROOT/hermes/config.yaml" ]]; then
+    log "Hermes first-time setup will run interactively. Secrets remain under $STATE_ROOT/hermes."
+    compose run --rm hermes setup || warn "Hermes setup did not complete; container will not be started automatically"
+  fi
+  if [[ -f "$STATE_ROOT/hermes/config.yaml" || -f "$STATE_ROOT/hermes/.env" ]]; then
+    compose up -d hermes
+  else
+    warn "Hermes is installed but not configured. Run: docker compose --env-file $APP_ROOT/compose-env -f $APP_ROOT/compose.yaml run --rm hermes setup"
+  fi
+  if ((ENABLE_HINDSIGHT == 1)); then
+    compose --profile hindsight pull hindsight
+    warn "Hindsight profile prepared but not started; configure its reviewed provider/binding before activation"
+  fi
+}
+
+write_operator_record() {
+  cat > "$CONFIG_ROOT/installation-record.txt" <<EOF_RECORD
+installed_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+installer_version=$TOOL_VERSION
+pantheon_commit=$RESOLVED_PANTHEON_COMMIT
+node_bind_address=$NODE_BIND_ADDRESS
+comfyui_bind_address=$COMFYUI_BIND_ADDRESS
+livesync_installed=$ENABLE_LIVESYNC
+hindsight_prepared=$ENABLE_HINDSIGHT
+
+installed != activated
+activated != task-authorized
+runtime success != Evidence
+projection != persistence
+EOF_RECORD
+  chmod 640 "$CONFIG_ROOT/installation-record.txt"
+}
+
+summary() {
+  printf '\nInstallation observation\n'
+  printf '%-24s %s\n' "Pantheon checkout" "$PANTHEON_ROOT/current"
+  printf '%-24s %s\n' "Hermes dashboard" "http://$NODE_BIND_ADDRESS:9119"
+  printf '%-24s %s\n' "CouchDB" "http://$NODE_BIND_ADDRESS:5984"
+  printf '%-24s %s\n' "Ollama" "http://$NODE_BIND_ADDRESS:11434"
+  printf '%-24s %s\n' "ComfyUI" "http://$COMFYUI_BIND_ADDRESS:8188"
+  printf '%-24s %s\n' "Secrets" "$CONFIG_ROOT/secrets.env (root only)"
+  if ((ENABLE_LIVESYNC == 1)); then
+    printf '%-24s %s\n' "LiveSync" "installed; disabled until settings.json exists"
+  fi
+  if ((ENABLE_HINDSIGHT == 1)); then
+    printf '%-24s %s\n' "Hindsight" "prepared; not started automatically"
+  fi
+  printf '\nFor LAN/Tailscale exposure, change bind addresses deliberately and keep firewall/authentication bounded.\n'
+}
+
+preflight
+if ! confirm_apply; then
+  log "doctor complete; no changes applied"
+  exit 0
+fi
+
+[[ ${EUID:-$(id -u)} -eq 0 ]] || die "--apply must run as root (sudo)"
+mkdir -p "$CONFIG_ROOT"
+apt_base
+prepare_layout
+ensure_nvidia
+ensure_docker
+prepare_service_permissions
+ensure_secrets
+write_node_config
+write_compose
+install_ollama
+install_comfyui
+install_pantheon_checkout
+install_livesync
+start_containers
+write_operator_record
+rm -f "$CONFIG_ROOT/reboot-required"
+summary
