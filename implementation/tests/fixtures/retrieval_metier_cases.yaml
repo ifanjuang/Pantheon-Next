@@ -17,16 +17,16 @@
   lexical_max_rank: 1
   hybrid_max_rank: 1
 
-- case_id: quote_membrane_exact
+- case_id: quote_membrane_variant_exact
   category: technical_terms
-  query: "membrane bicouche élastomère"
+  query: "variante SBS renforcée"
   expected_source: dossiers/devis_reprise/sources/quote_Q-2026-041.md
   lexical_max_rank: 1
   hybrid_max_rank: 1
 
-- case_id: quote_vapour_barrier_exact
+- case_id: quote_vapour_barrier_scope_exact
   category: technical_identifier
-  query: "pare vapeur"
+  query: "T2 T3 pare vapeur"
   expected_source: dossiers/devis_reprise/sources/quote_Q-2026-041.md
   lexical_max_rank: 1
   hybrid_max_rank: 1
@@ -40,8 +40,15 @@
 
 - case_id: cctp_degradation_observation_exact
   category: technical_terms
-  query: "constat contradictoire dégradation"
+  query: "isolation existante conservée constat contradictoire"
   expected_source: dossiers/devis_reprise/sources/cctp_excerpt_lot06.md
+  lexical_max_rank: 1
+  hybrid_max_rank: 1
+
+- case_id: dpgf_bordereau_exact
+  category: document_type
+  query: "bordereau quantitatif synthétique"
+  expected_source: dossiers/devis_reprise/sources/dpgf_lot06.md
   lexical_max_rank: 1
   hybrid_max_rank: 1
 
