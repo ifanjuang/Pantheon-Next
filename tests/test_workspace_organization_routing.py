@@ -67,3 +67,19 @@ def test_obsidian_second_brain_remains_optional_and_subordinate() -> None:
 
     assert "consumers of this posture, not alternative manifest owners" in inspector
     assert "an Obsidian/second-brain skill is not a workspace prerequisite" in instructions
+
+
+def test_obsidian_second_brain_prefers_consolidation_over_note_proliferation() -> None:
+    obsidian = OBSIDIAN.read_text(encoding="utf-8")
+
+    for invariant in (
+        "search-before-create",
+        "create a new note only when no suitable existing note exists",
+        "Conversation consolidation is explicit by default.",
+        "unambiguous workspace-persistence intent",
+        "Ambiguous retention wording such as `keep this` or `remember this` does not by itself select workspace persistence.",
+        "The intended destination must be resolved before a durable workspace write.",
+        "Consolidation is not transcript export",
+        "must not silently persist ordinary conversation material",
+    ):
+        assert invariant in obsidian

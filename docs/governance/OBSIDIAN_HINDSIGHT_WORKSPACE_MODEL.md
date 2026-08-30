@@ -225,6 +225,35 @@ The workspace remains usable without either layer. Existing folder organization 
 
 Second-brain behavior may operate more freely only inside an explicitly designated, reconstructible knowledge area. Its upstream-style automatic rewriting, cross-note propagation, contradiction reconciliation or proactive saving must not silently touch professional source material, admitted Evidence, governed status, document identity or other consequential records.
 
+### Minimal maintenance behavior
+
+When selected, the optional second-brain profile should prefer maintenance of existing knowledge over note proliferation.
+
+```text
+search-before-create
+
+durable information candidate
+-> search relevant notes inside the authorized workspace scope
+-> patch / enrich / link the natural existing note when one exists
+-> create a new note only when no suitable existing note exists
+```
+
+This is workspace behavior, not a new Pantheon Knowledge object or lifecycle. Search remains bounded by the active task/context scope. It does not introduce a note-per-concept topology, fixed folder layout, frontmatter schema or automatic propagation rule.
+
+Conversation consolidation is explicit by default. An instruction such as `consolidate this discussion`, `add this to the workspace knowledge`, `update our notes on this topic`, or equivalent unambiguous workspace-persistence intent may turn only the durable delta of the conversation into workspace edits:
+
+```text
+conversation / Result Candidate
+-> select durable delta only
+-> search existing notes
+-> patch / enrich / link existing notes
+-> create a new note only if needed
+```
+
+Ambiguous retention wording such as `keep this` or `remember this` does not by itself select workspace persistence. The intended destination must be resolved before a durable workspace write.
+
+Consolidation is not transcript export and does not make the conversation, summary or workspace note Evidence, canonical memory, approved professional status or source truth. A second-brain profile may suggest consolidation, but must not silently persist ordinary conversation material or treat repeated recall as promotion.
+
 For manifests, the boundary is narrower:
 
 ```text
