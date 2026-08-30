@@ -1,6 +1,7 @@
 # Task Contract du dossier fictif devis_reprise — bloc 1.
 # Conforme à Pantheon-Next schemas/mvp_governed_loop_objects.schema.yaml (task_contract).
 # Un contrat n'autorise rien par lui-même ; le gate décide.
+# declared_sources borne le périmètre de ce test ; il ne décide pas l'applicabilité professionnelle.
 
 object_type: task_contract
 object_id: mvp.devis-reprise.tc-001
@@ -22,6 +23,7 @@ scope:
     - source_ref: dossiers/devis_reprise/sources/client_email_2026-07-05.md
     - source_ref: dossiers/devis_reprise/sources/quote_Q-2026-041.md
     - source_ref: dossiers/devis_reprise/sources/cctp_excerpt_lot06.md
+    - source_ref: dossiers/devis_reprise/sources/dpgf_lot06.md
   operations:
     - read_selected_sources
     - retrieve_scoped_passages

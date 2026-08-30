@@ -21,6 +21,9 @@ ROOT = Path(__file__).resolve().parents[1]
 CASES = yaml.safe_load(
     (ROOT / "tests/fixtures/retrieval_metier_cases.yaml").read_text(encoding="utf-8")
 )
+PROFESSIONAL_REVIEW = yaml.safe_load(
+    (ROOT / "tests/fixtures/professional_quote_review_cases.yaml").read_text(encoding="utf-8")
+)
 
 
 @pytest.fixture(scope="module")
@@ -77,7 +80,7 @@ def _hybrid_signature(hits) -> list[tuple]:
 
 
 def test_labelled_case_fixture_is_bounded_and_explicit() -> None:
-    assert len(CASES) == 8
+    assert len(CASES) == 9
     assert len({case["case_id"] for case in CASES}) == len(CASES)
     for case in CASES:
         assert case["query"].strip()
@@ -87,6 +90,28 @@ def test_labelled_case_fixture_is_bounded_and_explicit() -> None:
             assert case["expected_source"]
             assert case["lexical_max_rank"] >= 1
             assert case["hybrid_max_rank"] >= 1
+
+
+def test_professional_review_oracle_is_bounded_human_input(contract) -> None:
+    assert PROFESSIONAL_REVIEW["corpus_id"] == "devis_reprise"
+    assert PROFESSIONAL_REVIEW["status"] == "synthetic_human_labelled"
+    assert "project_document_currentness" in PROFESSIONAL_REVIEW["authority_note"]
+    assert "observed_results" not in PROFESSIONAL_REVIEW
+    assert "quality_score" not in PROFESSIONAL_REVIEW
+
+    declared = set(PROFESSIONAL_REVIEW["declared_source_refs"])
+    controls = set(PROFESSIONAL_REVIEW["control_source_refs"])
+    assert declared <= set(contract.sources)
+    assert controls.isdisjoint(contract.sources)
+    assert len(PROFESSIONAL_REVIEW["cases"]) == 9
+    assert len({case["case_id"] for case in PROFESSIONAL_REVIEW["cases"]}) == 9
+
+    for case in PROFESSIONAL_REVIEW["cases"]:
+        assert case["expected_posture"]
+        assert case["human_label"]
+        assert case["required_observations"]
+        assert case["forbidden_claims"]
+        assert set(case["source_refs"]) <= declared
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda case: case["case_id"])

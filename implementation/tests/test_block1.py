@@ -130,7 +130,7 @@ def test_contract_validates_against_vendored_schema(tmp_path):
 def test_real_fixture_conforms_to_vendored_schema():
     # The shipped fixture must load, which now means it passes schema validation.
     c = load_contract(ROOT / "dossiers/devis_reprise/task_contract.yaml")
-    assert len(c.sources) == 3
+    assert len(c.sources) == 4
     assert c.dossier == "devis_reprise"
 
 
