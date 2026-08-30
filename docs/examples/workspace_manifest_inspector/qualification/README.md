@@ -17,7 +17,8 @@ The corpus uses one synthetic façade/window context across:
 
 - architectural plan index C;
 - architectural plan index D with the same information repositioned;
-- structural plan with grid-only localization;
+- structural plan with grid-only localization plus one general comment with no
+  precise anchor;
 - IFC source with a native element identifier;
 - CCTP-like specification;
 - DPGF-like price schedule;
@@ -30,12 +31,16 @@ The fixture intentionally uses only the small shape being qualified:
 ```text
 information[]
 ├── info_id
-├── text
-├── anchor?       # best available source-local locator
-├── comment?      # free context
-├── status?       # lightweight, not professional approval
-└── refs[]?       # heterogeneous navigation/context refs
+├── text?          # source-local summary when useful
+├── anchor?        # best available source-local locator
+├── comment?       # free context; may be the only descriptive field
+├── status?        # lightweight, not professional approval
+└── refs[]?        # heterogeneous navigation/context refs
 ```
+
+Only `info_id` is structurally assumed for every item by this fixture. An item
+must carry useful local context through `text` or `comment`, but no precise
+anchor, status or ref is required.
 
 Reference schemes are open strings in this fixture. Only schemes required by
 the corpus are exercised now:
@@ -86,13 +91,20 @@ new locator
 != new governed object identity
 ```
 
-## Ambiguity
+## Weak localization and ambiguity
+
+The structural case `I-STRUCT-GENERAL-002` intentionally carries only a comment
+and no anchor or refs. It demonstrates that missing grid/cloud/page precision
+does not make an information item unusable.
 
 The email case `I-MAIL-AMBIGUOUS-002` has no resolved refs. Its source text is
 retained with a `to_check` state and a comment explaining that several targets
 match.
 
 ```text
+weak localization
+!= fabricated precision
+
 ambiguous reference
 -> unresolved / no fabricated target
 ```
@@ -100,7 +112,8 @@ ambiguous reference
 ## Deep navigation and preview boundary
 
 Locators retain enough context for a later adapter to reconstruct a preview or
-deep navigation target. The preview itself is not persisted in this fixture.
+deep navigation target when such a locator exists. The preview itself is not
+persisted in this fixture.
 
 ```text
 source/version + locator
