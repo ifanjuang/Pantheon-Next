@@ -22,6 +22,11 @@ def test_source_research_is_single_surviving_research_skill_candidate():
     assert "retrieved != truth" in text
     assert "research synthesis != Evidence" in text
     assert "autonomous recurring research loops" in text
+    assert "optional workspace source notebook" in text
+    assert "notebook entry != Source Registry Entry" in text
+    assert "registered route != inspected source" in text
+    assert "Never hard-code its filename or Obsidian path" in text
+    assert "`source_addition_candidate`" in text
 
     registry = REGISTRY.read_text(encoding="utf-8")
     skill_path = "templates/hermes/skills/source-research/SKILL.md"
