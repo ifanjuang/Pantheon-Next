@@ -311,13 +311,13 @@ class Handler(base.Handler):
             response = base._tool_call_message(
                 step,
                 "tool_search",
-                {"query": "pantheon context manifest entity", "limit": 5},
+                {"queries": ["pantheon context manifest entity"], "limit": 5},
             )
         elif step == 1:
             response = base._tool_call_message(
                 step,
                 "tool_describe",
-                {"name": "pantheon_context_manifest"},
+                {"names": ["pantheon_context_manifest"]},
             )
         elif step == 2:
             response = base._tool_call_message(
@@ -329,7 +329,7 @@ class Handler(base.Handler):
             response = base._tool_call_message(
                 step,
                 "tool_describe",
-                {"name": "pantheon_context_entity"},
+                {"names": ["pantheon_context_entity"]},
             )
         elif step == 4:
             response = base._tool_call_message(
