@@ -118,10 +118,18 @@ def test_information_shape_is_progressive_not_rigid() -> None:
     items = _all_information()
 
     assert all(isinstance(item["info_id"], str) and item["info_id"] for item in items)
-    assert all(isinstance(item.get("text"), str) and item["text"] for item in items)
+    assert all(
+        (isinstance(item.get("text"), str) and bool(item["text"]))
+        or (isinstance(item.get("comment"), str) and bool(item["comment"]))
+        for item in items
+    )
 
+    assert any("text" in item for item in items)
+    assert any("text" not in item for item in items)
     assert any("comment" in item for item in items)
     assert any("comment" not in item for item in items)
+    assert any("anchor" in item for item in items)
+    assert any("anchor" not in item for item in items)
     assert any("status" in item for item in items)
     assert any("status" not in item for item in items)
     assert any(_refs(item) for item in items)
@@ -147,6 +155,11 @@ def test_localizers_can_be_strong_weak_or_source_native() -> None:
         "grid_ref": "C-D/4-5",
     }
     assert _refs(structure) == []
+
+    general = _documents()["plan_structure_s102_b"]["information"][1]
+    assert "anchor" not in general
+    assert "text" not in general
+    assert _refs(general) == []
 
 
 def test_same_information_can_be_repositioned_between_plan_versions() -> None:
