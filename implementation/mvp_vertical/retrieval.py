@@ -8,12 +8,21 @@ truth.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 import psycopg
 
 from .contract import TaskContract, assert_source_in_scope
 from .store import RetrievedChunk, retrieve_exact_scoped, retrieve_scoped
+
+
+_NATURAL_LANGUAGE_FALLBACK_MIN_TOKENS = 6
+_QUERY_TOKEN_RE = re.compile(r"[^\W_]+", re.UNICODE)
+_EXPLICIT_WEBSEARCH_RE = re.compile(
+    r'"|(?:^|\s)OR(?:\s|$)|(?:^|\s)-\S+',
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True)
@@ -65,24 +74,68 @@ def _exact_scope_columns(
     return source_refs, source_digests
 
 
-def retrieve_lexical_scoped(
+def _lexical_fallback_query(query: str) -> str | None:
+    """Return a bounded disjunctive recall query for an exact-source request.
+
+    ``websearch_to_tsquery`` intentionally ANDs unqualified terms. That is a good
+    default for focused search strings, but a natural-language professional
+    instruction can contain enough framing words that no single chunk satisfies
+    the full conjunction. After exact source identities have already been
+    resolved by access/currentness composition, that exact-scoped lexical lane
+    may retry selected query tokens with OR semantics when strict retrieval is
+    empty.
+
+    The fallback is deliberately conservative:
+
+    - it is available only for requests with at least six lexical tokens;
+    - explicit web-search syntax (quotes, OR, negative terms) is never rewritten;
+    - short words are omitted unless they are numeric or uppercase identifiers;
+    - duplicate terms are removed without changing their first-seen order.
+
+    This changes candidate recall only. A lexical match remains retrieved context,
+    not truth, Evidence, authority or professional validation.
+    """
+    text = query.strip()
+    if not text or _EXPLICIT_WEBSEARCH_RE.search(text):
+        return None
+
+    tokens = _QUERY_TOKEN_RE.findall(text)
+    if len(tokens) < _NATURAL_LANGUAGE_FALLBACK_MIN_TOKENS:
+        return None
+
+    selected: list[str] = []
+    seen: set[str] = set()
+    for token in tokens:
+        if not (len(token) >= 5 or token.isupper() or token.isdigit()):
+            continue
+        key = token.casefold()
+        if key in seen:
+            continue
+        seen.add(key)
+        selected.append(token)
+
+    if len(selected) < 2:
+        return None
+    return " OR ".join(selected)
+
+
+def _rows_to_chunks(rows: list[tuple]) -> list[RetrievedChunk]:
+    return [
+        RetrievedChunk(
+            *row[:-2],
+            section_path=tuple(row[-2] or ()),
+            quality_flags=tuple(row[-1] or ()),
+        )
+        for row in rows
+    ]
+
+
+def _retrieve_lexical_scoped_once(
     conn: psycopg.Connection,
     contract: TaskContract,
     query: str,
-    top_k: int = 8,
+    top_k: int,
 ) -> list[RetrievedChunk]:
-    """Retrieve lexical candidates from current source versions in scope.
-
-    PostgreSQL full-text ranking is used as a replaceable candidate capability.
-    The returned ``distance`` is ``1 - normalized lexical rank`` so existing
-    consumers can still treat lower values as closer. It is not a probability
-    and must not be interpreted as Evidence quality.
-    """
-    if top_k < 1 or top_k > 100:
-        raise ValueError("top_k must be between 1 and 100")
-    if not query.strip():
-        return []
-
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -124,31 +177,43 @@ def retrieve_lexical_scoped(
             """,
             (query, contract.dossier, list(contract.sources), top_k),
         )
-        return [
-            RetrievedChunk(
-                *row[:-2],
-                section_path=tuple(row[-2] or ()),
-                quality_flags=tuple(row[-1] or ()),
-            )
-            for row in cur.fetchall()
-        ]
+        return _rows_to_chunks(cur.fetchall())
 
 
-def retrieve_lexical_exact_scoped(
+def retrieve_lexical_scoped(
+    conn: psycopg.Connection,
+    contract: TaskContract,
+    query: str,
+    top_k: int = 8,
+) -> list[RetrievedChunk]:
+    """Retrieve strict lexical candidates from current source versions in scope.
+
+    PostgreSQL full-text ranking is used as a replaceable candidate capability.
+    The returned ``distance`` is ``1 - normalized lexical rank`` so existing
+    consumers can still treat lower values as closer. It is not a probability
+    and must not be interpreted as Evidence quality.
+
+    This general Task-Contract-scoped path intentionally keeps strict
+    ``websearch_to_tsquery`` semantics. Natural-language disjunctive fallback is
+    reserved for the exact immutable source-identity path below, where source
+    applicability has already been resolved explicitly.
+    """
+    if top_k < 1 or top_k > 100:
+        raise ValueError("top_k must be between 1 and 100")
+    if not query.strip():
+        return []
+    return _retrieve_lexical_scoped_once(conn, contract, query, top_k)
+
+
+def _retrieve_lexical_exact_scoped_once(
     conn: psycopg.Connection,
     contract: TaskContract,
     query: str,
     *,
-    sources: tuple[tuple[str, str], ...],
-    top_k: int = 8,
+    source_refs: list[str],
+    source_digests: list[str],
+    top_k: int,
 ) -> list[RetrievedChunk]:
-    """Rank lexical candidates only inside exact source-ref/digest identities."""
-    if top_k < 1 or top_k > 100:
-        raise ValueError("top_k must be between 1 and 100")
-    if not query.strip() or not sources:
-        return []
-    source_refs, source_digests = _exact_scope_columns(contract, sources)
-
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -192,14 +257,45 @@ def retrieve_lexical_exact_scoped(
             """,
             (source_refs, source_digests, query, contract.dossier, top_k),
         )
-        return [
-            RetrievedChunk(
-                *row[:-2],
-                section_path=tuple(row[-2] or ()),
-                quality_flags=tuple(row[-1] or ()),
-            )
-            for row in cur.fetchall()
-        ]
+        return _rows_to_chunks(cur.fetchall())
+
+
+def retrieve_lexical_exact_scoped(
+    conn: psycopg.Connection,
+    contract: TaskContract,
+    query: str,
+    *,
+    sources: tuple[tuple[str, str], ...],
+    top_k: int = 8,
+) -> list[RetrievedChunk]:
+    """Rank lexical candidates only inside exact source-ref/digest identities."""
+    if top_k < 1 or top_k > 100:
+        raise ValueError("top_k must be between 1 and 100")
+    if not query.strip() or not sources:
+        return []
+    source_refs, source_digests = _exact_scope_columns(contract, sources)
+
+    strict = _retrieve_lexical_exact_scoped_once(
+        conn,
+        contract,
+        query,
+        source_refs=source_refs,
+        source_digests=source_digests,
+        top_k=top_k,
+    )
+    if strict:
+        return strict
+    fallback = _lexical_fallback_query(query)
+    if fallback is None:
+        return []
+    return _retrieve_lexical_exact_scoped_once(
+        conn,
+        contract,
+        fallback,
+        source_refs=source_refs,
+        source_digests=source_digests,
+        top_k=top_k,
+    )
 
 
 def reciprocal_rank_fusion(
