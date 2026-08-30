@@ -228,11 +228,31 @@ Second-brain behavior may operate more freely only inside an explicitly designat
 For manifests, the boundary is narrower:
 
 ```text
-discover / read / lint manifest          = allowed bounded assistance
-propose manifest creation or correction  = candidate only
-define manifest semantics                = existing Pantheon owner
-silently mutate manifest or move files   = forbidden
+discover / read / lint manifest                 = allowed bounded assistance
+propose manifest creation or correction         = candidate only
+define manifest semantics                       = existing Pantheon owner
+refresh admitted technical observation fields   = deterministic manifest engine only
+change human or governed fields                  = explicit admitted action only
+second-brain background manifest mutation        = forbidden
+move or rename files                             = separately authorized effect only
 ```
+
+This is a field-ownership boundary, not a blanket grant to rewrite a sidecar. A
+future admitted manifest writer may persist exact observations such as digests,
+representation bindings, validation results or check timestamps only under an
+adopted schema, an expected-current-digest check and an idempotent write
+contract. It does not thereby gain authority over human comments, semantic
+summaries, professional status, currentness, Evidence, Decisions or approval.
+Until that schema and write contract are admitted, the first implementation
+slice remains read-only and computes local health without persisting it.
+
+A workspace-local Hermes discussion may be created or appended only inside an
+explicitly allowed working area. It remains non-authoritative collaboration
+material and may coordinate several document candidates. A link from a
+manifest to that discussion is navigation metadata only; it does not turn the
+discussion into a Decision, professional review, Evidence or approval. Exact
+revision comments persisted by the existing document-revision discussion owner
+remain a separate surface and are not silently mirrored into workspace notes.
 
 `docs/architecture/WORKSPACE_MANIFEST_INSPECTOR_CANDIDATE.md` owns the candidate manifest UX and local health posture. A second-brain package may consume that contract; it does not replace it. A missing manifest remains neutral unless an explicit qualification rule requires one.
 

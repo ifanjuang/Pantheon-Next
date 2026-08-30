@@ -178,6 +178,11 @@ A heuristic may suggest `QUALIFIABLE`, but only an explicit rule/qualification p
 
 Optional Obsidian skills or second-brain behavior are consumers of this posture, not alternative manifest owners. They may discover, read or lint a sidecar and prepare a correction candidate, but they must not silently create a required-manifest rule, redefine manifest semantics, mutate professional status or move files. The capability boundary and optional layering are recorded in `docs/governance/OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md`.
 
+The first executable slice derived from this candidate is read-only. It may
+parse a present sidecar, calculate exact observed digests and project local
+health, but it must not persist those observations on read. Persisted manifest
+writes require a separately admitted schema and write contract.
+
 ## 5. Candidate document sidecar
 
 For a real document package, `document.yaml` remains a reasonable candidate user-facing sidecar name because it is readable, editable and schema-validatable.
@@ -307,6 +312,7 @@ Candidate sidecar responsibilities may include:
 stable identity mapping once admitted
 schema identity/version
 full human designation
+short human-authored annotation
 artifact origin / representation role
 current-compatible classification refs
 representation refs
@@ -315,7 +321,13 @@ source/snapshot refs and digests where applicable
 derived summary + exact basis digest
 source-to-source change summary + both exact basis digests
 conversion/derivation provenance where useful
+navigation refs to bounded workspace discussions
 ```
+
+Human annotation and discussion references remain collaboration metadata. They
+do not express professional approval, purpose-specific currentness, Evidence or
+a Decision. A detailed Hermes exchange belongs in a separate Markdown working
+note rather than being copied into the sidecar.
 
 Do **not** make ordinary editable sidecar fields authoritative for:
 
@@ -552,6 +564,12 @@ Expliquer une incohérence
 Proposer une correction de fiche
 ```
 
+One optional `workspace-manifest` skill may expose the bounded modes
+`inspect`, `validate`, `propose-create` and `propose-update`. Those modes reuse
+the current manifest owner and return candidates; they do not create a second
+schema or writer. An `apply` mode is deferred until a deterministic writer,
+expected-current-digest checks and the consequential-effect gate are admitted.
+
 Separate responsibilities:
 
 ```text
@@ -601,14 +619,37 @@ Creating a sidecar is not itself Document admission.
 
 Generated semantic fields should record their exact basis and become stale when that basis changes.
 
+### Multi-document Hermes working discussion
+
+A workspace-local Markdown discussion may coordinate one request across several
+targets, for example a CCTP correction and the corresponding DPGF update. It
+should carry explicit relative target refs and expected digests so that a later
+proposal can be detected as stale.
+
+The discussion is working context only:
+
+```text
+Hermes working discussion != exact-revision professional comment
+Hermes working discussion != Decision or approval
+manifest discussion ref    != authority transfer
+```
+
+The existing implementation owner for comments on one exact admitted document
+revision remains unchanged. Promotion of a useful conclusion from a workspace
+discussion into that owner is explicit, not an automatic two-way sync.
+
 ## 14. Direct editing versus governed fields
 
 The inspector may expose direct controls only for fields whose owner/write posture permits it.
 
-Candidate split:
+Candidate ownership split:
 
 ```text
-LOW-CONSEQUENCE CANDIDATES
+HUMAN-OWNED WORKSPACE METADATA
+short manual comment
+explicit request to link or unlink a working discussion
+
+AI-PROPOSED / HUMAN-REVIEWED
 full display name
 ordinary currently valid tag refs
 working derived-summary text
@@ -620,6 +661,7 @@ schema version
 source/snapshot digests
 representation bindings
 version refs
+validation result and observation timestamp when the adopted schema permits them
 
 PROJECTED OR GOVERNED ELSEWHERE
 purpose-specific currentness
@@ -631,11 +673,20 @@ professional approval
 
 This split is not adopted until Phase 2 owner/doctrine convergence classifies the actual fields.
 
+Automatic refresh, if later admitted, is limited to the managed deterministic
+subset and must compare the expected current manifest digest before writing.
+Human-owned fields are changed only by an explicit human action. AI-proposed
+fields remain candidates until reviewed. A managed-field refresh must preserve
+unknown and human-owned YAML content through a round-trip-capable writer.
+
 `Modifier avec Hermes` should produce a bounded proposal/diff against an expected current basis digest. Consequential application remains subject to the existing Workspace write/gate model.
 
 ## 15. Local-first index/cache
 
-Basic manifest health should not require a server round-trip.
+Basic manifest health should not require a server round-trip. The first
+implementation slice calculates it on demand and remains read-only; incremental
+events, a persistent local index and any sidecar refresh are later qualification
+steps rather than MVP prerequisites.
 
 Candidate behavior:
 
@@ -916,6 +967,7 @@ heuristic package suggestion = QUALIFIABLE, not governed Document
 sidecar creation alone does not admit Document identity
 assets do not each become Pantheon objects
 one logical package may contain many physical files
+read-only inspection does not persist observed fields
 ```
 
 ### Identity
@@ -988,6 +1040,8 @@ server receipt may create Work before execution admission
 waiting/comment does not become Decision or approval
 manifest edit cannot admit Evidence/Decision/approval
 Hermes generated summary remains derived/candidate
+automatic technical refresh cannot change human or governed fields
+workspace discussion remains distinct from exact-revision comments
 ```
 
 ### Sync

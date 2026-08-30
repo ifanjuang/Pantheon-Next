@@ -60,10 +60,37 @@ def test_obsidian_second_brain_remains_optional_and_subordinate() -> None:
     for invariant in (
         "Neither is a Pantheon prerequisite, workspace owner, memory authority or manifest authority.",
         "Each layer is independently optional.",
-        "silently mutate manifest or move files   = forbidden",
+        "second-brain background manifest mutation        = forbidden",
+        "refresh admitted technical observation fields   = deterministic manifest engine only",
         "A missing manifest remains neutral",
     ):
         assert invariant in obsidian
 
     assert "consumers of this posture, not alternative manifest owners" in inspector
     assert "an Obsidian/second-brain skill is not a workspace prerequisite" in instructions
+
+
+def test_manifest_write_boundary_is_field_owned_and_read_only_first() -> None:
+    owner = OWNER.read_text(encoding="utf-8")
+    inspector = INSPECTOR.read_text(encoding="utf-8")
+    obsidian = OBSIDIAN.read_text(encoding="utf-8")
+
+    for invariant in (
+        "The first executable slice derived from this candidate is read-only.",
+        "HUMAN-OWNED WORKSPACE METADATA",
+        "MANAGED / DETERMINISTIC",
+        "expected current manifest digest",
+        "workspace discussion remains distinct from exact-revision comments",
+    ):
+        assert invariant in inspector
+
+    for invariant in (
+        "Until that schema and write contract are admitted, the first implementation",
+        "change human or governed fields                  = explicit admitted action only",
+        "A link from a",
+        "manifest to that discussion is navigation metadata only",
+    ):
+        assert invariant in obsidian
+
+    assert "one shallow optional `Hermes/` working area" in owner
+    assert "Neither optional area adds a required" in owner

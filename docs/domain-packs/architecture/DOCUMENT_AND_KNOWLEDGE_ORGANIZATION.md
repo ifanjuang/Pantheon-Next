@@ -168,6 +168,20 @@ LIEUREY_B2_DCE_IFJ_CCTP_GROS-OEUVRE_2026-10-15.pdf
 
 The original file is preserved. Hermes may propose a classification or rename, but must not silently apply it.
 
+Where useful, an affair may contain one shallow optional `Hermes/` working area
+for non-authoritative Markdown discussions that coordinate one or several
+document candidates. A deployment may use another name or placement. This area
+does not become a required project folder, a document owner, a Decision store or
+an approval surface, and its presence does not change the validity of any other
+organization.
+
+An optional reconstructible area may also be designated for autonomous
+second-brain knowledge maintenance. Its placement is deployment-owned and its
+write boundary is defined by
+`docs/governance/OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md`; it must not silently
+rewrite professional project sources. Neither optional area adds a required
+subfolder hierarchy inside the recommended phase folders.
+
 ## Reusable Markdown knowledge corpus
 
 The recommended IFJA human-facing corpus profile uses five first-level families:
