@@ -65,6 +65,7 @@ def test_active_distribution_lock_is_revision_3_and_validates() -> None:
     assert active["source_pins"]["pantheon_repository"]["repository"] == (
         "ifanjuang/Pantheon-Next"
     )
+    assert active["source_pins"]["hermes_runtime"]["version"] == "0.20.5"
     assert all("source_repository" not in item for item in active["components"])
 
 
@@ -165,14 +166,17 @@ def test_tree_digest_documentation_has_closed_ephemeral_exclusions() -> None:
 def test_runtime_review_preserves_boundary_and_live_observation_gate() -> None:
     review = RUNTIME_REVIEW.read_text(encoding="utf-8")
 
-    assert "Current reviewed target: Hermes Agent 0.20.0." in review
-    assert "version: 0.20.0" in review
+    assert "Current reviewed target: Hermes Agent 0.20.6 (`v2026.8.27`)." in review
+    assert "version: 0.20.6" in review
+    assert "release_commit: 5fc308a70719a83cccdbba4c0e39c23f5a8239d5" in review
+    assert "current candidate distribution runtime target: 0.20.5" in review
     assert "kernel_change_required: false" in review
+    assert "run_binding_change_required: false" in review
+    assert "candidate_distribution_pin_change_authorized: false" in review
     assert "real_instance_observation_required: true" in review
-    assert "artifact_digest: null" in review
-    assert "trusted peer != approved actor" in review
-    assert "citation present != Evidence admitted" in review
-    assert "voice command received != human approval recorded" in review
+    assert "runtime_artifact_digest_required_before_observed: true" in review
+    assert "POST /v1/runs/{run_id}/approval" in review
+    assert "release reviewed != distribution pin changed" in review
     assert "provider" in review and "model_options" in review
 
 
