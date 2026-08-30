@@ -89,6 +89,8 @@ corpus:
         anchor:
           locator_kind: grid_ref
           grid_ref: C-D/4-5
+      - info_id: I-STRUCT-GENERAL-002
+        comment: Observation générale de coordination structure sans localisation plus précise dans la source.
 
   - document_key: model_ifc_2026_08
     document_kind: model
