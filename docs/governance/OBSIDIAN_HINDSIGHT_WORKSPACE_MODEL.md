@@ -276,6 +276,42 @@ Hermes-native files/context
 
 Each layer is independently optional. Installing one does not authorize or require the next.
 
+## Optional Obsidian authoring and document-assembly UX
+
+Obsidian plugins may also provide local authoring ergonomics without becoming part of the workspace, memory or governance architecture. The reviewed external `Sadsnake1/word-smith` plugin is classified in this category only.
+
+Its useful patterns include focused writing, manuscript/document organization, preview and compilation/export. These capabilities may improve human authoring of Markdown material and can inform future document-assembly UX, but Pantheon does not adopt, install, bind or qualify Word-Smith through this document.
+
+```text
+Word-Smith
+= optional Obsidian authoring / document-assembly UX
+
+Word-Smith
+!= Pantheon architecture owner
+!= document identity or professional-status owner
+!= Evidence producer
+!= memory / retrieval provider
+!= synchronization owner
+```
+
+Word-Smith-local structure, ordering, flags, goals or history remain plugin/workspace state. In particular, `ws-structure.md` must not become authority for Pantheon document identity, governed order, applicability, approval or status. A successful local export similarly does not establish professional approval or Evidence.
+
+```text
+plugin organization != governed document structure
+plugin metadata != Pantheon authority
+export success != professional approval
+```
+
+The intended layering is therefore:
+
+```text
+Pantheon governance / document contracts
+-> Markdown workspace
+-> optional Obsidian authoring UX such as Word-Smith
+```
+
+The plugin remains replaceable. No Word-Smith-specific schema, registry binding, storage layer or runtime component should be introduced unless a later demonstrated requirement cannot be satisfied through existing document/workspace contracts.
+
 ## Hindsight posture
 
 Hindsight is the currently recommended external retrieval/memory provider because the repository contains real integration and separation tests for it.
@@ -319,6 +355,7 @@ Hindsight                = qualified/recommended optional retrieval/memory provi
 Hermes native facilities = valid zero-extra-provider alternative
 Hermes Obsidian skill    = optional runtime workspace capability
 second-brain behavior    = optional knowledge-maintenance profile, subordinate to workspace governance
+Word-Smith               = optional Obsidian authoring / document-assembly UX
 Pantheon                 = provider-agnostic governance boundary
 ```
 
