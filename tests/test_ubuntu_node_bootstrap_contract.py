@@ -48,6 +48,8 @@ def test_updater_never_follows_main_or_silently_updates_stateful_services() -> N
     assert "STATEFUL_BACKUP_CONFIRMED" in text
     assert "available upstream != qualified for this node" in text
     assert "successful update != activation or task authorization" in text
+    assert 'install -d -m 0700 "$checkpoint"' in text
+    assert "umask 077" in text
 
 
 def test_operator_readme_preserves_authority_and_storage_boundaries() -> None:
