@@ -205,4 +205,4 @@ This qualification does not:
 
 `tests/test_workspace_manifest_information_routing.py` protects the M2 fixture
 invariants. `tests/test_workspace_manifest_m3_routing_decision.py` protects the
-M3 non-persistence and owner-reuse decision.
+M3 non-persistence and downstream-contract reuse decision.
