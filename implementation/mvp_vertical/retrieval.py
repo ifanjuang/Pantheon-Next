@@ -221,7 +221,19 @@ def reciprocal_rank_fusion(
     if semantic_weight == 0 and lexical_weight == 0:
         raise ValueError("at least one retrieval weight must be positive")
 
-    semantic = semantic[:candidate_k]
+    # Vector distance can tie exactly. PostgreSQL does not promise a stable
+    # ordering for equal ORDER BY values, so stabilize the already-bounded
+    # semantic ranking before assigning RRF ranks. This changes only ties; it
+    # does not rewrite distance, widen the candidate set or alter source scope.
+    semantic = sorted(
+        semantic[:candidate_k],
+        key=lambda chunk: (
+            chunk.distance,
+            chunk.source_ref,
+            chunk.source_digest,
+            chunk.chunk_no,
+        ),
+    )
     lexical = lexical[:candidate_k]
     by_key: dict[tuple[str, str, int], dict] = {}
 
