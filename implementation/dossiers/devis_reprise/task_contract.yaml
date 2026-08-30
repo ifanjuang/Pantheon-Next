@@ -49,6 +49,10 @@ approval_ceiling: C3
 retrieval_boundary:
   store: pgvector
   boundary: retrieval_only
+  # Comparative review selected CCTP + DPGF + quote intentionally. Keep at
+  # least one already-ranked candidate from each resolved source when available;
+  # this does not make source selection proof of relevance, truth or Evidence.
+  minimum_hits_per_source: 1
 
 governance_refs:
   - docs/governance/MVP_GOVERNED_TASK_LOOP.md

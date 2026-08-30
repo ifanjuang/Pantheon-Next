@@ -265,6 +265,72 @@ def reciprocal_rank_fusion(
     return fused[:top_k]
 
 
+def select_minimum_source_hits(
+    hits: list[HybridRetrievedChunk],
+    *,
+    sources: tuple[tuple[str, str], ...],
+    top_k: int,
+    minimum_hits_per_source: int = 0,
+) -> list[HybridRetrievedChunk]:
+    """Apply an opt-in source-representation floor to an already-ranked pool.
+
+    This selector never creates a candidate and never changes RRF scores. For
+    each exact source identity it may retain up to ``minimum_hits_per_source``
+    candidates that already exist in ``hits``; remaining slots are filled by
+    the original global order. The returned list is then restored to that same
+    global order.
+
+    A selected source with no candidate in the ranked pool stays absent. Source
+    selection is a comparison perimeter, not proof that content is relevant,
+    true, or admissible as Evidence.
+    """
+    if top_k < 1:
+        raise ValueError("top_k must be at least 1")
+    if minimum_hits_per_source < 0:
+        raise ValueError("minimum_hits_per_source must be non-negative")
+
+    source_keys = list(dict.fromkeys((str(ref), str(digest)) for ref, digest in sources))
+    if minimum_hits_per_source == 0 or not source_keys:
+        return hits[:top_k]
+    if minimum_hits_per_source * len(source_keys) > top_k:
+        raise ValueError(
+            "minimum_hits_per_source cannot require more source slots than top_k"
+        )
+
+    def hit_key(hit: HybridRetrievedChunk) -> tuple[str, str, int]:
+        return (hit.chunk.source_ref, hit.chunk.source_digest, hit.chunk.chunk_no)
+
+    selected: list[HybridRetrievedChunk] = []
+    selected_keys: set[tuple[str, str, int]] = set()
+
+    for source_ref, source_digest in source_keys:
+        retained = 0
+        for hit in hits:
+            if (
+                hit.chunk.source_ref == source_ref
+                and hit.chunk.source_digest == source_digest
+                and hit_key(hit) not in selected_keys
+            ):
+                selected.append(hit)
+                selected_keys.add(hit_key(hit))
+                retained += 1
+                if retained >= minimum_hits_per_source:
+                    break
+
+    for hit in hits:
+        if len(selected) >= top_k:
+            break
+        key = hit_key(hit)
+        if key in selected_keys:
+            continue
+        selected.append(hit)
+        selected_keys.add(key)
+
+    global_order = {hit_key(hit): index for index, hit in enumerate(hits)}
+    selected.sort(key=lambda hit: global_order[hit_key(hit)])
+    return selected[:top_k]
+
+
 def retrieve_hybrid_scoped(
     conn: psycopg.Connection,
     contract: TaskContract,
@@ -302,8 +368,14 @@ def retrieve_hybrid_exact_scoped(
     rrf_k: int = 60,
     semantic_weight: float = 1.0,
     lexical_weight: float = 1.0,
+    minimum_hits_per_source: int = 0,
 ) -> list[HybridRetrievedChunk]:
-    """Run semantic and lexical ranking only inside exact immutable identities."""
+    """Run hybrid ranking inside exact immutable identities.
+
+    ``minimum_hits_per_source`` is an opt-in final-selection policy over the
+    already-ranked candidate pool. Zero preserves the historical global top-k
+    behavior exactly.
+    """
     _validate_limits(top_k, candidate_k)
     semantic = retrieve_exact_scoped(
         conn,
@@ -319,12 +391,19 @@ def retrieve_hybrid_exact_scoped(
         sources=sources,
         top_k=candidate_k,
     )
-    return reciprocal_rank_fusion(
+    pool_top_k = candidate_k if minimum_hits_per_source else top_k
+    fused = reciprocal_rank_fusion(
         semantic,
         lexical,
-        top_k=top_k,
+        top_k=pool_top_k,
         candidate_k=candidate_k,
         rrf_k=rrf_k,
         semantic_weight=semantic_weight,
         lexical_weight=lexical_weight,
+    )
+    return select_minimum_source_hits(
+        fused,
+        sources=sources,
+        top_k=top_k,
+        minimum_hits_per_source=minimum_hits_per_source,
     )

@@ -87,6 +87,17 @@ def _contract_project_id(contract: TaskContract) -> str:
     )
 
 
+def _minimum_hits_per_source(contract: TaskContract) -> int:
+    """Read an optional retrieval selection parameter without owning ranking."""
+    boundary = contract.raw.get("retrieval_boundary") or {}
+    raw = boundary.get("minimum_hits_per_source", 0)
+    if isinstance(raw, bool) or not isinstance(raw, int) or raw < 0:
+        raise RetrievalScopeError(
+            "retrieval_boundary.minimum_hits_per_source must be a non-negative integer"
+        )
+    return raw
+
+
 def _source_identity_for_revision(
     conn: psycopg.Connection,
     *,
@@ -291,8 +302,9 @@ def retrieve_accessible_applicable_hybrid(
     """Resolve access/applicability first, then delegate exact ranking.
 
     The composition owner does not rank. It passes only the already-authorized,
-    already-resolved immutable identities to the existing retrieval owner. Empty
-    exact retrieval stays empty; there is no fallback to current-path content.
+    already-resolved immutable identities and the Task Contract's declared
+    retrieval parameters to the existing retrieval owner. Empty exact retrieval
+    stays empty; there is no fallback to current-path content.
     """
 
     resolution = resolve_accessible_applicable_sources(
@@ -315,6 +327,7 @@ def retrieve_accessible_applicable_hybrid(
         rrf_k=rrf_k,
         semantic_weight=semantic_weight,
         lexical_weight=lexical_weight,
+        minimum_hits_per_source=_minimum_hits_per_source(contract),
     )
     return resolution, hits
 

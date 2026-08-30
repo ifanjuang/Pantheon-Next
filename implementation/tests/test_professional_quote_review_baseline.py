@@ -312,9 +312,19 @@ def test_current_project_aware_professional_review_baseline_is_observed_not_assu
         }
         assert forbidden_hits == []
 
-        # Corpus shape is stable, but output quality is deliberately observational.
-        # A later retrieval/method improvement must be allowed to increase source
-        # coverage or professional findings without making this baseline fail.
+        # Failure-to-constraint ratchet from the first observed #827 baseline:
+        # the selected quote, CCTP and DPGF must each contribute useful retrieved
+        # context when a candidate exists. This is source coverage, not truth or
+        # professional approval.
+        assert contract.raw["retrieval_boundary"]["minimum_hits_per_source"] == 1
+        assert evidence_sources == declared
+        assert observation["retrieval_source_coverage_complete"] is True
+        assert observation["missing_evidence_source_refs"] == []
+        assert "dossiers/devis_reprise/sources/quote_Q-2026-041.md" in evidence_sources
+
+        # Corpus shape is stable; professional findings remain observational.
+        # The next behavior slice may improve claim types without breaking this
+        # retrieval/source-currentness regression.
         assert len(expected_attention_cases) == 7
     finally:
         conn.close()
