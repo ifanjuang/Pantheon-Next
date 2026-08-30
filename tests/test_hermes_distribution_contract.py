@@ -170,13 +170,15 @@ def test_runtime_review_preserves_boundary_and_live_observation_gate() -> None:
     assert "version: 0.20.6" in review
     assert "release_commit: 5fc308a70719a83cccdbba4c0e39c23f5a8239d5" in review
     assert f"current candidate distribution runtime target: {candidate_runtime}" in review
+    assert f"candidate_distribution_runtime_target: {candidate_runtime}" in review
     assert "kernel_change_required: false" in review
     assert "run_binding_change_required: false" in review
-    assert "candidate_distribution_pin_change_authorized: false" in review
+    assert "candidate_distribution_pin_change_authorized: true" in review
+    assert "target_selection_effect: candidate-only" in review
     assert "real_instance_observation_required: true" in review
     assert "runtime_artifact_digest_required_before_observed: true" in review
     assert "POST /v1/runs/{run_id}/approval" in review
-    assert "release reviewed != distribution pin changed" in review
+    assert "candidate pin selected != runtime qualified" in review
     assert "provider" in review and "model_options" in review
 
 
