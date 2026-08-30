@@ -21,6 +21,7 @@ Pantheon Cockpit     -> governed Cards/navigation/decision/status projections
 | Task Contract handoff | `templates/hermes/handoffs/task_contract_handoff.template.yaml` | Hermes | handoff candidate | non-executable |
 | Evidence Pack candidate return | `templates/hermes/returns/evidence_pack_candidate.template.yaml` | Hermes | return envelope candidate | non-executable |
 | Source research skill candidate | `templates/hermes/skills/source-research/SKILL.md` | Hermes | skill candidate | non-executable |
+| Visual focus skill candidate | `templates/hermes/skills/visual-focus/SKILL.md` | Hermes | skill candidate | non-executable |
 | Checkpoint manifest | `templates/hermes/run_manifests/checkpoint_manifest.template.yaml` | Hermes | run manifest candidate | non-executable |
 | Devis reprise run manifest | `templates/hermes/run_manifests/devis_reprise_run_manifest.template.yaml` | Hermes | run manifest candidate | non-executable |
 | Context Pack preparation flow | `templates/langflow/flows/context_pack_preparation_flow.template.yaml` | Langflow | deterministic flow candidate | non-executable |
