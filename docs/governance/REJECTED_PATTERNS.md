@@ -74,6 +74,7 @@ superseded
 | Simulation pass as approval | Future AGI, simulation/eval systems | simulation success can reveal confidence but cannot authorize delivery, transmission, memory or doctrine | Pre-execution simulation as Evidence Pack signal plus approval review |
 | Eval pass as automatic optimization | Future AGI, optimization loops | a score must not mutate prompts, policies, skills, workflows or doctrine | Improvement Candidate plus explicit approval |
 | LLM judge as final authority | automated evaluation methods | replaces user/professional decision | judge output as signal or dissent only |
+| Multi-model consensus as proof or authorization | second-opinion and model-panel systems | agreement between models is correlated generated output, not independent source corroboration, professional truth or authorization | preserve individual opinions/dissent as review signals, verify material claims against applicable sources, and keep the human/governance gate |
 | Hidden multi-agent debate | multi-agent frameworks | creates opaque authority and possible role collusion | Governance College as visible review roles |
 | Autonomous role agents | agent teams mapped to Greek roles | Pantheon Roles are review viewpoints, not workers | Hermes profiles may produce candidates |
 | ZEUS truth engine | over-centralized arbitration | ZEUS arbitrates status and procedure, not truth | User Decision Gate when procedure is insufficient |
@@ -99,6 +100,7 @@ superseded
 | Benchmark score as delivery approval | document QA benchmarks | benchmark performance does not validate a professional livrable | use as evaluation evidence only |
 | Near-zero hallucination claim as proof | RAG architecture articles | reliability claims without benchmark, abstention and evidence audit are not governance evidence | treat as weak signal only |
 | Direct skill manager adoption | SkillsGate-style managers | turns skill discovery into capability mutation | watch and review skills; never auto-install |
+| Working plan or handoff as current governed state | Scoville Plan/Handoff, planning-with-files | durable continuity files can be stale and do not become project identity, current truth, Evidence, approval or authorization | use Work Issue/Context Pack-style continuity and re-read current authoritative state before resuming |
 | Memory curator as canonical authority | memory curator systems | curation output must not promote a Registre Probatoire entry without approval | Register Candidate plus explicit approval |
 
 ## Rejection categories
@@ -149,6 +151,8 @@ Rejected when a tool, UI, runtime, agent, score, graph, marketplace or vendor be
 | trust RAG score | keep retrieval score as limited Evidence Candidate metadata |
 | trust benchmark score | record benchmark as method evidence, not delivery approval |
 | trust long-context answer | require page/source grounding and insufficiency handling |
+| trust model consensus | keep dissent visible and verify material claims against applicable sources |
+| trust persisted plan/handoff | re-read current governed state and owner documents before resuming |
 
 ## Relationship to Distillation Registry
 
