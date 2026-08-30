@@ -145,7 +145,7 @@ A later bounded qualification may move the candidate distribution pin from 0.20.
 11. verify the runtime approval API, if surfaced by a client, produces no Pantheon approval state by implication;
 12. if gateway/messaging/cron is selected in the deployment, exercise restart and code-skew/recovery behavior separately and retain delivery/runtime outcomes as technical observations only.
 
-No new schema or test is required by this source review alone. A protected-path change is justified only if live 0.20.6 acceptance exposes an invariant that the existing observer, binding or tests cannot represent.
+No new schema, observer or test surface is required by this source review. Existing regression assertions that name this release-review owner must track its current version and responsibility; a new protected-path invariant is justified only if live 0.20.6 acceptance exposes something the existing observer, binding or tests cannot represent.
 
 ## Local non-equivalences
 
