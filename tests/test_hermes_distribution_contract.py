@@ -14,6 +14,7 @@ SCHEMA = DISTRIBUTION / "distribution-lock.schema.yaml"
 EXAMPLE = DISTRIBUTION / "distribution-lock.example.yaml"
 README = DISTRIBUTION / "README.md"
 ACTIVE_LOCK = ROOT / "implementation" / "hermes" / "distribution" / "pantheon-standard.lock.yaml"
+EXTERNAL_PINS = ROOT / "implementation" / "qualification" / "external-pins.json"
 RUNTIME_REVIEW = ROOT / "docs" / "governance" / "HERMES_RUNTIME_SURFACE_REVIEW.md"
 EXECUTION_RUNBOOK = ROOT / "docs" / "install" / "HERMES_EXECUTION_BRIDGE_RUNBOOK.md"
 
@@ -164,11 +165,14 @@ def test_tree_digest_documentation_has_closed_ephemeral_exclusions() -> None:
 def test_runtime_review_preserves_boundary_and_live_observation_gate() -> None:
     review = RUNTIME_REVIEW.read_text(encoding="utf-8")
     active = _load(ACTIVE_LOCK)
+    pins = _load(EXTERNAL_PINS)
+    candidate_pin = pins["pins"]["hermes-agent"]
     candidate_runtime = active["source_pins"]["hermes_runtime"]["version"]
 
-    assert "Current reviewed target: Hermes Agent 0.20.6 (`v2026.8.27`)." in review
-    assert "version: 0.20.6" in review
-    assert "release_commit: 5fc308a70719a83cccdbba4c0e39c23f5a8239d5" in review
+    assert candidate_runtime == candidate_pin["version"]
+    assert f"Current reviewed target: Hermes Agent {candidate_runtime} (`v2026.8.27`)." in review
+    assert f"version: {candidate_runtime}" in review
+    assert f"release_commit: {candidate_pin['ref']}" in review
     assert f"current candidate distribution runtime target: {candidate_runtime}" in review
     assert f"candidate_distribution_runtime_target: {candidate_runtime}" in review
     assert "kernel_change_required: false" in review
