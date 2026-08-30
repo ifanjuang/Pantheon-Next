@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 
@@ -14,10 +15,16 @@ PROFILES = ROOT / "hermes" / "profiles"
 PROFILE_README = PROFILES / "README.md"
 PROFILE_CONSTITUTION = PROFILES / "PROFILE_CONSTITUTION.md"
 BASE_SOUL_RULES = PROFILES / "_base" / "base-soul-rules.md"
+EXTERNAL_PINS = ROOT / "implementation" / "qualification" / "external-pins.json"
 
 
 def _text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
+
+
+def _external_pin_version(pin_id: str) -> str:
+    data = json.loads(_text(EXTERNAL_PINS))
+    return data["pins"][pin_id]["version"]
 
 
 def test_runtime_review_keeps_governed_profile_and_release_sensitive_constraints() -> None:
@@ -141,8 +148,9 @@ def test_langfuse_runbook_requires_live_path_evidence_and_no_deleted_review() ->
 
 def test_runtime_review_does_not_change_distribution_or_authority() -> None:
     review = _text(RUNTIME_REVIEW)
+    candidate_runtime = _external_pin_version("hermes-agent")
 
-    assert "current candidate distribution runtime target: 0.20.5" in review
+    assert f"current candidate distribution runtime target: {candidate_runtime}" in review
     assert "candidate_distribution_pin_change_authorized: false" in review
     assert "new_runtime_owner_required: false" in review
     assert "new_client_owner_required: false" in review
