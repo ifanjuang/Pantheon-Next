@@ -49,10 +49,10 @@ def test_observe_raw_quote_review_hits_before_runner_filter() -> None:
             }
             for hit in hits
         ]
-        print(
-            "PROFESSIONAL_QUOTE_REVIEW_RAW_HITS="
-            + json.dumps(observation, ensure_ascii=False, sort_keys=True)
-        )
-        assert hits
+        diagnostic = json.dumps(observation, ensure_ascii=False, sort_keys=True)
+        print("PROFESSIONAL_QUOTE_REVIEW_RAW_HITS=" + diagnostic)
+        # Intentional temporary failure so GitHub Actions retains the exact raw
+        # observation even when pytest would otherwise hide stdout for a pass.
+        assert False, "PROFESSIONAL_QUOTE_REVIEW_RAW_HITS=" + diagnostic
     finally:
         conn.close()
