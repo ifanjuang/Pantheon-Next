@@ -178,6 +178,73 @@ health finding != defect confirmed
 provider output != governed Knowledge
 ```
 
+## Lotus renderer source qualification follow-up
+
+After the obsidian-wiki graph/health qualification, the separate visualization question was checked against exact current repository state rather than folded into the graph provider.
+
+Pantheon basis at the start of this follow-up:
+
+- `Pantheon-Next/main`: `fc5aae73f3933709e79deabcbe30bf34fcbca00f`;
+- the existing external-tool placement register remains the support owner for any future placement decision and is deliberately unchanged by this source-only qualification.
+
+Lotus upstream state observed:
+
+- repository: `TzadikimBIU/lotus`;
+- latest stable release: `1.2.3`;
+- current `main`: `b3b4dec3095d6cfe32d1443ad8a4a87ea50dd3e4`;
+- open pull requests observed: zero;
+- open issues observed: zero;
+- exact-head upstream smoke run `32519680456`: success.
+
+Relevant source findings at that pin:
+
+- `src/engine/managedOutput.ts` defines the `lotus-display` Markdown language and parses its source with `JSON.parse` into validated MIME display records;
+- `src/plugin/main.ts` registers `lotus-display` as a Markdown code-block processor and passes parsed display records directly to `renderDisplayOutput`; this path is distinct from `runBlock` and the local-execution consent gate;
+- current defaults keep local execution, note write-back, auto-run, API and logging disabled;
+- `application/vnd.lotus.d3+json` is rendered from a declarative chart spec limited by the reviewed adapter to `bar`, `line` or `scatter` plus JSON data/key values;
+- the reviewed D3 display path constructs SVG through bundled D3 and does not evaluate JavaScript carried in the display payload;
+- the Cytoscape adapter accepts a materially wider partial `CytoscapeOptions` object and is therefore deferred until an allowlisted projection is demonstrated;
+- Graphviz is excluded from this slice because it can invoke the `dot` process; HTML, Plotly, JSXGraph and all code-runner surfaces are also excluded.
+
+The smallest candidate profile is therefore:
+
+```text
+authorized Markdown note
+-> existing lotus-display JSON fence
+-> application/vnd.lotus.d3+json only
+-> Lotus first-party D3 renderer
+-> SVG projection
+```
+
+The source review supports preparing this profile for an Obsidian runtime smoke. It does not establish installed-runtime behavior or authorize the wider Lotus plugin runtime.
+
+```text
+generated data != executable code
+display record != Evidence
+rendered node or edge != governed relation
+view model != canonical model
+visualization success != professional validation
+renderer available != renderer authorized
+projection != persistence
+```
+
+Creating or replacing a `lotus-display` fence remains a workspace persistence action and therefore requires explicit authorized workspace-persistence intent under existing owners. Rendering an already-present fence is the read-only path being qualified.
+
+Qualification status:
+
+```text
+Lotus source review = passed for preparing renderer-only D3 smoke
+Lotus runtime smoke = pending
+Lotus provider placement = not yet recorded
+Lotus execution runtime adoption = no
+Pantheon capability binding = none
+workspace automatic write = not approved
+```
+
+A real isolated Obsidian test-vault smoke against release `1.2.3` is required before the external-tool placement register may record Lotus as a renderer candidate. That smoke must keep the renderer-only settings disabled, retain before/after note hashes, verify no output file or note mutation, and show that the D3 display renders without enabling local execution.
+
+The prepared source-review contract is retained in `tests/fixtures/lotus_renderer_pilot.json` and protected by `tests/test_lotus_renderer_qualification.py`.
+
 ## Changed paths
 
 The #854 reconstruction changed:
@@ -192,12 +259,18 @@ The executed-qualification follow-up adds:
 - `tests/test_obsidian_graph_health_observed.py`;
 - this existing intervention log.
 
-No new doctrine owner or generated index entry is required.
+The Lotus source-qualification follow-up adds:
+
+- `tests/fixtures/lotus_renderer_pilot.json`;
+- `tests/test_lotus_renderer_qualification.py`;
+- this existing intervention log.
+
+No new doctrine owner, generated index entry, runtime component or provider binding is introduced.
 
 ## Verification target
 
-Keep the observed result separate from the prepared expectations, pin the exact upstream source surfaces, run the focused observed-result regression and normal governance CI, and inspect exact-head mergeability before merge.
+Keep observed runtime results separate from prepared expectations. For Lotus, run static regression and normal governance CI now; execute the isolated Obsidian runtime smoke separately before any placement-register change.
 
 ## Status
 
-The qualification is executed for the named deterministic surfaces and is partial/not accepted provider-wide. Doctrine ownership, runtime status, professional authority and external bindings are unchanged. Re-test only after an upstream change relevant to link resolution, scope enforcement or the undemonstrated semantic capabilities.
+The obsidian-wiki qualification is executed for the named deterministic surfaces and remains partial/not accepted provider-wide. The Lotus renderer-only D3 profile is source-reviewed and prepared for runtime smoke, not runtime-qualified or adopted. Doctrine ownership, runtime status, professional authority and external bindings are unchanged.
