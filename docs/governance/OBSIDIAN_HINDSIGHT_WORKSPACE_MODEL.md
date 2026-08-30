@@ -265,12 +265,54 @@ silently mutate manifest or move files   = forbidden
 
 `docs/architecture/WORKSPACE_MANIFEST_INSPECTOR_CANDIDATE.md` owns the candidate manifest UX and local health posture. A second-brain package may consume that contract; it does not replace it. A missing manifest remains neutral unless an explicit qualification rule requires one.
 
+### Distilled maintenance patterns without a parallel knowledge system
+
+The reviewed external `Ar9av/obsidian-wiki` project demonstrates additional useful maintenance patterns, including staged writes, source-delta tracking, statement provenance labels and whole-vault equilibrium checks. Pantheon does not adopt or install that package through this document.
+
+Most of those responsibilities are already owned elsewhere in Pantheon and must not be duplicated here. Reusable Knowledge already has visible `generated_unreviewed`, `needs_review`, `reviewed` and `superseded` states, exact optimistic versions, idempotent write semantics, source references and digests. The workspace-manifest candidate already owns manifestability and local package health. Hindsight already owns derived retrieval in this reference profile.
+
+Therefore an optional Obsidian behavior must not import `_staging`, `.manifest.json`, a trust ledger, a required frontmatter lifecycle or a second retrieval index as Pantheon requirements.
+
+```text
+upstream staging directory != Pantheon review owner
+upstream manifest != governed workspace identity
+upstream trust ledger != Evidence or approval authority
+upstream lifecycle != Pantheon Knowledge lifecycle
+upstream graph query != replacement for bounded Hindsight retrieval
+```
+
+Two patterns remain useful because they add behavior without adding authority.
+
+First, a **report-only workspace audit** may inspect the authorized knowledge area for candidate duplicate notes, unresolved or malformed wikilinks/embeds, stale summaries or source references, contradictory statements, orphaned material and useful missing cross-links. Its default output is findings only. It must not auto-fix, rename, merge, archive, relink or rewrite professional material. Any accepted correction follows the existing write posture and exact task scope.
+
+```text
+audit finding != defect confirmed
+audit clean != professionally current
+duplicate candidate != merge authorization
+contradiction candidate != source adjudication
+link repair candidate != filesystem mutation authority
+```
+
+A later maintenance pass may compare report-only results across the relevant checks and state that no checked maintenance action is currently proposed. That local equilibrium is a workspace-health observation only; it is not truth, review completion, Evidence admission or authorization.
+
+Second, narrative workspace material may expose lightweight statement posture such as `extracted`, `inferred` or `ambiguous` when this improves human legibility. These are descriptive annotations only. They do not introduce a new Pantheon provenance schema, Claim status, Evidence class, lifecycle or confidence authority. Where an existing Pantheon contract already carries source/provenance or claim semantics, the existing owner must be consumed rather than mirrored in frontmatter.
+
+```text
+extracted annotation != source truth
+inferred annotation != accepted Claim
+ambiguous annotation != governed conflict state
+workspace annotation != Evidence provenance owner
+```
+
+These patterns intentionally stop short of automatic contradiction reconciliation or whole-vault rewriting. The current external `obsidian-wiki` implementation also has open edge cases around reserved staging paths and Obsidian link forms; that reinforces the Pantheon posture that maintenance starts as report-only and professional writes remain bounded by existing owners.
+
 This preserves a small default:
 
 ```text
 Hermes-native files/context
 -> optional Obsidian workspace capability
 -> optional second-brain behavior
+-> optional report-only maintenance
 -> optional Hindsight-derived recall
 ```
 
