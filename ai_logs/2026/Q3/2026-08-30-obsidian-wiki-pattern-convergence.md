@@ -2,42 +2,27 @@
 
 ## Objective
 
-Review the current `Ar9av/obsidian-wiki` maintenance model against current Pantheon Next `main` and retain only behavior that fills a demonstrated gap without creating a parallel Knowledge, manifest, retrieval, provenance or approval owner.
+Evaluate `Ar9av/obsidian-wiki` against the current Pantheon workspace model, retain only useful bounded behavior, and avoid creating parallel Knowledge, retrieval, manifest, provenance, lifecycle or approval authorities.
 
-## Current-state checks
+## Existing Pantheon owners reused
 
-- #848 is merged and already owns `search-before-create` plus explicit conversation consolidation in `docs/governance/OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md`.
-- `docs/domain-packs/architecture/DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md` already owns reusable Markdown Knowledge organization and the visible `generated_unreviewed | needs_review | reviewed | superseded` review posture.
-- `docs/governance/DOCUMENT_KNOWLEDGE_SLICE_CONTRACT.md` plus `implementation/mvp_vertical/knowledge.py` already provide source refs/digests, optimistic versions, idempotent material writes and candidate edit requests for the implemented candidate Knowledge slice.
-- `docs/architecture/WORKSPACE_MANIFEST_INSPECTOR_CANDIDATE.md` already owns manifestability and local package-health semantics.
-- Hindsight remains the qualified/recommended optional derived retrieval provider in the current Obsidian reference profile; the generic external runtime-memory binding remains unbound.
-- #852 adds Word-Smith only as optional Obsidian authoring/document-assembly UX in the same owner. That addition is preserved and does not replace or conflict with the maintenance behavior distilled here.
-- #855 is merged and changes only Hermes pin assertions; it does not overlap this workspace slice.
-- #849 is merged and remains confined to the professional quote-review qualification corpus; it does not overlap this workspace slice.
+Before this qualification, Pantheon already owned the relevant boundaries:
 
-## External patterns reviewed
+- #848: `search-before-create` and explicit conversation consolidation in `docs/governance/OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md`;
+- `docs/domain-packs/architecture/DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md`: reusable Markdown organization and review posture;
+- `docs/governance/DOCUMENT_KNOWLEDGE_SLICE_CONTRACT.md` plus `implementation/mvp_vertical/knowledge.py`: governed Knowledge candidate writes/versioning;
+- `docs/architecture/WORKSPACE_MANIFEST_INSPECTOR_CANDIDATE.md`: manifestability/local package-health semantics;
+- Hindsight: qualified/recommended optional derived retrieval provider, while the generic runtime-memory binding remains unbound;
+- Word-Smith: separate optional authoring/document-assembly UX only.
 
-The current `Ar9av/obsidian-wiki` architecture demonstrates useful ideas including:
+The upstream subsystem is therefore not imported wholesale.
 
-- staged LLM writes;
-- source-delta manifest tracking;
-- statement posture such as extracted/inferred/ambiguous;
-- lint/dedup/cross-link maintenance;
-- whole-vault equilibrium checks;
-- tiered graph/query behavior.
+## Patterns retained
 
-Its current repository also has open edge cases around reserved staging paths and valid Obsidian wikilink/embed forms. Those observations support retaining maintenance as report-only by default rather than importing automatic rewrite behavior into professional workspaces.
+Only bounded, provider-neutral patterns are retained:
 
-## Convergence decision
-
-Do not import the upstream subsystem.
-
-The staging, source-delta ledger, lifecycle/trust and retrieval responsibilities are already covered by existing Pantheon owners or would create parallel authority if copied literally.
-
-Retain only two additive behaviors inside the existing optional second-brain owner:
-
-1. a bounded report-only workspace audit that may surface duplicate candidates, malformed/unresolved links, stale summaries/source refs, contradiction candidates, orphans and missing cross-links, while refusing automatic mutation;
-2. lightweight narrative annotations `extracted`, `inferred` and `ambiguous` when useful for human legibility, explicitly non-authoritative and subordinate to existing Pantheon provenance/Claim/Evidence owners.
+1. report-only workspace maintenance observations such as unresolved links, orphan candidates, duplicate/consolidation candidates, contradiction candidates and missing cross-links;
+2. optional human-legibility annotations such as `extracted`, `inferred` and `ambiguous`, subordinate to Pantheon Claim/provenance/Evidence owners.
 
 ```text
 audit finding != defect confirmed
@@ -46,54 +31,22 @@ local equilibrium != professional review completion
 workspace annotation != Evidence provenance owner
 ```
 
-## Deliberate non-change
+No `_staging` contract, upstream `.manifest.json`, trust ledger, lifecycle, second provenance schema, Hindsight replacement, automatic contradiction reconciliation or automatic whole-vault rewrite is adopted.
 
-This slice introduces no:
+## Prepared qualification — #854
 
-- `_staging` directory contract;
-- `.manifest.json` contract;
-- trust ledger;
-- required frontmatter lifecycle;
-- second Knowledge lifecycle;
-- second provenance schema;
-- graph-query/retrieval engine;
-- Hindsight replacement;
-- automatic contradiction reconciliation;
-- automatic whole-vault rewrite;
-- runtime activation or dependency on `Ar9av/obsidian-wiki`.
+PR #854 converged the graph/health work into the existing owner and prepared `tests/fixtures/obsidian_graph_health_pilot.json` without changing runtime or bindings.
 
-Word-Smith remains a separate optional authoring UX classification and is not widened by this change.
+Stable candidate snapshot:
 
-## Follow-up qualification reconstruction — #854
+- repository: `Ar9av/obsidian-wiki`;
+- release: `v2026.08.6`;
+- release commit: `8b5859d0f895e51e785d3ba22ed8008297e8d367`;
+- current upstream `main` observed: `37596cffeef43faecd9b61246b0b119b11a87bc4`;
+- `graph_analysis.py` blob on stable/current: `9e2ff9be961f4149aa09d490e10089fb1d700c69`;
+- `lint.py` blob on stable/current: `09a2b8207e02296455fd4d9a9401e6aa1fbdd66d`.
 
-The graph/health qualification was revalidated after `main` advanced to `dfa7264cfc759f64e5c71016d3dc791f54577f03`.
-
-The earlier #854 draft duplicated a larger structural/health doctrine block into `OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md`. That duplication is no longer justified because #851 already absorbed the report-only maintenance boundary, valid-link edge-case warning, local-equilibrium posture and the rule that upstream graph query must not replace bounded Hindsight retrieval.
-
-The reconstruction therefore keeps the existing owner unchanged and narrows #854 to a qualification corpus plus regression. This is a convergence change, not a capability removal.
-
-The external snapshot remains:
-
-- stable qualification baseline: `Ar9av/obsidian-wiki` `v2026.08.6`, release commit `8b5859d0f895e51e785d3ba22ed8008297e8d367`;
-- current upstream observation: `main` `37596cffeef43faecd9b61246b0b119b11a87bc4`;
-- notable post-release graph-query fix: `427a9016b6aea04625133bd1a4ee00238c8c8518`, reducing false positives for non-English gap questions;
-- open write-path issue #199 remains a reason to exclude memory-server/write behavior;
-- open link-resolution issues #176 and #177 demonstrate false positives and destructive-risk around valid Obsidian attachment, `.base`, `.canvas`, explicit `.md`, heading, alias and escaped-pipe forms.
-
-The bounded corpus now carries ten human-labelled cases. In addition to the existing false-hub, `_raw`, shortest-path, isolate, true broken-link, duplicate, contradiction, scope and protected-material cases, it includes a negative control proving that valid Obsidian-native link forms must not become broken-link findings:
-
-```text
-![[plan.pdf]]
-![[perspective.png]]
-[[planning.base]]
-[[schema.canvas]]
-[[cctp.md]]
-[[cctp#Menuiseries]]
-[[cctp|CCTP courant]]
-| [[chauffage\|Chauffage]] |
-```
-
-The corpus remains prepared, not executed.
+The corpus contains ten human-labelled cases, including bookkeeping exclusion, `_raw` exclusion, shortest path, isolate, true broken link, valid native Obsidian link negative controls, semantic duplicate/contradiction candidates, an observable out-of-scope sentinel, and protected source/Evidence material.
 
 ```text
 fixture prepared != provider qualified
@@ -102,72 +55,92 @@ passing static regression != behavioral acceptance
 valid link != safe automatic rewrite target
 ```
 
-No provider binding, runtime activation, automatic maintenance path or professional authority changes through this qualification.
+## First observed record — #856
 
-## Executed qualification after #854
+PR #856 created the first separate observed-result owner:
 
-#854 merged on Pantheon `main` as `c351b12f2b6167865d62b5a008c7e670f79bd0da`. The prepared corpus was then executed against the deterministic graph/link-health surfaces pinned by the qualification.
+- `tests/fixtures/obsidian_graph_health_observed_v2026.08.6.json`;
+- `tests/test_obsidian_graph_health_observed.py`.
 
-Upstream pins inspected immediately before execution:
+Its local sandbox could not install/run the upstream package and instead reproduced selected deterministic source logic in a local harness. That was useful as an initial observation, but it materialized the graph differently from the canonical corpus and reported `programme -> chauffage -> cctp` as a passing path.
 
-- stable baseline: `Ar9av/obsidian-wiki` `v2026.08.6`, commit `8b5859d0f895e51e785d3ba22ed8008297e8d367`;
-- current upstream `main`: `37596cffeef43faecd9b61246b0b119b11a87bc4`;
-- `graph_analysis.py` blob on both stable and current main: `9e2ff9be961f4149aa09d490e10089fb1d700c69`;
-- `lint.py` blob on both stable and current main: `09a2b8207e02296455fd4d9a9401e6aa1fbdd66d`.
+That local-harness path result is superseded by the real-upstream execution below. The #856 owner paths are retained; no second observation registry is created.
 
-The current-main multilingual graph-query fix therefore does not alter the deterministic graph parser or lint resolver exercised here.
+## Real upstream execution — #857 Q1
 
-The execution sandbox had no outbound DNS access, so the upstream wheel was not installed from the network. Instead, the exact relevant deterministic function logic from the pinned source blobs was exercised in a disposable local harness. No memory server, capture hook, trust ledger, lifecycle, manifest or write path was started. This is qualification evidence for the named source surfaces only, not for the whole provider package.
+PR #857 adds a reproducible qualification harness rather than a provider integration.
 
-Observed result:
+`implementation/qualification/external-pins.json` gains the qualification-only candidate pin:
 
 ```text
-PASS
-- root bookkeeping index exclusion
-- _raw staging exclusion
-- programme -> chauffage -> cctp shortest path
-- isolated question detection
-- true missing details-menuiseries link detection
-- no mutation of the disposable workspace
-
-FAIL
-- valid Obsidian link precision: 6 false positives
-- bounded scope: out-of-scope sentinel entered the full-vault graph
-
-NOT DEMONSTRATED
-- near-duplicate semantic detection
-- semantic contradiction detection
+obsidian-wiki
+repository = Ar9av/obsidian-wiki
+version    = 2026.8.6
+ref        = 8b5859d0f895e51e785d3ba22ed8008297e8d367
 ```
 
-The six valid-link false positives were:
+`.github/workflows/obsidian-wiki-graph-health-q1.yml` follows the established external-qualification pattern:
+
+1. export the canonical pin;
+2. checkout the exact upstream commit;
+3. materialize the canonical pilot fixture into a disposable vault without normalizing away explicit `.md` targets;
+4. execute the real upstream `python -m obsidian_wiki graph-analyse` and `lint` commands;
+5. run graph/lint against `projects/maison/` and a whole-vault negative control;
+6. hash tracked workspace/source/Evidence material before and after execution;
+7. retain raw outputs as a 30-day GitHub Actions artifact.
+
+Excluded surfaces remain setup, capture, cache/manifest writes, trust recording, sync, memory server and automatic repair.
+
+Run record:
+
+- workflow run: `33331529533`;
+- execution head: `5fb920e57610cf7c46f41be3c8d75b85813c702b`;
+- artifact: `9737779875` / `obsidian-wiki-graph-health-q1-33331529533`;
+- artifact digest: `sha256:1dabfa025b443970a97743bba53a954206afeddfb50ea641ef1def04c8253f97`;
+- harness result: success.
+
+## Corrected observed result
+
+The exact upstream CLI produced a materially different structural result from the #856 local harness.
+
+Observed positives:
+
+- root `index.md` is excluded from graph ranking;
+- `_raw/` is excluded;
+- passing `projects/maison/` as the vault root excludes the out-of-scope sentinel;
+- all 16 tracked synthetic workspace/source/Evidence files were byte-identical after execution;
+- no Pantheon state, Evidence status, runtime activation or Capability Binding changed.
+
+Observed blockers:
+
+1. **explicit `.md` links break the graph**: the canonical corpus contains targets such as `[[projects/maison/decisions.md]]`, while upstream graph pages are keyed by stems. The real `programme -> cctp` query therefore returned `path: null`;
+2. **false isolates**: because those edges disappear, `programme`, `decisions`, `chauffage` and `chauffage-notes` were reported isolated alongside the true `question-ouverte` isolate;
+3. **broken-link precision fails**: `lint` produced 15 broken-link findings. The true `details-menuiseries.md` miss was present, but valid explicit `.md`, PDF/PNG embed, `.base`, `.canvas` and escaped-pipe alias forms were also reported broken;
+4. **provider schema noise**: neutral Pantheon pages also received missing `base_confidence`/`lifecycle` findings and a missing trust-ledger finding, although that provider lifecycle is outside this qualification target;
+5. **semantic duplicate/contradiction capabilities remain unexecuted** by deterministic Q1.
+
+The whole-vault negative control contains `sentinel-hors-perimetre`; the scoped run does not. This means subtree scoping is usable when the caller supplies the correct root, but Pantheon authorization remains caller/wrapper-owned and is not inferred by the provider.
+
+Current upstream `main` was rechecked after the run. Its `graph_analysis.py` and `lint.py` blobs are identical to the tested stable release, so these deterministic link-resolution observations remain current for those surfaces.
+
+The single canonical observed record remains:
+
+`tests/fixtures/obsidian_graph_health_observed_v2026.08.6.json`
+
+The prepared expectation corpus remains unchanged.
+
+## Qualification decision
 
 ```text
-plan.pdf
-perspective.png
-planning.base
-schema.canvas
-cctp.md
-chauffage\
-```
-
-The scope failure is structural rather than semantic: the upstream graph parser walks all non-skipped Markdown below the supplied vault root and exposes no task/project prefix parameter. A caller or adapter can pass a narrower materialized root, but that is external scope enforcement and must not be misreported as provider-native scope safety.
-
-The duplicate and contradiction cases are marked `not_demonstrated`, not failed, because the deterministic `graph_analysis.py` / `lint.py` surfaces exercised here do not contain the corresponding semantic detectors. Missing implementation is not converted into an invented behavioral result.
-
-Qualification decision:
-
-```text
-partial capability observations accepted
-!= provider accepted
-
-obsidian-wiki provider-wide qualification = not accepted
-binding change = none
+obsidian-wiki v2026.08.6 direct graph/health qualification = not accepted
+provider binding change = none
+runtime activation = none
 automatic writes = not approved
 ```
 
-Reusable observations remain valid for the tested blobs: bookkeeping and `_raw` exclusion, basic structural graph parsing, shortest paths, isolates and true broken-link signals. Whole-vault link health, native task/project scoping, semantic duplicate/contradiction quality and automatic repair remain unqualified or blocked.
+Accepted observations are limited to bookkeeping exclusion, `_raw` exclusion, read-only behavior of the tested surfaces and caller-enforced subtree scoping.
 
-The raw observed result is retained separately in `tests/fixtures/obsidian_graph_health_observed_v2026.08.6.json`; the original prepared fixture remains unchanged as `prepared_not_executed`, preserving expectation versus observation.
+Not accepted are explicit-`.md` graph correctness, shortest-path qualification on the canonical corpus, isolate precision, whole-vault link-health reliability, provider-native task/project authorization, semantic duplicate/contradiction quality, automatic repair and provider-wide adoption.
 
 ```text
 observed result != provider-wide truth
@@ -176,37 +149,23 @@ read-only success != authorization
 graph relation != Evidence
 health finding != defect confirmed
 provider output != governed Knowledge
+caller-supplied scope != provider-owned authorization
 ```
 
-## Lotus renderer source qualification follow-up
+## Lotus renderer source qualification — #861
 
-After the obsidian-wiki graph/health qualification, the separate visualization question was checked against exact current repository state rather than folded into the graph provider.
+The separate visualization question remains intentionally independent from the `obsidian-wiki` provider decision.
 
-Pantheon basis at the start of this follow-up:
-
-- `Pantheon-Next/main`: `fc5aae73f3933709e79deabcbe30bf34fcbca00f`;
-- the existing external-tool placement register remains the support owner for any future placement decision and is deliberately unchanged by this source-only qualification.
-
-Lotus upstream state observed:
+Reviewed Lotus upstream state:
 
 - repository: `TzadikimBIU/lotus`;
-- latest stable release: `1.2.3`;
-- current `main`: `b3b4dec3095d6cfe32d1443ad8a4a87ea50dd3e4`;
-- open pull requests observed: zero;
-- open issues observed: zero;
-- exact-head upstream smoke run `32519680456`: success.
-
-Relevant source findings at that pin:
-
-- `src/engine/managedOutput.ts` defines the `lotus-display` Markdown language and parses its source with `JSON.parse` into validated MIME display records;
-- `src/plugin/main.ts` registers `lotus-display` as a Markdown code-block processor and passes parsed display records directly to `renderDisplayOutput`; this path is distinct from `runBlock` and the local-execution consent gate;
+- stable release: `1.2.3`;
+- reviewed upstream `main`: `b3b4dec3095d6cfe32d1443ad8a4a87ea50dd3e4`;
+- the source-qualified path is an existing `lotus-display` JSON fence using `application/vnd.lotus.d3+json` and the first-party D3 renderer;
 - current defaults keep local execution, note write-back, auto-run, API and logging disabled;
-- `application/vnd.lotus.d3+json` is rendered from a declarative chart spec limited by the reviewed adapter to `bar`, `line` or `scatter` plus JSON data/key values;
-- the reviewed D3 display path constructs SVG through bundled D3 and does not evaluate JavaScript carried in the display payload;
-- the Cytoscape adapter accepts a materially wider partial `CytoscapeOptions` object and is therefore deferred until an allowlisted projection is demonstrated;
-- Graphviz is excluded from this slice because it can invoke the `dot` process; HTML, Plotly, JSXGraph and all code-runner surfaces are also excluded.
+- Cytoscape remains deferred behind an explicit allowlisted payload profile; Graphviz, HTML, Plotly, JSXGraph and code-runner surfaces remain excluded from this first qualification.
 
-The smallest candidate profile is therefore:
+The smallest candidate profile remains:
 
 ```text
 authorized Markdown note
@@ -215,8 +174,6 @@ authorized Markdown note
 -> Lotus first-party D3 renderer
 -> SVG projection
 ```
-
-The source review supports preparing this profile for an Obsidian runtime smoke. It does not establish installed-runtime behavior or authorize the wider Lotus plugin runtime.
 
 ```text
 generated data != executable code
@@ -228,49 +185,31 @@ renderer available != renderer authorized
 projection != persistence
 ```
 
-Creating or replacing a `lotus-display` fence remains a workspace persistence action and therefore requires explicit authorized workspace-persistence intent under existing owners. Rendering an already-present fence is the read-only path being qualified.
+PR #861 merged the source-review fixture and regression only. It did not add Lotus to the external-tool placement register, install the plugin, activate a runtime or create a Capability Binding.
 
-Qualification status:
+Current Lotus qualification status:
 
 ```text
 Lotus source review = passed for preparing renderer-only D3 smoke
 Lotus runtime smoke = pending
-Lotus provider placement = not yet recorded
+Lotus provider placement = not recorded
 Lotus execution runtime adoption = no
 Pantheon capability binding = none
 workspace automatic write = not approved
 ```
 
-A real isolated Obsidian test-vault smoke against release `1.2.3` is required before the external-tool placement register may record Lotus as a renderer candidate. That smoke must keep the renderer-only settings disabled, retain before/after note hashes, verify no output file or note mutation, and show that the D3 display renders without enabling local execution.
+A real isolated Obsidian test-vault smoke against release `1.2.3` remains required before any placement-register entry. The smoke must retain before/after note hashes, keep execution/write/API/logging disabled, verify no output-file or Markdown mutation and demonstrate that the D3 display renders without enabling a code runner.
 
-The prepared source-review contract is retained in `tests/fixtures/lotus_renderer_pilot.json` and protected by `tests/test_lotus_renderer_qualification.py`.
+The prepared source-review contract remains `tests/fixtures/lotus_renderer_pilot.json`, protected by `tests/test_lotus_renderer_qualification.py`.
 
-## Changed paths
+## Next action
 
-The #854 reconstruction changed:
+Keep `obsidian-wiki` unbound. Retain the report-only patterns already distilled into Pantheon. Re-run the same real-upstream corpus after upstream link-resolution changes. Do not introduce a Pantheon-specific compatibility adapter solely to compensate for this release unless a demonstrated workflow later justifies the maintenance cost.
 
-- `tests/fixtures/obsidian_graph_health_pilot.json`;
-- `tests/test_workspace_organization_routing.py`;
-- this existing intervention log.
+If semantic near-duplicate/contradiction behavior remains desirable, qualify it separately through an agent-capable test rather than inferring it from the deterministic CLI.
 
-The executed-qualification follow-up adds:
-
-- `tests/fixtures/obsidian_graph_health_observed_v2026.08.6.json`;
-- `tests/test_obsidian_graph_health_observed.py`;
-- this existing intervention log.
-
-The Lotus source-qualification follow-up adds:
-
-- `tests/fixtures/lotus_renderer_pilot.json`;
-- `tests/test_lotus_renderer_qualification.py`;
-- this existing intervention log.
-
-No new doctrine owner, generated index entry, runtime component or provider binding is introduced.
-
-## Verification target
-
-Keep observed runtime results separate from prepared expectations. For Lotus, run static regression and normal governance CI now; execute the isolated Obsidian runtime smoke separately before any placement-register change.
+For Lotus, execute the isolated Obsidian renderer-only smoke before any provider-placement decision.
 
 ## Status
 
-The obsidian-wiki qualification is executed for the named deterministic surfaces and remains partial/not accepted provider-wide. The Lotus renderer-only D3 profile is source-reviewed and prepared for runtime smoke, not runtime-qualified or adopted. Doctrine ownership, runtime status, professional authority and external bindings are unchanged.
+#854 is merged and the corpus is prepared. #856 established the observed-result owner. #857 supersedes the local-harness observation with a real upstream execution and keeps one canonical observed record. #861 separately prepares the Lotus D3 renderer-only runtime smoke. Doctrine ownership, professional authority, runtime state and external bindings remain unchanged.
