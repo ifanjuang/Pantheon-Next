@@ -121,7 +121,8 @@ fi
 
 stamp="$(date -u +%Y%m%dT%H%M%SZ)"
 checkpoint="$STATE_ROOT/backups/update-$stamp"
-mkdir -p "$checkpoint"
+umask 077
+install -d -m 0700 "$checkpoint"
 cp -a "$CONFIG_ROOT" "$checkpoint/etc-pantheon-node"
 cp -a "$APP_ROOT/compose.yaml" "$APP_ROOT/compose-env" "$checkpoint/"
 compose config > "$checkpoint/compose-rendered.yaml"
