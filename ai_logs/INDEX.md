@@ -14,12 +14,84 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **766**.
+Total indexed entries: **838**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-08-29 | `2026/Q3/2026-08-29-workspace-organization-routing.md` | Workspace organization routing — 2026-08-29 |
+| 2026-08-29 | `2026/Q3/2026-08-29-risk-history-owner-audit.md` | Risk / historical support owners — #787 audit — 2026-08-29 |
+| 2026-08-29 | `2026/Q3/2026-08-29-retire-historical-coordination-plans-current.md` | Retire historical coordination plans — current replay |
+| 2026-08-29 | `2026/Q3/2026-08-29-prompt-placement-absorption.md` | Prompt Placement — absorption into Adapters and Bindings — 2026-08-29 |
+| 2026-08-29 | `2026/Q3/2026-08-29-pre-execution-simulation-owner-seams.md` | Pre-Execution Simulation — owner-seam convergence — 2026-08-29 |
+| 2026-08-29 | `2026/Q3/2026-08-29-pre-execution-simulation-owner-decision.md` | Pre-Execution Simulation — owner retention decision — 2026-08-29 |
+| 2026-08-29 | `2026/Q3/2026-08-29-optional-obsidian-second-brain-boundary.md` | Optional Obsidian second-brain boundary — 2026-08-29 |
+| 2026-08-29 | `2026/Q3/2026-08-29-module-activation-owner-seam.md` | Module Activation — owner-seam convergence — 2026-08-29 |
+| 2026-08-29 | `2026/Q3/2026-08-29-module-activation-owner-decision.md` | Module Activation — owner retention and authority coverage — 2026-08-29 |
+| 2026-08-29 | `2026/Q3/2026-08-29-model-capability-passport-owner-seam.md` | AI log — Model Capability Passport owner seam |
+| 2026-08-29 | `2026/Q3/2026-08-29-information-acquisition-owner-convergence.md` | Information acquisition owner convergence |
+| 2026-08-29 | `2026/Q3/2026-08-29-governance-method-boundary-dedup.md` | Governance documentation topology — method boundary deduplication — 2026-08-29 |
+| 2026-08-29 | `2026/Q3/2026-08-29-final-active-owner-residues.md` | Final active-owner residue convergence |
+| 2026-08-29 | `2026/Q3/2026-08-29-external-reference-owner-family.md` | AI log — External reference owner family convergence |
+| 2026-08-29 | `2026/Q3/2026-08-29-execution-minimalism-owner-absorption.md` | AI log — Execution Minimalism owner absorption |
+| 2026-08-29 | `2026/Q3/2026-08-29-evidence-topology-antipattern-owner-test.md` | Evidence Topology anti-pattern owner test |
+| 2026-08-29 | `2026/Q3/2026-08-29-close-current-authority-coverage-baseline.md` | Close current-authority coverage baseline |
+| 2026-08-29 | `2026/Q3/2026-08-29-bridge-contract-owner-seam.md` | Bridge Contract — owner-seam convergence — 2026-08-29 |
+| 2026-08-29 | `2026/Q3/2026-08-29-adaptive-request-owner-seams.md` | Adaptive Request Method — owned-seam convergence — 2026-08-29 |
+| 2026-08-29 | `2026/Q3/2026-08-29-adapters-bindings-authority-coverage.md` | Adapters and Bindings — authority coverage repair — 2026-08-29 |
+| 2026-08-29 | `2026/Q3/2026-08-29-absorb-skill-lifecycle-into-capability-owners.md` | 2026-08-29 — absorb Skill Lifecycle into Capability owners |
+| 2026-08-29 | `2026/Q3/2026-08-29-absorb-situation-intake-into-lifecycle.md` | Governance cleanup — absorb Situation Intake into Request Lifecycle — 2026-08-29 |
+| 2026-08-29 | `2026/Q3/2026-08-29-absorb-adaptive-request-into-lifecycle.md` | Governance cleanup — absorb Adaptive Request Method into Request Lifecycle — 2026-08-29 |
+| 2026-08-28 | `2026/Q3/2026-08-28-openwebui-surface-separation-slice.md` | OpenWebUI surface-separation convergence — 2026-08-28 |
+| 2026-08-28 | `2026/Q3/2026-08-28-openwebui-support-methods-slice.md` | OpenWebUI support-method convergence — 2026-08-28 |
+| 2026-08-28 | `2026/Q3/2026-08-28-openwebui-support-boundaries-slice.md` | OpenWebUI support-boundary convergence — 2026-08-28 |
+| 2026-08-28 | `2026/Q3/2026-08-28-openwebui-structural-bindings-slice.md` | OpenWebUI structural bindings convergence — 2026-08-28 |
+| 2026-08-28 | `2026/Q3/2026-08-28-openwebui-skill-watchlist-slice.md` | OpenWebUI skill-watchlist convergence — 2026-08-28 |
+| 2026-08-28 | `2026/Q3/2026-08-28-openwebui-roadmap-slice.md` | OpenWebUI roadmap convergence — 2026-08-28 |
+| 2026-08-28 | `2026/Q3/2026-08-28-openwebui-risk-memory-slice.md` | OpenWebUI risk/memory convergence — 2026-08-28 |
+| 2026-08-28 | `2026/Q3/2026-08-28-openwebui-request-intake-owner-slice.md` | OpenWebUI request/intake owner convergence — 2026-08-28 |
+| 2026-08-28 | `2026/Q3/2026-08-28-openwebui-rejection-provenance-slice.md` | OpenWebUI rejection/provenance convergence — 2026-08-28 |
+| 2026-08-28 | `2026/Q3/2026-08-28-openwebui-method-family-slice.md` | OpenWebUI method-family convergence — 2026-08-28 |
+| 2026-08-28 | `2026/Q3/2026-08-28-openwebui-method-autonomy-final-slice.md` | OpenWebUI method/autonomy final convergence — 2026-08-28 |
+| 2026-08-28 | `2026/Q3/2026-08-28-openwebui-external-placement-slice.md` | OpenWebUI external-tool placement convergence — 2026-08-28 |
+| 2026-08-28 | `2026/Q3/2026-08-28-openwebui-exposure-examples-slice.md` | OpenWebUI exposure/example convergence — 2026-08-28 |
+| 2026-08-28 | `2026/Q3/2026-08-28-openwebui-editorial-slice.md` | OpenWebUI editorial convergence — 2026-08-28 |
+| 2026-08-28 | `2026/Q3/2026-08-28-openwebui-core-boundary-owner-slice.md` | OpenWebUI core-boundary owner convergence — 2026-08-28 |
+| 2026-08-28 | `2026/Q3/2026-08-28-openwebui-capability-governance-slice.md` | OpenWebUI capability-governance convergence — 2026-08-28 |
+| 2026-08-28 | `2026/Q3/2026-08-28-converge-residual-openwebui-active-docs.md` | Residual OpenWebUI active-document convergence — 2026-08-28 |
+| 2026-08-28 | `2026/Q3/2026-08-28-agent-plugins-kitbash-convergence.md` | Agent Plugins / Kitbash convergence — 2026-08-28 |
+| 2026-08-27 | `2026/Q3/2026-08-27-retire-paperless-runtime.md` | Retire Paperless runtime and document observer path |
+| 2026-08-27 | `2026/Q3/2026-08-27-retire-openwebui-template-surface.md` | Retire OpenWebUI template surface |
+| 2026-08-27 | `2026/Q3/2026-08-27-retire-openwebui-mcp-projection.md` | Retire OpenWebUI MCP projection |
+| 2026-08-27 | `2026/Q3/2026-08-27-retire-openwebui-integration-owner.md` | Retire OpenWebUI integration owner |
+| 2026-08-27 | `2026/Q3/2026-08-27-retire-openwebui-central-docs.md` | Retire OpenWebUI central doctrine pointers |
+| 2026-08-27 | `2026/Q3/2026-08-27-openwebui-central-owner-convergence.md` | OpenWebUI central-owner convergence |
+| 2026-08-27 | `2026/Q3/2026-08-27-h59-revalidation-and-active-state-convergence.md` | H5.9 repository revalidation and active-state convergence — 2026-08-27 |
+| 2026-08-27 | `2026/Q3/2026-08-27-converge-template-example-surfaces.md` | Converge template and professional-example surfaces |
+| 2026-08-27 | `2026/Q3/2026-08-27-converge-source-document-owners.md` | Converge source and document upstream owners |
+| 2026-08-27 | `2026/Q3/2026-08-27-converge-small-openwebui-consumers.md` | Converge small active OpenWebUI consumers |
+| 2026-08-27 | `2026/Q3/2026-08-27-converge-root-architecture-entry.md` | Converge root architecture entry |
+| 2026-08-27 | `2026/Q3/2026-08-27-converge-role-activation-surface.md` | Converge role/domain/skill activation surface |
+| 2026-08-27 | `2026/Q3/2026-08-27-converge-mvp-loop-client-retrieval.md` | Converge MVP governed loop client and retrieval ownership |
+| 2026-08-27 | `2026/Q3/2026-08-27-converge-langgraph-runtime-candidate.md` | Converge LangGraph runtime candidate boundary |
+| 2026-08-27 | `2026/Q3/2026-08-27-converge-evidence-topology.md` | Converge Evidence Topology authority |
+| 2026-08-27 | `2026/Q3/2026-08-27-converge-document-lifecycle.md` | Converge document lifecycle authority |
+| 2026-08-26 | `2026/Q3/2026-08-26-provider-agnostic-workspace-memory-rag-convergence.md` | Provider-agnostic workspace, memory and RAG convergence — 2026-08-26 |
+| 2026-08-26 | `2026/Q3/2026-08-26-agent-passport-distillation.md` | Agent Passport distillation |
+| 2026-08-25 | `2026/Q3/2026-08-25-ai-memory-mnemosyne-comparison.md` | 2026-08-25 — ai-memory vs Mnemosyne comparison checkpoint |
+| 2026-08-24 | `2026/Q3/2026-08-24-operator-monorepo-path-reconciliation.md` | Operator monorepo path reconciliation |
+| 2026-08-24 | `2026/Q3/2026-08-24-monorepo-placement-language-reconciliation.md` | Monorepo placement language reconciliation |
+| 2026-08-23 | `2026/Q3/2026-08-23-monorepo-mvp-import.md` | 2026-08-23 — history-preserving pantheon-mvp monorepo import |
+| 2026-08-23 | `2026/Q3/2026-08-23-canonical-contract-direct-consumption.md` | Canonical contract direct consumption |
+| 2026-08-23 | `2026/Q3/2026-08-23-architecture-audit-monorepo-zones.md` | Architecture Audit — monorepo zone convergence |
+| 2026-08-21 | `2026/Q3/2026-08-21-hermes-memory-provider-qualification.md` | 2026-08-21 — Hermes runtime-memory provider qualification |
+| 2026-08-20 | `2026/Q3/2026-08-20-canonical-mnemosyne-role.md` | Canonical Mnemosyne Role convergence |
+| 2026-08-20 | `2026/Q3/2026-08-20-ai-literacy-understand-page.md` | AI literacy / Pantheon explainer page |
+| 2026-08-19 | `2026/Q3/2026-08-19-sourcedown-docling-hindsight-qualification.md` | SourceDown / Docling / Hindsight qualification checkpoint |
+| 2026-08-19 | `2026/Q3/2026-08-19-obsidian-docling-markdown-convergence.md` | Obsidian / Docling Markdown convergence — qualification record |
 | 2026-08-18 | `2026/Q3/2026-08-18-landing-problem-first-pitch-for-independent-professionals.md` | Landing pitch — problem first, Pantheon revealed after, addressed to independent professionals |
+| 2026-08-18 | `2026/Q3/2026-08-18-landing-global-rework-stakes-objection-and-call-to-action.md` | Landing global rework — stakes, the work objection, honest state and a call to action |
+| 2026-08-18 | `2026/Q3/2026-08-18-hermes-realtime-voice-candidate-qualification.md` | 2026-08-18 — Hermes realtime voice candidate qualification |
 | 2026-08-17 | `2026/Q3/2026-08-17-landing-vertical-diagrams-and-problem-first-narrative.md` | Landing rework — vertical diagrams, borrowed method, problem-first narrative |
 | 2026-08-17 | `2026/Q3/2026-08-17-landing-architecture-and-memories-readability.md` | Landing readability — architecture, two memories, anonymised project names |
 | 2026-08-16 | `2026/Q3/2026-08-16-architecture-economy-convergence.md` | 2026-08-16 — architecture economy convergence |
