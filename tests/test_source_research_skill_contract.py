@@ -29,6 +29,8 @@ def test_source_research_is_single_surviving_research_skill_candidate():
     assert "`source_addition_candidate`" in text
 
     assert "Before an external retrieval query, minimize unnecessary private" in text
+    assert "task/context access != external transmission authorization" in text
+    assert "Secrets must never be sent to an external retrieval surface" in text
     assert "local context available != external disclosure required" in text
     assert "### 6. Challenge material claims" in text
     assert "support found != challenge completed" in text
