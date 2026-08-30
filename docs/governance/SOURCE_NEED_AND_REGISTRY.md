@@ -138,6 +138,67 @@ It does not say:
 anything retrieved from this route is automatically true
 ```
 
+## Workspace source notebook
+
+An optional Markdown workspace may keep one human-maintained source notebook,
+for example a `Carnet de sources`, to group useful websites, databases,
+institutional routes and working annotations.
+
+The notebook is a discovery surface for Source Leads. It is not the Source
+Registry, an Evidence store, a whitelist or an authorization surface.
+
+```text
+workspace source notebook != Source Registry
+notebook entry != Source Registry Entry
+listed route != inspected source
+workspace path != governed identity
+```
+
+The notebook may remain one file organized by source family. Pantheon does not
+require one note, manifest or governed object per website. Its filename, folder
+and link from a workspace index are deployment choices, not generic Pantheon
+contracts. Hermes and other consumers must not hard-code an Obsidian-specific
+path.
+
+A lightweight notebook entry may record:
+
+```text
+label and route
+intended use
+proposed source family
+freshness caution
+working status
+optional Source Registry reference
+```
+
+These fields support discovery without forcing every bookmark through registry
+admission. When a listed route is used for a task, the exact page, document,
+query result or observation must still be inspected, dated, scoped and linked
+through the normal Source Reference and Evidence chain.
+
+```text
+notebook entry
+-> Source Lead
+-> task-authorized inspection
+-> Source or Observation Candidate
+-> Evidence Candidate when selected and bounded
+```
+
+When a route is recurrent or consequential enough to deserve governed reuse,
+the existing promotion path applies:
+
+```text
+notebook entry
+-> Source Addition Candidate
+-> required review and arbitration
+-> Source Registry Entry when accepted
+```
+
+No synchronization, retrieval result, runtime success, repeated use or Cockpit
+projection promotes a notebook entry automatically. A separately authorized
+workspace edit may update the human note; it does not mutate the Source Registry
+or admit Evidence by implication.
+
 ## Source Addition Candidate
 
 A user may propose a source.
