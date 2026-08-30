@@ -14,11 +14,12 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **842**.
+Total indexed entries: **843**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-08-30 | `2026/Q3/2026-08-30-source-research-evaluation-pilot-ready.md` | 2026-08-30 — source-research evaluation pilot readiness |
 | 2026-08-30 | `2026/Q3/2026-08-30-source-notebook-current-convergence.md` | 2026-08-30 — converge optional workspace source notebook |
 | 2026-08-30 | `2026/Q3/2026-08-30-simplify-distillation-registry.md` | Distillation Registry simplification — 2026-08-30 |
 | 2026-08-30 | `2026/Q3/2026-08-30-prune-absorbed-research-distillations.md` | 2026-08-30 — prune absorbed research distillations |
