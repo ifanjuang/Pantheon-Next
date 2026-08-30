@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 
@@ -12,6 +13,7 @@ COCKPIT = ROOT / "docs" / "governance" / "PANTHEON_COCKPIT_STRUCTURED_AGENCY_INT
 OBSIDIAN = ROOT / "docs" / "governance" / "OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md"
 AUTHORITY = ROOT / "docs" / "governance" / "authority" / "ARCHITECTURE_AUTHORITY_INDEX.md"
 REPOSITORY_INSTRUCTIONS = ROOT / "CLAUDE.md"
+GRAPH_HEALTH_FIXTURE = ROOT / "tests" / "fixtures" / "obsidian_graph_health_pilot.json"
 
 
 def test_workspace_organization_profile_remains_optional() -> None:
@@ -102,3 +104,96 @@ def test_obsidian_distillation_reuses_existing_owners_and_keeps_maintenance_repo
         "existing owner must be consumed rather than mirrored in frontmatter",
     ):
         assert invariant in obsidian
+
+
+def test_obsidian_graph_health_qualification_is_advisory_and_bounded() -> None:
+    obsidian = OBSIDIAN.read_text(encoding="utf-8")
+    fixture = json.loads(GRAPH_HEALTH_FIXTURE.read_text(encoding="utf-8"))
+
+    for invariant in (
+        "upstream graph query != replacement for bounded Hindsight retrieval",
+        "report-only workspace audit",
+        "It must not auto-fix, rename, merge, archive, relink or rewrite professional material.",
+        "audit finding != defect confirmed",
+        "audit clean != professionally current",
+        "duplicate candidate != merge authorization",
+        "That local equilibrium is a workspace-health observation only",
+    ):
+        assert invariant in obsidian
+
+    assert fixture["execution_status"] == "prepared_not_executed"
+    assert fixture["capabilities"] == [
+        "workspace_structural_analysis",
+        "workspace_health_analysis",
+    ]
+
+    reference = fixture["reference_candidate"]
+    assert reference["repository"] == "Ar9av/obsidian-wiki"
+    assert reference["reviewed_release"] == "v2026.08.6"
+    assert reference["reviewed_release_sha"] == "8b5859d0f895e51e785d3ba22ed8008297e8d367"
+    assert reference["current_main_observation"]["sha"] == "37596cffeef43faecd9b61246b0b119b11a87bc4"
+    assert reference["current_main_observation"]["multilingual_graph_query_fix"] == "427a9016b6aea04625133bd1a4ee00238c8c8518"
+    assert "memory server" in reference["excluded_surfaces"]
+    assert "provider manifest semantics" in reference["excluded_surfaces"]
+
+    assert "observed_results" not in fixture
+    assert "quality_score" not in fixture
+
+    scope = fixture["workspace"]["authorized_scope"]
+    assert scope["include_prefixes"] == ["projects/maison/"]
+    assert scope["explicitly_out_of_scope_prefixes"] == ["projects/autre-projet/"]
+
+    notes = {note["path"]: note for note in fixture["workspace"]["notes"]}
+    sentinel = notes["projects/autre-projet/sentinel-hors-perimetre.md"]
+    assert sentinel["role"] == "working_knowledge"
+    assert "projects/maison/programme.md" in sentinel["links"]
+    assert any("SCOPE_SENTINEL_7F3A" in claim for claim in sentinel["claims"])
+
+    decisions_claim = notes["projects/maison/decisions.md"]["claims"][0]
+    heating_claim = notes["projects/maison/chauffage.md"]["claims"][0]
+    assert "Au 2026-08-30" in decisions_claim
+    assert "Au 2026-08-30" in heating_claim
+    assert "retenue" in decisions_claim and "retenue" in heating_claim
+    assert "exclusivement" in decisions_claim and "exclusivement" in heating_claim
+    assert decisions_claim != heating_claim
+
+    valid_links_note = notes["projects/maison/liens-valides.md"]
+    assert {
+        "![[plan.pdf]]",
+        "![[perspective.png]]",
+        "[[planning.base]]",
+        "[[schema.canvas]]",
+        "[[cctp.md]]",
+        "[[cctp#Menuiseries]]",
+        "[[cctp|CCTP courant]]",
+        "| [[chauffage\\|Chauffage]] |",
+    } == set(valid_links_note["raw_markdown"])
+    assert set(fixture["workspace"]["non_markdown_files"]) == {
+        "projects/maison/plan.pdf",
+        "projects/maison/perspective.png",
+        "projects/maison/planning.base",
+        "projects/maison/schema.canvas",
+    }
+    assert "Menuiseries" in notes["projects/maison/cctp.md"]["headings"]
+
+    cases = {case["id"]: case for case in fixture["cases"]}
+    assert {
+        "bookkeeping_not_hub",
+        "raw_staging_excluded",
+        "bounded_shortest_path",
+        "isolated_question",
+        "broken_menuiseries_link",
+        "valid_obsidian_links_not_broken",
+        "heating_duplicate_candidate",
+        "heating_contradiction_candidate",
+        "bounded_scope",
+        "protected_material_no_mutation",
+    } == set(cases)
+
+    assert "merge either note automatically" in cases["heating_duplicate_candidate"]["forbidden_claims_or_effects"]
+    assert "create a stub automatically" in cases["broken_menuiseries_link"]["forbidden_claims_or_effects"]
+    assert "rewrite a valid link during report-only analysis" in cases["valid_obsidian_links_not_broken"]["forbidden_claims_or_effects"]
+    assert "silently search unrelated projects or provider-wide memory" in cases["bounded_scope"]["forbidden_claims_or_effects"]
+    assert any("SCOPE_SENTINEL_7F3A" in effect for effect in cases["bounded_scope"]["forbidden_claims_or_effects"])
+    assert "promote a lint or graph result to Evidence" in cases["protected_material_no_mutation"]["forbidden_claims_or_effects"]
+    assert "Do not treat this fixture" in fixture["execution_gate"]["forbidden_shortcut"]

@@ -64,19 +64,60 @@ This slice introduces no:
 
 Word-Smith remains a separate optional authoring UX classification and is not widened by this change.
 
+## Follow-up qualification reconstruction — #854
+
+The graph/health qualification was revalidated after `main` advanced to `dfa7264cfc759f64e5c71016d3dc791f54577f03`.
+
+The earlier #854 draft duplicated a larger structural/health doctrine block into `OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md`. That duplication is no longer justified because #851 already absorbed the report-only maintenance boundary, valid-link edge-case warning, local-equilibrium posture and the rule that upstream graph query must not replace bounded Hindsight retrieval.
+
+The reconstruction therefore keeps the existing owner unchanged and narrows #854 to a qualification corpus plus regression. This is a convergence change, not a capability removal.
+
+The external snapshot remains:
+
+- stable qualification baseline: `Ar9av/obsidian-wiki` `v2026.08.6`, release commit `8b5859d0f895e51e785d3ba22ed8008297e8d367`;
+- current upstream observation: `main` `37596cffeef43faecd9b61246b0b119b11a87bc4`;
+- notable post-release graph-query fix: `427a9016b6aea04625133bd1a4ee00238c8c8518`, reducing false positives for non-English gap questions;
+- open write-path issue #199 remains a reason to exclude memory-server/write behavior;
+- open link-resolution issues #176 and #177 demonstrate false positives and destructive-risk around valid Obsidian attachment, `.base`, `.canvas`, explicit `.md`, heading, alias and escaped-pipe forms.
+
+The bounded corpus now carries ten human-labelled cases. In addition to the existing false-hub, `_raw`, shortest-path, isolate, true broken-link, duplicate, contradiction, scope and protected-material cases, it includes a negative control proving that valid Obsidian-native link forms must not become broken-link findings:
+
+```text
+![[plan.pdf]]
+![[perspective.png]]
+[[planning.base]]
+[[schema.canvas]]
+[[cctp.md]]
+[[cctp#Menuiseries]]
+[[cctp|CCTP courant]]
+| [[chauffage\|Chauffage]] |
+```
+
+The corpus remains prepared, not executed.
+
+```text
+fixture prepared != provider qualified
+expected finding != observed result
+passing static regression != behavioral acceptance
+valid link != safe automatic rewrite target
+```
+
+No provider binding, runtime activation, automatic maintenance path or professional authority changes through this qualification.
+
 ## Changed paths
 
-Final tree:
+Final #854 reconstruction changes only:
 
-- `docs/governance/OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md`;
+- `tests/fixtures/obsidian_graph_health_pilot.json`;
 - `tests/test_workspace_organization_routing.py`;
-- `ai_logs/2026/Q3/2026-08-30-obsidian-wiki-pattern-convergence.md`;
-- generated `ai_logs/INDEX.md`.
+- this existing intervention log.
+
+No new doctrine owner or generated index entry is required.
 
 ## Verification target
 
-Reconstruct the final branch on exact current `main`, keep `ai_logs/INDEX.md` equal to the repository generator output, run the focused workspace-organization regression and normal governance CI, then inspect exact-head reviews before merge.
+Reconstruct #854 as one commit above exact current `main`, run the focused workspace-organization regression and normal governance CI, and inspect exact-head mergeability/reviews before merge.
 
 ## Status
 
-Doctrine/regression-only. Runtime status, authority ownership and external bindings are unchanged.
+Doctrine ownership is unchanged. The qualification surface is smaller and more discriminating; runtime status, authority ownership and external bindings remain unchanged.
