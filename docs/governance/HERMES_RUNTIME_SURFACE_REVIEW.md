@@ -2,31 +2,35 @@
 
 Status: candidate external-runtime review — reviewed release, not installed, activated or task-authorized.
 Boundary profile: external_reference_review.
-Current reviewed target: Hermes Agent 0.20.0.
+Current reviewed target: Hermes Agent 0.20.6 (`v2026.8.27`).
 
-## Observed release
+## Responsibility
 
-Official upstream state reviewed on 2026-08-04:
+This document owns release-specific Hermes runtime facts that can affect Pantheon runtime qualification.
+
+Stable runtime/governance boundaries remain owned by `HERMES_INTEGRATION.md`. Client selection and runtime-status posture remain owned by `WHAT_RUNS.md` / `EXTERNAL_TOOLS_POLICY.md`. Optional external bindings remain owned by `HERMES_CAPABILITY_BINDINGS.md`.
+
+Do not duplicate those owners here. A new Hermes surface belongs here only when it changes what must be observed or refused before a concrete runtime can be qualified.
+
+## Reviewed upstream artifact
+
+Official upstream state reviewed on 2026-08-30:
 
 ```text
 repository: NousResearch/hermes-agent
-version: 0.20.0
-release_date: 2026.8.3
-release_commit: 3c27eb6234bf91b8ceee9e9071591b31e9b148cb
-release_name: The Herald Release
+version: 0.20.6
+tag: v2026.8.27
+release_date: 2026-08-27
+release_commit: 5fc308a70719a83cccdbba4c0e39c23f5a8239d5
 ```
 
-The official release commit describes voice, A2A v1.0, outbound webhooks,
-grounded citations and the desktop platform wave. The release source also
-reports `hermes_cli.__version__ = "0.20.0"`.
+The upstream release is a roll-up patch release covering roughly 525 merged PRs / 1,313 commits since 0.20.5. Its release note says the full curated 0.20.x feature summary is deferred to 0.21.0.
 
-External release metadata informs adapter review only. It does not govern
-Pantheon and does not prove that any local Hermes installation runs this
-artifact.
+The 0.20.6 source and tagged API documentation were therefore reviewed only for material qualification deltas. This review does not prove that any local Hermes installation runs this artifact.
 
-## Existing bridge compatibility
+## Existing Runs bridge compatibility
 
-The Hermes 0.20.0 API-server documentation at the release commit still exposes:
+The exact 0.20.6 tagged API documentation still exposes the stable discovery and Runs surfaces used by the Pantheon candidate bridge, including:
 
 ```text
 GET  /v1/capabilities
@@ -37,35 +41,33 @@ GET  /v1/runs/{run_id}/events
 POST /v1/runs/{run_id}/stop
 ```
 
-`/v1/capabilities` continues to advertise the run-submission, run-status,
-run-events and run-stop features used by the candidate MVP observer.
+`/v1/capabilities` advertises run submission, status, event streaming and stop support. `/v1/toolsets` exposes the concrete tool expansion for the API-server platform behind bearer authentication.
 
-The existing Pantheon run binding may therefore remain the candidate binding
-for 0.20.0, subject to a real-instance observation and acceptance run. This
-review does not claim wire compatibility on an unobserved installation.
+0.20.6 also exposes `POST /v1/runs/{run_id}/approval` for runtime-side pending approvals. The current Pantheon run binding does not need this endpoint and must not treat a runtime approval response as a Pantheon approval.
 
-## Surface mapping
+No source-review evidence requires a Pantheon kernel or run-binding change for 0.20.6. Wire compatibility still requires observation against the exact installed artifact.
 
-| Hermes 0.20 surface | Placement | Pantheon rule |
+## Material 0.20.6 qualification deltas
+
+Only deltas that materially change the trust, tool, execution-host or administration surface are retained here.
+
+| Surface | Upstream 0.20.6 observation | Qualification consequence |
 |---|---|---|
-| A2A v1.0, streaming and orchestration | external execution and delegation runtime | A2A peers are runtime endpoints, not Pantheon Roles. Each consequential delegation remains bounded by Task Contract, scope, return status and human gates. Runtime anti-loop limits narrow execution but do not grant legitimacy. |
-| Trusted A2A peers | runtime trust configuration | trusted peer does not mean approved capability, admissible source or authorized task. Peer identity and permitted effects remain explicit. |
-| Push notifications and outbound webhooks | external-effect transport | every consequential delivery requires an approved destination, payload scope, idempotency, trace and revocation path. Runtime delivery success is not acceptance or Evidence. |
-| Grounded citations | provenance-bearing runtime output | citations may become source references or Evidence candidates after verification. Retrieved or cited does not mean true, admissible or sufficient. |
-| Streaming voice, barge-in and wake words | runtime input/output surface | microphone access, wake-word listening, recording, retention and external TTS processing require explicit deployment and user decisions. A spoken instruction is not by itself a Pantheon approval signal. |
-| Desktop platform and multiple UI surfaces | runtime exposure surface | additional windows and controls expose runtime state only. UI state does not create authorization, canonical status or Evidence. |
-| Per-request `model`, `provider` and `model_options` on `/v1/runs` | runtime provider-routing surface | the Pantheon candidate binding continues to omit these fields. Provider/model selection remains external runtime configuration and must not be silently inferred from a Task Contract. |
-| Existing smart approvals | runtime approval mechanic inherited from 0.19 | an in-runtime model assessment remains distinct from human approval and must not authorize consequential effects. |
-| OpenAI-compatible chat surface | external conversation transport | OpenWebUI may use Hermes as its agent backend. OpenWebUI memory, retrieval and tool configuration remain separate runtime inputs and must not silently widen a governed task. `X-Hermes-Session-Key` is an opt-in long-term-memory scope and is forbidden for the governed profile. |
-| MCP and plugin surfaces | replaceable execution bindings | tool discovery or plugin availability does not select, activate or authorize a binding. Exact tool names are bounded by reviewed runtime-profile/binding configuration; a Task Contract or admission may constrain scope and effects but must never widen or route that runtime tool envelope. |
-| External memory provider system | optional runtime-memory layer | the reviewed 0.20 documentation lists external provider plugins, allows one external provider at a time and keeps built-in `MEMORY.md` / `USER.md` available alongside it. Provider activation may inject context, prefetch recall, synchronize turns, extract memories, mirror writes and expose provider tools. These effects are forbidden by default for the governed Pantheon profile. |
-| Built-in memory controls | profile-local runtime configuration | `hermes memory off` disables the external provider only. Hermes separately reports built-in memory injection, user-profile injection and memory-tool state. All three must be disabled for `pantheon-governed`; stored files may remain present but must not enter the prompt or tool surface. |
-| Observability plugin surface | external trace layer | Langfuse may remain the preferred candidate observability binding, but plugin presence does not prove hook delivery from API-server, OpenWebUI or Runs paths. A live synthetic trace is required before qualification. |
+| Browser control / real browser profile | The release adds consent-gated use of a real Chromium profile. Tagged API docs also expose opt-in authenticated browser-extension control with exact controller/session/profile matching and fail-closed controller routing. | Keep real-profile / extension control disabled for the governed profile unless separately qualified. If enabled later, record exact controller identity, browser-profile scope, authentication and failure behavior. |
+| Desktop remote administration | The release adds managed SSH remote-update behavior and a fleet profile rail. | Treat remote administration/update as an operator surface outside the governed task path. It requires separate deployment qualification before use; it is not implied by runtime qualification. |
+| Remote MCP catalogue | The release expands live-verified vendor-hosted MCP availability substantially. | Re-observe the exact enabled toolsets on the target profile. Catalogue/discovery growth must not widen the reviewed runtime tool envelope. |
+| Terminal environment backends | The release adds pluggable terminal environment backends. | Record the exact terminal backend used by the target profile because host identity, filesystem mounts, environment and network reach can change with the backend. |
+| Secret storage | The release adds opt-in OS-keychain encryption for stored secrets. | Record the configured secret-storage posture. Encryption at rest is useful operational hardening but does not qualify authentication, scope or external-effect safety. |
+| Gateway lifecycle / cron | Updaters can pause gateways over the control socket; cron gains durable incident acknowledgements and clearer code-skew failures. | If gateway, messaging or cron surfaces are selected for a deployment, qualification must include restart/update/skew/recovery behavior rather than inferring availability from a healthy process. |
+| Runtime approval API | Runs may expose a pending runtime approval and resume through `/v1/runs/{run_id}/approval`. | Keep runtime approval mechanics distinct from Pantheon decision/approval state. No automatic bridge from runtime approval UI/API to Pantheon approval is authorized by this review. |
+| Per-request model/provider routing | Tagged API docs continue to accept `model`, `provider` and `model_options` on `/v1/runs` and other authenticated request surfaces. | The Pantheon candidate binding continues to omit these overrides. Provider/model choice remains runtime configuration unless a separately reviewed binding says otherwise. |
+| Session-scoped runtime memory | Tagged API docs continue to accept `X-Hermes-Session-Key` on Runs/API conversation surfaces for stable long-term-memory scope. | Keep this header absent from the governed Pantheon run path unless a separately qualified memory posture explicitly requires it. |
 
-## Runtime profile separation
+Release-note items such as search caching, compression defaults, picker additions and Slack link-unfurl controls do not currently create a distinct Pantheon qualification requirement and are intentionally not copied into this review.
 
-The runtime must use separate operational profiles rather than one profile with
-all convenience features enabled.
+## Governed runtime-profile posture
+
+The existing `pantheon-governed` posture remains the target for a Pantheon-admitted Hermes run. This is deployment configuration, not a new Pantheon identity or authority object.
 
 ```text
 profile: pantheon-governed
@@ -74,83 +76,50 @@ built_in_memory_injection: off
 built_in_user_profile_injection: off
 memory_tool: off
 session_memory_key: forbidden
-automatic_runtime_recall: forbidden
-automatic_runtime_memory_write: forbidden
-OpenWebUI_memory_injection: forbidden
-OpenWebUI_automatic_RAG: forbidden
-allowed_tools: explicit reviewed runtime-profile/binding allowlist
 provider_and_model_override_in_run_payload: omitted
-consequential_effects: human-gated
-
-profile: assistant-personal
-external_memory_provider: optional_one_only
-built_in_memory_posture: user_selected
-runtime_recall_and_write: user-scoped convenience
-Pantheon_authority: none
-professional_task_authorization: none
-canonical_memory_promotion: none
+allowed_tools: exact reviewed runtime-profile/binding envelope
+real_browser_profile: disabled unless separately qualified
+browser_extension_control: disabled unless separately qualified
+remote_admin_update_surface: outside governed task path
+terminal_environment_backend: exact observed backend required
+consequential_effects: existing Pantheon policy / human gates apply
 ```
 
-Tool-surface minimization is a runtime projection, not Pantheon tool routing.
-For a governed run, the runtime may expose a smaller useful subset, but it may
-never widen beyond the reviewed profile/binding envelope:
+The existing runtime observer already records route/tool/memory posture in the candidate distribution composition. 0.20.6 does not justify a second observer or a parallel runtime inventory path. Any missing 0.20.6 observation should extend that existing seam only after a real target proves the gap.
+
+## Adjacent ownership
+
+This release review does not reclassify external products or clients.
+
+Use existing owners instead:
 
 ```text
-selected_runtime_tools ⊆ reviewed_profile_tools
+runtime/client selection and current status -> WHAT_RUNS.md / EXTERNAL_TOOLS_POLICY.md
+optional capability bindings               -> HERMES_CAPABILITY_BINDINGS.md
+stable Hermes/Pantheon authority boundary  -> HERMES_INTEGRATION.md
+technical execution receipt                -> HERMES_EXECUTION_TRACE_SUMMARY.md
 ```
 
-Task Contracts constrain intent, scope, outputs, forbidden behavior, memory and
-approval expectations. Execution Admission authorizes one exact bounded run
-opportunity. Capability Slots classify governed capability placement. None of
-these objects compiles to Hermes tool names or becomes a tool-dispatch table.
-A future Hermes-side optimizer may reduce the visible tool subset only inside
-the already reviewed envelope; uncertainty must not create new tool authority.
+A mobile, browser, desktop or messaging client may therefore evolve without requiring a new Pantheon architecture document unless it introduces a genuinely new governed consequence.
 
-Disabling only the external provider is insufficient. The governed posture must
-also disable built-in `MEMORY.md` injection, `USER.md` profile injection and the
-memory tool. The files may remain stored as Hermes runtime data, but they must
-not influence a Pantheon-admitted run.
+## Current repository decision
 
-Profile separation is a deployment and runtime-configuration requirement. It
-creates no new Pantheon runtime, identity or approval object.
+Current repository state deliberately distinguishes source review from the candidate runtime pin:
 
 ```text
-profile created != scope governed
-hermes memory off != built-in memory injection off
-provider absent != memory context absent
-memory tool absent != memory injection disabled
-provider selected != memory admitted
-memory recalled != source verified
-conversation synchronized != Register Candidate accepted
+reviewed upstream release: 0.20.6
+current candidate distribution runtime target: 0.20.5
 ```
 
-## Ecosystem compatibility decisions
-
-These decisions reuse existing Capability Slots and adapter boundaries. They do
-not add components to the standard distribution lock.
-
-| System | Candidate placement with Hermes | Decision at this review |
-|---|---|---|
-| OpenWebUI | conversation and cockpit exposure through the Hermes OpenAI-compatible surface | compatible as UI; governed profile must suppress hidden memory or retrieval enrichment |
-| Langfuse | external observability binding | preferred candidate; synthetic API-server and Runs-path trace still required |
-| Docling | `document_structural_analysis` binding through a bounded service, MCP or API | preferred document-analysis candidate; output remains a source-linked derivation candidate |
-| Paperless-ngx | optional `document_source_management` binding | compatible and already independently classified; not required for core local/NAS ingestion |
-| Mem0 | official Hermes external-memory provider candidate | optional for the personal assistant profile; refused as canonical or governed-task memory |
-| Mnemosyne | third-party Hermes/MCP memory adapter candidate | sandbox candidate for local-first personal memory; not bundled or selected by Pantheon |
-| Haystack | bounded `knowledge_retrieval_pipeline` candidate | compare only when a concrete governed corpus requires a retrieval service |
-| LlamaIndex / LangChain | component libraries inside a bounded adapter | watch or compare; refuse as the global execution or provider abstraction layer |
-| Langflow | visual workflow laboratory exposed as one bounded tool if needed | sandbox/prototype only; refuse as a second production orchestrator |
-| LangGraph | specialized external workflow behind one capability contract | refuse as Pantheon or default Hermes runtime; use only for a demonstrated stateful workflow gap |
-| RAGFlow | integrated external RAG product | watch/reference only by default; refuse as a replacement for Hermes, Docling, Paperless, OpenWebUI or Pantheon governance |
-
-## Adapter decision
+The candidate distribution lock already contains a runtime observer and remains default-off / not observed / not activated / not task-authorized. This source review does not change that lock.
 
 ```text
-runtime_target: 0.20.0
+reviewed_runtime_target: 0.20.6
 kernel_change_required: false
 run_binding_change_required: false
-observer_contract_change_required: true
-standard_distribution_components_change_required: false
+new_runtime_owner_required: false
+new_client_owner_required: false
+candidate_distribution_pin_change_authorized: false
 real_instance_observation_required: true
 runtime_artifact_digest_required_before_observed: true
 composed_acceptance_required_before_qualified: true
@@ -159,68 +128,36 @@ activation_effect: none
 task_authorization_effect: none
 ```
 
-The observer contract requires a bounded extension because `/v1/toolsets` alone
-cannot prove that built-in prompt injection is disabled. The extension must
-consume an explicit read-only profile-memory observation; it must not inspect
-arbitrary host files, mutate Hermes configuration or infer safety from absent
-tool names.
+A later bounded qualification may move the candidate distribution pin from 0.20.5 to 0.20.6 only after the target artifact and the additional release-sensitive checks below are exercised.
 
-The distribution example and candidate operational lock may target `0.20.0`.
-They must retain:
+## Required live checks before selecting 0.20.6 for the governed distribution
 
-```text
-artifact_digest: null
-installation_state: not_observed
-activation_state: not_activated
-task_authorization_state: not_authorized
-acceptance_state: not_run
-```
+1. record the exact installed Hermes package/image identity and immutable digest;
+2. observe the named profile route and `/v1/capabilities` / `/v1/toolsets` from that exact runtime;
+3. verify active tools remain within the reviewed profile/binding envelope, including any remotely discoverable MCP surface;
+4. record the existing read-only memory-posture observation and prove memory/profile injection and the memory tool remain disabled for `pantheon-governed`;
+5. verify no `X-Hermes-Session-Key` is supplied by the governed run client;
+6. verify the Pantheon run payload contains no `model`, `provider` or `model_options` override;
+7. record the exact terminal environment backend and its effective host/mount/network boundary;
+8. confirm real-browser-profile and browser-extension-control paths are disabled, or run a separate explicit qualification before allowing either;
+9. confirm remote Desktop/fleet/SSH update administration is not part of the admitted run path and cannot silently mutate the qualified runtime during acceptance;
+10. execute one admitted read-only run through the existing launch/reconciliation path and exercise the existing real-runtime ambiguity/failure case required by the current environment qualification work;
+11. verify the runtime approval API, if surfaced by a client, produces no Pantheon approval state by implication;
+12. if gateway/messaging/cron is selected in the deployment, exercise restart and code-skew/recovery behavior separately and retain delivery/runtime outcomes as technical observations only.
 
-until an operator observes the exact installed artifact and executes the
-bounded acceptance procedure.
+No new schema or test is required by this source review alone. A protected-path change is justified only if live 0.20.6 acceptance exposes an invariant that the existing observer, binding or tests cannot represent.
 
-## Required live checks
+## Local non-equivalences
 
-Before any 0.20.0 distribution is marked `observed` or `qualified`:
-
-1. record the installed Hermes package or image digest;
-2. observe the explicit named `/p/<profile>/v1/capabilities` and `/v1/toolsets` route when profile multiplexing is used;
-3. verify that active tools remain within the exact reviewed profile/binding allowlist and that no unexpected tool is exposed;
-4. verify that the Pantheon run-binding payload contains no `model`, `provider`
-   or `model_options` override;
-5. record a read-only profile memory-status observation proving:
-   - external provider is absent;
-   - built-in memory injection is disabled;
-   - built-in user-profile injection is disabled;
-   - memory tool is disabled;
-   - no `X-Hermes-Session-Key` is supplied by the governed client;
-6. verify that OpenWebUI adds no hidden memory or automatic RAG enrichment;
-7. execute one admitted read-only run and one one-shot reconciliation;
-8. if Langfuse is selected, emit one synthetic trace from the actual API-server
-   and Runs path and verify redaction, correlation and retention;
-9. confirm that no A2A, webhook, voice, messaging or provider-routing surface
-   was activated by the composition;
-10. retain runtime and observability traces as technical observations, not Evidence.
-
-## Non-equivalences
+The generic repository non-equivalences remain owned by `NON_EQUIVALENCE_RULES.md`. This review adds only the release-sensitive distinctions needed here:
 
 ```text
+release reviewed != distribution pin changed
 release reviewed != release installed
-version target updated != artifact observed
-Runs API documented != live instance compatible
-profile route answered != governed profile qualified
-trusted peer != approved actor
-webhook configured != external effect authorized
-citation present != Evidence admitted
-voice command received != human approval recorded
-Task Contract != tool dispatch table
-tool useful != tool authorized
-selected_runtime_tools ⊆ reviewed_profile_tools
-hermes memory off != built-in memory injection off
-provider absent != memory context absent
-memory tool absent != memory injection disabled
-provider selected != memory admitted
-memory recalled != truth
-trace recorded != Evidence
-runtime success != Evidence
+runtime approval endpoint != Pantheon approval
+remote admin available != update authorized
+remote MCP available != tool admitted
+real browser profile available != profile access authorized
+terminal backend selected != host boundary qualified
+keychain encryption enabled != service exposure safe
 ```
