@@ -1,0 +1,215 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+TOOL_VERSION="0.1.0"
+CONFIG_ROOT="/etc/pantheon-node"
+APP_ROOT="/opt/pantheon-node"
+STATE_ROOT="/srv/pantheon"
+PANTHEON_ROOT="/opt/pantheon"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -f "$SCRIPT_DIR/release.env" ]]; then
+  # shellcheck disable=SC1091
+  source "$SCRIPT_DIR/release.env"
+fi
+
+# Reviewed deployment-candidate targets. These are not qualification or authorization truth.
+TARGET_HERMES_IMAGE="${RELEASE_HERMES_IMAGE:-nousresearch/hermes-agent:v2026.8.27}"
+TARGET_HINDSIGHT_IMAGE="${RELEASE_HINDSIGHT_IMAGE:-ghcr.io/vectorize-io/hindsight:0.9.2}"
+TARGET_COUCHDB_IMAGE="${RELEASE_COUCHDB_IMAGE:-couchdb:3.5.0}"
+TARGET_OLLAMA_VERSION="${RELEASE_OLLAMA_VERSION:-0.33.2}"
+TARGET_COMFYUI_REF="${RELEASE_COMFYUI_REF:-v0.34.0}"
+TARGET_TORCH_VERSION="${RELEASE_TORCH_VERSION:-2.13.0}"
+TARGET_TORCH_INDEX="${RELEASE_TORCH_INDEX:-https://download.pytorch.org/whl/cu132}"
+TARGET_LIVESYNC_REF="${RELEASE_LIVESYNC_REF:-32e827692f1a552cd581de9da45cecd0711573d3}"
+TARGET_LIVESYNC_IMAGE="${RELEASE_LIVESYNC_IMAGE:-pantheon-node/livesync-cli:1.0.18-cli}"
+
+APPLY=0
+ASSUME_YES=0
+COMPONENT="all"
+
+log() { printf '[pantheon-update] %s\n' "$*"; }
+warn() { printf '[pantheon-update] WARNING: %s\n' "$*" >&2; }
+die() { printf '[pantheon-update] ERROR: %s\n' "$*" >&2; exit 1; }
+
+usage() {
+  cat <<'USAGE'
+Usage:
+  ./update-node --check
+  sudo ./update-node --apply [--component all|pantheon|containers|ollama|comfyui|livesync] [--yes]
+
+Pantheon changes require PANTHEON_COMMIT_OVERRIDE=<reviewed full sha>.
+Update-node never follows floating :latest tags and never changes activation/authorization state.
+USAGE
+}
+
+while (($#)); do
+  case "$1" in
+    --check) APPLY=0; ASSUME_YES=1 ;;
+    --apply) APPLY=1 ;;
+    --yes) ASSUME_YES=1 ;;
+    --component) shift; COMPONENT="${1:?missing component}" ;;
+    -h|--help) usage; exit 0 ;;
+    *) die "unknown argument: $1" ;;
+  esac
+  shift
+done
+
+case "$COMPONENT" in
+  all|pantheon|containers|ollama|comfyui|livesync) ;;
+  *) die "unsupported component: $COMPONENT" ;;
+esac
+
+[[ -f "$CONFIG_ROOT/versions.env" ]] || die "no existing node installation found at $CONFIG_ROOT"
+# shellcheck disable=SC1090
+source "$CONFIG_ROOT/versions.env"
+# shellcheck disable=SC1090
+source "$CONFIG_ROOT/node.env"
+
+compose() {
+  docker compose --env-file "$APP_ROOT/compose-env" -f "$APP_ROOT/compose.yaml" "$@"
+}
+
+selected() { [[ "$COMPONENT" == "all" || "$COMPONENT" == "$1" ]]; }
+set_version() {
+  local key="$1" value="$2"
+  if grep -q "^${key}=" "$CONFIG_ROOT/versions.env"; then
+    sed -i "s|^${key}=.*|${key}=${value}|" "$CONFIG_ROOT/versions.env"
+  else
+    printf '%s=%s\n' "$key" "$value" >> "$CONFIG_ROOT/versions.env"
+  fi
+}
+
+set_compose_env() {
+  local key="$1" value="$2"
+  if grep -q "^${key}=" "$APP_ROOT/compose-env"; then
+    sed -i "s|^${key}=.*|${key}=${value}|" "$APP_ROOT/compose-env"
+  else
+    printf '%s=%s\n' "$key" "$value" >> "$APP_ROOT/compose-env"
+  fi
+}
+
+current_comfy="$(git -C "$APP_ROOT/ComfyUI" describe --tags --exact-match 2>/dev/null || git -C "$APP_ROOT/ComfyUI" rev-parse --short HEAD 2>/dev/null || echo absent)"
+current_ollama="$(ollama --version 2>/dev/null | awk '{print $NF}' || echo absent)"
+current_livesync="$(git -C "$APP_ROOT/obsidian-livesync" rev-parse HEAD 2>/dev/null || echo absent)"
+
+cat <<EOF_STATUS
+Node update check — tool $TOOL_VERSION
+
+component        installed / pinned                         target in this updater
+Pantheon         ${PANTHEON_COMMIT:-unknown}                explicit reviewed SHA only
+Hermes           ${HERMES_IMAGE:-unknown}                   $TARGET_HERMES_IMAGE
+Hindsight        ${HINDSIGHT_IMAGE:-unknown}                $TARGET_HINDSIGHT_IMAGE
+CouchDB          ${COUCHDB_IMAGE:-unknown}                  $TARGET_COUCHDB_IMAGE
+Ollama           $current_ollama                            $TARGET_OLLAMA_VERSION
+ComfyUI          $current_comfy                             $TARGET_COMFYUI_REF
+PyTorch          ${TORCH_VERSION:-unknown}                  $TARGET_TORCH_VERSION / cu132
+LiveSync source  $current_livesync                          $TARGET_LIVESYNC_REF
+
+available upstream != qualified for this node
+successful update != activation or task authorization
+EOF_STATUS
+
+((APPLY == 1)) || exit 0
+[[ ${EUID:-$(id -u)} -eq 0 ]] || die "--apply must run as root (sudo)"
+
+if ((ASSUME_YES == 0)); then
+  [[ -t 0 ]] || die "non-interactive update requires --yes"
+  printf 'Create checkpoint and apply component=%s? [y/N] ' "$COMPONENT"
+  read -r answer
+  [[ "$answer" =~ ^[Yy]$ ]] || exit 0
+fi
+
+stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+checkpoint="$STATE_ROOT/backups/update-$stamp"
+umask 077
+install -d -m 0700 "$checkpoint"
+cp -a "$CONFIG_ROOT" "$checkpoint/etc-pantheon-node"
+cp -a "$APP_ROOT/compose.yaml" "$APP_ROOT/compose-env" "$checkpoint/"
+compose config > "$checkpoint/compose-rendered.yaml"
+readlink -f "$PANTHEON_ROOT/current" > "$checkpoint/pantheon-current.txt" 2>/dev/null || true
+
+update_containers() {
+  if [[ "${COUCHDB_IMAGE:-}" != "$TARGET_COUCHDB_IMAGE" && "${STATEFUL_BACKUP_CONFIRMED:-0}" != "1" ]]; then
+    die "CouchDB target changes stateful runtime; set STATEFUL_BACKUP_CONFIRMED=1 only after a verified backup/rollback point exists"
+  fi
+  local hindsight_was_running=0
+  if docker inspect -f '{{.State.Running}}' pantheon-hindsight 2>/dev/null | grep -qx true; then hindsight_was_running=1; fi
+  if ((hindsight_was_running == 1)) && [[ "${HINDSIGHT_IMAGE:-}" != "$TARGET_HINDSIGHT_IMAGE" && "${STATEFUL_BACKUP_CONFIRMED:-0}" != "1" ]]; then
+    die "running Hindsight target changes stateful runtime; verify backup/rollback and set STATEFUL_BACKUP_CONFIRMED=1"
+  fi
+  set_compose_env HERMES_IMAGE "$TARGET_HERMES_IMAGE"
+  set_compose_env HINDSIGHT_IMAGE "$TARGET_HINDSIGHT_IMAGE"
+  set_compose_env COUCHDB_IMAGE "$TARGET_COUCHDB_IMAGE"
+  compose pull couchdb hermes
+  if [[ "${ENABLE_HINDSIGHT:-0}" == "1" ]]; then compose --profile hindsight pull hindsight; fi
+  compose up -d couchdb
+  if [[ -f "$STATE_ROOT/hermes/config.yaml" || -f "$STATE_ROOT/hermes/.env" ]]; then compose up -d hermes; fi
+  if ((hindsight_was_running == 1)); then compose --profile hindsight up -d hindsight; fi
+  set_version HERMES_IMAGE "$TARGET_HERMES_IMAGE"
+  set_version HINDSIGHT_IMAGE "$TARGET_HINDSIGHT_IMAGE"
+  set_version COUCHDB_IMAGE "$TARGET_COUCHDB_IMAGE"
+}
+
+update_ollama() {
+  curl -fsSL https://ollama.com/install.sh | OLLAMA_VERSION="$TARGET_OLLAMA_VERSION" sh
+  systemctl restart ollama
+  set_version OLLAMA_VERSION "$TARGET_OLLAMA_VERSION"
+}
+
+update_comfyui() {
+  [[ -d "$APP_ROOT/ComfyUI/.git" ]] || die "ComfyUI checkout missing"
+  git -C "$APP_ROOT/ComfyUI" fetch --tags --force
+  git -C "$APP_ROOT/ComfyUI" checkout --detach "$TARGET_COMFYUI_REF"
+  "$APP_ROOT/uv/bin/uv" pip install --python "$APP_ROOT/ComfyUI/.venv/bin/python" \
+    "torch==$TARGET_TORCH_VERSION" torchvision torchaudio --index-url "$TARGET_TORCH_INDEX"
+  "$APP_ROOT/uv/bin/uv" pip install --python "$APP_ROOT/ComfyUI/.venv/bin/python" -r "$APP_ROOT/ComfyUI/requirements.txt"
+  chown -R comfyui:comfyui "$APP_ROOT/ComfyUI"
+  systemctl restart comfyui
+  set_version COMFYUI_REF "$TARGET_COMFYUI_REF"
+  set_version TORCH_VERSION "$TARGET_TORCH_VERSION"
+  set_version TORCH_INDEX "$TARGET_TORCH_INDEX"
+}
+
+update_livesync() {
+  [[ -d "$APP_ROOT/obsidian-livesync/.git" ]] || die "LiveSync checkout missing"
+  git -C "$APP_ROOT/obsidian-livesync" fetch origin "$TARGET_LIVESYNC_REF"
+  git -C "$APP_ROOT/obsidian-livesync" checkout --detach "$TARGET_LIVESYNC_REF"
+  docker build -f "$APP_ROOT/obsidian-livesync/src/apps/cli/Dockerfile" -t "$TARGET_LIVESYNC_IMAGE" "$APP_ROOT/obsidian-livesync"
+  if [[ "$LIVESYNC_IMAGE" != "$TARGET_LIVESYNC_IMAGE" ]]; then
+    sed -i "s|$LIVESYNC_IMAGE|$TARGET_LIVESYNC_IMAGE|g" /usr/local/bin/livesync-cli-node /etc/systemd/system/livesync-headless.service
+    systemctl daemon-reload
+  fi
+  LIVESYNC_IMAGE="$TARGET_LIVESYNC_IMAGE"
+  systemctl try-restart livesync-headless.service || true
+  set_version LIVESYNC_REF "$TARGET_LIVESYNC_REF"
+  set_version LIVESYNC_IMAGE "$TARGET_LIVESYNC_IMAGE"
+}
+
+update_pantheon() {
+  if [[ -z ${PANTHEON_COMMIT_OVERRIDE:-} ]]; then
+    warn "Pantheon not changed: set PANTHEON_COMMIT_OVERRIDE=<reviewed full sha> to update it"
+    return 0
+  fi
+  [[ "$PANTHEON_COMMIT_OVERRIDE" =~ ^[0-9a-f]{40}$ ]] || die "PANTHEON_COMMIT_OVERRIDE must be a full 40-character SHA"
+  local short target repository
+  short="${PANTHEON_COMMIT_OVERRIDE:0:12}"
+  target="$PANTHEON_ROOT/Pantheon-Next-$short"
+  repository="${PANTHEON_REPOSITORY_OVERRIDE:-$(git -C "$PANTHEON_ROOT/current" remote get-url origin 2>/dev/null || true)}"
+  [[ -n "$repository" ]] || die "cannot resolve Pantheon repository remote; set PANTHEON_REPOSITORY_OVERRIDE"
+  if [[ ! -d "$target/.git" ]]; then git clone "$repository" "$target"; fi
+  git -C "$target" fetch origin "$PANTHEON_COMMIT_OVERRIDE"
+  git -C "$target" checkout --detach "$PANTHEON_COMMIT_OVERRIDE"
+  "$APP_ROOT/uv/bin/uv" pip install --python "$STATE_ROOT/policy-venv/bin/python" --force-reinstall "$target/mcp-server"
+  "$STATE_ROOT/policy-venv/bin/pantheon-mcp-server" --help >/dev/null
+  ln -sfn "$target" "$PANTHEON_ROOT/current"
+  set_version PANTHEON_COMMIT "$PANTHEON_COMMIT_OVERRIDE"
+}
+
+selected containers && update_containers
+selected ollama && update_ollama
+selected comfyui && update_comfyui
+selected livesync && update_livesync
+selected pantheon && update_pantheon
+
+log "checkpoint retained at $checkpoint"
+log "run service-specific health checks before changing any activation/authorization posture"
