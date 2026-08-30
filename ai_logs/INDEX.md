@@ -14,7 +14,7 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **843**.
+Total indexed entries: **844**.
 
 | Date | Log | Subject |
 |---|---|---|
@@ -23,6 +23,7 @@ Total indexed entries: **843**.
 | 2026-08-30 | `2026/Q3/2026-08-30-source-notebook-current-convergence.md` | 2026-08-30 — converge optional workspace source notebook |
 | 2026-08-30 | `2026/Q3/2026-08-30-simplify-distillation-registry.md` | Distillation Registry simplification — 2026-08-30 |
 | 2026-08-30 | `2026/Q3/2026-08-30-prune-absorbed-research-distillations.md` | 2026-08-30 — prune absorbed research distillations |
+| 2026-08-30 | `2026/Q3/2026-08-30-obsidian-wiki-pattern-convergence.md` | 2026-08-30 — converge bounded obsidian-wiki maintenance patterns |
 | 2026-08-30 | `2026/Q3/2026-08-30-distill-agent-skills-evaluation-patterns-current.md` | 2026-08-30 — reconstruct Agent Skills evaluation pattern distillation |
 | 2026-08-29 | `2026/Q3/2026-08-29-workspace-organization-routing.md` | Workspace organization routing — 2026-08-29 |
 | 2026-08-29 | `2026/Q3/2026-08-29-risk-history-owner-audit.md` | Risk / historical support owners — #787 audit — 2026-08-29 |

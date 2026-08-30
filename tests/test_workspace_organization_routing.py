@@ -83,3 +83,22 @@ def test_obsidian_second_brain_prefers_consolidation_over_note_proliferation() -
         "must not silently persist ordinary conversation material",
     ):
         assert invariant in obsidian
+
+
+def test_obsidian_distillation_reuses_existing_owners_and_keeps_maintenance_report_only() -> None:
+    obsidian = OBSIDIAN.read_text(encoding="utf-8")
+
+    for invariant in (
+        "must not import `_staging`, `.manifest.json`, a trust ledger",
+        "upstream trust ledger != Evidence or approval authority",
+        "upstream graph query != replacement for bounded Hindsight retrieval",
+        "report-only workspace audit",
+        "It must not auto-fix, rename, merge, archive, relink or rewrite professional material.",
+        "audit finding != defect confirmed",
+        "duplicate candidate != merge authorization",
+        "That local equilibrium is a workspace-health observation only",
+        "`extracted`, `inferred` or `ambiguous`",
+        "They do not introduce a new Pantheon provenance schema",
+        "existing owner must be consumed rather than mirrored in frontmatter",
+    ):
+        assert invariant in obsidian
