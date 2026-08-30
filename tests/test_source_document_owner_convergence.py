@@ -73,3 +73,19 @@ def test_information_acquisition_reuses_existing_owners_without_new_router():
     assert "an acquisition route, not a source family" in sources
     assert "AI-specific shadow store" in adapters
     assert "runtime -> typed adapter -> existing operational owner" in adapters
+
+
+def test_workspace_source_notebook_reuses_registry_owner_without_parallel_authority():
+    sources = _read("docs/governance/SOURCE_NEED_AND_REGISTRY.md")
+
+    for invariant in (
+        "workspace source notebook != Source Registry",
+        "notebook entry != Source Registry Entry",
+        "listed route != inspected source",
+        "workspace path != governed identity",
+    ):
+        assert invariant in sources
+
+    assert "one note, manifest or governed object per website" in sources
+    assert "Source Addition Candidate" in sources
+    assert "Hermes and other consumers must not hard-code an Obsidian-specific" in sources

@@ -53,6 +53,11 @@ Use the available Task Contract and Context Pack to identify, when relevant:
 - evidence/citation expectations;
 - material limits on breadth, cost, time or data exposure.
 
+An optional workspace source notebook may be consulted only when its reference
+and contents are inside the authorized task/context scope. Treat notebook entries
+as Source Leads unless an entry resolves to an admitted Source Registry Entry.
+The notebook's absence must not block another permitted discovery route.
+
 Missing capability, scope or authorization must be reported, not bypassed.
 
 ## Modes
@@ -77,6 +82,19 @@ A task may combine these modes without creating separate skills:
 ### 2. Discover
 
 Use only capabilities allowed by the Task Contract.
+
+When an authorized workspace source notebook is available, use it as a bounded
+discovery aid for relevant routes. Never hard-code its filename or Obsidian path,
+infer authorization from its workspace location, or treat a listed domain as a
+whitelist. Whether a route came from the notebook or the Source Registry, inspect
+the exact page, document or returned observation before using it to support a
+material claim.
+
+```text
+notebook entry != Source Registry Entry
+registered route != inspected source
+workspace access != task authorization
+```
 
 Prefer source classes appropriate to the question, generally:
 
@@ -178,6 +196,7 @@ As authorized:
 - `uncertainty_note`;
 - `research_limitation`;
 - `followup_candidate`;
+- `source_addition_candidate`;
 - `capability_gap`.
 
 ## Forbidden effects
@@ -188,6 +207,8 @@ This skill must not by itself:
 - create or admit Evidence or Knowledge;
 - promote memory or a Registre Probatoire entry;
 - mutate doctrine or registries;
+- promote a notebook entry or rewrite the notebook without separate
+  workspace-write authorization;
 - send externally;
 - perform consequential external effects;
 - install or activate tools/providers/runtimes;
