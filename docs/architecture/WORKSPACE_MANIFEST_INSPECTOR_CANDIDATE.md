@@ -176,6 +176,8 @@ COHERENT health state
 
 A heuristic may suggest `QUALIFIABLE`, but only an explicit rule/qualification path may make a manifest required.
 
+Optional Obsidian skills or second-brain behavior are consumers of this posture, not alternative manifest owners. They may discover, read or lint a sidecar and prepare a correction candidate, but they must not silently create a required-manifest rule, redefine manifest semantics, mutate professional status or move files. The capability boundary and optional layering are recorded in `docs/governance/OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md`.
+
 ## 5. Candidate document sidecar
 
 For a real document package, `document.yaml` remains a reasonable candidate user-facing sidecar name because it is readable, editable and schema-validatable.

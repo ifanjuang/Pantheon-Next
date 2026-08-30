@@ -202,6 +202,51 @@ Those facilities remain Hermes runtime state/context. They do not become Pantheo
 
 Choosing the native path does not invalidate or deprecate the qualified Obsidian/Hindsight stack; it simply avoids extra components when their capabilities are not needed.
 
+## Optional Hermes Obsidian skill and second-brain behavior
+
+An Obsidian skill exposed to Hermes is a runtime operation surface for reading, searching and preparing writes against a Markdown workspace. A second-brain package is a richer optional behavior profile for recall, linking, synthesis, health checks and knowledge maintenance. Neither is a Pantheon prerequisite, workspace owner, memory authority or manifest authority.
+
+The reviewed external `eugeniughelbur/obsidian-second-brain` project advertises a Hermes adapter and an optional Obsidian MCP access path. This is a compatibility signal only. Pantheon has not adopted, installed or qualified that package through this document.
+
+If such a package is selected, the intended layering is:
+
+```text
+Hermes Obsidian capability
+= bounded workspace access and candidate operations
+
+optional second-brain behavior
+= knowledge recall, links, synthesis and vault-health assistance
+
+Pantheon workspace/manifest owners
+= identity, manifestability, provenance, approval and consequential-write rules
+```
+
+The workspace remains usable without either layer. Existing folder organization remains valid, and a selected skill must discover and respect workspace-local conventions rather than bootstrap or impose its own folder map, frontmatter schema or propagation rules.
+
+Second-brain behavior may operate more freely only inside an explicitly designated, reconstructible knowledge area. Its upstream-style automatic rewriting, cross-note propagation, contradiction reconciliation or proactive saving must not silently touch professional source material, admitted Evidence, governed status, document identity or other consequential records.
+
+For manifests, the boundary is narrower:
+
+```text
+discover / read / lint manifest          = allowed bounded assistance
+propose manifest creation or correction  = candidate only
+define manifest semantics                = existing Pantheon owner
+silently mutate manifest or move files   = forbidden
+```
+
+`docs/architecture/WORKSPACE_MANIFEST_INSPECTOR_CANDIDATE.md` owns the candidate manifest UX and local health posture. A second-brain package may consume that contract; it does not replace it. A missing manifest remains neutral unless an explicit qualification rule requires one.
+
+This preserves a small default:
+
+```text
+Hermes-native files/context
+-> optional Obsidian workspace capability
+-> optional second-brain behavior
+-> optional Hindsight-derived recall
+```
+
+Each layer is independently optional. Installing one does not authorize or require the next.
+
 ## Hindsight posture
 
 Hindsight is the currently recommended external retrieval/memory provider because the repository contains real integration and separation tests for it.
@@ -243,6 +288,8 @@ filesystem mirror        = qualified materialized representation
 hindsight-obsidian-sync  = qualified designated ingestion producer
 Hindsight                = qualified/recommended optional retrieval/memory provider
 Hermes native facilities = valid zero-extra-provider alternative
+Hermes Obsidian skill    = optional runtime workspace capability
+second-brain behavior    = optional knowledge-maintenance profile, subordinate to workspace governance
 Pantheon                 = provider-agnostic governance boundary
 ```
 
