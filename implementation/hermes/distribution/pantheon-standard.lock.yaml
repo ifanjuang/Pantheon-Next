@@ -10,7 +10,7 @@ source_pins:
   # test_external_qualification_pins.py rejects drift from the canonical registry.
   hermes_runtime:
     runtime_id: nousresearch-hermes-agent
-    version: "0.20.5"
+    version: "0.20.6"
     artifact_digest: null
     observation_ref: docs/governance/HERMES_RUNTIME_SURFACE_REVIEW.md
 components:

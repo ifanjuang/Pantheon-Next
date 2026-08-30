@@ -1,6 +1,6 @@
 # Hermes Runtime Surface Review
 
-Status: candidate external-runtime review — reviewed release, not installed, activated or task-authorized.
+Status: candidate external-runtime review and selected qualification target — not installed, observed, activated or task-authorized.
 Boundary profile: external_reference_review.
 Current reviewed target: Hermes Agent 0.20.6 (`v2026.8.27`).
 
@@ -104,22 +104,24 @@ A mobile, browser, desktop or messaging client may therefore evolve without requ
 
 ## Current repository decision
 
-Current repository state deliberately distinguishes source review from the candidate runtime pin:
+The reviewed release and the candidate distribution target are now aligned:
 
 ```text
 reviewed upstream release: 0.20.6
-current candidate distribution runtime target: 0.20.5
+current candidate distribution runtime target: 0.20.6
 ```
 
-The candidate distribution lock already contains a runtime observer and remains default-off / not observed / not activated / not task-authorized. This source review does not change that lock.
+The canonical external qualification pin and the candidate distribution lock select Hermes 0.20.6 at release commit `5fc308a70719a83cccdbba4c0e39c23f5a8239d5`. This is a target-selection decision only. The candidate distribution remains default-off / not observed / not activated / not task-authorized, and its runtime artifact digest remains unset until a concrete installed artifact is observed.
 
 ```text
 reviewed_runtime_target: 0.20.6
+candidate_distribution_runtime_target: 0.20.6
 kernel_change_required: false
 run_binding_change_required: false
 new_runtime_owner_required: false
 new_client_owner_required: false
-candidate_distribution_pin_change_authorized: false
+candidate_distribution_pin_change_authorized: true
+target_selection_effect: candidate-only
 real_instance_observation_required: true
 runtime_artifact_digest_required_before_observed: true
 composed_acceptance_required_before_qualified: true
@@ -128,9 +130,9 @@ activation_effect: none
 task_authorization_effect: none
 ```
 
-A later bounded qualification may move the candidate distribution pin from 0.20.5 to 0.20.6 only after the target artifact and the additional release-sensitive checks below are exercised.
+Selecting 0.20.6 as the candidate target does not qualify it. A later bounded qualification may mark the exact observed 0.20.6 artifact qualified only after the checks below are exercised. A future Hermes release may replace 0.20.6 as the candidate target through the same reviewed-pin process without creating a second runtime owner or qualification path.
 
-## Required live checks before selecting 0.20.6 for the governed distribution
+## Required live checks before qualifying 0.20.6 for the governed distribution
 
 1. record the exact installed Hermes package/image identity and immutable digest;
 2. observe the named profile route and `/v1/capabilities` / `/v1/toolsets` from that exact runtime;
@@ -145,7 +147,7 @@ A later bounded qualification may move the candidate distribution pin from 0.20.
 11. verify the runtime approval API, if surfaced by a client, produces no Pantheon approval state by implication;
 12. if gateway/messaging/cron is selected in the deployment, exercise restart and code-skew/recovery behavior separately and retain delivery/runtime outcomes as technical observations only.
 
-No new schema, observer or test surface is required by this source review. Existing regression assertions that name this release-review owner must track its current version and responsibility; a new protected-path invariant is justified only if live 0.20.6 acceptance exposes something the existing observer, binding or tests cannot represent.
+No new schema, observer or test surface is required by this target selection. Existing regression assertions that name this release-review owner must track its current version and responsibility; a new protected-path invariant is justified only if live 0.20.6 acceptance exposes something the existing observer, binding or tests cannot represent.
 
 ## Local non-equivalences
 
@@ -153,6 +155,8 @@ The generic repository non-equivalences remain owned by `NON_EQUIVALENCE_RULES.m
 
 ```text
 release reviewed != distribution pin changed
+candidate pin selected != runtime observed
+candidate pin selected != runtime qualified
 release reviewed != release installed
 runtime approval endpoint != Pantheon approval
 remote admin available != update authorized

@@ -8,8 +8,8 @@
       "kind": "git",
       "env_prefix": "HERMES",
       "repository": "NousResearch/hermes-agent",
-      "version": "0.20.5",
-      "ref": "fcbd1076a93841fa88855acce810e342a5b78101",
+      "version": "0.20.6",
+      "ref": "5fc308a70719a83cccdbba4c0e39c23f5a8239d5",
       "aliases": {
         "ref": ["HERMES_RELEASE_COMMIT", "HERMES_COMMIT"]
       }
