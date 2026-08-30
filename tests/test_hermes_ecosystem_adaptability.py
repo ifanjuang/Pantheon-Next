@@ -146,16 +146,19 @@ def test_langfuse_runbook_requires_live_path_evidence_and_no_deleted_review() ->
     assert "reference_reviews/LANGFUSE_HERMES_INSTALLATION_PACKAGE_CANDIDATE.md" not in runbook
 
 
-def test_runtime_review_does_not_change_distribution_or_authority() -> None:
+def test_runtime_target_selection_does_not_change_runtime_authority() -> None:
     review = _text(RUNTIME_REVIEW)
     candidate_runtime = _external_pin_version("hermes-agent")
 
     assert f"current candidate distribution runtime target: {candidate_runtime}" in review
-    assert "candidate_distribution_pin_change_authorized: false" in review
+    assert f"candidate_distribution_runtime_target: {candidate_runtime}" in review
+    assert "candidate_distribution_pin_change_authorized: true" in review
+    assert "target_selection_effect: candidate-only" in review
     assert "new_runtime_owner_required: false" in review
     assert "new_client_owner_required: false" in review
     assert "installation_effect: none" in review
     assert "activation_effect: none" in review
     assert "task_authorization_effect: none" in review
-    assert "release reviewed != distribution pin changed" in review
+    assert "candidate pin selected != runtime observed" in review
+    assert "candidate pin selected != runtime qualified" in review
     assert "runtime approval endpoint != Pantheon approval" in review
