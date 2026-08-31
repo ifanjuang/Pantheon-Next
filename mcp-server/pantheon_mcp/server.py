@@ -13,6 +13,7 @@ from typing import Any, Callable
 
 import yaml
 from mcp.server import MCPServer
+from mcp.types import ToolAnnotations
 
 from . import source_map
 from .repo import find_repo_root
@@ -27,6 +28,31 @@ mcp = MCPServer(
         "human decides consequential effects."
     ),
 )
+
+
+_READ_ONLY_ANNOTATIONS = ToolAnnotations(
+    read_only_hint=True,
+    destructive_hint=False,
+    idempotent_hint=True,
+    open_world_hint=False,
+)
+"""Protocol-level declaration of the property this package already guarantees.
+
+Every primitive here consults governed data and returns a verdict. None of them
+executes, sends, writes, approves, installs, schedules, routes a provider or
+promotes memory, so the read-only, non-destructive, idempotent and closed-world
+hints are true for the whole surface. A client reading the tool list can verify
+that boundary without trusting this package's prose.
+
+An annotation is a declaration, not an enforcement: it does not itself prevent an
+effect. ``tests/test_tool_annotations.py`` fails closed when a tool is registered
+without it, so the declaration cannot silently drift from the surface it describes.
+"""
+
+
+def _read_only_tool():
+    """Register one read-only, side-effect-free Pantheon policy tool."""
+    return mcp.tool(annotations=_READ_ONLY_ANNOTATIONS)
 
 
 def _dump(data: Any) -> str:
@@ -87,140 +113,140 @@ def _register_resources() -> None:
 _register_resources()
 
 
-@mcp.tool()
+@_read_only_tool()
 def list_sources() -> str:
     """List governed sources with the historical JSON-array response shape."""
     return _dump(source_map.list_sources())
 
 
-@mcp.tool()
+@_read_only_tool()
 def read_doctrine(key: str) -> str:
     """Read one allowlisted governed source; arbitrary paths are not accepted."""
     return _call("read_doctrine", key)
 
 
-@mcp.tool()
+@_read_only_tool()
 def explain_governance_structure(source_key: str = "") -> str:
     """Explain repository placement without creating parallel doctrine."""
     return _call("explain_governance_structure", source_key)
 
 
-@mcp.tool()
+@_read_only_tool()
 def get_consultation_catalog() -> str:
     """Return the honest availability map for policy consultation surfaces."""
     return _call("consultation_catalog")
 
 
-@mcp.tool()
+@_read_only_tool()
 def explain_architecture(topic: str) -> str:
     """Explain one allowlisted architecture topic from governed sources."""
     return _call("explain_architecture", topic)
 
 
-@mcp.tool()
+@_read_only_tool()
 def get_capability_status(status_yaml: str) -> str:
     """Qualify a caller-provided capability observation; perform no live probe."""
     return _call_yaml(status_yaml, "qualify_capability_status")
 
 
-@mcp.tool()
+@_read_only_tool()
 def validate_passport(passport_yaml: str) -> str:
     """Validate a capability passport candidate; validation is not authorization."""
     return _call_yaml(passport_yaml, "validate_passport")
 
 
-@mcp.tool()
+@_read_only_tool()
 def classify_request(request_yaml: str) -> str:
     """Classify a request on the governed consequence, verification and approval axes."""
     return _call_yaml(request_yaml, "classify_request")
 
 
-@mcp.tool()
+@_read_only_tool()
 def evaluate_preflight(preflight_yaml: str) -> str:
     """Return candidate-work eligibility and missing gates without authorizing effects."""
     return _call_yaml(preflight_yaml, "evaluate_preflight")
 
 
-@mcp.tool()
+@_read_only_tool()
 def validate_decision(decision_yaml: str) -> str:
     """Validate a caller-provided human decision reference (scope, ceiling, expiry,
     object identity, digest, human signer). A valid verdict is not an approval."""
     return _call_yaml(decision_yaml, "validate_decision")
 
 
-@mcp.tool()
+@_read_only_tool()
 def prepare_task_contract_skeleton(request_yaml: str) -> str:
     """Prepare a non-executable Task Contract candidate skeleton."""
     return _call_yaml(request_yaml, "prepare_task_contract")
 
 
-@mcp.tool()
+@_read_only_tool()
 def prepare_evidence_pack_skeleton(request_yaml: str) -> str:
     """Prepare an Evidence Pack candidate skeleton; do not validate truth."""
     return _call_yaml(request_yaml, "prepare_evidence_pack")
 
 
-@mcp.tool()
+@_read_only_tool()
 def check_external_action(description: str) -> str:
     """Return the blocked-by-default legitimacy path for an external action."""
     return _call("check_external_action", description)
 
 
-@mcp.tool()
+@_read_only_tool()
 def run_doctor_checks() -> str:
     """Run fail-closed, read-only repository governance checks."""
     return _call("run_doctor")
 
 
-@mcp.tool()
+@_read_only_tool()
 def validate_apu_dossier(dossier_yaml: str) -> str:
     """Validate a candidate APU dossier; canonize and approve nothing."""
     return _call_yaml(dossier_yaml, "validate_apu_dossier")
 
 
-@mcp.tool()
+@_read_only_tool()
 def verify_install(evidence_yaml: str) -> str:
     """Classify installation posture from caller-provided evidence only."""
     return _call_yaml(evidence_yaml, "verify_install")
 
 
-@mcp.tool()
+@_read_only_tool()
 def verify_observability(evidence_yaml: str) -> str:
     """Classify observability posture from caller-provided evidence only."""
     return _call_yaml(evidence_yaml, "verify_observability")
 
 
-@mcp.tool()
+@_read_only_tool()
 def verify_backup(evidence_yaml: str) -> str:
     """Classify recoverability posture from caller-provided evidence only."""
     return _call_yaml(evidence_yaml, "verify_backup")
 
 
-@mcp.tool()
+@_read_only_tool()
 def verify_exposure(evidence_yaml: str) -> str:
     """Classify exposure posture from caller-provided evidence only."""
     return _call_yaml(evidence_yaml, "verify_exposure")
 
 
-@mcp.tool()
+@_read_only_tool()
 def verify_update(evidence_yaml: str) -> str:
     """Classify update availability from caller-provided version evidence only."""
     return _call_yaml(evidence_yaml, "verify_update")
 
 
-@mcp.tool()
+@_read_only_tool()
 def load_verification_preset(preset_yaml: str) -> str:
     """Validate and project a verification preset into a data-gathering plan."""
     return _call_yaml(preset_yaml, "load_verification_preset")
 
 
-@mcp.tool()
+@_read_only_tool()
 def plan_context_pack(request_yaml: str) -> str:
     """Prepare boundaries for a caller-assembled scoped Context Pack candidate."""
     return _call_yaml(request_yaml, "plan_context_pack")
 
 
-@mcp.tool()
+@_read_only_tool()
 def validate_context_pack(context_pack_yaml: str) -> str:
     """Validate one caller-provided Context Pack against the governed schema."""
     return _call_yaml(context_pack_yaml, "validate_context_pack")
