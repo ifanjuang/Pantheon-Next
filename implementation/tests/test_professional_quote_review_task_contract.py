@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
 import yaml
 
+from mvp_vertical import runner
 from mvp_vertical.contract import load_contract
+from mvp_vertical.retrieval import HybridRetrievedChunk
+from mvp_vertical.store import RetrievedChunk
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -39,6 +43,53 @@ def test_devis_reprise_contract_projects_current_document_review_method() -> Non
     assert "skill" not in intent
 
 
+def test_runner_transports_complete_review_method_to_drafter() -> None:
+    contract = load_contract(CONTRACT_PATH)
+    source_ref = contract.sources[0]
+    chunk = RetrievedChunk(
+        source_ref=source_ref,
+        chunk_no=0,
+        body="Le lot 06 décrit une prestation à examiner.",
+        distance=0.01,
+        source_digest="a" * 64,
+        content_type="paragraph",
+        page_start=1,
+        page_end=1,
+        structural_locator="section:lot-06",
+        section_path=("lot 06",),
+    )
+    hit = HybridRetrievedChunk(
+        chunk=chunk,
+        hybrid_score=1.0,
+        semantic_rank=1,
+        lexical_rank=1,
+    )
+    observed: dict[str, object] = {}
+
+    class CapturingDrafter:
+        def draft(self, *, intent, question, chunks):
+            observed["intent"] = json.loads(intent)
+            return f"Point à examiner [{source_ref}#chunk-0]."
+
+    output = runner._run_with_hits(
+        contract,
+        "Analyse le devis du lot couverture.",
+        CapturingDrafter(),
+        [hit],
+    )
+
+    assert output.kind == "candidates"
+    assert observed["intent"] == contract.raw["intent"]
+    projected = observed["intent"]
+    assert isinstance(projected, dict)
+    assert projected["method_projection"]["authority_ref"] == (
+        "docs/domain-packs/architecture/DOCUMENT_REVIEW.md"
+    )
+    assert projected["method_projection"]["status"] == (
+        "task_scoped_non_authoritative_projection"
+    )
+
+
 def test_professional_oracle_uses_only_document_review_claim_types() -> None:
     contract = load_contract(CONTRACT_PATH)
     method_types = set(contract.raw["intent"]["method_projection"]["acceptable_claim_types"])
@@ -61,7 +112,7 @@ def test_devis_reprise_contract_no_longer_routes_a_reply_surface() -> None:
     assert "draft_reply_candidate" not in operations
     assert "prepare_result_candidate" in operations
     assert raw["expected_outputs"] == ["result_candidate", "evidence_pack_candidate"]
-    assert "email" not in contract.intent.casefold()
+    assert "email" not in contract.intent_summary.casefold()
     assert raw["forbidden_scope"] == [
         "external_send",
         "source_outside_declared_perimeter",
