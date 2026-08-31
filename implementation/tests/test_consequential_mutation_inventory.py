@@ -20,7 +20,7 @@ added tomorrow inheriting none of it, with no check noticing.
 
 ## Where the review stands
 
-Seventeen of the seventy-two entry points have been read individually; 55 have
+Nineteen of the seventy-two entry points have been read individually; 53 have
 not. The nine reviewed most recently were chosen because nothing in production
 reaches them yet — eight are exercised only by tests and one, `disable_principal`,
 is called by nothing at all. That made the question "is this effect consequential?"
@@ -210,8 +210,54 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
         "local_guards": ("existence check", "idempotent when already disabled"),
         "reviewed": "Withdraws the ability to act, so the direction is safety-increasing and the local chain is thin by design. Recorded as reviewed with one finding: unlike create_principal it records no actor, so a disabling leaves no trace of who did it.",
     },
-    ("human_access.py", "grant_access"): _UNREVIEWED,
-    ("human_access.py", "revoke_grant"): _UNREVIEWED,
+    ("human_access.py", "grant_access"): {
+        "gate": "none",
+        "local_guards": (
+            "route requires an authenticated principal holding project.access.manage",
+            "granted_by is taken from the authenticated session, never from the request body",
+            "route refuses to delegate project.access.manage, so a grant cannot escalate",
+            "a document grant requires the target to already hold active project.read",
+            "refuses a disabled principal",
+            "resource_type and action checked against controlled vocabularies",
+            "project existence and document-belongs-to-project checked",
+            "idempotent on an identical active grant",
+        ),
+        "reviewed": (
+            "An authorization boundary, and the reflex after the store_reviewed_dossier "
+            "correction is to escalate it too. The distinguishing fact is that the actor "
+            "here is verified rather than asserted: granted_by comes from the "
+            "authenticated session and the caller must already hold project.access.manage, "
+            "checked against the database. store_reviewed_dossier failed on exactly the "
+            "opposite — a review_ref nothing verifies. The route also caps escalation by "
+            "refusing to delegate the manage right at all, and the codebase names the "
+            "effect technical_project_access_granted, distinguishing it from a "
+            "professional one. Cleared on the chain, not on the category."
+        ),
+    },
+    ("human_access.py", "revoke_grant"): {
+        "gate": "gate_required_not_wired",
+        "local_guards": (
+            "route requires an authenticated principal holding project.access.manage",
+            "grant must belong to the named project, AccessDenied otherwise",
+            "route refuses to revoke a grant whose own action is project.access.manage",
+            "idempotent when already revoked",
+        ),
+        "reviewed": (
+            "First reviewed as none, on the claim that the one escalation it could enable — "
+            "stripping a project administrator — was refused by the route outright. A review "
+            "caught that this is false, and the guard list said so too. "
+            "require_project_access_manager checks project.read first and project.access.manage "
+            "second, while the route refuses only a grant whose own action is "
+            "project.access.manage. A manager can therefore revoke another manager's paired "
+            "project.read grant: the victim keeps the manage row and fails every management "
+            "endpoint. project.read is remotely grantable and revocation carries no "
+            "REMOTE_MANAGEABLE_ACTIONS restriction at all, so the path needs no special access. "
+            "An administrator lockout reachable by an ordinary manager is consequential, and "
+            "nothing routes this through the governance check. The durable remedy is a code "
+            "fix — protect a manager's paired read grant — which is a behavioural change and "
+            "not this record's to make."
+        ),
+    },
     ("human_access.py", "revoke_oidc_binding"): {
         "gate": "none",
         "local_guards": ("required binding_id", "raises on unknown binding", "idempotent when already revoked"),
@@ -405,9 +451,9 @@ def test_a_required_gate_that_is_not_wired_stays_visible_and_does_not_grow() -> 
     was ever taken.
     """
     pending = [key for key, record in INVENTORY.items() if record["gate"] == "gate_required_not_wired"]
-    assert len(pending) <= 2, (
+    assert len(pending) <= 3, (
         f"{len(pending)} entry points are known to need the chokepoint and do not reach "
-        "it; the ceiling is 2. Wire one, or move the ceiling deliberately and say why."
+        "it; the ceiling is 3. Wire one, or move the ceiling deliberately and say why."
     )
 
 
@@ -415,14 +461,14 @@ def test_the_unreviewed_debt_is_visible_and_does_not_grow() -> None:
     """Enumerated is not reviewed, and the gap is recorded rather than implied.
 
     The widened net enumerated 64 entry points that had not been read
-    individually. Nine have now been reviewed, leaving 55. Reviewing one means
+    individually. Eleven have now been reviewed, leaving 53. Reviewing one means
     replacing `_UNREVIEWED` with its real guard regime and the reasoning behind
     it. This bound exists so the debt shrinks deliberately and cannot quietly
     grow.
     """
     unreviewed = [key for key, record in INVENTORY.items() if record["gate"] == "unreviewed"]
-    assert len(unreviewed) <= 55, (
-        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 55. A new "
+    assert len(unreviewed) <= 53, (
+        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 53. A new "
         "mutation entry point must be reviewed, not added to the backlog."
     )
 
