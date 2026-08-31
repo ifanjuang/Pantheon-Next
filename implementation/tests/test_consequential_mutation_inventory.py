@@ -20,7 +20,7 @@ added tomorrow inheriting none of it, with no check noticing.
 
 ## Where the review stands
 
-Forty-two of the seventy-two entry points have been read individually; 30 have
+Forty-nine of the seventy-two entry points have been read individually; 23 have
 not. The first batches were chosen because nothing in production reached them —
 answerable without unwinding a call graph, and the cheapest end of the backlog
 rather than the most urgent one. From `knowledge.py` onward every entry point is
@@ -49,7 +49,15 @@ knowledge                 created_by               a body field, persisted verba
 knowledge_edit_variants   X-Pantheon-Human-Actor   asserted, persisted; kind is a literal
 decision_requests         X-Pantheon-Human-Actor   asserted — and so is its assurance level
 information_projection    X-Pantheon-Actor         asserted, persisted into the event log
+hermes_execution          X-Pantheon-Human-Actor   asserted — but the key decides the side
 ```
+
+The last line is the one exception found so far, and it is an exception of
+authorization rather than attribution. Admission and revocation take the editor
+key with a human actor; launch reservation, runtime start and result return take
+the Hermes key with a Hermes actor. The name in the header is still unverified,
+but no key can play both sides: Hermes cannot admit its own handoff, and a human
+editor cannot forge the runtime callback.
 
 The last line is the one that settles the question. `decision_requests` is the
 only module that models the distinction: `identity_assurance` is mandatory and
@@ -416,8 +424,35 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("document_revision_discussion.py", "create_comment"): _UNREVIEWED,
     ("entity_relations.py", "propose_relation"): _UNREVIEWED,
-    ("execution_results.py", "append_review_disposition"): _UNREVIEWED,
-    ("execution_results.py", "store_execution_result"): _UNREVIEWED,
+    ("execution_results.py", "append_review_disposition"): {
+        "gate": "none",
+        "local_guards": ("disposition vocabulary", "result row locked FOR UPDATE across checks and replay", "result_kind must match the disposition family", "claim-bearing dispositions require reviewer_kind human", "a database trigger enforces the same", "idempotency with payload digest"),
+        "reviewed": (
+            "The first guard in this review enforced below Python. "
+            "`accepted_for_claim` and `selected_for_change_candidate` are refused "
+            "for a non-human reviewer by this function *and* by "
+            "`validate_execution_result_review_disposition`, a trigger on the "
+            "table. That answers the weakness recorded against "
+            "`agency_classification._validate_actor`, which was not a second "
+            "layer because a direct caller inherited its default: a trigger is a "
+            "second layer, because a second Python caller cannot route around it. "
+            "The route passes `reviewer_kind=\"human\"` as a literal behind the "
+            "editor key. The immutable result row is locked before the checks and "
+            "kept locked through the replay lookup, so a replay cannot bypass the "
+            "semantic checks for its family."
+        ),
+    },
+    ("execution_results.py", "store_execution_result"): {
+        "gate": "none",
+        "local_guards": ("Hermes bearer key on the route", "authority block must equal the module constant exactly", "producer, results and refs required", "idempotency with payload digest"),
+        "reviewed": (
+            "Stores a returned execution result as a candidate. The record is "
+            "refused unless its `authority` block equals the module's own "
+            "constant, so a runtime cannot return a result that describes its own "
+            "authority differently from the one the store recognises — the "
+            "boundary is compared, not read from the payload."
+        ),
+    },
     ("hermes_execution.py", "admit_handoff"): {
         "gate": "none",
         "local_guards": ("human actor", "read_only effect only", "Task Contract and Context Pack identity", "TTL bounds", "idempotency"),
@@ -425,11 +460,73 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "Admits an external execution handoff bounded to a read_only effect, tied to a Task Contract and Context Pack identity and a TTL. Admission of a read_only effect is not authorization of a consequential one."
         ),
     },
-    ("hermes_execution.py", "record_external_runtime_start"): _UNREVIEWED,
-    ("hermes_execution.py", "revoke_admission"): _UNREVIEWED,
-    ("hermes_handoff_store.py", "submit_handoff"): _UNREVIEWED,
-    ("hermes_launch_context.py", "reserve_launch"): _UNREVIEWED,
-    ("hermes_result_candidate.py", "create_result_candidate"): _UNREVIEWED,
+    ("hermes_execution.py", "record_external_runtime_start"): {
+        "gate": "none",
+        "local_guards": ("Hermes key and Hermes actor on the route", "admission locked", "state must be admitted or launch_reserved", "exact launch reservation match", "work-issue version pinned to the admitted or reserved version", "run linkage asserts rowcount == 1", "idempotent on the same run_id"),
+        "reviewed": (
+            "Records that an external runtime started against an admission. It "
+            "cannot be reached with the editor key: the route takes "
+            "`require_hermes_key` and `require_hermes_actor`, while admission and "
+            "revocation take the editor key and a human actor, so Hermes cannot "
+            "admit its own handoff and a human cannot forge the runtime callback. "
+            "The callback's `expected_issue_version` must equal the version the "
+            "admission or reservation pinned. Worth quoting: the response carries "
+            "its own non-equivalences as data — `runtime start recorded != "
+            "Evidence`, `launch reservation != dispatch`, `running != task "
+            "success`. The code states what it does not mean."
+        ),
+    },
+    ("hermes_execution.py", "revoke_admission"): {
+        "gate": "none",
+        "local_guards": ("editor key and human actor on the route", "human actor and reason required", "admission locked", "state must be admitted", "idempotency checked across admission, actor and reason"),
+        "reviewed": (
+            "Withdraws an admission, which is safety-increasing, and records the "
+            "reason as an event rather than mutating the admission row. The "
+            "replay check compares admission, actor and reason together, so one "
+            "idempotency key cannot carry a different revocation."
+        ),
+    },
+    ("hermes_handoff_store.py", "submit_handoff"): {
+        "gate": "none",
+        "local_guards": ("human actor required", "preview must carry execution_authorized false", "requested_effect must be read_only", "immutable basis assembled and stored", "owner reads inside the write transaction", "idempotency with request digest"),
+        "reviewed": (
+            "Submits a handoff request. Two refusals are structural rather than "
+            "advisory: the preview must say `execution_authorized: false`, and the "
+            "effect must be `read_only`. Owner reads run inside the same explicit "
+            "transaction as the write, which the source comment explains. The "
+            "finding is `preview_digest`: it is taken from the caller's preview "
+            "and never recomputed from that preview's content, anywhere. Every "
+            "later stage compares it — the basis equality at admission, the "
+            "re-derivation in `get_execution_envelope`, `expected_preview_digest` "
+            "at the handoff API — so it is a real seal against drift between "
+            "stages, and its first link is an assertion. Recorded rather than "
+            "escalated: the effect here is a request, and the admission it can "
+            "reach is bounded to read_only work on an open Work Issue whose Task "
+            "Contract and Context Pack must already match."
+        ),
+    },
+    ("hermes_launch_context.py", "reserve_launch"): {
+        "gate": "none",
+        "local_guards": ("Hermes key and actor on the route", "REPEATABLE READ isolation", "admission locked FOR UPDATE", "one reservation per admission", "idempotency checked across admission and actor"),
+        "reviewed": (
+            "Reserves exactly one launch against an admission and freezes its "
+            "bootstrap context. It raises the transaction isolation to REPEATABLE "
+            "READ and locks the admission, so two runtimes cannot both reserve. "
+            "The docstring names the thing a caller would otherwise assume: a "
+            "replay of the same idempotency key returns the same immutable "
+            "reservation and is not permission to submit Hermes again."
+        ),
+    },
+    ("hermes_result_candidate.py", "create_result_candidate"): {
+        "gate": "none",
+        "local_guards": ("Hermes key and actor on the route", "candidate payload normalized", "at least one trace_ref required", "summary bounded", "result digest over the whole material", "idempotency"),
+        "reviewed": (
+            "Persists what the runtime returned as a candidate. Nothing here "
+            "admits Evidence, validates Knowledge or authorizes a task; the "
+            "requirement of at least one `trace_ref` means a candidate cannot "
+            "arrive with nothing to check it against."
+        ),
+    },
     ("human_access.py", "bind_oidc_identity"): {
         "gate": "gate_required_not_wired",
         "local_guards": ("refuses a disabled principal", "required issuer, subject and bound_by", "BindingConflict when the identity is bound to another principal", "idempotent within the same principal"),
@@ -870,14 +967,14 @@ def test_the_unreviewed_debt_is_visible_and_does_not_grow() -> None:
     """Enumerated is not reviewed, and the gap is recorded rather than implied.
 
     The widened net enumerated 64 entry points that had not been read
-    individually. Thirty-four have now been reviewed, leaving 30. Reviewing one means
+    individually. Forty-one have now been reviewed, leaving 23. Reviewing one means
     replacing `_UNREVIEWED` with its real guard regime and the reasoning behind
     it. This bound exists so the debt shrinks deliberately and cannot quietly
     grow.
     """
     unreviewed = [key for key, record in INVENTORY.items() if record["gate"] == "unreviewed"]
-    assert len(unreviewed) <= 30, (
-        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 30. A new "
+    assert len(unreviewed) <= 23, (
+        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 23. A new "
         "mutation entry point must be reviewed, not added to the backlog."
     )
 
