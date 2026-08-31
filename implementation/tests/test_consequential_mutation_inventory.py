@@ -151,62 +151,67 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     ("agency_classification.py", "archive_category"): {
         "gate": "none",
         "local_guards": (
-            "route requires the editor bearer key and rejects the Hermes key outright",
-            "_validate_actor accepts only human or system",
+            "route rejects the Hermes bearer key outright, and 503s if the editor and Hermes keys are identical — the only verified refusal of Hermes on this path",
+            "_validate_actor rejects an actor_kind outside human or system, but the label is caller-supplied and defaults to human, so it refuses nothing on a direct call",
             "expected_revision optimistic concurrency, StaleCategoryWrite on mismatch",
             "refuses an already archived Category",
         ),
         "reviewed": (
-            "Classification, not a professional act: it approves nothing, admits no Evidence and reaches nothing external. Hermes is refused at two independent layers — the route rejects the Hermes bearer key outright, and _validate_actor accepts only human or system. Attribution is the module's weak point and is recorded as a module finding rather than folded into this regime: see the docstring."
+            "Classification, not a professional act: it approves nothing, admits no Evidence and reaches nothing external. The protection is route-borne, not module-borne: the API route is the sole production caller and rejects the Hermes bearer key, "
+            "while _validate_actor only checks a label the caller supplies and which defaults to human. A first review of this entry called those two independent layers; they are not, and the correction matters because a second production caller would inherit none of the route's refusal. Attribution is the module's other weak point: see the docstring."
         ),
     },
     ("agency_classification.py", "assign_category"): {
         "gate": "none",
         "local_guards": (
-            "route requires the editor bearer key and rejects the Hermes key outright",
-            "_validate_actor accepts only human or system",
+            "route rejects the Hermes bearer key outright, and 503s if the editor and Hermes keys are identical — the only verified refusal of Hermes on this path",
+            "_validate_actor rejects an actor_kind outside human or system, but the label is caller-supplied and defaults to human, so it refuses nothing on a direct call",
             "required assignment, category and entity identifiers",
             "entity_type checked against a controlled set",
         ),
         "reviewed": (
-            "Classification, not a professional act: it approves nothing, admits no Evidence and reaches nothing external. Hermes is refused at two independent layers — the route rejects the Hermes bearer key outright, and _validate_actor accepts only human or system. Attribution is the module's weak point and is recorded as a module finding rather than folded into this regime: see the docstring."
+            "Classification, not a professional act: it approves nothing, admits no Evidence and reaches nothing external. The protection is route-borne, not module-borne: the API route is the sole production caller and rejects the Hermes bearer key, "
+            "while _validate_actor only checks a label the caller supplies and which defaults to human. A first review of this entry called those two independent layers; they are not, and the correction matters because a second production caller would inherit none of the route's refusal. Attribution is the module's other weak point: see the docstring."
         ),
     },
     ("agency_classification.py", "create_category"): {
         "gate": "none",
         "local_guards": (
-            "route requires the editor bearer key and rejects the Hermes key outright",
-            "actor_kind is a literal at the call site, so a request body cannot set it",
-            "_validate_actor accepts only human or system",
+            "route rejects the Hermes bearer key outright, and 503s if the editor and Hermes keys are identical — the only verified refusal of Hermes on this path",
+            "the sole production caller passes actor_kind as a literal, so a request body cannot set it",
+            "_validate_actor rejects an actor_kind outside human or system, but the label is caller-supplied and defaults to human, so it refuses nothing on a direct call",
             "required category_id and title, non-negative sort_order",
         ),
         "reviewed": (
-            "Classification, not a professional act: it approves nothing, admits no Evidence and reaches nothing external. Hermes is refused at two independent layers — the route rejects the Hermes bearer key outright, and _validate_actor accepts only human or system. Attribution is the module's weak point and is recorded as a module finding rather than folded into this regime: see the docstring."
+            "Classification, not a professional act: it approves nothing, admits no Evidence and reaches nothing external. The protection is route-borne, not module-borne: the API route is the sole production caller and rejects the Hermes bearer key, "
+            "while _validate_actor only checks a label the caller supplies and which defaults to human. A first review of this entry called those two independent layers; they are not, and the correction matters because a second production caller would inherit none of the route's refusal. Attribution is the module's other weak point: see the docstring."
         ),
     },
     ("agency_classification.py", "retire_category_assignment"): {
         "gate": "none",
         "local_guards": (
-            "route requires the editor bearer key and rejects the Hermes key outright",
-            "_validate_actor accepts only human or system",
+            "route rejects the Hermes bearer key outright, and 503s if the editor and Hermes keys are identical — the only verified refusal of Hermes on this path",
+            "_validate_actor rejects an actor_kind outside human or system, but the label is caller-supplied and defaults to human, so it refuses nothing on a direct call",
             "expected_revision optimistic concurrency, StaleCategoryAssignmentWrite on mismatch",
             "refuses an already retired CategoryAssignment",
         ),
         "reviewed": (
-            "Classification, not a professional act: it approves nothing, admits no Evidence and reaches nothing external. Hermes is refused at two independent layers — the route rejects the Hermes bearer key outright, and _validate_actor accepts only human or system. Attribution is the module's weak point and is recorded as a module finding rather than folded into this regime: see the docstring."
+            "Classification, not a professional act: it approves nothing, admits no Evidence and reaches nothing external. The protection is route-borne, not module-borne: the API route is the sole production caller and rejects the Hermes bearer key, "
+            "while _validate_actor only checks a label the caller supplies and which defaults to human. A first review of this entry called those two independent layers; they are not, and the correction matters because a second production caller would inherit none of the route's refusal. Attribution is the module's other weak point: see the docstring."
         ),
     },
     ("agency_classification.py", "update_category"): {
         "gate": "none",
         "local_guards": (
-            "route requires the editor bearer key and rejects the Hermes key outright",
-            "actor_kind is a literal at the call site",
-            "_validate_actor accepts only human or system",
+            "route rejects the Hermes bearer key outright, and 503s if the editor and Hermes keys are identical — the only verified refusal of Hermes on this path",
+            "the sole production caller passes actor_kind as a literal",
+            "_validate_actor rejects an actor_kind outside human or system, but the label is caller-supplied and defaults to human, so it refuses nothing on a direct call",
             "expected_revision optimistic concurrency, StaleCategoryWrite on mismatch",
             "refuses an empty change set",
         ),
         "reviewed": (
-            "Classification, not a professional act: it approves nothing, admits no Evidence and reaches nothing external. Hermes is refused at two independent layers — the route rejects the Hermes bearer key outright, and _validate_actor accepts only human or system. Attribution is the module's weak point and is recorded as a module finding rather than folded into this regime: see the docstring."
+            "Classification, not a professional act: it approves nothing, admits no Evidence and reaches nothing external. The protection is route-borne, not module-borne: the API route is the sole production caller and rejects the Hermes bearer key, "
+            "while _validate_actor only checks a label the caller supplies and which defaults to human. A first review of this entry called those two independent layers; they are not, and the correction matters because a second production caller would inherit none of the route's refusal. Attribution is the module's other weak point: see the docstring."
         ),
     },
     ("agency_data.py", "create_project"): _UNREVIEWED,

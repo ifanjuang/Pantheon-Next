@@ -22,11 +22,11 @@ retire_category_assignment    none
 ```
 
 Classification is not a professional act: it approves nothing, admits no Evidence
-and reaches nothing external. Hermes is refused at two independent layers — the
-route rejects the Hermes bearer key outright and returns 503 if the editor and
-Hermes keys are configured identically, and `_validate_actor` accepts only
-`human` or `system`. `actor_kind` is a literal at every call site, so a request
-body cannot set it. Update, archive and retirement carry `expected_revision`
+and reaches nothing external. The protection is route-borne: the API route is the
+sole production caller, rejects the Hermes bearer key outright and returns 503 if
+the editor and Hermes keys are configured identically, and passes `actor_kind` as
+a literal so a request body cannot set it. See the amendment below on what
+`_validate_actor` does and does not add. Update, archive and retirement carry `expected_revision`
 optimistic concurrency and refuse an already-terminal row.
 
 ## What tracing composition surfaced
@@ -93,3 +93,54 @@ module finding         != entry guard regime
 Whether the header-asserted actor should be replaced by the authenticated
 principal context on those 19 route dependencies. Until it is, `updated_by` on
 those tables records a claim rather than an identity.
+
+
+## Amendment, 2026-08-31 — the second Hermes layer does not exist
+
+This log and all five entries said Hermes was "refused at two independent
+layers": the route's bearer-key rejection, and `_validate_actor` accepting only
+`human` or `system`.
+
+The second is not a layer. `_validate_actor` checks a label the **caller
+supplies**, and every one of the five functions defaults it:
+
+```python
+actor_kind: str = "human"
+```
+
+A direct caller can omit `actor_kind` entirely, receive `human` by default, and
+pass. The check verifies a string, not an identity. The route's bearer-key
+rejection is the only verified refusal of Hermes on this path.
+
+Today's posture is unchanged, because the API route is the sole production caller
+of all five and it both rejects the Hermes key and passes `actor_kind` as a
+literal. What was wrong is the recorded reason — and it matters, because a second
+production caller would inherit none of that and the entry would still read as
+doubly protected.
+
+The verdicts stay `none`; the guard lists now say the protection is route-borne
+rather than module-borne.
+
+## This is the fourth instance, and the first one I made inside the rule
+
+```text
+review_ref                          looked like a reference to a review     (#894)
+"refuses to revoke access.manage"   looked like protection of the admin     (#895)
+require_human_actor                 looks like authentication               (#897)
+_validate_actor                     looks like a refusal of Hermes          (#897)
+```
+
+The first two were caught by review. The third I caught by applying the rule that
+came out of them — and then, in the same batch, asserted the fourth. I traced
+`_validate_actor` far enough to see it rejects `hermes` and stopped there,
+without asking who supplies `actor_kind` on a direct call. I had even flagged the
+default as worth checking at the start of the batch.
+
+Reading one call down is not a depth. The question is who controls each input,
+and it has to be asked of every link, including the ones that look settled.
+
+```text
+checks a label != checks an identity
+has a default  != has a value the caller must justify
+traced once    != traced through
+```
