@@ -12,3 +12,38 @@ The former repository remains the historical reference for its original
 pull requests, issues and commit identifiers. Runtime success, projection,
 persistence or schema conformance do not by themselves grant authorization,
 Evidence status or governed identity.
+
+## Retirement audit — 2026-08-31
+
+The former repository's `main` still equals the imported cutoff above. A retirement
+audit against `Pantheon-Next/main@3ffc583ac4232552aca9c34fa1407c11f388a59c`
+confirmed that the historical divergent branch families do not constitute a second
+active implementation trajectory: their material responsibilities are represented
+by current monorepo owners or have been explicitly superseded/consolidated.
+
+The audit covered Decision Requests, Professional Document revision/admission/
+comparison/currentness/inbox/impact paths, ProjectClaim candidates, storage
+retention, Project Anatomy projections, APU cross-family behavior, EntityRelation
+migration coverage and Cockpit/Tool projection convergence.
+
+Historical Git divergence is retained as provenance; it is not interpreted as
+current implementation authority. The audit was semantic/owner-based rather than a
+claim that every historical branch commit has a byte-identical successor SHA.
+
+All formerly open issues were reconciled on 2026-08-31:
+
+- former #94: completed in the monorepo Cockpit path and closed;
+- former #165: residual Knowledge mobile/offline work moved to `Pantheon-Next#906`;
+- former #227: real-environment Hermes/NAS qualification superseded by `#644` under `#607`;
+- former #338: non-project solicitation closed and locked.
+
+The standalone repository README now marks it as historical provenance only and
+forbids new implementation work. The repository is therefore eligible for the
+GitHub archive setting while remaining useful for original PR/issue URLs and
+original commit identifiers.
+
+```text
+retired repository != deleted provenance
+historical branch != active owner
+archived repository != authority transfer
+```
