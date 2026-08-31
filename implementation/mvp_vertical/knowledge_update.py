@@ -30,6 +30,10 @@ class KnowledgeUpdateExpired(KnowledgeUpdateError):
     pass
 
 
+class KnowledgeUpdatePolicyUnavailable(KnowledgeUpdateError):
+    """A configured Pantheon policy decision point could not answer."""
+
+
 def _material_markdown(value: str) -> str:
     """Normalize only for material-change detection, never for persistence."""
     return value.strip()
@@ -54,6 +58,15 @@ def _validate_actor(actor: str) -> str:
     if len(actor) < 2 or len(actor) > 200:
         raise KnowledgeUpdateError("a declared human actor between 2 and 200 characters is required")
     return actor
+
+
+def _validate_gate_ref(value: str | None, label: str) -> str:
+    ref = str(value or "").strip()
+    if len(ref) < 2 or len(ref) > 500:
+        raise KnowledgeUpdateError(
+            f"{label} is required when Pantheon policy enforcement is enabled"
+        )
+    return ref
 
 
 def _validate_scope(card: dict, *, parent_project_id: str, knowledge_id: str) -> None:
@@ -214,6 +227,9 @@ def apply_knowledge_update(
     now: int | None = None,
     policy_client: PolicyClient | None = None,
     required_ceiling: str = "C2",
+    task_contract_ref: str | None = None,
+    evidence_pack_candidate_ref: str | None = None,
+    human_decision_ref: str | None = None,
     preflight_candidate: dict[str, Any] | None = None,
     issuer_signing_secret: str | None = None,
 ) -> dict:
@@ -224,6 +240,11 @@ def apply_knowledge_update(
     the update is blocked, before any database access, unless the preflight is
     eligible and the human decision validates. When it is ``None`` the module's
     own signed checks apply unchanged.
+
+    Ordinary preflight gate references are caller-provided references. Their
+    presence satisfies the current preflight shape but does not authenticate the
+    referenced Task Contract or Evidence candidate. The decision payload remains
+    separately bound to this exact scope and content digest.
 
     When ``issuer_signing_secret`` is also supplied, the decision sent to the PDP
     is signed by the human issuer (`decision_signing`), so a PDP with an issuer
@@ -260,9 +281,38 @@ def apply_knowledge_update(
     if policy_client is not None:
         scope = {"scope_type": "project", "scope_id": parent_project_id}
         object_identity = f"knowledge:{knowledge_id}:{proposed_digest}"
+        if preflight_candidate is None:
+            task_ref = _validate_gate_ref(task_contract_ref, "task_contract_ref")
+            evidence_ref = _validate_gate_ref(
+                evidence_pack_candidate_ref, "evidence_pack_candidate_ref"
+            )
+            decision_ref = _validate_gate_ref(human_decision_ref, "human_decision_ref")
+            candidate = {
+                "request": {
+                    "intent": "knowledge_update",
+                    "external_effect": False,
+                    "writes_state": True,
+                    "scope": scope,
+                },
+                "gate_signals": {
+                    "task_contract_ref": task_ref,
+                    "evidence_pack_candidate_ref": evidence_ref,
+                    "human_decision_ref": decision_ref,
+                    "human_decision_level": required_ceiling,
+                },
+            }
+        else:
+            candidate = preflight_candidate
+            candidate_signals = candidate.get("gate_signals")
+            candidate_signals = candidate_signals if isinstance(candidate_signals, dict) else {}
+            decision_ref = _validate_gate_ref(
+                human_decision_ref or candidate_signals.get("human_decision_ref"),
+                "human_decision_ref",
+            )
+
         decision_payload = {
             "decision": {
-                "decision_id": idempotency_key,
+                "decision_id": decision_ref,
                 "decided_by": actor,
                 "approval_level": required_ceiling,
                 "expires_at": datetime.fromtimestamp(
@@ -279,14 +329,6 @@ def apply_knowledge_update(
                 "expected_digest": proposed_digest,
             },
         }
-        candidate = preflight_candidate or {
-            "request": {
-                "intent": "knowledge_update",
-                "external_effect": False,
-                "writes_state": True,
-                "scope": scope,
-            }
-        }
         if issuer_signing_secret:
             from .decision_signing import signed_decision_payload
 
@@ -295,10 +337,13 @@ def apply_knowledge_update(
             policy_client, candidate=candidate, decision_payload=decision_payload
         )
         if not verdict.allowed:
-            raise KnowledgeUpdateError(
+            message = (
                 "policy chokepoint blocked the Knowledge update "
                 f"({verdict.disposition}): {verdict.reasons}"
             )
+            if verdict.disposition == "policy_unavailable":
+                raise KnowledgeUpdatePolicyUnavailable(message)
+            raise KnowledgeUpdateError(message)
 
     card = knowledge.get_knowledge_card(conn, knowledge_id)
     _validate_scope(card, parent_project_id=parent_project_id, knowledge_id=knowledge_id)
