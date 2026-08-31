@@ -2,26 +2,42 @@
 
 Status: support doctrine index — reference review navigation only.
 
-This directory contains detailed reviews of external systems before any Pantheon distillation, Hermes candidate use or OpenWebUI exposure pattern.
+This directory contains detailed reviews of external systems before any Pantheon distillation, external-runtime binding, client selection or governed Cockpit projection is considered.
 
 It does not approve dependencies.
 It does not approve integrations.
 It does not define runtime behavior.
 
+Current responsibility split:
+
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Compatible runtime clients -> optional runtime interaction surfaces
+Hermes Agent               -> external execution candidate/binding where useful
+Pantheon Cockpit           -> governed projection where useful
+Pantheon Next              -> governance distillation and authority boundaries
+Human                      -> consequential decision when required
 ```
+
+A reference may concern only one of these layers. Reviewing a product does not create a missing layer merely to give that product somewhere to live.
 
 ## Review rule
 
-Every external reference should be reviewed across three layers:
+Every external reference should be reviewed against the smallest existing responsibility it could improve:
 
 ```text
-Pantheon   -> governance distillation and forbidden imports
-Hermes     -> execution candidate only, if useful and bounded
-OpenWebUI  -> cockpit exposure only, not runtime authority
+Pantheon governance -> useful governance pattern, forbidden imports and existing destination owner
+Hermes/runtime       -> executable capability candidate only when the capability is demonstrated and bounded
+Runtime client       -> replaceable interaction surface only when a distinct interaction need exists
+Pantheon Cockpit     -> governed projection pattern only when a distinct projection need exists
+```
+
+If the useful pattern already has an owner, distill into that owner rather than creating a product-specific path. If no demonstrated capability gap remains, keep the reference historical or refuse it.
+
+```text
+reviewed != adopted
+compatible != selected
+selected != dependency adopted
+projected != authoritative
 ```
 
 ## Reviews
@@ -29,6 +45,8 @@ OpenWebUI  -> cockpit exposure only, not runtime authority
 The detailed one-shot reviews formerly stored in this directory were removed on 2026-07-07 (governance cleanup, audit follow-up). Each full text remains in git history (`git log --diff-filter=D -- docs/governance/reference_reviews/` or commit `355a1b3^`). The strategic memory of each tool is kept below; the mapping trace is in `ai_logs/2026-07-07-governance-cleanup-pass-a.md`.
 
 New reviews follow the review rule above, are distilled promptly, and the one-shot review file is removed once its distillate lands here — a review is a working document, not doctrine.
+
+Historical rows below preserve the vocabulary and product relationships that were reviewed at the time. Those mentions are provenance, not current architecture assignments.
 
 ## Removal index — strategic memory of reviewed tools (2026-07-07)
 
@@ -80,11 +98,12 @@ One row per removed review. Status vocabulary: **distilled** (the useful pattern
 A review may recommend:
 
 - watch;
-- distill;
+- distill into an existing owner;
 - reject;
-- keep as Hermes candidate;
-- expose as OpenWebUI template;
-- archive.
+- keep as a bounded Hermes/runtime capability candidate;
+- keep as a replaceable runtime-client candidate;
+- keep as a governed Cockpit projection pattern;
+- archive as historical provenance.
 
 A review must not be treated as:
 
@@ -101,5 +120,6 @@ A review must not be treated as:
 ```text
 Review first.
 Distill only what survives the boundary.
+Reuse an existing owner before adding a product path.
 Install nothing by implication.
 ```

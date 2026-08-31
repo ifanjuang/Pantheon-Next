@@ -35,7 +35,6 @@ This repository may produce candidates, observations and refusals. It must not a
 - structured document extraction through an optional Docling binding;
 - Cockpit API, mobile Markdown editor and schema-driven card navigation;
 - read-only filesystem workspace projections through explicitly configured server roots;
-- residual Paperless-specific compatibility code pending its own consumer audit;
 - direct consumption of canonical Pantheon schemas, with generated copies only inside build artifacts.
 
 The former OpenWebUI adapter package and product-specific capability routes were removed after verification that their only executable consumers were dedicated OpenWebUI tests. Native document/Knowledge APIs and Cockpit projections remain under `mvp_vertical`.
@@ -75,7 +74,6 @@ The runner must refuse sources and questions outside the declared Task Contract 
 | default | PostgreSQL + pgvector development store. | Local service availability is not adoption. |
 | `documents` | Self-hosted Docling document conversion. | Extraction is derived data, not Evidence. |
 | `cockpit` | API, document/knowledge surfaces and mobile editor. | UI and API success are not authorization. |
-| `paperless` | Historical Paperless document-source compatibility profile pending cleanup. | Refused target binding; repository presence is not selection. |
 
 Start the Cockpit candidate with separate development credentials:
 

@@ -255,5 +255,10 @@ def test_composed_migrations_are_packaged_under_sql_directory():
 
 
 def test_console_entrypoint_targets_composed_cockpit():
-    pyproject = Path("pyproject.toml").read_text(encoding="utf-8")
+    # Resolve from this file, not the working directory: read relatively, the
+    # monorepo root's governance pyproject.toml is picked up instead and the
+    # assertion fails for a contributor running pytest from the repository root.
+    pyproject = (
+        Path(__file__).resolve().parents[1] / "pyproject.toml"
+    ).read_text(encoding="utf-8")
     assert 'mvp-cockpit-api = "mvp_vertical.cockpit_composed:run"' in pyproject

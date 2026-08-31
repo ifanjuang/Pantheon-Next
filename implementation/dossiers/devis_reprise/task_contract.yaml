@@ -9,13 +9,42 @@ contract_id: mvp.devis-reprise.tc-001
 status: candidate
 created_at: "2026-07-08T09:00:00Z"
 requested_by: practitioner
-exposure_surface: openwebui_capture
 
 intent:
   summary: >
-    Préparer une réponse à l'email client du 2026-07-05 sur le devis de
-    reprise Q-2026-041 (lot 06). La réponse ne doit valider, accepter ou
-    approuver aucun périmètre par elle-même.
+    Analyser le devis de reprise Q-2026-041 (lot 06) par rapport aux sources
+    sélectionnées du dossier et signaler uniquement les points nécessitant
+    l'attention du maître d'œuvre. Le résultat reste un candidat de revue : il
+    ne valide, n'accepte ni n'approuve aucun périmètre par lui-même.
+  method_projection:
+    authority_ref: docs/domain-packs/architecture/DOCUMENT_REVIEW.md
+    status: task_scoped_non_authoritative_projection
+    use_case: cctp_quote_comparison
+    acceptable_claim_types:
+      - missing_item
+      - contradiction
+      - ambiguity
+      - variant_detected
+      - exclusion_detected
+      - scope_shift
+      - quantity_mismatch
+      - deadline_or_phase_risk
+      - approval_needed
+      - contractor_question_needed
+      - client_arbitration_needed
+    requirements:
+      - preserve exact selected source and fragment references for material claims
+      - use at least one CCTP fragment and one quote or DPGF fragment for a material comparison claim, or state explicitly that the matching quote fragment was not found
+      - preserve contradictions and missing evidence instead of resolving them by inference
+      - keep version uncertainty visible and route consequential conclusions to human review
+    default_recommended_status: requires_human_review
+    forbidden_outputs:
+      - quote compliant
+      - quote non-compliant
+      - contractor selected
+      - service order ready to send
+      - client decision made
+      - memory promoted
 
 scope:
   dossier: devis_reprise
@@ -27,7 +56,7 @@ scope:
   operations:
     - read_selected_sources
     - retrieve_scoped_passages
-    - draft_reply_candidate
+    - prepare_result_candidate
     - prepare_evidence_pack_candidate
 
 forbidden_scope:
@@ -54,3 +83,4 @@ governance_refs:
   - docs/governance/MVP_GOVERNED_TASK_LOOP.md
   - docs/governance/TASK_CONTRACTS.md
   - docs/governance/USER_DECISION_GATE.md
+  - docs/domain-packs/architecture/DOCUMENT_REVIEW.md

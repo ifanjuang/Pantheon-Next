@@ -71,7 +71,7 @@ Status          candidate / reviewed / suspended / rejected or the applicable go
 
 A declaration describes governance. It does not describe scheduling, retries, provider routing or tool dispatch.
 
-Runtime implementation/release provenance and binding selection remain separate concerns. A passport does not install or bind anything by itself.
+Runtime implementation and release provenance, and binding selection, remain separate concerns. A passport does not install or bind anything by itself.
 
 ## Skill admission guard
 
