@@ -20,7 +20,7 @@ added tomorrow inheriting none of it, with no check noticing.
 
 ## Where the review stands
 
-Nineteen of the seventy-two entry points have been read individually; 53 have
+Twenty-four of the seventy-two entry points have been read individually; 48 have
 not. The nine reviewed most recently were chosen because nothing in production
 reaches them yet — eight are exercised only by tests and one, `disable_principal`,
 is called by nothing at all. That made the question "is this effect consequential?"
@@ -85,6 +85,27 @@ not yet individually read: their guard regime is *unknown*, which is recorded
 honestly rather than assumed to be `"none"`. A test counts them, so the debt is
 visible and shrinks deliberately.
 
+## Two attribution mechanisms, and only one of them verifies
+
+Reading the `agency_classification` cluster surfaced a repository-wide split that
+no single entry owns.
+
+```text
+principal.principal_ref     35 sites   an authenticated principal context
+X-Pantheon-Human-Actor      19 route dependencies across 8 modules
+```
+
+The second is a request header. `require_human_actor` is named like an
+authentication check and composes to: read the header, require it non-empty.
+Nothing ties the named human to a governed principal or to the party presenting
+the bearer key — and the value is persisted into governed rows as `updated_by`.
+
+So on those routes the *authorization* is verified (the bearer key) while the
+*attribution* is asserted. The chokepoint would not repair that; binding the
+actor to an authenticated identity would. It is recorded here because it is the
+third instance in this file of the same failure shape, and the one with the
+widest reach.
+
 ```text
 import edge != call path
 module reachable != gate invoked
@@ -127,11 +148,72 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     ("agency_change_candidates.py", "create_project_candidate"): _UNREVIEWED,
     ("agency_change_candidates.py", "reject_project_candidate"): _UNREVIEWED,
     ("agency_claims.py", "record_claim"): _UNREVIEWED,
-    ("agency_classification.py", "archive_category"): _UNREVIEWED,
-    ("agency_classification.py", "assign_category"): _UNREVIEWED,
-    ("agency_classification.py", "create_category"): _UNREVIEWED,
-    ("agency_classification.py", "retire_category_assignment"): _UNREVIEWED,
-    ("agency_classification.py", "update_category"): _UNREVIEWED,
+    ("agency_classification.py", "archive_category"): {
+        "gate": "none",
+        "local_guards": (
+            "route rejects the Hermes bearer key outright, and 503s if the editor and Hermes keys are identical — the only verified refusal of Hermes on this path",
+            "_validate_actor rejects an actor_kind outside human or system, but the label is caller-supplied and defaults to human, so it refuses nothing on a direct call",
+            "expected_revision optimistic concurrency, StaleCategoryWrite on mismatch",
+            "refuses an already archived Category",
+        ),
+        "reviewed": (
+            "Classification, not a professional act: it approves nothing, admits no Evidence and reaches nothing external. The protection is route-borne, not module-borne: the API route is the sole production caller and rejects the Hermes bearer key, "
+            "while _validate_actor only checks a label the caller supplies and which defaults to human. A first review of this entry called those two independent layers; they are not, and the correction matters because a second production caller would inherit none of the route's refusal. Attribution is the module's other weak point: see the docstring."
+        ),
+    },
+    ("agency_classification.py", "assign_category"): {
+        "gate": "none",
+        "local_guards": (
+            "route rejects the Hermes bearer key outright, and 503s if the editor and Hermes keys are identical — the only verified refusal of Hermes on this path",
+            "_validate_actor rejects an actor_kind outside human or system, but the label is caller-supplied and defaults to human, so it refuses nothing on a direct call",
+            "required assignment, category and entity identifiers",
+            "entity_type checked against a controlled set",
+        ),
+        "reviewed": (
+            "Classification, not a professional act: it approves nothing, admits no Evidence and reaches nothing external. The protection is route-borne, not module-borne: the API route is the sole production caller and rejects the Hermes bearer key, "
+            "while _validate_actor only checks a label the caller supplies and which defaults to human. A first review of this entry called those two independent layers; they are not, and the correction matters because a second production caller would inherit none of the route's refusal. Attribution is the module's other weak point: see the docstring."
+        ),
+    },
+    ("agency_classification.py", "create_category"): {
+        "gate": "none",
+        "local_guards": (
+            "route rejects the Hermes bearer key outright, and 503s if the editor and Hermes keys are identical — the only verified refusal of Hermes on this path",
+            "the sole production caller passes actor_kind as a literal, so a request body cannot set it",
+            "_validate_actor rejects an actor_kind outside human or system, but the label is caller-supplied and defaults to human, so it refuses nothing on a direct call",
+            "required category_id and title, non-negative sort_order",
+        ),
+        "reviewed": (
+            "Classification, not a professional act: it approves nothing, admits no Evidence and reaches nothing external. The protection is route-borne, not module-borne: the API route is the sole production caller and rejects the Hermes bearer key, "
+            "while _validate_actor only checks a label the caller supplies and which defaults to human. A first review of this entry called those two independent layers; they are not, and the correction matters because a second production caller would inherit none of the route's refusal. Attribution is the module's other weak point: see the docstring."
+        ),
+    },
+    ("agency_classification.py", "retire_category_assignment"): {
+        "gate": "none",
+        "local_guards": (
+            "route rejects the Hermes bearer key outright, and 503s if the editor and Hermes keys are identical — the only verified refusal of Hermes on this path",
+            "_validate_actor rejects an actor_kind outside human or system, but the label is caller-supplied and defaults to human, so it refuses nothing on a direct call",
+            "expected_revision optimistic concurrency, StaleCategoryAssignmentWrite on mismatch",
+            "refuses an already retired CategoryAssignment",
+        ),
+        "reviewed": (
+            "Classification, not a professional act: it approves nothing, admits no Evidence and reaches nothing external. The protection is route-borne, not module-borne: the API route is the sole production caller and rejects the Hermes bearer key, "
+            "while _validate_actor only checks a label the caller supplies and which defaults to human. A first review of this entry called those two independent layers; they are not, and the correction matters because a second production caller would inherit none of the route's refusal. Attribution is the module's other weak point: see the docstring."
+        ),
+    },
+    ("agency_classification.py", "update_category"): {
+        "gate": "none",
+        "local_guards": (
+            "route rejects the Hermes bearer key outright, and 503s if the editor and Hermes keys are identical — the only verified refusal of Hermes on this path",
+            "the sole production caller passes actor_kind as a literal",
+            "_validate_actor rejects an actor_kind outside human or system, but the label is caller-supplied and defaults to human, so it refuses nothing on a direct call",
+            "expected_revision optimistic concurrency, StaleCategoryWrite on mismatch",
+            "refuses an empty change set",
+        ),
+        "reviewed": (
+            "Classification, not a professional act: it approves nothing, admits no Evidence and reaches nothing external. The protection is route-borne, not module-borne: the API route is the sole production caller and rejects the Hermes bearer key, "
+            "while _validate_actor only checks a label the caller supplies and which defaults to human. A first review of this entry called those two independent layers; they are not, and the correction matters because a second production caller would inherit none of the route's refusal. Attribution is the module's other weak point: see the docstring."
+        ),
+    },
     ("agency_data.py", "create_project"): _UNREVIEWED,
     ("agency_data.py", "update_project"): _UNREVIEWED,
     ("agency_information.py", "act_working_information"): _UNREVIEWED,
@@ -461,14 +543,14 @@ def test_the_unreviewed_debt_is_visible_and_does_not_grow() -> None:
     """Enumerated is not reviewed, and the gap is recorded rather than implied.
 
     The widened net enumerated 64 entry points that had not been read
-    individually. Eleven have now been reviewed, leaving 53. Reviewing one means
+    individually. Sixteen have now been reviewed, leaving 48. Reviewing one means
     replacing `_UNREVIEWED` with its real guard regime and the reasoning behind
     it. This bound exists so the debt shrinks deliberately and cannot quietly
     grow.
     """
     unreviewed = [key for key, record in INVENTORY.items() if record["gate"] == "unreviewed"]
-    assert len(unreviewed) <= 53, (
-        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 53. A new "
+    assert len(unreviewed) <= 48, (
+        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 48. A new "
         "mutation entry point must be reviewed, not added to the backlog."
     )
 
