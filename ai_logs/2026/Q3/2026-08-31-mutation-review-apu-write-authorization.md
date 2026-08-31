@@ -65,6 +65,57 @@ append_authorization      a digest computed from the thing being approved
 This is not a design the repository lacks. It is a design the repository has,
 in one place, and does not apply where it records approvals elsewhere.
 
+## Amendment: the pattern is right, and even here it is not fully wired
+
+Review found two things this record overstated. Both are worth keeping, because
+together they sharpen the batch's point rather than undoing it.
+
+### The rejection does not reliably block the apply
+
+`_latest_application_authorization` runs an unlocked SELECT over the
+authorization events, and the delegation to `apu_owner.apply_source_match`
+follows outside any shared transaction, with no `FOR UPDATE` on the command row.
+A rejection that commits between the read and the write does not block the
+apply.
+
+The digest binding holds under concurrency — a digest does not change. The
+*ordering* does not. This is the same class as the `information_projection`
+first-write race recorded in the eighth batch: a check that reads outside the
+transaction that acts. The repair is to lock the command row and re-read the
+latest authorization event inside the applying transaction.
+
+Recorded rather than escalated: the gate exists and is invoked; it is readable
+stale.
+
+### The derivation triggers cover candidate-derived Claims only
+
+`validate_agency_project_claim_candidate_ref` opens with
+
+```sql
+IF NEW.source_kind <> 'execution_result' THEN
+```
+
+and returns. Every direct Claim through `POST /agency/projects/{id}/claims`
+passes it untouched. An editor can post `source_kind="human_assertion"` with
+`status="verified"` and a non-APU `backing_ref` that does not exist; the schema
+checks shape and the separate backing trigger validates only `apu_object`.
+
+**A governed Claim can read `verified` with nothing having verified it.** That
+is the same finding as `publish_knowledge` and its `review_status="reviewed"`,
+so `record_claim` takes the same regime: `gate_required_not_wired`. Required-gate
+ceiling 8 → 9.
+
+I described the triggers correctly and then cleared the whole entry point on
+their strength, without checking what they decline to cover.
+
+### What survives, and is stronger for it
+
+The thesis of this batch stands: the approval-bound-to-content pattern exists in
+this repository. What the amendment adds is that even the one place that has it
+does not serialize it — so the eight are not simply missing a design that works
+perfectly elsewhere. They are missing a design that exists once and is itself
+one lock short.
+
 ## And I nearly got this one backwards
 
 A first grep for consumers of `append_authorization` returned the writing route

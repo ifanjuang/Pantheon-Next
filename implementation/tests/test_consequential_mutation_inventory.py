@@ -304,7 +304,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     ("agency_change_candidates.py", "create_project_candidate"): _UNREVIEWED,
     ("agency_change_candidates.py", "reject_project_candidate"): _UNREVIEWED,
     ("agency_claims.py", "record_claim"): {
-        "gate": "none",
+        "gate": "gate_required_not_wired",
         "local_guards": ("status and certainty constrained by CHECK constraints", "value must match the reviewed candidate, enforced by a trigger", "backing_ref must be one of the candidate basis_refs, enforced by a trigger", "APU backing must belong to the Claim's Project", "append-only with supersedes"),
         "reviewed": (
             "Its docstring states the boundary — 'records an assertion; it "
@@ -317,7 +317,18 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "candidate's `basis_refs`, and an APU backing must belong to the "
             "Claim's own Project. Everywhere else in this review the below-Python "
             "guards check a vocabulary; here they check that the assertion "
-            "matches what it claims to be derived from."
+            "matches what it claims to be derived from. Corrected on review: "
+            "that holds only for candidate-derived Claims. "
+            "`validate_agency_project_claim_candidate_ref` opens with "
+            "`IF NEW.source_kind <> 'execution_result' THEN` and returns, so "
+            "every direct Claim through `POST /agency/projects/{id}/claims` "
+            "passes it untouched. An editor can post "
+            "`source_kind=\"human_assertion\"` with `status=\"verified\"` and a "
+            "non-APU `backing_ref` that does not exist; the schema checks shape "
+            "and the backing trigger only validates `apu_object`. A governed "
+            "Claim can therefore read `verified` with nothing having verified "
+            "it. That is the same finding as `publish_knowledge` and its "
+            "`review_status=\"reviewed\"`, so it takes the same regime."
         ),
     },
     ("agency_classification.py", "archive_category"): {
@@ -502,7 +513,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("apu_write_preparation.py", "apply_authorized_write_command"): {
         "gate": "none",
-        "local_guards": ("reviewed command chain", "latest authorization must be authorize_application", "authorization must cover the exact command payload digest", "stored index vs embedded effect", "owner and object revision freshness", "idempotency"),
+        "local_guards": ("reviewed command chain", "latest authorization must be authorize_application, read outside the write transaction", "authorization must cover the exact command payload digest", "stored index vs embedded effect", "owner and object revision freshness", "idempotency"),
         "reviewed": (
             "The strongest local chain in the inventory, and this record "
             "understated why. Beyond the reviewed command, the stored index "
@@ -514,7 +525,19 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "authorization here covers a specific content, not a name. That is "
             "what the eight `gate_required_not_wired` entries lack: they accept "
             "a claim that a decision happened, while this one refuses to act "
-            "unless the recorded decision covers the bytes being applied."
+            "unless the recorded decision covers the bytes being applied. "
+            "Corrected on review, and it matters: the digest binding holds under "
+            "concurrency, the ordering does not. "
+            "`_latest_application_authorization` runs an unlocked SELECT over the "
+            "authorization events and the delegation to `apu_owner."
+            "apply_source_match` follows outside any shared transaction, with no "
+            "`FOR UPDATE` on the command row. A rejection that commits between "
+            "the read and the write does not block the apply. Same class as the "
+            "`information_projection` first-write race: a check that reads "
+            "outside the transaction that acts. Recorded rather than escalated — "
+            "the gate exists and is invoked, it is readable stale — and the "
+            "repair is to lock the command row and re-read the latest event "
+            "inside the applying transaction."
         ),
     },
     ("apu_write_preparation.py", "prepare_write_command"): {
@@ -1432,9 +1455,9 @@ def test_a_required_gate_that_is_not_wired_stays_visible_and_does_not_grow() -> 
     was ever taken.
     """
     pending = [key for key, record in INVENTORY.items() if record["gate"] == "gate_required_not_wired"]
-    assert len(pending) <= 8, (
+    assert len(pending) <= 9, (
         f"{len(pending)} entry points are known to need the chokepoint and do not reach "
-        "it; the ceiling is 8. Wire one, or move the ceiling deliberately and say why."
+        "it; the ceiling is 9. Wire one, or move the ceiling deliberately and say why."
     )
 
 
