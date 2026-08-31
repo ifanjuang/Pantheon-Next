@@ -164,13 +164,49 @@ def test_a_dated_decision_closes_the_signal_without_moving_the_pin() -> None:
     assert registry["pins"]["thing"]["version"] == "1.0.0"
 
 
-def test_an_unreachable_host_does_not_silently_read_as_aligned() -> None:
+def test_an_unreachable_host_does_not_read_as_aligned() -> None:
+    """This test previously asserted the opposite of its own name.
+
+    It claimed an unreachable host would not silently read as aligned, and then
+    asserted `signal == "aligned"`. A review caught it. The consequence was real:
+    once the open lags are decided, a total upstream outage would leave
+    `actionable` empty and let the scheduled run report success having observed
+    nothing at all.
+    """
     registry, observations = _minimal()
     report = compare(registry, observations, {"thing": "__unreachable__:URLError"})
-    # Not actionable — a network failure is not a drift claim — but the row
-    # carries the failure so a run of all-unreachable pins cannot look green.
+
     assert report["rows"][0]["upstream_head_now"].startswith("__unreachable__")
+    assert report["rows"][0]["signal"] == "unreachable"
+    # Not a drift claim about the pin — kept out of `actionable` — but reported.
+    assert report["actionable"] == []
+    assert report["unobserved"] == ["thing"]
+
+
+def test_a_fetching_run_that_observed_nothing_is_not_green(tmp_path, capsys) -> None:
+    """The failure mode the review named: green while nothing was observed."""
+    heads = tmp_path / "heads.json"
+    registry = load_json(REGISTRY, REGISTRY_SCHEMA)
+    observations = load_json(OBSERVATIONS, OBSERVATIONS_SCHEMA)
+    fetchable = [
+        pin for pin, record in observations["observations"].items()
+        if record["source"] in FETCHABLE_SOURCES
+    ]
+    heads.write_text(
+        json.dumps({pin: "__unreachable__:URLError" for pin in fetchable}), encoding="utf-8"
+    )
+
+    assert registry  # the real registry is what the workflow compares
+    assert main(["--observed-json", str(heads), "--format", "json"]) == 1
+    capsys.readouterr()
+
+
+def test_offline_is_not_reported_as_unobserved() -> None:
+    """Not fetching on purpose is a different state from failing to fetch."""
+    registry, observations = _minimal()
+    report = compare(registry, observations, {})
     assert report["rows"][0]["signal"] == "aligned"
+    assert report["unobserved"] == []
 
 
 def test_a_pin_without_an_observation_record_fails_closed() -> None:
