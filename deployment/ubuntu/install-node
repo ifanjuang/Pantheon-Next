@@ -30,6 +30,8 @@ AI_ROOT="/srv/ai"
 APP_ROOT="/opt/pantheon-node"
 CONFIG_ROOT="/etc/pantheon-node"
 PANTHEON_ROOT="/opt/pantheon"
+UV_PYTHON_INSTALL_DIR="$APP_ROOT/python"
+export UV_PYTHON_INSTALL_DIR
 
 APPLY=1
 ASSUME_YES=0
@@ -113,7 +115,7 @@ preflight() {
   resolve_pantheon_commit
   log "installer $TOOL_VERSION"
   log "OS: Ubuntu $OS_VERSION (target $TARGET_UBUNTU LTS)"
-  [[ "$OS_VERSION" == "$TARGET_UBUNTU"* ]] || warn "this candidate is reviewed for Ubuntu $TARGET_UBUNTU; continuing requires operator review"
+  [[ "$OS_VERSION" == "$TARGET_UBUNTU"* ]] || warn "this candidate is reviewed for Ubuntu $TARGET_UBUNTU; --doctor may continue, but --apply will refuse this release"
 
   local arch mem_kb disk_kb
   arch="$(uname -m)"
@@ -161,7 +163,9 @@ preflight() {
 
 confirm_apply() {
   ((APPLY == 1)) || return 1
+  [[ "$OS_VERSION" == "$TARGET_UBUNTU"* ]] || die "Ubuntu $TARGET_UBUNTU LTS is required for --apply; detected $OS_VERSION"
   [[ -n "$RESOLVED_PANTHEON_COMMIT" ]] || die "PANTHEON_COMMIT is required when install-node is not run from a Pantheon Git checkout"
+  [[ "$RESOLVED_PANTHEON_COMMIT" =~ ^[0-9a-f]{40}$ ]] || die "PANTHEON_COMMIT must resolve to a full 40-character commit SHA"
   [[ -n "$PANTHEON_REPOSITORY" ]] || die "PANTHEON_REPOSITORY is required when no Git remote can be resolved from the current checkout"
   if ((ASSUME_YES == 1)); then return 0; fi
   [[ -t 0 ]] || die "non-interactive install requires --yes"
@@ -207,12 +211,17 @@ ensure_docker() {
 }
 
 prepare_layout() {
-  install -d -m 0750 "$CONFIG_ROOT" "$APP_ROOT" "$PANTHEON_ROOT"
+  install -d -m 0750 "$CONFIG_ROOT" "$PANTHEON_ROOT"
+  # Service users need execute-only traversal of the installer-owned application root.
+  install -d -m 0711 "$APP_ROOT"
   install -d -m 0755 "$STATE_ROOT" "$AI_ROOT"
   install -d -m 0750 \
     "$STATE_ROOT/hermes" "$STATE_ROOT/couchdb" "$STATE_ROOT/hindsight" \
     "$STATE_ROOT/livesync/db" "$STATE_ROOT/obsidian" "$STATE_ROOT/backups" \
-    "$AI_ROOT/models" "$AI_ROOT/comfyui-output" "$AI_ROOT/cache"
+    "$AI_ROOT/comfyui-output"
+  # Ollama and ComfyUI own their leaf directories; keep parent discovery closed while allowing traversal.
+  install -d -m 0711 "$AI_ROOT/models" "$AI_ROOT/cache"
+  install -d -m 0755 "$UV_PYTHON_INSTALL_DIR"
 }
 
 prepare_service_permissions() {
@@ -368,6 +377,7 @@ install_comfyui() {
   git -C "$src" fetch --tags --force
   git -C "$src" checkout --detach "$COMFYUI_REF"
   "$APP_ROOT/uv/bin/uv" python install "$COMFYUI_PYTHON"
+  chmod -R a+rX "$UV_PYTHON_INSTALL_DIR"
   rm -rf "$src/.venv"
   "$APP_ROOT/uv/bin/uv" venv --python "$COMFYUI_PYTHON" "$src/.venv"
   "$APP_ROOT/uv/bin/uv" pip install --python "$src/.venv/bin/python" "torch==$TORCH_VERSION" torchvision torchaudio --index-url "$TORCH_INDEX"
