@@ -140,3 +140,58 @@ The S1..S6 and O1/O2/Q5 results on this change are the first real signal on the 
 Seven mutation entry points still record `gate: "none"`. Each is a separate review: the inventory makes them enumerable, it does not make them equivalent. `admit_handoff` and `apply_authorized_write_command` carry the strongest local chains and are the natural next candidates.
 
 A real policy decision point observed end to end remains unproven. Configuration present is not a decision point reached.
+
+---
+
+## Addendum — the decision point was observed, and it did not need a deployment
+
+The section above listed "a real policy decision point observed end to end" as unproven, and the plan sized it at two days, mostly deployment. That was wrong: it took twenty minutes and no deployment at all.
+
+`pantheon-policy-api` was started as a local process against this checkout, and the exact production path — `HttpPolicyClient` into `enforce_consequential` — was driven against it.
+
+```text
+/livez   alive
+/readyz  ready, repository accessible, "ready != safe; healthy != authorized"
+protected route without a key  ->  401
+```
+
+Both directions were recorded, because only the pair is informative:
+
+```text
+without gate signals  ->  refused, blocked_pending_task_contract
+                          missing: reviewed_task_contract_ref, evidence_pack_candidate_ref
+with gate signals     ->  allowed, eligible_with_gate_signals_unverified
+```
+
+The refusal proves the gate is not permissive by default. The allow proves the round-trip completes. Neither performed any effect.
+
+### The allowing disposition is bounded, and says so
+
+`eligible_with_gate_signals_unverified`, with `gate_signal_validation_performed: false`. The decision point allowed the effect *and* reported that the gate references it was handed were never validated — they are caller-asserted strings. That is this repository's own distinction, enforced by the service rather than only written down:
+
+```text
+provided gate reference != validated decision
+eligible != approved
+gate answered != effect performed
+```
+
+### The request contract, recorded because it cost several attempts
+
+None of this is obvious from the client side, and each was established by a refusal rather than by reading:
+
+- `request.scope` is an object with `scope_type` and `scope_id`. A scope string is silently treated as absent and yields `blocked_pending_scope`.
+- Gate references live in `gate_signals`, a sibling of `request` — not inside it. Placing them in `request` changes nothing and the same refusal repeats.
+- `decision.expires_at` is an RFC 3339 string. An epoch integer is rejected with "not a valid timestamp".
+
+One false alarm is worth recording too: `/policy/decisions:validate` appeared missing from the service because it is registered through a table and `add_api_route` rather than an `@app.post` decorator. It exists. A grep for decorators is not an inventory of routes.
+
+### What this changes
+
+`WHAT_RUNS.md` no longer lists the round-trip as unproven. `implementation/tools/observe_policy_round_trip.py` makes the observation repeatable rather than anecdotal: it exercises both directions, prints the verdicts, and exits non-zero only when the decision point fails to answer — a refusal is a successful observation.
+
+What remains unproven is different and smaller: a decision point observed in a real deployment rather than a local process, and the seven other mutation entry points reviewed one by one.
+
+```text
+local process != deployment
+observation repeatable != observation adopted
+```
