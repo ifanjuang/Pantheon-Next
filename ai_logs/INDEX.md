@@ -14,7 +14,11 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
+<<<<<<< HEAD
 Total indexed entries: **869**.
+=======
+Total indexed entries: **868**.
+>>>>>>> origin/main
 
 | Date | Log | Subject |
 |---|---|---|
