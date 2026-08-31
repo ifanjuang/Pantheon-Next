@@ -61,17 +61,31 @@ That answers, concretely, the weakness recorded against
 direct caller inherited its default. A trigger *is* a second layer, because a
 second Python caller cannot route around it.
 
-### Two keys, two sides, no overlap
+### Two keys, two sides — separated by configuration, not by enforcement
 
 ```text
 admit_handoff / revoke_admission        editor key + human actor
 reserve_launch / runtime start / return Hermes key + Hermes actor
 ```
 
-The name in the header is still unverified — sixth module, same story. But no
-key can play both sides: Hermes cannot admit its own handoff, and a human editor
-cannot forge the runtime callback. Authorization is separated even though
-attribution is not.
+The first version of this record said no key can play both sides. **Review
+corrected it.** `require_editor_key` and `require_hermes_key` each compare the
+bearer against their own configured key and nothing else, and `create_app`
+accepts an editor key equal to the Hermes key. Under that configuration one
+credential admits a handoff *and* records its runtime start.
+
+The refusal exists in this codebase — `editor_match and hermes_match` → 503 —
+in `agency_data_api`, `agency_classification_api` and `cockpit_shell`. It covers
+none of the execution routes, which is where `implementation success !=
+authorization` actually lives.
+
+What is lost when the keys collapse is segregation of duties, not the read_only
+bound on the effect, and the collapsed holder is the editor key holder who could
+already admit. So the verdicts stand at `none` and the gap is recorded. The
+repair is one place: refuse equal keys when the app is constructed, rather than
+adding a fourth copy of the same check.
+
+The name in the header is still unverified — sixth module, same story.
 
 ### Code that states what it does not mean
 
