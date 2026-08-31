@@ -20,21 +20,38 @@ added tomorrow inheriting none of it, with no check noticing.
 
 ## Where the review stands
 
-Twenty-eight of the seventy-two entry points have been read individually; 44 have
+Thirty-two of the seventy-two entry points have been read individually; 40 have
 not. The first batches were chosen because nothing in production reached them —
 answerable without unwinding a call graph, and the cheapest end of the backlog
-rather than the most urgent one. The `knowledge.py` batch is the first that is
-live on both sides: every one of its four entry points is behind a route a key
-holder can call today.
+rather than the most urgent one. From `knowledge.py` onward every entry point is
+live: each sits behind a route a key holder can call today.
 
-Six entry points are now recorded as `gate_required_not_wired` rather than
+Seven entry points are now recorded as `gate_required_not_wired` rather than
 softened into `none`. `bind_oidc_identity` is where an external identity becomes
 able to act as a governed principal. `store_reviewed_dossier` installs canonical
 APU state on the strength of a `review_ref` that nothing validates. `revoke_grant`
 lets one access manager lock another one out. `publish_knowledge` accepts
 `review_status="reviewed"` as a caller assertion. `complete_edit_request` can
 return a human-rejected request to `proposed`. `apply_edit_request` acts on that
-status as though it were a decision.
+status as though it were a decision. `act_working_information` supersedes the
+acted version of a governed Information series and records no actor.
+
+## Attribution is a separate axis from authorization
+
+Three modules now show the same split, and it is not the gate's to fix. The
+authorization is verified — a key comparison, a principal lookup, a dependency
+that cannot be reached from a request body. The attribution is not.
+
+```text
+agency_classification   X-Pantheon-Human-Actor   asserted, persisted as updated_by
+agency_information      X-Pantheon-Actor         asserted, required, then discarded
+knowledge               created_by               a body field, persisted verbatim
+```
+
+The middle one is worth reading twice. All four Information routes refuse a
+request without `X-Pantheon-Actor` and none of them uses the value: the parameter
+is named `_actor`, and `agency_information_cards` has no actor column to put it
+in. The header is enforced as though it mattered and stored nowhere.
 
 ## What keeps being wrong
 
@@ -231,10 +248,67 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("agency_data.py", "create_project"): _UNREVIEWED,
     ("agency_data.py", "update_project"): _UNREVIEWED,
-    ("agency_information.py", "act_working_information"): _UNREVIEWED,
-    ("agency_information.py", "create_information"): _UNREVIEWED,
-    ("agency_information.py", "derive_working_version"): _UNREVIEWED,
-    ("agency_information.py", "update_working_information"): _UNREVIEWED,
+    ("agency_information.py", "act_working_information"): {
+        "gate": "gate_required_not_wired",
+        "local_guards": ("actor_kind must be human, no default", "row lock", "working status only", "expected_revision", "supersede and install in one transaction"),
+        "reviewed": (
+            "This is the act. It supersedes the currently acted version of a "
+            "governed Information series and installs a new one, in one "
+            "transaction, and the acted row is what `card_scope` and "
+            "`hermes_scoped_context` read. The module states its own gravity — "
+            "'only a human may act an Information version' — and enforces it by "
+            "comparing a string the caller passes. The route passes it correctly "
+            "today, from a dependency rather than the body. Two things make it a "
+            "gate requirement anyway: the effect is a change to canonical agency "
+            "state, and nothing records who performed it. `acted_at` is written; "
+            "the acting party is not, because the table has no actor column."
+        ),
+    },
+    ("agency_information.py", "create_information"): {
+        "gate": "none",
+        "local_guards": ("actor_kind human or system, no default", "new rows must start draft or in_progress", "source ref/note validation", "handwritten allowlist, validated against the field registry"),
+        "reviewed": (
+            "Creates a draft, which approves nothing and supersedes nothing, and "
+            "`actor_kind` carries no default, so a direct caller has to state its "
+            "claim rather than inherit one. Corrected on review: this record said "
+            "the field allowlist was derived from the schema rather than written "
+            "out twice. Neither half was true. The set passed to `_schema_values` "
+            "is seventeen names spelled out at the call site, duplicating the keys "
+            "of the dict directly above it, and `_schema_values` only forwards "
+            "whatever allowlist its caller hands it to `normalize_declared_fields`, "
+            "which checks the field registry — not any declared view. A `create` "
+            "view does exist and today matches the handwritten set exactly, minus "
+            "`project_id`, which is a path parameter; nothing holds them in step. "
+            "`update_working_information` next door does derive its allowlist, via "
+            "`_editable_fields()` and the `edit` view, so the two paths differ in "
+            "kind and only one of them was read correctly the first time."
+        ),
+    },
+    ("agency_information.py", "derive_working_version"): {
+        "gate": "none",
+        "local_guards": ("row lock", "base must be the acted version", "source ref/note validation", "new row forced to draft"),
+        "reviewed": (
+            "Derives a new draft from the acted version; the status is a literal in "
+            "the INSERT, so the caller cannot ask for anything else. One "
+            "inconsistency worth naming rather than filing: `actor_kind` defaults "
+            "to `human` here while the other three in this module require it. That "
+            "is the shape corrected in the classification cluster — a default "
+            "turning a claim into an inheritance — and it is the one entry point "
+            "here where a future direct caller would pass the check by omission."
+        ),
+    },
+    ("agency_information.py", "update_working_information"): {
+        "gate": "none",
+        "local_guards": ("hermes requires hermes_admitted, never passed by any route", "working status only", "expected_revision plus a rowcount check", "editable-field allowlist", "status restricted to working values"),
+        "reviewed": (
+            "Edits a working version only: an acted or superseded row is refused "
+            "outright. Concurrency is checked twice — the locked read compares "
+            "`expected_revision`, and the UPDATE carries the revision in its WHERE "
+            "clause and asserts `rowcount == 1`, so a race that slips past the "
+            "first check still cannot write. Hermes is refused unconditionally in "
+            "production because `hermes_admitted` is a parameter no route passes."
+        ),
+    },
     ("apu_mapping_reviews.py", "append_mapping_review"): _UNREVIEWED,
     ("apu_owner.py", "apply_source_match"): {
         "gate": "none",
@@ -614,9 +688,9 @@ def test_a_required_gate_that_is_not_wired_stays_visible_and_does_not_grow() -> 
     was ever taken.
     """
     pending = [key for key, record in INVENTORY.items() if record["gate"] == "gate_required_not_wired"]
-    assert len(pending) <= 6, (
+    assert len(pending) <= 7, (
         f"{len(pending)} entry points are known to need the chokepoint and do not reach "
-        "it; the ceiling is 6. Wire one, or move the ceiling deliberately and say why."
+        "it; the ceiling is 7. Wire one, or move the ceiling deliberately and say why."
     )
 
 
@@ -624,14 +698,14 @@ def test_the_unreviewed_debt_is_visible_and_does_not_grow() -> None:
     """Enumerated is not reviewed, and the gap is recorded rather than implied.
 
     The widened net enumerated 64 entry points that had not been read
-    individually. Twenty have now been reviewed, leaving 44. Reviewing one means
+    individually. Twenty-four have now been reviewed, leaving 40. Reviewing one means
     replacing `_UNREVIEWED` with its real guard regime and the reasoning behind
     it. This bound exists so the debt shrinks deliberately and cannot quietly
     grow.
     """
     unreviewed = [key for key, record in INVENTORY.items() if record["gate"] == "unreviewed"]
-    assert len(unreviewed) <= 44, (
-        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 44. A new "
+    assert len(unreviewed) <= 40, (
+        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 40. A new "
         "mutation entry point must be reviewed, not added to the backlog."
     )
 
