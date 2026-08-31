@@ -192,6 +192,59 @@ def _is_useful(hit: HybridRetrievedChunk) -> bool:
     return hit.semantic_rank is not None and hit.chunk.distance <= MAX_USEFUL_DISTANCE
 
 
+def _select_useful_context_hits(
+    hits: list[HybridRetrievedChunk],
+    *,
+    required_sources: tuple[tuple[str, str], ...] = (),
+    limit: int = HYBRID_TOP_K,
+) -> list[HybridRetrievedChunk]:
+    """Select useful context without silently dropping a resolved source.
+
+    The global fused order remains authoritative for ranking. On the project-aware
+    exact-source path only, one already-useful candidate from each explicitly
+    resolved source is retained when the fixed context budget permits it, then
+    remaining slots are filled in the original fused order.
+
+    A source with no useful candidate is never forced into context. This is a
+    final context-selection rule, not a retrieval floor, truth signal or Evidence
+    admission rule.
+    """
+    if limit < 1:
+        raise ValueError("context selection limit must be at least 1")
+
+    useful_hits = [hit for hit in hits if _is_useful(hit)]
+    if not useful_hits or not required_sources:
+        return useful_hits[:limit]
+
+    required = set(required_sources)
+    selected: list[HybridRetrievedChunk] = []
+    selected_keys: set[tuple[str, str, int]] = set()
+    covered_sources: set[tuple[str, str]] = set()
+
+    for hit in useful_hits:
+        source_key = (hit.chunk.source_ref, hit.chunk.source_digest)
+        if source_key not in required or source_key in covered_sources:
+            continue
+        selected.append(hit)
+        selected_keys.add((hit.chunk.source_ref, hit.chunk.source_digest, hit.chunk.chunk_no))
+        covered_sources.add(source_key)
+        if len(selected) == limit:
+            break
+
+    for hit in useful_hits:
+        if len(selected) == limit:
+            break
+        hit_key = (hit.chunk.source_ref, hit.chunk.source_digest, hit.chunk.chunk_no)
+        if hit_key in selected_keys:
+            continue
+        selected.append(hit)
+        selected_keys.add(hit_key)
+
+    rank = {id(hit): index for index, hit in enumerate(useful_hits)}
+    selected.sort(key=lambda hit: rank[id(hit)])
+    return selected
+
+
 def _metric_profile(hit: HybridRetrievedChunk) -> str:
     semantic = hit.semantic_rank if hit.semantic_rank is not None else "none"
     lexical = hit.lexical_rank if hit.lexical_rank is not None else "none"
@@ -339,7 +392,7 @@ def run_accessible_applicable(
                 project_id=project_id,
                 requested_documents=requested_documents,
                 query=question,
-                top_k=HYBRID_TOP_K,
+                top_k=HYBRID_CANDIDATE_K,
                 candidate_k=HYBRID_CANDIDATE_K,
                 rrf_k=HYBRID_RRF_K,
             )
@@ -380,11 +433,19 @@ def run_accessible_applicable(
                 "the project/document retrieval scope could not be resolved safely",
             )
         else:
+            required_sources = tuple(
+                (source.source_ref, source.source_digest) for source in resolution.sources
+            )
+            selected_hits = _select_useful_context_hits(
+                hits,
+                required_sources=required_sources,
+                limit=HYBRID_TOP_K,
+            )
             output = _run_with_hits(
                 contract,
                 question,
                 drafter or DeterministicDrafter(),
-                hits,
+                selected_hits,
                 scope_resolution=resolution,
             )
 
