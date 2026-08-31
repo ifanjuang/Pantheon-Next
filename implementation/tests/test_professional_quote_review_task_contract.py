@@ -16,6 +16,12 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_PATH = ROOT / "dossiers/devis_reprise/task_contract.yaml"
 METHOD_PATH = ROOT.parent / "docs/domain-packs/architecture/DOCUMENT_REVIEW.md"
 ORACLE_PATH = ROOT / "tests/fixtures/professional_quote_review_cases.yaml"
+SUMMARY_ONLY_CONTRACT_PATHS = (
+    ROOT / "dossiers/dce_relecture/task_contract.yaml",
+    ROOT / "dossiers/litige_facture/task_contract.yaml",
+    ROOT / "dossiers/permis_amenagement/task_contract.yaml",
+    ROOT / "dossiers/strategie_energetique/task_contract.yaml",
+)
 
 
 def _text_block_after(marker: str) -> list[str]:
@@ -41,6 +47,14 @@ def test_devis_reprise_contract_projects_current_document_review_method() -> Non
     # Method projection is task data, not a parallel Capability/Skill admission.
     assert "capability_id" not in intent
     assert "skill" not in intent
+
+
+def test_summary_only_contracts_keep_legacy_plain_drafter_intent() -> None:
+    for path in SUMMARY_ONLY_CONTRACT_PATHS:
+        contract = load_contract(path)
+        assert set(contract.raw["intent"]) == {"summary"}
+        assert contract.intent == contract.intent_summary
+        assert not contract.intent.startswith("{")
 
 
 def test_runner_transports_complete_review_method_to_drafter() -> None:
