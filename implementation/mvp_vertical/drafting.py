@@ -22,7 +22,6 @@ detecting or resolving them.
 
 from __future__ import annotations
 
-import json
 import re
 from typing import Protocol, Sequence
 
@@ -255,34 +254,29 @@ def grounding_review(draft: str, chunks: Sequence[RetrievedChunk]) -> dict:
 class Drafter(Protocol):
     """The seam a Hermes-side LLM drafter implements.
 
-    ``intent`` carries the complete task intent context when the Task Contract
-    declares an object-shaped intent. Receipt of that context does not make a
-    task-scoped method projection authoritative or professionally validated.
+    ``intent`` is the legacy summary string for summary-only Task Contracts and
+    the complete task-intent object when additional bounded task context exists.
+    Receipt of structured context does not make a task-scoped method projection
+    authoritative or professionally validated.
     """
 
     def draft(
         self,
         *,
-        intent: str,
+        intent: str | dict,
         question: str,
         chunks: Sequence[RetrievedChunk],
     ) -> str:
         ...
 
 
-def _human_request(intent: str, question: str) -> str:
-    """Keep structured task context out of the deterministic human-facing copy."""
-    raw = (intent or "").strip()
-    if raw:
-        try:
-            parsed = json.loads(raw)
-        except json.JSONDecodeError:
-            return raw
-        if isinstance(parsed, dict):
-            summary = str(parsed.get("summary") or "").strip()
-            if summary:
-                return summary
-    return (question or "").strip()
+def _human_request(intent: str | dict, question: str) -> str:
+    """Render the task summary without guessing from string content."""
+    if isinstance(intent, dict):
+        summary = str(intent.get("summary") or "").strip()
+        return summary or (question or "").strip()
+    raw = str(intent or "").strip()
+    return raw or (question or "").strip()
 
 
 class DeterministicDrafter:
@@ -291,7 +285,7 @@ class DeterministicDrafter:
     def draft(
         self,
         *,
-        intent: str,
+        intent: str | dict,
         question: str,
         chunks: Sequence[RetrievedChunk],
     ) -> str:

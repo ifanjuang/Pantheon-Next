@@ -7,8 +7,8 @@ declared scope.
 
 from __future__ import annotations
 
+import copy
 import functools
-import json
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 
@@ -48,25 +48,20 @@ class TaskContract:
         return str(intent or "").strip()
 
     @property
-    def intent(self) -> str:
-        """Task context passed to the drafter without widening legacy behavior.
+    def intent(self) -> str | dict:
+        """Task context passed to the drafter without content-based guessing.
 
         Existing summary-only object intents remain the same plain summary
         string. When an object-shaped intent carries additional bounded task
-        context, serialize the complete object deterministically so fields such
-        as ``method_projection`` are not discarded before the drafting seam.
+        context, pass a detached copy of the complete object so fields such as
+        ``method_projection`` are not discarded before the drafting seam.
         Receipt of those fields does not grant them authority.
         """
         intent = self.raw.get("intent")
         if isinstance(intent, dict):
             if set(intent) <= {"summary"}:
                 return str(intent.get("summary", "")).strip()
-            return json.dumps(
-                intent,
-                sort_keys=True,
-                ensure_ascii=False,
-                separators=(",", ":"),
-            )
+            return copy.deepcopy(intent)
         return str(intent or "").strip()
 
 
