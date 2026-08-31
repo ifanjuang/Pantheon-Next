@@ -25,7 +25,8 @@ document grant                        target must already hold project.read
 revoke                                project.access.manage cannot be stripped
 ```
 
-Both are recorded `none`.
+`grant_access` is recorded `none`. `revoke_grant` was too, and that was wrong —
+see the amendment below.
 
 ## Why not escalated, stated deliberately
 
@@ -75,3 +76,53 @@ Where the first `project.access.manage` grant is supposed to come from. Until
 that is answered, the access surface is either seeded by hand outside any
 governed path, or not seeded at all — and the second is what the symbol layer
 currently observes.
+
+
+## Amendment, 2026-08-31 — the revocation guard was narrower than asserted
+
+`revoke_grant` was recorded `none`, with a guard list stating that the route
+"refuses to revoke project.access.manage, so the administrator cannot be
+stripped", and reasoning that "the one escalation it could enable — stripping the
+project administrator — is refused by the route outright."
+
+A review caught that this is false, and it is false in the guard list itself, not
+only in the prose.
+
+```text
+require_project_access_manager  ->  require_project_read      (project.read)
+                                ->  require_access            (project.access.manage)
+
+revoke route refuses            ->  grant["action"] == "project.access.manage"
+                                    and nothing else
+```
+
+`project.read` is remotely grantable, and the revoke route carries no
+`REMOTE_MANAGEABLE_ACTIONS` restriction at all. So one manager can revoke another
+manager's paired `project.read` grant. The victim keeps the `project.access.manage`
+row and fails every management endpoint, because the read check runs first.
+
+An administrator lockout reachable by an ordinary manager, through a route that
+needs no special access, is consequential. Reclassified as
+`gate_required_not_wired`; the regime's ceiling moves 2 → 3.
+
+The durable remedy is a code fix — protect a manager's paired read grant, or make
+revocation refuse any grant the target needs in order to manage. That is a
+behavioural change and not this record's to make.
+
+## What this says about the previous entry, and what it does not
+
+The `grant_access` verdict is unaffected: its guard against escalation is the
+route refusing to *delegate* the manage right, which is real and direct. The
+error here was the mirror-image guard on revocation, which only looks symmetric.
+
+Twice in two batches a verdict has been corrected by review, and both times the
+error was the same shape: a guard asserted from what a check is named rather than
+from what it composes to. `review_ref` looked like a reference to a review.
+"refuses to revoke project.access.manage" looked like protection of the
+administrator. Neither survived reading the next call down.
+
+```text
+named guard      != composed guard
+refuses directly != refuses indirectly
+symmetric-looking != symmetric
+```

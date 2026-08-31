@@ -235,17 +235,27 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
         ),
     },
     ("human_access.py", "revoke_grant"): {
-        "gate": "none",
+        "gate": "gate_required_not_wired",
         "local_guards": (
             "route requires an authenticated principal holding project.access.manage",
             "grant must belong to the named project, AccessDenied otherwise",
-            "route refuses to revoke project.access.manage, so the administrator cannot be stripped",
+            "route refuses to revoke a grant whose own action is project.access.manage",
             "idempotent when already revoked",
         ),
         "reviewed": (
-            "Withdraws a technical access, so the direction is safety-increasing, and the "
-            "one escalation it could enable — stripping the project administrator — is "
-            "refused by the route outright."
+            "First reviewed as none, on the claim that the one escalation it could enable — "
+            "stripping a project administrator — was refused by the route outright. A review "
+            "caught that this is false, and the guard list said so too. "
+            "require_project_access_manager checks project.read first and project.access.manage "
+            "second, while the route refuses only a grant whose own action is "
+            "project.access.manage. A manager can therefore revoke another manager's paired "
+            "project.read grant: the victim keeps the manage row and fails every management "
+            "endpoint. project.read is remotely grantable and revocation carries no "
+            "REMOTE_MANAGEABLE_ACTIONS restriction at all, so the path needs no special access. "
+            "An administrator lockout reachable by an ordinary manager is consequential, and "
+            "nothing routes this through the governance check. The durable remedy is a code "
+            "fix — protect a manager's paired read grant — which is a behavioural change and "
+            "not this record's to make."
         ),
     },
     ("human_access.py", "revoke_oidc_binding"): {
@@ -441,9 +451,9 @@ def test_a_required_gate_that_is_not_wired_stays_visible_and_does_not_grow() -> 
     was ever taken.
     """
     pending = [key for key, record in INVENTORY.items() if record["gate"] == "gate_required_not_wired"]
-    assert len(pending) <= 2, (
+    assert len(pending) <= 3, (
         f"{len(pending)} entry points are known to need the chokepoint and do not reach "
-        "it; the ceiling is 2. Wire one, or move the ceiling deliberately and say why."
+        "it; the ceiling is 3. Wire one, or move the ceiling deliberately and say why."
     )
 
 
