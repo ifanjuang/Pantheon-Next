@@ -20,7 +20,7 @@ added tomorrow inheriting none of it, with no check noticing.
 
 ## Where the review stands
 
-Forty-nine of the seventy-two entry points have been read individually; 23 have
+Fifty-seven of the eighty-five entry points have been read individually; 28 have
 not. The first batches were chosen because nothing in production reached them —
 answerable without unwinding a call graph, and the cheapest end of the backlog
 rather than the most urgent one. From `knowledge.py` onward every entry point is
@@ -63,6 +63,39 @@ agency_information_projection_metadata.revision = <expected_revision>` — and
 require `rowcount == 1`. On a genuine first write exactly one racer's INSERT
 succeeds; the loser conflicts, its guarded UPDATE matches nothing, and it fails
 as stale instead of overwriting.
+
+## The net was under-counting, and it under-counted the worst cases
+
+The tenth batch found this by accident, reading `work_issues.py`:
+`transition_issue` was not in this inventory at all. Nor were twelve others.
+
+Discovery saw a public function only if its name began with one of five verbs
+or its own body contained a literal SQL write. Neither signal sees a public
+function that delegates its write to a private helper in the same module —
+which is a normal way to write this codebase, and is how the following are
+written:
+
+```text
+work_issues.transition_issue          the only general status move
+work_issues.close_issue               the only path to done
+entity_relations.canonize_relation    canonization, by name
+entity_relations.reject_relation      entity_relations.retire_relation
+source_intake.exclude_source          restore_source, link_project,
+                                      unlink_project, update_metadata,
+                                      suggest_projects
+hermes_runtime_return.record_external_runtime_return
+apu_cross_family.create_decision_request
+```
+
+Thirteen entry points, and the miss was not random: it fell on functions whose
+names are verbs of consequence. A third signal now catches them — a public
+function that calls a private same-module helper whose body writes.
+
+Worth being precise about how this instrument failed, because it is the same
+failure it exists to find. Two tests guarded discovery: one asserts every
+discovered entry point is declared, the other that discovery is not vacuous.
+Both passed throughout. Neither could fail for something the net never saw.
+**The control verified its output and never its coverage.**
 
 ## Attribution is a separate axis from authorization
 
@@ -877,17 +910,119 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     ("source_intake.py", "relate_contained_source"): _UNREVIEWED,
     ("storage_retention.py", "retain_document_version"): _UNREVIEWED,
     ("store.py", "ingest"): _UNREVIEWED,
-    ("work_issue_scopes.py", "add_scope"): _UNREVIEWED,
-    ("work_issue_scopes.py", "replace_primary_scope"): _UNREVIEWED,
-    ("work_issue_scopes.py", "retire_scope"): _UNREVIEWED,
+    ("apu_cross_family.py", "create_decision_request"): _UNREVIEWED,
+    ("entity_relations.py", "canonize_relation"): _UNREVIEWED,
+    ("entity_relations.py", "reject_relation"): _UNREVIEWED,
+    ("entity_relations.py", "retire_relation"): _UNREVIEWED,
+    ("hermes_runtime_return.py", "record_external_runtime_return"): _UNREVIEWED,
+    ("source_intake.py", "exclude_source"): _UNREVIEWED,
+    ("source_intake.py", "link_project"): _UNREVIEWED,
+    ("source_intake.py", "restore_source"): _UNREVIEWED,
+    ("source_intake.py", "suggest_projects"): _UNREVIEWED,
+    ("source_intake.py", "unlink_project"): _UNREVIEWED,
+    ("source_intake.py", "update_metadata"): _UNREVIEWED,
+    ("work_issue_scopes.py", "add_scope"): {
+        "gate": "none",
+        "local_guards": ("scope type and role vocabularies", "issue locked", "expected_version", "idempotency keyed on event type and payload", "event records the link"),
+        "reviewed": (
+            "Records which entities a Work Issue concerns. A scope link says what "
+            "the issue is about; it grants nothing and admits nothing. The "
+            "entity_type and scope_role vocabularies are closed frozensets and the "
+            "endpoint is validated by a database trigger — "
+            "`validate_work_issue_scope_endpoint` refuses an unknown project or "
+            "decision reference, so a dangling scope cannot be stored even by a "
+            "caller that skips this module."
+        ),
+    },
+    ("work_issue_scopes.py", "replace_primary_scope"): {
+        "gate": "none",
+        "local_guards": ("replacement normalized to the primary role", "issue locked", "expected_version", "retire and add in one transaction", "idempotency with payload digest"),
+        "reviewed": (
+            "Swaps the primary scope in one transaction, so an issue is never left "
+            "without one or holding two. The replacement's role is a literal "
+            "`primary` inside the function, not a caller argument."
+        ),
+    },
+    ("work_issue_scopes.py", "retire_scope"): {
+        "gate": "none",
+        "local_guards": ("issue locked", "expected_version", "idempotency keyed on event type and payload", "retirement rather than deletion, enforced by a trigger"),
+        "reviewed": (
+            "Withdraws a scope link. It retires rather than deletes, and that is "
+            "not a convention this function is trusted to keep: "
+            "`guard_work_issue_scope_link_mutation` refuses the DELETE outright — "
+            "'WorkIssue scope links are retained; retire instead of deleting'. "
+            "Third guard in this review enforced below Python."
+        ),
+    },
     ("work_issues.py", "add_comment"): {
         "gate": "none",
         "local_guards": ("idempotency replay", "row lock", "optimistic expected_version check", "event trail recording the author"),
         "reviewed": "A comment on a Work Issue is not a professional effect; the concurrency and trail guarantees are the right level for it.",
     },
-    ("work_issues.py", "create_issue"): _UNREVIEWED,
-    ("work_issues.py", "record_hermes_return"): _UNREVIEWED,
-    ("work_issues.py", "start_hermes_run"): _UNREVIEWED,
+    ("work_issues.py", "close_issue"): {
+        "gate": "none",
+        "local_guards": ("to_status and actor_kind are literals inside the function", "issue locked", "expected_version", "ALLOWED_TRANSITIONS confines done to review", "close_reason required", "idempotency"),
+        "reviewed": (
+            "Newly discovered by the delegation signal added in this batch. It is "
+            "the only path to `done`, and it does not take the target from its "
+            "caller: `to_status=\"done\"` and `actor_kind=\"human\"` are literals in "
+            "the body, and `ALLOWED_TRANSITIONS` permits `done` only out of "
+            "`review`. Its route adds the editor key and a human actor."
+        ),
+    },
+    ("work_issues.py", "create_issue"): {
+        "gate": "none",
+        "local_guards": ("origin and status are literals in the INSERT", "requested_effect constrained by a SQL CHECK", "idempotency", "event records the creator"),
+        "reviewed": (
+            "Creates an open issue: `origin` is a literal `'human'` and `status` a "
+            "literal `'open'` in the INSERT, so neither can be asked for. "
+            "`requested_effect` is caller-supplied and this module does not check "
+            "it — the column's CHECK constraint does, against the five permitted "
+            "effects. That matters more than it looks: `hermes_execution."
+            "admit_handoff` refuses anything but `read_only`, reading this column, "
+            "so the constraint that bounds the whole Hermes boundary is enforced "
+            "in SQL rather than here."
+        ),
+    },
+    ("work_issues.py", "record_hermes_return"): {
+        "gate": "none",
+        "local_guards": ("outcome vocabulary", "summary and trace_refs required", "run must be the issue's own running run, locked", "target status derived from a table, not from the caller", "expected_version", "idempotency"),
+        "reviewed": (
+            "Where Hermes reports what it produced — and the clearest expression "
+            "in this codebase of what Hermes may not do. The caller names an "
+            "outcome; the resulting issue status is looked up in "
+            "`RETURN_TO_ISSUE_STATUS`, whose whole range is `review` and "
+            "`waiting`. Hermes cannot name `done` because it never names a status "
+            "at all. The run must exist, belong to this issue and be `running`, "
+            "read `FOR UPDATE`."
+        ),
+    },
+    ("work_issues.py", "start_hermes_run"): {
+        "gate": "none",
+        "local_guards": ("issue must be assigned to hermes", "Task Contract and Context Pack must match the issue's", "status must be open or waiting", "requested_effect copied from the governed row", "expected_version", "idempotency"),
+        "reviewed": (
+            "The counterpart to `hermes_execution.record_external_runtime_start`. "
+            "Its refusals compare the caller's Task Contract and Context Pack refs "
+            "against the issue's own, and the run's `requested_effect` is copied "
+            "from `issue[\"requested_effect\"]` rather than taken as an argument — "
+            "so the bound on what the run may do comes from the governed row, not "
+            "from whoever starts it. `actor_kind` is a literal `hermes`."
+        ),
+    },
+    ("work_issues.py", "transition_issue"): {
+        "gate": "none",
+        "local_guards": ("issue locked", "ALLOWED_TRANSITIONS", "expected_version", "idempotency"),
+        "reviewed": (
+            "Newly discovered by the delegation signal added in this batch, and "
+            "the one that most deserved finding: it takes both `to_status` and "
+            "`actor_kind` from its caller, and it is how an issue moves. Its sole "
+            "production route passes `to_status=\"in_progress\"` and "
+            "`actor_kind=\"human\"` as literals behind the editor key and a human "
+            "actor, and `ALLOWED_TRANSITIONS` refuses any move the state machine "
+            "does not permit. Route-borne again: a second caller would choose both "
+            "values freely, within the state machine."
+        ),
+    },
 }
 
 
@@ -900,18 +1035,39 @@ def _writes_durable_state(node: ast.AST) -> bool:
     )
 
 
+def _private_writers(tree: ast.Module) -> set[str]:
+    """Names of same-module helpers whose own body writes durable state."""
+    return {
+        node.name
+        for node in tree.body
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name.startswith("_")
+        and _writes_durable_state(node)
+    }
+
+
+def _calls(node: ast.AST) -> set[str]:
+    return {
+        child.func.id
+        for child in ast.walk(node)
+        if isinstance(child, ast.Call) and isinstance(child.func, ast.Name)
+    }
+
+
 def _discovered() -> set[tuple[str, str]]:
     """Return every public mutation entry point the net can see under mvp_vertical."""
     found: set[tuple[str, str]] = set()
     for path in sorted(MVP.rglob("*.py")):
         tree = ast.parse(path.read_text(encoding="utf-8"))
+        writers = _private_writers(tree)
         for node in tree.body:
             if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 continue
             if node.name.startswith("_"):
                 continue
             by_verb = node.name.split("_")[0] in MUTATION_PREFIXES
-            if by_verb or _writes_durable_state(node):
+            by_delegation = bool(_calls(node) & writers)
+            if by_verb or _writes_durable_state(node) or by_delegation:
                 found.add((str(path.relative_to(MVP)), node.name))
     return found
 
@@ -1016,20 +1172,21 @@ def test_the_unreviewed_debt_is_visible_and_does_not_grow() -> None:
     """Enumerated is not reviewed, and the gap is recorded rather than implied.
 
     The widened net enumerated 64 entry points that had not been read
-    individually. Forty-one have now been reviewed, leaving 23. Reviewing one means
+    individually. The net was widened in the tenth batch and found 13 more, so
+    the enumerated total is 85; 57 are read and 28 are not. Reviewing one means
     replacing `_UNREVIEWED` with its real guard regime and the reasoning behind
     it. This bound exists so the debt shrinks deliberately and cannot quietly
     grow.
     """
     unreviewed = [key for key, record in INVENTORY.items() if record["gate"] == "unreviewed"]
-    assert len(unreviewed) <= 23, (
-        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 23. A new "
+    assert len(unreviewed) <= 28, (
+        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 28. A new "
         "mutation entry point must be reviewed, not added to the backlog."
     )
 
 
 def test_discovery_is_not_vacuous() -> None:
-    assert len(_discovered()) >= 70
+    assert len(_discovered()) >= 84
 
 
 def _claimed_covered() -> set[tuple[str, str]]:
