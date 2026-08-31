@@ -3,7 +3,7 @@
 Status: active support doctrine — outcome-oriented repository roadmap — implemented as documentation.
 Boundary profile: active_support_doctrine.
 
-This roadmap states the next governed outcomes for Pantheon Next. It is not a document inventory and it is not a runtime implementation plan.
+This roadmap states the next governed outcomes for Pantheon Next. It is not a document inventory, a release checklist or a runtime implementation plan.
 
 Use the repository status spine for current facts:
 
@@ -18,112 +18,93 @@ If this roadmap conflicts with that spine, the status spine wins.
 
 ## Doctrine
 
-Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: the Pantheon policy service is the bounded PDP interface, Hermes/the external runtime executes admitted work and enforces consequential effects as PEP, compatible runtime clients are optional interaction surfaces, Pantheon Cockpit projects governed state, Pantheon Next retains governance authority, and the human decides consequential effects when required.
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`:
 
-Pantheon may govern consequential status: truth, memory, evidence, approval, scope, external action, activation, proposed installation, update authorization, runtime-health visibility and rollback visibility.
+```text
+compatible Hermes clients -> runtime interaction
+Hermes Agent              -> external execution / PEP
+Pantheon policy service   -> bounded deterministic PDP interface
+Pantheon Cockpit          -> governed projections and review/decision surfaces
+Pantheon Next             -> governance authority and consequential status
+human                     -> consequential decision when required
+```
 
-Pantheon must not become an execution runtime, installer, scheduler, queue, provider router, MCP host, plugin manager, memory engine, automatic approval system or external sender.
+Pantheon may govern consequential status: truth, memory, Evidence, approval, scope, external action, activation, proposed installation, update authorization, runtime-health visibility and rollback visibility.
+
+Pantheon must not become an execution runtime, installer authority, scheduler, queue, provider router, plugin manager, memory engine, automatic approval system or external sender.
 
 ## Current position
 
 Status: partial but structurally coherent.
 
-### Repository foundation
+### Repository and monorepo boundary
 
-Outcome: implemented.
+Outcome: established.
 
-Current evidence:
+Current posture:
 
-- Pantheon Next is self-contained and has no active dependency on its retired predecessor;
-- the repository-status spine is established;
-- contribution, protected-path and promotion rules are documented;
-- the repository root is deliberately non-distributable;
-- pull-request review and governance checks are the normal change path.
-
-Remaining checkpoint:
-
-- publish the maintainer-created `v0.1.62` tag on commit `70d3a7bdf6b40807c0ba01ccc159945e43458e2c` and verify the tag-triggered checks.
+- Pantheon Next is the canonical governance repository and monorepo host;
+- the former standalone `pantheon-mvp` repository is historical provenance only;
+- executable candidate behavior is co-located under `implementation/`;
+- co-location does not imply adoption, activation, deployment or authority transfer;
+- the repository root remains deliberately non-distributable;
+- protected-path review and repository checks remain the normal change path.
 
 ### Governance kernel
 
-Outcome: coherent baseline, still under controlled consolidation.
+Outcome: coherent baseline under controlled consolidation.
 
-Current evidence:
+Current posture:
 
-- roles, Task Contracts, Evidence Packs, approvals, scope, knowledge, runtime-memory and Registre Probatoire boundaries are documented;
-- capability placement and external-adapter boundaries are explicit;
+- roles, Task Contracts, Evidence, approvals, scope, Knowledge, runtime-memory and Registre Probatoire boundaries are documented;
+- capability placement, external-runtime and client boundaries are explicit;
 - status headers, boundary profiles and non-equivalence rules reduce free-form drift;
-- Card Stack, Context Stack and Method Card models exist as candidate UX/governance doctrine.
+- the remaining work is primarily convergence: reduce duplicated owners, retire stale vocabulary and turn important invariants into existing schemas/tests rather than more prose.
 
-Remaining work:
+### Policy and verification surfaces
 
-- reduce navigation cost;
-- close obsolete active references and terminology debt;
-- promote, merge, archive or refuse candidates instead of creating parallel models.
+Outcome: implemented read-only / partial.
 
-### Read-only policy and verification surface
+Current posture:
 
-Outcome: implemented read-only / partial / protected path.
+- `mcp-server/` carries the bounded policy/verification distribution;
+- the same bounded policy meaning is projected through local MCP and authenticated internal HTTP;
+- policy decisions are returned as data and do not execute consequential effects;
+- CI and the Governance Doctor provide structural verification, not adoption or professional validation.
 
-Current evidence:
+Exact runtime enforcement and deployment observations remain owned by `WHAT_RUNS.md` and the relevant implementation/review artifacts; this roadmap does not restate their fast-moving state.
 
-- `mcp-server/` exposes bounded consultation, classification and validation tools;
-- the Governance Doctor fails closed when mandatory checks cannot run;
-- authority resolution is shared between the MCP and repository checks;
-- packaging is limited to the `mcp-server/` distribution.
+### Candidate implementation and Cockpit
 
-Remaining work:
+Outcome: executable candidate / not adopted.
 
-- normalize the repeated verification family;
-- remove migration-era CI checks that no longer represent active repository work;
-- keep collection of runtime evidence outside the MCP.
+Current posture:
 
-### External execution bindings
+- `implementation/` contains candidate persistence, APIs, document/Knowledge paths, Hermes seams and Cockpit foundations;
+- Pantheon Cockpit is executable and tested as a candidate governed projection surface;
+- Card/navigation/projection success does not create authorization or persistence authority;
+- live deployment, real-data bindings, operational acceptance and professional validation remain separate decisions.
 
-Outcome: first slices implemented and tested externally; no binding adopted.
+### External execution and operator deployment
 
-Current evidence:
+Outcome: bounded external-runtime and operator candidates exist; production adoption remains separate.
 
-- the external `pantheon-mvp` candidate implements a bounded task loop, Work Issues, document extraction, Project Document Cards, versioned Knowledge publication and conflict-safe mobile editing at a pinned reviewed commit;
-- external tests establish implementation evidence for that commit.
+Current posture:
 
-Still absent:
+- Hermes Agent is the selected external execution runtime;
+- Hermes Web/dashboard is the selected interaction baseline, with compatible clients remaining replaceable;
+- Obsidian/Hindsight is a qualified optional reference composition, not a Pantheon prerequisite;
+- `deployment/ubuntu/` contains an operator bootstrap candidate for a bounded Ubuntu node; its existence is not a turnkey agency product or production authorization.
 
-- installation in the real environment;
-- live Hermes proposal binding;
-- authorization for real dossiers;
-- production activation;
-- professional validation.
+### Professional use
 
-### Cockpit and visual surfaces
+Outcome: not adopted for real professional dossiers by repository presence alone.
 
-Outcome: candidate models and static or external prototypes.
-
-Current evidence:
-
-- Card Stack is the single current owner of Card, Scene, Deck, Constellation and navigation grammar;
-- Pantheon Control assets are static prototypes;
-- the Hermes dashboard template has one shared renderer for its installable external plugin and synthetic public preview.
-
-Remaining work:
-
-- validate one complete decision journey before expanding the UX grammar;
-- keep synthetic, external-live and governed status visibly distinct.
-
-### Professional corpus and adapters
-
-Outcome: external / to verify.
-
-Current position:
-
-- `base_metier/architecte/` is a professional corpus and adapter proving area, not Pantheon authority or proof;
-- source licensing remains to verify;
-- ingestion and transformation scripts belong on the Hermes/adapters side;
-- real professional and client data must remain outside the public governance repository.
+Real professional use still requires the applicable deployment, source, confidentiality, Evidence, approval, rollback and human-authority conditions. Synthetic qualification and sanitized professional patterns may improve confidence without becoming professional validation.
 
 ## Governed outcomes
 
-### R1 — Reduce repository navigation cost
+### R1 — Keep the current-state surfaces converged
 
 Status: in progress.
 
@@ -131,67 +112,63 @@ Target outcome:
 
 ```text
 one short stable read path
-+ task-based read paths
-+ roadmap limited to outcomes, blockers and exit criteria
-+ explicit kernel / adapter / corpus boundaries
++ public pages and diagrams aligned with the same owners
++ no retired product presented as current architecture
++ status spine remains the factual source for fast-moving state
 ```
 
 Exit criteria:
 
-- the default read path is no longer an exhaustive document list;
-- `ROADMAP.md` does not duplicate authority or module indexes;
-- active summaries contain no stale path to a removed document;
-- `base_metier/architecte/` no longer claims to be an internal Pantheon RAG runtime.
+- active public/readme/diagram surfaces do not present OpenWebUI, Paperless or the former standalone `pantheon-mvp` topology as current owners;
+- `implementation/` is consistently described as co-located candidate, not adopted runtime authority;
+- public explanation distinguishes execution, governance, persistence and projection;
+- currentness regressions that are cheap to express are held by existing checks rather than recurring manual audits.
 
-### R2 — Close terminology and schema debt
+### R2 — Reduce governance ontology and owner duplication
 
-Status: pending reviewed changes.
+Status: in progress.
 
 Target outcome:
 
 ```text
-no unjustified retired Register vocabulary
-+ one governed certainty representation
-+ reliable Project Understanding references
+canonical concepts stay few
++ lifecycle functions reuse existing Roles and gates
++ candidates converge into existing owners
++ duplicated public/support descriptions are reduced
 ```
-
-Tracked blockers:
-
-- issue #90: classify and resolve remaining retired Register vocabulary;
-- issue #169: reconcile shared definitions, certainty vocabulary and referential integrity before Project Understanding promotion.
 
 Exit criteria:
 
-- every retained historical vocabulary occurrence is explicit;
-- E0-E4 is the single governed certainty representation;
-- schema references and identifiers fail closed when inconsistent;
-- no ontology expansion is bundled into the debt-payment change.
+- lifecycle, workflow and memory documents do not introduce parallel canonical Role identities without a separate promotion decision;
+- one responsibility has one discoverable owner;
+- candidate documents have an explicit promote / merge / archive / refuse path;
+- navigation cost decreases rather than moving duplication to another index.
 
-### R3 — Simplify read-only verification
+### R3 — Make consequential boundaries observable and enforceable
 
-Status: planned / protected review required.
+Status: active implementation/verification work; exact state belongs to `WHAT_RUNS.md`.
 
 Target outcome:
 
 ```text
-one internal verification result contract
-+ explicit MCP tools
-+ one CLI family
-+ shared checks between CI and Doctor
+policy meaning is deterministic
++ consequential entry points declare their guard regime
++ required PDP/PEP paths fail closed when selected
++ runtime success remains separate from Evidence and approval
 ```
 
 Exit criteria:
 
-- install, observability, backup, exposure and update verifiers use a consistent envelope;
-- existing external command names remain compatible during transition;
-- no verifier probes, installs, updates, writes, approves or gathers secrets;
-- migration-era CI checks are replaced by a current predecessor-independence check.
+- every consequential mutation path has a reviewable guard owner;
+- the deployed target can demonstrate the applicable Pantheon policy round-trip where required;
+- local guards, policy checks, human approval and technical outcome remain distinguishable;
+- no client UI state substitutes for Pantheon approval.
 
-### R4 — Prove one external vertical
+### R4 — Prove one complete professional vertical on non-production data
 
-Status: documented and ready for an external operator; not executed.
+Status: qualification in progress.
 
-Candidate vertical:
+Reference vertical:
 
 ```text
 architecture_devis_reprise
@@ -201,37 +178,39 @@ Target loop:
 
 ```text
 bounded Task Contract
--> optional compatible runtime-client interaction, if a client is selected
--> Hermes / external runtime execution
+-> admitted source/context acquisition
+-> Hermes external execution
 -> Result Candidate + Evidence Pack Candidate
--> Pantheon read-only structural/status checks + governed Cockpit projection where used
+-> Pantheon structural/policy review
+-> governed Cockpit projection where useful
 -> explicit human decision
--> verified rollback
+-> rollback / reproducibility evidence
 ```
-
-The client step is optional and non-authoritative. A selected client may expose interaction with the run; it does not authorize the run or any consequential effect.
-
-Entry conditions:
-
-- audited Pantheon tag and MCP wheel;
-- isolated external environment;
-- exact Hermes, selected runtime client if any, and adapter versions recorded;
-- fictional data only;
-- read-only Pantheon checkout;
-- separate credentials and rollback plan.
 
 Exit criteria:
 
-- runtime trace, candidate result, candidate evidence and human decision are separate;
-- no client data or external consequential action is used;
-- rollback is demonstrated;
-- observed doctrine gaps become separate issues or PRs, not opportunistic patches in the validation record.
+- source identity, retrieved context, runtime output, Evidence and human decision remain distinct;
+- the professional method owner is reused rather than duplicated in the runtime;
+- contradictions, missing information and currentness limits stay visible;
+- the run is reproducible on bounded non-production material;
+- observed gaps become separate owner-coherent changes rather than hidden exceptions.
 
-### R5 — Decide adoption after evidence
+### R5 — Qualify deployment, then decide adoption
 
-Status: blocked by R4.
+Status: blocked on sufficient end-to-end evidence, not on repository presence.
 
-Possible decisions:
+Target outcome:
+
+```text
+operator bootstrap candidate
+-> exact reviewed component identities
+-> install / update / rollback observations
+-> bounded external-runtime path
+-> one accepted vertical
+-> explicit adoption decision
+```
+
+Possible decisions remain:
 
 ```text
 refuse adoption
@@ -240,36 +219,36 @@ adopt one binding for one scope
 request more evidence
 ```
 
-Adoption must remain separate from installation, health, enablement and runtime success.
+Adoption remains separate from installation, health, enablement, qualification and runtime success.
 
 ## Work-selection rule
 
 Before adding a new permanent model or document, answer:
 
-1. Which existing owner document cannot express the needed rule?
+1. Which existing owner cannot express the needed rule?
 2. What observed consequence requires the addition?
 3. What referent will support promotion?
 4. What is the exit criterion: promote, merge, archive or refuse?
-5. Does the proposal reduce or increase the repository's navigation and maintenance cost?
+5. Does the proposal reduce or increase repository navigation and maintenance cost?
 
 Default:
 
 ```text
-extend an existing owner
-before creating a new model
+reuse native/runtime behavior when sufficient
+-> extend an existing owner
+-> encode an invariant in an existing schema/test when useful
+-> add a new owner only for a genuinely distinct responsibility
 ```
 
 ## Current priority order
 
 ```text
-1. create and verify the v0.1.62 maintainer tag
-2. reduce navigation and clarify repository boundaries
-3. close terminology debt
-4. reconcile Project Understanding schemas
-5. simplify the MCP verification family and active CI
-6. tag the resulting bounded MCP checkpoint
-7. execute the first fictional external vertical
-8. decide adoption from evidence
+1. close active public/current-state drift
+2. converge lifecycle and Role/gate ownership without ontology growth
+3. finish consequential-boundary verification and target enforcement evidence
+4. execute and review one complete non-production professional vertical
+5. qualify the operator deployment path and rollback
+6. decide adoption from evidence
 ```
 
 ## Final rule
@@ -277,7 +256,7 @@ before creating a new model
 ```text
 Do not expand the doctrine to avoid testing it.
 Reduce.
-Stabilize the contracts.
+Stabilize owners and contracts.
 Run one bounded vertical.
 Measure the gaps.
 Promote, merge, archive or refuse.
