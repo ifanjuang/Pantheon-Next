@@ -20,7 +20,7 @@ added tomorrow inheriting none of it, with no check noticing.
 
 ## Where the review stands
 
-Thirty-six of the seventy-two entry points have been read individually; 36 have
+Thirty-nine of the seventy-two entry points have been read individually; 33 have
 not. The first batches were chosen because nothing in production reached them —
 answerable without unwinding a call graph, and the cheapest end of the backlog
 rather than the most urgent one. From `knowledge.py` onward every entry point is
@@ -47,7 +47,19 @@ agency_classification     X-Pantheon-Human-Actor   asserted, persisted as update
 agency_information        X-Pantheon-Actor         asserted, required, then discarded
 knowledge                 created_by               a body field, persisted verbatim
 knowledge_edit_variants   X-Pantheon-Human-Actor   asserted, persisted; kind is a literal
+decision_requests         X-Pantheon-Human-Actor   asserted — and so is its assurance level
 ```
+
+The last line is the one that settles the question. `decision_requests` is the
+only module that models the distinction: `identity_assurance` is mandatory and
+takes `declared` or `authenticated`, and `authenticated` requires an
+`authenticated_principal` with `user_id` and `identity_provider`. Both arrive in
+the request body. So the party asserting the name also chooses the assurance
+level describing that assertion, and supplies the principal said to back it.
+Nothing authenticates any of it.
+
+The concept the other four modules lack already exists here. What it lacks is a
+source of truth: an assurance level is only worth what produced it.
 
 Two are worth reading twice. All four Information routes refuse a request
 without `X-Pantheon-Actor` and none of them uses the value: the parameter is
@@ -354,9 +366,53 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("apu_write_preparation.py", "prepare_write_command"): _UNREVIEWED,
     ("contradictory_review_store.py", "persist_candidate"): _UNREVIEWED,
-    ("decision_requests.py", "cancel_request"): _UNREVIEWED,
-    ("decision_requests.py", "create_request"): _UNREVIEWED,
-    ("decision_requests.py", "resolve_request"): _UNREVIEWED,
+    ("decision_requests.py", "cancel_request"): {
+        "gate": "none",
+        "local_guards": ("rationale required", "row lock", "status must be pending", "expected_revision in the WHERE clause", "idempotency with payload digest", "event records the actor"),
+        "reviewed": (
+            "Withdraws a pending request, which decides nothing and is "
+            "safety-decreasing only in the sense that a question goes unanswered. "
+            "It insists on a rationale, refuses a request that is no longer "
+            "pending, and records the cancelling actor and an event. The actor is "
+            "the `X-Pantheon-Human-Actor` header value, as everywhere else."
+        ),
+    },
+    ("decision_requests.py", "create_request"): {
+        "gate": "none",
+        "local_guards": ("status is a literal in the INSERT", "decision_type, priority and response_mode checked against frozensets", "blocking requires a WorkIssue", "evidence ref and digest required together", "projection validated against the decision_request contract", "idempotency with payload digest"),
+        "reviewed": (
+            "Creates a pending request: it asks for a decision, it does not take "
+            "one. The INSERT writes `status` as a literal `'pending'`, so no "
+            "caller can create a request that arrives already resolved — the same "
+            "shape `create_variant_request` uses and `knowledge.create_edit_request` "
+            "does not. The projection is validated against the `decision_request` "
+            "contract on read."
+        ),
+    },
+    ("decision_requests.py", "resolve_request"): {
+        "gate": "gate_required_not_wired",
+        "local_guards": ("row lock", "status must be pending", "expected_revision in the WHERE clause", "response validated against the request's mode and options", "unique decision identity", "idempotency with payload digest", "decision record and status transition in one transaction"),
+        "reviewed": (
+            "This is the decision. It writes an `agency_decision_records` row "
+            "carrying `approve`, `refuse`, `request_revision` or "
+            "`request_more_evidence` against a candidate digest, and the "
+            "concurrency and idempotency around it are the most careful in the "
+            "codebase. The finding is what it records about who decided. This "
+            "module is the only one that models the distinction the rest of the "
+            "review keeps missing: `identity_assurance` is mandatory and takes "
+            "`declared` or `authenticated`, and `authenticated` requires an "
+            "`authenticated_principal` carrying `user_id` and `identity_provider`. "
+            "Both come from the request body. The route supplies `decided_by` from "
+            "the `X-Pantheon-Human-Actor` header and forwards the rest with "
+            "`**values`, so the party asserting the name also chooses the assurance "
+            "level describing that assertion, and supplies the principal that is "
+            "said to back it. Nothing authenticates it; the checks are that the "
+            "dict has two non-empty keys. A governed decision record can therefore "
+            "read `identity_assurance: authenticated` on a decision nothing "
+            "authenticated. The contract validation on the projection constrains "
+            "the value, not its truth."
+        ),
+    },
     ("document_revision_discussion.py", "create_comment"): _UNREVIEWED,
     ("entity_relations.py", "propose_relation"): _UNREVIEWED,
     ("execution_results.py", "append_review_disposition"): _UNREVIEWED,
@@ -765,9 +821,9 @@ def test_a_required_gate_that_is_not_wired_stays_visible_and_does_not_grow() -> 
     was ever taken.
     """
     pending = [key for key, record in INVENTORY.items() if record["gate"] == "gate_required_not_wired"]
-    assert len(pending) <= 7, (
+    assert len(pending) <= 8, (
         f"{len(pending)} entry points are known to need the chokepoint and do not reach "
-        "it; the ceiling is 7. Wire one, or move the ceiling deliberately and say why."
+        "it; the ceiling is 8. Wire one, or move the ceiling deliberately and say why."
     )
 
 
@@ -775,14 +831,14 @@ def test_the_unreviewed_debt_is_visible_and_does_not_grow() -> None:
     """Enumerated is not reviewed, and the gap is recorded rather than implied.
 
     The widened net enumerated 64 entry points that had not been read
-    individually. Twenty-eight have now been reviewed, leaving 36. Reviewing one means
+    individually. Thirty-one have now been reviewed, leaving 33. Reviewing one means
     replacing `_UNREVIEWED` with its real guard regime and the reasoning behind
     it. This bound exists so the debt shrinks deliberately and cannot quietly
     grow.
     """
     unreviewed = [key for key, record in INVENTORY.items() if record["gate"] == "unreviewed"]
-    assert len(unreviewed) <= 36, (
-        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 36. A new "
+    assert len(unreviewed) <= 33, (
+        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 33. A new "
         "mutation entry point must be reviewed, not added to the backlog."
     )
 
