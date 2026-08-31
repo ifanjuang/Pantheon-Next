@@ -8,6 +8,7 @@ declared scope.
 from __future__ import annotations
 
 import functools
+import json
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 
@@ -39,12 +40,30 @@ class TaskContract:
         return self.raw.get("contract_id", self.raw["object_id"])
 
     @property
-    def intent(self) -> str:
-        """The contract's stated intent, if any — passed to the drafter as
-        context. Empty string when the contract declares none."""
+    def intent_summary(self) -> str:
+        """Human-facing summary of the stated task intent, if any."""
         intent = self.raw.get("intent")
         if isinstance(intent, dict):
             return str(intent.get("summary", "")).strip()
+        return str(intent or "").strip()
+
+    @property
+    def intent(self) -> str:
+        """Complete stated intent passed to the drafter as task context.
+
+        Object-shaped intents are serialized deterministically instead of being
+        collapsed to ``summary``. This preserves bounded task-scoped method data
+        such as ``method_projection`` without granting it any new authority.
+        Scalar legacy intents remain unchanged.
+        """
+        intent = self.raw.get("intent")
+        if isinstance(intent, dict):
+            return json.dumps(
+                intent,
+                sort_keys=True,
+                ensure_ascii=False,
+                separators=(",", ":"),
+            )
         return str(intent or "").strip()
 
 
