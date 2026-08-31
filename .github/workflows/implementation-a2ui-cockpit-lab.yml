@@ -1,0 +1,47 @@
+name: A2UI Cockpit Qualification
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/implementation-a2ui-cockpit-lab.yml"
+      - "implementation/labs/a2ui-cockpit/**"
+      - "implementation/tests/test_a2ui_cockpit_qualification.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: a2ui-cockpit-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bounded-a2ui-lab:
+    name: guard, build and render isolated surface
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: implementation/labs/a2ui-cockpit
+
+    steps:
+      - name: Checkout current candidate
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Resolve exact top-level qualification pins
+        shell: bash
+        run: npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+
+      - name: Execute fail-closed guard tests
+        run: npm run test:guard
+
+      - name: Build isolated Lit renderer surface
+        run: npm run build
+
+      - name: Render and click bounded surface in headless Chrome
+        run: npm run test:browser

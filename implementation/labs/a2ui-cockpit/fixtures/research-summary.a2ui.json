@@ -1,0 +1,282 @@
+[
+  {
+    "version": "v0.9.1",
+    "createSurface": {
+      "surfaceId": "pantheon-research-summary",
+      "catalogId": "urn:pantheon:a2ui:research-summary:v0.1",
+      "sendDataModel": false
+    }
+  },
+  {
+    "version": "v0.9.1",
+    "updateComponents": {
+      "surfaceId": "pantheon-research-summary",
+      "components": [
+        {
+          "id": "root",
+          "component": "Column",
+          "children": [
+            "title",
+            "scope",
+            "divider-1",
+            "summary-card",
+            "divider-2",
+            "findings-title",
+            "finding-1",
+            "finding-1-source",
+            "finding-2",
+            "finding-2-source",
+            "finding-3",
+            "finding-3-source",
+            "contradictions-title",
+            "contradiction-1",
+            "limitations-title",
+            "limitation-1",
+            "sources-title",
+            "source-1",
+            "source-2",
+            "divider-3",
+            "action-row"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "title",
+          "component": "Text",
+          "text": {
+            "path": "/title"
+          },
+          "variant": "h2"
+        },
+        {
+          "id": "scope",
+          "component": "Text",
+          "text": {
+            "path": "/scope"
+          },
+          "variant": "caption"
+        },
+        {
+          "id": "divider-1",
+          "component": "Divider",
+          "axis": "horizontal"
+        },
+        {
+          "id": "summary-card",
+          "component": "Card",
+          "child": "summary-column"
+        },
+        {
+          "id": "summary-column",
+          "component": "Column",
+          "children": [
+            "summary-heading",
+            "summary-body"
+          ]
+        },
+        {
+          "id": "summary-heading",
+          "component": "Text",
+          "text": "Synthèse",
+          "variant": "h3"
+        },
+        {
+          "id": "summary-body",
+          "component": "Text",
+          "text": {
+            "path": "/summary"
+          },
+          "variant": "body"
+        },
+        {
+          "id": "divider-2",
+          "component": "Divider",
+          "axis": "horizontal"
+        },
+        {
+          "id": "findings-title",
+          "component": "Text",
+          "text": "Constats",
+          "variant": "h3"
+        },
+        {
+          "id": "finding-1",
+          "component": "Text",
+          "text": {
+            "path": "/findings/0/claim"
+          },
+          "variant": "body"
+        },
+        {
+          "id": "finding-1-source",
+          "component": "Text",
+          "text": {
+            "path": "/findings/0/source_label"
+          },
+          "variant": "caption"
+        },
+        {
+          "id": "finding-2",
+          "component": "Text",
+          "text": {
+            "path": "/findings/1/claim"
+          },
+          "variant": "body"
+        },
+        {
+          "id": "finding-2-source",
+          "component": "Text",
+          "text": {
+            "path": "/findings/1/source_label"
+          },
+          "variant": "caption"
+        },
+        {
+          "id": "finding-3",
+          "component": "Text",
+          "text": {
+            "path": "/findings/2/claim"
+          },
+          "variant": "body"
+        },
+        {
+          "id": "finding-3-source",
+          "component": "Text",
+          "text": {
+            "path": "/findings/2/source_label"
+          },
+          "variant": "caption"
+        },
+        {
+          "id": "contradictions-title",
+          "component": "Text",
+          "text": "Contradictions / écarts",
+          "variant": "h3"
+        },
+        {
+          "id": "contradiction-1",
+          "component": "Text",
+          "text": {
+            "path": "/contradictions/0"
+          },
+          "variant": "body"
+        },
+        {
+          "id": "limitations-title",
+          "component": "Text",
+          "text": "Limites",
+          "variant": "h3"
+        },
+        {
+          "id": "limitation-1",
+          "component": "Text",
+          "text": {
+            "path": "/limitations/0"
+          },
+          "variant": "body"
+        },
+        {
+          "id": "sources-title",
+          "component": "Text",
+          "text": "Sources inspectées",
+          "variant": "h3"
+        },
+        {
+          "id": "source-1",
+          "component": "Text",
+          "text": {
+            "path": "/sources/0"
+          },
+          "variant": "caption"
+        },
+        {
+          "id": "source-2",
+          "component": "Text",
+          "text": {
+            "path": "/sources/1"
+          },
+          "variant": "caption"
+        },
+        {
+          "id": "divider-3",
+          "component": "Divider",
+          "axis": "horizontal"
+        },
+        {
+          "id": "action-row",
+          "component": "Row",
+          "children": [
+            "handoff-button"
+          ],
+          "justify": "end",
+          "align": "center"
+        },
+        {
+          "id": "handoff-button",
+          "component": "Button",
+          "child": "handoff-label",
+          "variant": "default",
+          "action": {
+            "event": {
+              "name": "pantheon.prepare_hermes_handoff",
+              "context": {
+                "research_id": {
+                  "path": "/research_id"
+                },
+                "scope_ref": {
+                  "path": "/scope_ref"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "handoff-label",
+          "component": "Text",
+          "text": "Approfondir avec Hermès",
+          "variant": "body"
+        }
+      ]
+    }
+  },
+  {
+    "version": "v0.9.1",
+    "updateDataModel": {
+      "surfaceId": "pantheon-research-summary",
+      "path": "/",
+      "value": {
+        "fixture_kind": "research_report_candidate_projection",
+        "workflow_candidate": "research.multi_source_summary",
+        "research_id": "research:fixture:001",
+        "scope_ref": "task:fixture:iaq",
+        "title": "Synthèse de recherche — ventilation et qualité d’air intérieur",
+        "scope": "Fixture synthétique de qualification. Les contenus récupérés restent des sources inspectées ou des candidats ; cette surface ne les transforme ni en Evidence ni en vérité gouvernée.",
+        "summary": "Les deux sources convergent sur l’importance du renouvellement d’air et de la maîtrise des sources de pollution. Elles divergent sur la manière de présenter un seuil unique : la synthèse conserve donc l’écart au lieu de fabriquer une valeur normative.",
+        "findings": [
+          {
+            "claim": "Le renouvellement d’air doit être interprété avec l’occupation, le volume et les sources de polluants ; une valeur isolée ne suffit pas à conclure.",
+            "source_label": "Source A · https://example.test/guide-a · §3.2 · fixture"
+          },
+          {
+            "claim": "La mesure de CO₂ peut servir d’indicateur de confinement dans certains contextes, mais elle ne représente pas à elle seule l’ensemble de la qualité de l’air intérieur.",
+            "source_label": "Source B · https://example.test/guide-b · §5 · fixture"
+          },
+          {
+            "claim": "Une recommandation exploitable doit conserver le contexte de mesure, l’incertitude et la provenance avant toute décision professionnelle.",
+            "source_label": "Synthèse candidate · sources A+B · interprétation explicitement signalée"
+          }
+        ],
+        "contradictions": [
+          "Source A présente des plages indicatives dépendantes du contexte ; Source B déconseille de convertir ces plages en seuil universel. Aucun seuil unique n’est projeté comme fait."
+        ],
+        "limitations": [
+          "Fixture sans valeur professionnelle : URLs d’exemple, aucune vérification de juridiction, fraîcheur ou applicabilité réelle."
+        ],
+        "sources": [
+          "Source A · URL fictive · inspectée dans le scénario de test · pas Evidence",
+          "Source B · URL fictive · inspectée dans le scénario de test · pas Evidence"
+        ]
+      }
+    }
+  }
+]
