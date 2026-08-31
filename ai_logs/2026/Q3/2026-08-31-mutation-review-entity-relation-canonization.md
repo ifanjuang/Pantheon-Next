@@ -8,8 +8,10 @@ Boundary profile: validation_only_trace.
 ## Change
 
 - Added: `ai_logs/2026/Q3/2026-08-31-mutation-review-entity-relation-canonization.md`.
-- Updated: three inventory verdicts for `entity_relations.py`; unreviewed
-  ceiling 28 → 25.
+- Updated: three inventory verdicts for `entity_relations.py`; the discovery
+  signal made transitive after review; seven further entry points declared and
+  one of them reviewed; enumerated total 85 → 92; unreviewed ceiling 28 → 31;
+  discovery floor 84 → 91.
 - Removed: nothing.
 
 ## Why
@@ -75,6 +77,39 @@ entity_relations        a CHECK tying kind to event type      no row can contrad
 The review has recorded the weak end repeatedly. Recording the strong end is
 what makes the weak end a finding rather than a complaint: the repository knows
 how to do this, in SQL, on the act it cares most about.
+
+## Amendment: the widened net was still too narrow, then briefly too wide
+
+Review caught the discovery signal added in the previous batch. It intersected
+each function's calls with *private* helpers in its own module, and still missed
+`create_scoped_issue` — the entry point of `POST /work/issues` — because that
+one delegates to two *public* functions in another module. I had concluded it
+was already declared from its absence in the undeclared list, without opening
+the inventory. That is the same move the net was being corrected for.
+
+Making the closure transitive over whole subtrees then caught every
+`install_*_routes` and `create_app` in the package: eighteen wiring functions
+that *define* route handlers calling writers rather than calling writers
+themselves. Too narrow missed thirteen; naive-transitive added eighteen that
+mean nothing.
+
+The net that holds counts a function's own calls with nested definitions
+excluded, and follows them to a fixpoint across modules. It finds seven more
+real delegators:
+
+```text
+work_issue_scopes.create_scoped_issue      POST /work/issues
+store.intake_document
+apu_mapping_converter.convert_and_store
+human_revision_upload.upload_revision
+project_change_variants.select_variant_for_change_candidate
+project_claim_candidates.create_claim_from_candidate
+cli.main
+```
+
+`create_scoped_issue` is reviewed here — it composes two already-reviewed
+functions into one transaction, requires exactly one primary scope and refuses
+duplicate endpoints. The other six join the backlog.
 
 ## Also worth keeping
 
