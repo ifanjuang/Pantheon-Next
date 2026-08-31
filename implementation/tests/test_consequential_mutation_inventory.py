@@ -18,6 +18,27 @@ machines — and no two of them share a guard.
 Local defence is not the problem. The problem is that a new entry point can be
 added tomorrow inheriting none of it, with no check noticing.
 
+## Where the review stands
+
+Seventeen of the seventy-two entry points have been read individually; 55 have
+not. The nine reviewed most recently were chosen because nothing in production
+reaches them yet — eight are exercised only by tests and one, `disable_principal`,
+is called by nothing at all. That made the question "is this effect consequential?"
+answerable without unwinding a call graph, and it is the cheapest end of the
+backlog rather than the most urgent one.
+
+Two of the nine came back as needing the chokepoint. `bind_oidc_identity` is the
+point where an external identity becomes able to act as a governed principal.
+`store_reviewed_dossier` installs canonical APU state on the strength of a
+`review_ref` that nothing validates — no lookup, no foreign key, no signature,
+and no table of governed reviews to point at. Both are recorded as
+`gate_required_not_wired` rather than softened into `none`.
+
+The second one was first recorded as `none` and corrected by review. Its
+reasoning had been that the gate belonged at the upstream review rather than at
+its recording, which only holds if the reference to that review is worth
+something. It is a bare non-empty string.
+
 ## How the surface is discovered, and why not by name
 
 A first version of this test recognised entry points by five verb prefixes —
@@ -45,10 +66,18 @@ guarantee is that the surface it names is enumerated and cannot grow silently.
 ## What a declaration means
 
 ```text
-gate = "enforce_consequential"  -> calls the Pantheon chokepoint
-gate = "optional"               -> chokepoint reachable but opt-in, default off
-gate = "none"                   -> defends itself with module-local checks only
+gate = "enforce_consequential"    -> calls the Pantheon chokepoint
+gate = "optional"                 -> chokepoint reachable but opt-in, default off
+gate = "none"                     -> reviewed; module-local checks judged sufficient
+gate = "gate_required_not_wired"  -> reviewed; the effect needs the chokepoint and
+                                     does not reach it. A decision, not a defect
+                                     list, and a debt that may not grow.
 ```
+
+`none` is a conclusion, not an absence: it records that a human read the path and
+judged its local chain sufficient. `unreviewed` is the absence. Keeping the two
+apart is the whole point of this file — without the distinction, a path nobody
+has looked at is indistinguishable from one that was cleared.
 
 `local_guards` records what genuinely protects the path, so `"none"` is never
 mistaken for `"unprotected"`. Entries carrying `_UNREVIEWED` are enumerated but
@@ -91,6 +120,9 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     ("agency_change_candidates.py", "apply_project_candidate"): {
         "gate": "none",
         "local_guards": ("human actor", "status", "base revision staleness", "idempotency"),
+        "reviewed": (
+            "A reviewed candidate is applied to a project only from a declared human actor, against the base revision it was prepared on. Staleness is refused rather than merged."
+        ),
     },
     ("agency_change_candidates.py", "create_project_candidate"): _UNREVIEWED,
     ("agency_change_candidates.py", "reject_project_candidate"): _UNREVIEWED,
@@ -110,12 +142,37 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     ("apu_owner.py", "apply_source_match"): {
         "gate": "none",
         "local_guards": ("prior authorization id", "exact command shape", "idempotency"),
+        "reviewed": (
+            "Applies a match that a prior authorization already decided; the command shape is checked exactly, so this records a decision rather than taking one."
+        ),
     },
-    ("apu_owner.py", "store_reviewed_dossier"): _UNREVIEWED,
+    ("apu_owner.py", "store_reviewed_dossier"): {
+        "gate": "gate_required_not_wired",
+        "local_guards": (
+            "required project_id, review_ref, actor and idempotency_key",
+            "payload digest compared on replay, refusing a reused key with different content",
+            "normalization before write",
+        ),
+        "reviewed": (
+            "Installs canonical APU state. First reviewed as none on the reasoning that "
+            "review_ref carries a review that already happened, so the consequence gate "
+            "belonged at that review rather than at its recording. That was wrong, and a "
+            "review caught it: review_ref passes through _required only — a non-empty "
+            "string. No lookup, foreign key, signature or any other check ties it to a "
+            "completed governed review, and no table of such reviews exists to point at. "
+            "The verdict therefore rested on an unverified caller assertion, which is the "
+            "distinction this repository makes everywhere else: a provided reference is "
+            "not a validated decision. Recorded as needing the chokepoint until either "
+            "the prior review is verifiable or the write is routed through the gate."
+        ),
+    },
     ("apu_write_preparation.py", "append_authorization"): _UNREVIEWED,
     ("apu_write_preparation.py", "apply_authorized_write_command"): {
         "gate": "none",
         "local_guards": ("reviewed command chain", "stored index vs embedded effect", "owner and object revision freshness", "idempotency"),
+        "reviewed": (
+            "The strongest local chain in the inventory: the command must already be reviewed, its stored index must agree with the embedded effect, and both owner and object revision must still be fresh. Freshness is what makes replay safe here."
+        ),
     },
     ("apu_write_preparation.py", "prepare_write_command"): _UNREVIEWED,
     ("contradictory_review_store.py", "persist_candidate"): _UNREVIEWED,
@@ -129,24 +186,46 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     ("hermes_execution.py", "admit_handoff"): {
         "gate": "none",
         "local_guards": ("human actor", "read_only effect only", "Task Contract and Context Pack identity", "TTL bounds", "idempotency"),
+        "reviewed": (
+            "Admits an external execution handoff bounded to a read_only effect, tied to a Task Contract and Context Pack identity and a TTL. Admission of a read_only effect is not authorization of a consequential one."
+        ),
     },
     ("hermes_execution.py", "record_external_runtime_start"): _UNREVIEWED,
     ("hermes_execution.py", "revoke_admission"): _UNREVIEWED,
     ("hermes_handoff_store.py", "submit_handoff"): _UNREVIEWED,
     ("hermes_launch_context.py", "reserve_launch"): _UNREVIEWED,
     ("hermes_result_candidate.py", "create_result_candidate"): _UNREVIEWED,
-    ("human_access.py", "bind_oidc_identity"): _UNREVIEWED,
-    ("human_access.py", "create_principal"): _UNREVIEWED,
-    ("human_access.py", "disable_principal"): _UNREVIEWED,
+    ("human_access.py", "bind_oidc_identity"): {
+        "gate": "gate_required_not_wired",
+        "local_guards": ("refuses a disabled principal", "required issuer, subject and bound_by", "BindingConflict when the identity is bound to another principal", "idempotent within the same principal"),
+        "reviewed": "The moment an external identity becomes able to act as a governed principal. The local chain is the strongest in this module and still not the same thing as the governance check: this is an authorization boundary, not a bookkeeping write. Reviewed as needing the chokepoint; nothing routes it there today.",
+    },
+    ("human_access.py", "create_principal"): {
+        "gate": "none",
+        "local_guards": ("required principal_ref", "recorded created_by actor", "idempotent ON CONFLICT insert"),
+        "reviewed": "Creates a governed identity; it authorizes nothing on its own — grant_access does. The actor who created it is recorded. No runtime caller at review time.",
+    },
+    ("human_access.py", "disable_principal"): {
+        "gate": "none",
+        "local_guards": ("existence check", "idempotent when already disabled"),
+        "reviewed": "Withdraws the ability to act, so the direction is safety-increasing and the local chain is thin by design. Recorded as reviewed with one finding: unlike create_principal it records no actor, so a disabling leaves no trace of who did it.",
+    },
     ("human_access.py", "grant_access"): _UNREVIEWED,
     ("human_access.py", "revoke_grant"): _UNREVIEWED,
-    ("human_access.py", "revoke_oidc_binding"): _UNREVIEWED,
+    ("human_access.py", "revoke_oidc_binding"): {
+        "gate": "none",
+        "local_guards": ("required binding_id", "raises on unknown binding", "idempotent when already revoked"),
+        "reviewed": "Withdraws an ability, so it is safety-increasing. Same finding as disable_principal: no actor is recorded on the revocation.",
+    },
     ("information_projection.py", "add_document_link"): _UNREVIEWED,
     ("information_projection.py", "remove_document_link"): _UNREVIEWED,
     ("information_projection.py", "update_projection_metadata"): _UNREVIEWED,
     ("knowledge.py", "apply_edit_request"): {
         "gate": "none",
         "local_guards": ("request status", "single transaction with audit", "idempotency"),
+        "reviewed": (
+            "Applies an edit whose request status already carries the decision, with the audit written inside the same transaction so the trail cannot detach from the effect."
+        ),
     },
     ("knowledge.py", "complete_edit_request"): _UNREVIEWED,
     ("knowledge.py", "create_edit_request"): _UNREVIEWED,
@@ -155,6 +234,9 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     ("knowledge_edit_variants.py", "apply_selected_variant"): {
         "gate": "none",
         "local_guards": ("status", "variant ownership", "audit inside apply transaction"),
+        "reviewed": (
+            "Applies a variant the request already selected; ownership is checked so a variant cannot be applied to a request it does not belong to."
+        ),
     },
     ("knowledge_edit_variants.py", "create_variant_request"): _UNREVIEWED,
     ("knowledge_edit_variants.py", "project_execution_result_variant"): _UNREVIEWED,
@@ -163,15 +245,33 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     ("knowledge_update.py", "apply_knowledge_update"): {
         "gate": "optional",
         "local_guards": ("signed preview", "exact confirmation phrase", "expected_version and base digest", "idempotency"),
+        "reviewed": (
+            "The one path with the chokepoint reachable. Its local chain is a signed preview, an exact confirmation phrase, optimistic concurrency and idempotency; the gate is opt-in and off by default, which is why the regime is optional rather than covered."
+        ),
     },
     ("project_document_admission.py", "admit_source_as_revision"): {
         "gate": "none",
         "local_guards": ("explicit target document", "exact capture identity", "idempotency"),
+        "reviewed": (
+            "Admits a captured source as a revision of an explicitly named target document, keyed on the exact capture identity. Admission is not a currentness or authority claim, which are owned elsewhere."
+        ),
     },
-    ("project_document_currentness.py", "record_version_event"): _UNREVIEWED,
-    ("project_documents.py", "create_document"): _UNREVIEWED,
+    ("project_document_currentness.py", "record_version_event"): {
+        "gate": "none",
+        "local_guards": ("refuses hermes actors outright", "refuses any consequential authority status", "refuses a system actor setting anything authoritative", "controlled vocabulary on event type, status, effect class and authority", "required actor and idempotency_key"),
+        "reviewed": "The clearest case in the codebase of a path that enforces the doctrine without calling the chokepoint: it raises GovernanceGateRequired rather than deciding, so a consequential authority transition cannot pass through it at all.",
+    },
+    ("project_documents.py", "create_document"): {
+        "gate": "none",
+        "local_guards": ("_validate_actor refuses hermes with GovernanceGateRequired", "required parent project, type, title and idempotency_key", "payload digest with idempotent replay"),
+        "reviewed": "Creates a document shell; authority and currentness are owned elsewhere and refused here. No runtime caller at review time.",
+    },
     ("project_documents.py", "link_revision"): _UNREVIEWED,
-    ("project_documents.py", "record_issuer_reference"): _UNREVIEWED,
+    ("project_documents.py", "record_issuer_reference"): {
+        "gate": "none",
+        "local_guards": ("_validate_actor refuses hermes with GovernanceGateRequired", "basis_kind checked against a controlled vocabulary", "opaque reference validation", "revision existence check", "payload digest with idempotent replay"),
+        "reviewed": "Records an observation about a revision, not an authority claim about it.",
+    },
     ("source_intake.py", "create_source"): _UNREVIEWED,
     ("source_intake.py", "relate_contained_source"): _UNREVIEWED,
     ("storage_retention.py", "retain_document_version"): _UNREVIEWED,
@@ -179,7 +279,11 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     ("work_issue_scopes.py", "add_scope"): _UNREVIEWED,
     ("work_issue_scopes.py", "replace_primary_scope"): _UNREVIEWED,
     ("work_issue_scopes.py", "retire_scope"): _UNREVIEWED,
-    ("work_issues.py", "add_comment"): _UNREVIEWED,
+    ("work_issues.py", "add_comment"): {
+        "gate": "none",
+        "local_guards": ("idempotency replay", "row lock", "optimistic expected_version check", "event trail recording the author"),
+        "reviewed": "A comment on a Work Issue is not a professional effect; the concurrency and trail guarantees are the right level for it.",
+    },
     ("work_issues.py", "create_issue"): _UNREVIEWED,
     ("work_issues.py", "record_hermes_return"): _UNREVIEWED,
     ("work_issues.py", "start_hermes_run"): _UNREVIEWED,
@@ -252,9 +356,18 @@ def test_both_discovery_signals_carry_weight() -> None:
     assert sql_only, "no direct writer found outside the verb list; the structural signal has stopped earning its place"
 
 
+GATE_REGIMES = {
+    "enforce_consequential",
+    "optional",
+    "none",
+    "gate_required_not_wired",
+    "unreviewed",
+}
+
+
 def test_every_declared_entry_point_states_a_guard_regime() -> None:
     for key, record in INVENTORY.items():
-        assert record["gate"] in {"enforce_consequential", "optional", "none", "unreviewed"}, key
+        assert record["gate"] in GATE_REGIMES, key
         if record["gate"] == "unreviewed":
             assert record["local_guards"] is None, (
                 f"{key} is recorded as unreviewed but names local guards; either it was "
@@ -267,17 +380,49 @@ def test_every_declared_entry_point_states_a_guard_regime() -> None:
             )
 
 
+def test_a_reviewed_entry_records_why_it_was_cleared() -> None:
+    """A verdict without a reason is not a review.
+
+    `none` is the easiest value to write and the hardest to audit later. Requiring
+    the reasoning keeps it from becoming the default a future reader cannot
+    distinguish from a shrug.
+    """
+    for key, record in INVENTORY.items():
+        if record["gate"] == "unreviewed":
+            continue
+        assert record.get("reviewed"), (
+            f"{key} carries a verdict with no recorded reasoning; say what was read "
+            "and why the regime is right"
+        )
+
+
+def test_a_required_gate_that_is_not_wired_stays_visible_and_does_not_grow() -> None:
+    """A path known to need the chokepoint, recorded rather than quietly deferred.
+
+    This is the honest state for an effect whose review concluded it is
+    consequential while nothing routes it through the gate. It is not the same as
+    `none`, and collapsing the two would lose the only record that the decision
+    was ever taken.
+    """
+    pending = [key for key, record in INVENTORY.items() if record["gate"] == "gate_required_not_wired"]
+    assert len(pending) <= 2, (
+        f"{len(pending)} entry points are known to need the chokepoint and do not reach "
+        "it; the ceiling is 2. Wire one, or move the ceiling deliberately and say why."
+    )
+
+
 def test_the_unreviewed_debt_is_visible_and_does_not_grow() -> None:
     """Enumerated is not reviewed, and the gap is recorded rather than implied.
 
-    64 of the entry points below were enumerated by the widened net and have not
-    been read individually. Reviewing one means replacing `_UNREVIEWED` with its
-    real guard regime. This bound exists so the debt shrinks deliberately and
-    cannot quietly grow.
+    The widened net enumerated 64 entry points that had not been read
+    individually. Nine have now been reviewed, leaving 55. Reviewing one means
+    replacing `_UNREVIEWED` with its real guard regime and the reasoning behind
+    it. This bound exists so the debt shrinks deliberately and cannot quietly
+    grow.
     """
     unreviewed = [key for key, record in INVENTORY.items() if record["gate"] == "unreviewed"]
-    assert len(unreviewed) <= 64, (
-        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 64. A new "
+    assert len(unreviewed) <= 55, (
+        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 55. A new "
         "mutation entry point must be reviewed, not added to the backlog."
     )
 
