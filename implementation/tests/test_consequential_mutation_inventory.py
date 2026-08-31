@@ -20,7 +20,7 @@ added tomorrow inheriting none of it, with no check noticing.
 
 ## Where the review stands
 
-Thirty-two of the seventy-two entry points have been read individually; 40 have
+Thirty-six of the seventy-two entry points have been read individually; 36 have
 not. The first batches were chosen because nothing in production reached them —
 answerable without unwinding a call graph, and the cheapest end of the backlog
 rather than the most urgent one. From `knowledge.py` onward every entry point is
@@ -38,20 +38,26 @@ acted version of a governed Information series and records no actor.
 
 ## Attribution is a separate axis from authorization
 
-Three modules now show the same split, and it is not the gate's to fix. The
+Four modules now show the same split, and it is not the gate's to fix. The
 authorization is verified — a key comparison, a principal lookup, a dependency
 that cannot be reached from a request body. The attribution is not.
 
 ```text
-agency_classification   X-Pantheon-Human-Actor   asserted, persisted as updated_by
-agency_information      X-Pantheon-Actor         asserted, required, then discarded
-knowledge               created_by               a body field, persisted verbatim
+agency_classification     X-Pantheon-Human-Actor   asserted, persisted as updated_by
+agency_information        X-Pantheon-Actor         asserted, required, then discarded
+knowledge                 created_by               a body field, persisted verbatim
+knowledge_edit_variants   X-Pantheon-Human-Actor   asserted, persisted; kind is a literal
 ```
 
-The middle one is worth reading twice. All four Information routes refuse a
-request without `X-Pantheon-Actor` and none of them uses the value: the parameter
-is named `_actor`, and `agency_information_cards` has no actor column to put it
-in. The header is enforced as though it mattered and stored nowhere.
+Two are worth reading twice. All four Information routes refuse a request
+without `X-Pantheon-Actor` and none of them uses the value: the parameter is
+named `_actor`, and `agency_information_cards` has no actor column to put it in.
+The header is enforced as though it mattered and stored nowhere.
+
+And in `knowledge_edit_variants` the review event log — the record of who chose,
+who refused and who applied — takes its `actor` from that header and its
+`actor_kind` from a literal written at each call site. Both halves of the
+attribution are decided by the code path rather than observed from the caller.
 
 ## What keeps being wrong
 
@@ -506,15 +512,78 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge_edit_variants.py", "apply_selected_variant"): {
         "gate": "none",
-        "local_guards": ("status", "variant ownership", "audit inside apply transaction"),
+        "local_guards": ("status re-checked under lock", "selection unchanged under lock", "variant ownership", "audit inside the apply transaction", "idempotent replay when already applied"),
         "reviewed": (
-            "Applies a variant the request already selected; ownership is checked so a variant cannot be applied to a request it does not belong to."
+            "Reasoning rewritten, regime unchanged. It said the request had "
+            "already selected the variant, and selection is genuinely recorded "
+            "here — `selected_by`, an event, an idempotency key. What the "
+            "selection does not survive is a rejection: `reject_request` does not "
+            "clear `selected_variant_id`, and `knowledge.complete_edit_request` "
+            "returns a rejected request to `proposed`, after which this function "
+            "finds a `proposed` status and an intact selection and applies the "
+            "variant a human refused. The gate stays recorded at "
+            "`knowledge.apply_edit_request`, which this delegates to and which is "
+            "where the Knowledge changes; wiring it there covers this path, so "
+            "recording it twice would overstate what has to be wired. One caveat: "
+            "the `replacement_markdown` write here commits in its own transaction "
+            "before the delegation, so it would survive a refusal downstream."
         ),
     },
-    ("knowledge_edit_variants.py", "create_variant_request"): _UNREVIEWED,
-    ("knowledge_edit_variants.py", "project_execution_result_variant"): _UNREVIEWED,
-    ("knowledge_edit_variants.py", "reject_request"): _UNREVIEWED,
-    ("knowledge_edit_variants.py", "select_variant"): _UNREVIEWED,
+    ("knowledge_edit_variants.py", "create_variant_request"): {
+        "gate": "none",
+        "local_guards": ("status and replacement_markdown are literals in the INSERT", "locked snapshot with base_version equality", "selection range and text matched against the snapshot", "idempotency with payload digest"),
+        "reviewed": (
+            "The same table as `knowledge.create_edit_request`, and the "
+            "instructive contrast with it: here the INSERT writes "
+            "`replacement_markdown` as a literal NULL and the status as a literal "
+            "`queued_for_hermes`, so this creation path cannot manufacture a "
+            "`proposed` request. The shortcut recorded against the other path is "
+            "not a shape the codebase lacks a fix for; it is one this module "
+            "already closes."
+        ),
+    },
+    ("knowledge_edit_variants.py", "project_execution_result_variant"): {
+        "gate": "none",
+        "local_guards": ("status must be queued_for_hermes or proposed", "scope currency re-checked under lock", "candidate payload validated against the contract", "conflict persisted after the rollback", "idempotency with projection digest"),
+        "reviewed": (
+            "Projects a Hermes candidate and declares its authority as data: "
+            "CANDIDATE_AUTHORITY sets selects_variant, applies_edit, "
+            "validates_knowledge, admits_evidence, promotes_memory and "
+            "authorizes_task all False. It refuses any status outside "
+            "`{queued_for_hermes, proposed}` — the guard `complete_edit_request` "
+            "lacks — so a rejected request cannot receive a projection. The "
+            "staleness conflict is written in its own transaction after the "
+            "attempt unwinds, so discovering it does not depend on the attempt "
+            "committing."
+        ),
+    },
+    ("knowledge_edit_variants.py", "reject_request"): {
+        "gate": "none",
+        "local_guards": ("status must be queued_for_hermes or proposed", "row lock", "non-empty reason", "idempotency with payload digest", "event records the refusal"),
+        "reviewed": (
+            "Refuses an edit, which is safety-increasing, and records why. The "
+            "finding is not in this function but in what happens after it: the "
+            "rejection it writes is reversible by `complete_edit_request`, and "
+            "this function clears no selection, so a rejected request can arrive "
+            "back at `proposed` with its selection intact. Recorded here so the "
+            "reversal is findable from the function that is supposed to be "
+            "terminal."
+        ),
+    },
+    ("knowledge_edit_variants.py", "select_variant"): {
+        "gate": "none",
+        "local_guards": ("status must be proposed", "row lock", "variant ownership", "idempotency with payload digest", "event records the selection"),
+        "reviewed": (
+            "Records the human choice between two candidates; it mutates no "
+            "Knowledge and the event says so explicitly "
+            "(`knowledge_mutated: False`). Both halves of the attribution it "
+            "writes are unverified, though: `actor` is the "
+            "`X-Pantheon-Human-Actor` header value, and `actor_kind` is a literal "
+            "at the call site — as it is in all six event writes in this module, "
+            "five `human` and one `system`. The column records the kind the code "
+            "path intends, never the kind of the caller observed."
+        ),
+    },
     ("knowledge_update.py", "apply_knowledge_update"): {
         "gate": "optional",
         "local_guards": ("signed preview", "exact confirmation phrase", "expected_version and base digest", "idempotency"),
@@ -688,14 +757,14 @@ def test_the_unreviewed_debt_is_visible_and_does_not_grow() -> None:
     """Enumerated is not reviewed, and the gap is recorded rather than implied.
 
     The widened net enumerated 64 entry points that had not been read
-    individually. Twenty-four have now been reviewed, leaving 40. Reviewing one means
+    individually. Twenty-eight have now been reviewed, leaving 36. Reviewing one means
     replacing `_UNREVIEWED` with its real guard regime and the reasoning behind
     it. This bound exists so the debt shrinks deliberately and cannot quietly
     grow.
     """
     unreviewed = [key for key, record in INVENTORY.items() if record["gate"] == "unreviewed"]
-    assert len(unreviewed) <= 40, (
-        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 40. A new "
+    assert len(unreviewed) <= 36, (
+        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 36. A new "
         "mutation entry point must be reviewed, not added to the backlog."
     )
 
