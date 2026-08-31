@@ -1081,12 +1081,21 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("source_intake.py", "suggest_projects"): {
         "gate": "none",
-        "local_guards": ("actor_kind required, no default, Hermes refused by name", "row lock", "expected_revision checked on the read and repeated in the UPDATE WHERE", "rowcount == 1", "idempotency with payload digest", "event carries a result snapshot", "candidates written to a suggestion column, not to project_id"),
+        "local_guards": ("actor_kind required, no default, Hermes refused by name", "row lock", "expected_revision checked on the read and repeated in the UPDATE WHERE", "rowcount == 1", "idempotency with payload digest", "event carries a result snapshot", "every candidate Project must exist", "at least one candidate required"),
         "reviewed": (
-            "Records candidate Projects for a Source. The suggestion lands in its "
-            "own column and does not touch `project_id` or "
-            "`project_link_status`, so a suggestion cannot become a link by "
-            "being written. `retrieved data != truth`, kept structurally."
+            "Corrected on review, and the first version was the inverse of the "
+            "truth. It said the suggestion lands in its own column and does not "
+            "touch `project_id` or `project_link_status`. The assignment dict "
+            "reads `{\"candidate_project_refs\": ..., \"project_link_status\": "
+            "\"suggested\", \"project_id\": None}` — so suggesting on a Source "
+            "that is already linked **unlinks it**, and nothing refuses that or "
+            "asks for it. A suggestion cannot become a link by being written, "
+            "which is what I meant; what it can do is remove one. "
+            "The regime stays `none` because the effect is the same class as "
+            "`unlink_project`, which is separately recorded — but this is a state "
+            "transition no caller requested, and whether `suggest_projects` "
+            "should refuse a linked Source or preserve its link is the owner's "
+            "to decide. Candidate Projects are checked to exist before the write."
         ),
     },
     ("source_intake.py", "unlink_project"): {
