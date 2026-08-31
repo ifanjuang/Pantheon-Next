@@ -29,6 +29,13 @@
 # twice. It is not a skipped, disabled or quarantined test — the scenario runs
 # in full and must pass.
 #
+# The retry is restricted to the diagnosed condition. The first attempt's output
+# is captured and matched against the readiness-timeout signature; anything else
+# — an assertion failure, a CouchDB error, a genuine LiveSync regression — fails
+# immediately on the first attempt, unretried. Retrying every nonzero result
+# would be the "re-run until green" pathology this script exists to remove, and
+# it would let a real regression be reported as contention.
+#
 # The flake is never silent. A first-attempt failure is always written to the
 # run summary, so the fragility stays visible and countable instead of being
 # absorbed by a green tick.
@@ -52,19 +59,47 @@ fi
 SUMMARY="${GITHUB_STEP_SUMMARY:-/dev/null}"
 HARNESS="node_modules/@vrtmrz/obsidian-test-session"
 
-"$@"
-first_status=$?
+# The upstream harness call whose fixed readiness wait is the diagnosed flake,
+# and the wait's own failure mode. Both must appear for a retry to be justified.
+FLAKE_SITE="startObsidianPluginSession"
+FLAKE_MODE="waitForFunction|Timeout [0-9]+ms exceeded|Timeout.*exceeded"
+
+capture="$(mktemp)"
+trap 'rm -f "$capture"' EXIT
+
+"$@" 2>&1 | tee "$capture"
+first_status=${PIPESTATUS[0]}
 if [ "$first_status" -eq 0 ]; then
     exit 0
 fi
 
-echo "::warning title=Obsidian e2e first attempt failed::Retrying once. The flake is recorded in the run summary; a real regression fails both attempts."
+if ! grep -q "$FLAKE_SITE" "$capture" || ! grep -qE "$FLAKE_MODE" "$capture"; then
+    echo "::error title=Obsidian e2e failed::Not the known session-start flake; failing without a retry."
+    {
+        echo "### Obsidian e2e — failed (exit ${first_status}), not retried"
+        echo
+        echo "Command: \`$*\`"
+        echo
+        echo "The first attempt's output does not carry the diagnosed signature"
+        echo "(\`${FLAKE_SITE}\` together with a readiness timeout), so this is a real"
+        echo "failure and the bounded retry does not apply to it."
+        echo
+        echo '```text'
+        echo "unmatched failure != contention"
+        echo "bounded retry != retry until green"
+        echo '```'
+    } >> "$SUMMARY"
+    exit "$first_status"
+fi
+
+echo "::warning title=Obsidian e2e first attempt failed::Session-start readiness timeout; retrying once. The flake is recorded in the run summary; a real regression fails both attempts."
 
 {
     echo "### Obsidian e2e — first attempt failed (exit ${first_status})"
     echo
     echo "Command: \`$*\`"
     echo
+    echo "Matched the diagnosed session-start readiness timeout (\`${FLAKE_SITE}\`)."
     echo "Retrying once. This is recorded so the flake stays countable."
     echo
     echo '```text'
@@ -105,8 +140,10 @@ second_status=$?
 if [ "$second_status" -eq 0 ]; then
     {
         echo
-        echo "**Second attempt passed.** Recorded as a flake of the shared session-start"
-        echo "wait, not as a qualification failure. The pins under test are unaffected."
+        echo "**Second attempt passed.** The first failure matched the shared"
+        echo "session-start readiness timeout, so it is recorded as contention rather"
+        echo "than a qualification failure. That claim rests on the matched signature,"
+        echo "not on the retry having succeeded."
     } >> "$SUMMARY"
     exit 0
 fi

@@ -6,6 +6,7 @@ on:
       - ".github/workflows/implementation-livesync-real-obsidian-s2.yml"
       - "implementation/qualification/external-pins.json"
       - "implementation/tools/export_external_qualification_pins.py"
+      - "implementation/tools/obsidian_e2e_with_flake_report.sh"
       - "tests/test_livesync_real_obsidian_s2_contract.py"
   workflow_dispatch:
 

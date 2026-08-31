@@ -6,6 +6,7 @@ on:
       - ".github/workflows/implementation-livesync-security-seed-reconnect-s3.yml"
       - "implementation/qualification/external-pins.json"
       - "implementation/tools/export_external_qualification_pins.py"
+      - "implementation/tools/obsidian_e2e_with_flake_report.sh"
       - "tests/test_livesync_security_seed_reconnect_s3_contract.py"
   workflow_dispatch:
 

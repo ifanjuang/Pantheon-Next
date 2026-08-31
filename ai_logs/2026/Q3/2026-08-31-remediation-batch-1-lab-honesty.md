@@ -154,3 +154,57 @@ every lab's path filter watches the whole of `external-pins.json`, so one pin
 move fires all seventeen at once — which is the runner contention behind the
 Obsidian family's flake rate. Each lab already names the pins it consumes on its
 exporter command line; the trigger simply does not use that declaration.
+
+
+## Amendment, 2026-08-31 — two review findings, both correct
+
+### The retry was not restricted to the condition it was written for
+
+The wrapper retried *every* nonzero exit, and then wrote into the run summary
+that the first failure was a session-start flake and that the pins under test
+were unaffected — **regardless of what had actually failed**. An assertion
+failure, a CouchDB error or a real LiveSync regression that happened to pass on
+the second attempt would have been reported green and mislabelled as contention.
+
+That is precisely the "re-run until green" pathology this script was written to
+remove, reproduced inside the script itself.
+
+The first attempt's output is now captured and matched against the diagnosed
+signature — `startObsidianPluginSession` together with a readiness timeout —
+and the retry applies only on a match. Anything else fails immediately on the
+first attempt, with the summary stating that it was not retried and why. The
+contention claim now rests on the matched signature rather than on the retry
+having succeeded.
+
+Exercised on every decision path before pushing:
+
+```text
+pass first try                              exit 0
+matching signature, then pass               exit 0
+matching signature, fails twice             exit 1
+non-matching failure                        exit 1, no retry
+non-matching failure that would pass on a
+  retry (CouchDB, exit 4)                   exit 4, not 0
+matching signature, non-1 exit              exit 7 propagated
+```
+
+The fifth case is the one that matters: under the previous version it was a
+green tick with a false label.
+
+### The shared wrapper was not a trigger for its own consumers
+
+All four labs execute the wrapper, but none listed it in `pull_request.paths`.
+A pull request changing only the wrapper would have run none of the labs that
+depend on it — the common execution path merging without a single consumer
+exercised. The same class of gap as an import edge that no call ever takes.
+
+The path is added to all four filters, and each lab's contract test now asserts
+it is present in the trigger section specifically, not merely somewhere in the
+file — referencing it in `run:` was what made the omission easy to miss.
+Verified to bite: removing the path from one workflow fails that lab's contract.
+
+```text
+executed by a lab != a trigger for that lab
+referenced in the file != declared as a path
+retry on any failure != bounded retry
+```

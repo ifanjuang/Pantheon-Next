@@ -48,3 +48,19 @@ def test_s2_does_not_claim_nas_hindsight_or_pantheon_authority() -> None:
     assert '"evidence_admitted": false' in raw
     assert "hindsight-obsidian-sync" not in raw
     assert "portainer" not in raw.lower()
+
+
+def test_the_shared_retry_wrapper_is_a_trigger_for_this_lab() -> None:
+    """A change to the shared wrapper must run the labs that execute it.
+
+    All four Obsidian labs go through one script. Referencing it in `run:` is
+    not enough: if it is absent from the path filters, a pull request that
+    breaks only the wrapper runs none of its consumers and merges unexercised.
+    """
+    raw = _workflow()
+    triggers, separator, _ = raw.partition("permissions:")
+    assert separator, "workflow shape changed; the trigger section is no longer delimited"
+    assert "implementation/tools/obsidian_e2e_with_flake_report.sh" in raw, "this lab no longer executes the shared wrapper"
+    assert "implementation/tools/obsidian_e2e_with_flake_report.sh" in triggers, (
+        "the wrapper is executed but is not a declared trigger path"
+    )
