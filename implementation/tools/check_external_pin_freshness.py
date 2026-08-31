@@ -186,6 +186,13 @@ def compare(
             # Its freshness question belongs to the pin it follows; reporting a
             # lag here would double-count that pin's signal.
             signal = "derived"
+        elif observation_state == "unreachable":
+            # An earlier version fell through to `aligned` here. That was wrong:
+            # once the open lags are decided, a total upstream outage would leave
+            # `actionable` empty and let the scheduled run report success having
+            # observed nothing. Not observing is its own outcome, and it is
+            # neither drift nor alignment.
+            signal = "unreachable"
         elif observation_state == "observation_stale":
             signal = "observation_stale"
         elif delta == "none":
@@ -219,6 +226,10 @@ def compare(
         "actionable": sorted(
             row["pin"] for row in rows if row["signal"] in {"observation_stale", "unacknowledged_lag"}
         ),
+        # Kept apart from `actionable` on purpose: an unreachable host is not a
+        # drift claim about the pin, and must not be reported as one. It is a
+        # failure to observe, which the run reports on its own terms.
+        "unobserved": sorted(row["pin"] for row in rows if row["signal"] == "unreachable"),
         "authority": {
             "deployment_truth": False,
             "installation_state": False,
@@ -293,6 +304,15 @@ def main(argv: list[str] | None = None) -> int:
         # stay answerable while pins legitimately lag: an undecided lag is a
         # standing state for a human, not a defect in the diff under review.
         return 0
+
+    fetched = args.observed_json is not None or not args.offline
+    if fetched and report["unobserved"]:
+        print(
+            "\nupstream could not be read for: " + ", ".join(report["unobserved"])
+            + "\nthis run observed nothing for those pins; it is not a clean freshness result",
+            file=sys.stderr,
+        )
+        return 1
 
     if report["actionable"]:
         print(
