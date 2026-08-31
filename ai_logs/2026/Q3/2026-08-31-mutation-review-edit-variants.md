@@ -1,6 +1,34 @@
 # Mutation review: the A/B edit variant review
 
 Date: 2026-08-31
+
+Status: validation-only trace — governance review record, no runtime change.
+Boundary profile: validation_only_trace.
+
+## Change
+
+- Added: `ai_logs/2026/Q3/2026-08-31-mutation-review-edit-variants.md`.
+- Updated: four inventory verdicts for `knowledge_edit_variants.py` and one
+  rewritten rationale; unreviewed ceiling 40 → 36. Amended after review to
+  correct the event-write count.
+- Removed: nothing.
+
+## Why
+
+The four `knowledge_edit_variants.py` mutation entry points were unreviewed, and
+a fifth carried reasoning the same status chain falsifies.
+
+## Boundary
+
+Boundary profile applies: `validation_only_trace`.
+
+Protected paths touched: no.
+Runtime impact: none — no executable behaviour changes.
+Authority impact: none — the verdicts are review records, not approvals.
+Schema/test/CI impact: the inventory test's unreviewed ceiling moves; no schema
+or workflow changes.
+External action: none.
+Memory behavior: none.
 Zone: `implementation/`
 Scope: the four unreviewed mutation entry points in
 `implementation/mvp_vertical/knowledge_edit_variants.py`, plus a rewritten
@@ -110,3 +138,12 @@ knowledge_edit_variants   asserted, persisted; the kind is a literal
 
 No behaviour. Four verdicts, one rewritten rationale, and one ceiling moved:
 unreviewed 40 → 36.
+
+## Local distinctions
+
+```text
+records an actor       != verifies an actor
+declares its authority != is constrained by it
+terminal status        != irreversible status
+delegates the effect   != needs its own gate
+```

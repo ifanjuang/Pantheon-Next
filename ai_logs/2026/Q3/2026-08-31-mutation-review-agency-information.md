@@ -1,6 +1,34 @@
 # Mutation review: the Agency Information series
 
 Date: 2026-08-31
+
+Status: validation-only trace — governance review record, no runtime change.
+Boundary profile: validation_only_trace.
+
+## Change
+
+- Added: `ai_logs/2026/Q3/2026-08-31-mutation-review-agency-information.md`.
+- Updated: four inventory verdicts for `agency_information.py`; unreviewed
+  ceiling 44 → 40; required-gate ceiling 6 → 7. Amended after review to correct
+  the `create_information` allowlist claim.
+- Removed: nothing.
+
+## Why
+
+The four `agency_information.py` mutation entry points were unreviewed, and they
+are the first batch where every one sits behind a route a key holder can call.
+
+## Boundary
+
+Boundary profile applies: `validation_only_trace`.
+
+Protected paths touched: no.
+Runtime impact: none — no executable behaviour changes.
+Authority impact: none — the verdicts are review records, not approvals.
+Schema/test/CI impact: the inventory test's ceilings move; no schema or workflow
+changes.
+External action: none.
+Memory behavior: none.
 Zone: `implementation/`
 Scope: the four unreviewed mutation entry points in
 `implementation/mvp_vertical/agency_information.py`.
@@ -112,3 +140,12 @@ No behaviour. Four verdicts with their reasoning, and two ceilings moved
 deliberately: unreviewed 44 → 40, required-gate 6 → 7. The findings are recorded,
 not fixed — adding an actor column to a governed table is a schema decision and
 the owner's to take.
+
+## Local distinctions
+
+```text
+authorization verified != attribution verified
+required header        != recorded header
+states its gravity     != enforces its gravity
+acted_at recorded      != actor recorded
+```

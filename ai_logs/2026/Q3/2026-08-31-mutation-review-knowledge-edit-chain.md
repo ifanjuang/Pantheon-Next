@@ -1,6 +1,35 @@
 # Mutation review: the Knowledge edit chain
 
 Date: 2026-08-31
+
+Status: validation-only trace — governance review record, no runtime change.
+Boundary profile: validation_only_trace.
+
+## Change
+
+- Added: `ai_logs/2026/Q3/2026-08-31-mutation-review-knowledge-edit-chain.md`.
+- Updated: five inventory verdicts for `knowledge.py` in
+  `implementation/tests/test_consequential_mutation_inventory.py`; unreviewed
+  ceiling 48 → 44; required-gate ceiling 3 → 6.
+- Removed: nothing.
+
+## Why
+
+Four of the seventy-two enumerated mutation entry points were recorded as
+unreviewed, and a fifth carried a verdict whose stated reasoning turned out to
+rest on a status two functions can write with no decision behind it.
+
+## Boundary
+
+Boundary profile applies: `validation_only_trace`.
+
+Protected paths touched: no.
+Runtime impact: none — no executable behaviour changes.
+Authority impact: none — the verdicts are review records, not approvals.
+Schema/test/CI impact: the inventory test's ceilings move; no schema or workflow
+changes.
+External action: none.
+Memory behavior: none.
 Zone: `implementation/`
 Scope: the four unreviewed mutation entry points in `implementation/mvp_vertical/knowledge.py`,
 plus one correction to a verdict already recorded.
@@ -104,3 +133,12 @@ No behaviour. This is a review record: five inventory verdicts, the reasoning fo
 each, and two ceilings moved deliberately — unreviewed 48 → 44, required-gate
 3 → 6. The three findings are recorded, not fixed; fixing them changes live
 routes and is the owner's call.
+
+## Local distinctions
+
+```text
+schema conformance != professional approval
+provided reference != validated decision
+retired route      != retired capability
+recorded status    != recorded decision
+```
