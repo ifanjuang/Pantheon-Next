@@ -55,6 +55,9 @@ def _body() -> dict:
         "confirmation_expires_at": 2_000_000_000,
         "confirmation_phrase": "CONFIRMER UPDATE",
         "idempotency_key": "knowledge-update-0001",
+        "task_contract_ref": "task-contract:reviewed-001",
+        "evidence_pack_candidate_ref": "evidence-pack-candidate:001",
+        "human_decision_ref": "human-decision:001",
     }
 
 
