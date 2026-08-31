@@ -52,7 +52,8 @@ jobs:
           python monorepo/implementation/tools/audit_module_usage.py \
             --zone "implementation=implementation=Pantheon implementation=$PWD/monorepo/implementation" \
             --json-output audit-output/PANTHEON_MODULE_USAGE.json \
-            --markdown-output audit-output/PANTHEON_MODULE_USAGE.md
+            --markdown-output audit-output/PANTHEON_MODULE_USAGE.md \
+            --required-call-paths monorepo/implementation/qualification/required-call-paths.json
 
       - name: Validate Hermes distribution composition from monorepo source
         run: |

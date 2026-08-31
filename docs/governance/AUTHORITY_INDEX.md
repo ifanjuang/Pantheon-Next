@@ -108,6 +108,30 @@ This keeps the doctrine growing only where it anchors to something executable or
 explicitly decided (arbitration B-5). The rule governs promotion; it does not
 demote existing entries by itself.
 
+### Candidacy aging signal
+
+The promotion rule says how a candidate leaves that state. It says nothing about
+a candidate that never leaves it, and the repository currently cannot tell a
+candidate deliberately kept as one from a candidate nobody has revisited.
+
+`.github/scripts/check_candidacy_aging.py` reports that difference. It is a
+signal, not a gate: age promotes nothing, and the check does not fail on age. It
+derives each candidate's start from the commit history rather than a written
+date, and reports a candidate whose start predates this repository as
+`imported` instead of giving it a fabricated age.
+
+A document may restart its own clock by recording a dated review, in the same
+header block as `Status:`:
+
+```text
+Candidacy reviewed: <ISO date> (ai_logs/<year>/Q<n>/<record>.md)
+```
+
+The cited record must exist under `ai_logs/`; the check fails on a marker that
+cites nothing real, because an aging reset backed by a missing record is worse
+than no reset. The line is optional and adds no authority — it records that a
+human looked, and when.
+
 ## Current authority map
 
 A row whose path is a directory (ending in `/`) or a glob (containing `*`) is a **grouped row**: it indexes every governance document it matches, so individual members are covered without a separate row. The read-only coverage check honors grouped rows declared in this index and in the registered sub-indexes — a candidate under `docs/governance/reference_reviews/`, `docs/governance/rites/` or matching `docs/governance/DATA_PLATFORM_*.md` is considered indexed by its group. Coverage is visibility only; it does not promote a member's authority class.
