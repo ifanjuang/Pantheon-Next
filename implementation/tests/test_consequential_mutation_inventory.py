@@ -20,7 +20,7 @@ added tomorrow inheriting none of it, with no check noticing.
 
 ## Where the review stands
 
-Thirty-nine of the seventy-two entry points have been read individually; 33 have
+Forty-two of the seventy-two entry points have been read individually; 30 have
 not. The first batches were chosen because nothing in production reached them —
 answerable without unwinding a call graph, and the cheapest end of the backlog
 rather than the most urgent one. From `knowledge.py` onward every entry point is
@@ -48,6 +48,7 @@ agency_information        X-Pantheon-Actor         asserted, required, then disc
 knowledge                 created_by               a body field, persisted verbatim
 knowledge_edit_variants   X-Pantheon-Human-Actor   asserted, persisted; kind is a literal
 decision_requests         X-Pantheon-Human-Actor   asserted — and so is its assurance level
+information_projection    X-Pantheon-Actor         asserted, persisted into the event log
 ```
 
 The last line is the one that settles the question. `decision_requests` is the
@@ -497,9 +498,47 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
         "local_guards": ("required binding_id", "raises on unknown binding", "idempotent when already revoked"),
         "reviewed": "Withdraws an ability, so it is safety-increasing. Same finding as disable_principal: no actor is recorded on the revocation.",
     },
-    ("information_projection.py", "add_document_link"): _UNREVIEWED,
-    ("information_projection.py", "remove_document_link"): _UNREVIEWED,
-    ("information_projection.py", "update_projection_metadata"): _UNREVIEWED,
+    ("information_projection.py", "add_document_link"): {
+        "gate": "none",
+        "local_guards": ("actor_kind human or system, no default", "Information and Document existence checked", "link role vocabulary", "row lock", "expected_revision", "idempotency with payload digest", "event derived from the write's own result"),
+        "reviewed": (
+            "Links a Document to an Information card: metadata about what backs a "
+            "card, not a change to what the card says. Both endpoints are checked "
+            "to exist before the write. `observed_version` and `observed_digest` "
+            "are caller-supplied and unverified against the Document, which the "
+            "names say plainly — they record what the linker saw, not a validated "
+            "fact, and this review has recorded the opposite naming twice. "
+            "Notable in the other direction: the upsert returns `(xmax = 0)` and "
+            "the event type is chosen from that, so `document_link_added` versus "
+            "`document_link_updated` reflects what the statement did rather than "
+            "what a preceding SELECT predicted. The comment says a prior version "
+            "got this wrong and left the history describing a creation that never "
+            "happened. That is a record derived from an effect instead of "
+            "asserted beside it."
+        ),
+    },
+    ("information_projection.py", "remove_document_link"): {
+        "gate": "none",
+        "local_guards": ("actor_kind human or system, no default", "row lock", "expected_revision", "rowcount == 1 or the link did not exist", "idempotency with payload digest"),
+        "reviewed": (
+            "Unlinks a Document from an Information card, withdrawing a "
+            "projection rather than changing governed content. The DELETE asserts "
+            "`rowcount == 1`, so removing a link that was not there is an error "
+            "rather than a silent success — the event log cannot record a removal "
+            "that removed nothing."
+        ),
+    },
+    ("information_projection.py", "update_projection_metadata"): {
+        "gate": "none",
+        "local_guards": ("actor_kind human or system, no default", "media-type vocabulary", "contact refs resolved against their tables", "row lock", "expected_revision", "idempotency with payload digest"),
+        "reviewed": (
+            "Edits projection metadata — dates, media types, contact references. "
+            "`projection != persistence` and `projection != governed identity` "
+            "both apply: none of this changes what the Information says or who "
+            "may act on it. Contact references are resolved against their tables "
+            "rather than stored as free strings."
+        ),
+    },
     ("knowledge.py", "apply_edit_request"): {
         "gate": "gate_required_not_wired",
         "local_guards": ("request status", "re-read under lock", "version and selection digest", "single transaction with audit", "idempotency"),
@@ -831,14 +870,14 @@ def test_the_unreviewed_debt_is_visible_and_does_not_grow() -> None:
     """Enumerated is not reviewed, and the gap is recorded rather than implied.
 
     The widened net enumerated 64 entry points that had not been read
-    individually. Thirty-one have now been reviewed, leaving 33. Reviewing one means
+    individually. Thirty-four have now been reviewed, leaving 30. Reviewing one means
     replacing `_UNREVIEWED` with its real guard regime and the reasoning behind
     it. This bound exists so the debt shrinks deliberately and cannot quietly
     grow.
     """
     unreviewed = [key for key, record in INVENTORY.items() if record["gate"] == "unreviewed"]
-    assert len(unreviewed) <= 33, (
-        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 33. A new "
+    assert len(unreviewed) <= 30, (
+        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 30. A new "
         "mutation entry point must be reviewed, not added to the backlog."
     )
 

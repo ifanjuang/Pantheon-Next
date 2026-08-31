@@ -14,7 +14,7 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **862**.
+Total indexed entries: **863**.
 
 | Date | Log | Subject |
 |---|---|---|
@@ -23,6 +23,7 @@ Total indexed entries: **862**.
 | 2026-08-31 | `2026/Q3/2026-08-31-professional-private-source-patterns.md` | #827 — sanitized private-source-derived professional review patterns |
 | 2026-08-31 | `2026/Q3/2026-08-31-o3-qualification-retirement.md` | Historical O3 qualification retirement |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-knowledge-edit-chain.md` | Mutation review: the Knowledge edit chain |
+| 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-information-projection.md` | Mutation review: the Information Card projection |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-human-access-grants.md` | The two live human-access mutation points |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-first-nine.md` | First nine consequential-mutation entry points reviewed |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-edit-variants.md` | Mutation review: the A/B edit variant review |
