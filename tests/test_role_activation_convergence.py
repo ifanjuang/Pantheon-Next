@@ -8,6 +8,7 @@ ROLE_OWNER_SURFACES = (
     ROOT / "docs/governance/REQUEST_LIFECYCLE.md",
     ROOT / "docs/governance/WORKFLOW_SCHEMA.md",
     ROOT / "docs/governance/EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md",
+    ROOT / "docs/governance/authority/GOVERNANCE_AUTHORITY_INDEX.md",
 )
 CANONICAL_ROLES = (
     "ATHENA",
@@ -96,3 +97,7 @@ def test_active_lifecycle_surfaces_reuse_canonical_roles_and_existing_memory_own
     memory = ROLE_OWNER_SURFACES[2].read_text(encoding="utf-8")
     assert "MNEMOSYNE continuity framing" in memory
     assert "The canonical Role registry remains `AGENTS.md`" in memory
+
+    authority = ROLE_OWNER_SURFACES[3].read_text(encoding="utf-8")
+    assert "cap as an explicit Task Contract property" in authority
+    assert "Adds no canonical Role, memory-gate persona, router or runtime" in authority
