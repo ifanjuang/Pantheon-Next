@@ -54,6 +54,29 @@ def _chunk() -> RetrievedChunk:
     )
 
 
+def _ranked_hit(
+    source_ref: str,
+    source_digest: str,
+    rank: int,
+    *,
+    distance: float = 0.2,
+    lexical: bool = True,
+) -> HybridRetrievedChunk:
+    chunk = RetrievedChunk(
+        source_ref=source_ref,
+        chunk_no=rank,
+        body=f"Qualification candidate {rank} from {source_ref}",
+        distance=distance,
+        source_digest=source_digest,
+    )
+    return HybridRetrievedChunk(
+        chunk=chunk,
+        hybrid_score=1.0 / (60 + rank),
+        semantic_rank=rank,
+        lexical_rank=rank if lexical else None,
+    )
+
+
 def _resolution() -> retrieval_scope.RetrievalScopeResolution:
     return retrieval_scope.RetrievalScopeResolution(
         project_id="project-a",
@@ -121,6 +144,7 @@ def test_project_runner_uses_existing_currentness_scope_and_projects_exact_revis
     assert captured["project_id"] == "project-a"
     assert captured["requested_documents"] == (("project-document-cctp", "current_contractual"),)
     assert captured["query"] == "Que prévoit le CCTP pour le relevé ?"
+    assert captured["top_k"] == runner.HYBRID_CANDIDATE_K
 
     result_candidate, evidence_pack = output.documents
     assert result_candidate["status"] == "draft_to_review"
@@ -145,6 +169,56 @@ def test_project_runner_uses_existing_currentness_scope_and_projects_exact_revis
     assert item["retrieval_audit"]["source_digest"] == "b" * 64
     assert item["retrieval_provenance"]["page_start"] == 12
     assert item["support_status"] == "sourced_not_verified"
+
+
+def test_context_selection_keeps_one_useful_hit_per_resolved_source() -> None:
+    dpgf = ("sources/dpgf.md", "d" * 64)
+    cctp = ("sources/cctp.md", "c" * 64)
+    quote = ("sources/quote.md", "q" * 64)
+    hits = [
+        _ranked_hit(*dpgf, 1),
+        _ranked_hit(*cctp, 2),
+        _ranked_hit(*dpgf, 3),
+        _ranked_hit(*dpgf, 4),
+        _ranked_hit(*quote, 5, distance=0.9),
+    ]
+
+    selected = runner._select_useful_context_hits(
+        hits,
+        required_sources=(dpgf, cctp, quote),
+        limit=4,
+    )
+
+    assert [hit.semantic_rank for hit in selected] == [1, 2, 3, 5]
+    assert {(hit.chunk.source_ref, hit.chunk.source_digest) for hit in selected} == {
+        dpgf,
+        cctp,
+        quote,
+    }
+
+
+def test_context_selection_does_not_force_non_useful_resolved_source() -> None:
+    dpgf = ("sources/dpgf.md", "d" * 64)
+    cctp = ("sources/cctp.md", "c" * 64)
+    quote = ("sources/quote.md", "q" * 64)
+    hits = [
+        _ranked_hit(*dpgf, 1),
+        _ranked_hit(*cctp, 2),
+        _ranked_hit(*dpgf, 3),
+        _ranked_hit(*dpgf, 4),
+        _ranked_hit(*quote, 5, distance=0.9, lexical=False),
+    ]
+
+    selected = runner._select_useful_context_hits(
+        hits,
+        required_sources=(dpgf, cctp, quote),
+        limit=4,
+    )
+
+    assert [hit.semantic_rank for hit in selected] == [1, 2, 3, 4]
+    assert quote not in {
+        (hit.chunk.source_ref, hit.chunk.source_digest) for hit in selected
+    }
 
 
 def test_project_runner_refuses_unresolved_currentness_before_drafting(monkeypatch) -> None:
