@@ -302,7 +302,7 @@ def test_current_project_aware_professional_review_baseline_is_observed_not_assu
         # but it may not leak the planted old revision or invent authority.
         assert resolved_sources == declared
         assert controls.isdisjoint(resolved_sources)
-        assert evidence_sources <= declared
+        assert evidence_sources == declared
         assert controls.isdisjoint(evidence_sources)
         assert result_candidate["external_action_authorized"] is False
         assert evidence_pack["source_scope_resolution"]["authority"] == {
@@ -312,9 +312,8 @@ def test_current_project_aware_professional_review_baseline_is_observed_not_assu
         }
         assert forbidden_hits == []
 
-        # Corpus shape is stable, but output quality is deliberately observational.
-        # A later retrieval/method improvement must be allowed to increase source
-        # coverage or professional findings without making this baseline fail.
+        # Source coverage is now regression-protected. Professional finding
+        # quality remains observational and may improve without changing this test.
         assert len(expected_attention_cases) == 7
     finally:
         conn.close()
