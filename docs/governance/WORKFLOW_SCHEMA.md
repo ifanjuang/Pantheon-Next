@@ -176,23 +176,26 @@ A phase must not describe:
 
 ## Role viewpoints
 
-A workflow may request candidate viewpoints from Pantheon Roles.
+A workflow may request candidate viewpoints from the canonical Pantheon Roles owned by `AGENTS.md`.
 
 Examples:
 
 ```text
-ATHENA for planning
+ATHENA for planning and decomposition
 ARGOS for source review
+MNEMOSYNE for continuity, version/supersession review and retention-placement proposals
 THEMIS for risk
 APOLLO for quality
-ZEUS for arbitration
+ZEUS for arbitration of status/procedure
 IRIS for formulation
-HEPHAISTOS for implementation candidate
+HEPHAISTOS for implementation candidates
 ```
 
 Roles provide governance perspectives.
 
 They are not autonomous workers inside Pantheon Next.
+
+A Workflow Manifest must not create another canonical Role by naming a lifecycle function or metaphor.
 
 ## Task Contract requirements
 
@@ -253,7 +256,7 @@ They are governance categories.
 
 ## Register rules
 
-A Workflow Manifest must define register expectations. ("Memory" belongs to Hermès, ungoverned; the governed durable object is the Registre Probatoire.)
+A Workflow Manifest must define register expectations. Runtime memory remains external; the governed durable object is the Registre Probatoire.
 
 Default rule:
 
@@ -263,7 +266,7 @@ workflow outputs are not a Registre Probatoire entry
 
 The workflow may propose Register Candidates.
 
-Only approval can promote a Registre Probatoire entry.
+Only the applicable governed review and approval path can promote a Registre Probatoire entry.
 
 ## Risk notes
 
@@ -306,16 +309,18 @@ Completion does not mean external execution succeeded unless evidence supports t
 
 ## Governed composition
 
-A Workflow Manifest may be composed on demand rather than written by hand. HÉPHAÏSTOS forges a Workflow Manifest candidate for a specific cap (the goal, held under MÈTIS in `REQUEST_LIFECYCLE.md`) from capabilities declared in `CAPABILITY_REGISTRY.md`.
+A Workflow Manifest may be composed on demand rather than written by hand. HEPHAISTOS may forge a Workflow Manifest Candidate for a specific cap that has already been made explicit through `REQUEST_LIFECYCLE.md` and the applicable Task Contract owners, using capabilities declared in `CAPABILITY_REGISTRY.md`.
 
 Composition reuses existing governance rather than adding machinery. It follows a retrieve / reuse / revise / retain loop:
 
 ```text
 retrieve  candidate capabilities and prior manifests for the cap
 reuse     a prior governed manifest when one fits
-revise    the manifest as a governed Task Contract revision
-retain    only what review keeps; superseded manifests are archived (CHARON), not deleted
+revise    the manifest as a governed Task Contract revision when the task boundary changes
+retain    only what review keeps; superseded material follows existing archive/retention owners
 ```
+
+Archive is a lifecycle status, not deletion. A superseded manifest does not keep acting merely because it remains preserved for provenance.
 
 A forged manifest is a candidate. forged != authorized.
 
@@ -324,7 +329,7 @@ A forged manifest is a candidate. forged != authorized.
 Composition is bounded by two governance gates.
 
 ```text
-Pre-execution eligibility gate — ZEUS arbitrates
+Pre-execution eligibility gate — ZEUS may arbitrate when status/procedure is disputed
   Before any step runs: are the capabilities admitted for this cap and scope?
   Is the Task Contract sufficient? Is the approval ceiling (C0–C5) declared?
   Decision: allow / allow_with_gate / block / needs_revision / needs_evidence.
@@ -336,7 +341,7 @@ Post-execution evidence gate
   promoted to a Registre Probatoire entry on the strength of completion alone.
 ```
 
-The first gate decides whether the forge may proceed. The second decides what the result means. Neither gate executes work, approves by itself or promotes a register entry.
+The first gate decides whether the governed execution opportunity is admitted. The second qualifies what the returned result means. Neither gate executes work, approves by itself or promotes a register entry.
 
 ### Per-step signatures
 
@@ -356,7 +361,7 @@ A signature records what governance expects of a step. It does not run the step.
 
 ### Boundary
 
-Governed composition adds no forge engine, compiler, scheduler, queue, provider router or runtime. HÉPHAÏSTOS forges a recipe; the execution runtime executes it outside Pantheon under Task Contract; Pantheon governs the cap, the proof and the status; the human engages.
+Governed composition adds no forge engine, compiler, scheduler, queue, provider router or runtime. HEPHAISTOS may prepare a candidate recipe or artifact structure; the execution runtime executes outside Pantheon under Task Contract; Pantheon governs the cap, proof and status; the human engages where consequence requires authority.
 
 ```text
 forged != authorized
@@ -378,7 +383,7 @@ It must not replace task-specific scope, evidence or approval decisions.
 
 A Workflow Manifest defines expected proof patterns.
 
-The Evidence Pack records the actual evidence produced for a specific task.
+The Evidence Pack records the actual Evidence produced for a specific task.
 
 The workflow does not approve its own evidence.
 
@@ -398,34 +403,40 @@ Pantheon Next does not install, schedule or run workflows.
 
 ## Relationship to runtime clients and Cockpit
 
-An optional runtime client, including Hermes WebUI if separately selected and qualified, may expose workflow descriptions, approval prompts, evidence and outputs.
+An optional compatible runtime client may expose workflow descriptions, approval prompts, evidence and outputs.
 
-Pantheon Cockpit may project governed workflow status, evidence gaps, approvals and linked decisions.
+Pantheon Cockpit may project governed workflow status, Evidence gaps, approvals and linked decisions.
 
 Neither client display nor Cockpit projection makes the workflow canonical, executes it for Pantheon Next, grants approval or transfers authority.
 
 ```text
-Hermes WebUI available != Hermes WebUI selected
+client selected != authority transfer
 client display != authority
 projection != persistence
 ```
 
 ## Relationship to schemas
 
-A future `workflow_manifest.schema.yaml` may validate the structure of Workflow Manifests.
+The machine contract exists at:
 
-The schema may validate:
+```text
+schemas/workflow_manifest.schema.yaml
+```
+
+It validates the declared Workflow Manifest structure. Current qualification work, including the bounded multi-source research manifest, uses that schema as a structural referent.
+
+The schema may validate fields such as:
 
 - identity;
 - scope;
 - phase declarations;
 - role references;
-- evidence requirements;
+- Evidence requirements;
 - approval requirements;
 - memory rules;
 - risk notes.
 
-The schema must not define:
+It must not define:
 
 - execution order as runtime semantics;
 - scheduling;
@@ -435,6 +446,11 @@ The schema must not define:
 - provider routing;
 - tool dispatch;
 - hidden graph state.
+
+```text
+schema_valid != authorized
+schema_present != runtime implemented
+```
 
 ## Forbidden drift
 
@@ -450,7 +466,7 @@ Workflow Manifests must never become:
 - hidden orchestration specs;
 - self-evolution loops.
 
-If a Workflow Manifest becomes necessary to run the system, governance drift has occurred.
+If a Workflow Manifest becomes necessary to run the system as an internal Pantheon execution graph, governance drift has occurred.
 
 ## Final rule
 

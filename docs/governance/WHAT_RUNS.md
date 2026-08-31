@@ -45,6 +45,7 @@ repository presence != selected architecture
 | Area | Current status | Remaining proof |
 |---|---|---|
 | Hermes policy/PEP integration | co-located candidate / target round-trip not established here | Demonstrate mandatory target-runtime invocation, signed/qualified decision handling and real deployment boundary. |
+| Internal consequential-write chokepoint | implemented / tested / not wired | `policy_gate.enforce_consequential` and `HttpPolicyClient` exist and are tested, but the client is never instantiated outside tests and `policy_client` has no non-test caller. Consequential writes under `implementation/` are currently held by module-local guards — signed previews, confirmation phrases, optimistic concurrency, idempotency keys, admission state machines — not by the central gate. `implementation/tests/test_consequential_mutation_inventory.py` enumerates every entry point and its actual guard. Remaining proof: wire the client in the application factory and prove no mutation path can start without it. |
 | Core local/NAS document ingestion | co-located implementation candidate | Prove selected target paths, permissions, real-dossier authorization and operational rollback before production use. |
 | Pantheon Cockpit adoption | executable candidate / not adopted | Live deployment, data bindings and operational acceptance remain separate decisions. |
 | Obsidian/Hindsight synchronization topology | partially qualified / external stabilization work remains | Real client/offline/conflict and deployment hardening remain separate from repository CI. |

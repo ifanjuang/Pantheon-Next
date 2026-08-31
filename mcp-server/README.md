@@ -3,12 +3,14 @@
 Status: implemented read-only / partial / protected path — implementation artifact, not authority; broader coverage remains to verify.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
+Hermes clients handle runtime interaction.
+Hermes Agent executes externally.
+Pantheon policy surfaces return governed decisions as data.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
-This module is the read-only policy / validation MCP surface of the monorepo. It serves governed sources, explains allowlisted architecture placements, qualifies caller-provided capability-status candidates, validates capability passports and candidate Architecture Project Understanding dossiers, and verifies component installs, observability posture, backup recoverability, exposure-surface safety and update availability from provided evidence. It exposes the governance core to Hermes Agent and OpenWebUI and returns decisions **as data**: the gate decides, the human decides.
+This module contains the bounded read-only policy / validation service and its local MCP projection. It serves governed sources, explains allowlisted architecture placements, qualifies caller-provided capability-status candidates, validates capability passports and candidate Architecture Project Understanding dossiers, and verifies component installs, observability posture, backup recoverability, exposure-surface safety and update availability from provided evidence. The same transport-neutral policy service is also projected through the authenticated internal HTTP API described in `mcp-server/docs/HTTP_API_CONTRACT.md`. Both transports return decisions **as data**; neither executes the effect or replaces the required human decision.
 
 ## Boundary
 
@@ -36,7 +38,7 @@ Any request asking the server to perform such an effect is refused with a report
 | `read_doctrine(key)` | one source, full body, labeled |
 | `explain_governance_structure(source_key="")` | read-only wiki view of the governance sections, why they exist and their traced sources; optional focus by source key |
 | `get_consultation_catalog()` | honest availability map: implemented read-only, partial and documented-non-implemented consultation surfaces |
-| `explain_architecture(topic)` | bounded placement, purpose, rationale, forbidden responsibilities and governed source references for Pantheon, Hermes, OpenWebUI, Pantheon Control, MCP/API, capability, knowledge, memory and evidence topics |
+| `explain_architecture(topic)` | bounded placement, purpose, rationale, forbidden responsibilities and governed source references for Pantheon, Hermes, historical/refused OpenWebUI placement, Pantheon Control, MCP/API, capability, knowledge, memory and evidence topics |
 | `get_capability_status(status_yaml)` | qualifies a *provided* observation on the Hermes dashboard axes (`listed`, `detected`, `installed`, `configured`, `enabled`, `reachable`, `health`) plus separate governance, task-use, update and rollback axes; performs no live inventory or runtime probe and grants no authorization |
 | `validate_passport(passport_yaml)` | shape report + governance gaps (validation ≠ authorization) |
 | `classify_request(request_yaml)` | consequence K0–K4, required verification V0–V4, approval ceiling C0–C5, required gates |
@@ -132,11 +134,15 @@ registered, approved or used.
 NAS posture (see `PANTHEON_CONTROL_BOUNDARY.md` / PR #72 history): mount the repository read-only (`…/Pantheon-Next:/repo:ro`); the server needs no Docker socket, no credentials, no write access.
 
 The transport-neutral consultation response contract is documented in
-[`docs/CONSULTATION_CONTRACT.md`](docs/CONSULTATION_CONTRACT.md). A future HTTP
-projection may reuse it. The external Hermes dashboard plugin can produce a
-partial live inventory, but this MCP performs no inventory or probe. No HTTP API, knowledge
-retrieval, Mem0/Memvid lookup, user/project authorization service or remote MCP
-transport is implemented by this module today.
+[`docs/CONSULTATION_CONTRACT.md`](docs/CONSULTATION_CONTRACT.md). The same bounded
+service is also projected over authenticated internal HTTP by
+`pantheon-policy-api`; see [`docs/HTTP_API_CONTRACT.md`](docs/HTTP_API_CONTRACT.md)
+and the repository-level `compose.policy-api.yaml`. MCP and HTTP remain projections
+of the same policy meaning and neither transport executes effects. The external
+Hermes dashboard plugin can produce a partial live inventory, but these policy
+surfaces perform no inventory or probe. Knowledge retrieval, Mem0/Memvid lookup,
+a general user/project authorization service and remote MCP transport are not
+implemented by this module today.
 
 ## APU validation CLI
 
@@ -285,8 +291,9 @@ mcp-server/
 ```
 
 The logic modules import without the MCP SDK; only `server.py` requires it. The
-repository root is deliberately non-distributable; this module carries the only
-Python package metadata and explicit package list.
+repository root is deliberately non-distributable. `mcp-server/` carries its own
+Python package metadata; `implementation/` is a separate Python project in the
+same monorepo. Co-location does not transfer governance authority between them.
 
 ## Final rule
 

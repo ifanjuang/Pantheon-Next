@@ -252,16 +252,31 @@ def grounding_review(draft: str, chunks: Sequence[RetrievedChunk]) -> dict:
 
 
 class Drafter(Protocol):
-    """The seam a Hermes-side LLM drafter implements."""
+    """The seam a Hermes-side LLM drafter implements.
+
+    ``intent`` is the legacy summary string for summary-only Task Contracts and
+    the complete task-intent object when additional bounded task context exists.
+    Receipt of structured context does not make a task-scoped method projection
+    authoritative or professionally validated.
+    """
 
     def draft(
         self,
         *,
-        intent: str,
+        intent: str | dict,
         question: str,
         chunks: Sequence[RetrievedChunk],
     ) -> str:
         ...
+
+
+def _human_request(intent: str | dict, question: str) -> str:
+    """Render the task summary without guessing from string content."""
+    if isinstance(intent, dict):
+        summary = str(intent.get("summary") or "").strip()
+        return summary or (question or "").strip()
+    raw = str(intent or "").strip()
+    return raw or (question or "").strip()
 
 
 class DeterministicDrafter:
@@ -270,7 +285,7 @@ class DeterministicDrafter:
     def draft(
         self,
         *,
-        intent: str,
+        intent: str | dict,
         question: str,
         chunks: Sequence[RetrievedChunk],
     ) -> str:
@@ -278,7 +293,7 @@ class DeterministicDrafter:
             f"- [{c.source_ref}#chunk-{c.chunk_no}] {c.body[:160].strip()}…"
             for c in chunks
         )
-        request = (intent or question or "").strip()
+        request = _human_request(intent, question)
         return (
             "Bonjour,\n\n"
             "Cette réponse est un candidat soumis à votre décision. Elle ne "

@@ -7,6 +7,7 @@ declared scope.
 
 from __future__ import annotations
 
+import copy
 import functools
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
@@ -39,12 +40,28 @@ class TaskContract:
         return self.raw.get("contract_id", self.raw["object_id"])
 
     @property
-    def intent(self) -> str:
-        """The contract's stated intent, if any — passed to the drafter as
-        context. Empty string when the contract declares none."""
+    def intent_summary(self) -> str:
+        """Human-facing summary of the stated task intent, if any."""
         intent = self.raw.get("intent")
         if isinstance(intent, dict):
             return str(intent.get("summary", "")).strip()
+        return str(intent or "").strip()
+
+    @property
+    def intent(self) -> str | dict:
+        """Task context passed to the drafter without content-based guessing.
+
+        Existing summary-only object intents remain the same plain summary
+        string. When an object-shaped intent carries additional bounded task
+        context, pass a detached copy of the complete object so fields such as
+        ``method_projection`` are not discarded before the drafting seam.
+        Receipt of those fields does not grant them authority.
+        """
+        intent = self.raw.get("intent")
+        if isinstance(intent, dict):
+            if set(intent) <= {"summary"}:
+                return str(intent.get("summary", "")).strip()
+            return copy.deepcopy(intent)
         return str(intent or "").strip()
 
 
