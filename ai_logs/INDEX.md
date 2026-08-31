@@ -14,7 +14,7 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **866**.
+Total indexed entries: **867**.
 
 | Date | Log | Subject |
 |---|---|---|
@@ -28,6 +28,7 @@ Total indexed entries: **866**.
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-human-access-grants.md` | The two live human-access mutation points |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-hermes-execution-boundary.md` | Mutation review: the Hermes execution boundary |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-first-nine.md` | First nine consequential-mutation entry points reviewed |
+| 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-entity-relation-canonization.md` | Mutation review: canonizing an Entity relation |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-edit-variants.md` | Mutation review: the A/B edit variant review |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-decision-requests.md` | Mutation review: the Decision Request inbox |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-classification-cluster.md` | The agency_classification cluster, and two attribution mechanisms |
