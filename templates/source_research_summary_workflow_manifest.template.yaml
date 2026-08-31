@@ -1,0 +1,210 @@
+workflow_id: research.multi_source_summary
+title: Multi-source research summary
+purpose: Govern bounded research from supplied or discovered source leads into a traceable synthesis candidate without turning retrieval, copying, or runtime completion into Evidence or approval.
+
+scope:
+  scope_type: task
+  included:
+    - bounded research question
+    - supplied URLs, documents, source references, or authorized workspace source-notebook entries as seed sources
+    - task-relevant references discovered inside inspected sources
+    - source inspection, contradiction review, bounded reference expansion, synthesis, and validation
+  excluded:
+    - unbounded crawling
+    - automatic ingestion or retention of every linked source
+    - treating a notebook entry, link, cache, derivative, or retrieval result as Evidence by itself
+    - automatic Register promotion or consequential external action
+  authority_limits:
+    - the Workflow Manifest governs the research class but does not execute it
+    - discovered references are Source Leads until separately inspected within the authorized Task Contract
+    - source copying, caching, or ingestion is a separate source-handling decision and is never implied by a Markdown link
+  expected_inputs:
+    - bounded research question and scope
+    - one or more seed sources, or an admitted discovery route when no seed is supplied
+    - freshness, jurisdiction, confidentiality, and retrieval constraints when material
+  expected_outputs:
+    - research_report_candidate
+    - source_map
+    - Evidence Pack Candidate or explicit Evidence gap
+
+entry_criteria:
+  - a bounded research question and task scope are available
+  - at least one seed source or admitted discovery route is available
+  - external retrieval and disclosure boundaries are known before following external references
+
+governed_phases:
+  - phase_id: frame
+    purpose: Qualify the question, seed-source scope, freshness needs, and permitted discovery boundary.
+    role_viewpoint: ARGOS
+    expected_input:
+      - research question
+      - seed sources or admitted discovery route
+      - Task Contract constraints
+    expected_output:
+      - bounded research frame
+      - initial Source Leads
+    evidence_expectation:
+      - preserve original source references and source status
+    approval_expectation: C0 read-only analytical work unless the Task Contract declares a higher consequence
+    risk_condition: scope or external-disclosure boundary is unclear
+
+  - phase_id: inspect_and_expand
+    purpose: Inspect seed sources and follow only task-relevant references discovered inside them as bounded Source Leads.
+    role_viewpoint: ARGOS
+    expected_input:
+      - bounded research frame
+      - initial Source Leads
+    expected_output:
+      - inspected source candidates
+      - source-linked Evidence Item candidates
+      - bounded discovered Source Leads
+      - contradiction and uncertainty notes
+    evidence_expectation:
+      - each material claim candidate retains an exact source reference and locator when available
+      - each followed reference preserves provenance from the source in which it was discovered
+      - uninspected references remain leads rather than support
+    approval_expectation: C0 read-only retrieval within the Task Contract
+    risk_condition: reference following would widen scope, disclose unnecessary private context, or become an unbounded crawl
+
+  - phase_id: synthesize
+    purpose: Produce one bounded synthesis that preserves source locality, contradictions, limitations, and unresolved gaps.
+    role_viewpoint: ARGOS
+    expected_input:
+      - inspected source candidates
+      - source-linked Evidence Item candidates
+      - contradictions and uncertainty
+    expected_output:
+      - research_report_candidate
+      - source_map
+      - Evidence Pack Candidate material
+    evidence_expectation:
+      - material findings remain traceable to inspected sources
+      - interpretation and inference remain distinguishable from observed source content
+    approval_expectation: C0 candidate synthesis only
+    risk_condition: summary would hide contradictory, stale, uninspected, or weakly supported material
+
+  - phase_id: validate
+    purpose: Review traceability, source applicability, freshness, contradiction coverage, and research stopping conditions before return.
+    role_viewpoint: APOLLO
+    expected_input:
+      - research_report_candidate
+      - source map and Evidence Pack Candidate material
+    expected_output:
+      - reviewable research candidate
+      - explicit limitations and remaining source gaps
+    evidence_expectation:
+      - material claims are source-traceable or labelled as inference or uncertainty
+      - unresolved reference leads are visible when decision-relevant
+    approval_expectation: C0 review; consequential reliance remains separately gated
+    risk_condition: material source gaps, applicability uncertainty, or unsupported claims remain hidden
+
+role_viewpoints:
+  - ARGOS
+  - APOLLO
+
+task_contract_requirements:
+  - define the bounded research question, scope, and intended use
+  - declare supplied seed sources or the admitted discovery route
+  - bound whether task-relevant references discovered inside inspected sources may be followed
+  - declare freshness, jurisdiction, confidentiality, and external-disclosure limits when material
+  - do not require source content to be copied into a Markdown notebook merely because a link is used
+  - preserve the distinction between linked source access and any separately authorized caching or ingestion
+
+reasoning_topology_requirements:
+  allowed_topologies:
+    - single_primary_reasoning_context
+    - fanout_extract_then_single_synthesis
+  default_topology: fanout_extract_then_single_synthesis
+  topology_selection_policy: Use bounded fan-out when sources can be inspected independently; use one primary context when the decisive inference depends on a connected reference chain or cross-source contradiction.
+  evidence_policy: Extraction returns source-linked Evidence Item candidates; final synthesis must preserve exact source locality and cannot treat worker output or retrieval as truth.
+  handoff_policy: Discovered references are Source Leads, not authorization or Evidence; material claims must not rely on summary-only handoff when the original source can be inspected.
+  synthesis_policy: One bounded synthesis context reconciles inspected sources while preserving contradictions, limitations, and unresolved gaps.
+  approval_policy: C0 is sufficient for read-only analytical research; any higher consequence, external effect, scope expansion, or durable promotion requires the applicable Task Contract and gate.
+  memory_policy: Research outputs, source leads, caches, and summaries do not promote themselves into the Registre Probatoire.
+
+evidence_item_requirements:
+  required_when:
+    - a material finding is supported or contradicted by an inspected source
+  required_fields:
+    - evidence_id
+    - claim
+    - source_type
+    - source_ref
+    - scope_of_support
+    - confidence
+  minimum_items: 1
+  forbidden_substitutes:
+    - uninspected link
+    - search snippet
+    - notebook entry
+    - summary without source locator
+  notes: Evidence Items support review; they are not final conclusions or approval.
+
+evidence_requirements:
+  - preserve exact source references and locators for material claims when available
+  - record source freshness or observation date when material
+  - preserve contradictions, limitations, and unresolved gaps
+  - preserve provenance when a source is reached through a reference discovered in another source
+  - record that uninspected discovered references remain Source Leads
+  - expose when task limits stop further research before uncertainty is resolved
+
+approval_requirements:
+  - C0
+
+allowed_outputs:
+  - research_report_candidate
+  - source_map
+  - source_risk_note
+  - contradiction_note
+  - missing_source_note
+  - uncertainty_note
+  - research_limitation
+  - Evidence Pack Candidate
+
+forbidden_outputs:
+  - unbounded_crawl_result
+  - source_copy_presented_as_original_authority
+  - retrieval_presented_as_Evidence
+  - automatically_promoted_Register_entry
+  - autonomous_external_action
+
+memory_rules:
+  memory_candidates_allowed: false
+  automatic_promotion_allowed: false
+  notes: Research output and discovered source leads remain task-scoped unless a separate governed retention path explicitly accepts a candidate.
+
+risk_notes:
+  - the same URL may expose different content at different observation times
+  - a reference discovered inside a source is a Source Lead, not authorization or support by itself
+  - following references must remain task-relevant and bounded; recursive crawl is not a default behavior
+  - copied, cached, ingested, extracted, or summarized material does not replace the original source identity
+  - stopping research does not mean remaining uncertainty is resolved
+
+completion_criteria:
+  - the research question and scope remain bounded
+  - seed sources and materially used discovered references are attributable
+  - material claims are source-linked or explicitly labelled as inference or uncertainty
+  - contradictions, freshness limitations, and unresolved source gaps are visible
+  - reference expansion stopped within Task Contract bounds rather than becoming an unbounded crawl
+  - the research report candidate and Evidence Pack Candidate material are reviewable
+  - no research output was automatically promoted into Evidence, Decision, Knowledge, or a Registre Probatoire entry
+
+forbidden_runtime_patterns:
+  - execution_engine
+  - scheduler
+  - queue
+  - provider_router
+  - autonomous_research_loop
+  - unbounded_recursive_crawl
+  - automatic_source_ingestion
+  - automatic_memory_promotion
+  - hidden_workflow_runtime
+
+governance_refs:
+  - docs/governance/WORKFLOW_SCHEMA.md
+  - docs/governance/TASK_CONTRACTS.md
+  - docs/governance/EVIDENCE_TOPOLOGY.md
+  - docs/governance/SOURCE_NEED_AND_REGISTRY.md
+  - docs/governance/SOURCE_INGESTION_RETRIEVAL_MODEL.md
+  - docs/governance/EVIDENCE_PACK.md
+  - docs/governance/NON_EQUIVALENCE_RULES.md
