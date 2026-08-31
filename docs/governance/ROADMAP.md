@@ -59,7 +59,7 @@ Current posture:
 - roles, Task Contracts, Evidence, approvals, scope, Knowledge, runtime-memory and Registre Probatoire boundaries are documented;
 - capability placement, external-runtime and client boundaries are explicit;
 - status headers, boundary profiles and non-equivalence rules reduce free-form drift;
-- the remaining work is primarily convergence: reduce duplicated owners, retire stale vocabulary and turn important invariants into existing schemas/tests rather than more prose.
+- the remaining work is primarily convergence: reduce duplicated owners, retire stale vocabulary and turn important invariants into existing schemas and tests rather than more prose.
 
 ### Policy and verification surfaces
 
@@ -72,7 +72,7 @@ Current posture:
 - policy decisions are returned as data and do not execute consequential effects;
 - CI and the Governance Doctor provide structural verification, not adoption or professional validation.
 
-Exact runtime enforcement and deployment observations remain owned by `WHAT_RUNS.md` and the relevant implementation/review artifacts; this roadmap does not restate their fast-moving state.
+Exact runtime enforcement and deployment observations remain owned by `WHAT_RUNS.md` and the relevant implementation and review artifacts; this roadmap does not restate their fast-moving state.
 
 ### Candidate implementation and Cockpit
 
@@ -146,7 +146,7 @@ Exit criteria:
 
 ### R3 — Make consequential boundaries observable and enforceable
 
-Status: active implementation/verification work; exact state belongs to `WHAT_RUNS.md`.
+Status: active implementation and verification work; exact state belongs to `WHAT_RUNS.md`.
 
 Target outcome:
 
