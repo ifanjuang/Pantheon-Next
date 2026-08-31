@@ -20,7 +20,7 @@ added tomorrow inheriting none of it, with no check noticing.
 
 ## Where the review stands
 
-Sixty-one of the ninety-two entry points have been read individually; 31 have
+Sixty-seven of the ninety-two entry points have been read individually; 25 have
 not. The first batches were chosen because nothing in production reached them —
 answerable without unwinding a call graph, and the cheapest end of the backlog
 rather than the most urgent one. From `knowledge.py` onward every entry point is
@@ -989,12 +989,68 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
         ),
     },
     ("hermes_runtime_return.py", "record_external_runtime_return"): _UNREVIEWED,
-    ("source_intake.py", "exclude_source"): _UNREVIEWED,
-    ("source_intake.py", "link_project"): _UNREVIEWED,
-    ("source_intake.py", "restore_source"): _UNREVIEWED,
-    ("source_intake.py", "suggest_projects"): _UNREVIEWED,
-    ("source_intake.py", "unlink_project"): _UNREVIEWED,
-    ("source_intake.py", "update_metadata"): _UNREVIEWED,
+    ("source_intake.py", "exclude_source"): {
+        "gate": "none",
+        "local_guards": ("actor_kind required, no default, Hermes refused by name", "row lock", "expected_revision checked on the read and repeated in the UPDATE WHERE", "rowcount == 1", "idempotency with payload digest", "event carries a result snapshot", "reversible by restore_source"),
+        "reviewed": (
+            "Marks a Source excluded from project work. It withdraws material "
+            "from consideration rather than admitting any, and it is reversible: "
+            "`restore_source` exists and refuses anything that is not excluded. "
+            "The row is not deleted and the exclusion is an event."
+        ),
+    },
+    ("source_intake.py", "link_project"): {
+        "gate": "none",
+        "local_guards": ("actor_kind required, no default, Hermes refused by name", "row lock", "expected_revision checked on the read and repeated in the UPDATE WHERE", "rowcount == 1", "idempotency with payload digest", "event carries a result snapshot", "link status set alongside the project id"),
+        "reviewed": (
+            "Attaches a Source to a Project. `workspace folder != governed "
+            "identity` is the neighbouring invariant and it holds here too: a "
+            "link says which Project a Source belongs to, not that anything in it "
+            "has been admitted."
+        ),
+    },
+    ("source_intake.py", "restore_source"): {
+        "gate": "none",
+        "local_guards": ("actor_kind required, no default, Hermes refused by name", "row lock", "expected_revision checked on the read and repeated in the UPDATE WHERE", "rowcount == 1", "idempotency with payload digest", "event carries a result snapshot", "refuses any Source that is not excluded", "restores to unassigned, not to the previous project"),
+        "reviewed": (
+            "Undoes an exclusion. Worth noting what it does not do: it returns "
+            "the Source to `unassigned` with a null project, not to whatever "
+            "project it had before. Restoring does not re-establish a link that "
+            "a human has to make again."
+        ),
+    },
+    ("source_intake.py", "suggest_projects"): {
+        "gate": "none",
+        "local_guards": ("actor_kind required, no default, Hermes refused by name", "row lock", "expected_revision checked on the read and repeated in the UPDATE WHERE", "rowcount == 1", "idempotency with payload digest", "event carries a result snapshot", "candidates written to a suggestion column, not to project_id"),
+        "reviewed": (
+            "Records candidate Projects for a Source. The suggestion lands in its "
+            "own column and does not touch `project_id` or "
+            "`project_link_status`, so a suggestion cannot become a link by "
+            "being written. `retrieved data != truth`, kept structurally."
+        ),
+    },
+    ("source_intake.py", "unlink_project"): {
+        "gate": "none",
+        "local_guards": ("actor_kind required, no default, Hermes refused by name", "row lock", "expected_revision checked on the read and repeated in the UPDATE WHERE", "rowcount == 1", "idempotency with payload digest", "event carries a result snapshot", "clears the project id and the link status together"),
+        "reviewed": (
+            "Detaches a Source from its Project, clearing `project_id` and "
+            "setting `project_link_status` to `unassigned` in the same "
+            "assignment, so the two cannot disagree."
+        ),
+    },
+    ("source_intake.py", "update_metadata"): {
+        "gate": "none",
+        "local_guards": ("actor_kind required, no default, Hermes refused by name", "row lock", "expected_revision checked on the read and repeated in the UPDATE WHERE", "rowcount == 1", "idempotency with payload digest", "event carries a result snapshot", "field allowlist checked against METADATA_FIELDS", "at least one change required", "checksum must be a 64-character hexadecimal digest"),
+        "reviewed": (
+            "Edits Source metadata behind a real allowlist — unknown fields are "
+            "named in the error rather than silently dropped — and validates a "
+            "supplied checksum as a SHA-256 digest by length and alphabet. That "
+            "is a format check, not a verification: nothing recomputes the digest "
+            "from the bytes, so it records what the intaker asserted. The field "
+            "is named `checksum` rather than something that claims verification, "
+            "which is the naming this review has twice recorded the absence of."
+        ),
+    },
     ("apu_mapping_converter.py", "convert_and_store"): _UNREVIEWED,
     ("cli.py", "main"): _UNREVIEWED,
     ("human_revision_upload.py", "upload_revision"): _UNREVIEWED,
@@ -1318,14 +1374,14 @@ def test_the_unreviewed_debt_is_visible_and_does_not_grow() -> None:
 
     The widened net enumerated 64 entry points that had not been read
     individually. The net was widened in the tenth batch and found 13 more, so
-    the enumerated total is 92; 61 are read and 31 are not. Reviewing one means
+    the enumerated total is 92; 67 are read and 25 are not. Reviewing one means
     replacing `_UNREVIEWED` with its real guard regime and the reasoning behind
     it. This bound exists so the debt shrinks deliberately and cannot quietly
     grow.
     """
     unreviewed = [key for key, record in INVENTORY.items() if record["gate"] == "unreviewed"]
-    assert len(unreviewed) <= 31, (
-        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 31. A new "
+    assert len(unreviewed) <= 25, (
+        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 25. A new "
         "mutation entry point must be reviewed, not added to the backlog."
     )
 
