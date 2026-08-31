@@ -20,7 +20,7 @@ added tomorrow inheriting none of it, with no check noticing.
 
 ## Where the review stands
 
-Fifty-seven of the eighty-five entry points have been read individually; 28 have
+Sixty-one of the ninety-two entry points have been read individually; 31 have
 not. The first batches were chosen because nothing in production reached them —
 answerable without unwinding a call graph, and the cheapest end of the backlog
 rather than the most urgent one. From `knowledge.py` onward every entry point is
@@ -64,6 +64,29 @@ require `rowcount == 1`. On a genuine first write exactly one racer's INSERT
 succeeds; the loser conflicts, its guarded UPDATE matches nothing, and it fails
 as stale instead of overwriting.
 
+## Where the actor label is strongest, and what that still is not
+
+Six modules record an actor nobody verified. `entity_relations` is where this
+codebase pushes hardest against that, and reading it clarifies the whole axis.
+
+```text
+agency_classification   _validate_actor, defaulted        a caller omits it and passes
+agency_information      actor_kind literal at the route   body-proof, module still trusts it
+execution_results       trigger: claim needs a human      a second Python caller cannot pass
+entity_relations        CHECK: only a proposal may be     no row can say Hermes canonized
+                        attributed to a non-human
+```
+
+The last is the strongest form available, and it is worth being exact about
+what it buys. None of these verifies that the label is true: a caller
+presenting `human` passes every one of them. What the constraint guarantees is
+that the audit trail can never hold the contradiction — no stored row can say
+Hermes canonized a relation.
+
+That is internal consistency of the record. It is real, it is rare, and it is
+not the same as knowing who acted. `canonize_relation`'s docstring says "Hermes
+cannot reach this"; what holds is "no record can say Hermes reached this".
+
 ## The net was under-counting, and it under-counted the worst cases
 
 The tenth batch found this by accident, reading `work_issues.py`:
@@ -88,8 +111,20 @@ apu_cross_family.create_decision_request
 ```
 
 Thirteen entry points, and the miss was not random: it fell on functions whose
-names are verbs of consequence. A third signal now catches them — a public
-function that calls a private same-module helper whose body writes.
+names are verbs of consequence. A third signal now catches them: discovery follows calls, so a public function
+counts if a write is reachable from it through any chain of named functions,
+across modules included.
+
+That signal was itself wrong twice before it was right, which is worth keeping.
+The first version intersected each function's calls with *private* helpers in
+its own module, and still missed `create_scoped_issue` — the entry point of
+`POST /work/issues`, which delegates to two *public* functions in another
+module. The second version walked whole subtrees and caught every
+`install_*_routes` and `create_app` in the package, because those *define*
+route handlers that call writers rather than calling writers themselves:
+eighteen wiring functions, the opposite failure and just as useless. The net
+that holds counts a function's own calls, nested definitions excluded, and
+follows them to a fixpoint.
 
 Worth being precise about how this instrument failed, because it is the same
 failure it exists to find. Two tests guarded discovery: one asserts every
@@ -911,9 +946,48 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     ("storage_retention.py", "retain_document_version"): _UNREVIEWED,
     ("store.py", "ingest"): _UNREVIEWED,
     ("apu_cross_family.py", "create_decision_request"): _UNREVIEWED,
-    ("entity_relations.py", "canonize_relation"): _UNREVIEWED,
-    ("entity_relations.py", "reject_relation"): _UNREVIEWED,
-    ("entity_relations.py", "retire_relation"): _UNREVIEWED,
+    ("entity_relations.py", "canonize_relation"): {
+        "gate": "none",
+        "local_guards": ("separate route with the editor key and a human actor", "actor_kind literal at the route", "_actor refuses any kind but human, no default", "relation locked", "status must be proposed", "expected_revision", "idempotency with payload digest", "a CHECK constraint refuses a non-human actor_kind on any event that is not a proposal"),
+        "reviewed": (
+            "The act the doctrine names, and the most layered guard in this "
+            "codebase. The route is separate from the Hermes proposal route and "
+            "passes `actor_kind=\"human\"` as a literal; `_actor(..., "
+            "proposing=False)` accepts only `human` and has no default; and "
+            "`agency_entity_relation_events_hermes_proposes_only` — "
+            "`CHECK (actor_kind = 'human' OR event_type = 'relation_proposed')` — "
+            "refuses to store any other event kind attributed to Hermes. "
+            "Worth being exact about what that buys, because the docstring says "
+            "'Hermes cannot reach this' and that is not quite the property. None "
+            "of the three layers verifies that the label is true; a caller "
+            "presenting `human` passes all of them. What the constraint "
+            "guarantees is that the audit trail can never contain the "
+            "contradiction: no row can say Hermes canonized anything. That is "
+            "internal consistency of the record, which is real and rare — and it "
+            "is not the same as knowing who acted."
+        ),
+    },
+    ("entity_relations.py", "reject_relation"): {
+        "gate": "none",
+        "local_guards": ("same three layers as canonize_relation", "status must be proposed", "closes the relation and frees the edge", "expected_revision", "idempotency with payload digest"),
+        "reviewed": (
+            "Refuses a proposal, which is safety-increasing, and shares "
+            "`_decide` with canonization and retirement so the optimistic lock, "
+            "the replay check and the audit record are identical across all "
+            "three. The source says why that matters: a reader of the history is "
+            "entitled to assume the three decisions were recorded the same way."
+        ),
+    },
+    ("entity_relations.py", "retire_relation"): {
+        "gate": "none",
+        "local_guards": ("same three layers as canonize_relation", "status must be canonical", "retires rather than deletes", "records retired_by and retired_at", "expected_revision", "idempotency with payload digest"),
+        "reviewed": (
+            "Withdraws a relation that had been made canonical. It moves the row "
+            "to `retired` and stamps `retired_by`, rather than deleting: the "
+            "relation that was once true stays readable as having been true and "
+            "withdrawn."
+        ),
+    },
     ("hermes_runtime_return.py", "record_external_runtime_return"): _UNREVIEWED,
     ("source_intake.py", "exclude_source"): _UNREVIEWED,
     ("source_intake.py", "link_project"): _UNREVIEWED,
@@ -921,6 +995,26 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     ("source_intake.py", "suggest_projects"): _UNREVIEWED,
     ("source_intake.py", "unlink_project"): _UNREVIEWED,
     ("source_intake.py", "update_metadata"): _UNREVIEWED,
+    ("apu_mapping_converter.py", "convert_and_store"): _UNREVIEWED,
+    ("cli.py", "main"): _UNREVIEWED,
+    ("human_revision_upload.py", "upload_revision"): _UNREVIEWED,
+    ("project_change_variants.py", "select_variant_for_change_candidate"): _UNREVIEWED,
+    ("project_claim_candidates.py", "create_claim_from_candidate"): _UNREVIEWED,
+    ("store.py", "intake_document"): _UNREVIEWED,
+    ("work_issue_scopes.py", "create_scoped_issue"): {
+        "gate": "none",
+        "local_guards": ("at least one scope", "exactly one primary scope", "duplicate endpoints refused", "scope vocabularies", "issue and every scope written in one transaction", "idempotency", "scope endpoints validated by a trigger"),
+        "reviewed": (
+            "Found only after the discovery closure was made transitive: it "
+            "delegates to `work_issues.create_issue` and `add_scope`, both "
+            "public and one of them in another module, so the one-hop signal "
+            "never saw it — and it is the entry point of `POST /work/issues`. "
+            "The composition is what it should be: the issue and all its scopes "
+            "commit together, exactly one scope is primary, duplicate endpoints "
+            "are refused, and the two functions it calls carry their own "
+            "reviewed guards."
+        ),
+    },
     ("work_issue_scopes.py", "add_scope"): {
         "gate": "none",
         "local_guards": ("scope type and role vocabularies", "issue locked", "expected_version", "idempotency keyed on event type and payload", "event records the link"),
@@ -1035,41 +1129,92 @@ def _writes_durable_state(node: ast.AST) -> bool:
     )
 
 
-def _private_writers(tree: ast.Module) -> set[str]:
-    """Names of same-module helpers whose own body writes durable state."""
-    return {
-        node.name
-        for node in tree.body
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
-        and node.name.startswith("_")
-        and _writes_durable_state(node)
-    }
+def _own_calls(node: ast.AST) -> tuple[set[str], set[tuple[str, str]]]:
+    """This function's own calls: bare names and `module.attr`, nested defs excluded.
+
+    Excluding nested bodies is what separates a delegator from a wiring
+    function. `install_*_routes` and `create_app` *define* route handlers that
+    call writers; they do not call them. Walking into those bodies made every
+    installer in the package look like a mutation entry point — eighteen of
+    them — which is the opposite failure to the one this signal was added for,
+    and just as useless.
+    """
+    bare: set[str] = set()
+    qualified: set[tuple[str, str]] = set()
+    stack = list(ast.iter_child_nodes(node))
+    while stack:
+        child = stack.pop()
+        if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)):
+            continue
+        if isinstance(child, ast.Call):
+            func = child.func
+            if isinstance(func, ast.Name):
+                bare.add(func.id)
+            elif isinstance(func, ast.Attribute) and isinstance(func.value, ast.Name):
+                qualified.add((func.value.id, func.attr))
+        stack.extend(ast.iter_child_nodes(child))
+    return bare, qualified
 
 
-def _calls(node: ast.AST) -> set[str]:
-    return {
-        child.func.id
-        for child in ast.walk(node)
-        if isinstance(child, ast.Call) and isinstance(child.func, ast.Name)
+def _module_functions() -> dict[str, dict[str, ast.AST]]:
+    """Every module-level function under mvp_vertical, keyed by module stem."""
+    out: dict[str, dict[str, ast.AST]] = {}
+    for path in sorted(MVP.rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        out[path.stem] = {
+            node.name: node
+            for node in tree.body
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        }
+    return out
+
+
+def _writer_closure(modules: dict[str, dict[str, ast.AST]]) -> set[tuple[str, str]]:
+    """(module, function) pairs that write, directly or through any call chain.
+
+    A first version of this intersected each function's calls with *private*
+    helpers in its own module. That missed `create_scoped_issue`, the entry
+    point of a live route, because it delegates to two *public* functions in
+    another module. Discovery is not a one-hop question: a mutation entry point
+    is any public function from which a write is reachable, however many named
+    functions lie between it and the SQL.
+    """
+    writers = {
+        (mod, name)
+        for mod, funcs in modules.items()
+        for name, node in funcs.items()
+        if _writes_durable_state(node)
     }
+    changed = True
+    while changed:
+        changed = False
+        for mod, funcs in modules.items():
+            for name, node in funcs.items():
+                if (mod, name) in writers:
+                    continue
+                bare, qualified = _own_calls(node)
+                if any((mod, callee) in writers for callee in bare) or any(
+                    (other, attr) in writers for other, attr in qualified
+                ):
+                    writers.add((mod, name))
+                    changed = True
+    return writers
 
 
 def _discovered() -> set[tuple[str, str]]:
     """Return every public mutation entry point the net can see under mvp_vertical."""
+    modules = _module_functions()
+    writers = _writer_closure(modules)
     found: set[tuple[str, str]] = set()
     for path in sorted(MVP.rglob("*.py")):
-        tree = ast.parse(path.read_text(encoding="utf-8"))
-        writers = _private_writers(tree)
-        for node in tree.body:
-            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        for name in modules[path.stem]:
+            if name.startswith("_"):
                 continue
-            if node.name.startswith("_"):
-                continue
-            by_verb = node.name.split("_")[0] in MUTATION_PREFIXES
-            by_delegation = bool(_calls(node) & writers)
-            if by_verb or _writes_durable_state(node) or by_delegation:
-                found.add((str(path.relative_to(MVP)), node.name))
+            by_verb = name.split("_")[0] in MUTATION_PREFIXES
+            if by_verb or (path.stem, name) in writers:
+                found.add((str(path.relative_to(MVP)), name))
     return found
+
 
 
 def test_every_mutation_entry_point_is_declared() -> None:
@@ -1173,20 +1318,20 @@ def test_the_unreviewed_debt_is_visible_and_does_not_grow() -> None:
 
     The widened net enumerated 64 entry points that had not been read
     individually. The net was widened in the tenth batch and found 13 more, so
-    the enumerated total is 85; 57 are read and 28 are not. Reviewing one means
+    the enumerated total is 92; 61 are read and 31 are not. Reviewing one means
     replacing `_UNREVIEWED` with its real guard regime and the reasoning behind
     it. This bound exists so the debt shrinks deliberately and cannot quietly
     grow.
     """
     unreviewed = [key for key, record in INVENTORY.items() if record["gate"] == "unreviewed"]
-    assert len(unreviewed) <= 28, (
-        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 28. A new "
+    assert len(unreviewed) <= 31, (
+        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 31. A new "
         "mutation entry point must be reviewed, not added to the backlog."
     )
 
 
 def test_discovery_is_not_vacuous() -> None:
-    assert len(_discovered()) >= 84
+    assert len(_discovered()) >= 91
 
 
 def _claimed_covered() -> set[tuple[str, str]]:
