@@ -20,7 +20,7 @@ added tomorrow inheriting none of it, with no check noticing.
 
 ## Where the review stands
 
-Sixty-seven of the ninety-two entry points have been read individually; 25 have
+Seventy-one of the ninety-two entry points have been read individually; 21 have
 not. The first batches were chosen because nothing in production reached them —
 answerable without unwinding a call graph, and the cheapest end of the backlog
 rather than the most urgent one. From `knowledge.py` onward every entry point is
@@ -303,7 +303,23 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("agency_change_candidates.py", "create_project_candidate"): _UNREVIEWED,
     ("agency_change_candidates.py", "reject_project_candidate"): _UNREVIEWED,
-    ("agency_claims.py", "record_claim"): _UNREVIEWED,
+    ("agency_claims.py", "record_claim"): {
+        "gate": "none",
+        "local_guards": ("status and certainty constrained by CHECK constraints", "value must match the reviewed candidate, enforced by a trigger", "backing_ref must be one of the candidate basis_refs, enforced by a trigger", "APU backing must belong to the Claim's Project", "append-only with supersedes"),
+        "reviewed": (
+            "Its docstring states the boundary — 'records an assertion; it "
+            "approves nothing' — and `status`, `certainty` and the rest arrive "
+            "from the caller with defaults. What holds them is below Python and "
+            "unusually strong: `agency_project_claims` carries CHECK constraints "
+            "on the status vocabulary and triggers that validate content rather "
+            "than labels. A claim derived from a candidate must carry the "
+            "reviewed candidate's value, its `backing_ref` must be one of that "
+            "candidate's `basis_refs`, and an APU backing must belong to the "
+            "Claim's own Project. Everywhere else in this review the below-Python "
+            "guards check a vocabulary; here they check that the assertion "
+            "matches what it claims to be derived from."
+        ),
+    },
     ("agency_classification.py", "archive_category"): {
         "gate": "none",
         "local_guards": (
@@ -433,7 +449,17 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "production because `hermes_admitted` is a parameter no route passes."
         ),
     },
-    ("apu_mapping_reviews.py", "append_mapping_review"): _UNREVIEWED,
+    ("apu_mapping_reviews.py", "append_mapping_review"): {
+        "gate": "none",
+        "local_guards": ("action vocabulary", "the mapping candidate must exist in that execution result", "select_existing_object requires a selected ref", "append-only", "idempotency"),
+        "reviewed": (
+            "Records a human review of one Hermes mapping candidate. It reads the "
+            "execution result and refuses a mapping_ref that is not in it, so a "
+            "review cannot be recorded against a mapping that was never produced. "
+            "Its output is what `prepare_write_command` later reads for the "
+            "target, which is why that function does not need to accept one."
+        ),
+    },
     ("apu_owner.py", "apply_source_match"): {
         "gate": "none",
         "local_guards": ("prior authorization id", "exact command shape", "idempotency"),
@@ -461,15 +487,49 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "the prior review is verifiable or the write is routed through the gate."
         ),
     },
-    ("apu_write_preparation.py", "append_authorization"): _UNREVIEWED,
-    ("apu_write_preparation.py", "apply_authorized_write_command"): {
+    ("apu_write_preparation.py", "append_authorization"): {
         "gate": "none",
-        "local_guards": ("reviewed command chain", "stored index vs embedded effect", "owner and object revision freshness", "idempotency"),
+        "local_guards": ("action vocabulary", "command payload revalidated", "authorization bound to the command payload digest", "append-only event", "idempotency with payload digest"),
         "reviewed": (
-            "The strongest local chain in the inventory: the command must already be reviewed, its stored index must agree with the embedded effect, and both owner and object revision must still be fresh. Freshness is what makes replay safe here."
+            "Records a human authorization, or a rejection, of a prepared "
+            "command. The row it writes carries `command_payload_digest` taken "
+            "from the stored command, and `apply_authorized_write_command` "
+            "refuses to act unless that digest still equals the command being "
+            "applied. This is the one place in the codebase where an approval is "
+            "a first-class stored object bound to the content it approves, rather "
+            "than a reference someone supplied."
         ),
     },
-    ("apu_write_preparation.py", "prepare_write_command"): _UNREVIEWED,
+    ("apu_write_preparation.py", "apply_authorized_write_command"): {
+        "gate": "none",
+        "local_guards": ("reviewed command chain", "latest authorization must be authorize_application", "authorization must cover the exact command payload digest", "stored index vs embedded effect", "owner and object revision freshness", "idempotency"),
+        "reviewed": (
+            "The strongest local chain in the inventory, and this record "
+            "understated why. Beyond the reviewed command, the stored index "
+            "agreeing with the embedded effect and both revisions still being "
+            "fresh, `_latest_application_authorization` requires that the most "
+            "recent authorization is `authorize_application` — so a later "
+            "rejection blocks the apply — and that its "
+            "`command_payload_digest` equals the command's own. An "
+            "authorization here covers a specific content, not a name. That is "
+            "what the eight `gate_required_not_wired` entries lack: they accept "
+            "a claim that a decision happened, while this one refuses to act "
+            "unless the recorded decision covers the bytes being applied."
+        ),
+    },
+    ("apu_write_preparation.py", "prepare_write_command"): {
+        "gate": "none",
+        "local_guards": ("target taken from the latest selected review, not from the caller", "selected object must still be among the mapping candidates", "target APU object must exist and not be retired", "owner and object revisions captured into the command", "stable command id derived from the whole chain", "idempotency"),
+        "reviewed": (
+            "Builds the command a human will later authorize. It does not accept "
+            "the target: it reads the latest selected mapping review and takes "
+            "`selected_stable_object_ref` from there, then refuses if that object "
+            "is no longer among the mapping's candidates or has been retired. The "
+            "command id is derived from the execution result, the result and "
+            "mapping refs and the review id, so the same chain always produces the "
+            "same command."
+        ),
+    },
     ("contradictory_review_store.py", "persist_candidate"): _UNREVIEWED,
     ("decision_requests.py", "cancel_request"): {
         "gate": "none",
@@ -1374,14 +1434,14 @@ def test_the_unreviewed_debt_is_visible_and_does_not_grow() -> None:
 
     The widened net enumerated 64 entry points that had not been read
     individually. The net was widened in the tenth batch and found 13 more, so
-    the enumerated total is 92; 67 are read and 25 are not. Reviewing one means
+    the enumerated total is 92; 71 are read and 21 are not. Reviewing one means
     replacing `_UNREVIEWED` with its real guard regime and the reasoning behind
     it. This bound exists so the debt shrinks deliberately and cannot quietly
     grow.
     """
     unreviewed = [key for key, record in INVENTORY.items() if record["gate"] == "unreviewed"]
-    assert len(unreviewed) <= 25, (
-        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 25. A new "
+    assert len(unreviewed) <= 21, (
+        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 21. A new "
         "mutation entry point must be reviewed, not added to the backlog."
     )
 

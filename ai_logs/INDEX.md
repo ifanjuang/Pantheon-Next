@@ -14,7 +14,7 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **868**.
+Total indexed entries: **869**.
 
 | Date | Log | Subject |
 |---|---|---|
@@ -33,6 +33,7 @@ Total indexed entries: **868**.
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-edit-variants.md` | Mutation review: the A/B edit variant review |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-decision-requests.md` | Mutation review: the Decision Request inbox |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-classification-cluster.md` | The agency_classification cluster, and two attribution mechanisms |
+| 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-apu-write-authorization.md` | Mutation review: APU write authorization and governed Claims |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-agency-information.md` | Mutation review: the Agency Information series |
 | 2026-08-31 | `2026/Q3/2026-08-31-former-mvp-retirement-audit.md` | 2026-08-31 — former pantheon-mvp retirement audit |
 | 2026-08-31 | `2026/Q3/2026-08-31-external-pin-freshness-observation.md` | 2026-08-31 — external pin freshness observation |
