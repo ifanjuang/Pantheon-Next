@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 
 from mvp_vertical import knowledge_update
 from mvp_vertical.cockpit_shell import create_cockpit_app
+from mvp_vertical.policy_gate import StandInPolicyClient
 
 
 class _Connection:
@@ -87,11 +88,13 @@ def test_update_apply_passes_only_exact_confirmed_effect(monkeypatch) -> None:
         return {"status": "applied", "knowledge": {"version": 3}}
 
     monkeypatch.setattr(knowledge_update, "apply_knowledge_update", apply)
+    policy_client = StandInPolicyClient()
     client = TestClient(
         create_cockpit_app(
             connect_fn=_Connection,
             editor_api_key="edit-key",
             update_signing_secret="server-signing-secret",
+            policy_client=policy_client,
         )
     )
     response = client.post(
@@ -119,6 +122,7 @@ def test_update_apply_passes_only_exact_confirmed_effect(monkeypatch) -> None:
         "knowledge_id": "knowledge.coverage",
         "actor": "ifan.juang",
         "signing_secret": "server-signing-secret",
+        "policy_client": policy_client,
         "proposed_markdown": "# Updated",
         "expected_version": 2,
         "review_status": "needs_review",
@@ -128,6 +132,9 @@ def test_update_apply_passes_only_exact_confirmed_effect(monkeypatch) -> None:
         "confirmation_phrase": "CONFIRMER UPDATE",
         "idempotency_key": "knowledge-update-0001",
     }
+    # The configured decision point reaches the effect function itself. Until
+    # this branch, `policy_client` had no non-test caller and this key was absent.
+    assert observed["policy_client"] is policy_client
 
 
 def test_expired_confirmation_maps_to_gone(monkeypatch) -> None:
@@ -140,6 +147,9 @@ def test_expired_confirmation_maps_to_gone(monkeypatch) -> None:
             connect_fn=_Connection,
             editor_api_key="edit-key",
             update_signing_secret="server-signing-secret",
+            # This test covers error translation, not admission. The bypass is
+            # named rather than inherited from an unconfigured decision point.
+            policy_enforcement="disabled",
         )
     )
     response = client.post(

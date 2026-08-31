@@ -50,6 +50,19 @@ def test_release_lock_has_no_floating_latest_and_preserves_qualified_livesync_re
     assert f"RELEASE_LIVESYNC_REF={livesync['ref']}" in text
     assert f"RELEASE_COUCHDB_IMAGE={couchdb['image']}:{couchdb['version']}" in text
 
+    # The Hindsight image and the LiveSync CLI image were unguarded, and the
+    # deployment target had already drifted ahead of its qualification: the
+    # release lock carried a newer Hindsight image than the registry pinned. A
+    # deployment target ahead of the qualification that is supposed to justify
+    # it is the same class of gap in the other direction. Versions are read from
+    # the registry here and never restated, so this guard cannot itself drift.
+    #
+    #     deployment target != qualified artifact
+    hindsight = _pin("hindsight")
+    livesync_cli = _pin("self-hosted-livesync-cli")
+    assert f"RELEASE_HINDSIGHT_IMAGE={hindsight['image']}:{hindsight['version']}" in text
+    assert f"livesync-cli:{livesync_cli['version']}" in text
+
 
 def test_updater_never_follows_main_or_silently_updates_stateful_services() -> None:
     text = _text(UPDATE)

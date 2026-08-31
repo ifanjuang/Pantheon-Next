@@ -18,7 +18,7 @@
       "kind": "container",
       "env_prefix": "HINDSIGHT",
       "image": "ghcr.io/vectorize-io/hindsight",
-      "version": "0.9.1",
+      "version": "0.9.2",
       "digest": null
     },
     "hindsight-obsidian-sync": {
@@ -35,8 +35,8 @@
       "kind": "git",
       "env_prefix": "LIVESYNC",
       "repository": "vrtmrz/obsidian-livesync",
-      "version": "1.0.18",
-      "ref": "32e827692f1a552cd581de9da45cecd0711573d3",
+      "version": "1.0.21",
+      "ref": "f5f7aab11f03f62c6946d2fa296c50bb5df5b2a4",
       "aliases": {
         "ref": ["LIVESYNC_COMMIT"]
       }
@@ -45,7 +45,7 @@
       "kind": "package",
       "env_prefix": "LIVESYNC_CLI",
       "package": "self-hosted-livesync-cli",
-      "version": "1.0.18-cli",
+      "version": "1.0.21-cli",
       "source_pin": "self-hosted-livesync"
     },
     "obsidian-desktop": {
@@ -65,7 +65,7 @@
       "kind": "container",
       "env_prefix": "COUCHDB",
       "image": "couchdb",
-      "version": "3.5.0",
+      "version": "3.5.2",
       "digest": null
     },
     "mnemosyne-memory": {
