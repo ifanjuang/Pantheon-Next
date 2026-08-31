@@ -6,7 +6,7 @@ This document defines how external systems that store, recall, rank, summarize, 
 
 It does not implement a runtime, memory backend, graph database, vector store, checkpoint engine, observability backend, MCP server, connector, schema, test, operation, platform component, Docker service, approval engine or automatic memory promotion.
 
-Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: external runtime-memory systems remain runtime-side capabilities, optional compatible clients may expose runtime interaction, Pantheon Cockpit projects governed memory/evidence status, and neither retrieval nor client selection transfers Pantheon authority.
+Runtime/client/authority placement is inherited from `HERMES_INTEGRATION.md`: external runtime-memory systems remain runtime-side capabilities, optional compatible clients may expose runtime interaction, Pantheon Cockpit projects governed memory/Evidence status, and neither retrieval nor client selection transfers Pantheon authority.
 
 ## Purpose
 
@@ -19,7 +19,7 @@ If this is not governed, runtime convenience can quietly become:
 ```text
 truth
 memory
-evidence
+Evidence
 approval
 scope
 authorization
@@ -75,7 +75,7 @@ allowed candidate outputs
 forbidden outputs
 scope discipline
 memory promotion rules
-evidence expectations
+Evidence expectations
 review gates
 approval thresholds
 failure handling
@@ -319,11 +319,11 @@ summary must not hide missing sources
 
 A retrieved memory is not proof.
 
-A retrieved memory may become evidence only when selected, represented and reviewed inside an Evidence Pack.
+A retrieved memory may become Evidence only when selected, represented and reviewed inside an Evidence Pack.
 
 ## Promotion discipline
 
-Only Pantheon governance and the relevant human decision can promote memory.
+Only the applicable Pantheon governance path and relevant human decision can promote durable governed memory.
 
 An adapter must not promote memory because of:
 
@@ -430,18 +430,18 @@ The queue may order the review. It does not validate the answer.
 
 ## Request Lifecycle relation
 
-During request lifecycle work, external runtime memory may support:
+During request lifecycle work, external runtime memory may support existing owners with candidate material such as:
 
 ```text
-MÈTIS comprehension with scoped prior context
-Cerbère admission / reconfirmation signals
-Charon archival candidates
-Zeus status arbitration with evidence references
+MNEMOSYNE continuity framing with scoped prior context
+ARGOS source/provenance challenge when recalled material must support a claim
+MEMORY / Register-owner reconfirmation or retention candidates
+ZEUS status/procedure arbitration with Evidence references when conflict remains
 ```
 
-But the adapter itself is not MÈTIS, Cerbère, Charon or Zeus.
+The adapter itself is not a Pantheon Role, memory authority, Evidence authority, approval authority or persistence authority.
 
-It supplies material. It does not exercise the role.
+It supplies scoped material and observations. The canonical Role registry remains `AGENTS.md`; durable-retention semantics remain with `MEMORY.md`, Register contracts and applicable approval owners.
 
 ## Failure modes
 
