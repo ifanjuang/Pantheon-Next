@@ -60,9 +60,13 @@ python -m pytest -q
 `mcp-server/` remains the bounded governance-side Python distribution:
 
 ```bash
-python -m pip install "mcp-server/.[test]"
+python -m pip install -e "mcp-server/.[test]"
 python -m unittest discover -s mcp-server/tests -v
 ```
+
+The install is editable, matching what Governance CI runs. A non-editable
+install resolves `pantheon_mcp` from a copy in `site-packages`, so the suite
+silently tests a snapshot rather than the working tree.
 
 `implementation/` is a separate Python project containing the executable candidate implementation imported from `pantheon-mvp`:
 

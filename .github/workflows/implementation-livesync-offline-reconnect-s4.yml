@@ -6,6 +6,7 @@ on:
       - ".github/workflows/implementation-livesync-offline-reconnect-s4.yml"
       - "implementation/qualification/external-pins.json"
       - "implementation/tools/export_external_qualification_pins.py"
+      - "implementation/tools/obsidian_e2e_with_flake_report.sh"
       - "implementation/labs/livesync/pantheon-offline-reconnect-s4.ts"
       - "tests/test_livesync_offline_reconnect_s4_contract.py"
   workflow_dispatch:
@@ -88,7 +89,13 @@ jobs:
       - name: Run real Obsidian CouchDB outage and reconnect scenario
         working-directory: obsidian-livesync
         shell: bash
-        run: xvfb-run -a npx tsx test/e2e-obsidian/scripts/pantheon-offline-reconnect-s4.ts
+        # One bounded retry around the shared upstream session-start wait.
+        # The scenario runs in full and must pass; a real regression fails
+        # both attempts. A first-attempt failure is always written to the run
+        # summary, so the flake stays countable instead of silently absorbed.
+        run: >-
+          "$GITHUB_WORKSPACE/implementation/tools/obsidian_e2e_with_flake_report.sh"
+          xvfb-run -a npx tsx test/e2e-obsidian/scripts/pantheon-offline-reconnect-s4.ts
 
       - name: Capture bounded acceptance summary
         if: success()

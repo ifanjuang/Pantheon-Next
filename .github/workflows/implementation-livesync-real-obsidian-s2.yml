@@ -6,6 +6,7 @@ on:
       - ".github/workflows/implementation-livesync-real-obsidian-s2.yml"
       - "implementation/qualification/external-pins.json"
       - "implementation/tools/export_external_qualification_pins.py"
+      - "implementation/tools/obsidian_e2e_with_flake_report.sh"
       - "tests/test_livesync_real_obsidian_s2_contract.py"
   workflow_dispatch:
 
@@ -81,7 +82,13 @@ jobs:
       - name: Run upstream CLI-to-real-Obsidian compatibility scenario
         working-directory: obsidian-livesync
         shell: bash
-        run: xvfb-run -a npm run test:e2e:obsidian:focused -- cli-to-obsidian-sync
+        # One bounded retry around the shared upstream session-start wait.
+        # The scenario runs in full and must pass; a real regression fails
+        # both attempts. A first-attempt failure is always written to the run
+        # summary, so the flake stays countable instead of silently absorbed.
+        run: >-
+          "$GITHUB_WORKSPACE/monorepo/implementation/tools/obsidian_e2e_with_flake_report.sh"
+          xvfb-run -a npm run test:e2e:obsidian:focused -- cli-to-obsidian-sync
 
       - name: Capture bounded acceptance summary
         if: success()
