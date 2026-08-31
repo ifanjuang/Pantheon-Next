@@ -64,6 +64,11 @@ class KnowledgeUpdateApplyBody(KnowledgeUpdatePreviewBody):
     confirmation_expires_at: int = Field(ge=1)
     confirmation_phrase: str = Field(min_length=1, max_length=100)
     idempotency_key: str = Field(min_length=8, max_length=200)
+    task_contract_ref: str | None = Field(default=None, min_length=2, max_length=500)
+    evidence_pack_candidate_ref: str | None = Field(
+        default=None, min_length=2, max_length=500
+    )
+    human_decision_ref: str | None = Field(default=None, min_length=2, max_length=500)
 
 
 class StructureSiteScopeBody(BaseModel):
@@ -299,6 +304,8 @@ def create_cockpit_app(
             return with_connection(operation)
         except knowledge.KnowledgeNotFound as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except knowledge_update.KnowledgeUpdatePolicyUnavailable as exc:
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
         except knowledge_update.KnowledgeUpdateExpired as exc:
             raise HTTPException(status_code=410, detail=str(exc)) from exc
         except (knowledge.StaleKnowledgeWrite, knowledge.IdempotencyConflict) as exc:
@@ -463,7 +470,9 @@ def create_cockpit_app(
 
         The policy dependency resolves before the body is touched, so an
         unconfigured decision point refuses the request rather than reaching the
-        signed-preview checks and the database.
+        signed-preview checks and the database. When enforcement is active, the
+        body also carries the ordinary caller-provided Task Contract, Evidence
+        candidate and human-decision references required by the current PDP.
         """
         return knowledge_update_write(
             lambda conn: knowledge_update.apply_knowledge_update(
