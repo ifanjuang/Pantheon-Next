@@ -125,11 +125,20 @@ def parse_review_marker(
         record = match.group("record").strip()
         if reviewed > today:
             return None, None, f"'Candidacy reviewed:' date is in the future: {reviewed.isoformat()}"
-        if not record.startswith("ai_logs/"):
+        # Containment, not a prefix test. `ai_logs/../docs/governance/STATUS.md`
+        # starts with the right string and resolves to a real file that is not a
+        # record at all, so a candidate could reset its own clock by citing a
+        # governance document.
+        try:
+            resolved = (ROOT / record).resolve()
+            inside = resolved.is_relative_to((ROOT / "ai_logs").resolve())
+        except (OSError, ValueError):
+            return None, None, f"'Candidacy reviewed:' record is not a usable path: {record!r}"
+        if not inside:
             return None, None, (
-                f"'Candidacy reviewed:' record must live under ai_logs/, got {record!r}"
+                f"'Candidacy reviewed:' record must resolve inside ai_logs/, got {record!r}"
             )
-        if not (ROOT / record).is_file():
+        if not resolved.is_file():
             return None, None, f"'Candidacy reviewed:' record does not exist: {record}"
         return reviewed, record, None
     return None, None, None
@@ -185,18 +194,37 @@ def _root_commits() -> set[str]:
         return set()
 
 
-def _file_commits(rel: str) -> list[tuple[str, dt.date]]:
-    """Commits touching `rel`, newest first, as (sha, author date)."""
+def _file_commits(rel: str) -> list[tuple[str, dt.date, str]]:
+    """Commits touching `rel`, newest first, as (sha, author date, path then).
+
+    History is followed across renames. Without that, renaming a candidate
+    resets its clock to the rename commit, and a document unresolved for a year
+    reads as new. The path is carried per commit because the blob lookup needs
+    the name the file had at that commit, not the name it has now.
+    """
     try:
-        raw = _git(["log", "--format=%H%x09%aI", "--", rel])
+        raw = _git(["log", "--follow", "--name-status", "--format=%x00%H%x09%aI", "--", rel])
     except subprocess.CalledProcessError:
         return []
-    rows: list[tuple[str, dt.date]] = []
-    for line in raw.splitlines():
-        if "\t" not in line:
+
+    rows: list[tuple[str, dt.date, str]] = []
+    current = rel
+    for block in raw.split("\0"):
+        block = block.strip("\n")
+        if not block:
             continue
-        sha, stamp = line.split("\t", 1)
-        rows.append((sha, dt.datetime.fromisoformat(stamp).date()))
+        lines = block.splitlines()
+        header = lines[0]
+        if "\t" not in header:
+            continue
+        sha, stamp = header.split("\t", 1)
+        rows.append((sha, dt.datetime.fromisoformat(stamp).date(), current))
+        # A rename tells us what the file was called before this commit.
+        for entry in lines[1:]:
+            parts = entry.split("\t")
+            if parts and parts[0].startswith("R") and len(parts) >= 3:
+                current = parts[1]
+                break
     return rows
 
 
@@ -210,9 +238,9 @@ def candidacy_start(rel: str, blobs: _Blobs, roots: set[str]) -> tuple[dt.date |
     commits = _file_commits(rel)
     if not commits:
         return None, "unknown"
-    start_sha, start_date = commits[0]
-    for sha, when in commits:
-        _, status = HEADERS.detect_status((blobs.read(f"{sha}:{rel}") or "").splitlines())
+    start_sha, start_date, _ = commits[0]
+    for sha, when, path_then in commits:
+        _, status = HEADERS.detect_status((blobs.read(f"{sha}:{path_then}") or "").splitlines())
         if not is_candidate(status):
             break
         start_sha, start_date = sha, when

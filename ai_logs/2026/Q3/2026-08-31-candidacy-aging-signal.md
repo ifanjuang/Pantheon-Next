@@ -83,3 +83,42 @@ The report is empty of aged rows today by construction. It becomes informative
 at the first threshold crossing, at which point each row needs one of three
 outcomes: promotion with a referent, archival, or a dated review. Nothing in
 this change makes any of those automatic.
+
+
+## Amendment, 2026-08-31 — two review findings, both correct
+
+### The record check was a prefix test, not a containment test
+
+`Candidacy reviewed: 2026-08-20 (ai_logs/../docs/governance/STATUS.md)` starts
+with `ai_logs/` and resolves to a real file, so it was accepted. A candidate
+could have reset its own aging clock by citing a governance document that is not
+a record at all — which is the exact failure the check was written to prevent,
+one indirection away.
+
+The path is now resolved and required to remain beneath `ai_logs/`. An absolute
+path is refused for the same reason. Confirmed refused; the legitimate marker
+still passes.
+
+### Renaming a candidate restarted its clock
+
+`git log -- <path>` returns only commits under the current name, so a document
+created in January and renamed in August read as six days old and dropped out of
+the report entirely. Reproduced on a scratch repository before fixing.
+
+History is now followed across renames, and the path is carried **per commit**:
+the blob lookup needs the name the file had at that commit, not the name it has
+now. Following history while reading `<sha>:<current name>` would have found
+nothing at the older commits and silently produced the same wrong answer. A test
+asserts both halves — the two commits are recovered, and the old name resolves
+at the old commit while the new name does not.
+
+Same shape as the finding this whole batch is about: a lookup that is present
+and correct-looking, against a name nothing answers to.
+
+```text
+prefix match     != containment
+follows history  != reads the historical blob
+renamed          != new
+```
+
+Cost check: the full corpus run is 1.7 s with `--follow`, against 1.3 s before.

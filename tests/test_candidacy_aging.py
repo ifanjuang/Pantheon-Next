@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import datetime as dt
 import importlib.util
+import os
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -86,6 +88,10 @@ def test_a_reset_that_cites_nothing_real_is_refused() -> None:
         "future": f"Candidacy reviewed: 2027-01-01 ({A_REAL_RECORD})",
         "outside ai_logs": "Candidacy reviewed: 2026-08-20 (docs/governance/STATUS.md)",
         "dangling": "Candidacy reviewed: 2026-08-20 (ai_logs/2026/Q3/does-not-exist.md)",
+        # Starts with the right prefix and resolves to a real file that is not a
+        # record, so a candidate could reset its own clock by citing doctrine.
+        "escapes via ..": "Candidacy reviewed: 2026-08-20 (ai_logs/../docs/governance/STATUS.md)",
+        "absolute": "Candidacy reviewed: 2026-08-20 (/etc/hostname)",
     }
     for label, line in cases.items():
         reviewed, record, error = AGING.parse_review_marker(["# T", "", line], TODAY)
@@ -135,3 +141,75 @@ def test_age_alone_never_reads_as_a_promotion() -> None:
     report = AGING.render([], {"candidate": 0, "other": 1}, threshold=180, today=TODAY)
     assert "Age does not promote anything." in report
     assert "referent" in report
+
+
+# --- history across renames -----------------------------------------------
+
+
+def _repo_with_a_renamed_candidate(root: Path) -> None:
+    """A candidate created long ago, renamed recently, status untouched."""
+    def git(*args: str, **env: str) -> None:
+        subprocess.run(
+            ["git", *args], cwd=root, check=True,
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            env={**os.environ, **env},
+        )
+
+    (root / "docs" / "governance").mkdir(parents=True)
+    (root / "docs" / "governance" / "OLD.md").write_text(
+        "# A\n\nStatus: candidate support doctrine — unchanged by the rename.\n",
+        encoding="utf-8",
+    )
+    git("init", "-q", ".")
+    git("config", "user.email", "t@example.invalid")
+    git("config", "user.name", "t")
+    git("add", "-A")
+    git("commit", "-qm", "add candidate",
+        GIT_AUTHOR_DATE="2026-01-10T10:00:00+00:00",
+        GIT_COMMITTER_DATE="2026-01-10T10:00:00+00:00")
+    git("mv", "docs/governance/OLD.md", "docs/governance/NEW.md")
+    git("commit", "-qm", "rename only",
+        GIT_AUTHOR_DATE="2026-08-25T10:00:00+00:00",
+        GIT_COMMITTER_DATE="2026-08-25T10:00:00+00:00")
+
+
+def test_a_rename_does_not_restart_the_candidacy_clock(tmp_path: Path, monkeypatch) -> None:
+    """Renaming a candidate must not make a year-old one look new."""
+    _repo_with_a_renamed_candidate(tmp_path)
+    monkeypatch.setattr(AGING, "ROOT", tmp_path)
+
+    commits = AGING._file_commits("docs/governance/NEW.md")
+    assert len(commits) == 2, "history was not followed across the rename"
+
+    blobs = AGING._Blobs(tmp_path)
+    try:
+        since, provenance = AGING.candidacy_start(
+            "docs/governance/NEW.md", blobs, AGING._root_commits()
+        )
+    finally:
+        blobs.close()
+
+    assert since == dt.date(2026, 1, 10), (
+        f"clock restarted at the rename instead of the original commit: {since}"
+    )
+    assert provenance in {"observed", "imported"}
+
+
+def test_the_blob_is_read_under_the_name_the_file_had_then(tmp_path: Path, monkeypatch) -> None:
+    """Following history is useless if the blob lookup uses today's name."""
+    _repo_with_a_renamed_candidate(tmp_path)
+    monkeypatch.setattr(AGING, "ROOT", tmp_path)
+
+    commits = AGING._file_commits("docs/governance/NEW.md")
+    paths = [path for _, _, path in commits]
+    assert paths == ["docs/governance/NEW.md", "docs/governance/OLD.md"]
+
+    blobs = AGING._Blobs(tmp_path)
+    try:
+        oldest_sha, _, oldest_path = commits[-1]
+        assert blobs.read(f"{oldest_sha}:{oldest_path}"), "historical blob unreadable"
+        assert blobs.read(f"{oldest_sha}:docs/governance/NEW.md") is None, (
+            "the new name should not resolve at the older commit"
+        )
+    finally:
+        blobs.close()
