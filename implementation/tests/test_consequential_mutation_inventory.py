@@ -20,24 +20,39 @@ added tomorrow inheriting none of it, with no check noticing.
 
 ## Where the review stands
 
-Twenty-four of the seventy-two entry points have been read individually; 48 have
-not. The nine reviewed most recently were chosen because nothing in production
-reaches them yet — eight are exercised only by tests and one, `disable_principal`,
-is called by nothing at all. That made the question "is this effect consequential?"
-answerable without unwinding a call graph, and it is the cheapest end of the
-backlog rather than the most urgent one.
+Twenty-eight of the seventy-two entry points have been read individually; 44 have
+not. The first batches were chosen because nothing in production reached them —
+answerable without unwinding a call graph, and the cheapest end of the backlog
+rather than the most urgent one. The `knowledge.py` batch is the first that is
+live on both sides: every one of its four entry points is behind a route a key
+holder can call today.
 
-Two of the nine came back as needing the chokepoint. `bind_oidc_identity` is the
-point where an external identity becomes able to act as a governed principal.
-`store_reviewed_dossier` installs canonical APU state on the strength of a
-`review_ref` that nothing validates — no lookup, no foreign key, no signature,
-and no table of governed reviews to point at. Both are recorded as
-`gate_required_not_wired` rather than softened into `none`.
+Six entry points are now recorded as `gate_required_not_wired` rather than
+softened into `none`. `bind_oidc_identity` is where an external identity becomes
+able to act as a governed principal. `store_reviewed_dossier` installs canonical
+APU state on the strength of a `review_ref` that nothing validates. `revoke_grant`
+lets one access manager lock another one out. `publish_knowledge` accepts
+`review_status="reviewed"` as a caller assertion. `complete_edit_request` can
+return a human-rejected request to `proposed`. `apply_edit_request` acts on that
+status as though it were a decision.
 
-The second one was first recorded as `none` and corrected by review. Its
-reasoning had been that the gate belonged at the upstream review rather than at
-its recording, which only holds if the reference to that review is worth
-something. It is a bare non-empty string.
+## What keeps being wrong
+
+Four of those six were first recorded as `none`, and each correction had the same
+shape: a guard was believed on the strength of what it is called rather than what
+it composes to.
+
+```text
+review_ref                     reads as a reference to a review
+"cannot revoke access.manage"  reads as protection of the administrator
+_validate_actor                reads as a refusal of Hermes
+status == "proposed"           reads as a decision already taken
+```
+
+None of the four was a slip. Each was a verdict written after reading the
+function, and each was wrong one call away from where the reading stopped. The
+question that finds them is not "what does this check" but "who controls each
+input" — asked of every link, including the ones that look settled.
 
 ## How the surface is discovered, and why not by name
 
@@ -349,16 +364,82 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     ("information_projection.py", "remove_document_link"): _UNREVIEWED,
     ("information_projection.py", "update_projection_metadata"): _UNREVIEWED,
     ("knowledge.py", "apply_edit_request"): {
-        "gate": "none",
-        "local_guards": ("request status", "single transaction with audit", "idempotency"),
+        "gate": "gate_required_not_wired",
+        "local_guards": ("request status", "re-read under lock", "version and selection digest", "single transaction with audit", "idempotency"),
         "reviewed": (
-            "Applies an edit whose request status already carries the decision, with the audit written inside the same transaction so the trail cannot detach from the effect."
+            "Corrected. This entry read `none` on the reasoning that the request "
+            "status already carried the decision. Reading the two functions that "
+            "write that status shows nothing has to decide anything for it to say "
+            "`proposed`: `create_edit_request` accepts `replacement_markdown` from "
+            "its caller and sets `proposed` on the spot, and `complete_edit_request` "
+            "sets `proposed` with no status guard. The transactional audit and the "
+            "concurrency checks are real and unchanged; what is not real is the "
+            "decision they are recorded against. This is the point where the "
+            "Knowledge Markdown changes, so it is where the chokepoint belongs."
         ),
     },
-    ("knowledge.py", "complete_edit_request"): _UNREVIEWED,
-    ("knowledge.py", "create_edit_request"): _UNREVIEWED,
-    ("knowledge.py", "publish_knowledge"): _UNREVIEWED,
-    ("knowledge.py", "revise_knowledge"): _UNREVIEWED,
+    ("knowledge.py", "complete_edit_request"): {
+        "gate": "gate_required_not_wired",
+        "local_guards": ("non-empty replacement", "Hermes bearer key on the route", "version comparison against base_version"),
+        "reviewed": (
+            "Reads as Hermes filling in the proposal it was queued for. It takes no "
+            "actor, no idempotency key, writes no event, and guards no status: it "
+            "sets `replacement_markdown` and a status on whatever request_id it is "
+            "given. `knowledge_edit_variants.reject_request` moves a request to "
+            "`rejected` and records a human rejection event; that rejection does not "
+            "revise the Knowledge item, so the version still equals base_version, so "
+            "this function returns the request to `proposed` — and the editor-keyed "
+            "apply route then applies it. The party whose proposal was rejected can "
+            "un-reject it, leaving no trace beside the rejection event. An applied "
+            "request is safe here only by accident of the same version comparison."
+        ),
+    },
+    ("knowledge.py", "create_edit_request"): {
+        "gate": "none",
+        "local_guards": ("instruction kind and non-empty instruction", "row lock", "base_version equality", "selected text matched against the live snapshot", "idempotency with payload digest"),
+        "reviewed": (
+            "Writes a request row, which is a candidate and not itself consequential, "
+            "and its concurrency guards are unusually tight — the selection range and "
+            "the selected text are both checked against the locked snapshot. The "
+            "finding is what it can set that row to: passing `replacement_markdown` "
+            "on creation skips `queued_for_hermes` and writes `proposed` directly, so "
+            "the editor key alone produces the text, the status that reads as a "
+            "decision, and then the apply. `requested_by` is an unverified body "
+            "string. Recorded at the apply, which is where the Knowledge changes, "
+            "rather than duplicated here."
+        ),
+    },
+    ("knowledge.py", "publish_knowledge"): {
+        "gate": "gate_required_not_wired",
+        "local_guards": ("non-empty knowledge_id, title and Markdown", "family membership", "expected_version must be 0", "idempotency"),
+        "reviewed": (
+            "The route guard is a bearer-token comparison, and the body is passed "
+            "through with `**body.model_dump()`. Three of those fields are claims "
+            "about people: `created_by`, `actor_kind` — which accepts `hermes` — and "
+            "`review_status`, which accepts `reviewed`. The function checks each "
+            "against a set of permitted strings and nothing else. A holder of the "
+            "editor key can therefore publish a Knowledge item that already reads as "
+            "professionally reviewed, attributed to anyone. `schema conformance != "
+            "professional approval` is the invariant, and membership in "
+            "REVIEW_STATUSES is exactly the conformance being mistaken for it."
+        ),
+    },
+    ("knowledge.py", "revise_knowledge"): {
+        "gate": "none",
+        "local_guards": ("expected_version optimistic concurrency", "actor_kind membership", "idempotency with payload digest"),
+        "reviewed": (
+            "The revision primitive, not an entry point: its own route, "
+            "`PUT /knowledge/{knowledge_id}`, is retired and raises 410. It holds as "
+            "`none` only because both live callers are themselves recorded — "
+            "`knowledge_update.apply_knowledge_update`, behind the signed preview and "
+            "confirmation phrase, and `apply_edit_request`, recorded above as needing "
+            "the gate. Worth naming plainly: the 410 says direct revision is retired "
+            "in favour of the signed routes, and the edit-request pair reaches this "
+            "same function on the same editor key with no signature, no confirmation "
+            "phrase and no project scope. The retirement is a property of the route, "
+            "not of the module."
+        ),
+    },
     ("knowledge_edit_variants.py", "apply_selected_variant"): {
         "gate": "none",
         "local_guards": ("status", "variant ownership", "audit inside apply transaction"),
@@ -533,9 +614,9 @@ def test_a_required_gate_that_is_not_wired_stays_visible_and_does_not_grow() -> 
     was ever taken.
     """
     pending = [key for key, record in INVENTORY.items() if record["gate"] == "gate_required_not_wired"]
-    assert len(pending) <= 3, (
+    assert len(pending) <= 6, (
         f"{len(pending)} entry points are known to need the chokepoint and do not reach "
-        "it; the ceiling is 3. Wire one, or move the ceiling deliberately and say why."
+        "it; the ceiling is 6. Wire one, or move the ceiling deliberately and say why."
     )
 
 
@@ -543,14 +624,14 @@ def test_the_unreviewed_debt_is_visible_and_does_not_grow() -> None:
     """Enumerated is not reviewed, and the gap is recorded rather than implied.
 
     The widened net enumerated 64 entry points that had not been read
-    individually. Sixteen have now been reviewed, leaving 48. Reviewing one means
+    individually. Twenty have now been reviewed, leaving 44. Reviewing one means
     replacing `_UNREVIEWED` with its real guard regime and the reasoning behind
     it. This bound exists so the debt shrinks deliberately and cannot quietly
     grow.
     """
     unreviewed = [key for key, record in INVENTORY.items() if record["gate"] == "unreviewed"]
-    assert len(unreviewed) <= 48, (
-        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 48. A new "
+    assert len(unreviewed) <= 44, (
+        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 44. A new "
         "mutation entry point must be reviewed, not added to the backlog."
     )
 

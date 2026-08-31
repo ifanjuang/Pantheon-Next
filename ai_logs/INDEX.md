@@ -14,17 +14,32 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **844**.
+Total indexed entries: **859**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-08-31 | `2026/Q3/2026-08-31-remediation-batch-1-lab-honesty.md` | 2026-08-31 — remediation batch 1: make a green lab mean something again |
+| 2026-08-31 | `2026/Q3/2026-08-31-professional-private-source-patterns.md` | #827 — sanitized private-source-derived professional review patterns |
+| 2026-08-31 | `2026/Q3/2026-08-31-o3-qualification-retirement.md` | Historical O3 qualification retirement |
+| 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-knowledge-edit-chain.md` | Mutation review: the Knowledge edit chain |
+| 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-human-access-grants.md` | The two live human-access mutation points |
+| 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-first-nine.md` | First nine consequential-mutation entry points reviewed |
+| 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-classification-cluster.md` | The agency_classification cluster, and two attribution mechanisms |
+| 2026-08-31 | `2026/Q3/2026-08-31-external-pin-freshness-observation.md` | 2026-08-31 — external pin freshness observation |
+| 2026-08-31 | `2026/Q3/2026-08-31-external-pin-alignment-convergence.md` | External qualification pin alignment — 2026-08-31 |
+| 2026-08-31 | `2026/Q3/2026-08-31-consequential-mutation-inventory-and-read-only-annotations.md` | 2026-08-31 — consequential-mutation inventory and protocol-level read-only declaration |
+| 2026-08-31 | `2026/Q3/2026-08-31-candidacy-aging-signal.md` | Candidacy aging signal |
+| 2026-08-31 | `2026/Q3/2026-08-31-call-reachability-audit.md` | Symbol call reachability in the module usage audit |
+| 2026-08-31 | `2026/Q3/2026-08-31-asserted-properties-controls.md` | Every asserted property names a control |
 | 2026-08-30 | `2026/Q3/2026-08-30-source-research-evaluation-pilot-ready.md` | 2026-08-30 — source-research evaluation pilot readiness |
 | 2026-08-30 | `2026/Q3/2026-08-30-source-notebook-current-convergence.md` | 2026-08-30 — converge optional workspace source notebook |
 | 2026-08-30 | `2026/Q3/2026-08-30-simplify-distillation-registry.md` | Distillation Registry simplification — 2026-08-30 |
 | 2026-08-30 | `2026/Q3/2026-08-30-prune-absorbed-research-distillations.md` | 2026-08-30 — prune absorbed research distillations |
 | 2026-08-30 | `2026/Q3/2026-08-30-obsidian-wiki-pattern-convergence.md` | 2026-08-30 — converge bounded obsidian-wiki maintenance patterns |
 | 2026-08-30 | `2026/Q3/2026-08-30-distill-agent-skills-evaluation-patterns-current.md` | 2026-08-30 — reconstruct Agent Skills evaluation pattern distillation |
+| 2026-08-30 | `2026/Q3/2026-08-30-827-professional-review-baseline.md` | 2026-08-30 — observe first #827 professional quote-review baseline |
+| 2026-08-30 | `2026/Q3/2026-08-30-827-currentness-runner-composition.md` | 2026-08-30 — compose #827 review through existing currentness retrieval |
 | 2026-08-29 | `2026/Q3/2026-08-29-workspace-organization-routing.md` | Workspace organization routing — 2026-08-29 |
 | 2026-08-29 | `2026/Q3/2026-08-29-risk-history-owner-audit.md` | Risk / historical support owners — #787 audit — 2026-08-29 |
 | 2026-08-29 | `2026/Q3/2026-08-29-retire-historical-coordination-plans-current.md` | Retire historical coordination plans — current replay |
