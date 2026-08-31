@@ -4,6 +4,12 @@ ROOT = Path(__file__).resolve().parents[1]
 GOV = ROOT / "docs" / "governance"
 REMOVED = GOV / "OPENWEBUI_INTEGRATION.md"
 OBSOLETE = GOV / "authority" / "OBSOLETE_AND_ABSENT_INDEX.md"
+PUBLIC_DIAGRAMS = (
+    ROOT / "docs" / "assets" / "diagrams" / "pantheon-system-map-fr.svg",
+    ROOT / "docs" / "assets" / "diagrams" / "pantheon-system-map-en.svg",
+    ROOT / "docs" / "assets" / "diagrams" / "pantheon-authority-chain-fr.svg",
+    ROOT / "docs" / "assets" / "diagrams" / "pantheon-authority-chain-en.svg",
+)
 
 # Follow-up debt owner: #785. This exact set is intentionally machine-tracked so
 # no new current-authority OpenWebUI ownership residue can appear silently while
@@ -159,6 +165,34 @@ def test_public_entrypoints_match_current_monorepo_and_transport_posture():
     assert "No HTTP API" not in mcp_readme
     assert "pantheon-policy-api" in mcp_readme
     assert "`implementation/` is a separate Python project" in mcp_readme
+
+
+def test_public_architecture_diagrams_match_current_owners():
+    forbidden = (
+        "OpenWebUI",
+        "PANTHEON-MVP",
+        "pantheon-mvp",
+        "serveur autoritaire",
+        "authoritative server",
+    )
+    for path in PUBLIC_DIAGRAMS:
+        text = _read(path)
+        for phrase in forbidden:
+            assert phrase not in text, f"{path.relative_to(ROOT).as_posix()}: {phrase}"
+
+    system_fr = _read(PUBLIC_DIAGRAMS[0])
+    system_en = _read(PUBLIC_DIAGRAMS[1])
+    authority_fr = _read(PUBLIC_DIAGRAMS[2])
+    authority_en = _read(PUBLIC_DIAGRAMS[3])
+
+    assert "IMPLEMENTATION/ · CANDIDAT CO-LOCALISÉ" in system_fr
+    assert "IMPLEMENTATION/ · CO-LOCATED CANDIDATE" in system_en
+    assert "NON ADOPTÉ" in system_fr
+    assert "NOT ADOPTED" in system_en
+    assert "Pantheon Cockpit" in authority_fr
+    assert "Pantheon Cockpit" in authority_en
+    assert "persistance ≠ autorité" in authority_fr
+    assert "persistence ≠ authority" in authority_en
 
 
 def test_governance_ci_no_longer_requires_removed_owner():
