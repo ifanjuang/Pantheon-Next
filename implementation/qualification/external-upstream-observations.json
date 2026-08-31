@@ -1,0 +1,112 @@
+{
+  "schema_id": "pantheon.external_upstream_observations",
+  "revision": 1,
+  "status": "candidate",
+  "description": "What upstream published, when it was last looked at, and whether a lag behind it was decided. This file records observations about external projects. It is not the pin registry, does not select a target, and authorizes no update. `external-pins.json` remains the sole owner of which artifact each qualification targets.",
+  "method": {
+    "why_separate_from_the_registry": "The registry records a decision; this file records a fact about someone else's project. Keeping them apart preserves `observed != adopted`: refreshing an observation must never look like moving a pin.",
+    "version_comparison": "No mechanical comparison is made between `latest_seen` and the pinned version. Upstream identifiers are heterogeneous — Hermes Agent 0.20.6 ships as tag `v2026.8.27` — so a human records the `delta` verdict. The tool only detects that upstream moved past `latest_seen`.",
+    "delta_states": {
+      "none": "the pin is on the upstream head recorded here",
+      "acknowledged": "a newer upstream release exists and a dated human decision explains why the pin stays",
+      "open": "a newer upstream release exists and no decision has been recorded"
+    }
+  },
+  "observations": {
+    "hermes-agent": {
+      "source": "github_releases_latest",
+      "locator": "NousResearch/hermes-agent",
+      "latest_seen": "v2026.8.27",
+      "observed_on": "2026-08-30",
+      "delta": "none"
+    },
+    "hindsight": {
+      "source": "github_releases_latest",
+      "locator": "vectorize-io/hindsight",
+      "latest_seen": "v0.9.2",
+      "observed_on": "2026-08-31",
+      "delta": {
+        "state": "open",
+        "reason": "0.9.2 (2026-08-25) exposes MCP tools for knowledge-base operations, asymmetric query/passage embedding prefixes and a BM25 fix for extended queries. The pin stays on 0.9.1 with no recorded decision. The BM25 change overlaps the hand-written lexical fallback added to implementation/mvp_vertical/retrieval.py in #874, so the decision is not purely a version bump: it should also settle which lexical lane is authoritative on which corpus."
+      }
+    },
+    "hindsight-obsidian-sync": {
+      "source": "github_releases_latest",
+      "locator": "vectorize-io/hindsight-obsidian",
+      "latest_seen": "0.2.1",
+      "observed_on": "2026-08-30",
+      "delta": "none"
+    },
+    "self-hosted-livesync": {
+      "source": "github_releases_latest",
+      "locator": "vrtmrz/obsidian-livesync",
+      "latest_seen": "1.0.21",
+      "observed_on": "2026-08-31",
+      "delta": {
+        "state": "open",
+        "reason": "The pin is three releases behind (1.0.20 on 2026-08-25, 1.0.21 on 2026-08-26). 1.0.20 specifically corrects settings-page behaviour under Obsidian 1.13 — the release line pinned beside it as `obsidian-desktop` — so the S1..S6 qualifications currently exercise a combination whose upstream documented an interaction defect. Reviewing this lag is not cosmetic."
+      }
+    },
+    "self-hosted-livesync-cli": {
+      "source": "derived_from_source_pin",
+      "locator": "self-hosted-livesync",
+      "latest_seen": "1.0.18-cli",
+      "observed_on": "2026-08-31",
+      "delta": {
+        "state": "acknowledged",
+        "reason": "Not independently released; it follows whatever `self-hosted-livesync` resolves to. Its freshness question is that pin's question.",
+        "decided_on": "2026-08-31"
+      }
+    },
+    "obsidian-desktop": {
+      "source": "github_releases_latest",
+      "locator": "obsidianmd/obsidian-releases",
+      "latest_seen": "v1.13.8",
+      "observed_on": "2026-08-31",
+      "delta": {
+        "state": "acknowledged",
+        "reason": "1.13.7 (2026-08-12) remains the current desktop head; 1.13.8 (2026-08-21) is a mobile release published in the same stream. `releases/latest` on this repository does not distinguish the two, so the desktop pin is correct at 1.13.7 despite the newer tag.",
+        "decided_on": "2026-08-31"
+      }
+    },
+    "obsidian-wiki": {
+      "source": "github_releases_latest",
+      "locator": "Ar9av/obsidian-wiki",
+      "latest_seen": "v2026.08.6",
+      "observed_on": "2026-08-31",
+      "delta": "none"
+    },
+    "couchdb": {
+      "source": "dockerhub_latest_semver",
+      "locator": "library/couchdb",
+      "latest_seen": "3.5.2",
+      "observed_on": "2026-08-31",
+      "delta": {
+        "state": "open",
+        "reason": "The image registry carries 3.5.1 and 3.5.2 above the pinned 3.5.0. `apache/couchdb` publishes no GitHub releases, so the registry tag list is the authoritative head for this pin. CouchDB backs the LiveSync topology, so this lag is reviewed together with `self-hosted-livesync`."
+      }
+    },
+    "mnemosyne-memory": {
+      "source": "pypi_latest",
+      "locator": "mnemosyne-memory",
+      "latest_seen": "3.15.1",
+      "observed_on": "2026-08-31",
+      "delta": "none"
+    },
+    "mnemosyne-hermes": {
+      "source": "pypi_latest",
+      "locator": "mnemosyne-hermes",
+      "latest_seen": "0.5.0",
+      "observed_on": "2026-08-31",
+      "delta": "none"
+    }
+  },
+  "authority": {
+    "deployment_truth": false,
+    "installation_state": false,
+    "runtime_activation": false,
+    "update_authorization": false,
+    "task_authorization": false,
+    "evidence_admission": false
+  }
+}
