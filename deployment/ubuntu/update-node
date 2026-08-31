@@ -7,21 +7,24 @@ APP_ROOT="/opt/pantheon-node"
 STATE_ROOT="/srv/pantheon"
 PANTHEON_ROOT="/opt/pantheon"
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-if [[ -f "$SCRIPT_DIR/release.env" ]]; then
-  # shellcheck disable=SC1091
-  source "$SCRIPT_DIR/release.env"
+RELEASE_LOCK="$SCRIPT_DIR/release.env"
+if [[ ! -f "$RELEASE_LOCK" ]]; then
+  printf '[pantheon-update] ERROR: reviewed deployment lock is missing: %s\n' "$RELEASE_LOCK" >&2
+  exit 1
 fi
+# shellcheck disable=SC1091
+source "$RELEASE_LOCK"
 
 # Reviewed deployment-candidate targets. These are not qualification or authorization truth.
-TARGET_HERMES_IMAGE="${RELEASE_HERMES_IMAGE:-nousresearch/hermes-agent:v2026.8.27}"
-TARGET_HINDSIGHT_IMAGE="${RELEASE_HINDSIGHT_IMAGE:-ghcr.io/vectorize-io/hindsight:0.9.2}"
-TARGET_COUCHDB_IMAGE="${RELEASE_COUCHDB_IMAGE:-couchdb:3.5.0}"
-TARGET_OLLAMA_VERSION="${RELEASE_OLLAMA_VERSION:-0.33.2}"
-TARGET_COMFYUI_REF="${RELEASE_COMFYUI_REF:-v0.34.0}"
-TARGET_TORCH_VERSION="${RELEASE_TORCH_VERSION:-2.13.0}"
-TARGET_TORCH_INDEX="${RELEASE_TORCH_INDEX:-https://download.pytorch.org/whl/cu132}"
-TARGET_LIVESYNC_REF="${RELEASE_LIVESYNC_REF:-32e827692f1a552cd581de9da45cecd0711573d3}"
-TARGET_LIVESYNC_IMAGE="${RELEASE_LIVESYNC_IMAGE:-pantheon-node/livesync-cli:1.0.18-cli}"
+TARGET_HERMES_IMAGE="${RELEASE_HERMES_IMAGE:?release.env missing RELEASE_HERMES_IMAGE}"
+TARGET_HINDSIGHT_IMAGE="${RELEASE_HINDSIGHT_IMAGE:?release.env missing RELEASE_HINDSIGHT_IMAGE}"
+TARGET_COUCHDB_IMAGE="${RELEASE_COUCHDB_IMAGE:?release.env missing RELEASE_COUCHDB_IMAGE}"
+TARGET_OLLAMA_VERSION="${RELEASE_OLLAMA_VERSION:?release.env missing RELEASE_OLLAMA_VERSION}"
+TARGET_COMFYUI_REF="${RELEASE_COMFYUI_REF:?release.env missing RELEASE_COMFYUI_REF}"
+TARGET_TORCH_VERSION="${RELEASE_TORCH_VERSION:?release.env missing RELEASE_TORCH_VERSION}"
+TARGET_TORCH_INDEX="${RELEASE_TORCH_INDEX:?release.env missing RELEASE_TORCH_INDEX}"
+TARGET_LIVESYNC_REF="${RELEASE_LIVESYNC_REF:?release.env missing RELEASE_LIVESYNC_REF}"
+TARGET_LIVESYNC_IMAGE="${RELEASE_LIVESYNC_IMAGE:?release.env missing RELEASE_LIVESYNC_IMAGE}"
 
 APPLY=0
 ASSUME_YES=0
