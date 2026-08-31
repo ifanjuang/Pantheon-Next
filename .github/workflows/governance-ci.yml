@@ -141,6 +141,12 @@ jobs:
           python3 -m pip install --quiet --upgrade -r .github/requirements/governance-ci.txt
           python3 -c "import jsonschema, referencing, yaml"
 
+      - name: Qualification labs are accounted for
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/check_qualification_labs.py
+
       - name: Canonical schema vocabulary consistency
         shell: bash
         run: |

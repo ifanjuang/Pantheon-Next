@@ -1,0 +1,124 @@
+{
+  "schema_id": "pantheon.qualification_labs",
+  "revision": 1,
+  "purpose": "Record, for every workflow that runs somebody else's project, which decision it guards and whether it still tests what the pin registry says was qualified.",
+  "how_to_read": [
+    "guards: the decision that would be taken differently if this lab failed. null means it has not been arbitrated; a blocking lab with null is counted against the ceiling below.",
+    "Deciding which labs deserve a blocking slot is an arbitration for a human. This file records the answers, it does not produce them.",
+    "targets: every literal env value in the workflow that pins an external identifier, mapped to the external-pins.json entry it corresponds to, or null when it is not a governed external target. An undeclared one fails the check, so a new hardcoded target cannot appear unnoticed.",
+    "A declared target whose literal has drifted from the registry means the lab qualifies a combination the repository no longer claims to have qualified, while its green tick reads exactly like one that does."
+  ],
+  "blocking_without_declared_decision_ceiling": 17,
+  "frozen_target_drift_ceiling": 3,
+  "labs": [
+    {
+      "workflow": "hermes-hindsight-ingestion-q5.yml",
+      "id": "Hermes Hindsight Ingestion Q5",
+      "guards": null
+    },
+    {
+      "workflow": "hermes-langfuse-q1.yml",
+      "id": "Hermes Langfuse Observability Q1",
+      "guards": null,
+      "targets": {
+        "HERMES_COMMIT": "hermes-agent",
+        "HERMES_LANGFUSE_PLUGIN_BLOB": null
+      },
+      "note": "HERMES_LANGFUSE_PLUGIN_BLOB names a blob inside the Hermes tree, not an independently pinned project."
+    },
+    {
+      "workflow": "hermes-langfuse-selfhosted-q2.yml",
+      "id": "Hermes Langfuse Self-hosted Q2",
+      "guards": null,
+      "targets": {
+        "HERMES_COMMIT": "hermes-agent",
+        "LANGFUSE_COMMIT": null
+      },
+      "note": "Langfuse has no entry in external-pins.json at all, so this lab qualifies against a target the registry does not govern."
+    },
+    {
+      "workflow": "hermes-livesync-reverse-q3.yml",
+      "id": "Hermes LiveSync Reverse Q3",
+      "guards": null
+    },
+    {
+      "workflow": "hermes-obsidian-workspace-q1.yml",
+      "id": "Hermes Obsidian Workspace Q1",
+      "guards": null
+    },
+    {
+      "workflow": "implementation-hermes-project-variant-lab.yml",
+      "id": "Hermes Project Variant Lab",
+      "guards": null,
+      "targets": {
+        "PANTHEON_DISTRIBUTION_AUTHORITY_REF": null
+      },
+      "note": "PANTHEON_DISTRIBUTION_AUTHORITY_REF pins a Pantheon revision, not an external project."
+    },
+    {
+      "workflow": "implementation-hermes-runtime-lab-acceptance.yml",
+      "id": "Hermes Runtime Lab Acceptance",
+      "guards": null,
+      "targets": {
+        "PANTHEON_DISTRIBUTION_AUTHORITY_REF": null
+      },
+      "note": "PANTHEON_DISTRIBUTION_AUTHORITY_REF pins a Pantheon revision, not an external project."
+    },
+    {
+      "workflow": "implementation-hindsight-hermes-o1-lab.yml",
+      "id": "Hindsight Hermes O1 Sandbox",
+      "guards": null
+    },
+    {
+      "workflow": "implementation-hindsight-obsidian-hermes-o3-lab.yml",
+      "id": "Hindsight Obsidian Hermes O3 Shared Bank",
+      "guards": null,
+      "targets": {
+        "HERMES_RELEASE_COMMIT": "hermes-agent",
+        "HINDSIGHT_VERSION": "hindsight",
+        "OBSIDIAN_SYNC_COMMIT": "hindsight-obsidian-sync"
+      },
+      "note": "Deliberately frozen as a historical fixture, per the comment at the top of the workflow."
+    },
+    {
+      "workflow": "implementation-hindsight-obsidian-o2-sync.yml",
+      "id": "Hindsight Obsidian O2 Sync",
+      "guards": null
+    },
+    {
+      "workflow": "implementation-livesync-conflict-policy-s5.yml",
+      "id": "LiveSync Conflict Policy S5",
+      "guards": null
+    },
+    {
+      "workflow": "implementation-livesync-headless-mirror-s1.yml",
+      "id": "LiveSync Headless Mirror S1",
+      "guards": null
+    },
+    {
+      "workflow": "implementation-livesync-offline-reconnect-s4.yml",
+      "id": "LiveSync Offline Reconnect S4",
+      "guards": null
+    },
+    {
+      "workflow": "implementation-livesync-production-audit-s6.yml",
+      "id": "LiveSync Production Dependency Audit S6",
+      "guards": null
+    },
+    {
+      "workflow": "implementation-livesync-real-obsidian-s2.yml",
+      "id": "LiveSync Real Obsidian S2",
+      "guards": null
+    },
+    {
+      "workflow": "implementation-livesync-security-seed-reconnect-s3.yml",
+      "id": "LiveSync Security Seed Reconnect S3",
+      "guards": null
+    },
+    {
+      "workflow": "obsidian-wiki-graph-health-q1.yml",
+      "id": "Obsidian Wiki Graph Health Q1",
+      "guards": null
+    }
+  ]
+}
