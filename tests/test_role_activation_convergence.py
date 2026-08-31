@@ -3,6 +3,22 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOC = ROOT / "docs/governance/ROLE_ACTIVATION.md"
+ROLE_REGISTRY = ROOT / "docs/governance/AGENTS.md"
+ROLE_OWNER_SURFACES = (
+    ROOT / "docs/governance/REQUEST_LIFECYCLE.md",
+    ROOT / "docs/governance/WORKFLOW_SCHEMA.md",
+    ROOT / "docs/governance/EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md",
+)
+CANONICAL_ROLES = (
+    "ATHENA",
+    "ARGOS",
+    "THEMIS",
+    "APOLLO",
+    "ZEUS",
+    "IRIS",
+    "HEPHAISTOS",
+    "MNEMOSYNE",
+)
 
 
 def _text() -> str:
@@ -49,3 +65,34 @@ def test_activation_reuses_existing_owners() -> None:
         "PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md",
     ):
         assert owner in text
+
+
+def test_canonical_role_registry_keeps_the_eight_current_roles() -> None:
+    registry = ROLE_REGISTRY.read_text(encoding="utf-8")
+    for role in CANONICAL_ROLES:
+        assert f"| {role} |" in registry
+
+    for unregistered_role in ("MÈTIS", "CERBÈRE", "CHARON"):
+        assert f"| {unregistered_role} |" not in registry
+
+
+def test_active_lifecycle_surfaces_reuse_canonical_roles_and_existing_memory_owners() -> None:
+    forbidden_personas = ("MÈTIS", "CERBÈRE", "CHARON", "Cerbère", "Charon")
+    for path in ROLE_OWNER_SURFACES:
+        text = path.read_text(encoding="utf-8")
+        for persona in forbidden_personas:
+            assert persona not in text, f"{path.relative_to(ROOT).as_posix()}: {persona}"
+
+    lifecycle = ROLE_OWNER_SURFACES[0].read_text(encoding="utf-8")
+    assert "Situated clarification is a function, not a Role" in lifecycle
+    assert "MNEMOSYNE frames continuity" in lifecycle
+    assert "retention placement proposal != persistence authorization" in lifecycle
+
+    workflow = ROLE_OWNER_SURFACES[1].read_text(encoding="utf-8")
+    assert "schemas/workflow_manifest.schema.yaml" in workflow
+    assert "A future `workflow_manifest.schema.yaml`" not in workflow
+    assert "schema_valid != authorized" in workflow
+
+    memory = ROLE_OWNER_SURFACES[2].read_text(encoding="utf-8")
+    assert "MNEMOSYNE continuity framing" in memory
+    assert "The canonical Role registry remains `AGENTS.md`" in memory
