@@ -22,6 +22,7 @@ detecting or resolving them.
 
 from __future__ import annotations
 
+import json
 import re
 from typing import Protocol, Sequence
 
@@ -252,7 +253,12 @@ def grounding_review(draft: str, chunks: Sequence[RetrievedChunk]) -> dict:
 
 
 class Drafter(Protocol):
-    """The seam a Hermes-side LLM drafter implements."""
+    """The seam a Hermes-side LLM drafter implements.
+
+    ``intent`` carries the complete task intent context when the Task Contract
+    declares an object-shaped intent. Receipt of that context does not make a
+    task-scoped method projection authoritative or professionally validated.
+    """
 
     def draft(
         self,
@@ -262,6 +268,21 @@ class Drafter(Protocol):
         chunks: Sequence[RetrievedChunk],
     ) -> str:
         ...
+
+
+def _human_request(intent: str, question: str) -> str:
+    """Keep structured task context out of the deterministic human-facing copy."""
+    raw = (intent or "").strip()
+    if raw:
+        try:
+            parsed = json.loads(raw)
+        except json.JSONDecodeError:
+            return raw
+        if isinstance(parsed, dict):
+            summary = str(parsed.get("summary") or "").strip()
+            if summary:
+                return summary
+    return (question or "").strip()
 
 
 class DeterministicDrafter:
@@ -278,7 +299,7 @@ class DeterministicDrafter:
             f"- [{c.source_ref}#chunk-{c.chunk_no}] {c.body[:160].strip()}…"
             for c in chunks
         )
-        request = (intent or question or "").strip()
+        request = _human_request(intent, question)
         return (
             "Bonjour,\n\n"
             "Cette réponse est un candidat soumis à votre décision. Elle ne "
