@@ -99,6 +99,12 @@ jobs:
             python3 .github/scripts/check_new_ai_log_paths.py --base "$GOVERNANCE_BASE_REF"
           fi
 
+      - name: Asserted properties name a control
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/check_asserted_properties.py
+
       - name: Candidacy aging signal
         shell: bash
         run: |
