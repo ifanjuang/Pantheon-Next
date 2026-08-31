@@ -42,6 +42,25 @@ def test_install_defaults_fail_private_and_keep_optional_services_inactive() -> 
     assert "activated != task-authorized" in text
 
 
+def test_install_service_users_can_traverse_managed_runtime_paths() -> None:
+    text = _text(INSTALL)
+    assert 'install -d -m 0711 "$APP_ROOT"' in text
+    assert 'install -d -m 0711 "$AI_ROOT/models" "$AI_ROOT/cache"' in text
+    assert 'install -d -m 0755 "$UV_PYTHON_INSTALL_DIR"' in text
+    assert 'UV_PYTHON_INSTALL_DIR="$APP_ROOT/python"' in text
+    assert "export UV_PYTHON_INSTALL_DIR" in text
+    assert 'User=comfyui' in text
+    assert 'Environment="OLLAMA_MODELS=$AI_ROOT/models/ollama"' in text
+
+
+def test_install_apply_requires_reviewed_ubuntu_and_immutable_pantheon_commit() -> None:
+    text = _text(INSTALL)
+    assert '--apply is reviewed only for Ubuntu $TARGET_UBUNTU; detected $OS_VERSION' in text
+    assert '[[ "$RESOLVED_PANTHEON_COMMIT" =~ ^[0-9a-f]{40}$ ]]' in text
+    assert "PANTHEON_COMMIT must resolve to a full 40-character lowercase commit SHA" in text
+    assert "--apply will refuse this host" in text
+
+
 def test_release_lock_has_no_floating_latest_and_preserves_qualified_livesync_ref() -> None:
     text = _text(RELEASE)
     couchdb = _pin("couchdb")
