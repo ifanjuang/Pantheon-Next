@@ -1,6 +1,33 @@
 # Mutation review: the Decision Request inbox
 
 Date: 2026-08-31
+
+Status: validation-only trace — governance review record, no runtime change.
+Boundary profile: validation_only_trace.
+
+## Change
+
+- Added: `ai_logs/2026/Q3/2026-08-31-mutation-review-decision-requests.md`.
+- Updated: three inventory verdicts for `decision_requests.py`; unreviewed
+  ceiling 36 → 33; required-gate ceiling 7 → 8.
+- Removed: nothing.
+
+## Why
+
+The three `decision_requests.py` mutation entry points were unreviewed, and one
+of them writes the decision record the whole governed loop exists to produce.
+
+## Boundary
+
+Boundary profile applies: `validation_only_trace`.
+
+Protected paths touched: no.
+Runtime impact: none — no executable behaviour changes.
+Authority impact: none — the verdicts are review records, not approvals.
+Schema/test/CI impact: the inventory test's ceilings move; no schema or workflow
+changes.
+External action: none.
+Memory behavior: none.
 Zone: `implementation/`
 Scope: the three unreviewed mutation entry points in
 `implementation/mvp_vertical/decision_requests.py`.
@@ -74,3 +101,12 @@ request, insists on a rationale, and records the actor.
 
 No behaviour. Three verdicts and two ceilings moved: unreviewed 36 → 33,
 required-gate 7 → 8.
+
+## Local distinctions
+
+```text
+models the distinction != sources the distinction
+assurance level        != assurance
+validates the value    != validates its truth
+careful write          != trustworthy record
+```
