@@ -29,11 +29,12 @@ cheap end of the backlog and it is stated as such.
 
 ## What the review found
 
-Eight were cleared as `none` — meaning a human read the path and judged its local
-chain sufficient, which is a conclusion and not an absence. One was not:
+Seven were cleared as `none` — meaning a human read the path and judged its local
+chain sufficient, which is a conclusion and not an absence. Two were not:
 
 ```text
-human_access.py::bind_oidc_identity    gate_required_not_wired
+human_access.py::bind_oidc_identity      gate_required_not_wired
+apu_owner.py::store_reviewed_dossier     gate_required_not_wired
 ```
 
 That is the moment an external identity becomes able to act as a governed
@@ -98,3 +99,36 @@ production caller whose context decides whether the effect is consequential. The
 natural next batch is `human_access.py::grant_access` and `revoke_grant`, because
 the module's other four are now on record and those two are what actually decide
 who may act.
+
+
+## Amendment, 2026-08-31 — one verdict was wrong, and a review caught it
+
+`store_reviewed_dossier` was first recorded as `none`, on the reasoning that
+`review_ref` carries a review that already happened, so the consequence gate
+belonged at that review rather than at its recording. This log even called it the
+closest call of the nine.
+
+It was still wrong. `review_ref` passes through `_required` only — a check that
+the string is non-empty. There is no lookup, no foreign key, no signature, and no
+table of governed reviews to point at; `source_review_ref` in the write-
+preparation schema is likewise plain text. The verdict therefore rested on an
+unverified caller assertion while the function installs canonical APU state.
+
+That is the distinction this repository makes everywhere else, and one this same
+session wrote down when observing the policy service report
+`gate_signal_validation_performed: false`:
+
+```text
+provided reference != validated decision
+caller asserts     != repository verified
+closest call       != call it either way
+```
+
+Reclassified as `gate_required_not_wired`. The ceiling for that regime moves from
+1 to 2 — deliberately, which is the mechanism the ceiling exists for, rather than
+by softening the verdict to keep the number.
+
+Worth recording plainly: this is the fifth finding from the same reviewer in this
+session and the first to catch a *judgment* rather than a coding slip. Flagging an
+entry as the closest call and then still deciding it the easy way is exactly the
+failure mode the `reviewed` field was added to expose.

@@ -27,10 +27,17 @@ is called by nothing at all. That made the question "is this effect consequentia
 answerable without unwinding a call graph, and it is the cheapest end of the
 backlog rather than the most urgent one.
 
-One of the nine came back as needing the chokepoint: `bind_oidc_identity` is the
+Two of the nine came back as needing the chokepoint. `bind_oidc_identity` is the
 point where an external identity becomes able to act as a governed principal.
-Nothing routes it there, which is recorded as `gate_required_not_wired` rather
-than softened into `none`.
+`store_reviewed_dossier` installs canonical APU state on the strength of a
+`review_ref` that nothing validates — no lookup, no foreign key, no signature,
+and no table of governed reviews to point at. Both are recorded as
+`gate_required_not_wired` rather than softened into `none`.
+
+The second one was first recorded as `none` and corrected by review. Its
+reasoning had been that the gate belonged at the upstream review rather than at
+its recording, which only holds if the reference to that review is worth
+something. It is a bare non-empty string.
 
 ## How the surface is discovered, and why not by name
 
@@ -140,9 +147,24 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
         ),
     },
     ("apu_owner.py", "store_reviewed_dossier"): {
-        "gate": "none",
-        "local_guards": ("required project_id, review_ref, actor and idempotency_key", "payload digest compared on replay, refusing a reused key with different content", "normalization before write"),
-        "reviewed": "Records a review that already happened, carried by review_ref; the consequence gate belongs at that review rather than at its recording. The closest call of the nine — it installs canonical state — and the one most worth re-arbitrating if the review upstream is ever less than governed.",
+        "gate": "gate_required_not_wired",
+        "local_guards": (
+            "required project_id, review_ref, actor and idempotency_key",
+            "payload digest compared on replay, refusing a reused key with different content",
+            "normalization before write",
+        ),
+        "reviewed": (
+            "Installs canonical APU state. First reviewed as none on the reasoning that "
+            "review_ref carries a review that already happened, so the consequence gate "
+            "belonged at that review rather than at its recording. That was wrong, and a "
+            "review caught it: review_ref passes through _required only — a non-empty "
+            "string. No lookup, foreign key, signature or any other check ties it to a "
+            "completed governed review, and no table of such reviews exists to point at. "
+            "The verdict therefore rested on an unverified caller assertion, which is the "
+            "distinction this repository makes everywhere else: a provided reference is "
+            "not a validated decision. Recorded as needing the chokepoint until either "
+            "the prior review is verifiable or the write is routed through the gate."
+        ),
     },
     ("apu_write_preparation.py", "append_authorization"): _UNREVIEWED,
     ("apu_write_preparation.py", "apply_authorized_write_command"): {
@@ -383,9 +405,9 @@ def test_a_required_gate_that_is_not_wired_stays_visible_and_does_not_grow() -> 
     was ever taken.
     """
     pending = [key for key, record in INVENTORY.items() if record["gate"] == "gate_required_not_wired"]
-    assert len(pending) <= 1, (
+    assert len(pending) <= 2, (
         f"{len(pending)} entry points are known to need the chokepoint and do not reach "
-        "it; the ceiling is 1. Wire it, or take the decision again deliberately."
+        "it; the ceiling is 2. Wire one, or move the ceiling deliberately and say why."
     )
 
 
