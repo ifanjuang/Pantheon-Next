@@ -20,7 +20,7 @@ added tomorrow inheriting none of it, with no check noticing.
 
 ## Where the review stands
 
-Thirty-nine of the seventy-two entry points have been read individually; 33 have
+Forty-two of the seventy-two entry points have been read individually; 30 have
 not. The first batches were chosen because nothing in production reached them —
 answerable without unwinding a call graph, and the cheapest end of the backlog
 rather than the most urgent one. From `knowledge.py` onward every entry point is
@@ -36,6 +36,34 @@ return a human-rejected request to `proposed`. `apply_edit_request` acts on that
 status as though it were a decision. `act_working_information` supersedes the
 acted version of a governed Information series and records no actor.
 
+## The first write of a projection is not serialised
+
+Recorded because all three `information_projection` entries share it, and
+because the first version of those records named the row lock and
+`expected_revision` as effective guards without qualification.
+
+`_metadata_row(..., lock=True)` runs `SELECT ... FOR UPDATE` and, when no
+projection-metadata row exists yet, returns a synthetic dictionary carrying
+`revision: 0`. `FOR UPDATE` locks rows, not keys: a row that does not exist
+cannot be locked. So two concurrent first mutations both read revision 0, both
+pass the `expected_revision` check, and both compute `resulting_revision = 1`.
+
+For `update_projection_metadata` that is a lost update — the second
+`ON CONFLICT DO UPDATE` overwrites every field the first wrote. For the link
+paths the metadata survives, but the event log gains two events both declaring
+`0 -> 1`, describing a linear history that did not happen.
+
+The pattern is used correctly everywhere else: eleven other modules raise a
+not-found error when the locked row is missing. This is the one place where the
+row is optional by design, and the optional case is where the token is invented.
+
+A minimal repair, for the owner: carry the expected revision into the upsert's
+conflict clause — `ON CONFLICT ... DO UPDATE SET ... WHERE
+agency_information_projection_metadata.revision = <expected_revision>` — and
+require `rowcount == 1`. On a genuine first write exactly one racer's INSERT
+succeeds; the loser conflicts, its guarded UPDATE matches nothing, and it fails
+as stale instead of overwriting.
+
 ## Attribution is a separate axis from authorization
 
 Four modules now show the same split, and it is not the gate's to fix. The
@@ -48,6 +76,7 @@ agency_information        X-Pantheon-Actor         asserted, required, then disc
 knowledge                 created_by               a body field, persisted verbatim
 knowledge_edit_variants   X-Pantheon-Human-Actor   asserted, persisted; kind is a literal
 decision_requests         X-Pantheon-Human-Actor   asserted — and so is its assurance level
+information_projection    X-Pantheon-Actor         asserted, persisted into the event log
 ```
 
 The last line is the one that settles the question. `decision_requests` is the
@@ -497,9 +526,53 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
         "local_guards": ("required binding_id", "raises on unknown binding", "idempotent when already revoked"),
         "reviewed": "Withdraws an ability, so it is safety-increasing. Same finding as disable_principal: no actor is recorded on the revocation.",
     },
-    ("information_projection.py", "add_document_link"): _UNREVIEWED,
-    ("information_projection.py", "remove_document_link"): _UNREVIEWED,
-    ("information_projection.py", "update_projection_metadata"): _UNREVIEWED,
+    ("information_projection.py", "add_document_link"): {
+        "gate": "none",
+        "local_guards": ("actor_kind human or system, no default", "Information and Document existence checked", "link role vocabulary", "row lock once the metadata row exists", "expected_revision, unserialised on the first write", "idempotency with payload digest", "event derived from the write's own result"),
+        "reviewed": (
+            "Links a Document to an Information card: metadata about what backs a "
+            "card, not a change to what the card says. Both endpoints are checked "
+            "to exist before the write. `observed_version` and `observed_digest` "
+            "are caller-supplied and unverified against the Document, which the "
+            "names say plainly — they record what the linker saw, not a validated "
+            "fact, and this review has recorded the opposite naming twice. "
+            "Notable in the other direction: the upsert returns `(xmax = 0)` and "
+            "the event type is chosen from that, so `document_link_added` versus "
+            "`document_link_updated` reflects what the statement did rather than "
+            "what a preceding SELECT predicted. The comment says a prior version "
+            "got this wrong and left the history describing a creation that never "
+            "happened. That is a record derived from an effect instead of "
+            "asserted beside it. Corrected on review: see the first-write race "
+            "recorded in this module's docstring section; the row lock and "
+            "`expected_revision` above hold only once the metadata row exists."
+        ),
+    },
+    ("information_projection.py", "remove_document_link"): {
+        "gate": "none",
+        "local_guards": ("actor_kind human or system, no default", "row lock once the metadata row exists", "expected_revision, unserialised on the first write", "rowcount == 1 or the link did not exist", "idempotency with payload digest"),
+        "reviewed": (
+            "Unlinks a Document from an Information card, withdrawing a "
+            "projection rather than changing governed content. The DELETE asserts "
+            "`rowcount == 1`, so removing a link that was not there is an error "
+            "rather than a silent success — the event log cannot record a removal "
+            "that removed nothing. Corrected on review: the row lock and "
+            "`expected_revision` hold only once the metadata row exists — see the "
+            "first-write race in this module's docstring section."
+        ),
+    },
+    ("information_projection.py", "update_projection_metadata"): {
+        "gate": "none",
+        "local_guards": ("actor_kind human or system, no default", "media-type vocabulary", "contact refs resolved against their tables", "row lock once the metadata row exists", "expected_revision, unserialised on the first write", "idempotency with payload digest"),
+        "reviewed": (
+            "Edits projection metadata — dates, media types, contact references. "
+            "`projection != persistence` and `projection != governed identity` "
+            "both apply: none of this changes what the Information says or who "
+            "may act on it. Contact references are resolved against their tables "
+            "rather than stored as free strings. Corrected on review: this is the "
+            "path where the first-write race recorded below costs a lost update, "
+            "not just a false history line."
+        ),
+    },
     ("knowledge.py", "apply_edit_request"): {
         "gate": "gate_required_not_wired",
         "local_guards": ("request status", "re-read under lock", "version and selection digest", "single transaction with audit", "idempotency"),
@@ -831,14 +904,14 @@ def test_the_unreviewed_debt_is_visible_and_does_not_grow() -> None:
     """Enumerated is not reviewed, and the gap is recorded rather than implied.
 
     The widened net enumerated 64 entry points that had not been read
-    individually. Thirty-one have now been reviewed, leaving 33. Reviewing one means
+    individually. Thirty-four have now been reviewed, leaving 30. Reviewing one means
     replacing `_UNREVIEWED` with its real guard regime and the reasoning behind
     it. This bound exists so the debt shrinks deliberately and cannot quietly
     grow.
     """
     unreviewed = [key for key, record in INVENTORY.items() if record["gate"] == "unreviewed"]
-    assert len(unreviewed) <= 33, (
-        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 33. A new "
+    assert len(unreviewed) <= 30, (
+        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 30. A new "
         "mutation entry point must be reviewed, not added to the backlog."
     )
 
