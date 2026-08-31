@@ -36,6 +36,7 @@ from .agency_data_api import install_agency_data_routes
 from .cockpit_api import create_app
 from .hermes_handoff_api import install_hermes_handoff_preview_routes
 from .information_projection_api import install_information_projection_routes
+from .policy_gate import HttpPolicyClient, PolicyClient
 from .source_intake_api import install_source_intake_routes
 
 COCKPIT = Path(__file__).resolve().parent / "cockpit"
@@ -129,6 +130,8 @@ def create_cockpit_app(
     hermes_api_key: str | None = None,
     update_signing_secret: str | None = None,
     public_url: str | None = None,
+    policy_client: PolicyClient | None = None,
+    policy_enforcement: str | None = None,
 ) -> FastAPI:
     """Compose the existing bounded API with the cards-first static shell."""
     app = create_app(
@@ -144,6 +147,37 @@ def create_cockpit_app(
         if update_signing_secret is not None
         else os.getenv("MVP_UPDATE_SIGNING_SECRET", "")
     )
+
+    # The Pantheon chokepoint. `enforce_consequential` and `HttpPolicyClient`
+    # existed and were tested long before anything called them: `policy_client`
+    # had no non-test caller, so every consequential write here ran on this
+    # module's local guards alone while the doctrine described a central gate.
+    #
+    # Enforcement defaults to `required`. A deployment that runs without a policy
+    # decision point must say so, by name, and the refusal is scoped to the
+    # consequential route: read-only projections keep working with no PDP.
+    #
+    #     gate implemented != gate invoked
+    #     unconfigured != permitted
+    app.state.policy_enforcement = (
+        policy_enforcement
+        if policy_enforcement is not None
+        else os.getenv("MVP_POLICY_ENFORCEMENT", "required")
+    ).strip().lower()
+    if app.state.policy_enforcement not in {"required", "disabled"}:
+        raise ValueError(
+            "MVP_POLICY_ENFORCEMENT must be 'required' or 'disabled'; "
+            f"got {app.state.policy_enforcement!r}"
+        )
+
+    if policy_client is not None:
+        app.state.policy_client = policy_client
+    else:
+        base_url = os.getenv("MVP_POLICY_API_URL", "").strip()
+        api_key = os.getenv("MVP_POLICY_API_KEY", "").strip()
+        app.state.policy_client = (
+            HttpPolicyClient(base_url, api_key) if base_url and api_key else None
+        )
 
     if initialize_fn is _DEFAULT_INITIALIZER:
         initialize_fn = initialize_cockpit_schema if connect_fn is connect_cockpit else None
@@ -199,6 +233,28 @@ def create_cockpit_app(
         if editor_match:
             return "human"
         raise HTTPException(status_code=401, detail="invalid Agency Data writer key")
+
+    def require_policy_client() -> PolicyClient | None:
+        """Return the policy decision point, or refuse the consequential write.
+
+        Returning ``None`` is reachable only through an explicitly disabled
+        enforcement posture. An unconfigured decision point under the default
+        posture is a refusal, never a silent bypass.
+        """
+        if app.state.policy_enforcement == "disabled":
+            return None
+        client = app.state.policy_client
+        if client is None:
+            raise HTTPException(
+                status_code=503,
+                detail=(
+                    "Pantheon policy decision point is not configured; a "
+                    "consequential Knowledge write cannot be admitted. Set "
+                    "MVP_POLICY_API_URL and MVP_POLICY_API_KEY, or declare "
+                    "MVP_POLICY_ENFORCEMENT=disabled explicitly."
+                ),
+            )
+        return client
 
     def require_update_signing_secret() -> str:
         secret = app.state.update_signing_secret
@@ -401,8 +457,14 @@ def create_cockpit_app(
         _authorized: None = Depends(require_editor_key),
         signing_secret: str = Depends(require_update_signing_secret),
         actor: str = Depends(require_human_actor),
+        policy_client: PolicyClient | None = Depends(require_policy_client),
     ) -> dict:
-        """Apply only the exact signed and explicitly confirmed Knowledge UPDATE."""
+        """Apply only the exact signed and explicitly confirmed Knowledge UPDATE.
+
+        The policy dependency resolves before the body is touched, so an
+        unconfigured decision point refuses the request rather than reaching the
+        signed-preview checks and the database.
+        """
         return knowledge_update_write(
             lambda conn: knowledge_update.apply_knowledge_update(
                 conn,
@@ -410,6 +472,7 @@ def create_cockpit_app(
                 knowledge_id=knowledge_id,
                 actor=actor,
                 signing_secret=signing_secret,
+                policy_client=policy_client,
                 **body.model_dump(),
             )
         )

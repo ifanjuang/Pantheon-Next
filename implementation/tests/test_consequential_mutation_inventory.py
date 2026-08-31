@@ -15,8 +15,12 @@ entry point defends itself with its own local checks — signed previews,
 confirmation phrases, optimistic concurrency, idempotency keys, admission state
 machines — and no two of them share a guard.
 
-Local defence is not the problem. The problem is that a new entry point can be
-added tomorrow inheriting none of it, with no check noticing.
+Local defence was never the problem. The problem is that a new entry point can
+be added tomorrow inheriting none of it, with no check noticing.
+
+The Cockpit's Knowledge write is now wired to the chokepoint and enforcement
+defaults to required, so one entry point below records real coverage. The rest
+do not, and that is the current honest state rather than a defect list.
 
 ## How the surface is discovered, and why not by name
 
@@ -161,8 +165,13 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     ("knowledge_edit_variants.py", "reject_request"): _UNREVIEWED,
     ("knowledge_edit_variants.py", "select_variant"): _UNREVIEWED,
     ("knowledge_update.py", "apply_knowledge_update"): {
-        "gate": "optional",
-        "local_guards": ("signed preview", "exact confirmation phrase", "expected_version and base digest", "idempotency"),
+        "gate": "enforce_consequential",
+        "local_guards": (
+            "signed preview",
+            "exact confirmation phrase",
+            "expected_version and base digest",
+            "idempotency",
+        ),
     },
     ("project_document_admission.py", "admit_source_as_revision"): {
         "gate": "none",
@@ -291,7 +300,13 @@ def _claimed_covered() -> set[tuple[str, str]]:
 
 
 def test_a_coverage_claim_requires_a_client_that_can_exist() -> None:
-    """No entry point may claim a call that nothing can reach."""
+    """No entry point may claim a call that nothing can reach.
+
+    Before the application factory built one, `HttpPolicyClient` had no non-test
+    instantiation, so a claim of `enforce_consequential` described a call that
+    could not happen. Removing the wiring must make that claim fail again rather
+    than leave the inventory asserting coverage the deployment lost.
+    """
     sources = "\n".join(path.read_text(encoding="utf-8") for path in MVP.rglob("*.py"))
     if "HttpPolicyClient(" not in sources:
         assert not _claimed_covered(), (
@@ -301,9 +316,22 @@ def test_a_coverage_claim_requires_a_client_that_can_exist() -> None:
 
 
 def test_a_coverage_claim_is_backed_by_a_real_call() -> None:
+    """A declared claim must be visible in the module that makes it."""
     for module, function in sorted(_claimed_covered()):
         source = (MVP / module).read_text(encoding="utf-8")
         assert "enforce_consequential(" in source, (
             f"{module}::{function} is recorded as routing through the chokepoint, "
             "but the module contains no call to enforce_consequential"
         )
+
+
+def test_the_wired_entry_point_is_reachable_only_with_a_decision_point() -> None:
+    """The claim must hold at the application boundary, not only in the module.
+
+    A module that calls the gate when handed a client still bypasses it when the
+    application hands it None. Enforcement therefore defaults to required, and
+    `test_policy_client_assembly.py` covers the refusal paths in full.
+    """
+    shell = (MVP / "cockpit_shell.py").read_text(encoding="utf-8")
+    assert "require_policy_client" in shell
+    assert 'os.getenv("MVP_POLICY_ENFORCEMENT", "required")' in shell
