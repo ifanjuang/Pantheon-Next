@@ -87,25 +87,47 @@ And `reserve_launch`'s docstring names the assumption a caller would otherwise
 make: a replay of the same idempotency key returns the same immutable
 reservation and is not permission to submit Hermes again.
 
-## The finding: the first link of the digest chain is asserted
+## The digest chain, corrected
 
-`preview_digest` is taken from the caller's preview in `submit_handoff` and
-**never recomputed from that preview's content**, anywhere in the codebase.
+The first version of this record claimed `preview_digest` was taken from the
+caller's preview and never recomputed from that preview's content anywhere in
+the codebase. **That was wrong, and review caught it.**
 
-Everything downstream compares it: the immutable basis at admission, the
-re-derivation in `get_execution_envelope`, `expected_preview_digest` at the
-handoff API. So it is a genuine seal against drift *between* stages — and the
-value it seals was supplied rather than computed.
+`hermes_handoff_preview.build_preview` sets
 
-Recorded rather than escalated. The effect of `submit_handoff` is a request, and
-the admission it can reach is bounded to `read_only` work on an open Work Issue
-whose Task Contract and Context Pack must already match the handoff's. The
-constraint that does the work there is the governed Work Issue row, not the
-digest.
+```python
+preview["preview_digest"] = _digest(preview)
+```
 
-I nearly wrote seven `none` verdicts without checking this one, on a module
+over the preview it has just built. The sole production caller of
+`submit_handoff` — `submit_hermes_handoff` — rebuilds the preview server-side
+with `prepare(preview_body)` and passes that object; the client's
+`expected_preview_digest` is only compared against it, to reject a stale scope
+with 409. The client cannot supply the digest that gets stored.
+
+What remains true is narrower, and is the shape this review has recorded
+repeatedly: the protection is **route-borne, not module-borne**.
+`submit_handoff` does not recompute the digest from the preview it is handed, so
+a second caller added later would inherit none of it, while the chain every
+downstream stage relies on — the immutable basis at admission, the re-derivation
+in `get_execution_envelope` — would still read as anchored.
+
+## How the wrong version happened
+
+The claim rested on a `grep` for `preview_digest` truncated by `head -20`. The
+assignment lives in `hermes_handoff_preview.py`, a file the batch never opened,
+and it was below the cut.
+
+That is the second time today a record asserted something from a search result
+taken for the search itself; the first was an event-write count read off
+`actor_kind=` matches. Both are the same move this review keeps recording
+against the code, committed against the code by the review.
+
+The original note still stands on its own terms, and is worth keeping: I nearly
+wrote seven `none` verdicts without examining this link at all, on the module
 whose other controls are the strongest in the codebase. Strength elsewhere is
-not evidence about the link you did not read.
+not evidence about the link you did not read — and a truncated search is not a
+reading.
 
 ## Local distinctions
 
@@ -113,6 +135,7 @@ not evidence about the link you did not read.
 admitted read_only     != authorized consequential
 runtime start recorded != Evidence
 launch reservation     != dispatch
-compared digest        != computed digest
+route-borne guard      != module-borne guard
+truncated search       != reading
 checked in Python      != checked below Python
 ```
