@@ -84,8 +84,17 @@ halves of it are unverified:
 
 - `actor` is the `X-Pantheon-Human-Actor` header value, non-empty and nothing
   more;
-- `actor_kind` is a literal written at the call site. All six event writes in
-  this module pass a constant — five `"human"`, one `"system"`.
+- `actor_kind` is a literal written at the call site. There are four
+  `_insert_event` sites — one `"system"` for the projection, three `"human"` for
+  selection, rejection and application.
+
+Amended on review. That was first recorded as six event writes, five `"human"`
+and one `"system"`, which counted `actor_kind=` matches in the file rather than
+reading what each call was to: two of the six are arguments to
+`knowledge.apply_edit_request`, not event writes. Six literals, four of them in
+the audit log. The finding is unchanged — every one is a constant — but the
+count was asserted from a grep pattern instead of from the call sites, which is
+the same move this review keeps recording against the code.
 
 So the column records the kind the code path intends, never the kind of the
 caller observed. Across four modules the same header now has four fates:

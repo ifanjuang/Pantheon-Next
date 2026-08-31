@@ -68,8 +68,9 @@ The header is enforced as though it mattered and stored nowhere.
 
 And in `knowledge_edit_variants` the review event log — the record of who chose,
 who refused and who applied — takes its `actor` from that header and its
-`actor_kind` from a literal written at each call site. Both halves of the
-attribution are decided by the code path rather than observed from the caller.
+`actor_kind` from a literal written at each of its four `_insert_event` sites,
+one `system` and three `human`. Both halves of the attribution are decided by the
+code path rather than observed from the caller.
 
 ## What keeps being wrong
 
@@ -645,9 +646,16 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "(`knowledge_mutated: False`). Both halves of the attribution it "
             "writes are unverified, though: `actor` is the "
             "`X-Pantheon-Human-Actor` header value, and `actor_kind` is a literal "
-            "at the call site — as it is in all six event writes in this module, "
-            "five `human` and one `system`. The column records the kind the code "
-            "path intends, never the kind of the caller observed."
+            "at the call site — as it is at every site in this module. Corrected "
+            "on review: that was first written as six event writes, five `human` "
+            "and one `system`, which counted `actor_kind=` matches rather than "
+            "reading what each call was to. There are four `_insert_event` sites, "
+            "one `system` for the projection and three `human` for selection, "
+            "rejection and application; the remaining two literals are passed into "
+            "`knowledge.apply_edit_request`. Six literals, four of them in the "
+            "audit log. The point is unchanged and the count was not checked: the "
+            "column records the kind the code path intends, never the kind of the "
+            "caller observed."
         ),
     },
     ("knowledge_update.py", "apply_knowledge_update"): {
