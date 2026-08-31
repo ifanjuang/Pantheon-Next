@@ -27,7 +27,7 @@ def test_source_research_summary_manifest_conforms_to_current_schema():
     )
 
 
-def test_source_research_summary_manifest_reuses_existing_source_boundaries():
+def test_source_research_summary_manifest_keeps_only_specific_research_delta():
     manifest = _load_yaml(MANIFEST)
     text = MANIFEST.read_text(encoding="utf-8")
 
@@ -40,15 +40,16 @@ def test_source_research_summary_manifest_reuses_existing_source_boundaries():
         "fanout_extract_then_single_synthesis",
     }
 
-    assert "workspace source-notebook entries as seed sources" in text
+    assert "URL, document, Source Reference, or authorized Source Lead" in text
     assert "task-relevant references discovered inside inspected sources" in text
-    assert "discovered references are Source Leads" in text
-    assert "never implied by a Markdown link" in text
-    assert "unbounded crawling" in text
+    assert "bounded independent challenge discovery" in text
+    assert "discovered references remain Source Leads" in text
+    assert "linked access is the default posture" in text
     assert "unbounded_recursive_crawl" in text
-    assert "recursive crawl is not a default behavior" in text
-    assert "same URL may expose different content" in text
-    assert "Research outputs, source leads, caches, and summaries do not promote themselves" in text
+    assert "automatic_source_ingestion" in text
+
+    assert "workspace source-notebook" not in text
+    assert "Markdown notebook" not in text
 
 
 def test_source_research_summary_manifest_is_registered_once():
