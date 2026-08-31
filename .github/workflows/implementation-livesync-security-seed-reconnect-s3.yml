@@ -81,7 +81,13 @@ jobs:
       - name: Run upstream real-Obsidian restart/reconnect scenario
         working-directory: obsidian-livesync
         shell: bash
-        run: xvfb-run -a npm run test:e2e:obsidian:focused -- security-seed-reconnect
+        # One bounded retry around the shared upstream session-start wait.
+        # The scenario runs in full and must pass; a real regression fails
+        # both attempts. A first-attempt failure is always written to the run
+        # summary, so the flake stays countable instead of silently absorbed.
+        run: >-
+          "$GITHUB_WORKSPACE/monorepo/implementation/tools/obsidian_e2e_with_flake_report.sh"
+          xvfb-run -a npm run test:e2e:obsidian:focused -- security-seed-reconnect
 
       - name: Capture bounded acceptance summary
         if: success()

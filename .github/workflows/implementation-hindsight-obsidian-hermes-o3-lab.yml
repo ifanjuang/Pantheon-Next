@@ -6,14 +6,21 @@
 
 name: Hindsight Obsidian Hermes O3 Shared Bank
 
+# Frozen historical lab. It pins Hindsight, hindsight-obsidian and Hermes at
+# versions the canonical registry no longer targets, and it is exempted from the
+# pin-drift guard through HISTORICAL_ACTIVE_PATHS, so nothing reports the gap.
+#
+# It ran on pull_request until 2026-08-31, where a green result read as a
+# qualification of a combination it no longer tests. Adding the pin registry to
+# its triggers would not fix that: the scenario is written against the older
+# Hindsight API and would simply fail.
+#
+# Dispatch-only until it is either rebuilt against the current pins or retired.
+# See WHAT_RUNS.md for the recorded status.
+#
+#     lab green != qualification
+#     frozen fixture != current target
 on:
-  pull_request:
-    paths:
-      - ".github/workflows/implementation-hindsight-obsidian-hermes-o3-lab.yml"
-      - "implementation/tools/run_hindsight_obsidian_hermes_o3.sh"
-      - "implementation/tools/run_hindsight_hermes_o1.py"
-      - "implementation/tools/hindsight_hermes_o1_fixture.py"
-      - "implementation/tests/test_hindsight_obsidian_hermes_o3_contract.py"
   workflow_dispatch:
 
 permissions:
