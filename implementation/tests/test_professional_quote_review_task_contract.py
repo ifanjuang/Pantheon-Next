@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-import json
 import re
 from pathlib import Path
 
+import pytest
 import yaml
 
 from mvp_vertical import runner
 from mvp_vertical.contract import load_contract
+from mvp_vertical.drafting import DeterministicDrafter
 from mvp_vertical.retrieval import HybridRetrievedChunk
 from mvp_vertical.store import RetrievedChunk
 
@@ -54,7 +55,27 @@ def test_summary_only_contracts_keep_legacy_plain_drafter_intent() -> None:
         contract = load_contract(path)
         assert set(contract.raw["intent"]) == {"summary"}
         assert contract.intent == contract.intent_summary
-        assert not contract.intent.startswith("{")
+        assert isinstance(contract.intent, str)
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        "null",
+        "123",
+        '{"action":"review"}',
+        '{"summary":"literal summary text"}',
+    ],
+)
+def test_deterministic_drafter_preserves_json_looking_plain_summary(summary: str) -> None:
+    body = DeterministicDrafter().draft(
+        intent=summary,
+        question="fallback question",
+        chunks=[],
+    )
+
+    assert f"Votre demande : {summary}" in body
+    assert "Votre demande : fallback question" not in body
 
 
 def test_runner_transports_complete_review_method_to_drafter() -> None:
@@ -82,7 +103,7 @@ def test_runner_transports_complete_review_method_to_drafter() -> None:
 
     class CapturingDrafter:
         def draft(self, *, intent, question, chunks):
-            observed["intent"] = json.loads(intent)
+            observed["intent"] = intent
             return f"Point à examiner [{source_ref}#chunk-0]."
 
     output = runner._run_with_hits(
@@ -94,6 +115,7 @@ def test_runner_transports_complete_review_method_to_drafter() -> None:
 
     assert output.kind == "candidates"
     assert observed["intent"] == contract.raw["intent"]
+    assert observed["intent"] is not contract.raw["intent"]
     projected = observed["intent"]
     assert isinstance(projected, dict)
     assert projected["method_projection"]["authority_ref"] == (
