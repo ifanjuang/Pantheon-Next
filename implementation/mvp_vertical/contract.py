@@ -49,15 +49,18 @@ class TaskContract:
 
     @property
     def intent(self) -> str:
-        """Complete stated intent passed to the drafter as task context.
+        """Task context passed to the drafter without widening legacy behavior.
 
-        Object-shaped intents are serialized deterministically instead of being
-        collapsed to ``summary``. This preserves bounded task-scoped method data
-        such as ``method_projection`` without granting it any new authority.
-        Scalar legacy intents remain unchanged.
+        Existing summary-only object intents remain the same plain summary
+        string. When an object-shaped intent carries additional bounded task
+        context, serialize the complete object deterministically so fields such
+        as ``method_projection`` are not discarded before the drafting seam.
+        Receipt of those fields does not grant them authority.
         """
         intent = self.raw.get("intent")
         if isinstance(intent, dict):
+            if set(intent) <= {"summary"}:
+                return str(intent.get("summary", "")).strip()
             return json.dumps(
                 intent,
                 sort_keys=True,
