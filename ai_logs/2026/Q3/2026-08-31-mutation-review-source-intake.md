@@ -55,10 +55,27 @@ label — seventh module, same axis — but a caller cannot inherit it by omissi
 
 ## Three structural choices worth recording
 
-**A suggestion cannot become a link by being written.** `suggest_projects`
-writes to its own column and never touches `project_id` or
-`project_link_status`. `retrieved data != truth`, kept in the table shape rather
-than in a rule someone has to remember.
+**A suggestion removes a link by being written.** This record first claimed the
+opposite — that `suggest_projects` writes to its own column and never touches
+`project_id` or `project_link_status`. Review corrected it. The assignment dict
+is on the same line as the call:
+
+```python
+assignments={"candidate_project_refs": normalized,
+             "project_link_status": "suggested",
+             "project_id": None}
+```
+
+Suggesting on an already-linked Source therefore unlinks it, and nothing refuses
+that or asks for it. The regime stays `none` — the effect is the same class as
+`unlink_project`, recorded separately — but it is a state transition no caller
+requested, and whether `suggest_projects` should refuse a linked Source or
+preserve its link is the owner's to decide.
+
+I wrote the claim from the function's name and purpose without reading the
+assignment beside it, then headlined the batch with it. Eighth instance of this
+review's own recurring failure, and the most direct: a property asserted from
+what the code is for rather than from what it does.
 
 **Restoring does not re-link.** `restore_source` returns an excluded Source to
 `unassigned` with a null project, not to whatever project it had before. The
@@ -76,6 +93,7 @@ worth noting where it appears.
 
 ```text
 suggestion        != link
+suggesting        != leaving the link alone
 excluded          != deleted
 restored          != re-linked
 format valid      != verified
