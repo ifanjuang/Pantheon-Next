@@ -54,6 +54,37 @@ each writes an event carrying the resulting snapshot.
 not linked is an error rather than a silent success — the event log cannot
 record a removal that removed nothing.
 
+## Amendment: the first write is not serialised
+
+Review caught a guard this record named without qualification. All three entries
+listed "row lock" and "expected_revision"; both hold only once the
+projection-metadata row exists.
+
+`_metadata_row(..., lock=True)` runs `SELECT ... FOR UPDATE` and, when no row is
+there yet, returns a synthetic dictionary carrying `revision: 0`. `FOR UPDATE`
+locks rows, not keys — a row that does not exist cannot be locked. Two concurrent
+first mutations therefore both read revision 0, both pass the check, and both
+compute `resulting_revision = 1`.
+
+For `update_projection_metadata` that is a lost update: the second
+`ON CONFLICT DO UPDATE` overwrites every field the first wrote. For the link
+paths the metadata survives, but the event log gains two events both declaring
+`0 -> 1` — a linear history that did not happen, in an append-only table.
+
+The pattern is used correctly everywhere else. Eleven other modules raise a
+not-found error when the locked row is missing; this is the one place where the
+row is optional by design, and the optional case is where the concurrency token
+is invented rather than read.
+
+A minimal repair, for the owner to take or refuse: carry the expected revision
+into the upsert's conflict clause and require `rowcount == 1`. On a genuine first
+write exactly one racer's INSERT succeeds; the loser conflicts, its guarded
+UPDATE matches nothing, and it fails as stale instead of overwriting.
+
+Worth stating flatly: this record was written to praise the module for deriving
+its event type from the write rather than predicting it, and in the same breath
+credited a lock that is not taken on the path that matters most.
+
 ## Two things worth naming, one in each direction
 
 ### `observed_version` and `observed_digest` are unverified, and say so
