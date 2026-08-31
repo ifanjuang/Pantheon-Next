@@ -39,6 +39,31 @@ defect corrected in the classification cluster, avoided here.
 asserts `rowcount == 1`. A race that slips past the first check still cannot
 write.
 
+## Amendment: one of the strengths above was not there
+
+Review caught a claim in the first version of this record. It said
+`create_information`'s field allowlist was "derived from the schema rather than
+written out twice". Neither half was true.
+
+The set passed to `_schema_values` is seventeen names spelled out at the call
+site, duplicating the keys of the dict immediately above it. `_schema_values`
+forwards whatever allowlist its caller hands it to
+`normalize_declared_fields`, which validates against the field registry — not
+against any declared view. A `create` view exists in the Information schema and
+today matches the handwritten set exactly, minus `project_id`, which is a path
+parameter rather than a body field. Nothing holds the two in step.
+
+`update_working_information` next door genuinely does derive its allowlist,
+through `_editable_fields()` and the `edit` view. The two paths differ in kind,
+and the reading above collapsed them because `_schema_values` sounds like the
+derivation it is not.
+
+That is the same failure this review keeps recording, committed once more inside
+the batch that praises the module for avoiding it: a guard described by what it
+resembles rather than by what it composes to. The fix — derive the create
+allowlist from the `create` view, adding `project_id` — is a behaviour change and
+is left to the owner, like every other finding in this series.
+
 ## Two things that do not hold
 
 ### `derive_working_version` defaults `actor_kind` to `"human"`

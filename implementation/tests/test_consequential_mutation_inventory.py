@@ -272,12 +272,22 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("agency_information.py", "create_information"): {
         "gate": "none",
-        "local_guards": ("actor_kind human or system, no default", "new rows must start draft or in_progress", "source ref/note validation", "schema-restricted field allowlist"),
+        "local_guards": ("actor_kind human or system, no default", "new rows must start draft or in_progress", "source ref/note validation", "handwritten allowlist, validated against the field registry"),
         "reviewed": (
-            "Creates a draft, which approves nothing and supersedes nothing. The "
-            "field allowlist is derived from the schema rather than written out "
-            "twice, and `actor_kind` carries no default, so a direct caller has to "
-            "state its claim rather than inherit one."
+            "Creates a draft, which approves nothing and supersedes nothing, and "
+            "`actor_kind` carries no default, so a direct caller has to state its "
+            "claim rather than inherit one. Corrected on review: this record said "
+            "the field allowlist was derived from the schema rather than written "
+            "out twice. Neither half was true. The set passed to `_schema_values` "
+            "is seventeen names spelled out at the call site, duplicating the keys "
+            "of the dict directly above it, and `_schema_values` only forwards "
+            "whatever allowlist its caller hands it to `normalize_declared_fields`, "
+            "which checks the field registry — not any declared view. A `create` "
+            "view does exist and today matches the handwritten set exactly, minus "
+            "`project_id`, which is a path parameter; nothing holds them in step. "
+            "`update_working_information` next door does derive its allowlist, via "
+            "`_editable_fields()` and the `edit` view, so the two paths differ in "
+            "kind and only one of them was read correctly the first time."
         ),
     },
     ("agency_information.py", "derive_working_version"): {
