@@ -50,7 +50,6 @@ repository presence != selected architecture
 | Pantheon Cockpit adoption | executable candidate / not adopted | Live deployment, data bindings and operational acceptance remain separate decisions. |
 | Obsidian/Hindsight synchronization topology | partially qualified / external stabilization work remains | Real client/offline/conflict and deployment hardening remain separate from repository CI. |
 | Hermes external dashboard/plugin helpers | existing templates and candidates where present | Installation/enablement and live target state must be observed externally. |
-| Hindsight/Obsidian/Hermes O3 shared-bank lab | frozen historical fixture / not a current qualification | The lab pins Hindsight, `hindsight-obsidian` and Hermes at versions the canonical registry no longer targets, and `HISTORICAL_ACTIVE_PATHS` exempts it from the pin-drift guard, so nothing reported the gap. It ran on `pull_request` until 2026-08-31, where a green result read as a qualification of a combination it no longer tests; it is now `workflow_dispatch` only. Adding the pin registry to its triggers would not fix this — the scenario is written against the older Hindsight API. Remaining decision: rebuild it against the current pins, or retire it. Rebuilding is only worth it if shared memory between vaults still guards a real decision. |
 
 ## Refused target integrations and historical provenance
 

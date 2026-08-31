@@ -120,3 +120,37 @@ The composite action factoring the lab preamble (plan P2‑3) was sequenced firs
 ## Next
 
 The generalized required-path check (P1‑2) and the test-altitude migration (P1‑1) are the remaining root-cause items. The seven ungated mutation entry points (P1‑3) are each a separate review, not a mechanical pass.
+
+
+## Amendment, 2026-08-31 — O3 conceded to #893, and a framing corrected
+
+**O3 is no longer part of this change.** PR #893 retires the O3 live lane
+outright — workflow, harness and contract removed, with the two provider-neutral
+assertions O3 carried retained under the current O1 contract and a guard that
+the retired paths do not reappear. That is a better answer than the
+`workflow_dispatch`-only holding position taken here, so this branch drops its
+O3 edits rather than run a parallel path. Convergence over two owners.
+
+**A framing in the companion lab-accounting work was wrong.** It said seventeen
+labs "block merges". They do not. The active `protect-main` ruleset requires
+four status contexts — `mcp-server module tests`, `Read-only governance checks`,
+`Packaging and release contract`, `Obsolete document authority consistency` —
+and no qualification lab is among them. Running on `pull_request` is not the
+same as gating a merge.
+
+This is independently visible in data collected during that work: while
+`real-restart-reconnect` was failing on this branch, GitHub reported the pull
+request as `unstable`, not `blocked`. A failing *required* check yields
+`blocked`.
+
+```text
+runs on pull_request != required status check
+required status check != gates the merge button
+red non-required check != blocked merge
+```
+
+What survives that correction is the cost question, unchanged in substance:
+every lab's path filter watches the whole of `external-pins.json`, so one pin
+move fires all seventeen at once — which is the runner contention behind the
+Obsidian family's flake rate. Each lab already names the pins it consumes on its
+exporter command line; the trigger simply does not use that declaration.
