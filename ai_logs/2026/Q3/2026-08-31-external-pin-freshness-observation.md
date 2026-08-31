@@ -93,6 +93,40 @@ mcp-server/tests                                     229 passed
 
 The guard scans `.yml/.yaml/.py/.sh/.ts` and not `.json`, so the observation record itself is outside its scope. That is correct here: for an aligned pin, the observed head legitimately equals the pinned version, and forbidding that would make the file unwritable.
 
+## First CI run failed; both causes are recorded here
+
+The `contract` job was red on its first run. Two distinct defects, one of them a
+design error worth keeping in the record.
+
+**Missing package install.** `implementation/tests/conftest.py` imports
+`mvp_vertical` for its pgvector session guard, so any test under that directory
+needs the package installed. The job installed only `pytest`:
+
+```text
+ImportError while loading conftest '.../implementation/tests/conftest.py'
+tests/conftest.py:22: from mvp_vertical import store
+E   ModuleNotFoundError: No module named 'mvp_vertical'
+```
+
+It passed locally because the working environment already had
+`pip install -e "implementation[test]"`. The job now performs the same install
+`implementation-ci.yml` does.
+
+**Two questions sharing one exit code.** Behind that first failure sat a second
+one that would have surfaced on the next run: the `contract` step asked "are
+these records consistent and comparable?" and the CLI answered "is anything
+waiting on a human?" — exit 1, because three lags are undecided. A pull request
+would have been red for a release someone else published.
+
+That is a design error, not a typo: the tool conflated a structural question
+with a freshness verdict. `--structure-only` now separates them, three tests pin
+the distinction, and one of them asserts that silencing the lag verdict does not
+also silence a real inconsistency.
+
+Both were fixed in one push, validated in a clean virtual environment installed
+exactly as the workflow installs, rather than in the working environment that
+hid the first defect.
+
 ## Boundary
 
 ```text
@@ -101,6 +135,8 @@ report red != update authorized
 upstream head read != artifact installed
 acknowledged lag != permanent exemption
 scheduled check != gate on a pull request
+structural validity != freshness verdict
+green locally != green in CI
 ```
 
 ## Next admissible step

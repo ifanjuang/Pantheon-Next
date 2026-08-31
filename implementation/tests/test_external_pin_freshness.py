@@ -38,6 +38,7 @@ from tools.check_external_pin_freshness import (  # noqa: E402
     FreshnessError,
     compare,
     load_json,
+    main,
 )
 
 
@@ -204,3 +205,37 @@ def test_the_committed_records_parse_and_compare(registry, observations) -> None
     report = compare(registry, observations, {})
     assert len(report["rows"]) == len(registry["pins"])
     assert json.dumps(report)  # serialisable for the workflow artifact
+
+
+# --------------------------------------------------------------------------
+# The two questions the CLI answers must not collapse into one exit code.
+# --------------------------------------------------------------------------
+
+
+def test_structure_only_does_not_fail_on_an_undecided_lag(capsys) -> None:
+    """A pull request must not be reddened by a pin someone else moved.
+
+    The first run of this workflow failed exactly here: the pull-request job
+    asked "are these records consistent?" and received the answer to "is
+    anything waiting on a human?". An undecided lag is a standing state, not a
+    defect in the diff under review.
+    """
+    assert main(["--offline", "--structure-only", "--format", "json"]) == 0
+    capsys.readouterr()
+
+
+def test_the_default_run_still_reports_a_pin_needing_a_human_look(capsys) -> None:
+    report = compare(
+        load_json(REGISTRY, REGISTRY_SCHEMA), load_json(OBSERVATIONS, OBSERVATIONS_SCHEMA), {}
+    )
+    expected = 1 if report["actionable"] else 0
+    assert main(["--offline", "--format", "json"]) == expected
+    capsys.readouterr()
+
+
+def test_structure_only_still_fails_on_a_structurally_broken_record(tmp_path) -> None:
+    """Silencing the lag verdict must not silence a real inconsistency."""
+    registry, observations = _minimal()
+    registry["pins"]["undeclared"] = {"kind": "git", "version": "9.9.9"}
+    with pytest.raises(FreshnessError, match="missing"):
+        compare(registry, observations, {})

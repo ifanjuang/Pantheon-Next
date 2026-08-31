@@ -259,6 +259,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", type=Path)
     parser.add_argument("--offline", action="store_true", help="compare recorded state only")
     parser.add_argument("--observed-json", type=Path, help="inject upstream heads instead of fetching")
+    parser.add_argument(
+        "--structure-only",
+        action="store_true",
+        help=(
+            "answer only whether the registry and the observation record are "
+            "consistent and comparable; do not report a pin needing a human look "
+            "as a failure"
+        ),
+    )
     args = parser.parse_args(argv)
 
     registry = load_json(REGISTRY, REGISTRY_SCHEMA)
@@ -277,6 +286,13 @@ def main(argv: list[str] | None = None) -> int:
     if args.output:
         args.output.write_text(text + "\n", encoding="utf-8")
     print(text)
+
+    if args.structure_only:
+        # Two different questions share this tool, and only one of them is a
+        # pull-request concern. "Are the records consistent and comparable?" must
+        # stay answerable while pins legitimately lag: an undecided lag is a
+        # standing state for a human, not a defect in the diff under review.
+        return 0
 
     if report["actionable"]:
         print(

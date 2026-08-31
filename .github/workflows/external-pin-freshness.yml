@@ -42,14 +42,24 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - run: python3 -m pip install --quiet pytest
+      # implementation/tests/conftest.py imports mvp_vertical for its pgvector
+      # session guard, so any test under that directory needs the package
+      # installed — the same install implementation-ci.yml performs.
+      - name: Install the implementation package (with test extra)
+        run: python3 -m pip install --quiet -e "implementation[test]"
+
       - name: Exercise the comparison offline
         working-directory: implementation
         run: pytest -q tests/test_external_pin_freshness.py
 
+      # --structure-only asks whether the records are consistent and comparable.
+      # It must not fail on an undecided lag: that is a standing state for a
+      # human to resolve, not a defect in the diff under review.
       - name: Confirm the committed records still compare
         working-directory: implementation
-        run: python3 tools/check_external_pin_freshness.py --offline --format json > /dev/null
+        run: |
+          python3 tools/check_external_pin_freshness.py \
+            --offline --structure-only --format json > /dev/null
 
   observe:
     name: Observe upstream heads
