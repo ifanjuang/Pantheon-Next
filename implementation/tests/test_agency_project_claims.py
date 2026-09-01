@@ -90,6 +90,31 @@ def test_claim_updates_derived_project_projection_without_bumping_project_revisi
     ]
 
 
+def test_direct_claim_cannot_assert_verified_status(conn) -> None:
+    project = _project(conn)
+
+    with pytest.raises(
+        agency_claims.AgencyClaimError,
+        match="verified Project claim requires a human-reviewed execution_result candidate",
+    ):
+        agency_claims.record_claim(
+            conn,
+            project_id=project["project_id"],
+            claim_type="budget",
+            value=350000,
+            actor="human:test",
+            source_kind="human_assertion",
+            backing_ref={
+                "entity_type": "project",
+                "entity_id": project["project_id"],
+                "observed_status": "active",
+            },
+            status="verified",
+        )
+
+    assert agency_claims.list_project_claims(conn, project["project_id"]) == []
+
+
 def test_scalar_parcel_claims_are_aggregated_into_project_list_projection(conn) -> None:
     project = _project(conn)
     for value in ("AD-85", "AD-86"):

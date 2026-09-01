@@ -255,6 +255,14 @@ def record_claim(
         raise AgencyClaimError(f"{status} Project claim requires backing_ref")
     if source_kind == "execution_result" and normalized_candidate is None:
         raise AgencyClaimError("execution_result Project claim requires candidate_ref")
+    if status == "verified" and (
+        source_kind != "execution_result"
+        or normalized_candidate is None
+        or not normalized_candidate.get("review_disposition_id")
+    ):
+        raise AgencyClaimError(
+            "verified Project claim requires a human-reviewed execution_result candidate"
+        )
     if source_kind == "derived" and not str(derivation_note or "").strip():
         raise AgencyClaimError("derived Project claim requires derivation_note")
     expected_unit = field.get("unit")
