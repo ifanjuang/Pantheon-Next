@@ -1257,7 +1257,8 @@ def retrieve_scoped(
             "   ON p.dossier = c.dossier AND p.source_ref = c.source_ref"
             "  AND p.source_digest = c.source_digest AND p.chunk_no = c.chunk_no"
             " WHERE c.dossier = %s AND c.source_ref = ANY(%s)"
-            " ORDER BY distance ASC"
+            " ORDER BY distance ASC, c.source_ref ASC, c.source_digest ASC,"
+            "          c.chunk_no ASC"
             " LIMIT %s",
             (qvec, contract.dossier, list(contract.sources), top_k),
         )
@@ -1325,7 +1326,8 @@ def retrieve_exact_scoped(
             "   ON p.dossier = c.dossier AND p.source_ref = c.source_ref"
             "  AND p.source_digest = c.source_digest AND p.chunk_no = c.chunk_no"
             " WHERE c.dossier = %s"
-            " ORDER BY distance ASC"
+            " ORDER BY distance ASC, c.source_ref ASC, c.source_digest ASC,"
+            "          c.chunk_no ASC"
             " LIMIT %s",
             (source_refs, source_digests, qvec, contract.dossier, top_k),
         )
