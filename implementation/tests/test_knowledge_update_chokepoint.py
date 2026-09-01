@@ -44,6 +44,9 @@ def _signed_kwargs(actor="marie", now=1_000_000):
         confirmation_expires_at=expires,
         confirmation_phrase=knowledge_update.CONFIRMATION_PHRASE,
         idempotency_key="idem-key-123456",
+        task_contract_ref="task-contract:test",
+        evidence_pack_candidate_ref="evidence-pack-candidate:test",
+        human_decision_ref="human-decision:test",
         now=now,
     )
 

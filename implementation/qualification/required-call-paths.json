@@ -19,21 +19,20 @@
       "id": "policy-chokepoint",
       "symbol": "mvp_vertical.policy_gate:enforce_consequential",
       "expected_state": "entry_reachable",
-      "why": "The governance check itself. Reaching it is the floor, not the goal: the symbol layer cannot see that a caller passes no policy client, which is why the inventory and assembly tests exist alongside this entry."
+      "why": "The governance check itself. Reaching it is the floor, not the goal: assembly and mutation-inventory tests separately verify that the first Knowledge write is supplied a decision client under the required posture."
     },
     {
       "id": "policy-decision-client",
       "symbol": "mvp_vertical.policy_gate:HttpPolicyClient",
-      "expected_state": "test_called_only",
-      "blocked_by": "No runtime code constructs the PDP client. Every consequential path that reaches enforce_consequential therefore reaches it without a decision point, and the gate resolves locally.",
-      "why": "This is the dead path the module-level inventory could not see: the client is imported, typed, tested, and never built outside tests. Pinning it here means the day it becomes reachable, this file has to be updated deliberately rather than the change passing unremarked."
+      "expected_state": "entry_reachable",
+      "why": "The Cockpit factory now constructs the real PDP client when both MVP_POLICY_API_URL and MVP_POLICY_API_KEY are configured. Assembly tests also require an unconfigured consequential Knowledge write to fail closed by default. Entry reachability is still not a claim that a selected deployment has configured or exercised the client."
     },
     {
       "id": "governed-effect-wrapper",
       "symbol": "mvp_vertical.policy_gate:governed_effect",
       "expected_state": "test_called_only",
-      "blocked_by": "No runtime caller wraps an effect in the gate; the wrapper exists and is exercised only by its own tests.",
-      "why": "A gate that is implemented and never invoked reads as a gate that is in place. It is not the same thing, and this entry keeps the difference on the record."
+      "blocked_by": "No runtime caller wraps an effect in the generic gate helper; the first real Knowledge path binds the shared enforce_consequential seam directly so its existing persistence owner remains authoritative.",
+      "why": "A generic convenience wrapper is not required for the owner-specific write. Keeping its actual state explicit prevents a helper that exists only in tests from being mistaken for the application boundary."
     },
     {
       "id": "governed-capability-execution",
@@ -46,7 +45,7 @@
       "id": "knowledge-update-apply",
       "symbol": "mvp_vertical.knowledge_update:apply_knowledge_update",
       "expected_state": "entry_reachable",
-      "why": "The first owner-specific Knowledge mutation, and one of the two mutation entry points carrying the strongest local guard chain. Its route must stay connected to the application."
+      "why": "The first owner-specific Knowledge mutation. The Cockpit now supplies its decision client under a fail-closed default posture, while the owner binds the decision expectation to the exact signed UPDATE effect."
     },
     {
       "id": "handoff-admission",
