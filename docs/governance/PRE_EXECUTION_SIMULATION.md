@@ -178,6 +178,47 @@ provider-routing authority
 
 The relevant Evidence semantics remain with `EVIDENCE_PACK.md`; approval semantics remain with `APPROVALS.md` and `USER_DECISION_GATE.md`.
 
+## Paired baseline/candidate governance-damage accounting
+
+When a governance layer, prompt, policy, Skill or other candidate can change task utility, an aggregate candidate score is insufficient. The test should expose whether the intervention repaired failures or destroyed behavior that already worked.
+
+Use this technique only where a meaningful baseline exists. Before observing outcomes, freeze the exact baseline, exact candidate, representative case set and evaluation rule. Run both on the same cases under materially comparable conditions.
+
+For every paired case, classify the transition explicitly:
+
+```text
+baseline pass -> candidate fail = damage
+baseline fail -> candidate pass = rescue
+baseline pass -> candidate pass = pass survival
+baseline fail -> candidate fail = unchanged failure
+```
+
+Report the raw counts and denominators. Where the denominator is non-zero, the useful derived signals are:
+
+```text
+governance_damage_rate = pass_to_fail / baseline_passes
+rescue_rate            = fail_to_pass / baseline_failures
+pass_survival_rate     = pass_to_pass / baseline_passes
+```
+
+Keep abstention, refusal, timeout, transport failure and other liveness outcomes visible separately when they matter. A runtime failure must not be silently scored as a governance failure or governance success; the report should say which layer failed.
+
+```text
+same aggregate score != same regressions
+runtime liveness != governance quality
+candidate abstention != task success
+```
+
+Do not tune the frozen candidate after inspecting these paired outcomes and then report the same evaluation as if it were prospective. A material change creates a new candidate/version and therefore a new comparison. This keeps evaluation useful for falsification rather than turning observed failures into hidden benchmark optimization.
+
+The method creates no acceptance threshold by itself. Damage, rescue and survival remain review signals; the applicable Task Contract, Evidence, approval and User Decision Gate owners determine what consequence follows.
+
+```text
+paired evaluation != approval
+governance improvement != zero regressions
+frozen comparison != permanent benchmark
+```
+
 ## Improvement Candidate
 
 A simulation may produce an Improvement Candidate describing:

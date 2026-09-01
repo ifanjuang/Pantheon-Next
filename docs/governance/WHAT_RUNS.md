@@ -3,7 +3,7 @@
 Status: active support note — repository runtime-status map — implemented as documentation.
 Boundary profile: active_support_doctrine.
 
-Date: 2026-08-27
+Date: 2026-08-31
 
 This file distinguishes repository implementation, external observations, target selection and production adoption. It creates no runtime behavior or authorization.
 
@@ -44,8 +44,8 @@ repository presence != selected architecture
 
 | Area | Current status | Remaining proof |
 |---|---|---|
-| Hermes policy/PEP integration | co-located candidate / target round-trip not established here | Demonstrate mandatory target-runtime invocation, signed/qualified decision handling and real deployment boundary. |
-| Internal consequential-write chokepoint | implemented / tested / not wired | `policy_gate.enforce_consequential` and `HttpPolicyClient` exist and are tested, but the client is never instantiated outside tests and `policy_client` has no non-test caller. Consequential writes under `implementation/` are currently held by module-local guards — signed previews, confirmation phrases, optimistic concurrency, idempotency keys, admission state machines — not by the central gate. `implementation/tests/test_consequential_mutation_inventory.py` enumerates every entry point and its actual guard. Remaining proof: wire the client in the application factory and prove no mutation path can start without it. |
+| Hermes policy/PEP integration | co-located candidate / internal decision-client assembly exists / target enforcement not established | The Cockpit can assemble the real Pantheon decision client for one internal consequential Knowledge path. This does not establish mandatory invocation in the selected Hermes/runtime deployment. Demonstrate the target-runtime boundary, authenticated/qualified decision references and actual deployment configuration separately. |
+| Internal consequential-write chokepoint | partial — one reviewed application boundary wired; wider surface remains open | The mutation inventory still enumerates 72 entry points: 17 have been individually reviewed and 55 remain explicitly unreviewed. The Cockpit Knowledge UPDATE apply path now resolves the Pantheon decision client under a fail-closed default posture; an unconfigured decision point refuses that write, while local-guards-only operation must be selected explicitly. The Knowledge owner re-binds intent, write status, project scope and decision expectation from the exact signed UPDATE, so a caller-supplied candidate cannot broaden the effect Pantheon validates. Its existing `knowledge.revise_knowledge` transaction remains the persistence owner and validates before commit. Two other reviewed paths remain `gate_required_not_wired`: `human_access.bind_oidc_identity` and `apu_owner.store_reviewed_dossier`. Remaining proof: review the 55 unknown entries, wire only consequential application boundaries that actually require the PDP, and observe the selected deployment. A validated decision is not the applied effect; the returned effect-binding trace is not Evidence, approval or production proof. |
 | Core local/NAS document ingestion | co-located implementation candidate | Prove selected target paths, permissions, real-dossier authorization and operational rollback before production use. |
 | Pantheon Cockpit adoption | executable candidate / not adopted | Live deployment, data bindings and operational acceptance remain separate decisions. |
 | Obsidian/Hindsight synchronization topology | partially qualified / external stabilization work remains | Real client/offline/conflict and deployment hardening remain separate from repository CI. |

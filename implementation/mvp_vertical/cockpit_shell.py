@@ -36,6 +36,7 @@ from .agency_data_api import install_agency_data_routes
 from .cockpit_api import create_app
 from .hermes_handoff_api import install_hermes_handoff_preview_routes
 from .information_projection_api import install_information_projection_routes
+from .policy_gate import HttpPolicyClient, PolicyClient
 from .source_intake_api import install_source_intake_routes
 
 COCKPIT = Path(__file__).resolve().parent / "cockpit"
@@ -63,6 +64,11 @@ class KnowledgeUpdateApplyBody(KnowledgeUpdatePreviewBody):
     confirmation_expires_at: int = Field(ge=1)
     confirmation_phrase: str = Field(min_length=1, max_length=100)
     idempotency_key: str = Field(min_length=8, max_length=200)
+    task_contract_ref: str | None = Field(default=None, min_length=2, max_length=500)
+    evidence_pack_candidate_ref: str | None = Field(
+        default=None, min_length=2, max_length=500
+    )
+    human_decision_ref: str | None = Field(default=None, min_length=2, max_length=500)
 
 
 class StructureSiteScopeBody(BaseModel):
@@ -129,6 +135,8 @@ def create_cockpit_app(
     hermes_api_key: str | None = None,
     update_signing_secret: str | None = None,
     public_url: str | None = None,
+    policy_client: PolicyClient | None = None,
+    policy_enforcement: str | None = None,
 ) -> FastAPI:
     """Compose the existing bounded API with the cards-first static shell."""
     app = create_app(
@@ -144,6 +152,35 @@ def create_cockpit_app(
         if update_signing_secret is not None
         else os.getenv("MVP_UPDATE_SIGNING_SECRET", "")
     )
+
+    # The application boundary now assembles the existing Pantheon decision client
+    # instead of leaving the Knowledge owner with an optional client no runtime
+    # caller ever supplies. Enforcement is fail-closed by default and can be
+    # bypassed only through an explicitly named deployment posture.
+    #
+    #     gate implemented != gate invoked
+    #     unconfigured != permitted
+    app.state.policy_enforcement = (
+        policy_enforcement
+        if policy_enforcement is not None
+        else os.getenv("MVP_POLICY_ENFORCEMENT", "required")
+    ).strip().lower()
+    if app.state.policy_enforcement not in {"required", "disabled"}:
+        raise ValueError(
+            "MVP_POLICY_ENFORCEMENT must be 'required' or 'disabled'; "
+            f"got {app.state.policy_enforcement!r}"
+        )
+
+    if policy_client is not None:
+        app.state.policy_client = policy_client
+    else:
+        base_url = os.getenv("MVP_POLICY_API_URL", "").strip()
+        api_key_value = os.getenv("MVP_POLICY_API_KEY", "").strip()
+        app.state.policy_client = (
+            HttpPolicyClient(base_url, api_key_value)
+            if base_url and api_key_value
+            else None
+        )
 
     if initialize_fn is _DEFAULT_INITIALIZER:
         initialize_fn = initialize_cockpit_schema if connect_fn is connect_cockpit else None
@@ -200,6 +237,23 @@ def create_cockpit_app(
             return "human"
         raise HTTPException(status_code=401, detail="invalid Agency Data writer key")
 
+    def require_policy_client() -> PolicyClient | None:
+        """Return the decision point, or refuse this consequential write."""
+        if app.state.policy_enforcement == "disabled":
+            return None
+        client = app.state.policy_client
+        if client is None:
+            raise HTTPException(
+                status_code=503,
+                detail=(
+                    "Pantheon policy decision point is not configured; a "
+                    "consequential Knowledge write cannot be admitted. Set "
+                    "MVP_POLICY_API_URL and MVP_POLICY_API_KEY, or declare "
+                    "MVP_POLICY_ENFORCEMENT=disabled explicitly."
+                ),
+            )
+        return client
+
     def require_update_signing_secret() -> str:
         secret = app.state.update_signing_secret
         if not secret:
@@ -243,6 +297,8 @@ def create_cockpit_app(
             return with_connection(operation)
         except knowledge.KnowledgeNotFound as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except knowledge_update.KnowledgeUpdatePolicyUnavailable as exc:
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
         except knowledge_update.KnowledgeUpdateExpired as exc:
             raise HTTPException(status_code=410, detail=str(exc)) from exc
         except (knowledge.StaleKnowledgeWrite, knowledge.IdempotencyConflict) as exc:
@@ -401,8 +457,9 @@ def create_cockpit_app(
         _authorized: None = Depends(require_editor_key),
         signing_secret: str = Depends(require_update_signing_secret),
         actor: str = Depends(require_human_actor),
+        policy_client: PolicyClient | None = Depends(require_policy_client),
     ) -> dict:
-        """Apply only the exact signed and explicitly confirmed Knowledge UPDATE."""
+        """Apply only the exact signed, confirmed and admitted Knowledge UPDATE."""
         return knowledge_update_write(
             lambda conn: knowledge_update.apply_knowledge_update(
                 conn,
@@ -410,6 +467,7 @@ def create_cockpit_app(
                 knowledge_id=knowledge_id,
                 actor=actor,
                 signing_secret=signing_secret,
+                policy_client=policy_client,
                 **body.model_dump(),
             )
         )
