@@ -458,6 +458,23 @@ def revoke_grant(conn: psycopg.Connection, *, grant_id: str) -> dict[str, Any]:
     grant_id = _required(grant_id, "grant_id")
     with conn.transaction():
         row = get_grant(conn, grant_id)
+        if (
+            row["revoked_at"] is None
+            and row["resource_type"] == "project"
+            and row["resource_id"] == row["project_id"]
+            and row["action"] == "project.read"
+            and has_access(
+                conn,
+                principal_ref=row["principal_ref"],
+                project_id=row["project_id"],
+                resource_type="project",
+                resource_id=row["project_id"],
+                action="project.access.manage",
+            )
+        ):
+            raise HumanAccessError(
+                "cannot revoke project.read while principal holds active project.access.manage"
+            )
         if row["revoked_at"] is None:
             conn.execute(
                 "UPDATE human_resource_grants SET revoked_at = clock_timestamp() WHERE grant_id = %s",
