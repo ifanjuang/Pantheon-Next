@@ -9,8 +9,10 @@ This document is a direction record, not a runtime or adoption proof. It names t
 
 ```text
 USER INTERACTION
-  Hermes-compatible client surface
+  Hermes Desktop
+  selected rich interaction host
         |
+        | local backend or authenticated remote Hermes connection
         v
 EXECUTION
   Hermes Agent
@@ -25,6 +27,10 @@ GOVERNANCE
         +-> Pantheon Cockpit
               governed projections and decision/review surfaces
 
+BROWSER / ADMIN FALLBACK
+  Hermes Web/dashboard
+  browser interaction · runtime administration · remote-backend service surface
+
 OPTIONAL REPLACEABLE BINDINGS
   workspace / note client
   synchronization transport
@@ -35,13 +41,15 @@ PROFESSIONAL SOURCES
   exact files / source representations under existing document/source owners
 ```
 
-Pantheon does not require one particular workspace, synchronization product, RAG stack or memory engine.
+Pantheon does not require one particular workspace, synchronization product, RAG stack, memory engine or permanent Hermes client implementation.
 
 ## Responsibilities
 
 | Layer | Owns | Does not own |
 |---|---|---|
 | Hermes-compatible clients | conversation, sessions and runtime interaction | Pantheon governance or professional truth |
+| Hermes Desktop | selected rich interaction host, including local or remote Hermes runtime interaction when deployed | Pantheon authorization, governed persistence or professional truth |
+| Hermes Web/dashboard | browser/admin fallback and Hermes remote-backend service surface where selected | Pantheon governance, Evidence admission or a second Pantheon projection owner |
 | Hermes Agent | external execution, native runtime context/files/memory, tools and skills | approval, Evidence admission or Registre Probatoire promotion |
 | Pantheon Next | consequential status, contracts, gates, Evidence/approval/Register rules | general agent runtime, provider routing, chat UI, RAG engine or memory engine |
 | Pantheon Cockpit | governed product projections, Cards, navigation, review/decision surfaces | general-purpose chat frontend, source store or memory engine |
@@ -63,6 +71,9 @@ projection != persistence
 folder != governed identity
 sync success != professional approval
 provider selected != Pantheon dependency
+client selected != authority transfer
+remote connection established != task authorized
+UI action emitted != consequential effect authorized
 ```
 
 ## Zero-extra-provider posture
@@ -150,14 +161,25 @@ Their historical material remains provenance; compatibility code may be removed 
 
 ## Client posture
 
-Hermes client implementations are also replaceable.
+Hermes client implementations remain replaceable, but the current direction now distinguishes their roles.
 
-The Hermes web/dashboard is the current baseline. A compatible mobile/PWA client can be selected separately when its API compatibility, authentication and deployment boundaries are verified.
+Hermes Desktop is the selected rich interaction host. The reviewed Hermes line supports a native Desktop interaction surface and remote-backend operation, so the user-facing client may stay on one workstation while the Hermes runtime executes on another authenticated machine. That topology is an interaction/deployment choice, not an authority transfer.
+
+Hermes Web/dashboard remains the browser/admin fallback and, where the Hermes remote topology requires it, the remotely reachable backend service surface. It is not removed and does not become a Pantheon Cockpit substitute.
+
+The current generative-UI direction is to qualify A2UI, if still justified, inside the Hermes Desktop interaction layer rather than adding a general-purpose generative chat path to the Pantheon Cockpit. Any such renderer must remain presentation-only until an emitted UI intent passes the existing Pantheon/runtime effect boundary.
 
 ```text
+Desktop selected != Desktop mandatory forever
+remote Hermes reachable != remote Hermes qualified for governed work
+A2UI rendered != A2UI adopted
+A2UI surface != governed object
+A2UI action != Pantheon authorization
 client works != client selected
 client selected != Pantheon dependency
 ```
+
+A compatible mobile/PWA client can still be selected separately when its API compatibility, authentication and deployment boundaries are verified.
 
 ## Coherence criterion
 
@@ -166,11 +188,12 @@ The architecture is coherent when one bounded professional task can:
 ```text
 start from an identified scope/source
 -> use only the context/retrieval capability actually needed
+-> interact through a replaceable Hermes client
 -> pass existing Pantheon admission/policy boundaries when consequential
--> execute through Hermes
+-> execute through local or authenticated remote Hermes
 -> return reviewable candidates/observations
 -> preserve Evidence/approval distinctions
--> project status in the Cockpit when useful
+-> project governed status in the Cockpit when useful
 -> leave durable governed state only through the existing owner
 ```
 
@@ -180,6 +203,8 @@ No additional general-purpose frontend, DMS, scheduler, queue, RAG framework, pr
 
 ```text
 Pantheon specifies governance contracts, not a preferred personal knowledge stack.
+Hermes Desktop is the current rich interaction direction, not a Pantheon authority.
+Hermes Web/dashboard remains a replaceable browser/admin and remote-backend surface.
 Hermes native facilities are sufficient when they satisfy the task.
 External workspace, retrieval and memory providers stay optional and replaceable.
 Sources, retrieved context, memory and Evidence remain distinct.
