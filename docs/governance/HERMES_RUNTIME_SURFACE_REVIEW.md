@@ -2,7 +2,7 @@
 
 Status: candidate external-runtime review and selected qualification target — not installed, observed, activated or task-authorized.
 Boundary profile: external_reference_review.
-Current reviewed target: Hermes Agent 0.20.6 (`v2026.8.27`).
+Current reviewed target: Hermes Agent 0.21.0 (`v2026.8.31`).
 
 ## Responsibility
 
@@ -14,23 +14,24 @@ Do not duplicate those owners here. A new Hermes surface belongs here only when 
 
 ## Reviewed upstream artifact
 
-Official upstream state reviewed on 2026-08-30:
+Official upstream release and tagged source reviewed on 2026-09-01:
 
 ```text
 repository: NousResearch/hermes-agent
-version: 0.20.6
-tag: v2026.8.27
-release_date: 2026-08-27
-release_commit: 5fc308a70719a83cccdbba4c0e39c23f5a8239d5
+version: 0.21.0
+tag: v2026.8.31
+release_date: 2026-08-31
+release_commit: 29112bef099274229cadff79cdff7bf7b99c4b77
+annotated_tag_object: 6e8f8418e6378eb2617e4de074e13dedd091b8af
 ```
 
-The upstream release is a roll-up patch release covering roughly 525 merged PRs / 1,313 commits since 0.20.5. Its release note says the full curated 0.20.x feature summary is deferred to 0.21.0.
+The annotated tag resolves to the exact commit above. Upstream describes 0.21.0 as a roll-up over the 0.20.x patch window plus materially expanded Bot, peer, cron/continuity, subagent, MCP, browser, approval and verification surfaces.
 
-The 0.20.6 source and tagged API documentation were therefore reviewed only for material qualification deltas. This review does not prove that any local Hermes installation runs this artifact.
+This review is a source/release qualification input only. It does not prove that any local Hermes installation runs this artifact.
 
 ## Existing Runs bridge compatibility
 
-The exact 0.20.6 tagged API documentation still exposes the stable discovery and Runs surfaces used by the Pantheon candidate bridge, including:
+The exact 0.21.0 tagged API documentation still exposes the discovery and Runs surfaces used by the Pantheon candidate bridge:
 
 ```text
 GET  /v1/capabilities
@@ -39,31 +40,82 @@ POST /v1/runs
 GET  /v1/runs/{run_id}
 GET  /v1/runs/{run_id}/events
 POST /v1/runs/{run_id}/stop
+POST /v1/runs/{run_id}/approval
 ```
 
-`/v1/capabilities` advertises run submission, status, event streaming and stop support. `/v1/toolsets` exposes the concrete tool expansion for the API-server platform behind bearer authentication.
+0.21.0 keeps run submission, polling, SSE events and stop semantics. It additionally documents durable idempotency keys for run creation, optional session/transcript reuse, subagent lifecycle events, and runtime-side approval continuation.
 
-0.20.6 also exposes `POST /v1/runs/{run_id}/approval` for runtime-side pending approvals. The current Pantheon run binding does not need this endpoint and must not treat a runtime approval response as a Pantheon approval.
+These additions do not require a new Pantheon run binding: the governed candidate binding can continue to submit one admitted run, correlate its runtime identity, observe status/events and stop it without adopting runtime session continuity, runtime approval or subagent orchestration as Pantheon authority.
 
-No source-review evidence requires a Pantheon kernel or run-binding change for 0.20.6. Wire compatibility still requires observation against the exact installed artifact.
+```text
+run_binding_change_required: false
+```
 
-## Material 0.20.6 qualification deltas
+Wire compatibility still requires observation against the exact installed artifact.
 
-Only deltas that materially change the trust, tool, execution-host or administration surface are retained here.
+## Material 0.21.0 qualification deltas
 
-| Surface | Upstream 0.20.6 observation | Qualification consequence |
-|---|---|---|
-| Browser control / real browser profile | The release adds consent-gated use of a real Chromium profile. Tagged API docs also expose opt-in authenticated browser-extension control with exact controller/session/profile matching and fail-closed controller routing. | Keep real-profile / extension control disabled for the governed profile unless separately qualified. If enabled later, record exact controller identity, browser-profile scope, authentication and failure behavior. |
-| Desktop remote administration | The release adds managed SSH remote-update behavior and a fleet profile rail. | Treat remote administration/update as an operator surface outside the governed task path. It requires separate deployment qualification before use; it is not implied by runtime qualification. |
-| Remote MCP catalogue | The release expands live-verified vendor-hosted MCP availability substantially. | Re-observe the exact enabled toolsets on the target profile. Catalogue/discovery growth must not widen the reviewed runtime tool envelope. |
-| Terminal environment backends | The release adds pluggable terminal environment backends. | Record the exact terminal backend used by the target profile because host identity, filesystem mounts, environment and network reach can change with the backend. |
-| Secret storage | The release adds opt-in OS-keychain encryption for stored secrets. | Record the configured secret-storage posture. Encryption at rest is useful operational hardening but does not qualify authentication, scope or external-effect safety. |
-| Gateway lifecycle / cron | Updaters can pause gateways over the control socket; cron gains durable incident acknowledgements and clearer code-skew failures. | If gateway, messaging or cron surfaces are selected for a deployment, qualification must include restart/update/skew/recovery behavior rather than inferring availability from a healthy process. |
-| Runtime approval API | Runs may expose a pending runtime approval and resume through `/v1/runs/{run_id}/approval`. | Keep runtime approval mechanics distinct from Pantheon decision/approval state. No automatic bridge from runtime approval UI/API to Pantheon approval is authorized by this review. |
-| Per-request model/provider routing | Tagged API docs continue to accept `model`, `provider` and `model_options` on `/v1/runs` and other authenticated request surfaces. | The Pantheon candidate binding continues to omit these overrides. Provider/model choice remains runtime configuration unless a separately reviewed binding says otherwise. |
-| Session-scoped runtime memory | Tagged API docs continue to accept `X-Hermes-Session-Key` on Runs/API conversation surfaces for stable long-term-memory scope. | Keep this header absent from the governed Pantheon run path unless a separately qualified memory posture explicitly requires it. |
+Only deltas that change trust, state, tool, execution-host or administration boundaries are retained here.
 
-Release-note items such as search caching, compression defaults, picker additions and Slack link-unfurl controls do not currently create a distinct Pantheon qualification requirement and are intentionally not copied into this review.
+### Bot Mode and durable Bot Chats
+
+0.21.0 ships named agent profiles, shared rosters, group chats and durable Bot Chats. These are Hermes runtime interaction and continuity surfaces, not Pantheon governed identities, dossiers, Registers or Evidence stores.
+
+Qualification consequence: no Pantheon Bot registry or multi-agent runtime is added. Any future use must preserve:
+
+```text
+Bot identity != governed identity
+Bot Chat != dossier
+Bot Chat != Register
+```
+
+### `hermes peer`
+
+0.21.0 adds direct agent-to-agent messaging across profiles/gateways with replies retained in canonical Bot Chats.
+
+Qualification consequence: peer transport may be used by Hermes internally only after its concrete profile/tool exposure is observed. A peer message does not create a Pantheon Task Contract, governed delegation, approval or Evidence.
+
+### Cron memory, continuity and notepads
+
+0.21.0 adds persistent cron memory, `continuity=true`, durable job notepads and delivery into Bot Chats.
+
+Qualification consequence: the governed runtime mode keeps memory/profile injection, the memory tool and session memory scope off. Runtime cron memory or continuity must not be promoted to Pantheon memory, Evidence or provenance by implication. Cron/jobs remain outside the admitted task path unless separately qualified.
+
+### Subagent steering and structured output
+
+0.21.0 adds live child listing/steering/stop, partial-result handling, JSON-schema validation and per-delegation cost reporting. Runs SSE can expose `subagent.start` and `subagent.complete` lifecycle observations.
+
+Qualification consequence: these are execution/runtime mechanics. Structured-output validity does not prove a claim true; a child result does not become Evidence; steering a child is not a Pantheon decision. Existing run observation may record bounded child lifecycle facts without adding a Pantheon subagent owner.
+
+### MCP command center
+
+0.21.0 expands MCP inventory, health, import/install and usage/cost management surfaces.
+
+Qualification consequence: catalogue/discovery/installability does not widen the admitted tool envelope. The exact enabled toolset remains the qualification boundary.
+
+### Browser control
+
+0.21.0 extends direct control of the Desktop browser. Tagged API docs also retain authenticated browser-extension control with explicit registration, exact controller/profile matching and fail-closed routing.
+
+Qualification consequence: real-profile / extension / Desktop-browser control remains disabled for `pantheon-governed` unless separately qualified. Browser capability availability does not authorize a browser action or its consequence.
+
+### Protected runtime writes and runtime approval
+
+0.21.0 hardens writes to protected agent instruction, skill and memory files behind Hermes write approval and retains `POST /v1/runs/{run_id}/approval`.
+
+Qualification consequence: Hermes approval is a runtime PEP mechanism only. It does not create Pantheon approval, Evidence or governed write authorization. No automatic bridge from runtime approval state into Pantheon decision state is authorized.
+
+### Verify subsystem
+
+0.21.0 adds run-recipe detection and environment-manifest support for technical verification workflows.
+
+Qualification consequence: a successful build/test recipe is a technical execution observation. It may support later Evidence admission only through the existing Pantheon Evidence path; it is not Evidence or authorization by itself.
+
+### Per-request routing and runtime session state
+
+Tagged API docs continue to accept `model`, `provider` and `model_options` on `/v1/runs`; Runs can also load an existing Hermes session transcript when a `session_id` is supplied and no explicit history is supplied.
+
+Qualification consequence: the Pantheon candidate binding continues to omit provider/model overrides and must not opt into runtime transcript reuse or long-term session memory unless a separately qualified binding/profile explicitly requires it.
 
 ## Governed runtime-profile posture
 
@@ -76,16 +128,23 @@ built_in_memory_injection: off
 built_in_user_profile_injection: off
 memory_tool: off
 session_memory_key: forbidden
+runtime_transcript_reuse: forbidden unless separately qualified
 provider_and_model_override_in_run_payload: omitted
 allowed_tools: exact reviewed runtime-profile/binding envelope
+skill_manage: outside admitted tool surface
+peer_transport: outside admitted tool surface unless separately qualified
+cron_jobs: outside governed task path unless separately qualified
 real_browser_profile: disabled unless separately qualified
 browser_extension_control: disabled unless separately qualified
+desktop_browser_control: disabled unless separately qualified
 remote_admin_update_surface: outside governed task path
 terminal_environment_backend: exact observed backend required
 consequential_effects: existing Pantheon policy / human gates apply
 ```
 
-The existing runtime observer already records route/tool/memory posture in the candidate distribution composition. 0.20.6 does not justify a second observer or a parallel runtime inventory path. Any missing 0.20.6 observation should extend that existing seam only after a real target proves the gap.
+The existing runtime observer already records route/tool/memory posture in the candidate distribution composition. 0.21.0 does not justify a second observer, a Pantheon multi-agent runtime, a second scheduler, a second memory owner or a parallel runtime inventory path. Any missing live observation should extend an existing seam only after a concrete target proves the gap.
+
+The earlier 0.20.6 review of Hermes automatic memory/skill background review remains a useful historical finding, but 0.21.0 changes the wider memory/continuity surface enough that its exact trigger mechanics must be re-observed before any governed profile enables `memory`, `skill_manage` or runtime learning. The current profile admits none of them, so no authority expansion is required for this target selection.
 
 ## Adjacent ownership
 
@@ -100,26 +159,28 @@ stable Hermes/Pantheon authority boundary  -> HERMES_INTEGRATION.md
 technical execution receipt                -> HERMES_EXECUTION_TRACE_SUMMARY.md
 ```
 
-A mobile, browser, desktop or messaging client may therefore evolve without requiring a new Pantheon architecture document unless it introduces a genuinely new governed consequence.
+A mobile, browser, desktop, Bot, peer, cron or messaging client may therefore evolve without requiring a new Pantheon architecture document unless it introduces a genuinely new governed consequence.
 
 ## Current repository decision
 
-The reviewed release and the candidate distribution target are now aligned:
+The reviewed release and candidate distribution target are aligned on 0.21.0:
 
 ```text
-reviewed upstream release: 0.20.6
-current candidate distribution runtime target: 0.20.6
+reviewed upstream release: 0.21.0
+current candidate distribution runtime target: 0.21.0
 ```
 
-The canonical external qualification pin and the candidate distribution lock select Hermes 0.20.6 at release commit `5fc308a70719a83cccdbba4c0e39c23f5a8239d5`. This is a target-selection decision only. The candidate distribution remains default-off / not observed / not activated / not task-authorized, and its runtime artifact digest remains unset until a concrete installed artifact is observed.
+The canonical external qualification pin and candidate distribution lock select Hermes 0.21.0 at release commit `29112bef099274229cadff79cdff7bf7b99c4b77`. This is a target-selection decision only. The candidate distribution remains default-off / not observed / not activated / not task-authorized, and its runtime artifact digest remains unset until a concrete installed artifact is observed.
 
 ```text
-reviewed_runtime_target: 0.20.6
-candidate_distribution_runtime_target: 0.20.6
+reviewed_runtime_target: 0.21.0
+candidate_distribution_runtime_target: 0.21.0
 kernel_change_required: false
 run_binding_change_required: false
 new_runtime_owner_required: false
 new_client_owner_required: false
+new_memory_owner_required: false
+new_scheduler_owner_required: false
 candidate_distribution_pin_change_authorized: true
 target_selection_effect: candidate-only
 real_instance_observation_required: true
@@ -130,38 +191,56 @@ activation_effect: none
 task_authorization_effect: none
 ```
 
-Selecting 0.20.6 as the candidate target does not qualify it. A later bounded qualification may mark the exact observed 0.20.6 artifact qualified only after the checks below are exercised. A future Hermes release may replace 0.20.6 as the candidate target through the same reviewed-pin process without creating a second runtime owner or qualification path.
+Selecting 0.21.0 as the candidate target does not qualify it. Qualification requires the exact observed 0.21.0 artifact and the checks below.
 
-## Required live checks before qualifying 0.20.6 for the governed distribution
+## Required live checks before qualifying 0.21.0 for the governed distribution
 
 1. record the exact installed Hermes package/image identity and immutable digest;
 2. observe the named profile route and `/v1/capabilities` / `/v1/toolsets` from that exact runtime;
-3. verify active tools remain within the reviewed profile/binding envelope, including any remotely discoverable MCP surface;
+3. verify active tools remain within the reviewed profile/binding envelope, including MCP, `memory`, `skill_manage`, peer and browser surfaces;
 4. record the existing read-only memory-posture observation and prove memory/profile injection and the memory tool remain disabled for `pantheon-governed`;
-5. verify no `X-Hermes-Session-Key` is supplied by the governed run client;
+5. verify no `X-Hermes-Session-Key`, governed transcript-reuse `session_id`, `previous_response_id` or equivalent continuity input is supplied by the governed run client unless separately qualified;
 6. verify the Pantheon run payload contains no `model`, `provider` or `model_options` override;
 7. record the exact terminal environment backend and its effective host/mount/network boundary;
-8. confirm real-browser-profile and browser-extension-control paths are disabled, or run a separate explicit qualification before allowing either;
+8. confirm real-browser-profile, browser-extension-control and Desktop-browser-control paths are disabled, or run a separate explicit qualification before allowing any of them;
 9. confirm remote Desktop/fleet/SSH update administration is not part of the admitted run path and cannot silently mutate the qualified runtime during acceptance;
-10. execute one admitted read-only run through the existing launch/reconciliation path and exercise the existing real-runtime ambiguity/failure case required by the current environment qualification work;
-11. verify the runtime approval API, if surfaced by a client, produces no Pantheon approval state by implication;
-12. if gateway/messaging/cron is selected in the deployment, exercise restart and code-skew/recovery behavior separately and retain delivery/runtime outcomes as technical observations only.
+10. execute one admitted read-only run through the existing launch/reconciliation path and exercise the existing real-runtime ambiguity/failure case;
+11. observe 0.21.0 run idempotency/replay behavior and confirm a replayed runtime run is not treated as fresh Pantheon authorization;
+12. if subagent lifecycle events are emitted, retain them as technical observations only and confirm they create no Evidence, decision or governed child identity by implication;
+13. verify the runtime approval API and protected-file write approvals produce no Pantheon approval/write authorization state by implication;
+14. if Bot/peer surfaces are enabled in the runtime installation, prove they remain outside the admitted governed tool envelope unless separately qualified;
+15. if gateway/messaging/cron/continuity is selected in the deployment, exercise restart, persistence, code-skew and recovery behavior separately and retain outcomes as runtime observations only;
+16. if Verify is exercised, retain detected recipes/manifests/results as technical execution material until separately admitted through Pantheon Evidence rules.
 
-No new schema, observer or test surface is required by this target selection. Existing regression assertions that name this release-review owner must track its current version and responsibility; a new protected-path invariant is justified only if live 0.20.6 acceptance exposes something the existing observer, binding or tests cannot represent.
+No new schema, observer or runtime owner is required by this target selection. A new protected-path invariant is justified only if live 0.21.0 acceptance exposes something the existing observer, binding or tests cannot represent.
 
 ## Local non-equivalences
 
-The generic repository non-equivalences remain owned by `NON_EQUIVALENCE_RULES.md`. This review adds only the release-sensitive distinctions needed here:
+The generic repository non-equivalences remain owned by `NON_EQUIVALENCE_RULES.md`. This review adds only release-sensitive distinctions needed here:
 
 ```text
 release reviewed != distribution pin changed
 candidate pin selected != runtime observed
 candidate pin selected != runtime qualified
 release reviewed != release installed
+Bot identity != governed identity
+Bot Chat != dossier
+peer message != governed delegation
+cron memory != Pantheon memory
+continuity != governed provenance
+runtime memory != Evidence
+subagent result != Evidence
+subagent steering != Pantheon decision
+JSON schema valid != claim true
+Verify success != Evidence
 runtime approval endpoint != Pantheon approval
+runtime write approval != Pantheon write authorization
+MCP discovered != MCP admitted
+tool admitted != effect authorized
+browser available != browser action authorized
+runtime replay != fresh task authorization
+runtime success != Evidence
+runtime success != authorization
 remote admin available != update authorized
-remote MCP available != tool admitted
-real browser profile available != profile access authorized
 terminal backend selected != host boundary qualified
-keychain encryption enabled != service exposure safe
 ```
