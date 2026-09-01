@@ -159,6 +159,64 @@ def test_hybrid_relevance_order_is_repeatable(conn, contract, ingested) -> None:
     assert _hybrid_signature(first) == _hybrid_signature(second)
 
 
+def test_semantic_order_is_total_when_distances_tie(conn, contract, ingested) -> None:
+    """Equal distances must still come back in one order, every time.
+
+    `test_hybrid_relevance_order_is_repeatable` asserts the property but can only
+    catch a violation when the planner happens to reorder, which made it a
+    recurring CI failure rather than a signal. This plants the tie instead of
+    waiting for one: two chunks with the same body embed to the same vector, so
+    the query that is that body puts both at distance 0 and the ORDER BY has
+    nothing left to separate them except its tiebreak.
+    """
+    body = "zzz tie-break probe chunk, identical in both sources"
+    declared = list(contract.sources)[:2]
+    assert len(declared) == 2, "this dossier needs two declared sources"
+
+    planted: list[tuple[str, str, int]] = []
+    with conn.cursor() as cur:
+        for source_ref in declared:
+            cur.execute(
+                "SELECT source_digest FROM source_documents"
+                " WHERE dossier = %s AND source_ref = %s LIMIT 1",
+                (contract.dossier, source_ref),
+            )
+            row = cur.fetchone()
+            assert row is not None, f"{source_ref} is not ingested"
+            digest = row[0]
+            cur.execute(
+                """
+                INSERT INTO chunks (dossier, source_ref, source_digest, chunk_no, body, embedding)
+                VALUES (%s, %s, %s, 920, %s, %s::vector)
+                ON CONFLICT (dossier, source_ref, source_digest, chunk_no) DO UPDATE SET
+                    body = EXCLUDED.body,
+                    embedding = EXCLUDED.embedding
+                """,
+                (contract.dossier, source_ref, digest, body, to_pgvector(embed(body))),
+            )
+            planted.append((source_ref, digest, 920))
+
+    try:
+        seen = [
+            (chunk.source_ref, chunk.source_digest, chunk.chunk_no)
+            for chunk in store.retrieve_scoped(conn, contract, body, top_k=12)
+        ]
+        tied = [item for item in seen if item in set(planted)]
+        assert len(tied) == 2, f"both planted chunks should rank; got {tied}"
+        assert tied == sorted(tied), (
+            "tied chunks came back out of the declared tiebreak order: "
+            f"{tied}. ORDER BY distance alone leaves the planner free to choose."
+        )
+    finally:
+        with conn.cursor() as cur:
+            for source_ref, digest, chunk_no in planted:
+                cur.execute(
+                    "DELETE FROM chunks WHERE dossier = %s AND source_ref = %s"
+                    "   AND source_digest = %s AND chunk_no = %s",
+                    (contract.dossier, source_ref, digest, chunk_no),
+                )
+
+
 def test_lexical_and_hybrid_paths_reject_planted_scope_markers(
     conn, contract, ingested
 ) -> None:
