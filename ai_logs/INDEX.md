@@ -14,15 +14,13 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-<<<<<<< HEAD
-Total indexed entries: **869**.
-=======
-Total indexed entries: **868**.
->>>>>>> origin/main
+Total indexed entries: **872**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-09-02 | `2026/Q3/2026-09-02-mutation-inventory-refresh.md` | Refreshing a governance record the code had left behind |
+| 2026-09-01 | `2026/Q3/2026-09-01-aci-distillation-finish.md` | ACI distillation finish — 2026-09-01 |
 | 2026-08-31 | `2026/Q3/2026-08-31-remediation-batch-1-lab-honesty.md` | 2026-08-31 — remediation batch 1: make a green lab mean something again |
 | 2026-08-31 | `2026/Q3/2026-08-31-professional-private-source-patterns.md` | #827 — sanitized private-source-derived professional review patterns |
 | 2026-08-31 | `2026/Q3/2026-08-31-o3-qualification-retirement.md` | Historical O3 qualification retirement |
@@ -46,6 +44,7 @@ Total indexed entries: **868**.
 | 2026-08-31 | `2026/Q3/2026-08-31-candidacy-aging-signal.md` | Candidacy aging signal |
 | 2026-08-31 | `2026/Q3/2026-08-31-call-reachability-audit.md` | Symbol call reachability in the module usage audit |
 | 2026-08-31 | `2026/Q3/2026-08-31-asserted-properties-controls.md` | Every asserted property names a control |
+| 2026-08-31 | `2026/Q3/2026-08-31-aci-distillation-convergence.md` | ACI distillation convergence — 2026-08-31 |
 | 2026-08-30 | `2026/Q3/2026-08-30-source-research-evaluation-pilot-ready.md` | 2026-08-30 — source-research evaluation pilot readiness |
 | 2026-08-30 | `2026/Q3/2026-08-30-source-notebook-current-convergence.md` | 2026-08-30 — converge optional workspace source notebook |
 | 2026-08-30 | `2026/Q3/2026-08-30-simplify-distillation-registry.md` | Distillation Registry simplification — 2026-08-30 |

@@ -26,7 +26,7 @@ answerable without unwinding a call graph, and the cheapest end of the backlog
 rather than the most urgent one. From `knowledge.py` onward every entry point is
 live: each sits behind a route a key holder can call today.
 
-Seven entry points are now recorded as `gate_required_not_wired` rather than
+Six entry points are now recorded as `gate_required_not_wired` rather than
 softened into `none`. `bind_oidc_identity` is where an external identity becomes
 able to act as a governed principal. `store_reviewed_dossier` installs canonical
 APU state on the strength of a `review_ref` that nothing validates. `revoke_grant`
@@ -36,7 +36,7 @@ return a human-rejected request to `proposed`. `apply_edit_request` acts on that
 status as though it were a decision. `act_working_information` supersedes the
 acted version of a governed Information series and records no actor.
 
-## The first write of a projection is not serialised
+## The first write of a projection was not serialised, and now is
 
 Recorded because all three `information_projection` entries share it, and
 because the first version of those records named the row lock and
@@ -57,12 +57,20 @@ The pattern is used correctly everywhere else: eleven other modules raise a
 not-found error when the locked row is missing. This is the one place where the
 row is optional by design, and the optional case is where the token is invented.
 
-A minimal repair, for the owner: carry the expected revision into the upsert's
-conflict clause — `ON CONFLICT ... DO UPDATE SET ... WHERE
-agency_information_projection_metadata.revision = <expected_revision>` — and
-require `rowcount == 1`. On a genuine first write exactly one racer's INSERT
-succeeds; the loser conflicts, its guarded UPDATE matches nothing, and it fails
-as stale instead of overwriting.
+Closed in 552e67e7, with the repair this section proposed:
+`_advance_metadata_revision` carries the expected revision into the upsert's
+conflict clause and requires `rowcount == 1`. On a genuine first write exactly
+one racer's INSERT succeeds; the loser conflicts, its guarded UPDATE matches
+nothing, and it fails as stale instead of overwriting.
+
+The section is kept rather than deleted. The three entries were cleared on a
+lock that was not taken, and a reader of this inventory is entitled to know that
+happened and how it was found.
+
+They were then wrong in the other direction: after 552e67e7 the three entries
+went on describing the race as live, and the guard lists were refreshed while the
+explanations beside them were not. A record can rot toward either verdict, and
+only the entry's own text says which reading is current.
 
 ## Where the actor label is strongest, and what that still is not
 
@@ -131,6 +139,26 @@ failure it exists to find. Two tests guarded discovery: one asserts every
 discovered entry point is declared, the other that discovery is not vacuous.
 Both passed throughout. Neither could fail for something the net never saw.
 **The control verified its output and never its coverage.**
+
+## What happened to this record the day after it was written
+
+Five of the findings above were repaired within a day — `revoke_grant`,
+`record_claim`, `resolve_request`, `suggest_projects` and the Information
+projection race. **None of the repairs touched this file**, so for a day the
+inventory recorded three gates that were closed and two defects that were fixed,
+while every test here passed.
+
+They passed because they check that each entry point is declared and never that
+the declaration is still true. That is the failure this inventory exists to
+record, committed by the inventory: a record describing a state the code has
+left.
+
+`test_a_pending_gate_still_points_at_the_code_that_needs_it` is the repair, and
+it is deliberately the pattern this review recommended everywhere else — the one
+`apu_write_preparation.append_authorization` already uses. Each pending gate
+names a literal fragment of the code that makes it pending, and the test asks
+for the verdict back when that fragment goes. A verdict bound to a content, not
+to a name.
 
 ## Attribution is a separate axis from authorization
 
@@ -277,6 +305,7 @@ is a permitted, honest answer; recording nothing is not.
 from __future__ import annotations
 
 import ast
+import hashlib
 import re
 from pathlib import Path
 
@@ -304,31 +333,19 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     ("agency_change_candidates.py", "create_project_candidate"): _UNREVIEWED,
     ("agency_change_candidates.py", "reject_project_candidate"): _UNREVIEWED,
     ("agency_claims.py", "record_claim"): {
-        "gate": "gate_required_not_wired",
-        "local_guards": ("status and certainty constrained by CHECK constraints", "value must match the reviewed candidate, enforced by a trigger", "backing_ref must be one of the candidate basis_refs, enforced by a trigger", "APU backing must belong to the Claim's Project", "append-only with supersedes"),
+        "gate": "none",
+        "local_guards": ("status and certainty constrained by CHECK constraints", "verified requires an execution_result candidate carrying a review_disposition_id", "value must match the reviewed candidate, enforced by a trigger", "backing_ref must be one of the candidate basis_refs, enforced by a trigger", "append-only with supersedes"),
         "reviewed": (
-            "Its docstring states the boundary — 'records an assertion; it "
-            "approves nothing' — and `status`, `certainty` and the rest arrive "
-            "from the caller with defaults. What holds them is below Python and "
-            "unusually strong: `agency_project_claims` carries CHECK constraints "
-            "on the status vocabulary and triggers that validate content rather "
-            "than labels. A claim derived from a candidate must carry the "
-            "reviewed candidate's value, its `backing_ref` must be one of that "
-            "candidate's `basis_refs`, and an APU backing must belong to the "
-            "Claim's own Project. Everywhere else in this review the below-Python "
-            "guards check a vocabulary; here they check that the assertion "
-            "matches what it claims to be derived from. Corrected on review: "
-            "that holds only for candidate-derived Claims. "
-            "`validate_agency_project_claim_candidate_ref` opens with "
-            "`IF NEW.source_kind <> 'execution_result' THEN` and returns, so "
-            "every direct Claim through `POST /agency/projects/{id}/claims` "
-            "passes it untouched. An editor can post "
-            "`source_kind=\"human_assertion\"` with `status=\"verified\"` and a "
-            "non-APU `backing_ref` that does not exist; the schema checks shape "
-            "and the backing trigger only validates `apu_object`. A governed "
-            "Claim can therefore read `verified` with nothing having verified "
-            "it. That is the same finding as `publish_knowledge` and its "
-            "`review_status=\"reviewed\"`, so it takes the same regime."
+            "Recorded as `gate_required_not_wired` when a direct Claim could "
+            "carry `status=\"verified\"` with nothing having verified it: "
+            "`validate_agency_project_claim_candidate_ref` returns early unless "
+            "`source_kind` is `execution_result`, so the derivation triggers "
+            "never saw the direct path. Closed in b201a019, which refuses "
+            "`verified` unless the Claim comes from an execution_result "
+            "candidate carrying a `review_disposition_id` — the status now "
+            "requires the human review it asserts. The docstring's own boundary "
+            "holds again: it records an assertion, and the one status that is a "
+            "conclusion rather than an assertion has to be earned."
         ),
     },
     ("agency_classification.py", "archive_category"): {
@@ -401,6 +418,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     ("agency_data.py", "update_project"): _UNREVIEWED,
     ("agency_information.py", "act_working_information"): {
         "gate": "gate_required_not_wired",
+        "unguarded_body": "74f862fb2f3da2bb4313624eee6ebcd1f080d20918064dd638b8a47db28cc7e6",
         "local_guards": ("actor_kind must be human, no default", "row lock", "working status only", "expected_revision", "supersede and install in one transaction"),
         "reviewed": (
             "This is the act. It supersedes the currently acted version of a "
@@ -480,6 +498,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("apu_owner.py", "store_reviewed_dossier"): {
         "gate": "gate_required_not_wired",
+        "unguarded_body": "f541f77e5a1065733c5b43625ce7cc2643f4ee490e086dc914b89080a0520fdc",
         "local_guards": (
             "required project_id, review_ref, actor and idempotency_key",
             "payload digest compared on replay, refusing a reused key with different content",
@@ -533,8 +552,9 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "apply_source_match` follows outside any shared transaction, with no "
             "`FOR UPDATE` on the command row. A rejection that commits between "
             "the read and the write does not block the apply. Same class as the "
-            "`information_projection` first-write race: a check that reads "
-            "outside the transaction that acts. Recorded rather than escalated — "
+            "first-write race `information_projection` carried until 552e67e7 "
+            "closed it: a check that reads outside the transaction that acts. "
+            "That one is repaired and this one is not. Recorded rather than escalated — "
             "the gate exists and is invoked, it is readable stale — and the "
             "repair is to lock the command row and re-read the latest event "
             "inside the applying transaction."
@@ -578,27 +598,23 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
         ),
     },
     ("decision_requests.py", "resolve_request"): {
-        "gate": "gate_required_not_wired",
-        "local_guards": ("row lock", "status must be pending", "expected_revision in the WHERE clause", "response validated against the request's mode and options", "unique decision identity", "idempotency with payload digest", "decision record and status transition in one transaction"),
+        "gate": "none",
+        "local_guards": ("row lock", "status must be pending", "expected_revision in the WHERE clause", "response validated against the request's mode and options", "unique decision identity", "idempotency with payload digest", "decision record and status transition in one transaction", "authenticated assurance unreachable from the route"),
         "reviewed": (
-            "This is the decision. It writes an `agency_decision_records` row "
-            "carrying `approve`, `refuse`, `request_revision` or "
-            "`request_more_evidence` against a candidate digest, and the "
-            "concurrency and idempotency around it are the most careful in the "
-            "codebase. The finding is what it records about who decided. This "
-            "module is the only one that models the distinction the rest of the "
-            "review keeps missing: `identity_assurance` is mandatory and takes "
-            "`declared` or `authenticated`, and `authenticated` requires an "
-            "`authenticated_principal` carrying `user_id` and `identity_provider`. "
-            "Both come from the request body. The route supplies `decided_by` from "
-            "the `X-Pantheon-Human-Actor` header and forwards the rest with "
-            "`**values`, so the party asserting the name also chooses the assurance "
-            "level describing that assertion, and supplies the principal that is "
-            "said to back it. Nothing authenticates it; the checks are that the "
-            "dict has two non-empty keys. A governed decision record can therefore "
-            "read `identity_assurance: authenticated` on a decision nothing "
-            "authenticated. The contract validation on the projection constrains "
-            "the value, not its truth."
+            "Recorded as `gate_required_not_wired` when the caller chose both "
+            "the name and the assurance level describing it — a governed "
+            "decision record could read `identity_assurance: authenticated` on "
+            "a decision nothing authenticated. Closed by typing "
+            "`authenticated_principal` as `None` on the route body, so the "
+            "module's own requirement that an authenticated assurance carry a "
+            "principal can no longer be met and the persisted level is always "
+            "`declared`. Closed by removing the capability rather than by "
+            "sourcing it, and the route says so: 'this editor-key route has no "
+            "authenticated-principal source. Keep the persisted assurance honest "
+            "until a real identity provider is composed.' `decided_by` is still "
+            "the header value, which is the attribution axis this review records "
+            "across seven modules and does not escalate — but `declared` is now "
+            "a truthful label for it."
         ),
     },
     ("document_revision_discussion.py", "create_comment"): _UNREVIEWED,
@@ -723,6 +739,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("human_access.py", "bind_oidc_identity"): {
         "gate": "gate_required_not_wired",
+        "unguarded_body": "11debe55862414f0c68a9115a74151071395ee7b9d535fb5c89d17ddaeaee7e1",
         "local_guards": ("refuses a disabled principal", "required issuer, subject and bound_by", "BindingConflict when the identity is bound to another principal", "idempotent within the same principal"),
         "reviewed": "The moment an external identity becomes able to act as a governed principal. The local chain is the strongest in this module and still not the same thing as the governance check: this is an authorization boundary, not a bookkeeping write. Reviewed as needing the chokepoint; nothing routes it there today.",
     },
@@ -761,27 +778,16 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
         ),
     },
     ("human_access.py", "revoke_grant"): {
-        "gate": "gate_required_not_wired",
-        "local_guards": (
-            "route requires an authenticated principal holding project.access.manage",
-            "grant must belong to the named project, AccessDenied otherwise",
-            "route refuses to revoke a grant whose own action is project.access.manage",
-            "idempotent when already revoked",
-        ),
+        "gate": "none",
+        "local_guards": ("refuses to revoke project.access.manage remotely", "refuses to revoke project.read while the principal holds active project.access.manage", "idempotent when already revoked"),
         "reviewed": (
-            "First reviewed as none, on the claim that the one escalation it could enable — "
-            "stripping a project administrator — was refused by the route outright. A review "
-            "caught that this is false, and the guard list said so too. "
-            "require_project_access_manager checks project.read first and project.access.manage "
-            "second, while the route refuses only a grant whose own action is "
-            "project.access.manage. A manager can therefore revoke another manager's paired "
-            "project.read grant: the victim keeps the manage row and fails every management "
-            "endpoint. project.read is remotely grantable and revocation carries no "
-            "REMOTE_MANAGEABLE_ACTIONS restriction at all, so the path needs no special access. "
-            "An administrator lockout reachable by an ordinary manager is consequential, and "
-            "nothing routes this through the governance check. The durable remedy is a code "
-            "fix — protect a manager's paired read grant — which is a behavioural change and "
-            "not this record's to make."
+            "Recorded as `gate_required_not_wired` for an administrator "
+            "lockout: the route refused to revoke a `project.access.manage` "
+            "grant but not the paired `project.read` grant a manager needs to "
+            "pass its own check, so one manager could lock another out. Closed "
+            "in 2f9fcfbd, which refuses to revoke `project.read` while that "
+            "principal still holds an active `project.access.manage`. The "
+            "symmetric guard the first one only looked like."
         ),
     },
     ("human_access.py", "revoke_oidc_binding"): {
@@ -791,7 +797,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("information_projection.py", "add_document_link"): {
         "gate": "none",
-        "local_guards": ("actor_kind human or system, no default", "Information and Document existence checked", "link role vocabulary", "row lock once the metadata row exists", "expected_revision, unserialised on the first write", "idempotency with payload digest", "event derived from the write's own result"),
+        "local_guards": ("actor_kind human or system, no default", "Information and Document existence checked", "link role vocabulary", "row lock once the metadata row exists", "expected_revision, compare-and-swap on the write itself", "idempotency with payload digest", "event derived from the write's own result"),
         "reviewed": (
             "Links a Document to an Information card: metadata about what backs a "
             "card, not a change to what the card says. Both endpoints are checked "
@@ -805,39 +811,50 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "what a preceding SELECT predicted. The comment says a prior version "
             "got this wrong and left the history describing a creation that never "
             "happened. That is a record derived from an effect instead of "
-            "asserted beside it. Corrected on review: see the first-write race "
-            "recorded in this module's docstring section; the row lock and "
-            "`expected_revision` above hold only once the metadata row exists."
+            "asserted beside it. Corrected twice on review: this entry first "
+            "named the row lock and `expected_revision` as unqualified guards "
+            "while `FOR UPDATE` could not lock a row that did not exist yet, so "
+            "two concurrent first writes both logged `0 -> 1`; 552e67e7 closed "
+            "that by carrying the expected revision into the upsert's conflict "
+            "clause, and this entry then went on describing it as open. Both "
+            "readings are kept in the docstring section, because the record was "
+            "wrong in each direction in turn."
         ),
     },
     ("information_projection.py", "remove_document_link"): {
         "gate": "none",
-        "local_guards": ("actor_kind human or system, no default", "row lock once the metadata row exists", "expected_revision, unserialised on the first write", "rowcount == 1 or the link did not exist", "idempotency with payload digest"),
+        "local_guards": ("actor_kind human or system, no default", "row lock once the metadata row exists", "expected_revision, compare-and-swap on the write itself", "rowcount == 1 or the link did not exist", "idempotency with payload digest"),
         "reviewed": (
             "Unlinks a Document from an Information card, withdrawing a "
             "projection rather than changing governed content. The DELETE asserts "
             "`rowcount == 1`, so removing a link that was not there is an error "
             "rather than a silent success — the event log cannot record a removal "
-            "that removed nothing. Corrected on review: the row lock and "
-            "`expected_revision` hold only once the metadata row exists — see the "
-            "first-write race in this module's docstring section."
+            "that removed nothing. Corrected twice on review: the row lock and "
+            "`expected_revision` were first recorded as unqualified, then as "
+            "holding only once the metadata row existed, which stopped being "
+            "true when 552e67e7 moved the revision check into the upsert's own "
+            "conflict clause. The guard list above is the current reading."
         ),
     },
     ("information_projection.py", "update_projection_metadata"): {
         "gate": "none",
-        "local_guards": ("actor_kind human or system, no default", "media-type vocabulary", "contact refs resolved against their tables", "row lock once the metadata row exists", "expected_revision, unserialised on the first write", "idempotency with payload digest"),
+        "local_guards": ("actor_kind human or system, no default", "media-type vocabulary", "contact refs resolved against their tables", "row lock once the metadata row exists", "expected_revision, compare-and-swap on the write itself", "idempotency with payload digest"),
         "reviewed": (
             "Edits projection metadata — dates, media types, contact references. "
             "`projection != persistence` and `projection != governed identity` "
             "both apply: none of this changes what the Information says or who "
             "may act on it. Contact references are resolved against their tables "
-            "rather than stored as free strings. Corrected on review: this is the "
-            "path where the first-write race recorded below costs a lost update, "
-            "not just a false history line."
+            "rather than stored as free strings. Corrected twice on review: this "
+            "was the path where the first-write race cost a lost update rather "
+            "than just a false history line, and it is the path 552e67e7 "
+            "repaired most directly — the upsert now names `expected_revision` "
+            "in its `WHERE` and raises unless it changed exactly one row, so the "
+            "loser of a first-write race fails as stale instead of overwriting."
         ),
     },
     ("knowledge.py", "apply_edit_request"): {
         "gate": "gate_required_not_wired",
+        "unguarded_body": "9ee59f56a33c9f32ba04678efbd169e61c461a7e61b054637fc854d938344a70",
         "local_guards": ("request status", "re-read under lock", "version and selection digest", "single transaction with audit", "idempotency"),
         "reviewed": (
             "Corrected. This entry read `none` on the reasoning that the request "
@@ -853,6 +870,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge.py", "complete_edit_request"): {
         "gate": "gate_required_not_wired",
+        "unguarded_body": "17a636d4f1f1e91b9d5cea9427b89bad147b4c7154d2af0627cd9b663031d565",
         "local_guards": ("non-empty replacement", "Hermes bearer key on the route", "version comparison against base_version"),
         "reviewed": (
             "Reads as Hermes filling in the proposal it was queued for. It takes no "
@@ -884,6 +902,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge.py", "publish_knowledge"): {
         "gate": "gate_required_not_wired",
+        "unguarded_body": "ed4ec38f184914173ef0c8ffc0e87d1d2195696fcdc28913b77fe91367e084e2",
         "local_guards": ("non-empty knowledge_id, title and Markdown", "family membership", "expected_version must be 0", "idempotency"),
         "reviewed": (
             "The route guard is a bearer-token comparison, and the body is passed "
@@ -1104,7 +1123,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("source_intake.py", "suggest_projects"): {
         "gate": "none",
-        "local_guards": ("actor_kind required, no default, Hermes refused by name", "row lock", "expected_revision checked on the read and repeated in the UPDATE WHERE", "rowcount == 1", "idempotency with payload digest", "event carries a result snapshot", "every candidate Project must exist", "at least one candidate required"),
+        "local_guards": ("actor_kind required, no default, Hermes refused by name", "row lock", "expected_revision checked on the read and repeated in the UPDATE WHERE", "rowcount == 1", "idempotency with payload digest", "event carries a result snapshot", "refuses a Source that is still linked", "every candidate Project must exist", "at least one candidate required"),
         "reviewed": (
             "Corrected on review, and the first version was the inverse of the "
             "truth. It said the suggestion lands in its own column and does not "
@@ -1113,12 +1132,12 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "\"suggested\", \"project_id\": None}` — so suggesting on a Source "
             "that is already linked **unlinks it**, and nothing refuses that or "
             "asks for it. A suggestion cannot become a link by being written, "
-            "which is what I meant; what it can do is remove one. "
-            "The regime stays `none` because the effect is the same class as "
-            "`unlink_project`, which is separately recorded — but this is a state "
-            "transition no caller requested, and whether `suggest_projects` "
-            "should refuse a linked Source or preserve its link is the owner's "
-            "to decide. Candidate Projects are checked to exist before the write."
+            "which is what I meant; what it could do was remove one. Closed in "
+            "2222a020: a Source whose `project_link_status` is `linked`, or "
+            "whose `project_id` is set, is refused outright — an explicit "
+            "unlink is now required first. A suggestion can no longer change a "
+            "link in either direction. Candidate Projects are checked to exist "
+            "before the write."
         ),
     },
     ("source_intake.py", "unlink_project"): {
@@ -1455,9 +1474,9 @@ def test_a_required_gate_that_is_not_wired_stays_visible_and_does_not_grow() -> 
     was ever taken.
     """
     pending = [key for key, record in INVENTORY.items() if record["gate"] == "gate_required_not_wired"]
-    assert len(pending) <= 9, (
+    assert len(pending) <= 6, (
         f"{len(pending)} entry points are known to need the chokepoint and do not reach "
-        "it; the ceiling is 9. Wire one, or move the ceiling deliberately and say why."
+        "it; the ceiling is 6. Wire one, or move the ceiling deliberately and say why."
     )
 
 
@@ -1476,6 +1495,126 @@ def test_the_unreviewed_debt_is_visible_and_does_not_grow() -> None:
         f"{len(unreviewed)} entry points are unreviewed; the ceiling is 21. A new "
         "mutation entry point must be reviewed, not added to the backlog."
     )
+
+
+
+def _gate_closure(modules: dict[str, dict[str, ast.AST]]) -> set[tuple[str, str]]:
+    """(module, function) pairs from which `enforce_consequential` is reachable.
+
+    The mirror of `_writer_closure`, and asked for the opposite reason: that one
+    finds the functions that write, this one finds the functions that are gated.
+    A pending verdict is a claim that a given entry point is in the first set and
+    not in this one, so this is what makes the claim checkable.
+    """
+    reached: set[tuple[str, str]] = set()
+    changed = True
+    while changed:
+        changed = False
+        for mod, funcs in modules.items():
+            for name, node in funcs.items():
+                if (mod, name) in reached:
+                    continue
+                bare, qualified = _own_calls(node)
+                if (
+                    "enforce_consequential" in bare
+                    or any(attr == "enforce_consequential" for _, attr in qualified)
+                    or any((mod, callee) in reached for callee in bare)
+                    or any((other, attr) in reached for other, attr in qualified)
+                ):
+                    reached.add((mod, name))
+                    changed = True
+    return reached
+
+
+def _normalized_function(module_file: str, function: str) -> str | None:
+    """The function as the parser sees it: formatting and comments removed.
+
+    `ast.unparse` is what makes the digest below usable. Re-wrapping a line or
+    rewriting a comment leaves it unchanged; changing what the function does
+    does not.
+    """
+    tree = ast.parse((MVP / module_file).read_text(encoding="utf-8"))
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == function:
+            return ast.unparse(node)
+    return None
+
+
+def test_a_pending_gate_is_still_absent_from_the_code_it_names() -> None:
+    """A verdict is bound to a content, not to a name.
+
+    Four entries in this inventory went stale within a day. `revoke_grant`,
+    `record_claim` and `resolve_request` had their gaps closed in code while
+    their records still read `gate_required_not_wired`, and the entries for
+    `suggest_projects` and the Information projection still described defects
+    that had been repaired. Every test here passed throughout, because they
+    check that each entry point is declared and never that the declaration is
+    still true.
+
+    That is the failure this inventory exists to record, committed by the
+    inventory. The repair is the pattern the review found in
+    `apu_write_preparation.append_authorization` and recommended everywhere
+    else: bind the record to the thing it describes.
+
+    The first version of this test bound each verdict to a literal fragment the
+    entry point contains, and got the polarity wrong. `gate_required_not_wired`
+    is a claim about what the code does *not* do, and a fragment the function
+    keeps — its `def` line, a parameter name, a check it already performs —
+    survives the repair. Wiring the gate into `bind_oidc_identity` would have
+    left `def bind_oidc_identity(` exactly where it was and this test green:
+    the anchor proved the function still existed, which was never in doubt.
+    That is the same mistake the review kept finding in the code — a guard
+    asserted from what something is named rather than from what it composes to
+    — committed one more time, in the test written to stop it.
+
+    So assert the absence instead, twice over. The gate must still not be
+    reachable from the entry point, which fails the moment someone wires it.
+    And the function's body, normalized through the parser, must still digest to
+    what was read when the verdict was taken, which fails for a repair made by
+    any other means — validating the `review_ref`, guarding the status, taking
+    the actor. Either failure asks the same question: this was recorded as
+    unguarded, the code has moved, is the verdict still true?
+
+    A body that moves for an unrelated reason is a false alarm, and that is the
+    intended cost: re-reading six known-defective functions is cheaper than a
+    governance record nobody can trust.
+    """
+    gated = _gate_closure(_module_functions())
+    for key, record in INVENTORY.items():
+        module_file, function = key
+        if record["gate"] != "gate_required_not_wired":
+            assert "unguarded_body" not in record, (
+                f"{key} carries an unguarded-body digest without a pending gate; "
+                "drop it or restore the regime"
+            )
+            continue
+
+        digest = record.get("unguarded_body")
+        assert digest, (
+            f"{key} is recorded as needing the chokepoint without pinning the "
+            "body that makes it so; record the digest of the function as read"
+        )
+
+        stem = Path(module_file).stem
+        assert (stem, function) not in gated, (
+            f"{key} is recorded as gate_required_not_wired, but "
+            "`enforce_consequential` is now reachable from it. The gap was "
+            "closed and the verdict is stale: re-read the entry point and "
+            "record what it is now."
+        )
+
+        source = _normalized_function(module_file, function)
+        assert source is not None, (
+            f"{key} is recorded as gate_required_not_wired, but the function is "
+            "gone. Either it was removed or it was renamed; say which."
+        )
+        current = hashlib.sha256(source.encode("utf-8")).hexdigest()
+        assert current == digest, (
+            f"{key} is recorded as gate_required_not_wired against a body that "
+            f"has since changed:\n    recorded {digest}\n    current  {current}\n"
+            "Re-read the entry point. If the gap is closed, replace the verdict; "
+            "if it is not, re-pin the digest and say in `reviewed` what moved."
+        )
 
 
 def test_discovery_is_not_vacuous() -> None:
