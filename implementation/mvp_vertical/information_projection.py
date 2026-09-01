@@ -200,6 +200,23 @@ def _validate_actor(actor: str, actor_kind: str) -> None:
         raise InformationProjectionGateRequired("Hermes cannot mutate canonical Information projection data directly")
 
 
+def _advance_metadata_revision(conn: psycopg.Connection, information_id: str, expected_revision: int) -> int:
+    resulting_revision = expected_revision + 1
+    result = conn.execute(
+        """
+        INSERT INTO agency_information_projection_metadata (information_id, revision)
+        VALUES (%s,%s)
+        ON CONFLICT (information_id) DO UPDATE
+            SET revision = EXCLUDED.revision, updated_at = CURRENT_TIMESTAMP
+          WHERE agency_information_projection_metadata.revision = %s
+        """,
+        (information_id, resulting_revision, expected_revision),
+    )
+    if result.rowcount != 1:
+        raise StaleInformationProjectionWrite("Information projection changed during mutation")
+    return resulting_revision
+
+
 def update_projection_metadata(conn: psycopg.Connection, *, information_id: str, source_date: date | None, received_at: datetime | None, issued_at: datetime | None, media_types: list[str] | None, contact_refs: list[dict] | None, expected_revision: int, actor: str, actor_kind: Literal["human", "system"], idempotency_key: str) -> dict:
     _validate_actor(actor, actor_kind)
     payload = {"operation": "update_projection_metadata", "information_id": information_id, "source_date": source_date.isoformat() if source_date else None, "received_at": received_at.isoformat() if received_at else None, "issued_at": issued_at.isoformat() if issued_at else None, "media_types": _normalize_media_types(media_types), "contact_refs": contact_refs or [], "actor": actor, "actor_kind": actor_kind}
@@ -214,11 +231,21 @@ def update_projection_metadata(conn: psycopg.Connection, *, information_id: str,
         if current["revision"] != expected_revision:
             raise StaleInformationProjectionWrite(f"stale Information projection revision: expected {expected_revision}, current {current['revision']}")
         resulting_revision = expected_revision + 1
-        conn.execute("""
+        result = conn.execute("""
             INSERT INTO agency_information_projection_metadata (information_id, source_date, received_at, issued_at, media_types, contact_refs, revision, updated_at)
             VALUES (%s,%s,%s,%s,%s,%s,%s,CURRENT_TIMESTAMP)
-            ON CONFLICT (information_id) DO UPDATE SET source_date = EXCLUDED.source_date, received_at = EXCLUDED.received_at, issued_at = EXCLUDED.issued_at, media_types = EXCLUDED.media_types, contact_refs = EXCLUDED.contact_refs, revision = EXCLUDED.revision, updated_at = CURRENT_TIMESTAMP
-            """, (information_id, source_date, received_at, issued_at, Jsonb(payload["media_types"]), Jsonb(normalized_contacts), resulting_revision))
+            ON CONFLICT (information_id) DO UPDATE
+                SET source_date = EXCLUDED.source_date,
+                    received_at = EXCLUDED.received_at,
+                    issued_at = EXCLUDED.issued_at,
+                    media_types = EXCLUDED.media_types,
+                    contact_refs = EXCLUDED.contact_refs,
+                    revision = EXCLUDED.revision,
+                    updated_at = CURRENT_TIMESTAMP
+              WHERE agency_information_projection_metadata.revision = %s
+            """, (information_id, source_date, received_at, issued_at, Jsonb(payload["media_types"]), Jsonb(normalized_contacts), resulting_revision, expected_revision))
+        if result.rowcount != 1:
+            raise StaleInformationProjectionWrite("Information projection changed during mutation")
         snapshot = get_projection(conn, information_id)
         _record_event(conn, information_id=information_id, event_type="projection_metadata_updated", actor=actor, actor_kind=actor_kind, expected_revision=expected_revision, resulting_revision=resulting_revision, idempotency_key=idempotency_key, payload_digest=digest, payload={**payload, "contact_refs": normalized_contacts}, snapshot=snapshot)
         return snapshot
@@ -240,21 +267,13 @@ def add_document_link(conn: psycopg.Connection, *, information_id: str, document
         current = _metadata_row(conn, information_id, lock=True)
         if current["revision"] != expected_revision:
             raise StaleInformationProjectionWrite(f"stale Information projection revision: expected {expected_revision}, current {current['revision']}")
-        # This is an upsert, so the event type depends on what it did. Reporting
-        # `document_link_added` for a role or observed-version change made the
-        # append-only history describe a link creation that never happened, and
-        # left no trace that a link had been modified at all. `xmax = 0` marks a
-        # row this statement inserted rather than updated, so the statement that
-        # decides is the same one that writes — a preceding SELECT would answer
-        # for a state the upsert is free to leave behind.
         inserted = conn.execute("""
             INSERT INTO agency_information_document_links (information_id, document_id, role, observed_version, observed_digest)
             VALUES (%s,%s,%s,%s,%s)
             ON CONFLICT (information_id, document_id) DO UPDATE SET role = EXCLUDED.role, observed_version = EXCLUDED.observed_version, observed_digest = EXCLUDED.observed_digest
             RETURNING (xmax = 0)
             """, (information_id, document_id, role, observed_version, observed_digest)).fetchone()[0]
-        resulting_revision = expected_revision + 1
-        conn.execute("INSERT INTO agency_information_projection_metadata (information_id, revision) VALUES (%s,%s) ON CONFLICT (information_id) DO UPDATE SET revision = EXCLUDED.revision, updated_at = CURRENT_TIMESTAMP", (information_id, resulting_revision))
+        resulting_revision = _advance_metadata_revision(conn, information_id, expected_revision)
         snapshot = get_projection(conn, information_id)
         event_type = "document_link_added" if inserted else "document_link_updated"
         mutation_result = {
@@ -281,8 +300,7 @@ def remove_document_link(conn: psycopg.Connection, *, information_id: str, docum
             cur.execute("DELETE FROM agency_information_document_links WHERE information_id = %s AND document_id = %s", (information_id, document_id))
             if cur.rowcount != 1:
                 raise InformationProjectionNotFound(f"Document {document_id} is not linked to Information {information_id}")
-        resulting_revision = expected_revision + 1
-        conn.execute("INSERT INTO agency_information_projection_metadata (information_id, revision) VALUES (%s,%s) ON CONFLICT (information_id) DO UPDATE SET revision = EXCLUDED.revision, updated_at = CURRENT_TIMESTAMP", (information_id, resulting_revision))
+        resulting_revision = _advance_metadata_revision(conn, information_id, expected_revision)
         snapshot = get_projection(conn, information_id)
         _record_event(conn, information_id=information_id, event_type="document_link_removed", actor=actor, actor_kind=actor_kind, expected_revision=expected_revision, resulting_revision=resulting_revision, idempotency_key=idempotency_key, payload_digest=digest, payload=payload, snapshot=snapshot)
         return snapshot
@@ -313,9 +331,6 @@ def contract_projection(conn: psycopg.Connection, information_id: str) -> dict[s
         for link in block.get("document_refs") or []
     ]
 
-    # The contract's `revision` starts at 1 and is optional. This repository uses
-    # 0 to mean "no projection metadata row yet", which is an absence, not a
-    # revision — so it is omitted rather than emitted as a non-conforming 0.
     revision = block.get("revision", 0)
     optional_revision = {"revision": revision} if revision >= 1 else {}
 
