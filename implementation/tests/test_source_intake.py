@@ -123,6 +123,48 @@ def test_candidate_project_is_not_an_authoritative_link(conn) -> None:
     assert suggested["candidate_project_refs"][0]["score"] == 0.93
 
 
+def test_project_suggestion_cannot_implicitly_unlink_a_linked_source(conn) -> None:
+    linked_project = _project(conn)
+    candidate_project = _project(conn)
+    source = _source(conn)
+    linked = source_intake.link_project(
+        conn,
+        source_id=source["source_id"],
+        project_id=linked_project["project_id"],
+        expected_revision=1,
+        actor="reviewer",
+        actor_kind="human",
+        idempotency_key=_id("link"),
+    )
+
+    with pytest.raises(
+        source_intake.SourceIntakeError,
+        match="linked Source must be explicitly unlinked before project suggestions",
+    ):
+        source_intake.suggest_projects(
+            conn,
+            source_id=source["source_id"],
+            candidates=[
+                {
+                    "project_ref": candidate_project["project_id"],
+                    "score": 0.91,
+                    "basis": ["declared_name_match"],
+                    "producer": "deterministic-project-matcher",
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                }
+            ],
+            expected_revision=linked["revision"],
+            actor="reviewer",
+            actor_kind="human",
+            idempotency_key=_id("suggest-linked"),
+        )
+
+    current = source_intake.get_source(conn, source["source_id"])
+    assert current["project_link_status"] == "linked"
+    assert current["project_id"] == linked_project["project_id"]
+    assert current["revision"] == linked["revision"]
+
+
 def test_link_unlink_exclude_and_restore_are_explicit_revision_checked_actions(conn) -> None:
     project = _project(conn)
     source = _source(conn)

@@ -242,6 +242,9 @@ def suggest_projects(conn: psycopg.Connection, *, source_id: str, candidates: li
     normalized = _normalize_candidates(candidates)
     if not normalized:
         raise SourceIntakeError("at least one Project candidate is required")
+    current = _source_row(conn, source_id)
+    if current["project_link_status"] == "linked" or current.get("project_id") is not None:
+        raise SourceIntakeError("linked Source must be explicitly unlinked before project suggestions")
     for candidate in normalized:
         if not _project_exists(conn, candidate["project_ref"]):
             raise SourceIntakeError(f"unknown candidate Project: {candidate['project_ref']}")
