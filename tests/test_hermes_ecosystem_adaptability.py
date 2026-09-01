@@ -22,9 +22,13 @@ def _text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def _external_pin_version(pin_id: str) -> str:
+def _external_pin(pin_id: str) -> dict:
     data = json.loads(_text(EXTERNAL_PINS))
-    return data["pins"][pin_id]["version"]
+    return data["pins"][pin_id]
+
+
+def _external_pin_version(pin_id: str) -> str:
+    return _external_pin(pin_id)["version"]
 
 
 def test_runtime_review_keeps_governed_profile_and_release_sensitive_constraints() -> None:
@@ -52,11 +56,12 @@ def test_runtime_review_keeps_governed_profile_and_release_sensitive_constraints
     assert "OpenWebUI_automatic_RAG" not in review
 
 
-def test_runtime_review_keeps_hermes_021_runtime_state_non_authoritative() -> None:
+def test_runtime_review_keeps_current_runtime_state_non_authoritative() -> None:
     review = _text(RUNTIME_REVIEW)
+    pin = _external_pin("hermes-agent")
 
-    assert "Current reviewed target: Hermes Agent 0.21.0 (`v2026.8.31`)" in review
-    assert "release_commit: 29112bef099274229cadff79cdff7bf7b99c4b77" in review
+    assert f"Current reviewed target: Hermes Agent {pin['version']}" in review
+    assert f"release_commit: {pin['ref']}" in review
     assert "run_binding_change_required: false" in review
     assert "Bot identity != governed identity" in review
     assert "Bot Chat != dossier" in review
