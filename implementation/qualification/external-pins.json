@@ -79,6 +79,14 @@
       "env_prefix": "MNEMOSYNE_HERMES",
       "package": "mnemosyne-hermes",
       "version": "0.5.0"
+    },
+    "haystack": {
+      "kind": "git-package",
+      "env_prefix": "HAYSTACK",
+      "repository": "deepset-ai/haystack",
+      "package": "haystack-ai",
+      "version": "3.1.0",
+      "ref": "859a6eb3ac4d0bd33f069bab57fb041e3434a353"
     }
   },
   "authority": {
