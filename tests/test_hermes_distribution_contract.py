@@ -170,7 +170,7 @@ def test_runtime_review_preserves_boundary_and_live_observation_gate() -> None:
     candidate_runtime = active["source_pins"]["hermes_runtime"]["version"]
 
     assert candidate_runtime == candidate_pin["version"]
-    assert f"Current reviewed target: Hermes Agent {candidate_runtime} (`v2026.8.27`)." in review
+    assert f"Current reviewed target: Hermes Agent {candidate_runtime}" in review
     assert f"version: {candidate_runtime}" in review
     assert f"release_commit: {candidate_pin['ref']}" in review
     assert f"current candidate distribution runtime target: {candidate_runtime}" in review

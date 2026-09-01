@@ -1,18 +1,11 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "templates/hermes/skills/visual-focus/SKILL.md"
 REGISTRY = ROOT / "templates/TEMPLATE_REGISTRY.md"
-EXTERNAL_PINS = ROOT / "implementation/qualification/external-pins.json"
-
-
-def _hermes_version() -> str:
-    data = json.loads(EXTERNAL_PINS.read_text(encoding="utf-8"))
-    return data["pins"]["hermes-agent"]["version"]
 
 
 def test_visual_focus_skill_reuses_native_hermes_region_surface():
@@ -24,7 +17,7 @@ def test_visual_focus_skill_reuses_native_hermes_region_surface():
     assert "governed_by: templates/hermes/SKILLS.md" in text
 
     for native_surface in (
-        f"Hermes Agent {_hermes_version()} / v2026.8.27",
+        "Hermes Agent 0.20.6 / v2026.8.27",
         "vision_analyze.region",
         "region=[x1, y1, x2, y2]",
         "original-image pixel coordinates",

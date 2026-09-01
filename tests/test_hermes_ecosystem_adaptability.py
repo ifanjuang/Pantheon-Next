@@ -22,9 +22,13 @@ def _text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def _external_pin_version(pin_id: str) -> str:
+def _external_pin(pin_id: str) -> dict:
     data = json.loads(_text(EXTERNAL_PINS))
-    return data["pins"][pin_id]["version"]
+    return data["pins"][pin_id]
+
+
+def _external_pin_version(pin_id: str) -> str:
+    return _external_pin(pin_id)["version"]
 
 
 def test_runtime_review_keeps_governed_profile_and_release_sensitive_constraints() -> None:
@@ -36,14 +40,45 @@ def test_runtime_review_keeps_governed_profile_and_release_sensitive_constraints
     assert "built_in_user_profile_injection: off" in review
     assert "memory_tool: off" in review
     assert "session_memory_key: forbidden" in review
+    assert "runtime_transcript_reuse: forbidden unless separately qualified" in review
+    assert "skill_manage: outside admitted tool surface" in review
+    assert "peer_transport: outside admitted tool surface unless separately qualified" in review
+    assert "cron_jobs: outside governed task path unless separately qualified" in review
     assert "real_browser_profile: disabled unless separately qualified" in review
     assert "browser_extension_control: disabled unless separately qualified" in review
+    assert "desktop_browser_control: disabled unless separately qualified" in review
     assert "remote_admin_update_surface: outside governed task path" in review
     assert "terminal_environment_backend: exact observed backend required" in review
     assert "existing runtime observer already records route/tool/memory posture" in review
+    assert "Pantheon multi-agent runtime" in review
     assert "profile: assistant-personal" not in review
     assert "OpenWebUI_memory_injection" not in review
     assert "OpenWebUI_automatic_RAG" not in review
+
+
+def test_runtime_review_keeps_current_runtime_state_non_authoritative() -> None:
+    review = _text(RUNTIME_REVIEW)
+    pin = _external_pin("hermes-agent")
+
+    assert f"Current reviewed target: Hermes Agent {pin['version']}" in review
+    assert f"release_commit: {pin['ref']}" in review
+    assert "run_binding_change_required: false" in review
+    assert "Bot identity != governed identity" in review
+    assert "Bot Chat != dossier" in review
+    assert "peer message != governed delegation" in review
+    assert "cron memory != Pantheon memory" in review
+    assert "continuity != governed provenance" in review
+    assert "runtime memory != Evidence" in review
+    assert "subagent result != Evidence" in review
+    assert "subagent steering != Pantheon decision" in review
+    assert "JSON schema valid != claim true" in review
+    assert "Verify success != Evidence" in review
+    assert "runtime write approval != Pantheon write authorization" in review
+    assert "MCP discovered != MCP admitted" in review
+    assert "tool admitted != effect authorized" in review
+    assert "browser available != browser action authorized" in review
+    assert "runtime replay != fresh task authorization" in review
+    assert "runtime success != authorization" in review
 
 
 def test_functional_profiles_inherit_one_governed_runtime_mode() -> None:
@@ -161,6 +196,8 @@ def test_runtime_target_selection_does_not_change_runtime_authority() -> None:
     assert "target_selection_effect: candidate-only" in review
     assert "new_runtime_owner_required: false" in review
     assert "new_client_owner_required: false" in review
+    assert "new_memory_owner_required: false" in review
+    assert "new_scheduler_owner_required: false" in review
     assert "installation_effect: none" in review
     assert "activation_effect: none" in review
     assert "task_authorization_effect: none" in review
