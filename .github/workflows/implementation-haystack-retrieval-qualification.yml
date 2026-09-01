@@ -7,7 +7,13 @@ on:
       - "implementation/qualification/external-pins.json"
       - "implementation/tools/export_external_qualification_pins.py"
       - "implementation/labs/haystack_retrieval/**"
+      - "implementation/mvp_vertical/retrieval.py"
+      - "implementation/mvp_vertical/retrieval_scope.py"
+      - "implementation/tests/fixtures/professional_quote_review_cases.yaml"
+      - "implementation/tests/fixtures/retrieval_metier_cases.yaml"
       - "implementation/tests/test_haystack_bounded_retrieval_lab.py"
+      - "implementation/tests/test_haystack_native_retrieval_comparison.py"
+      - "implementation/tests/test_professional_quote_review_baseline.py"
   workflow_dispatch:
 
 permissions:
@@ -17,6 +23,20 @@ jobs:
   bounded-retrieval:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    services:
+      pgvector:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: mvp
+          POSTGRES_PASSWORD: mvp
+          POSTGRES_DB: mvp
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U mvp -d mvp"
+          --health-interval 2s
+          --health-timeout 2s
+          --health-retries 15
     steps:
       - name: Checkout Pantheon qualification harness
         uses: actions/checkout@v4
@@ -54,3 +74,10 @@ jobs:
         env:
           HAYSTACK_UNSAFE_DESERIALIZATION: "false"
         run: pytest -q tests/test_haystack_bounded_retrieval_lab.py
+
+      - name: Measure Haystack against current native exact-scoped retrieval
+        working-directory: implementation
+        env:
+          HAYSTACK_UNSAFE_DESERIALIZATION: "false"
+          MVP_PG_DSN: postgresql://mvp:mvp@localhost:5433/mvp
+        run: pytest -q -s tests/test_haystack_native_retrieval_comparison.py
