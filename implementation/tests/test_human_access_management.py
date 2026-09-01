@@ -128,3 +128,57 @@ def test_project_grant_listing_and_revocation_keep_history(conn) -> None:
     assert len(all_rows) == 1
     assert all_rows[0]["grant_id"] == grant["grant_id"]
     assert all_rows[0]["revoked_at"] is not None
+
+
+def test_project_read_cannot_be_revoked_while_manage_grant_is_active(conn) -> None:
+    _project(conn, "project-a")
+    human_access.create_principal(conn, principal_ref="manager", created_by="bootstrap")
+    read_grant = human_access.grant_access(
+        conn,
+        principal_ref="manager",
+        project_id="project-a",
+        resource_type="project",
+        resource_id="project-a",
+        action="project.read",
+        granted_by="bootstrap",
+    )
+    manage_grant = human_access.grant_access(
+        conn,
+        principal_ref="manager",
+        project_id="project-a",
+        resource_type="project",
+        resource_id="project-a",
+        action="project.access.manage",
+        granted_by="bootstrap",
+    )
+    conn.commit()
+
+    with pytest.raises(
+        human_access.HumanAccessError,
+        match="cannot revoke project.read while principal holds active project.access.manage",
+    ):
+        human_access.revoke_grant(conn, grant_id=read_grant["grant_id"])
+
+    assert human_access.has_access(
+        conn,
+        principal_ref="manager",
+        project_id="project-a",
+        resource_type="project",
+        resource_id="project-a",
+        action="project.read",
+    )
+    assert human_access.has_access(
+        conn,
+        principal_ref="manager",
+        project_id="project-a",
+        resource_type="project",
+        resource_id="project-a",
+        action="project.access.manage",
+    )
+
+    revoked_manage = human_access.revoke_grant(conn, grant_id=manage_grant["grant_id"])
+    revoked_read = human_access.revoke_grant(conn, grant_id=read_grant["grant_id"])
+    conn.commit()
+
+    assert revoked_manage["revoked_at"] is not None
+    assert revoked_read["revoked_at"] is not None

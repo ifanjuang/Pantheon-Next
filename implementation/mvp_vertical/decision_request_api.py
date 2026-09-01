@@ -23,7 +23,7 @@ ResponseMode = Literal[
 DecisionValue = Literal[
     "approve", "refuse", "request_revision", "request_more_evidence"
 ]
-IdentityAssurance = Literal["declared", "authenticated"]
+IdentityAssurance = Literal["declared"]
 RequestStatus = Literal["pending", "resolved", "cancelled"]
 
 
@@ -99,30 +99,18 @@ class DecisionRequestCreateBody(BaseModel):
         return self
 
 
-class AuthenticatedPrincipalBody(BaseModel):
-    user_id: str = Field(min_length=1, max_length=500)
-    display_name: str | None = Field(default=None, min_length=1, max_length=500)
-    identity_provider: str = Field(min_length=1, max_length=500)
-
-
 class ResolveDecisionRequestBody(BaseModel):
     decision_id: str = Field(pattern=r"^[a-z0-9][a-z0-9._-]*$")
     decision: DecisionValue
+    # This editor-key route has no authenticated-principal source. Keep the
+    # persisted assurance honest until a real identity provider is composed.
     identity_assurance: IdentityAssurance = "declared"
-    authenticated_principal: AuthenticatedPrincipalBody | None = None
+    authenticated_principal: None = None
     expected_revision: int = Field(ge=1)
     idempotency_key: str = Field(min_length=8, max_length=200)
     selected_option_ids: list[str] = Field(default_factory=list, max_length=50)
     response_text: str | None = Field(default=None, max_length=20000)
     rationale: str | None = Field(default=None, max_length=20000)
-
-    @model_validator(mode="after")
-    def validate_identity_shape(self):
-        if self.identity_assurance == "authenticated" and self.authenticated_principal is None:
-            raise ValueError("authenticated assurance requires authenticated_principal")
-        if self.identity_assurance == "declared" and self.authenticated_principal is not None:
-            raise ValueError("declared assurance cannot carry authenticated_principal")
-        return self
 
 
 class CancelDecisionRequestBody(BaseModel):
@@ -286,9 +274,6 @@ def install_decision_request_routes(
         actor: str = Depends(require_human_actor),
     ) -> dict[str, Any]:
         values = body.model_dump()
-        principal = values.get("authenticated_principal")
-        if principal is not None:
-            values["authenticated_principal"] = principal
 
         def resolve_with_scope(conn):
             projection = decision_requests.resolve_request(
