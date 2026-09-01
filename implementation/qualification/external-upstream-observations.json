@@ -16,9 +16,10 @@
     "hermes-agent": {
       "source": "github_releases_latest",
       "locator": "NousResearch/hermes-agent",
-      "latest_seen": "v2026.8.27",
-      "observed_on": "2026-08-30",
-      "delta": "none"
+      "latest_seen": "v2026.8.31",
+      "observed_on": "2026-09-02",
+      "delta": "none",
+      "note": "Observed from the current stable GitHub release v2026.8.31 (Hermes Agent 0.21.0), whose annotated release tag resolves to commit 29112bef099274229cadff79cdff7bf7b99c4b77. This refresh records upstream state only; the qualification pin is owned separately and installation, activation, task authorization and Evidence admission remain unchanged."
     },
     "hindsight": {
       "source": "github_releases_latest",
