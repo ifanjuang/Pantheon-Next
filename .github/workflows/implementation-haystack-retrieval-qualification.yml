@@ -1,0 +1,56 @@
+name: Haystack Retrieval Qualification
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/implementation-haystack-retrieval-qualification.yml"
+      - "implementation/qualification/external-pins.json"
+      - "implementation/tools/export_external_qualification_pins.py"
+      - "implementation/labs/haystack_retrieval/**"
+      - "implementation/tests/test_haystack_bounded_retrieval_lab.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bounded-retrieval:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout Pantheon qualification harness
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Load canonical Haystack qualification pin
+        shell: bash
+        run: python3 implementation/tools/export_external_qualification_pins.py --github-env "$GITHUB_ENV" haystack
+
+      - name: Install bounded implementation test dependencies and exact Haystack package
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e "implementation[test]"
+          python -m pip install "${HAYSTACK_PACKAGE}==${HAYSTACK_VERSION}"
+
+      - name: Verify exact package and safe deserialization posture
+        shell: bash
+        run: |
+          python - <<'PY'
+          import importlib.metadata
+          import os
+
+          expected = os.environ["HAYSTACK_VERSION"]
+          observed = importlib.metadata.version("haystack-ai")
+          assert observed == expected, (observed, expected)
+          assert os.environ.get("HAYSTACK_UNSAFE_DESERIALIZATION", "").strip().lower() not in {"1", "true"}
+          PY
+
+      - name: Run bounded Haystack qualification
+        working-directory: implementation
+        env:
+          HAYSTACK_UNSAFE_DESERIALIZATION: "false"
+        run: pytest -q tests/test_haystack_bounded_retrieval_lab.py
