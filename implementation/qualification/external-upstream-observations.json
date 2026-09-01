@@ -101,6 +101,14 @@
       "observed_on": "2026-09-01",
       "delta": "none",
       "note": "Observed from the immutable v3.1.0 GitHub release published 2026-08-24; annotated tag resolves to release commit 859a6eb3ac4d0bd33f069bab57fb041e3434a353. This observation supports the #908 qualification pin only and does not select or activate Haystack."
+    },
+    "isnad": {
+      "source": "github_releases_latest",
+      "locator": "alizahidraja/isnad",
+      "latest_seen": "v2.20.1",
+      "observed_on": "2026-09-01",
+      "delta": "none",
+      "note": "Observed from the current GitHub latest release v2.20.1, published 2026-09-01. The qualification pin targets package 2.20.1 at commit 4a9a9a3dd22b459c5e6a15d87af0997febad1703. This observation answers freshness only; it does not install, activate, authorize, admit Evidence, or adopt ISNAD."
     }
   },
   "authority": {

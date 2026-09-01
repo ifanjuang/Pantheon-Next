@@ -87,6 +87,14 @@
       "package": "haystack-ai",
       "version": "3.1.0",
       "ref": "859a6eb3ac4d0bd33f069bab57fb041e3434a353"
+    },
+    "isnad": {
+      "kind": "package",
+      "env_prefix": "ISNAD",
+      "repository": "alizahidraja/isnad",
+      "package": "isnad",
+      "version": "2.20.1",
+      "ref": "4a9a9a3dd22b459c5e6a15d87af0997febad1703"
     }
   },
   "authority": {
