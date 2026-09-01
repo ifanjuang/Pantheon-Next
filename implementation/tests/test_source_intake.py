@@ -29,15 +29,6 @@ def conn():
     except Exception as exc:  # pragma: no cover - local unit-only environment
         pytest.skip(f"PostgreSQL unreachable: {exc}")
 
-    # Feature-local tests use unique identities and one rollback-only transaction.
-    # They must not TRUNCATE shared Agency Data authorities or replay schema DDL.
-    #
-    # The previous fixture truncated agency_projects — an authority other suites
-    # own — on every test. TRUNCATE needs ACCESS EXCLUSIVE, so it blocked behind
-    # any connection still holding a read lock, and a module-scoped fixture
-    # elsewhere holds one for the length of its module. That turned an ordinary
-    # serial run into a stall. Every identity here is already uuid-unique, so the
-    # truncation bought no isolation it did not already have.
     connection.execute("BEGIN")
     try:
         yield connection
@@ -51,9 +42,6 @@ def _id(prefix: str) -> str:
 
 
 def _project(conn, code: str | None = None) -> dict:
-    # agency_projects.code is UNIQUE. A fixed literal only worked while the
-    # fixture truncated the table on every test; without that it collides with
-    # any project another suite left behind.
     code = code or f"BLANC-{uuid.uuid4().hex[:8].upper()}"
     return agency_data.create_project(
         conn,
@@ -83,13 +71,8 @@ def _source(conn, *, suffix: str = "mail") -> dict:
 
 
 def test_source_is_preserved_without_project_or_information(conn) -> None:
-    # Admitting a Source must create no Information. Asserted as a delta rather
-    # than a global count of zero: the latter only held because the fixture
-    # truncated a table this suite does not own.
     before = conn.execute("SELECT count(*) FROM agency_information_cards").fetchone()[0]
-
     source = _source(conn)
-
     assert source["project_link_status"] == "unassigned"
     assert source["project_id"] is None
     assert source["declared_project_name"] == "Maison Blanc"
@@ -98,21 +81,23 @@ def test_source_is_preserved_without_project_or_information(conn) -> None:
     assert after == before
 
 
+def _candidate(project_id: str) -> dict:
+    return {
+        "project_ref": project_id,
+        "score": 0.93,
+        "basis": ["declared_name_match", "sender_match"],
+        "producer": "deterministic-project-matcher",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+
 def test_candidate_project_is_not_an_authoritative_link(conn) -> None:
     project = _project(conn)
     source = _source(conn)
     suggested = source_intake.suggest_projects(
         conn,
         source_id=source["source_id"],
-        candidates=[
-            {
-                "project_ref": project["project_id"],
-                "score": 0.93,
-                "basis": ["declared_name_match", "sender_match"],
-                "producer": "deterministic-project-matcher",
-                "created_at": datetime.now(timezone.utc).isoformat(),
-            }
-        ],
+        candidates=[_candidate(project["project_id"])],
         expected_revision=1,
         actor="intake-user",
         actor_kind="human",
@@ -121,6 +106,40 @@ def test_candidate_project_is_not_an_authoritative_link(conn) -> None:
     assert suggested["project_link_status"] == "suggested"
     assert suggested["project_id"] is None
     assert suggested["candidate_project_refs"][0]["score"] == 0.93
+
+
+def test_suggestions_cannot_implicitly_remove_an_explicit_project_link(conn) -> None:
+    linked_project = _project(conn)
+    candidate_project = _project(conn)
+    source = _source(conn)
+    linked = source_intake.link_project(
+        conn,
+        source_id=source["source_id"],
+        project_id=linked_project["project_id"],
+        expected_revision=1,
+        actor="reviewer",
+        actor_kind="human",
+        idempotency_key=_id("link"),
+    )
+
+    with pytest.raises(
+        source_intake.SourceIntakeError,
+        match="linked Source must be explicitly unlinked before project suggestions",
+    ):
+        source_intake.suggest_projects(
+            conn,
+            source_id=source["source_id"],
+            candidates=[_candidate(candidate_project["project_id"])],
+            expected_revision=linked["revision"],
+            actor="reviewer",
+            actor_kind="human",
+            idempotency_key=_id("suggest-linked"),
+        )
+
+    current = source_intake.get_source(conn, source["source_id"])
+    assert current["project_link_status"] == "linked"
+    assert current["project_id"] == linked_project["project_id"]
+    assert current["revision"] == linked["revision"]
 
 
 def test_link_unlink_exclude_and_restore_are_explicit_revision_checked_actions(conn) -> None:
@@ -265,9 +284,6 @@ def test_source_events_are_append_only(conn) -> None:
         "SELECT event_id FROM agency_source_events WHERE source_id = %s",
         (source["source_id"],),
     ).fetchone()[0]
-    # Each refusal aborts its own savepoint, not the fixture's transaction: a
-    # bare rollback here would discard the source this test just created and
-    # make the second assertion pass vacuously.
     for statement in (
         "UPDATE agency_source_events SET actor = 'changed' WHERE event_id = %s",
         "DELETE FROM agency_source_events WHERE event_id = %s",
@@ -276,7 +292,6 @@ def test_source_events_are_append_only(conn) -> None:
             with conn.transaction():
                 conn.execute(statement, (event_id,))
 
-    # The event survives both refusals.
     assert conn.execute(
         "SELECT actor FROM agency_source_events WHERE event_id = %s", (event_id,)
     ).fetchone() is not None
