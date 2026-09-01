@@ -260,6 +260,26 @@ def test_resolution_explicitly_refuses_execution_inference(monkeypatch) -> None:
     assert payload["action_executed"] is False
 
 
+def test_editor_route_cannot_self_assert_authenticated_identity(monkeypatch) -> None:
+    client = TestClient(_app(monkeypatch))
+    response = client.post(
+        "/decision-requests/request-one/resolve",
+        json={
+            "decision_id": "decision-one",
+            "decision": "approve",
+            "identity_assurance": "authenticated",
+            "authenticated_principal": {
+                "user_id": "architect-human",
+                "identity_provider": "caller-asserted",
+            },
+            "expected_revision": 1,
+            "idempotency_key": "resolve-authenticated-one",
+        },
+        headers=_headers("editor-secret", actor="architect-human"),
+    )
+    assert response.status_code == 422
+
+
 def test_pending_list_is_the_attention_inbox(monkeypatch) -> None:
     client = TestClient(_app(monkeypatch))
     response = client.get(
