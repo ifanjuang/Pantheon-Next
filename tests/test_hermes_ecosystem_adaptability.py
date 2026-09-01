@@ -102,6 +102,7 @@ def test_runtime_card_exposes_each_memory_posture_axis() -> None:
 
 def test_binding_registry_prefers_replaceable_components_over_platform_sprawl() -> None:
     bindings = _text(BINDINGS)
+    haystack_version = _external_pin_version("haystack")
 
     assert "`document_structural_analysis` | Docling preferred candidate" in bindings
     assert "`document_source_management` | `unbound`" in bindings
@@ -109,7 +110,7 @@ def test_binding_registry_prefers_replaceable_components_over_platform_sprawl() 
     assert "`observability` | Langfuse preferred candidate" in bindings
     assert "`knowledge_retrieval_pipeline` | `unbound`" in bindings
     assert "no canonical rag framework is required" in bindings.lower()
-    assert "Haystack 3.1.0 matched native quality" in bindings
+    assert f"Haystack {haystack_version} matched native quality" in bindings
     assert "`external_runtime_memory` | `unbound`" in bindings
     assert "Hermes native memory is a valid baseline" in bindings
     assert "Hindsight is the currently recommended external provider" in bindings
