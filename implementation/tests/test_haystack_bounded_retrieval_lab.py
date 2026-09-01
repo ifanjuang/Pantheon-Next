@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from importlib.metadata import version as package_version
 import importlib.util
 import os
 from pathlib import Path
@@ -70,7 +71,7 @@ def test_exact_provenance_survives_projection_and_runtime_contract_is_provider_n
     result = adapter.retrieve(_resolution(source), query="acier poutre", top_k=3)
 
     assert result.provider == "haystack"
-    assert result.provider_version == "3.1.0"
+    assert result.provider_version == package_version("haystack-ai")
     assert result.project_id == "project-a"
     assert result.evidence_admitted is False
     assert result.authorized_effect is False
