@@ -84,8 +84,10 @@ def test_exact_provenance_survives_projection_and_runtime_contract_is_provider_n
     assert candidate.source_version == source.source_version
     assert candidate.purpose == source.purpose
     assert candidate.basis_refs == source.basis_refs
-    assert "haystack" not in type(candidate).__module__.lower()
+    assert type(candidate).__name__ == "BoundedRetrievalCandidate"
     assert not isinstance(candidate, Document)
+    assert not hasattr(candidate, "meta")
+    assert not hasattr(candidate, "embedding")
 
 
 def test_provider_store_can_contain_out_of_scope_document_without_widening_results() -> None:
