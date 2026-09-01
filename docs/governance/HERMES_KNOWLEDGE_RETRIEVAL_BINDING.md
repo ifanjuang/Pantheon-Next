@@ -1,6 +1,6 @@
 # Hermes Knowledge Retrieval Binding
 
-Status: candidate support doctrine — documented non-implemented.
+Status: candidate support doctrine — native path sufficient on the measured slice; external binding remains unbound.
 
 ## Purpose
 
@@ -26,10 +26,10 @@ function: scoped retrieval, filtering, ranking/reranking and provenance-linked c
 owner_layer: execution_runtime
 executed_by: Hermes / reviewed retrieval adapter
 governed_by: Pantheon
-binding_status: candidate
+binding_status: unbound
 preferred_binding: unbound
-candidate_bindings: Haystack
-watchlist_bindings: LlamaIndex, selected LangChain components
+candidate_bindings: none selected
+watchlist_bindings: Haystack, LlamaIndex, selected LangChain components
 rejected_default_bindings: Langflow runtime, LangGraph runtime, RAGFlow integrated platform
 install_status: absent / not established
 health_status: unknown
@@ -87,19 +87,46 @@ become a second agent runtime beside Hermes
 
 ### Haystack
 
-Posture:
+Posture after bounded qualification:
 
 ```text
-binding_status: candidate / to verify
+binding_status: watch
 preferred: no
 installation: not established
-health: unknown
+health: qualification-lab only
 activation: unavailable
 ```
 
-Reason for candidacy: its current upstream positioning includes modular RAG, retrieval, context engineering, composable pipelines, ranking/reranking patterns and agent-oriented workflows. Those capabilities make it relevant to the slot, but product breadth is not a reason to adopt it automatically.
+Reason for continued watch status: Haystack provides modular retrieval, context-engineering, ranking/reranking and pipeline components that may become useful if a concrete gap appears. Product breadth is not itself a reason to adopt it.
 
-Primary review risks:
+Observed qualification on 2026-09-01, using the exact pin recorded in `implementation/qualification/external-pins.json` and the lab under `implementation/labs/haystack_retrieval/`:
+
+```text
+bounded scope/provenance lab                  = passed
+out-of-scope / stale / revoke fail-closed     = passed
+applicable labelled lexical cases             = 6
+native expected source at rank 1              = 6/6
+Haystack expected source at rank 1            = 6/6
+native long-request admitted-source coverage  = 3/3
+Haystack long-request admitted-source coverage= 3/3
+measured retrieval-quality gain               = none
+binding selected                              = no
+```
+
+The lab also observed a small CI-local latency difference in favor of the in-memory Haystack path. That observation is not deployment-performance evidence: Haystack used `InMemoryDocumentStore`, while the native lane crossed PostgreSQL, and persistence/restart/resource costs were intentionally outside the slice.
+
+Decision:
+
+```text
+current native bounded lexical retrieval is sufficient for the measured need
+-> keep knowledge_retrieval_pipeline unbound
+-> do not expose Haystack's framework/agent control surface to Hermes
+-> retain Haystack on watch only for a later demonstrated capability gap
+```
+
+A generic Hermes retrieval handoff remains a separate integration question. It should be implemented only when a concrete retrieval need requires it and should expose one provider-neutral bounded contract regardless of the underlying implementation. The absence of such a handoff is not a reason to select Haystack.
+
+Primary review risks if Haystack is reconsidered:
 
 ```text
 index or document-store scope broader than Task Contract
@@ -110,7 +137,7 @@ agent/tool features expanding beyond the retrieval slot
 framework dependency adopted by implication
 ```
 
-A future Haystack binding should expose one retrieval contract, not the whole framework control surface.
+Any future Haystack binding must expose one retrieval contract, not the whole framework control surface.
 
 ### LlamaIndex
 
@@ -243,17 +270,25 @@ retrieved != evidence
 
 ## MVP boundary
 
-No `pantheon-mvp` change is justified by this document alone.
+The bounded Haystack lab is implemented only as qualification evidence. It does not alter the product retrieval owner, create an activated CapabilityBinding or justify a `pantheon-mvp` dependency.
 
-A future MVP vertical becomes admissible only when there is a concrete comparison or acceptance target, for example:
+The measured slice currently supports the simpler outcome:
 
 ```text
-already-extracted synthetic project corpus
--> scoped retrieval
--> reranking
+Pantheon native bounded retrieval
+-> sufficient for the tested lexical need
+-> external knowledge_retrieval_pipeline binding remains unbound
+```
+
+A future product vertical is justified only after a concrete gap is demonstrated, for example a required retrieval/reranking quality improvement that the native path does not provide. Any such vertical must preserve the provider-neutral boundary:
+
+```text
+already-extracted governed project corpus
+-> exact scoped retrieval contract
+-> optional replaceable implementation
 -> Hermes candidate answer
 -> provenance-linked Evidence Pack Candidate
 -> human review
 ```
 
-Until then the slot remains documented non-implemented in Pantheon Next.
+Until such a gap exists, adding a provider-specific Hermes search surface, second store or broader RAG runtime would be unnecessary duplication.

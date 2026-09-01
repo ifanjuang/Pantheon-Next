@@ -65,7 +65,7 @@ Runtime status remains separate from candidate status.
 | `observability` | Langfuse preferred candidate | Optional Hermes trace/cost/latency visibility; traces are not Evidence or approval. |
 | `document_structural_analysis` | Docling preferred candidate | Existing bounded path; extraction is derivative, not source truth. |
 | `document_source_management` | `unbound` | Core source/document owners and local/NAS intake do not require a DMS. Paperless is superseded as a target dependency. |
-| `knowledge_retrieval_pipeline` | `unbound` | No canonical RAG framework is required. Hermes-native file/context access may be sufficient. |
+| `knowledge_retrieval_pipeline` | `unbound` | Native bounded retrieval is sufficient on the current measured lexical slice. Haystack 3.1.0 matched native quality in the bounded qualification and remains watch-only; no canonical RAG framework is required. |
 | `external_runtime_memory` | `unbound` | Hermes native memory is a valid baseline. Hindsight is the currently recommended external provider because it has the strongest live qualification in this repository. |
 | `structural_repo_analysis` | `Lum1104/Understand-Anything` candidate | Useful structural analysis; generated graph remains derivative. |
 | `revit_local_adapter` | Pantheon Revit Gate local-plugin candidate | Local sandbox exception; model mutation remains consequential. |
@@ -227,7 +227,7 @@ identified source / scope
 
 Embeddings, vector stores, rerankers, graphs and retrieval frameworks remain implementation choices. A task that can be satisfied by Hermes-native context or direct bounded source access does not need an extra RAG layer.
 
-If advanced retrieval is required, Hindsight is currently the best-demonstrated external option in this repository; Haystack, LlamaIndex and selected LangChain components remain replaceable candidates rather than Pantheon dependencies.
+The 2026-09-01 bounded Haystack qualification measured no lexical retrieval-quality gain over the current native path, so Haystack remains watch-only and `knowledge_retrieval_pipeline` stays unbound. Hindsight remains the best-demonstrated external memory/workspace retrieval composition in this repository; LlamaIndex and selected LangChain components remain replaceable watch candidates rather than Pantheon dependencies.
 
 ## Document source management
 
