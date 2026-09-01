@@ -81,7 +81,7 @@
       "version": "0.5.0"
     },
     "haystack": {
-      "kind": "git-package",
+      "kind": "package",
       "env_prefix": "HAYSTACK",
       "repository": "deepset-ai/haystack",
       "package": "haystack-ai",
