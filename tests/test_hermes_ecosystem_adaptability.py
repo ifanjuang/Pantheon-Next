@@ -143,7 +143,8 @@ def test_binding_registry_prefers_replaceable_components_over_platform_sprawl() 
     assert "Paperless is superseded as a target dependency" in bindings
     assert "`observability` | Langfuse preferred candidate" in bindings
     assert "`knowledge_retrieval_pipeline` | `unbound`" in bindings
-    assert "No canonical RAG framework is required" in bindings
+    assert "no canonical rag framework is required" in bindings.lower()
+    assert "Haystack 3.1.0 matched native quality" in bindings
     assert "`external_runtime_memory` | `unbound`" in bindings
     assert "Hermes native memory is a valid baseline" in bindings
     assert "Hindsight is the currently recommended external provider" in bindings
@@ -156,8 +157,11 @@ def test_binding_registry_prefers_replaceable_components_over_platform_sprawl() 
 def test_retrieval_binding_reuses_libraries_without_adopting_new_runtimes() -> None:
     retrieval = _text(RETRIEVAL)
 
-    assert "candidate_bindings: Haystack" in retrieval
-    assert "watchlist_bindings: LlamaIndex, selected LangChain components" in retrieval
+    assert "binding_status: unbound" in retrieval
+    assert "candidate_bindings: none selected" in retrieval
+    assert "watchlist_bindings: Haystack, LlamaIndex, selected LangChain components" in retrieval
+    assert "measured retrieval-quality gain               = none" in retrieval
+    assert "do not expose Haystack's framework/agent control surface to Hermes" in retrieval
     assert (
         "rejected_default_bindings: Langflow runtime, LangGraph runtime, "
         "RAGFlow integrated platform"
