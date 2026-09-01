@@ -93,6 +93,14 @@
       "latest_seen": "0.5.0",
       "observed_on": "2026-08-31",
       "delta": "none"
+    },
+    "haystack": {
+      "source": "github_releases_latest",
+      "locator": "deepset-ai/haystack",
+      "latest_seen": "v3.1.0",
+      "observed_on": "2026-09-01",
+      "delta": "none",
+      "note": "Observed from the immutable v3.1.0 GitHub release published 2026-08-24; annotated tag resolves to release commit 859a6eb3ac4d0bd33f069bab57fb041e3434a353. This observation supports the #908 qualification pin only and does not select or activate Haystack."
     }
   },
   "authority": {
