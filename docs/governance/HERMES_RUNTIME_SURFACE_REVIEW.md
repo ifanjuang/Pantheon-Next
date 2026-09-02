@@ -45,10 +45,12 @@ POST /v1/runs/{run_id}/approval
 
 0.21.0 keeps run submission, polling, SSE events and stop semantics. It additionally documents durable idempotency keys for run creation, optional session/transcript reuse, subagent lifecycle events, and runtime-side approval continuation.
 
-These additions do not require a new Pantheon run binding: the governed candidate binding can continue to submit one admitted run, correlate its runtime identity, observe status/events and stop it without adopting runtime session continuity, runtime approval or subagent orchestration as Pantheon authority.
+These additions do not require a new Pantheon run binding. The current binding supplies the freshly generated Pantheon Execution Admission identity as the Runs `session_id` because Hermes maps that value to the host `task_id` consumed by the existing Context Bridge. Pantheon uses that value as one-shot host correlation, not as permission to continue an earlier Hermes conversation. The admission can acquire only one immutable launch reservation; an exact reservation replay is marked as such and the external binding refuses a second Hermes submission.
 
 ```text
 run_binding_change_required: false
+session_correlation: fresh_one_shot_execution_admission
+session_correlation_reuse: forbidden
 ```
 
 Wire compatibility still requires observation against the exact installed artifact.
@@ -113,7 +115,20 @@ Qualification consequence: a successful build/test recipe is a technical executi
 
 ### Per-request routing and runtime session state
 
-Tagged API docs continue to accept `model`, `provider` and `model_options` on `/v1/runs`; Runs can also load an existing Hermes session transcript when a `session_id` is supplied and no explicit history is supplied.
+Tagged API docs continue to accept `model`, `provider` and `model_options` on `/v1/runs`. The exact 0.21.0 Runs handler also loads an existing Hermes session transcript when a `session_id` is supplied and neither an effective explicit history nor a `previous_response_id` supplies the conversation context. An empty `conversation_history` array is not a stateless override in this release because the handler still reaches the session-history fallback when the resulting history is empty.
+
+The current Pantheon binding deliberately supplies `session_id = admission_id` because that is how the reviewed Hermes Runs path gives the Context Bridge its host `task_id`. The safety property is therefore not absence of the `session_id` field. It is that the identifier is a freshly generated Execution Admission identity, the Pantheon launch path is one-shot, a reservation replay cannot reach a second Hermes submission, and no prior-conversation continuation input is intentionally supplied.
+
+```text
+session_id purpose: host task correlation
+session_id source: fresh Execution Admission identity
+second Pantheon launch for same admission: forbidden
+previous_response_id: omitted
+X-Hermes-Session-Key: absent
+runtime transcript reuse: forbidden
+```
+
+Pantheon-side freshness does not by itself prove the absence of arbitrary pre-existing state in an external Hermes installation. Exact target acceptance must therefore treat any observed prior transcript under the fresh synthetic admission identity as a qualification failure or unresolved runtime-state finding rather than silently accepting it as context.
 
 Qualification consequence: the Pantheon candidate binding continues to omit provider/model overrides and must not opt into runtime transcript reuse or long-term session memory unless a separately qualified binding/profile explicitly requires it.
 
@@ -199,7 +214,7 @@ Selecting 0.21.0 as the candidate target does not qualify it. Qualification requ
 2. observe the named profile route and `/v1/capabilities` / `/v1/toolsets` from that exact runtime;
 3. verify active tools remain within the reviewed profile/binding envelope, including MCP, `memory`, `skill_manage`, peer and browser surfaces;
 4. record the existing read-only memory-posture observation and prove memory/profile injection and the memory tool remain disabled for `pantheon-governed`;
-5. verify no `X-Hermes-Session-Key`, governed transcript-reuse `session_id`, `previous_response_id` or equivalent continuity input is supplied by the governed run client unless separately qualified;
+5. verify no `X-Hermes-Session-Key`, `previous_response_id` or equivalent continuity input is supplied by the governed run client; verify that its sole Runs `session_id` is the fresh current Execution Admission identity used for host task correlation, that Pantheon has not previously launched that admission, and that a replayed reservation cannot reach another `POST /v1/runs`; any observed pre-existing Hermes transcript under that fresh synthetic identity is a qualification failure or unresolved target-state finding;
 6. verify the Pantheon run payload contains no `model`, `provider` or `model_options` override;
 7. record the exact terminal environment backend and its effective host/mount/network boundary;
 8. confirm real-browser-profile, browser-extension-control and Desktop-browser-control paths are disabled, or run a separate explicit qualification before allowing any of them;
@@ -243,4 +258,6 @@ runtime success != Evidence
 runtime success != authorization
 remote admin available != update authorized
 terminal backend selected != host boundary qualified
+session correlation != transcript reuse
+Pantheon admission freshness != proof of empty external session state
 ```
