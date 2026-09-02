@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass
 from typing import Any
+from urllib.parse import quote
 
 from .adapter import DriveReadCandidate, GoogleDriveReadError
 
@@ -40,11 +41,21 @@ class DriveMaterializedContent:
     scope_drive_id: str | None
 
 
+def _validate_candidate_identity(candidate: DriveReadCandidate) -> None:
+    expected_locator = f"gdrive://file/{quote(candidate.file_id, safe='')}"
+    if candidate.provider != "google_drive" or candidate.source_locator != expected_locator:
+        raise GoogleDriveReadError("Drive read candidate does not preserve its provider file identity")
+    if candidate.scope_folder_id not in candidate.parents:
+        raise GoogleDriveReadError("Drive read candidate no longer proves its explicit folder scope")
+
+
 def _content_request_parts(candidate: DriveReadCandidate) -> tuple[str, dict[str, Any], str | None]:
+    _validate_candidate_identity(candidate)
+    encoded_file_id = quote(candidate.file_id, safe="")
     export_mime = _GOOGLE_NATIVE_EXPORT_MIME.get(candidate.mime_type)
     if export_mime:
         return (
-            f"/drive/v3/files/{candidate.file_id}/export",
+            f"/drive/v3/files/{encoded_file_id}/export",
             {"mimeType": export_mime},
             export_mime,
         )
@@ -56,7 +67,7 @@ def _content_request_parts(candidate: DriveReadCandidate) -> tuple[str, dict[str
     params: dict[str, Any] = {"alt": "media"}
     if candidate.scope_drive_id:
         params["supportsAllDrives"] = True
-    return f"/drive/v3/files/{candidate.file_id}", params, None
+    return f"/drive/v3/files/{encoded_file_id}", params, None
 
 
 def direct_google_content_request(candidate: DriveReadCandidate) -> dict[str, Any]:
@@ -97,6 +108,7 @@ def materialize_content(
     content_type: str | None = None,
     export_mime_type: str | None = None,
 ) -> DriveMaterializedContent:
+    _validate_candidate_identity(candidate)
     if not isinstance(content, bytes) or not content:
         raise GoogleDriveReadError("materialized content must be non-empty bytes")
 
@@ -136,6 +148,7 @@ def build_source_intake_draft(
     candidate: DriveReadCandidate,
     materialized: DriveMaterializedContent,
 ) -> dict[str, Any]:
+    _validate_candidate_identity(candidate)
     if (
         materialized.provider != "google_drive"
         or materialized.file_id != candidate.file_id
