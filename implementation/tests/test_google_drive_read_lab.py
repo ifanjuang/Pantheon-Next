@@ -48,6 +48,13 @@ def test_direct_and_nango_use_same_bounded_drive_query_semantics():
     assert direct["params"]["supportsAllDrives"] is True
 
 
+def test_folder_id_is_escaped_before_it_enters_drive_query_syntax():
+    scope = DriveReadScope("folder'with\\syntax")
+    query = direct_google_list_request(scope)["params"]["q"]
+
+    assert query == "'folder\\'with\\\\syntax' in parents and trashed = false"
+
+
 def test_normalization_preserves_locator_but_does_not_create_source_digest():
     candidate = normalize_list_response(DriveReadScope("folder-a"), _payload())[0]
 
@@ -56,6 +63,15 @@ def test_normalization_preserves_locator_but_does_not_create_source_digest():
     assert candidate.provider_version == "17"
     assert candidate.requires_content_hash is True
     assert not hasattr(candidate, "source_digest")
+
+
+def test_locator_percent_encodes_provider_file_identity():
+    payload = _payload()
+    payload["files"][0]["id"] = "file/with space"
+    candidate = normalize_list_response(DriveReadScope("folder-a"), payload)[0]
+
+    assert candidate.file_id == "file/with space"
+    assert candidate.source_locator == "gdrive://file/file%2Fwith%20space"
 
 
 def test_google_native_document_without_md5_still_requires_content_hash():
@@ -94,6 +110,15 @@ def test_incomplete_search_fails_closed():
         raise AssertionError("incomplete provider inventory was accepted")
 
 
+def test_next_page_token_fails_closed_until_pagination_is_explicit():
+    try:
+        normalize_list_response(DriveReadScope("folder-a"), _payload(nextPageToken="page-2"))
+    except GoogleDriveReadError as exc:
+        assert "pagination" in str(exc)
+    else:
+        raise AssertionError("partial provider page was accepted as complete")
+
+
 def test_trashed_item_fails_closed():
     payload = _payload()
     payload["files"][0]["trashed"] = True
@@ -116,6 +141,15 @@ def test_shared_drive_mismatch_fails_closed():
         assert "shared-drive scope" in str(exc)
     else:
         raise AssertionError("cross-drive provider item was accepted")
+
+
+def test_shared_drive_missing_proof_fails_closed():
+    try:
+        normalize_list_response(DriveReadScope("folder-a", "drive-a"), _payload())
+    except GoogleDriveReadError as exc:
+        assert "prove" in str(exc)
+    else:
+        raise AssertionError("shared-drive result without driveId proof was accepted")
 
 
 def test_lab_exposes_no_write_or_authority_surface():
