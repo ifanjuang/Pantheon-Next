@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any, Mapping
+from urllib.parse import quote
 
 
 class GoogleDriveReadError(ValueError):
@@ -23,6 +24,8 @@ class DriveReadScope:
     def __post_init__(self) -> None:
         if not self.folder_id.strip():
             raise GoogleDriveReadError("folder_id is required")
+        if self.drive_id is not None and not self.drive_id.strip():
+            raise GoogleDriveReadError("drive_id must be non-empty when supplied")
 
 
 @dataclass(frozen=True)
@@ -48,9 +51,19 @@ _FIELDS = (
 )
 
 
+def _drive_query_literal(value: str) -> str:
+    """Escape an opaque Drive id before embedding it in a Drive query literal."""
+    return value.replace("\\", "\\\\").replace("'", "\\'")
+
+
+def _source_locator(file_id: str) -> str:
+    return f"gdrive://file/{quote(file_id, safe='')}"
+
+
 def direct_google_list_request(scope: DriveReadScope) -> dict[str, Any]:
+    folder_literal = _drive_query_literal(scope.folder_id)
     params: dict[str, Any] = {
-        "q": f"'{scope.folder_id}' in parents and trashed = false",
+        "q": f"'{folder_literal}' in parents and trashed = false",
         "fields": _FIELDS,
         "pageSize": 1000,
     }
@@ -89,6 +102,8 @@ def nango_google_list_request(
 def normalize_list_response(scope: DriveReadScope, payload: Mapping[str, Any]) -> tuple[DriveReadCandidate, ...]:
     if payload.get("incompleteSearch") is True:
         raise GoogleDriveReadError("provider reported incomplete scoped search")
+    if str(payload.get("nextPageToken") or "").strip():
+        raise GoogleDriveReadError("provider page requires explicit pagination before inventory is complete")
 
     candidates: list[DriveReadCandidate] = []
     for raw in payload.get("files") or ():
@@ -103,8 +118,8 @@ def normalize_list_response(scope: DriveReadScope, payload: Mapping[str, Any]) -
             raise GoogleDriveReadError("provider item is missing stable identity metadata")
         if scope.folder_id not in parents:
             raise GoogleDriveReadError("provider returned item outside explicit folder scope")
-        if scope.drive_id and raw.get("driveId") not in (None, scope.drive_id):
-            raise GoogleDriveReadError("provider returned item outside explicit shared-drive scope")
+        if scope.drive_id and str(raw.get("driveId") or "").strip() != scope.drive_id:
+            raise GoogleDriveReadError("provider did not prove the explicit shared-drive scope")
 
         checksum = str(raw.get("md5Checksum") or "").strip() or None
         candidates.append(
@@ -118,7 +133,7 @@ def normalize_list_response(scope: DriveReadScope, payload: Mapping[str, Any]) -
                 provider_version=str(raw.get("version") or "").strip() or None,
                 web_view_link=str(raw.get("webViewLink") or "").strip() or None,
                 content_checksum=checksum,
-                source_locator=f"gdrive://file/{file_id}",
+                source_locator=_source_locator(file_id),
                 scope_folder_id=scope.folder_id,
                 scope_drive_id=scope.drive_id,
                 requires_content_hash=True,
