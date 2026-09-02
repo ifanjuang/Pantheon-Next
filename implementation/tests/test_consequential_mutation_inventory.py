@@ -20,11 +20,15 @@ added tomorrow inheriting none of it, with no check noticing.
 
 ## Where the review stands
 
-Eighty-one of the ninety-two entry points have been read individually; 11 have
-not. The first batches were chosen because nothing in production reached them —
-answerable without unwinding a call graph, and the cheapest end of the backlog
-rather than the most urgent one. From `knowledge.py` onward every entry point is
-live: each sits behind a route a key holder can call today.
+All ninety-two entry points have been read individually. The first batches were
+chosen because nothing in production reached them — answerable without unwinding
+a call graph, and the cheapest end of the backlog rather than the most urgent
+one. From `knowledge.py` onward every entry point is live: each sits behind a
+route a key holder can call today.
+
+One is not: `cli.main` opens its own connection and asks for no key at all.
+Recorded there, because "the write surface is behind an API key" is a true
+statement about the routes and a false one about the system.
 
 Six entry points are now recorded as `gate_required_not_wired` rather than
 softened into `none`. `bind_oidc_identity` is where an external identity becomes
@@ -355,7 +359,33 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "A reviewed candidate is applied to a project only from a declared human actor, against the base revision it was prepared on. Staleness is refused rather than merged."
         ),
     },
-    ("agency_change_candidates.py", "create_project_candidate"): _UNREVIEWED,
+    ("agency_change_candidates.py", "create_project_candidate"): {
+        "gate": "none",
+        "local_guards": ("proposer required", "proposer_kind vocabulary", "base_revision at least 1", "idempotency_key at least 8 characters", "base_revision must equal the Project current revision", "changes computed as a diff against the live Project", "status written as the literal pending_review", "an idempotency key carrying another proposal digest conflicts"),
+        "reviewed": (
+            "The admitted path for a non-human proposal, and the contrast with "
+            "its own module\u2019s neighbours is the point. `agency_data.create_project` "
+            "and `update_project` refuse `hermes` outright with "
+            "`GovernanceGateRequired`; this one accepts it as a `proposer_kind` "
+            "and can reach exactly one status, the literal `\u2019pending_review\u2019` in "
+            "the INSERT. A runtime may say what it thinks should change and "
+            "cannot say that it has changed. "
+            "It also does not accept the change wholesale: `_proposal_changes` "
+            "diffs the proposed attributes against the live Project, so what is "
+            "stored is what would actually differ. And the idempotency check "
+            "compares the proposal digest, so reusing a key for a different "
+            "proposal conflicts rather than returning the old candidate. "
+            "The finding is a read outside the write. "
+            "`agency_data.get_project` and the `base_revision` comparison run "
+            "before `conn.transaction()` opens, with no lock, so the Project can "
+            "advance in between and the candidate is stored against a revision "
+            "that is already stale. Recorded rather than escalated, and the "
+            "reason is in the row: `base_revision` is persisted, not consumed, "
+            "so the staleness survives into the data where an applier can still "
+            "catch it. A check that loses what it read would be the defect; "
+            "this one keeps it."
+        ),
+    },
     ("agency_change_candidates.py", "reject_project_candidate"): {
         "gate": "none",
         "local_guards": ("actor and reason both required non-empty", "row lock", "status must be pending_review", "status written as a literal", "actor_kind literal human in the event", "idempotency with the expected event type"),
@@ -459,8 +489,51 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "while _validate_actor only checks a label the caller supplies and which defaults to human. A first review of this entry called those two independent layers; they are not, and the correction matters because a second production caller would inherit none of the route's refusal. Attribution is the module's other weak point: see the docstring."
         ),
     },
-    ("agency_data.py", "create_project"): _UNREVIEWED,
-    ("agency_data.py", "update_project"): _UNREVIEWED,
+    ("agency_data.py", "create_project"): {
+        "gate": "none",
+        "local_guards": ("_validate_actor", "Hermes refused with GovernanceGateRequired", "project_id, code and display_name required", "tags, contacts and attributes normalized", "idempotency with payload digest", "pre-existence check", "event written in the same transaction"),
+        "reviewed": (
+            "Creates the Agency Project other tables carry foreign keys to. It "
+            "refuses Hermes explicitly and by name — `GovernanceGateRequired`, "
+            "not a generic error — so a bounded capability, not a direct call, "
+            "is what a runtime would have to go through. "
+            "The finding repeats one recorded a few entries earlier in this "
+            "batch, which is what makes it worth stating as a shape rather than "
+            "an incident. The pre-existence `SELECT` takes no lock, so two "
+            "concurrent first creations both see nothing. `project_id` is the "
+            "primary key and `code` is UNIQUE, so the race is closed below "
+            "Python — but neither `UniqueViolation` is caught, so a collision "
+            "on the concurrent path surfaces as a raw database exception where "
+            "the sequential path raises `AgencyDataError(\"Agency Project "
+            "already exists\")`. Same non-uniform error surface as "
+            "`contradictory_review_store.persist_candidate`. The data is safe in "
+            "both; the contract is not. "
+            "Also worth recording because a reader would expect otherwise: "
+            "`status` and `phase` are nullable TEXT with no CHECK, so a Project "
+            "carries whatever status string it was given. What the schema does "
+            "pin is `owner_system`, `CHECK (owner_system = \u2019postgres\u2019)` — a "
+            "Project row cannot claim to be owned elsewhere."
+        ),
+    },
+    ("agency_data.py", "update_project"): {
+        "gate": "none",
+        "local_guards": ("_validate_actor", "Hermes refused with GovernanceGateRequired", "PROJECT_MUTABLE_FIELDS allowlist, unknown fields refused by name", "an empty change refused", "expected_revision at least 1", "row lock", "revision compared under the lock", "AND revision = %s in the UPDATE with rowcount != 1", "idempotency with payload digest"),
+        "reviewed": (
+            "Edits an Agency Project, and carries the concurrency shape the "
+            "Information projection had to be repaired into: the revision is "
+            "compared under the row lock *and* carried into the UPDATE\u2019s own "
+            "`WHERE`, with `rowcount != 1` raising `StaleProjectWrite`. Either "
+            "layer alone would be defensible; both together mean a lost update "
+            "has no path, and this one already had it. "
+            "The assignment list is built by f-string interpolation of field "
+            "names into SQL, which is the first thing a reader should flag. "
+            "What makes it safe is the order: `set(changes) - "
+            "PROJECT_MUTABLE_FIELDS` refuses anything outside a module-level "
+            "literal set before a single name reaches the string. The guard is "
+            "the allowlist, not the formatting, and it has to come first. "
+            "Values stay parameterised throughout."
+        ),
+    },
     ("agency_information.py", "act_working_information"): {
         "gate": "gate_required_not_wired",
         "unguarded_body": "74f862fb2f3da2bb4313624eee6ebcd1f080d20918064dd638b8a47db28cc7e6",
@@ -690,7 +763,27 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "a truthful label for it."
         ),
     },
-    ("document_revision_discussion.py", "create_comment"): _UNREVIEWED,
+    ("document_revision_discussion.py", "create_comment"): {
+        "gate": "none",
+        "local_guards": ("revision must exist", "body and anchor normalized", "a reply may only target a comment on the same exact revision", "idempotency with payload digest", "insert and read in one transaction"),
+        "reviewed": (
+            "Appends a comment to one exact professional revision. The scope "
+            "guard is the one worth naming: a reply whose parent belongs to "
+            "another revision raises `CrossRevisionReply`, so a discussion "
+            "cannot be stitched across two versions of a document and read as "
+            "one thread. "
+            "What makes this entry unusual is that the module says what it is "
+            "not doing, in the code: *Existence only. Authorization is "
+            "deliberately outside this persistence owner.* Nothing here checks "
+            "that `created_by` may comment on that revision — and the comment "
+            "makes that a stated boundary rather than a gap someone has to "
+            "find. That is the opposite of the failure this review keeps "
+            "recording, and it is worth saying so. The obligation is real and "
+            "it is deferred to the route; a reader of this entry should treat "
+            "it as an open question about the route, not a closed one about "
+            "the module."
+        ),
+    },
     ("entity_relations.py", "propose_relation"): {
         "gate": "none",
         "local_guards": ("_actor(proposing=True) admits Hermes for the proposal and nothing else", "relation_type vocabulary", "entity_type checked against ADMITTED_ENTITY_TYPES", "self-edge refused", "partial unique index on the open edge", "idempotency with payload digest", "event written in the same transaction"),
@@ -1129,7 +1222,28 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
         "local_guards": ("_validate_actor refuses hermes with GovernanceGateRequired", "required parent project, type, title and idempotency_key", "payload digest with idempotent replay"),
         "reviewed": "Creates a document shell; authority and currentness are owned elsewhere and refused here. No runtime caller at review time.",
     },
-    ("project_documents.py", "link_revision"): _UNREVIEWED,
+    ("project_documents.py", "link_revision"): {
+        "gate": "none",
+        "local_guards": ("_validate_actor", "document row locked", "technical source version must belong to the same project", "identical source_digest reuses or conflicts on differing metadata", "version_seq computed under the document lock", "supersession: target must exist, share the document, precede the new revision, and not already have a successor", "idempotency with payload digest"),
+        "reviewed": (
+            "Links one technical version into a logical Project Document, and "
+            "the supersession chain is where the care went: the superseded "
+            "revision must exist, belong to this document, precede the new one, "
+            "and not already have a successor. Four conditions to keep a chain a "
+            "chain, and the last is the one a reader would forget. "
+            "The concurrency is clean, which is worth recording in a review that "
+            "has found the opposite repeatedly: the document row is locked "
+            "first, and both the duplicate lookup and "
+            "`MAX(version_seq) + 1` run under that lock, so two concurrent links "
+            "cannot compute the same sequence number. `CrossProjectSource` "
+            "refuses a technical version from another project scope. "
+            "The finding is a silence. Relinking bytes already present returns "
+            "the existing revision with `duplicate_reused` set and writes no "
+            "event, so the log shows the first link and nothing about the "
+            "second attempt. Nothing changed, so nothing is wrong — but the "
+            "history cannot answer whether anyone tried."
+        ),
+    },
     ("project_documents.py", "record_issuer_reference"): {
         "gate": "none",
         "local_guards": ("_validate_actor refuses hermes with GovernanceGateRequired", "basis_kind checked against a controlled vocabulary", "opaque reference validation", "revision existence check", "payload digest with idempotent replay"),
@@ -1172,8 +1286,68 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "Source\u2019s own revision does not move when a relation is added."
         ),
     },
-    ("storage_retention.py", "retain_document_version"): _UNREVIEWED,
-    ("store.py", "ingest"): _UNREVIEWED,
+    ("storage_retention.py", "retain_document_version"): {
+        "gate": "none",
+        "local_guards": ("bytes verified against the recorded source_digest and byte_size before anything is stored", "object identity derived from the content digest", "every INSERT is ON CONFLICT DO NOTHING followed by a read-back and an equality check", "byte size of an existing object must match", "location must read back verified and full_sha256", "a version already bound to another Storage Object conflicts"),
+        "reviewed": (
+            "Retains the exact bytes of a technical document version, and it is "
+            "the direct counter-example to `source_intake.create_source`. There "
+            "a checksum is optional and only its shape is checked; here "
+            "`_retain_exact_copy` is given `expected_digest` and `expected_size` "
+            "read from the stored version and verifies the bytes against them "
+            "before a row is written. The Storage Object\u2019s identity is then "
+            "derived from that digest, so the row cannot name content it does "
+            "not hold. "
+            "The concurrency shape is a third pattern beside the row-lock "
+            "compare-and-swap and the digest-bound approval this review has been "
+            "tracking: it takes no locks at all. Every write is "
+            "`ON CONFLICT DO NOTHING` followed by a read-back that must equal "
+            "what was intended — object, byte size, location status, "
+            "verification method, binding. That is sound *because* identity is "
+            "the content: two racers computing the same digest are writing the "
+            "same row, and a racer computing a different one fails the read-back "
+            "rather than overwriting. The literals matter too — "
+            "`location_status=\u2019verified\u2019` and "
+            "`verification_method=\u2019full_sha256\u2019` are written by this function "
+            "and then asserted back, so no caller supplies the claim that the "
+            "bytes were verified. "
+            "The finding is small and outside the transaction: "
+            "`_retain_exact_copy` writes the copy to the retention root before "
+            "`conn.transaction()` opens, so a transaction that fails afterwards "
+            "leaves the file behind. Content-addressed, so the orphan is inert "
+            "and a retry reuses it; it is disk, not authority."
+        ),
+    },
+    ("store.py", "ingest"): {
+        "gate": "none",
+        "local_guards": ("assert_source_in_scope per source, inside the loop", "resolve_source_within contains the path under the root", "subject tags refused for sources outside this ingestion", "every chunk stamped with contract id, contract digest, ingestion id and source digest", "the DELETE is scoped to one source_digest, so other digests stay indexed", "a conversion failure records the failed extraction before re-raising", "conversions prepared outside one atomic write transaction"),
+        "reviewed": (
+            "The ingestion. Its perimeter guard is inside the loop, not before "
+            "it — `assert_source_in_scope` runs for every source, with a comment "
+            "calling it the effect boundary — and `resolve_source_within` "
+            "contains the resolved path under the root, so a declared "
+            "`source_ref` cannot walk out of it. Re-ingesting is idempotent "
+            "without being destructive: the DELETE is scoped to "
+            "`(dossier, source_ref, source_digest)`, so replaying one immutable "
+            "digest refreshes only itself and older digests at the same path "
+            "stay indexed for exact governed retrieval. A conversion failure "
+            "records the failed extraction and then re-raises, so the capture "
+            "stays truthful about what could not be read. "
+            "The finding is a parameter that asserts a guard the function does "
+            "not have. `replace_dossier` is accepted, documented as retained for "
+            "API compatibility, and referenced exactly zero times in the body — "
+            "yet both callers pass `replace_dossier=False`, and a reader at "
+            "either call site would conclude the dossier is being protected from "
+            "replacement. It is protected, but by the digest-scoped DELETE, not "
+            "by anything that flag does. This is the review\u2019s own recurring "
+            "shape reduced to its smallest form: a name carrying a guarantee "
+            "that no code behind it provides. "
+            "Also worth recording: `conn.commit()` runs before the write "
+            "transaction opens, to end the read transaction psycopg started for "
+            "the cache lookups. Documented, and the third entry point in this "
+            "inventory that commits its caller\u2019s connection."
+        ),
+    },
     ("apu_cross_family.py", "create_decision_request"): {
         "gate": "none",
         "local_guards": ("request_id and created_by required", "APU-scoped request requires project_ref", "scope_refs immutable across a replay", "foreign key and CHECK violations on the scope insert converted to module errors", "one transaction"),
@@ -1360,10 +1534,123 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "APU state. Nothing in that chain can say who converted."
         ),
     },
-    ("cli.py", "main"): _UNREVIEWED,
-    ("human_revision_upload.py", "upload_revision"): _UNREVIEWED,
-    ("project_change_variants.py", "select_variant_for_change_candidate"): _UNREVIEWED,
-    ("project_claim_candidates.py", "create_claim_from_candidate"): _UNREVIEWED,
+    ("cli.py", "main"): {
+        "gate": "none",
+        "local_guards": ("argparse required arguments", "each subcommand delegates to a module that carries the real guards", "no guard of its own"),
+        "reviewed": (
+            "An argparse dispatcher. It holds no guard of its own — every "
+            "check belongs to what it calls: `store.ingest`, "
+            "`store.intake_document`, "
+            "`storage_retention.retain_document_version`, and the file-writing "
+            "`decide` and `register` subcommands. Discovery caught it because a "
+            "write is reachable through the dispatch, which is correct and "
+            "worth keeping rather than filtering out. "
+            "What the entry is for is the thing every other entry lets pass "
+            "unstated: this is the one mutation path in the inventory that no "
+            "route protects. It opens its own connection with "
+            "`store.connect()` / `storage_retention.connect()` and asks for no "
+            "editor key, no Hermes key and no principal. Shell access and "
+            "database credentials are the whole admission check. That is what a "
+            "CLI is, and it is not a defect — but the sentence \"the write "
+            "surface is behind an API key\" is a claim about the routes, and "
+            "this record should not let it read as a claim about the system."
+        ),
+    },
+    ("human_revision_upload.py", "upload_revision"): {
+        "gate": "none",
+        "local_guards": ("three require_access checks against a real principal: project.read, document.read, document.revision.submit", "document must belong to the requested Project", "stream bounded by max_bytes", "checksum computed from the bytes and passed down, not declared", "actor_kind literal human throughout", "the three access checks re-run after conversion and retention", "the returned authority block states what was and was not done"),
+        "reviewed": (
+            "The only entry point in this inventory that authorizes a named "
+            "principal rather than a shared key. Three `require_access` checks "
+            "— `project.read`, `document.read`, `document.revision.submit` — "
+            "then a scope check that the Document belongs to the Project asked "
+            "for. Everywhere else in this review the actor is a header value "
+            "nobody verified; here there is a principal and a grant. "
+            "It also closes, in composition, the finding recorded against "
+            "`source_intake.create_source`. That function accepts a declared "
+            "checksum and only checks its shape; this caller computes the digest "
+            "from the bytes it just published and passes that. The module-level "
+            "gap is real and this path does not walk into it. "
+            "Two deliberate choices are documented in the code and worth "
+            "recording as choices rather than defects. The filesystem and "
+            "database stages are explicitly not one transaction — "
+            "`conn.commit()` twice, `conn.rollback()` on failure — because a "
+            "preserved Source and an exact technical capture stay truthful even "
+            "if analysis fails afterwards. And the three access checks are run "
+            "again after conversion and retention, with the reason beside them: "
+            "access revoked during a long conversion should stop professional "
+            "admission without erasing intake stages that already happened. "
+            "That is the opposite decision from the APU application repair — "
+            "there the window between the check and the act was closed with a "
+            "lock; here it is left open on purpose and re-checked at the end, "
+            "because the stages in between are meant to survive. Both are "
+            "right, and the difference is what each window costs."
+        ),
+    },
+    ("project_change_variants.py", "select_variant_for_change_candidate"): {
+        "gate": "none",
+        "local_guards": ("execution result row locked FOR UPDATE, shared by every sibling variant", "result_kind and schema_ref must be canonical", "payload validated against the canonical variant contract", "execution and variant must name the same Project", "sibling scope validated", "a sibling already selected in this request scope conflicts", "Project revision must equal the variant base_revision", "reviewer_kind and proposer_kind literals", "UniqueViolation converted to the scope conflict"),
+        "reviewed": (
+            "Selects one variant out of a set and turns it into a "
+            "ChangeCandidate. The lock is the design: `FOR UPDATE` on the "
+            "*execution result* row, not on the item, so every sibling variant "
+            "of one execution contends on the same row — which is what makes "
+            "`_candidate_for_scope` meaningful, since two concurrent selections "
+            "of different siblings cannot both pass a check that only one may "
+            "pass. The comment says so beside the code. Second place in this "
+            "inventory where the lock ordering is both right and explained. "
+            "It also converts `UniqueViolation` into "
+            "`ProjectChangeVariantConflict`, which sharpens a finding recorded "
+            "twice elsewhere in this batch: `agency_data.create_project` and "
+            "`contradictory_review_store.persist_candidate` let the same "
+            "exception escape raw. The repository knows how to close that "
+            "surface. It is not that the pattern is unknown; it is that it is "
+            "applied unevenly. "
+            "The finding is a defect in the replay branch, and it is small but "
+            "real:\n"
+            "    _selection_row(conn, replayed[\"source_review_disposition_id\"] "
+            "and selection_key)\n"
+            "`_selection_row` looks a disposition up by `idempotency_key`. So "
+            "the expression tests the stored disposition id, discards it, and "
+            "passes this call\u2019s `selection_key` instead. That is correct only "
+            "when a replay reuses the original idempotency key: "
+            "`_candidate_for_source` matches on `source_result_id`, so a second "
+            "call for the same result with a different key reaches this branch "
+            "and finds no row under `{new_key}:selection`, then raises "
+            "`variant selection disposition was not retained` — about a "
+            "disposition that exists. The falsy branch passes `None` and reaches "
+            "the same error through `idempotency_key = NULL`. The value that "
+            "would make the lookup right unconditionally is the one being "
+            "thrown away; the repair is to look the disposition up by its id."
+        ),
+    },
+    ("project_claim_candidates.py", "create_claim_from_candidate"): {
+        "gate": "none",
+        "local_guards": ("candidate row locked FOR UPDATE before the existing-Claim lookup", "execution project_ref must equal the candidate payload project_ref", "_validate_candidate_unit", "backing ref selected against the project", "source_backed and verified both require a selected basis_ref", "candidate_ref carries the review disposition", "delegates to record_claim, whose errors are converted"),
+        "reviewed": (
+            "Turns a reviewed candidate into a ProjectClaim, and it is the "
+            "counter-example this inventory needed. The APU application path "
+            "read its decision outside the transaction that acted, and was "
+            "repaired in this repository; this function had the same problem to "
+            "solve and solved it, with the reasoning in a comment beside the "
+            "code: it takes `FOR UPDATE` on the candidate row first, and only "
+            "then looks for an existing Claim, because under READ COMMITTED the "
+            "second statement takes a fresh snapshot and therefore sees a Claim "
+            "committed while this transaction was waiting on the lock. Lock, "
+            "then read the decision under it. Same repository, same class of "
+            "problem, done right and written down. "
+            "It also fits the guard `b201a019` added downstream: it supplies "
+            "`candidate_ref` with the `review_disposition_id` that "
+            "`record_claim` now requires before it will store `verified`. "
+            "The finding is what it does not police. `status` and `certainty` "
+            "are caller-supplied and pass through: only two status values earn "
+            "a local check here — `source_backed` and `verified` must have a "
+            "selected basis_ref — and the vocabulary itself is `record_claim`\u2019s "
+            "to enforce, not this function\u2019s. `certainty` defaults to the "
+            "payload\u2019s and can be overridden by the caller with anything "
+            "non-empty."
+        ),
+    },
     ("store.py", "intake_document"): {
         "gate": "none",
         "local_guards": ("assert_source_in_scope before anything else", "parse_document_name", "delegates with replace_dossier=False and a single source"),
@@ -1690,19 +1977,24 @@ def test_a_required_gate_that_is_not_wired_stays_visible_and_does_not_grow() -> 
 
 
 def test_the_unreviewed_debt_is_visible_and_does_not_grow() -> None:
-    """Enumerated is not reviewed, and the gap is recorded rather than implied.
+    """Enumerated is not reviewed, and the gap is now closed rather than bounded.
 
     The widened net enumerated 64 entry points that had not been read
     individually. The net was widened in the tenth batch and found 13 more, so
-    the enumerated total is 92; 81 are read and 11 are not. Reviewing one means
-    replacing `_UNREVIEWED` with its real guard regime and the reasoning behind
-    it. This bound exists so the debt shrinks deliberately and cannot quietly
-    grow.
+    the enumerated total is 92, and all 92 have now been read. Reviewing one
+    means replacing `_UNREVIEWED` with its real guard regime and the reasoning
+    behind it.
+
+    The ceiling is 0, which changes what this test is for. It was a bound on a
+    shrinking backlog; it is now the rule that a new mutation entry point is
+    read when it is added, not after. Raising it is a decision someone has to
+    take deliberately and say why.
     """
     unreviewed = [key for key, record in INVENTORY.items() if record["gate"] == "unreviewed"]
-    assert len(unreviewed) <= 11, (
-        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 11. A new "
-        "mutation entry point must be reviewed, not added to the backlog."
+    assert not unreviewed, (
+        f"{len(unreviewed)} entry points are unreviewed: {sorted(unreviewed)}. Every "
+        "enumerated entry point has been read; a new one is reviewed when it is "
+        "added, not added to a backlog."
     )
 
 

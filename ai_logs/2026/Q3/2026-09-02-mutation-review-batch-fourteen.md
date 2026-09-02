@@ -1,4 +1,4 @@
-# Reading ten of the twenty-one remaining mutation entry points
+# Reading the last twenty-one mutation entry points
 
 Date: 2026-09-02
 
@@ -8,16 +8,17 @@ Boundary profile: validation_only_trace.
 ## Change
 
 - Added: `ai_logs/2026/Q3/2026-09-02-mutation-review-batch-fourteen.md`.
-- Updated: ten entries from `unreviewed` to `none` with their reasoning; an
-  addendum on the already-reviewed `canonize_relation`; unreviewed ceiling
-  21 → 11; the read count 71 → 81.
+- Updated: twenty-one entries from `unreviewed` to `none` with their
+  reasoning; an addendum on the already-reviewed `canonize_relation`; the
+  unreviewed ceiling from 21 to 0, which turns that test from a bound on a
+  backlog into a rule; the read count 71 → 92.
 - Removed: nothing.
 
 ## Why
 
 The backlog was the last piece of the mutation-entry-point review still
-standing. The ten read here are the ones a route can reach today, plus the two
-that sit on the Hermes and APU boundaries.
+standing. It is now empty: all ninety-two enumerated entry points have been read
+individually.
 
 ## Boundary
 
@@ -26,14 +27,16 @@ Boundary profile applies: `validation_only_trace`.
 Protected paths touched: no.
 Runtime impact: none — this changes a test module and a log.
 Authority impact: none — verdicts are review records, not approvals.
-Schema/test/CI impact: one ceiling lowered; no schema or workflow change.
+Schema/test/CI impact: the unreviewed ceiling becomes 0, so a new mutation
+entry point must be reviewed when it is added rather than admitted to a
+backlog; no schema or workflow change.
 External action: none.
 Memory behavior: none.
 
 ## What the batch found
 
-All ten are `none`. None of them needed the chokepoint, and saying that is only
-worth something alongside what each one does not check.
+All twenty-one are `none`. None of them needed the chokepoint, and saying that
+is only worth something alongside what each one does not check.
 
 **`hermes_runtime_return.record_external_runtime_return`** is the strongest
 intake in the inventory, and reading it changed what "strongest" means here.
@@ -86,12 +89,57 @@ function cannot be called inside a larger transaction without committing
 whatever that transaction had open — the property
 `apu_cross_family.create_decision_request` depends on for its own.
 
-## What remains
+## The second half
 
-Eleven entry points, in `agency_data`, `store.ingest`, `cli.main`,
-`project_documents`, `human_revision_upload`, `project_change_variants`,
-`project_claim_candidates`, `storage_retention`,
-`document_revision_discussion` and `agency_change_candidates`.
+**`storage_retention.retain_document_version`** verifies the bytes against the
+digest recorded on the version *before* it stores anything, and derives the
+Storage Object's identity from that digest. It is the direct counter-example to
+`source_intake.create_source`, where a checksum is optional and only its shape
+is checked. It also takes no locks at all: every write is
+`ON CONFLICT DO NOTHING` followed by a read-back that must equal what was
+intended — sound precisely because identity is the content.
+
+**`project_claim_candidates.create_claim_from_candidate`** and
+**`project_change_variants.select_variant_for_change_candidate`** both lock
+first and read the decision under the lock, and both say why in a comment
+beside the code. The APU application path had the same problem to solve and had
+to be repaired for it this morning. Same repository, same class of problem,
+already solved correctly twice.
+
+**`human_revision_upload.upload_revision`** is the only entry point in the
+inventory that authorizes a named principal rather than a shared key: three
+`require_access` checks, then a scope check. It re-runs all three after
+conversion and retention, with the reason written down — access revoked during a
+long conversion should stop professional admission without erasing intake stages
+that already happened. That is the opposite decision from the APU repair, where
+the window between the check and the act was closed with a lock. Both are right;
+the difference is what each window costs.
+
+## Two findings worth more than their size
+
+**A parameter that asserts a guard its function does not have.**
+`store.ingest` accepts `replace_dossier`, documents it as retained for API
+compatibility, and references it zero times in the body — while both callers
+pass `replace_dossier=False`. A reader at either call site would conclude the
+dossier is protected from replacement. It is, but by the digest-scoped DELETE,
+not by that flag. This is the shape the whole review has been cataloguing,
+reduced to its smallest form.
+
+**A lookup that discards the value that would make it correct.**
+`select_variant_for_change_candidate`, on its replay branch, calls
+`_selection_row(conn, replayed["source_review_disposition_id"] and
+selection_key)`. `_selection_row` matches on `idempotency_key`, so the
+expression tests the stored disposition id, throws it away, and passes this
+call's key instead — correct only when a replay reuses the original key. Since
+`_candidate_for_source` matches on `source_result_id`, a second call with a
+different key reaches this branch and raises *variant selection disposition was
+not retained* about a disposition that exists.
+
+## What the whole review leaves standing
+
+Six entry points recorded as `gate_required_not_wired`, each bound to the
+absence it claims. Everything else is `none`, with its reasoning and its
+findings written beside it. Nothing is enumerated-but-unread.
 
 ## Local distinctions
 
@@ -101,4 +149,6 @@ vocabulary CHECK       != doctrine CHECK
 type checked           != existence checked
 entry not wrong        != entry complete
 harmless here          != composable anywhere
+parameter accepted     != parameter honoured
+enumerated             != read
 ```
