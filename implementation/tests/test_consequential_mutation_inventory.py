@@ -44,18 +44,25 @@ One is not: `cli.main` opens its own connection and asks for no key at all.
 Recorded there, because "the write surface is behind an API key" is a true
 statement about the routes and a false one about the system.
 
-Five entry points are recorded as `gate_required_not_wired` rather than softened
-into `none`. `store_reviewed_dossier` installs canonical APU state on the
-strength of a `review_ref` that nothing validates. `publish_knowledge` accepts
-`review_status="reviewed"` as a caller assertion. `complete_edit_request` can
-return a human-rejected request to `proposed`. `apply_edit_request` acts on that
-status as though it were a decision. `act_working_information` supersedes the
-acted version of a governed Information series and records no actor.
+Four entry points are recorded as `gate_required_not_wired` rather than softened
+into `none`. `publish_knowledge` accepts `review_status="reviewed"` as a caller
+assertion. `complete_edit_request` can return a human-rejected request to
+`proposed`. `apply_edit_request` acts on that status as though it were a
+decision. `act_working_information` supersedes the acted version of a governed
+Information series and records no actor.
 
-`bind_oidc_identity` was the sixth and is now wired. Reading it in order to wire
-it found what its entry had not said: it had no production caller at all, so
-`human_oidc_bindings` — the table every authenticated request resolves against —
-could only be populated from outside the product.
+`bind_oidc_identity` and `store_reviewed_dossier` were the fifth and sixth and
+are now wired. Both share the same shape once read in order to wire them:
+neither had a production caller at all. `bind_oidc_identity` left
+`human_oidc_bindings` — the table every authenticated request resolves
+against — reachable only from outside the product; `store_reviewed_dossier`
+left a Project's whole Architecture Project Understanding baseline the same
+way. Wiring `store_reviewed_dossier` did not have to invent a content binding:
+`_normalize_dossier` already folds `review_ref` into the same structure as the
+dossier it accompanies before the existing idempotency digest is computed, so
+the decision expectation reuses that digest — covering this exact `review_ref`
+bundled with this exact dossier, though still not verifying `review_ref`
+names a review that actually happened.
 
 ## The first write of a projection was not serialised, and now is
 
@@ -632,12 +639,13 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
         ),
     },
     ("apu_owner.py", "store_reviewed_dossier"): {
-        "gate": "gate_required_not_wired",
-        "unguarded_body": "f541f77e5a1065733c5b43625ce7cc2643f4ee490e086dc914b89080a0520fdc",
+        "gate": "enforce_consequential",
         "local_guards": (
             "required project_id, review_ref, actor and idempotency_key",
             "payload digest compared on replay, refusing a reused key with different content",
             "normalization before write",
+            "chokepoint before the write, expectation bound to a digest that folds review_ref into the dossier as one unit",
+            "the only production path refuses to open a connection without a decision point",
         ),
         "reviewed": (
             "Installs canonical APU state. First reviewed as none on the reasoning that "
@@ -646,10 +654,25 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "review caught it: review_ref passes through _required only — a non-empty "
             "string. No lookup, foreign key, signature or any other check ties it to a "
             "completed governed review, and no table of such reviews exists to point at. "
-            "The verdict therefore rested on an unverified caller assertion, which is the "
-            "distinction this repository makes everywhere else: a provided reference is "
-            "not a validated decision. Recorded as needing the chokepoint until either "
-            "the prior review is verifiable or the write is routed through the gate."
+            "Wired. Wiring it found the same shape as `bind_oidc_identity`: the function "
+            "had no production caller at all — thirteen test modules called it and "
+            "nothing else did, so a Project's whole Architecture Project Understanding "
+            "baseline could only be installed by writing to the database directly. "
+            "`_normalize_dossier` already folds `review_ref` into the same structure as "
+            "the stable objects, representations and claims before "
+            "`payload_digest = _digest(dossier)` is computed, so the fix does not have "
+            "to invent a binding: the decision expectation's `expected_digest` is that "
+            "same `payload_digest`, which covers this exact `review_ref` bundled with "
+            "this exact dossier as one unit. That still does not verify `review_ref` "
+            "names a review that actually happened — nothing in this repository can, "
+            "absent the table that would let it — but it closes the gap this entry "
+            "originally named: a decision taken over one dossier/review_ref pairing "
+            "cannot be replayed against a different one. The scope is the Project, "
+            "matching what the write installs. `cli store-reviewed-dossier` is the new "
+            "production path and the composition point that makes the gate mandatory: "
+            "it refuses to open a connection unless a decision point is configured or "
+            "`MVP_POLICY_ENFORCEMENT=disabled` is declared by name, the same "
+            "arrangement `bind-oidc-identity` and `cockpit_shell` already use."
         ),
     },
     ("apu_write_preparation.py", "append_authorization"): {
@@ -2033,9 +2056,9 @@ def test_a_required_gate_that_is_not_wired_stays_visible_and_does_not_grow() -> 
     was ever taken.
     """
     pending = [key for key, record in INVENTORY.items() if record["gate"] == "gate_required_not_wired"]
-    assert len(pending) <= 5, (
+    assert len(pending) <= 4, (
         f"{len(pending)} entry points are known to need the chokepoint and do not reach "
-        "it; the ceiling is 5. Wire one, or move the ceiling deliberately and say why."
+        "it; the ceiling is 4. Wire one, or move the ceiling deliberately and say why."
     )
 
 

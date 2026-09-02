@@ -7,7 +7,7 @@ import os
 import sys
 from pathlib import Path
 
-from . import human_access, register, storage_retention, store, terminal_gate_standin as gate
+from . import apu_owner, human_access, register, storage_retention, store, terminal_gate_standin as gate
 from .policy_gate import HttpPolicyClient
 from .contract import load_contract
 from .documents import DoclingServeClient
@@ -91,6 +91,48 @@ def main() -> int:
     )
     p_bind.add_argument("--reason", default=None)
     p_bind.add_argument(
+        "--approval-level",
+        default="C3",
+        help="approval ceiling the decision must carry (default: C3)",
+    )
+
+    p_dossier = sub.add_parser(
+        "store-reviewed-dossier",
+        help="install one reviewed canonical APU dossier for one Project",
+        description=(
+            "Local provisioning only, and the reason is the same as "
+            "bind-oidc-identity: review_ref is a caller-supplied string with "
+            "nothing in apu_owner.py to verify it against, since no table of "
+            "completed dossier reviews exists here. The chokepoint stands in "
+            "for that missing verification, bound to the exact dossier content "
+            "rather than to review_ref's name. The effect routes through the "
+            "Pantheon chokepoint unless enforcement is explicitly declared "
+            "disabled."
+        ),
+    )
+    p_dossier.add_argument(
+        "--dossier",
+        required=True,
+        help=(
+            "YAML file with project_id, stable_objects, source_representations, "
+            "attribute_claims, relation_claims and review_ref"
+        ),
+    )
+    p_dossier.add_argument(
+        "--actor",
+        required=True,
+        help="the human installing this dossier",
+    )
+    p_dossier.add_argument(
+        "--decision-ref",
+        required=True,
+        help="immutable reference of the human decision this import is made under",
+    )
+    p_dossier.add_argument(
+        "--idempotency-key",
+        required=True,
+    )
+    p_dossier.add_argument(
         "--approval-level",
         default="C3",
         help="approval ceiling the decision must carry (default: C3)",
@@ -278,6 +320,100 @@ def main() -> int:
                             "is_approval": False,
                             "is_professional_role": False,
                             "grants_any_access": False,
+                        },
+                    },
+                    sort_keys=False,
+                    allow_unicode=True,
+                )
+            )
+            return 0
+        finally:
+            conn.close()
+
+    if args.command == "store-reviewed-dossier":
+        import yaml
+
+        # Same fail-closed shape as bind-oidc-identity: enforcement is decided
+        # here, once, before any connection opens — not inside apu_owner.py,
+        # where an optional client would otherwise be silently skippable.
+        enforcement = (os.getenv("MVP_POLICY_ENFORCEMENT", "required") or "").strip()
+        if enforcement not in {"required", "disabled"}:
+            print(
+                "MVP_POLICY_ENFORCEMENT must be 'required' or 'disabled'; "
+                f"got {enforcement!r}",
+                file=sys.stderr,
+            )
+            return 1
+        base_url = os.getenv("MVP_POLICY_API_URL", "").strip()
+        api_key = os.getenv("MVP_POLICY_API_KEY", "").strip()
+        policy_client = (
+            HttpPolicyClient(base_url, api_key) if base_url and api_key else None
+        )
+        if enforcement == "required" and policy_client is None:
+            print(
+                "Pantheon policy decision point is not configured; installing a "
+                "reviewed APU dossier cannot be admitted. Set MVP_POLICY_API_URL "
+                "and MVP_POLICY_API_KEY, or declare "
+                "MVP_POLICY_ENFORCEMENT=disabled explicitly.",
+                file=sys.stderr,
+            )
+            return 1
+
+        dossier = yaml.safe_load(Path(args.dossier).read_text(encoding="utf-8"))
+        if not isinstance(dossier, dict):
+            print(f"{args.dossier}: not a single dossier document", file=sys.stderr)
+            return 1
+        required_fields = {
+            "project_id", "stable_objects", "source_representations",
+            "attribute_claims", "relation_claims", "review_ref",
+        }
+        missing = required_fields - dossier.keys()
+        if missing:
+            print(
+                f"{args.dossier}: missing required field(s): {', '.join(sorted(missing))}",
+                file=sys.stderr,
+            )
+            return 1
+
+        conn = store.connect()
+        try:
+            try:
+                installed = apu_owner.store_reviewed_dossier(
+                    conn,
+                    project_id=dossier["project_id"],
+                    stable_objects=dossier["stable_objects"],
+                    source_representations=dossier["source_representations"],
+                    attribute_claims=dossier["attribute_claims"],
+                    relation_claims=dossier["relation_claims"],
+                    review_ref=dossier["review_ref"],
+                    actor=args.actor,
+                    idempotency_key=args.idempotency_key,
+                    policy_client=policy_client,
+                    decision_payload={
+                        "decision": {
+                            "decision_id": args.decision_ref,
+                            "decided_by": args.actor,
+                            "approval_level": args.approval_level,
+                        }
+                    },
+                    required_ceiling=args.approval_level,
+                )
+            except apu_owner.ApuOwnerPolicyUnavailable as exc:
+                print(f"dossier import failed closed: {exc}", file=sys.stderr)
+                return 1
+            except apu_owner.ApuOwnerError as exc:
+                print(f"dossier import refused: {exc}", file=sys.stderr)
+                return 1
+            sys.stdout.write(
+                yaml.safe_dump(
+                    {
+                        "project_id": installed["project_ref"],
+                        "owner_revision": installed.get("owner_revision"),
+                        "policy_enforcement": enforcement,
+                        "authority": {
+                            "is_approval": False,
+                            "is_professional_validation": False,
+                            "canonizes_apu_state": True,
                         },
                     },
                     sort_keys=False,

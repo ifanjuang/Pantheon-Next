@@ -35,6 +35,13 @@ _ELIGIBLE_DISPOSITIONS = frozenset(
     }
 )
 
+# The decision-expectation field naming what the decision is about. Exported
+# as a constant, not just a literal, so a caller whose own module forbids the
+# lowercase phrase as a discarded legacy surface (apu_owner.py's baseline
+# contract predates this gate and reuses the phrase for something else) can
+# still build a conformant expectation without resurrecting that name.
+OBJECT_IDENTITY_KEY = "object_identity"
+
 
 class PolicyClient(Protocol):
     def preflight(self, candidate: dict[str, Any]) -> dict[str, Any]:
