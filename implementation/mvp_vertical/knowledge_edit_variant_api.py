@@ -8,6 +8,7 @@ from fastapi import Depends, Header, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from . import knowledge, knowledge_edit_variants
+from .policy_gate import PolicyClient
 
 
 class VariantEditRequestBody(BaseModel):
@@ -35,6 +36,8 @@ class VariantRejectionBody(BaseModel):
 
 class ApplySelectedVariantBody(BaseModel):
     idempotency_key: str = Field(min_length=8, max_length=200)
+    # Required when Pantheon policy enforcement is active; ignored otherwise.
+    human_decision_ref: str | None = Field(default=None, min_length=2, max_length=500)
 
 
 def _human_actor(value: str | None) -> str:
@@ -75,6 +78,31 @@ def install_knowledge_edit_variant_routes(
             return with_connection(call)
         except Exception as exc:
             raise _translate(exc) from exc
+
+    def require_policy_client() -> PolicyClient | None:
+        """Same chokepoint `cockpit_api.py` defines, read off the same app.state.
+
+        This module is installed onto the app `cockpit_shell.create_cockpit_app`
+        already configured, so `policy_client`/`policy_enforcement` are already
+        set there. Read defensively rather than assuming: this installer is
+        also unit-tested against a bare app that never went through that
+        composition, where the attributes do not exist yet.
+        """
+        enforcement = getattr(app.state, "policy_enforcement", "required")
+        if enforcement == "disabled":
+            return None
+        client = getattr(app.state, "policy_client", None)
+        if client is None:
+            raise HTTPException(
+                status_code=503,
+                detail=(
+                    "Pantheon policy decision point is not configured; "
+                    "applying a selected Knowledge edit variant cannot be "
+                    "admitted. Set MVP_POLICY_API_URL and MVP_POLICY_API_KEY, "
+                    "or declare MVP_POLICY_ENFORCEMENT=disabled explicitly."
+                ),
+            )
+        return client
 
     @app.post(
         "/knowledge/{knowledge_id}/variant-edit-requests",
@@ -226,6 +254,7 @@ def install_knowledge_edit_variant_routes(
         request_id: str,
         body: ApplySelectedVariantBody,
         human_actor: str | None = Header(default=None, alias="X-Pantheon-Human-Actor"),
+        policy_client: PolicyClient | None = Depends(require_policy_client),
     ) -> dict[str, Any]:
         actor = _human_actor(human_actor)
         applied = operation(
@@ -234,6 +263,13 @@ def install_knowledge_edit_variant_routes(
                 request_id=request_id,
                 actor=actor,
                 idempotency_key=body.idempotency_key,
+                policy_client=policy_client,
+                decision_payload={
+                    "decision": {
+                        "decision_id": body.human_decision_ref,
+                        "decided_by": actor,
+                    }
+                },
             )
         )
         return {

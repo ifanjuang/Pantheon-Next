@@ -21,6 +21,7 @@ import yaml
 from psycopg.rows import dict_row
 
 from . import document_structure_read, pantheon_contracts
+from .policy_gate import OBJECT_IDENTITY_KEY, PolicyClient, enforce_consequential
 from .structured_extraction import chunk_ref
 
 
@@ -47,6 +48,14 @@ class IdempotencyConflict(KnowledgeError):
     pass
 
 
+class KnowledgeGateRefused(KnowledgeError):
+    """The chokepoint refused this Knowledge write."""
+
+
+class KnowledgeGatePolicyUnavailable(KnowledgeError):
+    """The decision point could not be reached; the write fails closed."""
+
+
 class _EditRequestConflict(Exception):
     """Internal signal: unwind the apply transaction so the conflict can persist.
 
@@ -63,6 +72,74 @@ def _digest(value: str) -> str:
 def _payload_digest(value: dict[str, Any]) -> str:
     canonical = json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
     return _digest(canonical)
+
+
+def _gate_knowledge_write(
+    policy_client: PolicyClient,
+    *,
+    intent: str,
+    scope: dict[str, str],
+    object_ref: str,
+    expected_digest: str,
+    decision_payload: dict[str, Any] | None,
+    actor: str,
+    required_ceiling: str,
+) -> None:
+    """Shared chokepoint call for the two Knowledge writes that need it.
+
+    Local to this module rather than a general-purpose wrapper: each gated
+    write elsewhere in the package binds its own scope and object reference,
+    and the two calls in `publish_knowledge` and `apply_edit_request` share
+    nothing but the shape of that binding.
+    """
+    expectation = {
+        "required_ceiling": required_ceiling,
+        "required_scope": scope,
+        OBJECT_IDENTITY_KEY: object_ref,
+        "expected_digest": expected_digest,
+    }
+    candidate = {
+        "intent": intent,
+        "decision_expectation": expectation,
+        "request": {
+            "intent": intent,
+            "external_effect": False,
+            "writes_state": True,
+            "transmission_requested": False,
+            "memory_promotion_requested": False,
+            "professional_position": False,
+            "financial_or_contractual_effect": False,
+            "scope": scope,
+        },
+    }
+    bound_decision = dict(decision_payload or {})
+    decision = dict(bound_decision.get("decision") or {})
+    decision_id = str(decision.get("decision_id") or "").strip()
+    if len(decision_id) < 2:
+        raise KnowledgeGateRefused(
+            f"{intent} requires an immutable human decision reference "
+            "(decision.decision_id) to route through the chokepoint; none "
+            "was supplied"
+        )
+    decision.setdefault("decided_by", actor)
+    decision.setdefault("approval_level", required_ceiling)
+    decision.setdefault("scope", scope)
+    decision.setdefault(OBJECT_IDENTITY_KEY, object_ref)
+    decision.setdefault("content_digest", expected_digest)
+    bound_decision["decision"] = decision
+    bound_decision["expectation"] = expectation
+
+    verdict = enforce_consequential(
+        policy_client, candidate=candidate, decision_payload=bound_decision
+    )
+    if not verdict.allowed:
+        message = (
+            f"policy chokepoint blocked the Knowledge write ({verdict.disposition}): "
+            f"{verdict.reasons}"
+        )
+        if verdict.disposition == "policy_unavailable":
+            raise KnowledgeGatePolicyUnavailable(message)
+        raise KnowledgeGateRefused(message)
 
 
 def _iso(value: datetime | None) -> str | None:
@@ -246,7 +323,23 @@ def publish_knowledge(
     idempotency_key: str,
     expected_version: int = 0,
     review_status: str = "generated_unreviewed",
+    policy_client: PolicyClient | None = None,
+    decision_payload: dict[str, Any] | None = None,
+    required_ceiling: str = "C2",
 ) -> dict:
+    """Publish a Knowledge item; `review_status="reviewed"` is a claim, not a fact.
+
+    `family`, `actor_kind` and `review_status` are each checked only against a
+    vocabulary of permitted strings. A holder of the editor key could
+    otherwise publish a Knowledge item that already reads as professionally
+    reviewed, attributed to anyone. Candidate publication —
+    `generated_unreviewed`, `needs_review`, `superseded` — asserts nothing a
+    reader would take as a professional claim, so it needs no gate. Asserting
+    `review_status="reviewed"` at publication is the professional claim this
+    module cannot verify on its own, so that specific request routes through
+    the chokepoint when `policy_client` is supplied; every other
+    `review_status` publishes exactly as before.
+    """
     if expected_version != 0:
         raise StaleKnowledgeWrite("first publication requires expected_version 0")
     if not title.strip() or not markdown.strip() or not knowledge_id:
@@ -276,6 +369,17 @@ def publish_knowledge(
                 raise IdempotencyConflict(
                     "Knowledge identity already exists; retry the original immutable idempotency key"
                 )
+        if review_status == "reviewed" and policy_client is not None:
+            _gate_knowledge_write(
+                policy_client,
+                intent="publish_knowledge_reviewed",
+                scope={"scope_type": "project", "scope_id": document["parent_project_id"]},
+                object_ref=f"knowledge_item:{knowledge_id}",
+                expected_digest=pdigest,
+                decision_payload=decision_payload,
+                actor=created_by,
+                required_ceiling=required_ceiling,
+            )
         conn.execute(
             """
             INSERT INTO knowledge_items (
@@ -498,10 +602,31 @@ def list_edit_requests(
 def complete_edit_request(
     conn: psycopg.Connection, *, request_id: str, replacement_markdown: str
 ) -> dict:
+    """Hermes fills in the proposal it was queued for; nothing else may call this.
+
+    The only status this may act from is `queued_for_hermes` — the one status
+    `create_edit_request` sets when it queues a request without a proposal
+    already in hand. Without this guard, a request that a human had already
+    moved to `rejected` (`knowledge_edit_variants.reject_request`) could be
+    completed again here, silently returning it to `proposed` and reaching the
+    editor-keyed apply route — un-rejecting a decision with no trace beside
+    the rejection event that was overwritten.
+    """
     if not replacement_markdown:
         raise KnowledgeError("Hermes proposal must contain replacement Markdown")
     with conn.transaction():
         request = get_edit_request(conn, request_id)
+        if (
+            request["status"] == "proposed"
+            and request["replacement_markdown"] == replacement_markdown
+        ):
+            return request
+        if request["status"] != "queued_for_hermes":
+            raise KnowledgeError(
+                f"edit request {request_id} is not awaiting a Hermes proposal "
+                f"(status: {request['status']!r}); a decided request cannot be "
+                "reopened through this path"
+            )
         item = _knowledge_row(conn, request["knowledge_id"], lock=True)
         status = "proposed" if item["version"] == request["base_version"] else "conflict"
         conn.execute(
@@ -520,6 +645,9 @@ def apply_edit_request(
     actor_kind: str,
     idempotency_key: str,
     on_applied: Callable[[psycopg.Connection, dict], None] | None = None,
+    policy_client: PolicyClient | None = None,
+    decision_payload: dict[str, Any] | None = None,
+    required_ceiling: str = "C2",
 ) -> dict:
     """Apply a proposed edit request; the whole effect commits or none of it does.
 
@@ -528,6 +656,15 @@ def apply_edit_request(
     A caller that must record its own audit of the application — the A/B variant
     review does — uses it so that audit cannot survive a rolled-back apply, or
     be lost by one that succeeded.
+
+    This is the point where the Knowledge Markdown actually changes, which is
+    why the chokepoint belongs here rather than at `create_edit_request` (a
+    candidate proposal, consequential of nothing) or `complete_edit_request`
+    (Hermes filling in what it was asked for, not deciding anything). Nothing
+    upstream of this function has to decide anything for a request to arrive
+    here `proposed`; when `policy_client` is supplied, the decision it
+    validates must cover this exact replacement applied to this exact
+    selection of this exact Knowledge version.
     """
     request = get_edit_request(conn, request_id)
     apply_payload_digest = _payload_digest(
@@ -571,6 +708,31 @@ def apply_edit_request(
                 or _digest(selected) != request["selected_text_digest"]
             ):
                 raise _EditRequestConflict
+
+            if policy_client is not None:
+                document = _document_row(conn, item["document_id"])
+                apply_digest = _payload_digest(
+                    {
+                        "request_id": request_id,
+                        "knowledge_id": request["knowledge_id"],
+                        "base_version": request["base_version"],
+                        "selected_text_digest": request["selected_text_digest"],
+                        "replacement_markdown": request["replacement_markdown"],
+                    }
+                )
+                _gate_knowledge_write(
+                    policy_client,
+                    intent="apply_edit_request",
+                    scope={
+                        "scope_type": "project",
+                        "scope_id": document["parent_project_id"],
+                    },
+                    object_ref=f"knowledge_edit_request:{request_id}",
+                    expected_digest=apply_digest,
+                    decision_payload=decision_payload,
+                    actor=actor,
+                    required_ceiling=required_ceiling,
+                )
 
             revised = (
                 item["markdown"][:start]
