@@ -22,7 +22,7 @@ from pathlib import Path
 
 import pytest
 
-from mvp_vertical import knowledge, knowledge_edit_variants, store
+from mvp_vertical import execution_results, knowledge, knowledge_edit_variants, store
 from mvp_vertical.contract import TaskContract
 from mvp_vertical.policy_gate import StandInPolicyClient
 
@@ -41,6 +41,11 @@ def conn():
         connection = store.connect()
     except Exception as exc:  # pragma: no cover - local unit-only lane
         pytest.skip(f"PostgreSQL/pgvector unreachable: {exc}")
+    # The rejected-request test below calls knowledge_edit_variants.reject_request
+    # directly, which is the only path in this module that touches its tables;
+    # nothing else in this file provisions them.
+    execution_results.ensure_schema(connection)
+    knowledge_edit_variants.ensure_schema(connection)
     yield connection
     connection.close()
 
