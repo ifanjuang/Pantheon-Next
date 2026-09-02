@@ -114,6 +114,7 @@ def test_acted_information_is_immutable_and_next_source_derives_from_it(conn) ->
         information_id=draft["information_id"],
         expected_revision=1,
         actor_kind="human",
+        actor="architecte",
     )
     assert acted["status"] == "acted"
     assert acted["acted_at"]
@@ -157,6 +158,7 @@ def test_acting_next_source_archives_previous_acted_version(conn) -> None:
         information_id=first["information_id"],
         expected_revision=1,
         actor_kind="human",
+        actor="architecte",
     )
     second = agency_information.derive_working_version(
         conn,
@@ -171,6 +173,7 @@ def test_acting_next_source_archives_previous_acted_version(conn) -> None:
         information_id=second["information_id"],
         expected_revision=1,
         actor_kind="human",
+        actor="architecte",
     )
 
     previous = conn.execute(

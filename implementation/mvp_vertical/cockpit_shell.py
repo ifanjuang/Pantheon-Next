@@ -478,6 +478,7 @@ def create_cockpit_app(
         require_read_key=require_agency_read_key,
         require_writer_kind=require_agency_writer_kind,
         require_actor=require_agency_actor,
+        require_policy_client=require_policy_client,
     )
     install_source_intake_routes(
         app,

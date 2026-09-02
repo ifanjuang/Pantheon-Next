@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field
 from . import agency_data, agency_directory, agency_information, agency_schema
 from .agency_change_candidate_api import install_agency_change_candidate_routes
 from .hermes_project_change_candidate_api import install_hermes_project_change_candidate_routes
+from .policy_gate import PolicyClient
 
 
 class ProjectContactBody(BaseModel):
@@ -102,6 +103,8 @@ class InformationUpdateBody(BaseModel):
 
 class InformationActBody(BaseModel):
     expected_revision: int = Field(ge=1)
+    # Required when Pantheon policy enforcement is active; ignored otherwise.
+    human_decision_ref: str | None = Field(default=None, min_length=2, max_length=500)
 
 
 def _bearer_token(authorization: str | None) -> str:
@@ -117,6 +120,7 @@ def install_agency_data_routes(
     require_read_key: Callable,
     require_writer_kind: Callable,
     require_actor: Callable,
+    require_policy_client: Callable,
 ) -> None:
     def agency_operation(operation):
         try:
@@ -128,6 +132,8 @@ def install_agency_data_routes(
             agency_information.InformationNotFound,
         ) as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except agency_information.AgencyInformationGatePolicyUnavailable as exc:
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
         except (
             agency_data.GovernanceGateRequired,
             agency_information.InformationGateRequired,
@@ -442,7 +448,8 @@ def install_agency_data_routes(
         information_id: str,
         body: InformationActBody,
         writer_kind: Literal["human"] = Depends(require_human_agency_writer),
-        _actor: str = Depends(require_actor),
+        actor: str = Depends(require_actor),
+        policy_client: PolicyClient | None = Depends(require_policy_client),
     ) -> dict:
         information = agency_operation(
             lambda conn: agency_information.act_working_information(
@@ -450,6 +457,14 @@ def install_agency_data_routes(
                 information_id=information_id,
                 expected_revision=body.expected_revision,
                 actor_kind=writer_kind,
+                actor=actor,
+                policy_client=policy_client,
+                decision_payload={
+                    "decision": {
+                        "decision_id": body.human_decision_ref,
+                        "decided_by": actor,
+                    }
+                },
             )
         )
         return {

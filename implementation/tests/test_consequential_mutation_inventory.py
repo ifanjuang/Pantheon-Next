@@ -44,17 +44,19 @@ One is not: `cli.main` opens its own connection and asks for no key at all.
 Recorded there, because "the write surface is behind an API key" is a true
 statement about the routes and a false one about the system.
 
-One entry point is recorded as `gate_required_not_wired` rather than softened
-into `none`. `act_working_information` supersedes the acted version of a
-governed Information series and records no actor.
+No entry point is recorded as `gate_required_not_wired` any longer. All five
+that once carried that regime are now either wired or closed by a local fix
+that made the chokepoint the wrong tool for the specific finding.
 
-`bind_oidc_identity`, `store_reviewed_dossier`, `publish_knowledge` and
-`apply_edit_request` are now wired. `complete_edit_request` — recorded
-alongside `apply_edit_request` because both write the same `status` column
-with nothing to decide it — was closed by a local status guard instead: it
-fixes the specific finding (a rejected request could be silently returned to
-`proposed`), not a missing decision point, and needed no chokepoint call.
-Two of the four wired entries share the same shape once read in order to
+`bind_oidc_identity`, `store_reviewed_dossier`, `publish_knowledge`,
+`apply_edit_request` and `act_working_information` are wired.
+`complete_edit_request` — recorded alongside `apply_edit_request` because
+both write the same `status` column with nothing to decide it — was closed
+by a local status guard instead: it fixes the specific finding (a rejected
+request could be silently returned to `proposed`), not a missing decision
+point, and needed no chokepoint call.
+
+Two of the five wired entries share the same shape once read in order to
 wire them: neither `bind_oidc_identity` nor `store_reviewed_dossier` had a
 production caller at all. `bind_oidc_identity` left `human_oidc_bindings` —
 the table every authenticated request resolves against — reachable only from
@@ -66,6 +68,14 @@ dossier it accompanies before the existing idempotency digest is computed, so
 the decision expectation reuses that digest — covering this exact `review_ref`
 bundled with this exact dossier, though still not verifying `review_ref`
 names a review that actually happened.
+
+`act_working_information` was the opposite shape: a live route, correctly
+guarded on everything the module itself could check, that discarded the one
+thing it could not check locally — who the caller was. The route already
+resolved a real identity from `X-Pantheon-Actor` and dropped it as `_actor`;
+it now threads through and becomes the decision's `decided_by`. The table
+still has no actor column; the decision record is where that identity lives
+now, not the row.
 
 ## The first write of a projection was not serialised, and now is
 
@@ -562,20 +572,30 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
         ),
     },
     ("agency_information.py", "act_working_information"): {
-        "gate": "gate_required_not_wired",
-        "unguarded_body": "74f862fb2f3da2bb4313624eee6ebcd1f080d20918064dd638b8a47db28cc7e6",
-        "local_guards": ("actor_kind must be human, no default", "row lock", "working status only", "expected_revision", "supersede and install in one transaction"),
+        "gate": "enforce_consequential",
+        "local_guards": ("actor_kind must be human, no default", "row lock", "working status only", "expected_revision", "supersede and install in one transaction", "decision_id required and bound to the content digest"),
         "reviewed": (
             "This is the act. It supersedes the currently acted version of a "
             "governed Information series and installs a new one, in one "
             "transaction, and the acted row is what `card_scope` and "
             "`hermes_scoped_context` read. The module states its own gravity — "
-            "'only a human may act an Information version' — and enforces it by "
-            "comparing a string the caller passes. The route passes it correctly "
-            "today, from a dependency rather than the body. Two things make it a "
-            "gate requirement anyway: the effect is a change to canonical agency "
-            "state, and nothing records who performed it. `acted_at` is written; "
-            "the acting party is not, because the table has no actor column."
+            "'only a human may act an Information version' — and enforced it by "
+            "comparing a string the caller passes; the route passed it correctly "
+            "already, from a dependency rather than the body. Two things made it "
+            "a gate requirement anyway: the effect is a change to canonical "
+            "agency state, and nothing recorded who performed it. `acted_at` is "
+            "written; the acting party was not, because the table has no actor "
+            "column. The route already discarded a real identity — "
+            "`X-Pantheon-Actor`, resolved by `require_agency_actor` — as `_actor`; "
+            "it now threads through as `actor` and becomes the decision's "
+            "`decided_by`, which is where that identity lives now: the "
+            "decision record, not the row. The digest binds `information_id` "
+            "and `expected_revision` to the working row's content fields "
+            "(excluding `status`/`acted_at`/`revision`/`updated_at`, which this "
+            "act is what changes), so a decision cannot be replayed against a "
+            "different card under the same identifiers. It does not verify the "
+            "content is fit to be acted — only that the decision was taken over "
+            "this exact content."
         ),
     },
     ("agency_information.py", "create_information"): {
@@ -2097,9 +2117,9 @@ def test_a_required_gate_that_is_not_wired_stays_visible_and_does_not_grow() -> 
     was ever taken.
     """
     pending = [key for key, record in INVENTORY.items() if record["gate"] == "gate_required_not_wired"]
-    assert len(pending) <= 1, (
+    assert len(pending) <= 0, (
         f"{len(pending)} entry points are known to need the chokepoint and do not reach "
-        "it; the ceiling is 1. Wire it, or move the ceiling deliberately and say why."
+        "it; the ceiling is 0. Wire it, or move the ceiling deliberately and say why."
     )
 
 

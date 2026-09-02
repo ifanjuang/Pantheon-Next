@@ -85,6 +85,7 @@ def _create_and_act_information(conn, project_id: str, item: dict) -> dict:
         information_id=draft["information_id"],
         expected_revision=draft["revision"],
         actor_kind="human",
+        actor="architecte",
     )
 
 
