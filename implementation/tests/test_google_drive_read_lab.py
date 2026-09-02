@@ -1,4 +1,4 @@
-from implementation.labs.google_drive_read.adapter import (
+from labs.google_drive_read.adapter import (
     AUTHORITY,
     DriveReadScope,
     GoogleDriveReadError,
