@@ -1,5 +1,80 @@
 # Changelog
 
+## 0.1.65 - 2026-09-02
+
+Consequential-mutation inventory closed and one chokepoint gap wired. This
+heading records an implementation candidate checkpoint and does not claim a
+published tag, installed service, live Hermes enforcement, activation or
+production authorization.
+
+### Added
+
+- The consequential-mutation entry-point inventory now enumerates and has
+  individually reviewed all 92 discovered mutation entry points under
+  `implementation/mvp_vertical`; the unreviewed ceiling moves from a bound on
+  a shrinking backlog (21) to a rule (0) — a newly discovered entry point must
+  be reviewed when it is added.
+- `human_access.bind_oidc_identity`, the write that makes an external OIDC
+  identity able to act as a governed principal, now routes through
+  `policy_gate.enforce_consequential` when a decision point is supplied, with
+  the decision expectation bound to a digest of the exact binding
+  (`principal_ref`, `issuer`, `subject`, `valid_until`) rather than to its
+  name. The only production path (`mvp-vertical bind-oidc-identity`) fails
+  closed without a configured decision point unless
+  `MVP_POLICY_ENFORCEMENT=disabled` is declared explicitly.
+- `test_semantic_order_is_total_when_distances_tie` and
+  `test_a_pending_gate_is_still_absent_from_the_code_it_names`: regression
+  tests that plant the defect they guard against instead of waiting to
+  observe it, and assert an absence rather than a surviving fragment.
+
+### Fixed
+
+- `mvp_vertical.store.retrieve_scoped` ordered semantic hits on vector
+  distance alone at both call sites, so equal-distance rows could return in
+  either order between two identical calls. Both queries now carry the same
+  tiebreak (`source_ref`, `source_digest`, `chunk_no`) the lexical retrieval
+  path already used.
+- `apu_write_preparation.apply_authorized_write_command` read the latest
+  write authorization outside the transaction that applies the command, so a
+  `reject_application` committing in the gap did not block the apply. Both
+  `apply_authorized_write_command` and `append_authorization` now take the
+  command row `FOR UPDATE` before reading or writing the decision.
+- `store.ingest` accepted a `replace_dossier` parameter it never read, while
+  both call sites passed `False` believing it protected the dossier from
+  replacement; removed. The protection is the digest-scoped `DELETE`, named
+  where it actually lives.
+- `project_change_variants.select_variant_for_change_candidate`'s replay
+  branch looked its selection disposition up by the current call's
+  idempotency key after testing and discarding the disposition id already on
+  the candidate row, so a replay under a different key raised as if the
+  disposition did not exist. It now looks the disposition up by that id.
+
+### Changed
+
+- The mutation inventory's pending-gate anchor changed from a literal code
+  fragment expected to remain present to a normalized-body digest and a
+  reachability check against `enforce_consequential`, so a repair is detected
+  by the absence of the gap rather than by a fragment that survives the
+  repair. Required-gate ceiling: 9 -> 5 (`store_reviewed_dossier`,
+  `publish_knowledge`, `complete_edit_request`, `apply_edit_request`,
+  `act_working_information` remain).
+- Reviewed Ubuntu release targets refreshed for the current bootstrap
+  candidate under `deployment/ubuntu/`.
+
+### Boundary clarification
+
+Reviewing an entry point and wiring one gate change what this repository can
+say about its own consequential-write surface. They do not change adoption,
+deployment or professional validation status.
+
+```text
+entry point reviewed  != entry point authorized
+gate reachable         != gate observed enforced in a live deployment
+identity bound          != identity granted access
+green CI               != adoption
+implemented            != installed
+```
+
 ## 0.1.64 - 2026-07-22
 
 Read-only policy transport checkpoint. This heading records an implementation
