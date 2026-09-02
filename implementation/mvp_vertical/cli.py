@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
-from . import register, storage_retention, store, terminal_gate_standin as gate
+from . import human_access, register, storage_retention, store, terminal_gate_standin as gate
+from .policy_gate import HttpPolicyClient
 from .contract import load_contract
 from .documents import DoclingServeClient
 from .naming import DocumentNameError
@@ -59,6 +61,39 @@ def main() -> int:
         "--provider-ref",
         required=True,
         help="opaque identity of this configured storage binding",
+    )
+
+    p_bind = sub.add_parser(
+        "bind-oidc-identity",
+        help="bind one external OIDC identity to one governed human principal",
+        description=(
+            "Local provisioning only. This is the root of trust for every route "
+            "behind require_principal, and it has no remote route by design: "
+            "033_human_project_access_management.sql states that "
+            "project.access.manage carries no IdP invitation authority and "
+            "remains a locally provisioned bootstrap capability. The effect "
+            "routes through the Pantheon chokepoint unless enforcement is "
+            "explicitly declared disabled."
+        ),
+    )
+    p_bind.add_argument("--principal-ref", required=True)
+    p_bind.add_argument("--issuer", required=True, help="exact OIDC iss claim")
+    p_bind.add_argument("--subject", required=True, help="exact OIDC sub claim")
+    p_bind.add_argument(
+        "--bound-by",
+        required=True,
+        help="the human taking responsibility for this binding",
+    )
+    p_bind.add_argument(
+        "--decision-ref",
+        required=True,
+        help="immutable reference of the human decision this binding is made under",
+    )
+    p_bind.add_argument("--reason", default=None)
+    p_bind.add_argument(
+        "--approval-level",
+        default="C3",
+        help="approval ceiling the decision must carry (default: C3)",
     )
 
     p_card = sub.add_parser("document-card", help="project one ingested source as a card")
@@ -168,6 +203,86 @@ def main() -> int:
                 return 1
             sys.stdout.write(
                 yaml.safe_dump(result, sort_keys=False, allow_unicode=True)
+            )
+            return 0
+        finally:
+            conn.close()
+
+    if args.command == "bind-oidc-identity":
+        import yaml
+
+        # Fail closed here, not in the module. `human_access.bind_oidc_identity`
+        # takes an optional client like every other gated write in this package;
+        # what makes the chokepoint mandatory is the composition point refusing
+        # to call it without one. Disabling enforcement is an explicit act with
+        # a name, never a default.
+        enforcement = (os.getenv("MVP_POLICY_ENFORCEMENT", "required") or "").strip()
+        if enforcement not in {"required", "disabled"}:
+            print(
+                "MVP_POLICY_ENFORCEMENT must be 'required' or 'disabled'; "
+                f"got {enforcement!r}",
+                file=sys.stderr,
+            )
+            return 1
+        base_url = os.getenv("MVP_POLICY_API_URL", "").strip()
+        api_key = os.getenv("MVP_POLICY_API_KEY", "").strip()
+        policy_client = (
+            HttpPolicyClient(base_url, api_key) if base_url and api_key else None
+        )
+        if enforcement == "required" and policy_client is None:
+            print(
+                "Pantheon policy decision point is not configured; binding an "
+                "external identity to a governed principal cannot be admitted. "
+                "Set MVP_POLICY_API_URL and MVP_POLICY_API_KEY, or declare "
+                "MVP_POLICY_ENFORCEMENT=disabled explicitly.",
+                file=sys.stderr,
+            )
+            return 1
+
+        conn = human_access.connect()
+        try:
+            try:
+                binding = human_access.bind_oidc_identity(
+                    conn,
+                    principal_ref=args.principal_ref,
+                    issuer=args.issuer,
+                    subject=args.subject,
+                    bound_by=args.bound_by,
+                    reason=args.reason,
+                    policy_client=policy_client,
+                    decision_payload={
+                        "decision": {
+                            "decision_id": args.decision_ref,
+                            "decided_by": args.bound_by,
+                            "approval_level": args.approval_level,
+                        }
+                    },
+                    required_ceiling=args.approval_level,
+                )
+            except human_access.BindingPolicyUnavailable as exc:
+                print(f"identity binding failed closed: {exc}", file=sys.stderr)
+                return 1
+            except human_access.HumanAccessError as exc:
+                print(f"identity binding refused: {exc}", file=sys.stderr)
+                return 1
+            sys.stdout.write(
+                yaml.safe_dump(
+                    {
+                        "binding": {
+                            key: str(value)
+                            for key, value in binding.items()
+                            if key in {"binding_id", "principal_ref", "issuer", "subject"}
+                        },
+                        "policy_enforcement": enforcement,
+                        "authority": {
+                            "is_approval": False,
+                            "is_professional_role": False,
+                            "grants_any_access": False,
+                        },
+                    },
+                    sort_keys=False,
+                    allow_unicode=True,
+                )
             )
             return 0
         finally:

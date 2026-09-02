@@ -15,6 +15,20 @@ entry point defends itself with its own local checks — signed previews,
 confirmation phrases, optimistic concurrency, idempotency keys, admission state
 machines — and no two of them share a guard.
 
+That paragraph was true when it was written on 2026-08-31 and stopped being true
+the next day. `4d3e99c3` wired `HttpPolicyClient` into `cockpit_shell.create_app`
+from `MVP_POLICY_API_URL` / `MVP_POLICY_API_KEY`, behind a
+`require_policy_client` dependency that answers 503 when enforcement is
+`required` and no decision point is configured — so the Knowledge update route
+fails closed, and disabling the gate is an explicitly declared value rather than
+a default. `human_access.bind_oidc_identity` was wired second, on the same
+arrangement.
+
+The sentence that motivates this entire document went stale within a day, and
+three passes over the entries did not catch it, because every one of them was
+reading entry points and none was reading this. A record rots at its premises as
+readily as at its rows.
+
 Local defence is not the problem. The problem is that a new entry point can be
 added tomorrow inheriting none of it, with no check noticing.
 
@@ -30,15 +44,18 @@ One is not: `cli.main` opens its own connection and asks for no key at all.
 Recorded there, because "the write surface is behind an API key" is a true
 statement about the routes and a false one about the system.
 
-Six entry points are now recorded as `gate_required_not_wired` rather than
-softened into `none`. `bind_oidc_identity` is where an external identity becomes
-able to act as a governed principal. `store_reviewed_dossier` installs canonical
-APU state on the strength of a `review_ref` that nothing validates. `revoke_grant`
-lets one access manager lock another one out. `publish_knowledge` accepts
+Five entry points are recorded as `gate_required_not_wired` rather than softened
+into `none`. `store_reviewed_dossier` installs canonical APU state on the
+strength of a `review_ref` that nothing validates. `publish_knowledge` accepts
 `review_status="reviewed"` as a caller assertion. `complete_edit_request` can
 return a human-rejected request to `proposed`. `apply_edit_request` acts on that
 status as though it were a decision. `act_working_information` supersedes the
 acted version of a governed Information series and records no actor.
+
+`bind_oidc_identity` was the sixth and is now wired. Reading it in order to wire
+it found what its entry had not said: it had no production caller at all, so
+`human_oidc_bindings` — the table every authenticated request resolves against —
+could only be populated from outside the product.
 
 ## The first write of a projection was not serialised, and now is
 
@@ -923,10 +940,46 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
         ),
     },
     ("human_access.py", "bind_oidc_identity"): {
-        "gate": "gate_required_not_wired",
-        "unguarded_body": "11debe55862414f0c68a9115a74151071395ee7b9d535fb5c89d17ddaeaee7e1",
-        "local_guards": ("refuses a disabled principal", "required issuer, subject and bound_by", "BindingConflict when the identity is bound to another principal", "idempotent within the same principal"),
-        "reviewed": "The moment an external identity becomes able to act as a governed principal. The local chain is the strongest in this module and still not the same thing as the governance check: this is an authorization boundary, not a bookkeeping write. Reviewed as needing the chokepoint; nothing routes it there today.",
+        "gate": "enforce_consequential",
+        "local_guards": ("refuses a disabled principal", "required issuer, subject and bound_by", "BindingConflict when the identity is bound to another principal", "idempotent within the same principal", "chokepoint before the write, with an expectation bound to binding_digest", "the only production path refuses to open a connection without a decision point"),
+        "reviewed": (
+            "The moment an external identity becomes able to act as a governed "
+            "principal, and the root of trust for every route behind "
+            "`require_principal`: `resolve_principal_context` resolves each "
+            "authenticated request against the row this writes. "
+            "Wired. It was recorded as needing the chokepoint, and reading it "
+            "again to wire it found something the entry had not said — the "
+            "function had no production caller at all. Seven test modules called "
+            "it and nothing else did, so `human_oidc_bindings` could only be "
+            "populated from outside the product, and the whole principal regime "
+            "resolved against a table nothing in it wrote. "
+            "The authority is not a grant, and that is the repository\u2019s own "
+            "decision rather than a gap here. "
+            "`033_human_project_access_management.sql` says "
+            "`project.access.manage` \"does not encode professional role, "
+            "approval, Decision, Evidence or IdP invitation authority\" and "
+            "\"remains a locally provisioned bootstrap capability\". The table "
+            "could not express the permission in any case: "
+            "`human_resource_grants.project_id` is NOT NULL against "
+            "`agency_projects`, so every grant is project-scoped, and a "
+            "project-scoped grant minting a system-wide identity would be an "
+            "escalation. "
+            "So the authority is the chokepoint. `enforce_consequential` runs "
+            "before the write with a `decision_expectation` whose "
+            "`expected_digest` is `binding_digest(...)` over the principal, "
+            "issuer, subject and validity — the decision covers this exact "
+            "binding rather than naming it, which is the "
+            "`append_authorization` shape this review recommended everywhere "
+            "else. The scope is `human_principal`, not a borrowed project, "
+            "because a binding is not project-scoped. "
+            "`policy_client` is optional here, exactly the shape this inventory "
+            "recorded as unenforced. What makes it bite is composition: the one "
+            "production path, `cli.bind-oidc-identity`, refuses to open a "
+            "connection unless a decision point is configured or "
+            "`MVP_POLICY_ENFORCEMENT=disabled` is declared by name. Same "
+            "arrangement as `cockpit_shell.require_policy_client`, and tested "
+            "by removing it."
+        ),
     },
     ("human_access.py", "create_principal"): {
         "gate": "none",
@@ -1980,9 +2033,9 @@ def test_a_required_gate_that_is_not_wired_stays_visible_and_does_not_grow() -> 
     was ever taken.
     """
     pending = [key for key, record in INVENTORY.items() if record["gate"] == "gate_required_not_wired"]
-    assert len(pending) <= 6, (
+    assert len(pending) <= 5, (
         f"{len(pending)} entry points are known to need the chokepoint and do not reach "
-        "it; the ceiling is 6. Wire one, or move the ceiling deliberately and say why."
+        "it; the ceiling is 5. Wire one, or move the ceiling deliberately and say why."
     )
 
 
@@ -2147,9 +2200,20 @@ def test_a_coverage_claim_requires_a_client_that_can_exist() -> None:
 
 
 def test_a_coverage_claim_is_backed_by_a_real_call() -> None:
+    """A claim of coverage is checked against the entry point, not its module.
+
+    The first version asked whether the *module* contained the string
+    `enforce_consequential(`. That is the polarity error `#928` fixed on the
+    pending side, made on the covered side: a module can gate one function and
+    leave the neighbour beside it ungated, and this would have called both
+    covered. `_gate_closure` already answers the real question — it is the same
+    walk `_writer_closure` does, seeded on the gate — so ask it.
+    """
+    gated = _gate_closure(_module_functions())
     for module, function in sorted(_claimed_covered()):
-        source = (MVP / module).read_text(encoding="utf-8")
-        assert "enforce_consequential(" in source, (
-            f"{module}::{function} is recorded as routing through the chokepoint, "
-            "but the module contains no call to enforce_consequential"
+        assert (Path(module).stem, function) in gated, (
+            f"{module}::{function} is recorded as routing through the "
+            "chokepoint, but `enforce_consequential` is not reachable from it. "
+            "Either the call was removed, or it sits in a neighbour and this "
+            "entry point never had it."
         )
