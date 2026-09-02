@@ -563,6 +563,27 @@ def get_write_command(conn, command_id: str) -> dict[str, Any]:
     }
 
 
+def _lock_write_command(conn, command_id: str) -> None:
+    """Take the command row as the mutex for the authorize/apply race.
+
+    The row is append-only — the trigger in `012_apu_write_preparation.sql`
+    refuses UPDATE and DELETE on it — so this never changes it. `FOR UPDATE` is
+    used only to give the authorization writer and the applying reader one row
+    to serialise on. Both must take it: locking a row one side never touches
+    orders nothing, and the authorization events themselves cannot serve as the
+    lock because the rejection that has to be seen is a row that does not exist
+    yet when the applying side reads.
+    """
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT command_id FROM apu_write_command_candidates"
+            " WHERE command_id = %s FOR UPDATE",
+            (command_id,),
+        )
+        if cur.fetchone() is None:
+            raise ApuWritePreparationNotFound(f"unknown APU write command: {command_id}")
+
+
 def append_authorization(
     conn,
     *,
@@ -588,6 +609,11 @@ def append_authorization(
     }
     payload_digest = _digest(payload)
     with conn.transaction():
+        # The applying side takes this same row lock and re-reads the events
+        # under it, so a rejection appended here either lands before that read
+        # or waits for the apply to finish. Without both halves the apply can
+        # still act on an authorization a committed rejection has superseded.
+        _lock_write_command(conn, command_id)
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
                 "SELECT * FROM apu_write_authorization_events WHERE idempotency_key = %s",
@@ -685,93 +711,100 @@ def apply_authorized_write_command(
     """Verify the reviewed chain, then delegate the bounded mutation to APU owner."""
     actor = _required(applied_by, "applied_by")
     key = _required(idempotency_key, "idempotency_key")
-    command_row = get_write_command(conn, command_id)
-    command = dict(command_row["command"])
-    _validate_command_payload(command)
-    representation = command["source_representation"]
-    relation = command["identity_relation_claim"]
-    source_candidate_ref = representation["representation_id"]
-    source_artifact_ref = representation["source_artifact_ref"]
-    target_stable_object_ref = relation["object_ref"]["entity_id"]
-    if (
-        command_row.get("source_candidate_ref") != source_candidate_ref
-        or command_row.get("source_artifact_ref") != source_artifact_ref
-        or command_row.get("target_stable_object_ref") != target_stable_object_ref
-    ):
-        raise ApuWriteApplicationConflict(
-            "stored command indexes differ from its exact embedded effect"
-        )
-    if command_row.get("expected_owner_revision") is None or command_row.get(
-        "expected_object_revision"
-    ) is None:
-        raise ApuWriteApplicationConflict(
-            "APU write command has no truthful target freshness and cannot be applied"
-        )
-    if (
-        command_row["expected_owner_revision"] != command["expected_owner_revision"]
-        or command_row["expected_object_revision"] != command["expected_object_revision"]
-    ):
-        raise ApuWriteApplicationConflict(
-            "stored APU write command revisions differ from its immutable payload"
-        )
-
-    execution = execution_results.get_execution_result(
-        conn, command["source_execution_result_ref"]
-    )
-    payload, mapping, _mapping_kind = _mapping(
-        execution,
-        command["source_mapping_result_ref"],
-        command["source_mapping_ref"],
-    )
-    if payload.get("project_ref") != command["project_ref"]:
-        raise ApuWriteApplicationConflict(
-            "source mapping Project differs from the authorized command"
-        )
-    if mapping.get("candidate_object_ref") != source_candidate_ref:
-        raise ApuWriteApplicationConflict(
-            "source mapping candidate differs from the authorized command"
-        )
-    candidates = {item.get("stable_object_ref") for item in mapping.get("match_candidates", [])}
-    if target_stable_object_ref not in candidates:
-        raise ApuWriteApplicationConflict(
-            "authorized target is no longer a member of the source mapping candidates"
-        )
-    if _mapping_kind == "observation_bundle":
-        if mapping.get("source_representation") != representation:
+    # The rejection race the review recorded: this chain used to read the
+    # authorization events outside the transaction that applies, so a
+    # reject_application committing between the read and the write did not
+    # block the apply. Everything the decision rests on is now read under the
+    # command-row lock that `append_authorization` also takes.
+    with conn.transaction():
+        _lock_write_command(conn, command_id)
+        command_row = get_write_command(conn, command_id)
+        command = dict(command_row["command"])
+        _validate_command_payload(command)
+        representation = command["source_representation"]
+        relation = command["identity_relation_claim"]
+        source_candidate_ref = representation["representation_id"]
+        source_artifact_ref = representation["source_artifact_ref"]
+        target_stable_object_ref = relation["object_ref"]["entity_id"]
+        if (
+            command_row.get("source_candidate_ref") != source_candidate_ref
+            or command_row.get("source_artifact_ref") != source_artifact_ref
+            or command_row.get("target_stable_object_ref") != target_stable_object_ref
+        ):
             raise ApuWriteApplicationConflict(
-                "Observation Bundle source representation changed after command preparation"
+                "stored command indexes differ from its exact embedded effect"
             )
-        if mapping.get("identity_relation_claim") != relation:
+        if command_row.get("expected_owner_revision") is None or command_row.get(
+            "expected_object_revision"
+        ) is None:
             raise ApuWriteApplicationConflict(
-                "Observation Bundle identity relation changed after command preparation"
+                "APU write command has no truthful target freshness and cannot be applied"
             )
-    review = _latest_selected_review(
-        conn,
-        execution_result_id=command["source_execution_result_ref"],
-        result_ref=command["source_mapping_result_ref"],
-        mapping_ref=command["source_mapping_ref"],
-    )
-    if review["review_id"] != command["source_review_ref"]:
-        raise ApuWriteApplicationConflict(
-            "a newer mapping review supersedes the authorized command"
-        )
-    if review.get("selected_stable_object_ref") != target_stable_object_ref:
-        raise ApuWriteApplicationConflict(
-            "latest mapping review selects another stable object"
-        )
-    authorization = _latest_application_authorization(conn, command)
+        if (
+            command_row["expected_owner_revision"] != command["expected_owner_revision"]
+            or command_row["expected_object_revision"] != command["expected_object_revision"]
+        ):
+            raise ApuWriteApplicationConflict(
+                "stored APU write command revisions differ from its immutable payload"
+            )
 
-    try:
-        return apu_owner.apply_source_match(
+        execution = execution_results.get_execution_result(
+            conn, command["source_execution_result_ref"]
+        )
+        payload, mapping, _mapping_kind = _mapping(
+            execution,
+            command["source_mapping_result_ref"],
+            command["source_mapping_ref"],
+        )
+        if payload.get("project_ref") != command["project_ref"]:
+            raise ApuWriteApplicationConflict(
+                "source mapping Project differs from the authorized command"
+            )
+        if mapping.get("candidate_object_ref") != source_candidate_ref:
+            raise ApuWriteApplicationConflict(
+                "source mapping candidate differs from the authorized command"
+            )
+        candidates = {item.get("stable_object_ref") for item in mapping.get("match_candidates", [])}
+        if target_stable_object_ref not in candidates:
+            raise ApuWriteApplicationConflict(
+                "authorized target is no longer a member of the source mapping candidates"
+            )
+        if _mapping_kind == "observation_bundle":
+            if mapping.get("source_representation") != representation:
+                raise ApuWriteApplicationConflict(
+                    "Observation Bundle source representation changed after command preparation"
+                )
+            if mapping.get("identity_relation_claim") != relation:
+                raise ApuWriteApplicationConflict(
+                    "Observation Bundle identity relation changed after command preparation"
+                )
+        review = _latest_selected_review(
             conn,
-            command=command,
-            authorization_id=authorization["authorization_id"],
-            actor=actor,
-            idempotency_key=key,
+            execution_result_id=command["source_execution_result_ref"],
+            result_ref=command["source_mapping_result_ref"],
+            mapping_ref=command["source_mapping_ref"],
         )
-    except apu_owner.ApuOwnerNotFound as exc:
-        raise ApuWritePreparationNotFound(str(exc)) from exc
-    except apu_owner.ApuOwnerConflict as exc:
-        raise ApuWriteApplicationConflict(str(exc)) from exc
-    except apu_owner.ApuOwnerError as exc:
-        raise ApuWritePreparationError(str(exc)) from exc
+        if review["review_id"] != command["source_review_ref"]:
+            raise ApuWriteApplicationConflict(
+                "a newer mapping review supersedes the authorized command"
+            )
+        if review.get("selected_stable_object_ref") != target_stable_object_ref:
+            raise ApuWriteApplicationConflict(
+                "latest mapping review selects another stable object"
+            )
+        authorization = _latest_application_authorization(conn, command)
+
+        try:
+            return apu_owner.apply_source_match(
+                conn,
+                command=command,
+                authorization_id=authorization["authorization_id"],
+                actor=actor,
+                idempotency_key=key,
+            )
+        except apu_owner.ApuOwnerNotFound as exc:
+            raise ApuWritePreparationNotFound(str(exc)) from exc
+        except apu_owner.ApuOwnerConflict as exc:
+            raise ApuWriteApplicationConflict(str(exc)) from exc
+        except apu_owner.ApuOwnerError as exc:
+            raise ApuWritePreparationError(str(exc)) from exc

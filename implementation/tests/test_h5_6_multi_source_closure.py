@@ -1,11 +1,47 @@
 from __future__ import annotations
 
+from contextlib import nullcontext
 from copy import deepcopy
 
 import pytest
 
 from mvp_vertical import apu_write_preparation, execution_results
 from mvp_vertical.project_anatomy_projection import build_project_anatomy_projection
+
+
+class _FakeCursor:
+    def __init__(self, row):
+        self._row = row
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_exc):
+        return False
+
+    def execute(self, sql, params=None):
+        return None
+
+    def fetchone(self):
+        return self._row
+
+
+class _FakeConnection:
+    """Enough connection for this unit check: a transaction and the command lock.
+
+    `apply_authorized_write_command` takes the command row for update before it
+    reads anything, so the sentinel this test used to pass no longer suffices.
+    """
+
+    def __init__(self, command_id: str) -> None:
+        self._row = (command_id,)
+
+    def transaction(self):
+        return nullcontext()
+
+    def cursor(self, **_kwargs):
+        return _FakeCursor(self._row)
+
 
 
 def _representation() -> dict:
@@ -164,7 +200,7 @@ def test_application_refuses_changed_observation_bundle_source_after_preparation
         match="source representation changed after command preparation",
     ):
         apu_write_preparation.apply_authorized_write_command(
-            object(),
+            _FakeConnection(command["command_id"]),
             command_id=command["command_id"],
             applied_by="human:architect",
             idempotency_key="apply-stale-bundle",
