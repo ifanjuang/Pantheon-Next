@@ -14,6 +14,59 @@ from mvp_vertical import (
 )
 
 
+class _FakeCursor:
+    def __init__(self, connection):
+        self._connection = connection
+        self._last = ""
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_exc):
+        return False
+
+    def execute(self, sql, params=None):
+        self._last = " ".join(sql.split())
+        self._connection.statements.append((self._last, params))
+
+    def fetchone(self):
+        # Answers the command-row lock and nothing else: an idempotency lookup
+        # that came back with the lock's row would make the fake, not the code,
+        # decide what happens next.
+        return self._connection.row if "FOR UPDATE" in self._last else None
+
+
+class _FakeConnection:
+    """Enough connection for the unit gate: a transaction and the command lock.
+
+    These tests passed `object()` while nothing in the chain touched the
+    connection. Both write paths now take the command row for update before
+    they read or write the decision, which is the repair — so the fake records
+    what it was asked to run and the tests assert the lock is there, and first.
+    """
+
+    def __init__(self, command_id: str = "command-1") -> None:
+        self.statements: list[tuple[str, object]] = []
+        self.row: tuple[str, ...] = (command_id,)
+
+    def transaction(self):
+        return nullcontext()
+
+    def cursor(self, **_kwargs):
+        return _FakeCursor(self)
+
+    def execute(self, sql, params=None):
+        self.statements.append((" ".join(sql.split()), params))
+
+
+def _lock_statement(command_id: str) -> tuple[str, object]:
+    return (
+        "SELECT command_id FROM apu_write_command_candidates"
+        " WHERE command_id = %s FOR UPDATE",
+        (command_id,),
+    )
+
+
 EXECUTION = {
     "execution_result": {"execution_result_id": "execution.mapping.001"},
     "results": [
@@ -360,13 +413,17 @@ def test_application_revalidates_review_authorization_and_candidate_membership(m
         return {"status": "applied", "authority": dict(apu_owner.APPLICATION_AUTHORITY)}
 
     monkeypatch.setattr(apu_owner, "apply_source_match", apply)
+    connection = _FakeConnection(command["command_id"])
     result = apu_write_preparation.apply_authorized_write_command(
-        object(),
+        connection,
         command_id=command["command_id"],
         applied_by="human:architect",
         idempotency_key="apply-1",
     )
     assert result["status"] == "applied"
+    assert connection.statements == [
+        _lock_statement(command["command_id"])
+    ], "the apply path must take the command row before it reads the decision"
     assert called["command"] == command
     assert called["authorization_id"] == "authorization-1"
     assert called["actor"] == "human:architect"
@@ -389,12 +446,13 @@ def test_application_refuses_superseded_review(monkeypatch) -> None:
         "_latest_selected_review",
         lambda *_args, **_kwargs: REVIEW | {"review_id": "review.mapping.newer"},
     )
+    connection = _FakeConnection(command["command_id"])
     with pytest.raises(
         apu_write_preparation.ApuWriteApplicationConflict,
         match="newer mapping review",
     ):
         apu_write_preparation.apply_authorized_write_command(
-            object(),
+            connection,
             command_id=command["command_id"],
             applied_by="human:architect",
             idempotency_key="apply-stale-review",
@@ -409,16 +467,56 @@ def test_application_refuses_tampered_command_digest(monkeypatch) -> None:
         "get_write_command",
         lambda _conn, _command_id: _command_row(command),
     )
+    connection = _FakeConnection(command["command_id"])
     with pytest.raises(
         apu_write_preparation.ApuWriteApplicationConflict,
         match="digest",
     ):
         apu_write_preparation.apply_authorized_write_command(
-            object(),
+            connection,
             command_id=command["command_id"],
             applied_by="human:architect",
             idempotency_key="apply-tampered",
         )
+
+
+def test_appending_an_authorization_takes_the_same_command_row(monkeypatch) -> None:
+    """A lock orders nothing unless both writers take it.
+
+    The apply path re-reads the decision under the command row. A rejection
+    appended without taking that row would still be free to commit inside the
+    very window the re-read was added to close, so this asserts the other half
+    — and that the lock comes before the event is written, not after.
+    """
+    command = _command()
+    monkeypatch.setattr(
+        apu_write_preparation,
+        "get_write_command",
+        lambda _conn, _command_id: _command_row(command),
+    )
+    monkeypatch.setattr(
+        apu_write_preparation,
+        "get_authorization",
+        lambda _conn, authorization_id: {"authorization_id": authorization_id},
+    )
+    connection = _FakeConnection(command["command_id"])
+    apu_write_preparation.append_authorization(
+        connection,
+        command_id=command["command_id"],
+        action="reject_application",
+        note="Rejeté après revue.",
+        authorized_by="human:architect",
+        idempotency_key="reject-1",
+    )
+    assert connection.statements[0] == _lock_statement(command["command_id"])
+    written = [
+        index
+        for index, (sql, _params) in enumerate(connection.statements)
+        if "INSERT INTO apu_write_authorization_events" in sql
+    ]
+    assert written == [len(connection.statements) - 1], (
+        "the rejection must be written after the command row is held, once"
+    )
 
 
 def test_latest_rejection_blocks_application(monkeypatch) -> None:

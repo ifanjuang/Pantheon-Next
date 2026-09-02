@@ -519,7 +519,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("apu_write_preparation.py", "append_authorization"): {
         "gate": "none",
-        "local_guards": ("action vocabulary", "command payload revalidated", "authorization bound to the command payload digest", "append-only event", "idempotency with payload digest"),
+        "local_guards": ("action vocabulary", "command payload revalidated", "authorization bound to the command payload digest", "command row locked before the event is written", "append-only event", "idempotency with payload digest"),
         "reviewed": (
             "Records a human authorization, or a rejection, of a prepared "
             "command. The row it writes carries `command_payload_digest` taken "
@@ -527,12 +527,15 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "refuses to act unless that digest still equals the command being "
             "applied. This is the one place in the codebase where an approval is "
             "a first-class stored object bound to the content it approves, rather "
-            "than a reference someone supplied."
+            "than a reference someone supplied. Updated on review: it now takes "
+            "the command row `FOR UPDATE` before writing, which is the half of "
+            "the apply-path repair that lives here. A lock one writer takes "
+            "alone orders nothing."
         ),
     },
     ("apu_write_preparation.py", "apply_authorized_write_command"): {
         "gate": "none",
-        "local_guards": ("reviewed command chain", "latest authorization must be authorize_application, read outside the write transaction", "authorization must cover the exact command payload digest", "stored index vs embedded effect", "owner and object revision freshness", "idempotency"),
+        "local_guards": ("reviewed command chain", "command row locked, then the whole chain read inside the transaction that applies", "latest authorization must be authorize_application", "authorization must cover the exact command payload digest", "stored index vs embedded effect", "owner and object revision freshness", "idempotency"),
         "reviewed": (
             "The strongest local chain in the inventory, and this record "
             "understated why. Beyond the reviewed command, the stored index "
@@ -545,19 +548,22 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "what the eight `gate_required_not_wired` entries lack: they accept "
             "a claim that a decision happened, while this one refuses to act "
             "unless the recorded decision covers the bytes being applied. "
-            "Corrected on review, and it matters: the digest binding holds under "
-            "concurrency, the ordering does not. "
-            "`_latest_application_authorization` runs an unlocked SELECT over the "
+            "Corrected on review, then repaired: the digest binding held under "
+            "concurrency and the ordering did not. "
+            "`_latest_application_authorization` ran an unlocked SELECT over the "
             "authorization events and the delegation to `apu_owner."
-            "apply_source_match` follows outside any shared transaction, with no "
-            "`FOR UPDATE` on the command row. A rejection that commits between "
-            "the read and the write does not block the apply. Same class as the "
+            "apply_source_match` followed outside any shared transaction, with no "
+            "`FOR UPDATE` on the command row, so a rejection committing between "
+            "the read and the write did not block the apply. Same class as the "
             "first-write race `information_projection` carried until 552e67e7 "
             "closed it: a check that reads outside the transaction that acts. "
-            "That one is repaired and this one is not. Recorded rather than escalated — "
-            "the gate exists and is invoked, it is readable stale — and the "
-            "repair is to lock the command row and re-read the latest event "
-            "inside the applying transaction."
+            "Now closed on both sides. `_lock_write_command` takes the command "
+            "row — append-only, so the lock never changes it and serves only as "
+            "the mutex — and the whole chain, the authorization read included, "
+            "runs inside the transaction that delegates. `append_authorization` "
+            "takes the same row before writing its event, which is what makes "
+            "the lock mean anything: the finding was not that a lock was "
+            "missing on one side but that neither side had one to share."
         ),
     },
     ("apu_write_preparation.py", "prepare_write_command"): {
