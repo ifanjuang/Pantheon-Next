@@ -23,6 +23,7 @@ from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
 
 from . import pantheon_contracts
+from .policy_gate import OBJECT_IDENTITY_KEY, PolicyClient, enforce_consequential
 
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "021_project_anatomy_owner.sql"
@@ -65,6 +66,14 @@ class ApuOwnerNotFound(ApuOwnerError):
 
 class ApuOwnerConflict(ApuOwnerError):
     pass
+
+
+class ApuOwnerRefused(ApuOwnerError):
+    """The chokepoint refused this write."""
+
+
+class ApuOwnerPolicyUnavailable(ApuOwnerError):
+    """The decision point could not be reached; the write fails closed."""
 
 
 @lru_cache(maxsize=1)
@@ -376,8 +385,27 @@ def store_reviewed_dossier(
     review_ref: str,
     actor: str,
     idempotency_key: str,
+    policy_client: PolicyClient | None = None,
+    decision_payload: dict[str, Any] | None = None,
+    required_ceiling: str = "C3",
 ) -> dict[str, Any]:
-    """Install one reviewed canonical dossier; this is not a create-object API."""
+    """Install one reviewed canonical dossier; this is not a create-object API.
+
+    `review_ref` is a caller-supplied string. Nothing in this module looks it
+    up, verifies a signature against it, or checks it against a table of
+    completed reviews, because no such table exists here — a provided
+    reference is not a validated decision, the distinction this repository
+    draws everywhere else. When `policy_client` is supplied, the chokepoint
+    stands in for that missing verification: `payload_digest` is computed
+    over `_normalize_dossier`'s output, which folds `review_ref` in beside
+    the stable objects, representations and claims, so the decision covers
+    this exact `review_ref` bundled with this exact dossier as one unit — a
+    caller cannot swap either half after the decision without changing the
+    digest the gate checks against. That still does not verify `review_ref`
+    names a review that actually happened; it only prevents a decision taken
+    over one dossier/review_ref pair from being replayed against a different
+    one.
+    """
     project_id = _required(project_id, "project_id")
     review_ref = _required(review_ref, "review_ref")
     actor = _required(actor, "actor")
@@ -391,6 +419,51 @@ def store_reviewed_dossier(
         review_ref=review_ref,
     )
     payload_digest = _digest(dossier)
+
+    if policy_client is not None:
+        scope = {"scope_type": "project", "scope_id": project_id}
+        dossier_object_ref = f"apu_reviewed_dossier:{project_id}"
+        expectation = {
+            "required_ceiling": required_ceiling,
+            "required_scope": scope,
+            OBJECT_IDENTITY_KEY: dossier_object_ref,
+            "expected_digest": payload_digest,
+        }
+        candidate = {
+            "intent": "store_reviewed_dossier",
+            "decision_expectation": expectation,
+            "request": {
+                "intent": "store_reviewed_dossier",
+                "external_effect": False,
+                "writes_state": True,
+                "transmission_requested": False,
+                "memory_promotion_requested": False,
+                "professional_position": False,
+                "financial_or_contractual_effect": False,
+                "scope": scope,
+            },
+        }
+        bound_decision = dict(decision_payload or {})
+        decision = dict(bound_decision.get("decision") or {})
+        decision.setdefault("decided_by", actor)
+        decision.setdefault("approval_level", required_ceiling)
+        decision.setdefault("scope", scope)
+        decision.setdefault(OBJECT_IDENTITY_KEY, dossier_object_ref)
+        decision.setdefault("content_digest", payload_digest)
+        bound_decision["decision"] = decision
+        bound_decision["expectation"] = expectation
+
+        verdict = enforce_consequential(
+            policy_client, candidate=candidate, decision_payload=bound_decision
+        )
+        if not verdict.allowed:
+            message = (
+                "policy chokepoint blocked the reviewed-dossier import "
+                f"({verdict.disposition}): {verdict.reasons}"
+            )
+            if verdict.disposition == "policy_unavailable":
+                raise ApuOwnerPolicyUnavailable(message)
+            raise ApuOwnerRefused(message)
 
     with conn.transaction():
         with conn.cursor(row_factory=dict_row) as cur:
