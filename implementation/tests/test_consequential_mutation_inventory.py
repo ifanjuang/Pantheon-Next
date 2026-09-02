@@ -20,7 +20,7 @@ added tomorrow inheriting none of it, with no check noticing.
 
 ## Where the review stands
 
-Seventy-one of the ninety-two entry points have been read individually; 21 have
+Eighty-one of the ninety-two entry points have been read individually; 11 have
 not. The first batches were chosen because nothing in production reached them —
 answerable without unwinding a call graph, and the cheapest end of the backlog
 rather than the most urgent one. From `knowledge.py` onward every entry point is
@@ -322,7 +322,32 @@ SQL_WRITE = re.compile(r"\b(INSERT\s+INTO|UPDATE\s+[\w.\"]+\s+SET|DELETE\s+FROM)
 _UNREVIEWED = {"gate": "unreviewed", "local_guards": None}
 
 INVENTORY: dict[tuple[str, str], dict[str, object]] = {
-    ("agency_change_candidate_review.py", "request_project_candidate_revision"): _UNREVIEWED,
+    ("agency_change_candidate_review.py", "request_project_candidate_revision"): {
+        "gate": "none",
+        "local_guards": ("actor required", "idempotency_key at least 8 characters", "note length bounded", "annotations normalized", "an idempotency key already used on another candidate conflicts", "row lock", "status must be pending_review", "actor_kind literal human", "the event payload records the non-equivalences as data"),
+        "reviewed": (
+            "Sends a candidate back for revision, which decides nothing and "
+            "asks for more. Two guards are better than their neighbours\u2019: the "
+            "replay check does not merely find the idempotency key, it refuses "
+            "when that key already belongs to another candidate or another "
+            "event type — an idempotency key cannot be smuggled across "
+            "decisions. And the event payload it writes states "
+            "`project_mutated`, `task_authorized` and `evidence_admitted` as "
+            "False, so the non-equivalences are in the record and not only in "
+            "the doctrine. "
+            "The finding is the first statement in the function: "
+            "`ensure_schema(conn)`, whose body is a migration followed by "
+            "`conn.commit()`. This is the only write path in `mvp_vertical` that "
+            "opens by committing — three functions call `ensure_schema` inline "
+            "and this is the one that mutates. Under the current routes it is "
+            "harmless, since `with_connection` hands out a fresh connection per "
+            "request with nothing in flight. What it costs is composition: this "
+            "function cannot be called inside a larger transaction without "
+            "committing whatever that transaction had open, which is exactly "
+            "the property `apu_cross_family.create_decision_request` relies on "
+            "in its own composition."
+        ),
+    },
     ("agency_change_candidates.py", "apply_project_candidate"): {
         "gate": "none",
         "local_guards": ("human actor", "status", "base revision staleness", "idempotency"),
@@ -331,7 +356,27 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
         ),
     },
     ("agency_change_candidates.py", "create_project_candidate"): _UNREVIEWED,
-    ("agency_change_candidates.py", "reject_project_candidate"): _UNREVIEWED,
+    ("agency_change_candidates.py", "reject_project_candidate"): {
+        "gate": "none",
+        "local_guards": ("actor and reason both required non-empty", "row lock", "status must be pending_review", "status written as a literal", "actor_kind literal human in the event", "idempotency with the expected event type"),
+        "reviewed": (
+            "Rejects a proposed change, which is safety-increasing, and refuses "
+            "to do it silently: the reason is required and stored. The replay "
+            "lookup runs outside the transaction, which elsewhere in this review "
+            "has been a finding — here it is not. A racing duplicate blocks on "
+            "the row lock and then meets `status != pending_review`, so the "
+            "second one conflicts rather than rejecting twice; the outside read "
+            "is a shortcut, not the decision. "
+            "The finding is one rung down from `entity_relations`. `actor_kind` "
+            "is the literal `\u2019human\u2019` in this function, but "
+            "`agency_change_candidate_events` only CHECKs the vocabulary "
+            "`(human, hermes, system)`. So nothing below Python stops a "
+            "rejection being attributed to Hermes — only this one literal in "
+            "this one function does. Where `entity_relations` can say no stored "
+            "row contradicts the doctrine, this module can only say no current "
+            "caller does."
+        ),
+    },
     ("agency_claims.py", "record_claim"): {
         "gate": "none",
         "local_guards": ("status and certainty constrained by CHECK constraints", "verified requires an execution_result candidate carrying a review_disposition_id", "value must match the reviewed candidate, enforced by a trigger", "backing_ref must be one of the candidate basis_refs, enforced by a trigger", "append-only with supersedes"),
@@ -579,7 +624,29 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "same command."
         ),
     },
-    ("contradictory_review_store.py", "persist_candidate"): _UNREVIEWED,
+    ("contradictory_review_store.py", "persist_candidate"): {
+        "gate": "none",
+        "local_guards": ("project_id and submitted_by required", "authority ceiling: is_evidence, is_approval, is_zeus_closure and is_task_authorization must each be exactly False", "status vocabulary", "deterministic review id", "an existing row must match both the project and the report digest"),
+        "reviewed": (
+            "Persists a compiled contradictory-review report, and carries a "
+            "guard shape that appears nowhere else in this inventory: an "
+            "authority ceiling. Before storing anything it reads the report\u2019s "
+            "own `authority` block and refuses unless `is_evidence`, "
+            "`is_approval`, `is_zeus_closure` and `is_task_authorization` are "
+            "each exactly `False`. The store refuses to hold a report that "
+            "claims to be Evidence or an approval — `memory != Evidence` "
+            "enforced at the point of writing rather than asserted in a name. "
+            "The finding is small and is about the error surface. The existence "
+            "check runs outside the transaction with no lock, so two concurrent "
+            "first writes of the same review id both see nothing. The primary "
+            "key on `review_id` closes the race below Python — but the "
+            "`UniqueViolation` it raises is not caught here, so a legitimate "
+            "concurrent replay surfaces as a raw database exception instead of "
+            "the `ContradictoryReviewConflict` the same collision produces on "
+            "the sequential path. The data is safe; the contract is not "
+            "uniform."
+        ),
+    },
     ("decision_requests.py", "cancel_request"): {
         "gate": "none",
         "local_guards": ("rationale required", "row lock", "status must be pending", "expected_revision in the WHERE clause", "idempotency with payload digest", "event records the actor"),
@@ -624,7 +691,26 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
         ),
     },
     ("document_revision_discussion.py", "create_comment"): _UNREVIEWED,
-    ("entity_relations.py", "propose_relation"): _UNREVIEWED,
+    ("entity_relations.py", "propose_relation"): {
+        "gate": "none",
+        "local_guards": ("_actor(proposing=True) admits Hermes for the proposal and nothing else", "relation_type vocabulary", "entity_type checked against ADMITTED_ENTITY_TYPES", "self-edge refused", "partial unique index on the open edge", "idempotency with payload digest", "event written in the same transaction"),
+        "reviewed": (
+            "Writes a proposal, which is a candidate and decides nothing, and "
+            "`_actor` is where this module states the boundary in one place: "
+            "proposing admits Hermes, canonizing and rejecting and retiring do "
+            "not. The finding is what `_entity_ref` checks. It validates the "
+            "endpoint's *type* against `ADMITTED_ENTITY_TYPES` and never its "
+            "existence, and `015_entity_relations.sql` cannot help: `project_id` "
+            "carries a foreign key to `agency_projects`, but `from_entity_id` and "
+            "`to_entity_id` are plain TEXT under a type CHECK, because the ids "
+            "are polymorphic and no single foreign key can reach them. So a "
+            "relation may be proposed between ids that name nothing at either "
+            "end. Recorded rather than escalated: a proposal is a claim, and the "
+            "act that would make it true is reviewed separately — see the "
+            "addendum on `canonize_relation`, which does not check existence "
+            "either."
+        ),
+    },
     ("execution_results.py", "append_review_disposition"): {
         "gate": "none",
         "local_guards": ("disposition vocabulary", "result row locked FOR UPDATE across checks and replay", "result_kind must match the disposition family", "claim-bearing dispositions require reviewer_kind human", "a database trigger enforces the same", "idempotency with payload digest"),
@@ -1049,11 +1135,63 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
         "local_guards": ("_validate_actor refuses hermes with GovernanceGateRequired", "basis_kind checked against a controlled vocabulary", "opaque reference validation", "revision existence check", "payload digest with idempotent replay"),
         "reviewed": "Records an observation about a revision, not an authority claim about it.",
     },
-    ("source_intake.py", "create_source"): _UNREVIEWED,
-    ("source_intake.py", "relate_contained_source"): _UNREVIEWED,
+    ("source_intake.py", "create_source"): {
+        "gate": "none",
+        "local_guards": ("_validate_actor", "source_kind vocabulary", "five required identity fields", "checksum must be a 64-character SHA-256 hex digest when present", "project_link_status written as the literal unassigned", "idempotency with payload digest", "UniqueViolation converted to a module error"),
+        "reviewed": (
+            "Admits a Source. The guard worth naming is the literal: "
+            "`project_link_status` is written as `\u2019unassigned\u2019` in the INSERT, "
+            "so intake cannot arrive already claiming a project no matter what "
+            "the caller passes. `declared_project_name` is free text beside it "
+            "and stays a declaration — the name says so, and the column that "
+            "would make it a link is not reachable from here. "
+            "The finding is the checksum. It is optional, and when present only "
+            "its shape is checked: sixty-four hexadecimal characters. Nothing "
+            "reads `raw_source_ref` to verify the digest describes those bytes. "
+            "So a Source may carry no checksum at all, or a well-formed one that "
+            "belongs to different content. Same axis as `observed_digest` on the "
+            "Information projection: it records what the intaker said."
+        ),
+    },
+    ("source_intake.py", "relate_contained_source"): {
+        "gate": "none",
+        "local_guards": ("_validate_actor", "both Sources must exist, _source_row raises", "CHECK (source_id <> target_source_id) below Python", "UNIQUE on the triple", "idempotency with payload digest"),
+        "reviewed": (
+            "Records that one Source contains another. Stronger than it looks "
+            "from Python: `009_source_intake_admission.sql` gives "
+            "`agency_source_relations` foreign keys on both ends and "
+            "`CHECK (source_id <> target_source_id)`, so the self-containment "
+            "this function refuses is refused again below it, where a second "
+            "Python caller cannot route around it. "
+            "The finding is what neither layer refuses: a cycle. A contains B and "
+            "B contains A are both storable, and nothing walks the graph. "
+            "Recorded rather than escalated — containment is a structural note "
+            "about Sources, not governed identity, so a cycle is a data-quality "
+            "defect and not an authority one. Also worth being exact: the event "
+            "carries `expected_revision=0, resulting_revision=0`, so the "
+            "Source\u2019s own revision does not move when a relation is added."
+        ),
+    },
     ("storage_retention.py", "retain_document_version"): _UNREVIEWED,
     ("store.py", "ingest"): _UNREVIEWED,
-    ("apu_cross_family.py", "create_decision_request"): _UNREVIEWED,
+    ("apu_cross_family.py", "create_decision_request"): {
+        "gate": "none",
+        "local_guards": ("request_id and created_by required", "APU-scoped request requires project_ref", "scope_refs immutable across a replay", "foreign key and CHECK violations on the scope insert converted to module errors", "one transaction"),
+        "reviewed": (
+            "Wraps `decision_requests.create_request` and adds the APU scope "
+            "refs beside it. The guard worth naming is the immutability check: "
+            "if the request already existed, the stored scope refs must equal "
+            "the ones being replayed, or the call conflicts. A replay cannot "
+            "quietly widen what a Decision Request is about. The scope insert "
+            "catches `ForeignKeyViolation` and `CheckViolation` and converts "
+            "them, which means the existence of what the scope points at is "
+            "enforced below Python, not here. "
+            "Worth being exact about the surface: everything but `request_id`, "
+            "`project_ref` and `created_by` passes through `**kwargs` "
+            "unexamined, so this function\u2019s own validation is those three and "
+            "the scope; the rest is `create_request`\u2019s, reviewed separately."
+        ),
+    },
     ("entity_relations.py", "canonize_relation"): {
         "gate": "none",
         "local_guards": ("separate route with the editor key and a human actor", "actor_kind literal at the route", "_actor refuses any kind but human, no default", "relation locked", "status must be proposed", "expected_revision", "idempotency with payload digest", "a CHECK constraint refuses a non-human actor_kind on any event that is not a proposal"),
@@ -1072,7 +1210,17 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "guarantees is that the audit trail can never contain the "
             "contradiction: no row can say Hermes canonized anything. That is "
             "internal consistency of the record, which is real and rare — and it "
-            "is not the same as knowing who acted."
+            "is not the same as knowing who acted. "
+            "Second finding, added while reviewing `propose_relation`: this "
+            "entry recorded the actor axis in detail and said nothing about the "
+            "endpoints. `_decide` moves the status and checks "
+            "`expected_revision`; it does not verify that either entity exists. "
+            "Nor could `015_entity_relations.sql` help — the ids are "
+            "polymorphic, so `from_entity_id` and `to_entity_id` carry a type "
+            "CHECK and no foreign key. The act the doctrine names as making a "
+            "relation true can therefore canonize an edge between two ids that "
+            "name nothing. The record was not wrong here; it was incomplete, "
+            "which a reader of a governance record cannot tell apart."
         ),
     },
     ("entity_relations.py", "reject_relation"): {
@@ -1096,7 +1244,33 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "withdrawn."
         ),
     },
-    ("hermes_runtime_return.py", "record_external_runtime_return"): _UNREVIEWED,
+    ("hermes_runtime_return.py", "record_external_runtime_return"): {
+        "gate": "none",
+        "local_guards": ("run joined to this admission, not merely to this run_id", "normalized return shape", "outcome and payload must correspond, in both directions", "trace summary validated against the persisted run", "Work Issue version, on the running path", "candidate source_refs bounded by the admitted Context Pack", "replay must match the stored return exactly", "one transaction", "the return enumerates what did not happen"),
+        "reviewed": (
+            "The Hermes boundary itself: the point where an external runtime\u2019s "
+            "output enters governed state, and the most guarded intake in the "
+            "inventory. Three of its guards are worth naming precisely. "
+            "`_run_for_admission` joins `r.admission_ref = %s`, so a run "
+            "belonging to another admission is refused rather than a wrong "
+            "run_id merely missing. The outcome/payload correspondence is "
+            "checked in both directions — a `result_candidate` without the "
+            "outcome and the outcome without the payload both raise. And "
+            "`_validate_candidate_sources` bounds what comes back by what went "
+            "out: `returned - admitted` must be empty against the Context Pack, "
+            "so Hermes cannot cite a source it was not given. The return value "
+            "then states the non-equivalences as data — `evidence_admitted`, "
+            "`external_effect_authorized` and `project_mutated` all False. "
+            "The finding is a guard narrower than its name. The Work Issue "
+            "version check reads `if issue[\"version\"] != expected_issue_version "
+            "and run[\"status\"] == \"running\"`, so a stale expected version is "
+            "not refused on the replay path. That path has its own stricter "
+            "check — the stored normalized return must equal the one being "
+            "replayed — so this is defensible; recording it flatly as "
+            "optimistic concurrency would not be. The actor is `actor.strip()`, "
+            "unverified, as everywhere."
+        ),
+    },
     ("source_intake.py", "exclude_source"): {
         "gate": "none",
         "local_guards": ("actor_kind required, no default, Hermes refused by name", "row lock", "expected_revision checked on the read and repeated in the UPDATE WHERE", "rowcount == 1", "idempotency with payload digest", "event carries a result snapshot", "reversible by restore_source"),
@@ -1168,12 +1342,41 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "which is the naming this review has twice recorded the absence of."
         ),
     },
-    ("apu_mapping_converter.py", "convert_and_store"): _UNREVIEWED,
+    ("apu_mapping_converter.py", "convert_and_store"): {
+        "gate": "none",
+        "local_guards": ("reads an existing Execution Result", "derives the candidate rather than accepting one", "storage guards inherited from store_execution_result"),
+        "reviewed": (
+            "Fourteen lines: read an Execution Result, derive a mapping candidate "
+            "from it, store that as another Execution Result. It accepts no "
+            "payload, so nothing a caller supplies reaches the stored candidate "
+            "except the two refs, and every storage guard is "
+            "`execution_results.store_execution_result`\u2019s. "
+            "The finding is what it does not carry: the module contains no "
+            "occurrence of `actor`, `actor_kind` or any producer field. A "
+            "conversion records nobody. That reads as harmless — a derivation "
+            "makes no new claim — until it is followed: the mapping result this "
+            "writes is what `prepare_write_command` reads to build a command, "
+            "and that command is what a human later authorizes into canonical "
+            "APU state. Nothing in that chain can say who converted."
+        ),
+    },
     ("cli.py", "main"): _UNREVIEWED,
     ("human_revision_upload.py", "upload_revision"): _UNREVIEWED,
     ("project_change_variants.py", "select_variant_for_change_candidate"): _UNREVIEWED,
     ("project_claim_candidates.py", "create_claim_from_candidate"): _UNREVIEWED,
-    ("store.py", "intake_document"): _UNREVIEWED,
+    ("store.py", "intake_document"): {
+        "gate": "none",
+        "local_guards": ("assert_source_in_scope before anything else", "parse_document_name", "delegates with replace_dossier=False and a single source"),
+        "reviewed": (
+            "A scoping wrapper over `ingest`, and the order matters: "
+            "`assert_source_in_scope(contract, source_ref)` is the first "
+            "statement, so a path outside the Task Contract perimeter never "
+            "reaches the ingestion. It then delegates with exactly one source "
+            "and `replace_dossier=False`, which is what keeps a single-document "
+            "intake from clearing the dossier it lands in. Every other guard is "
+            "`ingest`\u2019s."
+        ),
+    },
     ("work_issue_scopes.py", "create_scoped_issue"): {
         "gate": "none",
         "local_guards": ("at least one scope", "exactly one primary scope", "duplicate endpoints refused", "scope vocabularies", "issue and every scope written in one transaction", "idempotency", "scope endpoints validated by a trigger"),
@@ -1491,14 +1694,14 @@ def test_the_unreviewed_debt_is_visible_and_does_not_grow() -> None:
 
     The widened net enumerated 64 entry points that had not been read
     individually. The net was widened in the tenth batch and found 13 more, so
-    the enumerated total is 92; 71 are read and 21 are not. Reviewing one means
+    the enumerated total is 92; 81 are read and 11 are not. Reviewing one means
     replacing `_UNREVIEWED` with its real guard regime and the reasoning behind
     it. This bound exists so the debt shrinks deliberately and cannot quietly
     grow.
     """
     unreviewed = [key for key, record in INVENTORY.items() if record["gate"] == "unreviewed"]
-    assert len(unreviewed) <= 21, (
-        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 21. A new "
+    assert len(unreviewed) <= 11, (
+        f"{len(unreviewed)} entry points are unreviewed; the ceiling is 11. A new "
         "mutation entry point must be reviewed, not added to the backlog."
     )
 
