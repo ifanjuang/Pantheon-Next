@@ -8,6 +8,8 @@ explicit domain gates in this module.
 
 from __future__ import annotations
 
+import hashlib
+import json
 import uuid
 from datetime import date, datetime
 from pathlib import Path
@@ -18,6 +20,7 @@ from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
 from . import agency_schema
+from .policy_gate import OBJECT_IDENTITY_KEY, PolicyClient, enforce_consequential
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "004_agency_information_cards.sql"
 WORKING_STATUSES = {"draft", "in_progress"}
@@ -44,6 +47,19 @@ class StaleInformationWrite(AgencyInformationError):
 
 class InformationGateRequired(AgencyInformationError):
     pass
+
+
+class AgencyInformationGateRefused(AgencyInformationError):
+    """The chokepoint refused to act this Information version."""
+
+
+class AgencyInformationGatePolicyUnavailable(AgencyInformationError):
+    """The decision point could not be reached; the write fails closed."""
+
+
+def _digest(value: Any) -> str:
+    rendered = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(rendered.encode("utf-8")).hexdigest()
 
 
 def _jsonable(value: Any) -> Any:
@@ -305,7 +321,19 @@ def act_working_information(
     information_id: str,
     expected_revision: int,
     actor_kind: Literal["human"],
+    actor: str,
+    policy_client: PolicyClient | None = None,
+    decision_payload: dict[str, Any] | None = None,
+    required_ceiling: str = "C2",
 ) -> dict:
+    """Supersede the acted version of a governed Information series with this one.
+
+    ``agency_information_cards`` has no actor column: ``acted_at`` records
+    when, nothing in the row records who. The chokepoint's decision record
+    is where that identity now lives, bound to the exact content being
+    promoted so it cannot be replayed against a different card under the
+    same ``information_id``/``expected_revision``.
+    """
     if actor_kind != "human":
         raise InformationGateRequired("only a human may act an Information version")
     with conn.transaction():
@@ -316,6 +344,58 @@ def act_working_information(
             raise StaleInformationWrite(
                 f"stale Information revision: expected {expected_revision}, current {working['revision']}"
             )
+        if policy_client is not None:
+            scope = {"scope_type": "project", "scope_id": working["project_id"]}
+            object_ref = f"agency_information:{information_id}"
+            content_digest = _digest(
+                {
+                    key: value
+                    for key, value in working.items()
+                    if key not in {"status", "acted_at", "revision", "updated_at"}
+                }
+            )
+            expectation = {
+                "required_ceiling": required_ceiling,
+                "required_scope": scope,
+                OBJECT_IDENTITY_KEY: object_ref,
+                "expected_digest": content_digest,
+            }
+            candidate = {
+                "intent": "act_working_information",
+                "decision_expectation": expectation,
+                "request": {
+                    "information_id": information_id,
+                    "series_id": working["series_id"],
+                    "expected_revision": expected_revision,
+                },
+            }
+            bound_decision = dict(decision_payload or {})
+            decision = dict(bound_decision.get("decision") or {})
+            decision_id = str(decision.get("decision_id") or "").strip()
+            if len(decision_id) < 2:
+                raise AgencyInformationGateRefused(
+                    "acting an Information version requires an immutable human "
+                    "decision reference (decision.decision_id) to route through "
+                    "the chokepoint; none was supplied"
+                )
+            decision.setdefault("decided_by", actor)
+            decision.setdefault("approval_level", required_ceiling)
+            decision.setdefault("scope", scope)
+            decision.setdefault(OBJECT_IDENTITY_KEY, object_ref)
+            decision.setdefault("content_digest", content_digest)
+            bound_decision["decision"] = decision
+            bound_decision["expectation"] = expectation
+            verdict = enforce_consequential(
+                policy_client, candidate=candidate, decision_payload=bound_decision
+            )
+            if not verdict.allowed:
+                message = (
+                    f"policy chokepoint blocked acting this Information version "
+                    f"({verdict.disposition}): {verdict.reasons}"
+                )
+                if verdict.disposition == "policy_unavailable":
+                    raise AgencyInformationGatePolicyUnavailable(message)
+                raise AgencyInformationGateRefused(message)
         conn.execute(
             """
             UPDATE agency_information_cards

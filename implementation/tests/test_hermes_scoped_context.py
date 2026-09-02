@@ -139,6 +139,7 @@ def _running_information(conn) -> tuple[dict, str, dict, dict]:
         information_id=first["information_id"],
         expected_revision=first["revision"],
         actor_kind="human",
+        actor="architecte",
     )
     working = agency_information.derive_working_version(
         conn,
