@@ -448,7 +448,6 @@ def upload_revision(
             ingestion_id=f"human-upload-{identity[:32]}",
             docling=docling,
             source_refs=(source_ref,),
-            replace_dossier=False,
         )
     except DocumentConversionError as exc:
         # The existing store records exact failed technical capture first.

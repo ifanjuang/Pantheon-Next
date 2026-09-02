@@ -54,11 +54,22 @@ def _required_text(value: Any, field: str) -> str:
     return text
 
 
-def _selection_row(conn: psycopg.Connection, idempotency_key: str) -> dict[str, Any]:
+def _selection_row_by_id(conn: psycopg.Connection, disposition_id: str | None) -> dict[str, Any]:
+    """The selection disposition a stored ChangeCandidate already points at.
+
+    Looked up by its id, not by an idempotency key. A replay reaches this
+    through `_candidate_for_source`, which matches on `source_result_id`, so the
+    replaying call need not carry the key the original selection was made under
+    — and the candidate row already names the disposition.
+    """
+    if not disposition_id:
+        raise ProjectChangeVariantError(
+            "selected variant ChangeCandidate carries no selection disposition"
+        )
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
-            "SELECT * FROM execution_result_review_dispositions WHERE idempotency_key = %s",
-            (idempotency_key,),
+            "SELECT * FROM execution_result_review_dispositions WHERE disposition_id = %s",
+            (disposition_id,),
         )
         row = cur.fetchone()
     if row is None:
@@ -264,8 +275,8 @@ def select_variant_for_change_candidate(
 
             replayed = _candidate_for_source(conn, result_id)
             if replayed is not None:
-                selection = _selection_row(
-                    conn, replayed["source_review_disposition_id"] and selection_key
+                selection = _selection_row_by_id(
+                    conn, replayed["source_review_disposition_id"]
                 )
                 return {
                     "selection": selection,

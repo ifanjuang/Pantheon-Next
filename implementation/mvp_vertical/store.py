@@ -657,7 +657,6 @@ def ingest(
     ingestion_id: str | None = None,
     docling: DocumentConverter | None = None,
     source_refs: tuple[str, ...] | None = None,
-    replace_dossier: bool = True,
     naming_by_source: dict[str, DocumentName] | None = None,
     subject_tags_by_source: dict[str, list[str] | tuple[str, ...]] | None = None,
 ) -> int:
@@ -669,9 +668,11 @@ def ingest(
     source content it came from. Re-ingesting refreshes only the same immutable
     digest; older digests remain indexed for exact governed retrieval.
 
-    ``replace_dossier`` is retained for API compatibility. It no longer deletes
-    historical chunk versions; current-version retrieval follows the digest on
-    ``source_documents`` instead.
+    Re-ingestion is scoped to one immutable ``source_digest``: replaying a
+    digest refreshes only itself, and other digests at the same path stay
+    indexed. A ``replace_dossier`` flag used to sit here and was removed once it
+    stopped deleting anything — both callers passed ``False`` for a protection
+    it no longer provided, and the digest scope is what actually provides it.
     """
     ingestion_id = ingestion_id or uuid.uuid4().hex
     cdigest = contract_digest(contract)
@@ -925,7 +926,6 @@ def intake_document(
         ingestion_id=ingestion_id,
         docling=docling,
         source_refs=(source_ref,),
-        replace_dossier=False,
         naming_by_source={source_ref: naming},
         subject_tags_by_source=(
             {source_ref: subject_tags} if subject_tags is not None else None
