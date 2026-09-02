@@ -7,6 +7,8 @@ invitation lifecycle or provider routing.
 
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 import uuid
 from dataclasses import asdict, dataclass
@@ -17,6 +19,7 @@ import psycopg
 from psycopg.rows import dict_row
 
 from . import agency_data, project_documents, store
+from .policy_gate import PolicyClient, enforce_consequential
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "030_human_principal_access.sql"
 ACTION_MIGRATION = (
@@ -61,6 +64,14 @@ class PrincipalNotBound(HumanAccessError):
 
 class PrincipalDisabled(HumanAccessError):
     pass
+
+
+class BindingRefused(HumanAccessError):
+    """The chokepoint refused this identity binding."""
+
+
+class BindingPolicyUnavailable(HumanAccessError):
+    """The decision point could not be reached; the binding fails closed."""
 
 
 class BindingConflict(HumanAccessError):
@@ -251,6 +262,31 @@ def disable_principal(conn: psycopg.Connection, *, principal_ref: str) -> dict[s
         return _principal_row(conn, principal_ref)
 
 
+def binding_digest(
+    *,
+    principal_ref: str,
+    issuer: str,
+    subject: str,
+    valid_until: Any = None,
+) -> str:
+    """Digest the exact binding being made, so a decision can cover a content.
+
+    An approval that names a binding is worth less than one that covers it. This
+    is the shape `apu_write_preparation.append_authorization` already uses, and
+    the one this review recommended everywhere else.
+    """
+    payload = {
+        "operation": "bind_oidc_identity",
+        "principal_ref": principal_ref,
+        "issuer": issuer,
+        "subject": subject,
+        "valid_until": None if valid_until is None else str(valid_until),
+    }
+    return hashlib.sha256(
+        json.dumps(payload, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    ).hexdigest()
+
+
 def bind_oidc_identity(
     conn: psycopg.Connection,
     *,
@@ -260,7 +296,32 @@ def bind_oidc_identity(
     bound_by: str,
     reason: str | None = None,
     valid_until: Any = None,
+    policy_client: PolicyClient | None = None,
+    decision_payload: dict[str, Any] | None = None,
+    required_ceiling: str = "C3",
 ) -> dict[str, Any]:
+    """Make an external OIDC identity able to act as a governed principal.
+
+    This is the root of trust for every route behind `require_principal`:
+    `resolve_principal_context` resolves each request against the row this
+    writes. Nothing else in the product writes it.
+
+    `project.access.manage` cannot authorize this act, and that is not a gap in
+    this module. `033_human_project_access_management.sql` says so in the
+    schema: that action "does not encode professional role, approval, Decision,
+    Evidence or IdP invitation authority", and it "remains a locally provisioned
+    bootstrap capability". A project-scoped grant producing a system-wide
+    identity would be an escalation, and the grant table could not express the
+    permission anyway — `project_id` is NOT NULL against `agency_projects`.
+
+    So the authority for a binding is not a grant. It is the chokepoint: when
+    `policy_client` is supplied, the effect routes through
+    `enforce_consequential` with an expectation bound to
+    `binding_digest(...)`, so the decision must cover this exact binding rather
+    than name it. Composition is where that becomes mandatory — see the CLI,
+    which refuses to bind unless a decision point is configured or enforcement
+    is explicitly declared disabled.
+    """
     principal = _principal_row(conn, principal_ref)
     if principal["disabled_at"] is not None:
         raise PrincipalDisabled(f"human principal is disabled: {principal_ref}")
@@ -268,6 +329,61 @@ def bind_oidc_identity(
     subject = _required(subject, "subject")
     bound_by = _required(bound_by, "bound_by")
     reason = _optional(reason)
+
+    if policy_client is not None:
+        digest = binding_digest(
+            principal_ref=principal_ref,
+            issuer=issuer,
+            subject=subject,
+            valid_until=valid_until,
+        )
+        # A binding is not project-scoped: it makes an identity able to act
+        # wherever that principal is granted anything. The scope of the act is
+        # the principal, and saying so is more truthful than borrowing a project.
+        scope = {"scope_type": "human_principal", "scope_id": principal_ref}
+        object_identity = f"human_oidc_binding:{principal_ref}:{issuer}:{subject}"
+        expectation = {
+            "required_ceiling": required_ceiling,
+            "required_scope": scope,
+            "object_identity": object_identity,
+            "expected_digest": digest,
+        }
+        candidate = {
+            "intent": "bind_oidc_identity",
+            "decision_expectation": expectation,
+            "request": {
+                "intent": "bind_oidc_identity",
+                # Writes governed state, sends nothing, promotes no memory.
+                "external_effect": False,
+                "writes_state": True,
+                "transmission_requested": False,
+                "memory_promotion_requested": False,
+                "professional_position": False,
+                "financial_or_contractual_effect": False,
+                "scope": scope,
+            },
+        }
+        bound_decision = dict(decision_payload or {})
+        decision = dict(bound_decision.get("decision") or {})
+        decision.setdefault("decided_by", bound_by)
+        decision.setdefault("approval_level", required_ceiling)
+        decision.setdefault("scope", scope)
+        decision.setdefault("object_identity", object_identity)
+        decision.setdefault("content_digest", digest)
+        bound_decision["decision"] = decision
+        bound_decision["expectation"] = expectation
+
+        verdict = enforce_consequential(
+            policy_client, candidate=candidate, decision_payload=bound_decision
+        )
+        if not verdict.allowed:
+            message = (
+                "policy chokepoint blocked the OIDC identity binding "
+                f"({verdict.disposition}): {verdict.reasons}"
+            )
+            if verdict.disposition == "policy_unavailable":
+                raise BindingPolicyUnavailable(message)
+            raise BindingRefused(message)
 
     with conn.transaction():
         with conn.cursor(row_factory=dict_row) as cur:
