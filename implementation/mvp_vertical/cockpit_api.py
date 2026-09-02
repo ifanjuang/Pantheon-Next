@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field
 
 from . import knowledge, store
 from .contract import ContractError, resolve_source_within
+from .policy_gate import HttpPolicyClient, PolicyClient
 
 PREVIEW_TTL_SECONDS = 300
 MOBILE_EDITOR = Path(__file__).resolve().parent / "mobile_editor"
@@ -33,6 +34,9 @@ class PublishKnowledgeBody(BaseModel):
     idempotency_key: str
     expected_version: int = 0
     review_status: Literal["generated_unreviewed", "needs_review", "reviewed", "superseded"] = "generated_unreviewed"
+    # Only meaningful, and only required, alongside review_status="reviewed":
+    # the immutable reference of the human decision the chokepoint validates.
+    human_decision_ref: str | None = Field(default=None, min_length=2, max_length=500)
 
 
 class ReviseKnowledgeBody(BaseModel):
@@ -65,6 +69,8 @@ class ApplyEditBody(BaseModel):
     actor: str
     actor_kind: Literal["human", "hermes", "system"] = "human"
     idempotency_key: str
+    # Required when Pantheon policy enforcement is active; ignored otherwise.
+    human_decision_ref: str | None = Field(default=None, min_length=2, max_length=500)
 
 
 def _bearer_token(authorization: str | None) -> str:
@@ -86,6 +92,8 @@ def create_app(
     editor_api_key: str | None = None,
     hermes_api_key: str | None = None,
     public_url: str | None = None,
+    policy_client: PolicyClient | None = None,
+    policy_enforcement: str | None = None,
 ) -> FastAPI:
     """Create the API with injectable effects for tests and deployment."""
     app = FastAPI(
@@ -109,6 +117,34 @@ def create_app(
         public_url if public_url is not None else os.getenv("MVP_COCKPIT_PUBLIC_URL", "")
     ).rstrip("/")
 
+    # Same fail-closed arrangement as cockpit_shell.create_cockpit_app: an
+    # unconfigured decision point refuses the gated routes below rather than
+    # letting them fall back to local-guards-only, and staying disabled is an
+    # explicitly named posture, never a default. When cockpit_shell wraps this
+    # app it recomputes and overwrites these same two attributes from the same
+    # env vars, which is a harmless no-op — this makes the app self-sufficient
+    # when create_app is used on its own.
+    app.state.policy_enforcement = (
+        policy_enforcement
+        if policy_enforcement is not None
+        else os.getenv("MVP_POLICY_ENFORCEMENT", "required")
+    ).strip().lower()
+    if app.state.policy_enforcement not in {"required", "disabled"}:
+        raise ValueError(
+            "MVP_POLICY_ENFORCEMENT must be 'required' or 'disabled'; "
+            f"got {app.state.policy_enforcement!r}"
+        )
+    if policy_client is not None:
+        app.state.policy_client = policy_client
+    else:
+        policy_base_url = os.getenv("MVP_POLICY_API_URL", "").strip()
+        policy_api_key = os.getenv("MVP_POLICY_API_KEY", "").strip()
+        app.state.policy_client = (
+            HttpPolicyClient(policy_base_url, policy_api_key)
+            if policy_base_url and policy_api_key
+            else None
+        )
+
     def require_api_key(authorization: str | None = Header(default=None)) -> None:
         supplied = _bearer_token(authorization)
         expected = [key for key in (app.state.api_key, app.state.editor_api_key) if key]
@@ -130,6 +166,23 @@ def create_app(
             raise HTTPException(status_code=503, detail="Hermes API key is not configured")
         if not hmac.compare_digest(_bearer_token(authorization), expected):
             raise HTTPException(status_code=401, detail="invalid Hermes API key")
+
+    def require_policy_client() -> PolicyClient | None:
+        """Return the decision point, or refuse this consequential Knowledge write."""
+        if app.state.policy_enforcement == "disabled":
+            return None
+        client = app.state.policy_client
+        if client is None:
+            raise HTTPException(
+                status_code=503,
+                detail=(
+                    "Pantheon policy decision point is not configured; a "
+                    "consequential Knowledge write cannot be admitted. Set "
+                    "MVP_POLICY_API_URL and MVP_POLICY_API_KEY, or declare "
+                    "MVP_POLICY_ENFORCEMENT=disabled explicitly."
+                ),
+            )
+        return client
 
     def with_connection(operation):
         conn = app.state.connect_fn()
@@ -243,6 +296,8 @@ def create_app(
             return with_connection(operation)
         except knowledge.KnowledgeNotFound as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except knowledge.KnowledgeGatePolicyUnavailable as exc:
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
         except (knowledge.StaleKnowledgeWrite, knowledge.IdempotencyConflict) as exc:
             raise HTTPException(status_code=409, detail=str(exc)) from exc
         except knowledge.KnowledgeError as exc:
@@ -254,9 +309,34 @@ def create_app(
         body: PublishKnowledgeBody,
         _authorized: None = Depends(require_editor_key),
     ) -> dict:
+        # Not a blanket Depends(require_policy_client): most publications are
+        # candidate (generated_unreviewed, needs_review) and make no
+        # professional claim, so they need no decision point configured at
+        # all. Only a request that claims review_status="reviewed" is
+        # refused when enforcement is required and none is configured — the
+        # same fail-closed posture, narrowed to the one claim it protects.
+        policy_client = app.state.policy_client
+        if (
+            body.review_status == "reviewed"
+            and app.state.policy_enforcement == "required"
+            and policy_client is None
+        ):
+            raise HTTPException(
+                status_code=503,
+                detail=(
+                    "Pantheon policy decision point is not configured; "
+                    "publishing Knowledge as already reviewed cannot be "
+                    "admitted. Set MVP_POLICY_API_URL and MVP_POLICY_API_KEY, "
+                    "or declare MVP_POLICY_ENFORCEMENT=disabled explicitly."
+                ),
+            )
+        fields = body.model_dump()
+        decision_ref = fields.pop("human_decision_ref")
         return knowledge_write(
             lambda conn: knowledge.publish_knowledge(
-                conn, document_id=document_id, **body.model_dump()
+                conn, document_id=document_id, policy_client=policy_client,
+                decision_payload={"decision": {"decision_id": decision_ref}},
+                **fields
             )
         )
 
@@ -318,10 +398,15 @@ def create_app(
         request_id: str,
         body: ApplyEditBody,
         _authorized: None = Depends(require_editor_key),
+        policy_client: PolicyClient | None = Depends(require_policy_client),
     ) -> dict:
+        fields = body.model_dump()
+        decision_ref = fields.pop("human_decision_ref")
         return knowledge_write(
             lambda conn: knowledge.apply_edit_request(
-                conn, request_id=request_id, **body.model_dump()
+                conn, request_id=request_id, policy_client=policy_client,
+                decision_payload={"decision": {"decision_id": decision_ref}},
+                **fields
             )
         )
 

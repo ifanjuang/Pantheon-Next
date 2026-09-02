@@ -44,18 +44,21 @@ One is not: `cli.main` opens its own connection and asks for no key at all.
 Recorded there, because "the write surface is behind an API key" is a true
 statement about the routes and a false one about the system.
 
-Four entry points are recorded as `gate_required_not_wired` rather than softened
-into `none`. `publish_knowledge` accepts `review_status="reviewed"` as a caller
-assertion. `complete_edit_request` can return a human-rejected request to
-`proposed`. `apply_edit_request` acts on that status as though it were a
-decision. `act_working_information` supersedes the acted version of a governed
-Information series and records no actor.
+One entry point is recorded as `gate_required_not_wired` rather than softened
+into `none`. `act_working_information` supersedes the acted version of a
+governed Information series and records no actor.
 
-`bind_oidc_identity` and `store_reviewed_dossier` were the fifth and sixth and
-are now wired. Both share the same shape once read in order to wire them:
-neither had a production caller at all. `bind_oidc_identity` left
-`human_oidc_bindings` — the table every authenticated request resolves
-against — reachable only from outside the product; `store_reviewed_dossier`
+`bind_oidc_identity`, `store_reviewed_dossier`, `publish_knowledge` and
+`apply_edit_request` are now wired. `complete_edit_request` — recorded
+alongside `apply_edit_request` because both write the same `status` column
+with nothing to decide it — was closed by a local status guard instead: it
+fixes the specific finding (a rejected request could be silently returned to
+`proposed`), not a missing decision point, and needed no chokepoint call.
+Two of the four wired entries share the same shape once read in order to
+wire them: neither `bind_oidc_identity` nor `store_reviewed_dossier` had a
+production caller at all. `bind_oidc_identity` left `human_oidc_bindings` —
+the table every authenticated request resolves against — reachable only from
+outside the product; `store_reviewed_dossier`
 left a Project's whole Architecture Project Understanding baseline the same
 way. Wiring `store_reviewed_dossier` did not have to invent a content binding:
 `_normalize_dossier` already folds `review_ref` into the same structure as the
@@ -1114,36 +1117,57 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
         ),
     },
     ("knowledge.py", "apply_edit_request"): {
-        "gate": "gate_required_not_wired",
-        "unguarded_body": "9ee59f56a33c9f32ba04678efbd169e61c461a7e61b054637fc854d938344a70",
-        "local_guards": ("request status", "re-read under lock", "version and selection digest", "single transaction with audit", "idempotency"),
+        "gate": "enforce_consequential",
+        "local_guards": ("request status", "re-read under lock", "version and selection digest", "single transaction with audit", "idempotency", "chokepoint after the re-read under lock, expectation bound to a digest of the exact replacement", "unconditional: apply always needs a decision, not just a review_status=\"reviewed\" claim"),
         "reviewed": (
-            "Corrected. This entry read `none` on the reasoning that the request "
-            "status already carried the decision. Reading the two functions that "
-            "write that status shows nothing has to decide anything for it to say "
-            "`proposed`: `create_edit_request` accepts `replacement_markdown` from "
-            "its caller and sets `proposed` on the spot, and `complete_edit_request` "
-            "sets `proposed` with no status guard. The transactional audit and the "
-            "concurrency checks are real and unchanged; what is not real is the "
-            "decision they are recorded against. This is the point where the "
-            "Knowledge Markdown changes, so it is where the chokepoint belongs."
+            "Wired, at the point this entry itself named: `create_edit_request` "
+            "accepts `replacement_markdown` from its caller and sets `proposed` on "
+            "the spot, and `complete_edit_request` sets `proposed` with no status "
+            "guard (see that entry — closed separately, by a local fix rather than "
+            "this gate). Nothing upstream has to decide anything for a request to "
+            "arrive here `proposed`. This is the point where the Knowledge Markdown "
+            "actually changes, so this is where the chokepoint belongs, not either "
+            "of those. "
+            "The gate call sits after the re-read under lock, once `item[\"version\"]` "
+            "and `_digest(selected)` are confirmed to still match the request — so "
+            "the decision the PDP validates covers `{request_id, knowledge_id, "
+            "base_version, selected_text_digest, replacement_markdown}`, the exact "
+            "replacement about to be spliced in, not a name. Scope is the "
+            "Knowledge item's Project. A refusal propagates past the "
+            "`_EditRequestConflict` handler untouched — refusal is not staleness, "
+            "so the request stays `proposed` and retryable once a real decision "
+            "exists, rather than being marked `conflict`. "
+            "Three production paths reach this function: the direct "
+            "`apply_intelligent_edit` route, and `apply_selected_variant`'s two "
+            "call sites (replay and real). All three thread `policy_client` "
+            "through; missing one would have reopened exactly the gap this entry "
+            "records."
         ),
     },
     ("knowledge.py", "complete_edit_request"): {
-        "gate": "gate_required_not_wired",
-        "unguarded_body": "17a636d4f1f1e91b9d5cea9427b89bad147b4c7154d2af0627cd9b663031d565",
-        "local_guards": ("non-empty replacement", "Hermes bearer key on the route", "version comparison against base_version"),
+        "gate": "none",
+        "local_guards": ("non-empty replacement", "Hermes bearer key on the route", "version comparison against base_version", "status must be queued_for_hermes, or an identical replay of the same proposed replacement"),
         "reviewed": (
-            "Reads as Hermes filling in the proposal it was queued for. It takes no "
-            "actor, no idempotency key, writes no event, and guards no status: it "
-            "sets `replacement_markdown` and a status on whatever request_id it is "
-            "given. `knowledge_edit_variants.reject_request` moves a request to "
-            "`rejected` and records a human rejection event; that rejection does not "
-            "revise the Knowledge item, so the version still equals base_version, so "
-            "this function returns the request to `proposed` — and the editor-keyed "
-            "apply route then applies it. The party whose proposal was rejected can "
-            "un-reject it, leaving no trace beside the rejection event. An applied "
-            "request is safe here only by accident of the same version comparison."
+            "Corrected. Reads as Hermes filling in the proposal it was queued for. "
+            "It took no actor, no idempotency key, wrote no event, and guarded no "
+            "status: it set `replacement_markdown` and a status on whatever "
+            "request_id it was given. `knowledge_edit_variants.reject_request` "
+            "moves a request to `rejected` and records a human rejection event; "
+            "that rejection does not revise the Knowledge item, so the version "
+            "still equalled base_version, so this function returned the request "
+            "to `proposed` — and the editor-keyed apply route would then apply "
+            "it. The party whose proposal was rejected could un-reject it, "
+            "leaving no trace beside the rejection event. "
+            "This is a missing local check, not a missing decision point: "
+            "`queued_for_hermes` is the only status any code path ever sets it "
+            "to from, and nothing transitions a request back to it once it "
+            "leaves — `knowledge_edit_variants.py` treats `{queued_for_hermes, "
+            "proposed}` as the only live pair throughout. The function now "
+            "refuses unless the request is in that one status, with an "
+            "idempotent exception for replaying the identical replacement "
+            "already recorded. `apply_edit_request` is still where the actual "
+            "Markdown change is decided; this closes the one path that could "
+            "reach it carrying a decision that had already been withdrawn."
         ),
     },
     ("knowledge.py", "create_edit_request"): {
@@ -1162,19 +1186,36 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
         ),
     },
     ("knowledge.py", "publish_knowledge"): {
-        "gate": "gate_required_not_wired",
-        "unguarded_body": "ed4ec38f184914173ef0c8ffc0e87d1d2195696fcdc28913b77fe91367e084e2",
-        "local_guards": ("non-empty knowledge_id, title and Markdown", "family membership", "expected_version must be 0", "idempotency"),
+        "gate": "enforce_consequential",
+        "local_guards": ("non-empty knowledge_id, title and Markdown", "family membership", "expected_version must be 0", "idempotency", "chokepoint, only when review_status=\"reviewed\" is requested, expectation bound to the publish digest"),
         "reviewed": (
-            "The route guard is a bearer-token comparison, and the body is passed "
-            "through with `**body.model_dump()`. Three of those fields are claims "
-            "about people: `created_by`, `actor_kind` — which accepts `hermes` — and "
-            "`review_status`, which accepts `reviewed`. The function checks each "
-            "against a set of permitted strings and nothing else. A holder of the "
-            "editor key can therefore publish a Knowledge item that already reads as "
-            "professionally reviewed, attributed to anyone. `schema conformance != "
-            "professional approval` is the invariant, and membership in "
-            "REVIEW_STATUSES is exactly the conformance being mistaken for it."
+            "The route guard was a bearer-token comparison, and the body was "
+            "passed through with `**body.model_dump()`. Three of those fields "
+            "are claims about people: `created_by`, `actor_kind` — which accepts "
+            "`hermes` — and `review_status`, which accepts `reviewed`. The "
+            "function checked each only against a set of permitted strings. A "
+            "holder of the editor key could therefore publish a Knowledge item "
+            "that already read as professionally reviewed, attributed to "
+            "anyone. `schema conformance != professional approval` is the "
+            "invariant, and membership in REVIEW_STATUSES was exactly the "
+            "conformance being mistaken for it. "
+            "Wired, narrowly. Candidate publication — `generated_unreviewed`, "
+            "`needs_review`, `superseded` — asserts nothing a reader would take "
+            "as a professional claim, so it needs no decision point and gates "
+            "none of those three; wiring the whole function would have refused "
+            "ordinary candidate work whenever no PDP happened to be configured, "
+            "which the finding never asked for. Only a request that asserts "
+            "`review_status=\"reviewed\"` at publication routes through the "
+            "chokepoint, with the decision bound to the publish payload digest "
+            "— the same `pdigest` the idempotency replay already used, so the "
+            "decision covers this exact title, family, Markdown and chunk set, "
+            "not the word \"reviewed\" alone. `created_by` and `actor_kind` "
+            "remain unverified caller claims on the candidate path — a holder "
+            "of the editor key can still attribute an unreviewed publication "
+            "to anyone — which is outside what this gate was scoped to close: "
+            "the finding this entry recorded was the false professional claim, "
+            "not the unverified authorship a candidate publication always "
+            "carries."
         ),
     },
     ("knowledge.py", "revise_knowledge"): {
@@ -2056,9 +2097,9 @@ def test_a_required_gate_that_is_not_wired_stays_visible_and_does_not_grow() -> 
     was ever taken.
     """
     pending = [key for key, record in INVENTORY.items() if record["gate"] == "gate_required_not_wired"]
-    assert len(pending) <= 4, (
+    assert len(pending) <= 1, (
         f"{len(pending)} entry points are known to need the chokepoint and do not reach "
-        "it; the ceiling is 4. Wire one, or move the ceiling deliberately and say why."
+        "it; the ceiling is 1. Wire it, or move the ceiling deliberately and say why."
     )
 
 

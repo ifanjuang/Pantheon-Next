@@ -31,6 +31,12 @@ def _review(status: str = "proposed") -> dict:
 
 
 def _client() -> TestClient:
+    # This module exercises route wiring and actor extraction with the
+    # underlying knowledge_edit_variants functions monkeypatched out, not the
+    # chokepoint apply_selected_variant now routes through — that gate is
+    # covered directly against the real functions in
+    # test_knowledge_edit_and_publish_gate.py. Disabled here so a test with
+    # no policy client configured is not a statement about the gate.
     return TestClient(
         create_composed_cockpit_app(
             connect_fn=_Connection,
@@ -38,6 +44,7 @@ def _client() -> TestClient:
             api_key="read-key",
             editor_api_key="editor-key",
             hermes_api_key="hermes-key",
+            policy_enforcement="disabled",
         )
     )
 

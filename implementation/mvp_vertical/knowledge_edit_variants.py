@@ -20,6 +20,7 @@ from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
 from . import knowledge, pantheon_contracts
+from .policy_gate import PolicyClient
 
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "014_knowledge_edit_variants.sql"
@@ -732,7 +733,19 @@ def apply_selected_variant(
     request_id: str,
     actor: str,
     idempotency_key: str,
+    policy_client: PolicyClient | None = None,
+    decision_payload: dict[str, Any] | None = None,
+    required_ceiling: str = "C2",
 ) -> dict[str, Any]:
+    """Apply the selected variant, forwarding the gate to `apply_edit_request`.
+
+    Two call sites below both reach `knowledge.apply_edit_request`, the
+    replay branch and the real one. Both must carry `policy_client` through:
+    it is the only Knowledge Markdown mutation this function performs, and
+    the whole point of gating it there was that no caller could reach it
+    ungated. A route wired to supply a client but a forwarding function that
+    drops it on the floor would be exactly that, one call away.
+    """
     request = _request_row(conn, request_id)
     if request["status"] == "applied":
         applied = knowledge.apply_edit_request(
@@ -741,6 +754,9 @@ def apply_selected_variant(
             actor=actor,
             actor_kind="human",
             idempotency_key=idempotency_key,
+            policy_client=policy_client,
+            decision_payload=decision_payload,
+            required_ceiling=required_ceiling,
         )
         return {**applied, "review": get_variant_review(conn, request_id)}
     if request["status"] != "proposed":
@@ -797,6 +813,9 @@ def apply_selected_variant(
         actor_kind="human",
         idempotency_key=idempotency_key,
         on_applied=record_application,
+        policy_client=policy_client,
+        decision_payload=decision_payload,
+        required_ceiling=required_ceiling,
     )
     return {**applied, "review": get_variant_review(conn, request_id)}
 
