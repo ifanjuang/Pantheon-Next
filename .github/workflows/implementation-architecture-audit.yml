@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      PANTHEON_AUDIT_AUTHORITY_REF: 5ae389d1d66791fa3523504f75a133b4b709f79a
+      PANTHEON_AUDIT_AUTHORITY_REF: c335f5784cec005c1cf93e52b0b22ad4afce3442
     steps:
       - name: Checkout current monorepo candidate
         uses: actions/checkout@v4
