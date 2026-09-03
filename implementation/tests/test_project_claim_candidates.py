@@ -24,6 +24,7 @@ def conn():
         pytest.skip(f"PostgreSQL unreachable: {exc}")
     execution_results.ensure_schema(connection)
     connection.execute(agency_claims.MIGRATION.read_text(encoding="utf-8"))
+    connection.execute(agency_claims.PROVENANCE_MIGRATION.read_text(encoding="utf-8"))
     connection.execute(
         "TRUNCATE agency_project_claims, execution_result_review_dispositions, "
         "execution_clarification_requests, execution_result_items, execution_results, "
