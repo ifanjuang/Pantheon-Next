@@ -163,7 +163,13 @@ Authority impact
 Runtime impact
 ```
 
-The declared change level is guidance/explanatory convergence with no Role jurisdiction, Rite purpose/lifecycle, governed Space identity, authority boundary or runtime change.
+The second run showed that `Change level` must start literally with one of the guard vocabulary values. The PR body was normalized to:
+
+```text
+guidance — explanatory convergence
+```
+
+This remains a guidance change with no Role jurisdiction, Rite purpose/lifecycle, governed Space identity, authority boundary or runtime change.
 
 ## Status
 
