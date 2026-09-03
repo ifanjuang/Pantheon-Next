@@ -17,6 +17,21 @@ It does not own:
 
 Owner documents remain authoritative.
 
+### Broader concept-grammar boundary
+
+`CORE_CONCEPTS_MAP.md` may describe Pantheon as a governed cognitive ecology for navigation: Roles carry standing judgment responsibilities, Rites structure bounded review methods, and governed Spaces separate durable kinds of activity. Governed Objects carry their own identity, state and lifecycle under existing domain owners, while Rules / Contracts / Invariants constrain transitions through their existing owners.
+
+This metaphor does not create a `cognitive_ecology`, `god`, `law`, `object` or `space` registry, schema family, runtime or new authority plane.
+
+```text
+concept grammar = navigation
+module families = architecture placement
+system ownership registry = authority topology
+schemas / contracts / tests = enforced invariants
+```
+
+The maps are complementary. None may silently redefine another.
+
 ```text
 Roles judge.
 Rites structure method.

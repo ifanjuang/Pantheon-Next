@@ -42,6 +42,105 @@ projection != persistence
 folder != governed identity
 ```
 
+## Governed cognitive ecology
+
+Pantheon can be understood as a governed cognitive ecology rather than a central brain or a multi-agent execution team.
+
+This is a navigation model only. It creates no new authority class, runtime object, schema family or lifecycle.
+
+The purpose is to keep several kinds of attention, method, context, state and constraint distinct enough to disagree, correct one another and remain attributable without collapsing them into one autonomous actor.
+
+### Map 1 — concept grammar
+
+```text
+WHO judges?                 -> Pantheon Role
+HOW is review structured?   -> Rite
+WHERE does activity belong? -> governed Space
+WHAT carries governed state?-> governed Object
+UNDER WHICH CONSTRAINTS?    -> existing Rules / Contracts / Invariants
+
+WHO executes?               -> Hermes or another admitted runtime
+WHO closes consequence?     -> the human when consequential decision is required
+```
+
+The mythological vocabulary is a human memory aid, not an ownership system. `ATHENA`, `ARGOS`, `THEMIS`, `ZEUS` and the other Roles name standing responsibilities of judgment; they are not autonomous agents.
+
+`Rules / Contracts / Invariants` is deliberately descriptive rather than a new machine category. Schema validation, policy requirements, approval rules and PEP enforcement remain distinct mechanisms with their existing owners.
+
+### Map 2 — responsibility families
+
+`MODULES.md` groups responsibilities for navigation:
+
+```text
+Governance Kernel
+Governed State and Professional Semantics
+Admission and Consequential Effects
+Execution and Integration
+Interaction, Projection and Workspace
+```
+
+This answers where a responsibility sits in the architecture. It does not define its authority owner.
+
+### Map 3 — authority envelope
+
+`PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json` records machine-readable ownership dimensions such as:
+
+```text
+semantic_owner
+implementation_owner
+transition_owner
+persistence_owner
+runtime_owner
+projection_owner
+```
+
+This answers who owns each responsibility dimension. It is orthogonal to the concept grammar.
+
+For example, `ProjectClaim` may be read as a governed Object, placed in Governed State, while its semantic, transition, persistence and projection responsibilities remain separately owned.
+
+### Map 4 — governed flow
+
+Objects also participate in bounded transitions:
+
+```text
+Source / observation
+-> candidate
+-> Claim or other governed state where admitted
+-> Evidence where deliberately admitted
+-> review / decision
+-> authorized effect
+-> new observations
+```
+
+A later observation can re-enter the ecology without rewriting prior history or promoting itself to truth.
+
+Core non-collapse rules:
+
+```text
+Role judges an Object != Role owns that Object
+Rite structures review != Rite is a workflow runtime
+Space exposes an Object != Space owns its lifecycle
+Rule constrains an effect != Rule executes the effect
+candidate relation != governed relation
+confidence != authority
+```
+
+### Extension-before-creation test
+
+Before introducing a new concept, first ask:
+
+```text
+standing responsibility of judgment? -> test Role / facet / consultation
+recurring bounded review method?      -> test Rite / existing mode
+durable activity distinction?        -> test governed Space / existing Scene or projection
+identity + state + lifecycle of its own? -> test governed Object / existing owner extension
+constraint only?                      -> extend an existing Rule / Contract / Invariant owner
+calculation only?                     -> Capability / implementation
+presentation only?                    -> projection / Scene / Deck
+```
+
+If none of these requires a new identity, extend the existing owner instead of multiplying concepts.
+
 ## Object ownership map
 
 | Concept | Responsibility | Must not become |
