@@ -128,11 +128,14 @@ result: classified
 consequence_level: K0 | K1 | K2 | K3 | K4
 required_verification: V0 | V1 | V2 | V3 | V4
 required_approval_ceiling: C0 | C1 | C2 | C3 | C4 | C5
+delegated_execution: true | false
 task_contract_required:
 evidence_required:
 blocked_until_gate:
 required_gates: []
 ```
+
+`delegated_execution` describes the execution boundary; it is not an authorization flag. Omitted values fail conservative to `true`. A Task Contract governs work delegated to an external runtime. A direct human governed-state effect may therefore remain consequential and decision-gated without inventing a Task Contract merely because it writes state.
 
 Classification is not authorization.
 
@@ -147,6 +150,7 @@ request:
   intent:
   external_effect:
   writes_state:
+  delegated_execution:
   transmission_requested:
   memory_promotion_requested:
   professional_position:
@@ -160,6 +164,8 @@ gate_signals:
   human_decision_ref:
   human_decision_level:
 ```
+
+The implementation PEP owns the direct-human/delegated distinction for concrete effects. An arbitrary runtime candidate must not be able to escape a Task Contract requirement simply by asserting `delegated_execution: false`. Unknown effects remain delegated/fail-conservative until their execution boundary is reviewed.
 
 For ordinary requests the gate signals remain caller-provided references. Their presence alone does not authenticate their issuer, digest, scope or currentness, and ordinary external/canonical effects remain denied.
 
@@ -188,6 +194,15 @@ authorization_effect: none
 ```
 
 Thus the preflight can permit continued preparation of candidate work while still requiring the external runtime to block transmission, canonical mutation, memory promotion or other consequential effects.
+
+A direct-human local governed-state write is a separate case: it may require neither a Task Contract nor an Evidence Pack when the write itself is not an assertion, external effect, professional position, contractual effect or Registre operation. It still requires the User Decision Gate, and the operational PEP must validate the human decision against the exact scope, object and digest before the effect can run.
+
+```text
+direct human effect != delegated runtime task
+writes state != Evidence assertion
+no Task Contract required != effect authorized
+human decision ref present != decision valid
+```
 
 ### Issue #664 synthetic qualification fixture
 

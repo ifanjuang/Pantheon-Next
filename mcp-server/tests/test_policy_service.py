@@ -72,6 +72,58 @@ class TestPantheonPolicyService(unittest.TestCase):
         )
         self.assertFalse(report["external_effect_allowed"])
 
+    def test_direct_human_local_write_needs_decision_but_not_a_fake_task_contract(self):
+        report = self.service.evaluate_preflight(
+            {
+                "request": {
+                    "intent": "act_working_information",
+                    "external_effect": False,
+                    "writes_state": True,
+                    "delegated_execution": False,
+                    "transmission_requested": False,
+                    "memory_promotion_requested": False,
+                    "professional_position": False,
+                    "financial_or_contractual_effect": False,
+                    "scope": {"scope_type": "project", "scope_id": "fixture"},
+                },
+                "gate_signals": {
+                    "human_decision_ref": "decision-fixture",
+                    "human_decision_level": "C2",
+                },
+            }
+        )
+        self.assertEqual(report["classification"]["consequence_level"], "K3")
+        self.assertFalse(report["classification"]["delegated_execution"])
+        self.assertFalse(report["classification"]["task_contract_required"])
+        self.assertFalse(report["classification"]["evidence_required"])
+        self.assertTrue(report["classification"]["blocked_until_gate"])
+        self.assertEqual(
+            report["policy_disposition"], "eligible_with_gate_signals_unverified"
+        )
+        self.assertEqual(report["missing_requirements"], [])
+        self.assertTrue(report["candidate_work_allowed"])
+        self.assertFalse(report["external_effect_allowed"])
+        self.assertFalse(report["canonical_effect_allowed"])
+
+    def test_direct_human_write_without_decision_still_fails_closed(self):
+        report = self.service.evaluate_preflight(
+            {
+                "request": {
+                    "intent": "act_working_information",
+                    "external_effect": False,
+                    "writes_state": True,
+                    "delegated_execution": False,
+                    "scope": {"scope_type": "project", "scope_id": "fixture"},
+                },
+                "gate_signals": {},
+            }
+        )
+        self.assertEqual(
+            report["policy_disposition"], "blocked_pending_human_decision"
+        )
+        self.assertIn("human_decision_ref", report["missing_requirements"])
+        self.assertFalse(report["candidate_work_allowed"])
+
     def test_repository_commit_is_read_without_shell_execution(self):
         commit = repository_commit(REPO_ROOT)
         self.assertNotEqual(commit, "unknown")
