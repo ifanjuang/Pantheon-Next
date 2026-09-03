@@ -249,6 +249,7 @@ def test_reviewed_candidate_creates_separate_append_only_claim(conn) -> None:
     project = _project(conn)
     execution_id, result_id, information_id = _store_candidate(conn, project["project_id"])
     disposition_id = _accept(conn, result_id)
+    expected_basis = _candidate_payload(project["project_id"], information_id)["basis_refs"]
 
     claim = project_claim_candidates.create_claim_from_candidate(
         conn,
@@ -272,6 +273,7 @@ def test_reviewed_candidate_creates_separate_append_only_claim(conn) -> None:
         "review_disposition_id": disposition_id,
     }
     assert claim["provenance"]["source_kind"] == "execution_result"
+    assert claim["provenance"]["basis_refs"] == expected_basis
 
     source = execution_results.get_execution_result(conn, execution_id)
     assert source["results"][0]["payload"]["proposed_value"] == 375000
@@ -287,11 +289,13 @@ def test_reviewed_candidate_creates_separate_append_only_claim(conn) -> None:
         backing_ref={"entity_type": "information", "entity_id": information_id},
     )
     assert replay["claim_id"] == claim["claim_id"]
+    assert replay["provenance"]["basis_refs"] == expected_basis
     assert len(agency_claims.list_project_claims(conn, project["project_id"])) == 1
 
     projected = agency_data.get_project(conn, project["project_id"])["claim_refs"]["budget"]
     assert projected["certainty"] == "E3"
     assert projected["provenance"]["candidate_ref"]["result_id"] == result_id
+    assert projected["provenance"]["basis_refs"] == expected_basis
 
 
 def test_backing_ref_must_be_candidate_basis(conn) -> None:
