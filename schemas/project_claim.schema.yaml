@@ -98,9 +98,12 @@ properties:
         uniqueItems: true
         default: []
         description: >-
-          Structured governed-entity references used as the basis of the assertion.
-          For Claims created from an Execution Result candidate, the implementation
-          preserves the exact reviewed candidate basis array. A basis reference is
+          Structured governed-entity references used as the basis of an
+          execution-backed assertion. For newly created Claims from an Execution
+          Result candidate, the implementation preserves the exact reviewed
+          candidate basis array. Historical execution-backed Claims created before
+          this provenance field may expose an empty array. Other source kinds do
+          not admit non-empty basis_refs in this slice. A basis reference is
           provenance/support metadata only: it is not Evidence admission, truth,
           verification or approval.
         items:
@@ -211,6 +214,25 @@ allOf:
           properties:
             candidate_ref:
               type: object
+  - if:
+      properties:
+        provenance:
+          properties:
+            source_kind:
+              enum:
+                - information
+                - document
+                - human_assertion
+                - derived
+                - external_projection
+          required: [source_kind]
+      required: [provenance]
+    then:
+      properties:
+        provenance:
+          properties:
+            basis_refs:
+              maxItems: 0
   - if:
       properties:
         provenance:
