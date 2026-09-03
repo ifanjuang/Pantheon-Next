@@ -108,13 +108,31 @@ def test_candidate_hermes_distribution_snapshot_tracks_current_runtime_pin() -> 
     )
 
 
-def _current_pin_literals(data: dict) -> set[str]:
-    literals: set[str] = set()
-    for pin in data["pins"].values():
-        literals.add(pin["version"])
-        if pin.get("ref"):
-            literals.add(pin["ref"])
+def _pin_literals(pin: dict) -> set[str]:
+    literals = {pin["version"]}
+    if pin.get("ref"):
+        literals.add(pin["ref"])
     return literals
+
+
+def _provider_markers(pin_id: str, pin: dict) -> set[str]:
+    markers = {pin_id, pin["env_prefix"]}
+    for field in ("repository", "package", "image"):
+        value = pin.get(field)
+        if value:
+            markers.add(str(value))
+    return markers
+
+
+def _duplicated_pin_literals(data: dict, text: str) -> list[tuple[str, str]]:
+    duplicates: list[tuple[str, str]] = []
+    for pin_id, pin in data["pins"].items():
+        if not any(marker in text for marker in _provider_markers(pin_id, pin)):
+            continue
+        for literal in _pin_literals(pin):
+            if literal in text:
+                duplicates.append((pin_id, literal))
+    return duplicates
 
 
 def _active_qualification_sources() -> list[Path]:
@@ -133,12 +151,58 @@ def _active_qualification_sources() -> list[Path]:
     return paths
 
 
+def test_unrelated_semver_data_does_not_become_a_pin_dependency() -> None:
+    data = {
+        "pins": {
+            "example-provider": {
+                "env_prefix": "EXAMPLE_PROVIDER",
+                "version": "9.8.7",
+                "ref": "a" * 40,
+                "repository": "example/provider",
+            }
+        }
+    }
+    text = 'payload = {"version": "9.8.7", "kind": "runtime_observation"}'
+    assert _duplicated_pin_literals(data, text) == []
+
+
+def test_provider_consumer_cannot_restate_its_current_pin() -> None:
+    ref = "b" * 40
+    data = {
+        "pins": {
+            "example-provider": {
+                "env_prefix": "EXAMPLE_PROVIDER",
+                "version": "7.6.5",
+                "ref": ref,
+                "repository": "example/provider",
+            }
+        }
+    }
+    text = f'pin_id = "example-provider"\nversion = "7.6.5"\nref = "{ref}"\n'
+    assert _duplicated_pin_literals(data, text) == [
+        ("example-provider", "7.6.5"),
+        ("example-provider", ref),
+    ]
+
+
 def test_active_qualification_code_does_not_duplicate_current_pin_literals() -> None:
-    """Current pins live in the registry; explicit historical fixtures are exempt."""
-    forbidden = _current_pin_literals(_registry())
+    """A provider consumer must import its current pin instead of restating it.
+
+    Version strings are not globally unique identifiers: ordinary tests may
+    legitimately contain the same short semantic version as an unrelated
+    provider. The guard therefore applies a provider's literals only to files
+    that actually name that provider by pin id, env prefix, repository, package
+    or image. This keeps the registry canonical without turning coincidental
+    application/test data into a qualification dependency.
+    """
+
+    data = _registry()
     for path in _active_qualification_sources():
         if path == Path(__file__).resolve():
             continue
         text = path.read_text(encoding="utf-8")
-        for literal in forbidden:
-            assert literal not in text, f"{path} duplicates canonical current pin {literal}"
+        duplicates = _duplicated_pin_literals(data, text)
+        assert not duplicates, (
+            f"{path} duplicates canonical current pins: "
+            + ", ".join(f"{pin_id}={literal}" for pin_id, literal in duplicates)
+        )
