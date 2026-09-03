@@ -69,11 +69,14 @@ _DOCTRINE_REFS = [
     "docs/governance/APPROVALS.md",
     "docs/governance/UNIFORM_CAPABILITY_GOVERNANCE.md",
     "docs/governance/USER_DECISION_GATE.md",
+    "docs/governance/TASK_CONTRACTS.md",
 ]
 
 _AUTHORITY_NOTE = (
-    "Policy decision as data. The runtime executes outside Pantheon under a "
-    "Task Contract; the gate decides; the human decides."
+    "Policy decision as data. Delegated runtime work executes outside Pantheon "
+    "under a Task Contract; a direct human governed effect does not acquire a "
+    "Task Contract merely because it writes state. The gate decides; the human "
+    "decides."
 )
 
 
@@ -94,10 +97,15 @@ def classify_request(request: dict) -> dict:
     """Classify a described request. Input fields (all optional):
 
     intent (str), external_effect (bool|"unknown"), writes_state (bool),
-    memory_promotion_requested (bool), transmission_requested (bool),
-    professional_position (bool), financial_or_contractual_effect (bool),
-    scope (dict with scope_type/scope_id), perform (list of actions the
-    caller asks THIS server to do — these are refused, never done).
+    delegated_execution (bool), memory_promotion_requested (bool),
+    transmission_requested (bool), professional_position (bool),
+    financial_or_contractual_effect (bool), scope (dict with
+    scope_type/scope_id), perform (list of actions the caller asks THIS server
+    to do — these are refused, never done).
+
+    ``delegated_execution`` defaults to True. Only an operational PEP that knows
+    an effect is a direct human action should send False; the policy HTTP API is
+    read-only, so the flag never authorizes an effect by itself.
     """
     refused = _refusals_in(request)
     if refused:
@@ -107,11 +115,22 @@ def classify_request(request: dict) -> dict:
             "reason": (
                 "the MCP policy server may frame the work; it may not do the "
                 "work. Requested effects must run in the execution runtime "
-                "under a Task Contract and pass the gate."
+                "under the applicable governed boundary and pass the gate."
             ),
             "doctrine_refs": _DOCTRINE_REFS,
             "authority_note": _AUTHORITY_NOTE,
         }
+
+    raw_delegated = request.get("delegated_execution", True)
+    if not isinstance(raw_delegated, bool):
+        return {
+            "result": "refused",
+            "refused_effects": [],
+            "reason": "delegated_execution must be a boolean when provided",
+            "doctrine_refs": _DOCTRINE_REFS,
+            "authority_note": _AUTHORITY_NOTE,
+        }
+    delegated_execution = raw_delegated
 
     intent = str(request.get("intent", ""))
     external = request.get("external_effect", False)
@@ -124,14 +143,16 @@ def classify_request(request: dict) -> dict:
     # even though the candidate itself is never promoted here.
     register_material = bool(request.get("register_candidates"))
     scope = request.get("scope") or {}
+    k4_intent_trigger = bool(_K4_TRIGGERS.search(intent))
+    k3_intent_trigger = bool(_K3_TRIGGERS.search(intent))
 
     if external is True or transmission or memory or professional_position or financial_or_contractual:
         consequence = "K4"
     elif external == "unknown":
         consequence = "K4"  # unknown external effect escalates, never relaxes
-    elif _K4_TRIGGERS.search(intent):
+    elif k4_intent_trigger:
         consequence = "K4"
-    elif writes or register_material or _K3_TRIGGERS.search(intent):
+    elif writes or register_material or k3_intent_trigger:
         consequence = "K3"
     elif intent.strip():
         consequence = "K2"
@@ -148,16 +169,50 @@ def classify_request(request: dict) -> dict:
     }[consequence]
     if transmission or memory or professional_position or financial_or_contractual:
         approval = "C4"
-    elif consequence == "K4" and _K4_TRIGGERS.search(intent):
+    elif consequence == "K4" and k4_intent_trigger:
         # A professional-position / financial-claim intent is a C4-class
         # effect even when no explicit flag was set.
         approval = "C4"
 
+    # A Task Contract governs delegated external-runtime work. A direct human
+    # Cockpit/CLI effect can still be K3/K4 and require a bound human decision,
+    # but inventing a Task Contract for that act would misstate its execution
+    # boundary. Omission remains conservative: callers default to delegated.
+    task_contract_required = consequence in ("K2", "K3", "K4") and delegated_execution
+
+    # ``writes_state`` alone does not make the written content Evidence. Direct
+    # human local-state effects (review status, admitted binding, exact governed
+    # state transition) therefore do not fabricate an Evidence Pack merely to
+    # satisfy transport. Evidence remains mandatory for delegated consequential
+    # work, external/transmission/memory effects, professional/contractual
+    # positions, register material, and intents whose semantics themselves carry
+    # K3/K4 assertion risk.
+    evidence_required = consequence in ("K3", "K4") and bool(
+        delegated_execution
+        or external is True
+        or external == "unknown"
+        or transmission
+        or memory
+        or professional_position
+        or financial_or_contractual
+        or register_material
+        or k3_intent_trigger
+        or k4_intent_trigger
+    )
+
+    # K4 always stops at the User Decision Gate. Direct-human governed writes
+    # also require the human decision reference that makes them direct-human in
+    # the first place; ``delegated_execution=False`` is never an authorization.
+    blocked_until_gate = consequence == "K4" or (not delegated_execution and writes)
+
     gates: list[str] = []
-    if consequence in ("K3", "K4"):
+    if evidence_required:
         gates.append("evidence required (Registre Probatoire citation for assertions)")
-    if consequence == "K4":
-        gates.append("User Decision Gate before any external effect or Registre write")
+    if blocked_until_gate:
+        if consequence == "K4":
+            gates.append("User Decision Gate before any external effect or Registre write")
+        else:
+            gates.append("User Decision Gate before direct human governed-state effect")
     if not scope:
         gates.append("scope missing: declare scope_type/scope_id before work starts")
 
@@ -166,9 +221,10 @@ def classify_request(request: dict) -> dict:
         "consequence_level": consequence,
         "required_verification": verification,
         "required_approval_ceiling": approval,
-        "task_contract_required": consequence in ("K2", "K3", "K4"),
-        "evidence_required": consequence in ("K3", "K4"),
-        "blocked_until_gate": consequence == "K4",
+        "delegated_execution": delegated_execution,
+        "task_contract_required": task_contract_required,
+        "evidence_required": evidence_required,
+        "blocked_until_gate": blocked_until_gate,
         "required_gates": gates,
         "allowed_output": "candidate only (Result Candidate + Evidence Pack Candidate)",
         "scope_seen": scope or None,
