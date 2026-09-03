@@ -73,6 +73,14 @@
       "observed_on": "2026-08-31",
       "delta": "none"
     },
+    "graphify": {
+      "source": "github_releases_latest",
+      "locator": "Graphify-Labs/graphify",
+      "latest_seen": "v0.9.53",
+      "observed_on": "2026-09-03",
+      "delta": "none",
+      "note": "Observed from Graphify 0.9.53 at commit 33362d969292b57eda82f3fbd9eb5f3f5bc9bbc2. This record answers freshness for the bounded structural qualification only. It does not install or activate Graphify in Pantheon, grant relation authority, qualify mutation gates, admit Evidence, or authorize persistence."
+    },
     "couchdb": {
       "source": "dockerhub_latest_semver",
       "locator": "library/couchdb",
