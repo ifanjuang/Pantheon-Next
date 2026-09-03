@@ -45,7 +45,9 @@ def _candidate(*, expires_at: str = "2099-01-01T00:00:00Z") -> dict:
         "object_identity": identity,
         "content_digest": digest,
     }
-    decision["signature"] = gate_validation._expected_issuer_signature(SECRET, decision)
+    decision["signature"] = gate_validation._expected_issuer_signature(
+        ISSUER_SECRET, decision
+    )
     return {
         "request": {
             "intent": effect_qualification.QUALIFICATION_INTENT,
