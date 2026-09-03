@@ -120,6 +120,62 @@ def test_governance_contract_allows_asserted_without_backing_but_requires_backin
     agency_claims.validate_claim(source_backed)
 
 
+def test_structured_basis_is_bounded_to_execution_candidate_provenance() -> None:
+    common = {
+        "project_id": "project-demo",
+        "claim_type": "plu_zone",
+        "value": "UDb",
+        "unit": None,
+        "backing_ref": None,
+        "status": "asserted",
+        "certainty": "E0",
+        "observed_at": "2026-07-27T00:00:00+00:00",
+        "revision": 0,
+        "supersedes": None,
+        "note": None,
+        "governance_refs": list(agency_claims.GOVERNANCE_REFS),
+    }
+    basis = [{
+        "entity_type": "information",
+        "entity_id": "information-demo",
+        "observed_revision": 1,
+        "observed_status": "acted",
+    }]
+
+    human_claim = {
+        **common,
+        "claim_id": "claim.demo.human-basis",
+        "provenance": {
+            "source_kind": "human_assertion",
+            "source_ref": None,
+            "candidate_ref": None,
+            "basis_refs": basis,
+            "asserted_by": "human:test",
+            "derivation_note": None,
+        },
+    }
+    with pytest.raises(agency_claims.ClaimContractViolation):
+        agency_claims.validate_claim(human_claim)
+
+    historical_execution_claim = {
+        **common,
+        "claim_id": "claim.demo.execution-history",
+        "provenance": {
+            "source_kind": "execution_result",
+            "source_ref": None,
+            "candidate_ref": {
+                "execution_id": "execution.demo",
+                "result_id": "result.demo",
+                "review_disposition_id": "disposition.demo",
+            },
+            "basis_refs": [],
+            "asserted_by": "human:test",
+            "derivation_note": None,
+        },
+    }
+    agency_claims.validate_claim(historical_execution_claim)
+
+
 def test_parcels_are_declared_as_aggregated_scalar_claims() -> None:
     parcel_field = agency_schema.project_claim_fields()["parcelle"]
     assert parcel_field["key"] == "parcelles"
