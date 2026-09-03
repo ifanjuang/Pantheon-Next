@@ -61,6 +61,14 @@
       "version": "2026.8.6",
       "ref": "8b5859d0f895e51e785d3ba22ed8008297e8d367"
     },
+    "graphify": {
+      "kind": "package",
+      "env_prefix": "GRAPHIFY",
+      "repository": "Graphify-Labs/graphify",
+      "package": "graphifyy",
+      "version": "0.9.53",
+      "ref": "33362d969292b57eda82f3fbd9eb5f3f5bc9bbc2"
+    },
     "couchdb": {
       "kind": "container",
       "env_prefix": "COUCHDB",
