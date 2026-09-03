@@ -16,6 +16,8 @@ EXPECTED_VALIDATED_CONSTRAINTS = {
     "agency_project_claims_candidate_execution_fk",
     "agency_project_claims_candidate_result_fk",
     "agency_project_claims_candidate_disposition_fk",
+    "agency_project_claims_basis_refs_array_check",
+    "agency_project_claims_basis_refs_source_check",
 }
 
 
@@ -28,9 +30,11 @@ def migrated_conn():
     try:
         # agency_data.connect() deliberately runs the Claim migration before the
         # execution-result owner exists. The composed replay must then install
-        # and validate the three provenance foreign keys.
+        # and validate the three provenance foreign keys, followed by the
+        # structured-basis extension of the same Claim owner.
         execution_results.ensure_schema(conn)
         conn.execute(agency_claims.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(agency_claims.PROVENANCE_MIGRATION.read_text(encoding="utf-8"))
         conn.commit()
         yield conn
     finally:
@@ -60,6 +64,9 @@ def test_candidate_constraints_are_present_and_validated(migrated_conn) -> None:
         "execution_result_review_dispositions_disposition_check"
     ][1]
     assert "execution_result" in state["agency_project_claims_source_kind_check"][1]
+    assert "execution_result" in state[
+        "agency_project_claims_basis_refs_source_check"
+    ][1]
 
 
 def test_partial_source_kind_state_is_repaired_by_exact_constraint_name(
@@ -89,6 +96,7 @@ def test_replaying_candidate_migrations_preserves_validated_state(
     before = _constraint_state(migrated_conn)
     migrated_conn.execute(execution_results.MIGRATION.read_text(encoding="utf-8"))
     migrated_conn.execute(agency_claims.MIGRATION.read_text(encoding="utf-8"))
+    migrated_conn.execute(agency_claims.PROVENANCE_MIGRATION.read_text(encoding="utf-8"))
     migrated_conn.commit()
     after = _constraint_state(migrated_conn)
     assert after == before
