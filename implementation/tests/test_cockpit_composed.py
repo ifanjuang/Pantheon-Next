@@ -190,7 +190,7 @@ def test_composed_initializer_replays_owner_and_review_migrations_in_dependency_
     cockpit_composed.initialize_composed_schema()
     assert connection.commits == 1
     assert connection.closed is True
-    assert len(connection.statements) == 27
+    assert len(connection.statements) == 28
     assert "CREATE TABLE IF NOT EXISTS agency_apu_objects" in connection.statements[2]
     assert "model_version" in connection.statements[2]
     assert "CREATE TABLE IF NOT EXISTS agency_sources" in connection.statements[3]
@@ -211,13 +211,15 @@ def test_composed_initializer_replays_owner_and_review_migrations_in_dependency_
     assert "CREATE TABLE IF NOT EXISTS execution_results" in connection.statements[19]
     assert "project_change_variant" in connection.statements[20]
     assert "candidate_execution_id" in connection.statements[21]
-    assert "agency_decision_request_scope_refs" in connection.statements[22]
-    assert "apu_object" in connection.statements[22]
-    assert "CREATE TABLE IF NOT EXISTS knowledge_edit_variants" in connection.statements[23]
-    assert "CREATE TABLE IF NOT EXISTS apu_mapping_review_events" in connection.statements[24]
-    assert "CREATE TABLE IF NOT EXISTS apu_write_command_candidates" in connection.statements[25]
-    assert "expected_owner_revision" in connection.statements[25]
-    assert "agency_apu_source_match_command_once" in connection.statements[26]
+    assert "basis_refs" in connection.statements[22]
+    assert "agency_project_claims_validate_candidate_basis_refs" in connection.statements[22]
+    assert "agency_decision_request_scope_refs" in connection.statements[23]
+    assert "apu_object" in connection.statements[23]
+    assert "CREATE TABLE IF NOT EXISTS knowledge_edit_variants" in connection.statements[24]
+    assert "CREATE TABLE IF NOT EXISTS apu_mapping_review_events" in connection.statements[25]
+    assert "CREATE TABLE IF NOT EXISTS apu_write_command_candidates" in connection.statements[26]
+    assert "expected_owner_revision" in connection.statements[26]
+    assert "agency_apu_source_match_command_once" in connection.statements[27]
 
 
 def test_composed_migrations_are_packaged_under_sql_directory():
@@ -242,6 +244,7 @@ def test_composed_migrations_are_packaged_under_sql_directory():
         (execution_results.MIGRATION, "010_execution_results.sql"),
         (execution_results.VARIANT_MIGRATION, "020_project_change_variants.sql"),
         (agency_claims.MIGRATION, "019_project_claim_candidates.sql"),
+        (agency_claims.PROVENANCE_MIGRATION, "036_project_claim_provenance_basis.sql"),
         (apu_cross_family.MIGRATION, "023_apu_cross_family_links.sql"),
         (knowledge_edit_variants.MIGRATION, "014_knowledge_edit_variants.sql"),
         (apu_mapping_reviews.MIGRATION, "011_apu_mapping_reviews.sql"),
