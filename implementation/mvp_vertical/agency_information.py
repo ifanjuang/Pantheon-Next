@@ -363,10 +363,23 @@ def act_working_information(
             candidate = {
                 "intent": "act_working_information",
                 "decision_expectation": expectation,
+                # These are the policy facts the PDP classifies on, and they must
+                # be stated. `build_preflight_payload` keeps only the fields the
+                # policy transport declares and defaults `external_effect` to
+                # True for anything it is not told about — so domain identifiers
+                # placed here are dropped and the write is then classified as
+                # reaching outside Pantheon. Acting an Information version sends
+                # nothing outward: it supersedes one row and promotes another,
+                # both in the local store.
                 "request": {
-                    "information_id": information_id,
-                    "series_id": working["series_id"],
-                    "expected_revision": expected_revision,
+                    "intent": "act_working_information",
+                    "external_effect": False,
+                    "writes_state": True,
+                    "transmission_requested": False,
+                    "memory_promotion_requested": False,
+                    "professional_position": False,
+                    "financial_or_contractual_effect": False,
+                    "scope": scope,
                 },
             }
             bound_decision = dict(decision_payload or {})

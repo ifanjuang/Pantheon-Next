@@ -138,6 +138,45 @@ def test_an_allowed_act_carries_the_content_digest_to_the_decision_point(conn) -
     assert decision["decided_by"] == "architecte"
 
 
+def test_the_act_is_declared_to_the_decision_point_as_a_local_state_write(conn) -> None:
+    """The policy facts must be stated, not left to the transport's defaults.
+
+    `build_preflight_payload` keeps only the fields the policy transport
+    declares and defaults `external_effect` to True for anything it is not
+    told about. The first version of this gate put domain identifiers in
+    `request`; they were dropped, `external_effect` defaulted to True, and
+    the PDP classified acting an Information version as K4 (reaching outside
+    Pantheon, ceiling C3) instead of K3/C2. It sends nothing outward.
+    """
+    project = _project(conn)
+    draft = _draft(conn, project["project_id"])
+    client = StandInPolicyClient()
+
+    agency_information.act_working_information(
+        conn,
+        information_id=draft["information_id"],
+        expected_revision=1,
+        actor_kind="human",
+        actor="architecte",
+        policy_client=client,
+        decision_payload={"decision": {"decision_id": "decision-6"}},
+    )
+
+    request = client.last_preflight["request"]
+    assert request["intent"] == "act_working_information"
+    assert request["external_effect"] is False, (
+        "acting an Information version supersedes one row and promotes another, "
+        "both local; declaring an external effect inflates it to K4"
+    )
+    assert request["writes_state"] is True
+    assert request["transmission_requested"] is False
+    assert request["memory_promotion_requested"] is False
+    assert request["scope"] == {
+        "scope_type": "project",
+        "scope_id": project["project_id"],
+    }
+
+
 def test_a_refused_act_leaves_the_version_working_and_retryable(conn) -> None:
     project = _project(conn)
     draft = _draft(conn, project["project_id"])
