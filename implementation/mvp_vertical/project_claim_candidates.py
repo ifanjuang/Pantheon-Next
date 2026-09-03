@@ -284,6 +284,7 @@ def create_claim_from_candidate(
                     "result_id": result_id,
                     "review_disposition_id": disposition["disposition_id"],
                 },
+                basis_refs=payload["basis_refs"],
                 status=status,
                 certainty=selected_certainty,
                 observed_at=payload["observed_at"],
