@@ -17,6 +17,7 @@ _REQUEST_FIELDS = frozenset(
         "intent",
         "external_effect",
         "writes_state",
+        "delegated_execution",
         "transmission_requested",
         "memory_promotion_requested",
         "professional_position",
@@ -47,6 +48,23 @@ _PAPERLESS_EXTERNAL_EFFECT_KINDS = frozenset(
     {
         "external_document_upload",
         "external_document_metadata_update",
+    }
+)
+
+# These five intents are the already-wired human-originated Cockpit/CLI writes
+# identified by the 2026-09-02 real-PDP audit. They are not delegated Hermes
+# tasks, so manufacturing a Task Contract for them would violate TASK_CONTRACTS.
+# Keep the recognition here, in the operational PEP translation layer, rather
+# than trusting an arbitrary caller to downgrade itself with
+# ``delegated_execution=false``. A new direct-human effect must be reviewed and
+# added explicitly; unknown effects remain delegated/fail-conservative.
+_DIRECT_HUMAN_EFFECT_INTENTS = frozenset(
+    {
+        "bind_oidc_identity",
+        "store_reviewed_dossier",
+        "publish_knowledge_reviewed",
+        "apply_edit_request",
+        "act_working_information",
     }
 )
 
@@ -160,6 +178,11 @@ def build_preflight_payload(
     runtime unless the caller explicitly says otherwise. PEP-owned facts for
     known external executors are applied last and therefore cannot be downgraded
     by caller-provided request fields.
+
+    Direct-human execution posture is also PEP-owned. Only the closed set of
+    already-reviewed direct-human intents is translated to
+    ``delegated_execution=False``; every other intent defaults to delegated
+    execution even if its caller tries to claim otherwise.
     """
 
     explicit_request = candidate.get("request")
@@ -184,6 +207,15 @@ def build_preflight_payload(
     )
     request.setdefault("external_effect", bool(candidate.get("external_effect", True)))
     request.setdefault("writes_state", bool(candidate.get("writes_state", True)))
+
+    intent = str(request.get("intent") or "").strip()
+    if intent in _DIRECT_HUMAN_EFFECT_INTENTS:
+        request["delegated_execution"] = False
+    else:
+        # Unknown/new effects fail conservative. An arbitrary runtime candidate
+        # may not opt itself out of the Task Contract boundary by sending False.
+        request["delegated_execution"] = True
+
     request.setdefault(
         "transmission_requested", bool(candidate.get("transmission_requested", False))
     )
