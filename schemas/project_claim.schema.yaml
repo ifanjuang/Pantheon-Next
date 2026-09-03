@@ -7,7 +7,9 @@ description: >-
   approved/opposable truth. Source-backed states reference a governed semantic
   entity through backing_ref. A Claim created from an execution candidate retains
   the exact candidate and human review identities in provenance; the candidate
-  itself is never promoted or mutated into a Claim.
+  itself is never promoted or mutated into a Claim. Observation time, explicit
+  business-effective time and implementation recording time are distinct axes;
+  implementation recording metadata does not become part of this semantic payload.
 type: object
 required:
   - claim_id
@@ -115,11 +117,18 @@ properties:
   observed_at:
     type: string
     format: date-time
-    description: Time at which the assertion or its supporting material was observed.
+    description: >-
+      Time at which the assertion or its supporting material was observed.
+      Observation time is not the implementation recording/admission time and does
+      not by itself establish when the assertion is applicable in the project world.
   effective_at:
     type: [string, "null"]
     format: date-time
-    description: Optional business-effective date distinct from observation and creation time.
+    description: >-
+      Optional explicit business-effective start, distinct from observation and
+      implementation recording time. Null means that this Claim asserts no
+      business-applicability start; temporal readers must not substitute
+      observed_at or recording time.
   revision:
     type: integer
     minimum: 0
@@ -127,7 +136,11 @@ properties:
     description: Optimistic-concurrency marker; not an approval state.
   supersedes:
     type: [string, "null"]
-    description: claim_id of a prior Claim this separate append-only Claim replaces.
+    description: >-
+      claim_id of a prior append-only Claim replaced by this separate Claim.
+      Supersession records lineage and never mutates the predecessor. In a
+      business-time view the predecessor is displaced only when the superseding
+      Claim is itself explicitly applicable under that temporal perspective.
   note:
     type: [string, "null"]
   governance_refs:
