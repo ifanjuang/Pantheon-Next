@@ -155,8 +155,17 @@ def _accepted_disposition(conn, result_id: str) -> str:
     return stored["review_dispositions"][-1]["disposition_id"]
 
 
-def _insert_claim(conn, candidate, disposition_id: str, *, value=375000, backing=None):
+def _insert_claim(
+    conn,
+    candidate,
+    disposition_id: str,
+    *,
+    value=375000,
+    backing=None,
+    basis_refs=None,
+):
     project_id, information_id, execution_id, result_id, payload = candidate
+    selected_basis = payload["basis_refs"] if basis_refs is None else basis_refs
     conn.execute(
         """
         INSERT INTO agency_project_claims (
@@ -164,18 +173,19 @@ def _insert_claim(conn, candidate, disposition_id: str, *, value=375000, backing
             backing_entity_type, backing_entity_id, backing_observed_status,
             source_kind, asserted_by, status, certainty, observed_at, effective_at,
             candidate_execution_id, candidate_result_id,
-            candidate_review_disposition_id
+            candidate_review_disposition_id, basis_refs
         ) VALUES (
             %s, %s, %s, %s, %s,
             'information', %s, 'acted',
             'execution_result', 'human:test', 'source_backed', %s, %s, %s,
-            %s, %s, %s
+            %s, %s, %s, %s
         )
         """,
         (
             _id("claim"), project_id, payload["claim_type"], Jsonb(value), payload["unit"],
             backing or information_id, payload["certainty"], payload["observed_at"],
             payload["effective_at"], execution_id, result_id, disposition_id,
+            Jsonb(selected_basis),
         ),
     )
 
@@ -206,6 +216,16 @@ def test_sql_guard_preserves_reviewed_value_and_basis(conn) -> None:
         with conn.transaction():
             _insert_claim(conn, candidate, disposition_id, backing=other_information)
 
+    substituted_basis = [dict(candidate[4]["basis_refs"][0], observed_revision=99)]
+    with pytest.raises(psycopg.errors.RaiseException, match="exactly match"):
+        with conn.transaction():
+            _insert_claim(
+                conn,
+                candidate,
+                disposition_id,
+                basis_refs=substituted_basis,
+            )
+
 
 def test_sql_guard_accepts_exact_reviewed_candidate(conn) -> None:
     candidate = _candidate(conn)
@@ -213,8 +233,8 @@ def test_sql_guard_accepts_exact_reviewed_candidate(conn) -> None:
     with conn.transaction():
         _insert_claim(conn, candidate, disposition_id)
     stored = conn.execute(
-        "SELECT value, candidate_result_id FROM agency_project_claims "
+        "SELECT value, candidate_result_id, basis_refs FROM agency_project_claims "
         "WHERE candidate_result_id = %s",
         (candidate[3],),
     ).fetchone()
-    assert stored == (375000, candidate[3])
+    assert stored == (375000, candidate[3], candidate[4]["basis_refs"])

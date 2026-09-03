@@ -24,6 +24,10 @@ A missing ``effective_at`` is never replaced by ``observed_at`` or ``created_at`
 Supersession is lineage: an as-of view only lets a superseding Claim displace its
 predecessor when that superseding Claim is itself inside the requested temporal
 perspective.
+
+Structured ``basis_refs`` preserve the governed references used to form an
+assertion. They are provenance only: a basis reference is not Evidence admission,
+verification, approval or project truth.
 """
 
 from __future__ import annotations
@@ -45,6 +49,9 @@ from . import agency_schema, pantheon_contracts
 
 SCHEMA = pantheon_contracts.schema_path("project_claim")
 MIGRATION = Path(__file__).resolve().parent / "sql" / "019_project_claim_candidates.sql"
+PROVENANCE_MIGRATION = (
+    Path(__file__).resolve().parent / "sql" / "036_project_claim_provenance_basis.sql"
+)
 
 GOVERNANCE_REFS = [
     "docs/domain-packs/architecture/PROJECT_CARD_DECK_COMPOSITION.md",
@@ -129,6 +136,7 @@ def _claim_from_row(row: dict[str, Any]) -> dict[str, Any]:
             "source_kind": row["source_kind"],
             "source_ref": row.get("source_ref"),
             "candidate_ref": _candidate_ref_from_row(row),
+            "basis_refs": _jsonable(row.get("basis_refs") or []),
             "asserted_by": row.get("asserted_by"),
             "derivation_note": row.get("derivation_note"),
         },
@@ -205,6 +213,59 @@ def _normalize_candidate_ref(candidate_ref: dict[str, Any] | None) -> dict[str, 
         "result_id": result_id,
         "review_disposition_id": str(disposition_id).strip() if disposition_id is not None else None,
     }
+
+
+def _normalize_basis_refs(basis_refs: list[dict[str, Any]] | None) -> list[dict[str, Any]]:
+    if basis_refs is None:
+        return []
+    if not isinstance(basis_refs, list):
+        raise AgencyClaimError("basis_refs must be an array")
+
+    normalized: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for index, raw in enumerate(basis_refs):
+        if not isinstance(raw, dict):
+            raise AgencyClaimError(f"basis_refs[{index}] must be an object")
+        unknown = set(raw) - {
+            "entity_type",
+            "entity_id",
+            "observed_revision",
+            "observed_status",
+        }
+        if unknown:
+            raise AgencyClaimError(
+                f"unsupported basis_refs[{index}] field(s): {', '.join(sorted(unknown))}"
+            )
+        entity_type = str(raw.get("entity_type") or "").strip()
+        entity_id = str(raw.get("entity_id") or "").strip()
+        if not entity_type or not entity_id:
+            raise AgencyClaimError(
+                f"basis_refs[{index}] requires entity_type and entity_id"
+            )
+        observed_revision = raw.get("observed_revision")
+        if observed_revision is not None and (
+            isinstance(observed_revision, bool)
+            or not isinstance(observed_revision, int)
+            or observed_revision < 0
+        ):
+            raise AgencyClaimError(
+                f"basis_refs[{index}].observed_revision must be a non-negative integer or null"
+            )
+        observed_status = raw.get("observed_status")
+        item = {
+            "entity_type": entity_type,
+            "entity_id": entity_id,
+            "observed_revision": observed_revision,
+            "observed_status": (
+                str(observed_status).strip() if observed_status is not None else None
+            ),
+        }
+        marker = json.dumps(item, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+        if marker in seen:
+            raise AgencyClaimError("basis_refs must contain unique references")
+        seen.add(marker)
+        normalized.append(item)
+    return normalized
 
 
 def _normalize_datetime(value: str | datetime | None, field: str, *, default_now: bool) -> str | None:
@@ -284,6 +345,7 @@ def record_claim(
     backing_ref: dict[str, Any] | None = None,
     source_ref: str | None = None,
     candidate_ref: dict[str, Any] | None = None,
+    basis_refs: list[dict[str, Any]] | None = None,
     derivation_note: str | None = None,
     status: str = "asserted",
     certainty: str = "E0",
@@ -311,10 +373,13 @@ def record_claim(
     normalized_value = _normalize_claim_value(field, value)
     normalized_backing = _normalize_backing_ref(backing_ref)
     normalized_candidate = _normalize_candidate_ref(candidate_ref)
+    normalized_basis_refs = _normalize_basis_refs(basis_refs)
     if status in {"source_backed", "verified"} and normalized_backing is None:
         raise AgencyClaimError(f"{status} Project claim requires backing_ref")
     if source_kind == "execution_result" and normalized_candidate is None:
         raise AgencyClaimError("execution_result Project claim requires candidate_ref")
+    if source_kind == "execution_result" and not normalized_basis_refs:
+        raise AgencyClaimError("execution_result Project claim requires basis_refs")
     if status == "verified" and (
         source_kind != "execution_result"
         or normalized_candidate is None
@@ -354,6 +419,7 @@ def record_claim(
             "source_kind": source_kind,
             "source_ref": str(source_ref).strip() if source_ref is not None else None,
             "candidate_ref": normalized_candidate,
+            "basis_refs": normalized_basis_refs,
             "asserted_by": actor,
             "derivation_note": str(derivation_note).strip() if derivation_note is not None else None,
         },
@@ -381,13 +447,13 @@ def record_claim(
                 claim_id, project_id, claim_type, value, unit,
                 backing_entity_type, backing_entity_id, backing_observed_status,
                 source_kind, source_ref, candidate_execution_id, candidate_result_id,
-                candidate_review_disposition_id, asserted_by, derivation_note,
+                candidate_review_disposition_id, basis_refs, asserted_by, derivation_note,
                 status, certainty, observed_at, effective_at, revision, supersedes, note
             ) VALUES (
                 %s, %s, %s, %s, %s,
                 %s, %s, %s,
                 %s, %s, %s, %s,
-                %s, %s, %s,
+                %s, %s, %s, %s,
                 %s, %s, %s, %s, 0, %s, %s
             )
             """,
@@ -405,6 +471,7 @@ def record_claim(
                 normalized_candidate["execution_id"] if normalized_candidate else None,
                 normalized_candidate["result_id"] if normalized_candidate else None,
                 normalized_candidate["review_disposition_id"] if normalized_candidate else None,
+                Jsonb(normalized_basis_refs),
                 actor,
                 candidate["provenance"]["derivation_note"],
                 status,
