@@ -44,6 +44,7 @@ def test_flat_runtime_candidate_is_translated_to_policy_http_contract():
         "intent": "external_document_metadata_update",
         "external_effect": True,
         "writes_state": True,
+        "delegated_execution": True,
         "transmission_requested": False,
         "memory_promotion_requested": False,
         "professional_position": False,
@@ -72,11 +73,47 @@ def test_explicit_task_contract_signal_is_preserved():
         _decision_payload(),
     )
     assert payload["request"]["external_effect"] is False
+    assert payload["request"]["delegated_execution"] is True
     assert payload["gate_signals"] == {
         "task_contract_ref": "tc.project-42",
         "human_decision_ref": "decision-42",
         "human_decision_level": "C1",
     }
+
+
+def test_reviewed_direct_human_intent_is_not_mislabeled_as_delegated_work():
+    payload = build_preflight_payload(
+        {
+            "request": {
+                "intent": "act_working_information",
+                "external_effect": False,
+                "writes_state": True,
+                "scope": {"scope_type": "project", "scope_id": "P-42"},
+            }
+        },
+        _decision_payload(),
+    )
+    assert payload["request"]["delegated_execution"] is False
+    assert payload["gate_signals"] == {
+        "human_decision_ref": "decision-42",
+        "human_decision_level": "C1",
+    }
+
+
+def test_unknown_runtime_candidate_cannot_self_exempt_from_task_contract_boundary():
+    payload = build_preflight_payload(
+        {
+            "request": {
+                "intent": "custom_local_state_write",
+                "external_effect": False,
+                "writes_state": True,
+                "delegated_execution": False,
+                "scope": {"scope_type": "project", "scope_id": "P-42"},
+            }
+        },
+        _decision_payload(),
+    )
+    assert payload["request"]["delegated_execution"] is True
 
 
 def test_runtime_expectation_overrides_caller_supplied_expectation():
