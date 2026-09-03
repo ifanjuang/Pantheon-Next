@@ -80,6 +80,122 @@ Examples include:
 
 Pantheon does not treat Runtime State as Evidence or Registre Probatoire state.
 
+## Episodic and associative freedom
+
+Runtime memory may preserve project episodes, observations, hypotheses, unusual details, narrative context and associations without first forcing them into a Pantheon semantic schema.
+
+This is deliberate. Some useful project knowledge is specific, ambiguous or exploratory before it is machine-actionable.
+
+```text
+free episode
+!= Project Anatomy claim
+!= Knowledge publication
+!= Requirement
+!= Evidence
+!= Decision
+```
+
+A memory provider may keep a free payload such as:
+
+```text
+"The wall appears slightly irregular near the opening.
+Compare with the previous visit and the client's earlier remark."
+```
+
+without immediately inventing a defect taxonomy, stable project identity or admitted semantic relation.
+
+Where the runtime/provider supports it, a useful episode should keep only a small routing envelope around that free payload, for example:
+
+```text
+episode identity
+scope
+observed / remembered time when useful
+free content
+source / document / project-object references when known
+provider/runtime provenance
+```
+
+This list is guidance, not a new Pantheon schema. Fields may remain absent when the runtime cannot establish them honestly.
+
+```text
+minimal envelope != structured semantic payload
+missing ref != permission to infer one
+provider bank/folder != governed identity
+```
+
+An episode may point to several existing worlds at once, for example:
+
+```text
+photo / image region
+plan / document locator
+Project Anatomy source representation or stable-object candidate
+meeting note / email fragment
+external reference
+```
+
+Those references improve retrieval and context assembly. They do not admit the episode's interpretation into the referenced owner.
+
+## Structured and free knowledge coexist
+
+Pantheon should not require every useful memory to become structured, and runtime memory should not become a second Project Anatomy or Knowledge graph.
+
+```text
+free / episodic / associative
+-> preserve singularity, ambiguity and context
+
+structured / governed owners
+-> provide stable identity, addressable claims, requirements and durable professional state
+```
+
+The two sides may be composed for retrieval, but they keep distinct responsibilities.
+
+```text
+Project Anatomy / Knowledge -> runtime context or memory
+= allowed bounded retrieval
+
+runtime memory -> Project Anatomy / Knowledge / Requirement / Register
+= candidate only
+= existing owner must validate/admit the effect
+```
+
+In short:
+
+```text
+retrieval may be bidirectional
+promotion is one-way through governed owners
+```
+
+Repeated recall, similarity, model confidence or a dense cluster of associations does not perform that promotion.
+
+## Spatial and visual episodes
+
+Visual/spatial runtimes may remember observations derived from photographs, scans, video or reconstructed geometry, including references to image regions or derived representations.
+
+Examples include:
+
+```text
+segmented region
+detected object candidate
+relative depth observation
+surface-orientation observation
+camera/view context
+multi-view association
+point-cloud / reconstruction reference
+```
+
+Dense outputs such as masks, depth maps, normal maps, embeddings, point maps or meshes remain source-linked derived runtime representations unless an existing Project Anatomy adapter deliberately distills selected observations into an Observation Bundle.
+
+```text
+segmentation != stable identity
+object detection != Project Anatomy object
+depth prediction != surveyed geometry
+normal prediction != professionally measured orientation
+multi-view association != identity accepted
+derived spatial representation != Evidence
+```
+
+A spatial episode may therefore remain free and useful even when no stable object has been resolved yet. Later structured promotion must preserve the exact source/representation provenance and uncertainty rather than rewriting the episode as if it had always been a project fact.
+
 ## Provider-agnostic rule
 
 Pantheon does not prescribe Hindsight, Mnemosyne, Mem0 or another memory product.
@@ -173,8 +289,9 @@ Those are governance states, not runtime-memory states.
 ## Final rule
 
 ```text
-Hermes may remember with native or optional external facilities.
-Pantheon does not need to know which provider is fashionable.
+Hermes may remember freely with native or optional external facilities.
+Pantheon does not require every useful episode to fit a semantic schema.
+Structured owners remain available when stable identity or machine-actionable meaning is useful.
 Pantheon cares when memory crosses into consequential context, Evidence, approval or durable governed Assertions.
 Memory never crosses that boundary automatically.
 ```
