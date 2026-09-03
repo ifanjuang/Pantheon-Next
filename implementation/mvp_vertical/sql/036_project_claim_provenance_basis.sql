@@ -29,6 +29,17 @@ BEGIN
             CHECK (jsonb_typeof(basis_refs) = 'array') NOT VALID;
     END IF;
 
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+         WHERE conrelid = 'agency_project_claims'::regclass
+           AND conname = 'agency_project_claims_basis_refs_source_check'
+    ) THEN
+        ALTER TABLE agency_project_claims
+            ADD CONSTRAINT agency_project_claims_basis_refs_source_check
+            CHECK (source_kind = 'execution_result' OR basis_refs = '[]'::jsonb)
+            NOT VALID;
+    END IF;
+
     IF EXISTS (
         SELECT 1 FROM pg_constraint
          WHERE conrelid = 'agency_project_claims'::regclass
@@ -38,19 +49,28 @@ BEGIN
         ALTER TABLE agency_project_claims
             VALIDATE CONSTRAINT agency_project_claims_basis_refs_array_check;
     END IF;
+
+    IF EXISTS (
+        SELECT 1 FROM pg_constraint
+         WHERE conrelid = 'agency_project_claims'::regclass
+           AND conname = 'agency_project_claims_basis_refs_source_check'
+           AND NOT convalidated
+    ) THEN
+        ALTER TABLE agency_project_claims
+            VALIDATE CONSTRAINT agency_project_claims_basis_refs_source_check;
+    END IF;
 END;
 $$;
 
--- Candidate-backed Claims must preserve the exact immutable basis_refs array
--- reviewed in the source ProjectClaimCandidate. This is provenance binding, not
--- Evidence admission: a basis reference remains only a reference to material
--- used by the candidate.
+-- Candidate identity, reviewed disposition, value, unit and time binding remain
+-- owned by 019_project_claim_candidates.sql. This trigger adds only the missing
+-- provenance invariant: a newly created execution-backed Claim must preserve the
+-- candidate's exact immutable basis_refs array.
 CREATE OR REPLACE FUNCTION validate_agency_project_claim_candidate_basis_refs()
 RETURNS trigger
 LANGUAGE plpgsql
 AS $$
 DECLARE
-    actual_execution_id TEXT;
     candidate_payload JSONB;
 BEGIN
     IF NEW.source_kind <> 'execution_result' THEN
@@ -61,14 +81,13 @@ BEGIN
         RAISE EXCEPTION 'execution result authority is unavailable for ProjectClaim provenance binding';
     END IF;
 
-    SELECT execution_result_id, payload
-      INTO actual_execution_id, candidate_payload
+    SELECT payload
+      INTO candidate_payload
       FROM execution_result_items
-     WHERE result_id = NEW.candidate_result_id
-     FOR UPDATE;
+     WHERE result_id = NEW.candidate_result_id;
 
-    IF actual_execution_id IS NULL OR actual_execution_id <> NEW.candidate_execution_id THEN
-        RAISE EXCEPTION 'ProjectClaim provenance candidate does not belong to the declared execution';
+    IF candidate_payload IS NULL THEN
+        RAISE EXCEPTION 'ProjectClaim provenance candidate result is unavailable';
     END IF;
 
     IF COALESCE(candidate_payload->'basis_refs', '[]'::jsonb)
