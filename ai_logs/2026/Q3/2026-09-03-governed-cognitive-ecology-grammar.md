@@ -146,8 +146,27 @@ The cognitive-ecology grammar is intended to make placement decisions easier bef
 - no new Role, Rite or governed Space;
 - no authority promotion.
 
+## Review context
+
+PR #948 opened from `docs/cognitive-ecology-grammar`.
+
+The first Governance CI run correctly refused the PR because the Role / Rite / governed-Space change guard requires explicit review-context sections in the PR body. The body was then completed with:
+
+```text
+Change level
+Observed need
+Existing owners checked
+Overlap analysis
+Affected consumers
+Migration and rollback
+Authority impact
+Runtime impact
+```
+
+The declared change level is guidance/explanatory convergence with no Role jurisdiction, Rite purpose/lifecycle, governed Space identity, authority boundary or runtime change.
+
 ## Status
 
-Documentation and landing convergence prepared on branch `docs/cognitive-ecology-grammar`.
+PR #948 is the review surface for this bounded conceptual convergence.
 
 Repository CI and review remain the merge gate.
