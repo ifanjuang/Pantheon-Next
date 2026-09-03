@@ -12,6 +12,18 @@ exact Execution Result candidate reviewed before the separate Claim was created.
 Rows are append-only. A later Claim may supersede a prior Claim; the prior row is
 never rewritten. Every emitted Claim is validated against the vendored Pantheon
 Next governance schema.
+
+Temporal reads keep three axes distinct:
+
+    observed_at  = when the assertion/support was observed
+    effective_at = explicit business-effective start, when one is asserted
+    created_at   = PostgreSQL recording/system time
+
+``created_at`` remains implementation metadata rather than a ProjectClaim field.
+A missing ``effective_at`` is never replaced by ``observed_at`` or ``created_at``.
+Supersession is lineage: an as-of view only lets a superseding Claim displace its
+predecessor when that superseding Claim is itself inside the requested temporal
+perspective.
 """
 
 from __future__ import annotations
@@ -213,6 +225,54 @@ def _normalize_datetime(value: str | datetime | None, field: str, *, default_now
     return parsed.isoformat()
 
 
+def _required_datetime(value: str | datetime | None, field: str) -> str:
+    normalized = _normalize_datetime(value, field, default_now=False)
+    if normalized is None:
+        raise AgencyClaimError(f"{field} is required")
+    return normalized
+
+
+def _temporal_claim_rows(
+    conn: psycopg.Connection,
+    project_id: str,
+    *,
+    recorded_through: str | None = None,
+    effective_through: str | None = None,
+) -> list[dict[str, Any]]:
+    project_id = str(project_id or "").strip()
+    if not project_id:
+        raise AgencyClaimError("project_id is required")
+
+    conditions = ["project_id = %s"]
+    params: list[Any] = [project_id]
+    if recorded_through is not None:
+        conditions.append("created_at <= %s")
+        params.append(recorded_through)
+    if effective_through is not None:
+        conditions.extend(["effective_at IS NOT NULL", "effective_at <= %s"])
+        params.append(effective_through)
+
+    query = f"""
+        SELECT *
+          FROM agency_project_claims
+         WHERE {' AND '.join(conditions)}
+         ORDER BY observed_at DESC, created_at DESC, claim_id DESC
+    """
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(query, tuple(params))
+        return [dict(row) for row in cur.fetchall()]
+
+
+def _unsuperseded_claims(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    claims = [_claim_from_row(row) for row in rows]
+    superseded = {claim["supersedes"] for claim in claims if claim.get("supersedes")}
+    return [
+        claim
+        for claim in claims
+        if claim["status"] != "retired" and claim["claim_id"] not in superseded
+    ]
+
+
 def record_claim(
     conn: psycopg.Connection,
     *,
@@ -397,6 +457,60 @@ def active_project_claims(conn: psycopg.Connection, project_id: str) -> list[dic
         for claim in claims
         if claim["status"] != "retired" and claim["claim_id"] not in superseded
     ]
+
+
+def project_claims_known_as_of(
+    conn: psycopg.Connection,
+    project_id: str,
+    knowledge_time: str | datetime,
+) -> list[dict[str, Any]]:
+    """Reconstruct active Claim state using only rows recorded by ``knowledge_time``.
+
+    PostgreSQL ``created_at`` is the system/recording axis for this read. A later
+    correction, retirement or superseding Claim cannot rewrite what Pantheon could
+    have known before that row was recorded.
+    """
+    recorded_through = _required_datetime(knowledge_time, "knowledge_time")
+    rows = _temporal_claim_rows(
+        conn,
+        project_id,
+        recorded_through=recorded_through,
+    )
+    return _unsuperseded_claims(rows)
+
+
+def applicable_project_claims_as_of(
+    conn: psycopg.Connection,
+    project_id: str,
+    business_time: str | datetime,
+    *,
+    knowledge_time: str | datetime | None = None,
+) -> list[dict[str, Any]]:
+    """Return Claims explicitly applicable at business time under one knowledge view.
+
+    ``effective_at`` is the business/world-time axis. Claims without an explicit
+    ``effective_at`` are excluded rather than coercing observation or recording
+    time into applicability. When ``knowledge_time`` is supplied, only rows already
+    recorded by that system time participate; omitting it gives the current
+    retrospective view of the requested business time.
+
+    Supersession is evaluated after both cutoffs, so a superseding Claim only closes
+    its predecessor when the superseder itself was known (if bounded) and explicitly
+    effective by the requested business time.
+    """
+    effective_through = _required_datetime(business_time, "business_time")
+    recorded_through = (
+        _required_datetime(knowledge_time, "knowledge_time")
+        if knowledge_time is not None
+        else None
+    )
+    rows = _temporal_claim_rows(
+        conn,
+        project_id,
+        recorded_through=recorded_through,
+        effective_through=effective_through,
+    )
+    return _unsuperseded_claims(rows)
 
 
 def project_claim_projection(conn: psycopg.Connection, project_id: str) -> tuple[dict[str, Any], dict[str, Any]]:

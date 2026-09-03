@@ -155,3 +155,107 @@ def test_project_claim_rows_are_append_only(conn) -> None:
     with pytest.raises(Exception, match="append-only"):
         conn.execute("DELETE FROM agency_project_claims WHERE claim_id=%s", (claim["claim_id"],))
     conn.rollback()
+
+
+def test_temporal_reads_separate_historical_knowledge_from_retrospective_applicability(conn) -> None:
+    project = _project(conn)
+    project_id = project["project_id"]
+
+    first = agency_claims.record_claim(
+        conn,
+        project_id=project_id,
+        claim_type="budget",
+        value=350000,
+        actor="human:test",
+        source_kind="human_assertion",
+        status="asserted",
+        observed_at="2026-01-05T09:00:00+00:00",
+        effective_at="2026-01-01T00:00:00+00:00",
+    )
+    # get_claim() starts a normal read transaction after the insert transaction;
+    # close it before taking the explicit knowledge cutoff.
+    conn.commit()
+    knowledge_cutoff = conn.execute("SELECT clock_timestamp()").fetchone()[0]
+    conn.commit()
+
+    second = agency_claims.record_claim(
+        conn,
+        project_id=project_id,
+        claim_type="budget",
+        value=375000,
+        actor="human:test",
+        source_kind="human_assertion",
+        status="asserted",
+        observed_at="2026-03-10T09:00:00+00:00",
+        effective_at="2026-02-01T00:00:00+00:00",
+        supersedes=first["claim_id"],
+    )
+    conn.commit()
+
+    second_recorded_at = conn.execute(
+        "SELECT created_at FROM agency_project_claims WHERE claim_id = %s",
+        (second["claim_id"],),
+    ).fetchone()[0]
+    assert second_recorded_at > knowledge_cutoff
+
+    known_then = agency_claims.project_claims_known_as_of(
+        conn, project_id, knowledge_cutoff
+    )
+    applicable_then = agency_claims.applicable_project_claims_as_of(
+        conn,
+        project_id,
+        "2026-03-01T00:00:00+00:00",
+        knowledge_time=knowledge_cutoff,
+    )
+    retrospective_march = agency_claims.applicable_project_claims_as_of(
+        conn,
+        project_id,
+        "2026-03-01T00:00:00+00:00",
+    )
+    retrospective_january = agency_claims.applicable_project_claims_as_of(
+        conn,
+        project_id,
+        "2026-01-15T00:00:00+00:00",
+    )
+
+    assert [(claim["claim_id"], claim["value"]) for claim in known_then] == [
+        (first["claim_id"], 350000)
+    ]
+    assert [(claim["claim_id"], claim["value"]) for claim in applicable_then] == [
+        (first["claim_id"], 350000)
+    ]
+    assert [(claim["claim_id"], claim["value"]) for claim in retrospective_march] == [
+        (second["claim_id"], 375000)
+    ]
+    assert [(claim["claim_id"], claim["value"]) for claim in retrospective_january] == [
+        (first["claim_id"], 350000)
+    ]
+
+
+def test_business_time_does_not_invent_effective_at_from_observation_or_recording(conn) -> None:
+    project = _project(conn)
+    project_id = project["project_id"]
+
+    claim = agency_claims.record_claim(
+        conn,
+        project_id=project_id,
+        claim_type="plu_zone",
+        value="UDb",
+        actor="human:test",
+        source_kind="human_assertion",
+        status="asserted",
+        observed_at="2026-01-05T09:00:00+00:00",
+    )
+    conn.commit()
+    after_recording = conn.execute("SELECT clock_timestamp()").fetchone()[0]
+
+    known = agency_claims.project_claims_known_as_of(conn, project_id, after_recording)
+    applicable = agency_claims.applicable_project_claims_as_of(
+        conn,
+        project_id,
+        "2026-09-03T00:00:00+00:00",
+        knowledge_time=after_recording,
+    )
+
+    assert [item["claim_id"] for item in known] == [claim["claim_id"]]
+    assert applicable == []
