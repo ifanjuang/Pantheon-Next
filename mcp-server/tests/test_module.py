@@ -119,6 +119,8 @@ class TestPolicy(unittest.TestCase):
         self.assertEqual(report["consequence_level"], "K4")
         self.assertEqual(report["required_verification"], "V4")
         self.assertTrue(report["blocked_until_gate"])
+        self.assertTrue(report["task_contract_required"])
+        self.assertTrue(report["evidence_required"])
 
     def test_unknown_external_effect_escalates(self):
         report = policy.classify_request(
@@ -133,6 +135,62 @@ class TestPolicy(unittest.TestCase):
         )
         self.assertEqual(report["consequence_level"], "K3")
         self.assertTrue(report["evidence_required"])
+        self.assertTrue(report["task_contract_required"])
+
+    def test_direct_human_local_write_keeps_k3_without_fabricated_runtime_contract(self):
+        report = policy.classify_request(
+            {
+                "intent": "act_working_information",
+                "external_effect": False,
+                "writes_state": True,
+                "delegated_execution": False,
+                "scope": {"scope_type": "project", "scope_id": "fixture"},
+            }
+        )
+        self.assertEqual(report["consequence_level"], "K3")
+        self.assertEqual(report["required_verification"], "V3")
+        self.assertFalse(report["task_contract_required"])
+        self.assertFalse(report["evidence_required"])
+        self.assertTrue(report["blocked_until_gate"])
+        self.assertIn(
+            "User Decision Gate before direct human governed-state effect",
+            report["required_gates"],
+        )
+
+    def test_direct_human_professional_assertion_still_requires_evidence(self):
+        report = policy.classify_request(
+            {
+                "intent": "record project surface",
+                "external_effect": False,
+                "writes_state": True,
+                "delegated_execution": False,
+                "scope": {"scope_type": "project", "scope_id": "fixture"},
+            }
+        )
+        self.assertEqual(report["consequence_level"], "K3")
+        self.assertFalse(report["task_contract_required"])
+        self.assertTrue(report["evidence_required"])
+        self.assertTrue(report["blocked_until_gate"])
+
+    def test_omitted_delegation_mode_fails_conservative(self):
+        report = policy.classify_request(
+            {
+                "intent": "local_state_write",
+                "external_effect": False,
+                "writes_state": True,
+                "scope": {"scope_type": "project", "scope_id": "fixture"},
+            }
+        )
+        self.assertTrue(report["delegated_execution"])
+        self.assertTrue(report["task_contract_required"])
+        self.assertTrue(report["evidence_required"])
+
+    def test_invalid_delegation_mode_is_refused(self):
+        report = policy.classify_request(
+            {"intent": "local_state_write", "delegated_execution": "false"}
+        )
+        self.assertEqual(report["result"], "refused")
+        self.assertIn("must be a boolean", report["reason"])
 
     def test_missing_scope_flagged(self):
         report = policy.classify_request({"intent": "summarize the meeting notes"})
