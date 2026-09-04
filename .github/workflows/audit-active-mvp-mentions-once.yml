@@ -1,0 +1,16 @@
+name: Audit active MVP mentions once
+
+on:
+  push:
+    branches:
+      - refactor/remove-active-mvp-identity
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python scripts/audit_active_mvp_mentions_once.py
