@@ -87,9 +87,7 @@ def _conflict() -> dict:
     }
 
 
-def test_current_claim_read_projects_temporal_provenance_and_conflict_candidates(monkeypatch) -> None:
-    current = _claim()
-    conflict = _conflict()
+def _install_current_claim_mocks(monkeypatch, current: dict) -> None:
     monkeypatch.setattr(agency_claims, "list_project_claims", lambda conn, project_id: [current])
     monkeypatch.setattr(agency_claims, "active_project_claims", lambda conn, project_id: [current])
     monkeypatch.setattr(
@@ -97,6 +95,12 @@ def test_current_claim_read_projects_temporal_provenance_and_conflict_candidates
         "project_claim_projection",
         lambda conn, project_id: ({"budget": 375000}, {"budget": current}),
     )
+
+
+def test_current_claim_read_projects_temporal_provenance_and_conflict_candidates(monkeypatch) -> None:
+    current = _claim()
+    conflict = _conflict()
+    _install_current_claim_mocks(monkeypatch, current)
     monkeypatch.setattr(
         project_claim_conflicts,
         "detect_project_claim_conflicts",
@@ -115,10 +119,37 @@ def test_current_claim_read_projects_temporal_provenance_and_conflict_candidates
     assert payload["claim_values"]["budget"] == 375000
     assert payload["claim_refs"]["budget"]["provenance"]["basis_refs"][0]["entity_id"] == "info-1"
     assert payload["conflict_candidates"] == [conflict]
-    assert payload["conflict_candidates_scope"] == "active_unsuperseded_scalar_claims"
+    assert payload["conflict_projection"] == {
+        "status": "available",
+        "scope": "active_unsuperseded_scalar_claims",
+        "candidate_count": 1,
+        "absence_of_candidates_inferred": True,
+        "resolves_conflict": False,
+    }
     assert payload["conflicts_resolved"] is False
     assert payload["authorization_inferred"] is False
     assert payload["evidence_inferred"] is False
+
+
+def test_conflict_detector_refusal_does_not_hide_current_claims(monkeypatch) -> None:
+    current = _claim()
+    _install_current_claim_mocks(monkeypatch, current)
+
+    def refuse(conn, project_id):
+        raise project_claim_conflicts.ProjectClaimConflictError(
+            "same-type Claims carry different governed units"
+        )
+
+    monkeypatch.setattr(project_claim_conflicts, "detect_project_claim_conflicts", refuse)
+
+    response = TestClient(_app()).get("/agency/projects/project-a/claims")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["claim_values"]["budget"] == 375000
+    assert payload["conflict_candidates"] == []
+    assert payload["conflict_projection"]["status"] == "unavailable"
+    assert payload["conflict_projection"]["absence_of_candidates_inferred"] is False
+    assert "different governed units" in payload["conflict_projection"]["reason"]
 
 
 def test_business_and_knowledge_as_of_reuses_temporal_owner_without_current_conflicts(monkeypatch) -> None:
@@ -156,7 +187,9 @@ def test_business_and_knowledge_as_of_reuses_temporal_owner_without_current_conf
     assert payload["perspective"]["business_time"].startswith("2026-03-01T00:00:00")
     assert payload["perspective"]["knowledge_time"].startswith("2026-02-15T12:00:00")
     assert payload["conflict_candidates"] == []
-    assert payload["conflict_candidates_scope"] == "not_evaluated_for_temporal_perspective"
+    assert payload["conflict_projection"]["status"] == "not_evaluated"
+    assert payload["conflict_projection"]["absence_of_candidates_inferred"] is False
+    assert "bounded to current active unsuperseded scalar Claims" in payload["conflict_projection"]["reason"]
     assert observed["project_id"] == "project-a"
     assert observed["business_time"] is not None
     assert observed["knowledge_time"] is not None
