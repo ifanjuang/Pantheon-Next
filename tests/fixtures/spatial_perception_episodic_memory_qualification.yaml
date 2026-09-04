@@ -162,14 +162,16 @@ free_episodes:
   - episode_id: episode.zone-a.same-feature-cluster
     scope: project-a
     free_payload: >-
-      Three photographs appear to show the same physical opening, but the
-      correspondence is kept as an associative cluster until project identity is
-      reviewed.
+      Three photographs appear to show the same physical opening, and two
+      independently retained episodes appear relevant to the same feature. Keep
+      these associations provisional until project identity is reviewed.
     refs:
       - {kind: source, ref: source.photo.zone-a.01}
       - {kind: source, ref: source.photo.zone-a.02}
       - {kind: source, ref: source.photo.zone-a.03}
       - {kind: derived, ref: drv.zone-a.multiview-cluster-01}
+      - {kind: episode, ref: episode.zone-a.irregular-wall}
+      - {kind: episode, ref: episode.zone-a.contextual-recall}
     association:
       status: candidate
       proposed_same_feature: true
@@ -216,6 +218,7 @@ qualification_cases:
     episode_ref: episode.zone-a.same-feature-cluster
     expected:
       associative_cluster_allowed: true
+      linked_episode_count: 2
       relation_claim_created: false
       identity_represents_admitted: false
 
@@ -334,7 +337,6 @@ selected_promotion:
         assertion_mode: derived
         source_authority: model_interpretation_candidate
         proof_status: candidate
-        certainty: E1
         source_representation_refs:
           - rep.q949.photo-01.opening-left
     relation_claim_candidates: []
