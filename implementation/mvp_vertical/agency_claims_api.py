@@ -63,11 +63,31 @@ def install_agency_claim_routes(
             return with_connection(operation)
         except agency_claims.ClaimNotFound as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
-        except (
-            agency_claims.AgencyClaimError,
-            project_claim_conflicts.ProjectClaimConflictError,
-        ) as exc:
+        except agency_claims.AgencyClaimError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    def conflict_projection(project_id: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+        try:
+            candidates = with_connection(
+                lambda conn: project_claim_conflicts.detect_project_claim_conflicts(
+                    conn, project_id
+                )
+            )
+        except project_claim_conflicts.ProjectClaimConflictError as exc:
+            return [], {
+                "status": "unavailable",
+                "scope": "active_unsuperseded_scalar_claims",
+                "reason": str(exc),
+                "absence_of_candidates_inferred": False,
+                "resolves_conflict": False,
+            }
+        return candidates, {
+            "status": "available",
+            "scope": "active_unsuperseded_scalar_claims",
+            "candidate_count": len(candidates),
+            "absence_of_candidates_inferred": True,
+            "resolves_conflict": False,
+        }
 
     @app.get("/agency/projects/{project_id}/claims")
     def list_project_claims(
@@ -81,9 +101,7 @@ def install_agency_claim_routes(
         values, refs = claim_operation(
             lambda conn: agency_claims.project_claim_projection(conn, project_id)
         )
-        conflict_candidates = claim_operation(
-            lambda conn: project_claim_conflicts.detect_project_claim_conflicts(conn, project_id)
-        )
+        conflict_candidates, conflict_status = conflict_projection(project_id)
         return {
             "system_of_record": "postgres",
             "project_id": project_id,
@@ -103,7 +121,7 @@ def install_agency_claim_routes(
                 "knowledge_time": "postgres_recording_time_cutoff",
             },
             "conflict_candidates": conflict_candidates,
-            "conflict_candidates_scope": "active_unsuperseded_scalar_claims",
+            "conflict_projection": conflict_status,
             "conflicts_resolved": False,
             "claim_is_visible_card_family": False,
             "authorization_inferred": False,
@@ -163,7 +181,15 @@ def install_agency_claim_routes(
                 "knowledge_time": "postgres_recording_time_cutoff",
             },
             "conflict_candidates": [],
-            "conflict_candidates_scope": "not_evaluated_for_temporal_perspective",
+            "conflict_projection": {
+                "status": "not_evaluated",
+                "scope": "temporal_perspective",
+                "reason": (
+                    "P3 conflict-candidate contract is bounded to current active unsuperseded scalar Claims"
+                ),
+                "absence_of_candidates_inferred": False,
+                "resolves_conflict": False,
+            },
             "conflicts_resolved": False,
             "claim_is_visible_card_family": False,
             "authorization_inferred": False,
