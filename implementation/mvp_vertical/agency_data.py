@@ -18,7 +18,7 @@ import psycopg
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
-from . import agency_schema
+from . import agency_schema, project_claim_conflicts
 from .store import dsn_from_env
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "002_agency_data.sql"
@@ -79,6 +79,7 @@ def connect(dsn: str | None = None) -> psycopg.Connection:
     conn.execute(MIGRATION.read_text(encoding="utf-8"))
     conn.execute(CLAIM_MIGRATION.read_text(encoding="utf-8"))
     conn.execute(CLAIM_PROVENANCE_MIGRATION.read_text(encoding="utf-8"))
+    conn.execute(project_claim_conflicts.MIGRATION.read_text(encoding="utf-8"))
     conn.execute(VARIANT_MIGRATION.read_text(encoding="utf-8"))
     conn.commit()
     return conn

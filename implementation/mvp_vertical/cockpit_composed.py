@@ -28,6 +28,7 @@ from . import (
     human_access,
     information_projection,
     knowledge_edit_variants,
+    project_claim_conflicts,
     project_document_admission,
     project_document_currentness,
     project_documents,
@@ -92,6 +93,8 @@ def initialize_composed_schema() -> None:
         conn.execute(agency_claims.MIGRATION.read_text(encoding="utf-8"))
         # Structured candidate basis provenance extends the existing Claim owner.
         conn.execute(agency_claims.PROVENANCE_MIGRATION.read_text(encoding="utf-8"))
+        # Conflict candidates depend only on already-persisted ProjectClaims.
+        conn.execute(project_claim_conflicts.MIGRATION.read_text(encoding="utf-8"))
         # Cross-family links depend on DecisionRequest, ProjectClaim and APU owners.
         conn.execute(apu_cross_family.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(knowledge_edit_variants.MIGRATION.read_text(encoding="utf-8"))

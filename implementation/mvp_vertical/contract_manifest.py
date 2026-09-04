@@ -29,6 +29,7 @@ CONTRACT_PATHS: dict[str, str] = {
     "project_change_variant_candidate": "schemas/project_change_variant_candidate.schema.yaml",
     "project_claim": "schemas/project_claim.schema.yaml",
     "project_claim_candidate": "schemas/project_claim_candidate.schema.yaml",
+    "project_claim_conflict_candidate": "schemas/project_claim_conflict_candidate.schema.yaml",
     "source_intake_admission": "schemas/source_intake_admission.schema.yaml",
     "storage_object": "schemas/storage_object.schema.yaml",
     "tag_registry": "schemas/tag_registry.schema.yaml",
