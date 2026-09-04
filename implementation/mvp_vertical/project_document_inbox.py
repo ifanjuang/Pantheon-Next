@@ -1,8 +1,9 @@
-"""Read-only deterministic reconciliation for imported document Sources.
+"""Read-only governed reconciliation for imported document Sources.
 
 This is a projection over existing Source, technical capture and professional
-revision owners. It is not a second Inbox store and does not perform semantic
-matching, professional binding, revision creation or provider routing.
+revision owners. Exact deterministic identity signals always win. Optional
+semantic candidates may be projected for human review only; they never bind a
+professional identity, create a revision or route a provider.
 """
 
 from __future__ import annotations
@@ -12,7 +13,7 @@ from typing import Any
 import psycopg
 from psycopg.rows import dict_row
 
-from . import project_document_currentness, source_intake
+from . import project_document_currentness, project_documents, source_intake
 
 AUTHORITY = {
     "project_link_confirmed": False,
@@ -22,6 +23,8 @@ AUTHORITY = {
     "is_evidence": False,
     "changes_project_truth": False,
 }
+
+SEMANTIC_CANDIDATE_FIELDS = {"document_id", "score", "basis", "producer", "created_at"}
 
 
 class ProjectDocumentInboxError(ValueError):
@@ -158,6 +161,80 @@ def _professional_lineage(
         return [dict(row) for row in cur.fetchall()]
 
 
+def _normalize_semantic_candidates(
+    conn: psycopg.Connection,
+    *,
+    project_id: str,
+    candidates: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Validate advisory document candidates without selecting or persisting one."""
+    if len(candidates) > 50:
+        raise ProjectDocumentInboxError("at most 50 semantic document candidates are supported")
+
+    normalized: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for index, item in enumerate(candidates):
+        if not isinstance(item, dict):
+            raise ProjectDocumentInboxError(f"semantic candidate {index + 1} must be an object")
+        missing = SEMANTIC_CANDIDATE_FIELDS - set(item)
+        unknown = set(item) - SEMANTIC_CANDIDATE_FIELDS
+        if missing:
+            raise ProjectDocumentInboxError(
+                f"semantic candidate {index + 1} missing: {', '.join(sorted(missing))}"
+            )
+        if unknown:
+            raise ProjectDocumentInboxError(
+                f"semantic candidate {index + 1} unsupported fields: {', '.join(sorted(unknown))}"
+            )
+
+        document_id = str(item["document_id"]).strip()
+        if not document_id or document_id in seen:
+            raise ProjectDocumentInboxError("semantic candidate document_id must be non-empty and unique")
+        seen.add(document_id)
+
+        try:
+            score = float(item["score"])
+        except (TypeError, ValueError) as exc:
+            raise ProjectDocumentInboxError("semantic candidate score must be numeric") from exc
+        if not 0 <= score <= 1:
+            raise ProjectDocumentInboxError("semantic candidate score must be between 0 and 1")
+
+        if not isinstance(item["basis"], list):
+            raise ProjectDocumentInboxError("semantic candidate basis must be a list")
+        basis = [str(value).strip() for value in item["basis"] if str(value).strip()]
+        producer = str(item["producer"]).strip()
+        created_at = str(item["created_at"]).strip()
+        if not basis or not producer or not created_at:
+            raise ProjectDocumentInboxError(
+                "semantic candidate basis, producer and created_at are required"
+            )
+
+        try:
+            document = project_documents.get_document(conn, document_id)
+        except project_documents.ProjectDocumentNotFound as exc:
+            raise ProjectDocumentInboxError(f"unknown semantic candidate Document: {document_id}") from exc
+        if document["parent_project_id"] != project_id:
+            raise ProjectDocumentInboxError(
+                f"semantic candidate Document belongs to another Project: {document_id}"
+            )
+
+        normalized.append(
+            {
+                "document_id": document_id,
+                "document_type": document["document_type"],
+                "title": document["title"],
+                "lot_id": document.get("lot_id"),
+                "discipline_code": document.get("discipline_code"),
+                "score": score,
+                "basis": basis,
+                "producer": producer,
+                "created_at": created_at,
+            }
+        )
+
+    return sorted(normalized, key=lambda item: (-item["score"], item["document_id"]))
+
+
 def _base(source: dict[str, Any], status: str) -> dict[str, Any]:
     return {
         "source_id": source["source_id"],
@@ -172,6 +249,7 @@ def reconcile_source(
     conn: psycopg.Connection,
     *,
     source_id: str,
+    semantic_candidates: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Calculate the next safe intake posture for one preserved Source."""
     source = source_intake.get_source(conn, source_id)
@@ -268,11 +346,32 @@ def reconcile_source(
         result["reason"] = "technical source identity is not uniquely owned by one logical document"
         return result
 
+    if semantic_candidates:
+        candidates = _normalize_semantic_candidates(
+            conn,
+            project_id=source["project_id"],
+            candidates=semantic_candidates,
+        )
+        result = _base(source, "document_identity_candidates")
+        result["technical_capture"] = capture_projection
+        result["professional_candidates"] = candidates
+        result["candidate_basis"] = "semantic_candidate_projection"
+        result["reason"] = (
+            "advisory semantic candidates require explicit human selection or explicit new-identity creation "
+            "through the existing governed admission path"
+        )
+        result["limitations"] = [
+            "candidate score does not bind professional identity",
+            "candidate producer output is not Evidence or professional approval",
+            "no candidate can create, merge or mutate a Document identity",
+        ]
+        return result
+
     result = _base(source, "needs_document_identity")
     result["technical_capture"] = capture_projection
     result["candidate_basis"] = "no_deterministic_professional_lineage"
     result["reason"] = (
         "new content has no exact professional duplicate and no unique prior professional lineage; "
-        "explicit user context or a separately admitted semantic candidate is required"
+        "explicit user context or an advisory semantic candidate projection is required"
     )
     return result
