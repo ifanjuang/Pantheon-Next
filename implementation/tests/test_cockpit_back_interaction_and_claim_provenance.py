@@ -48,6 +48,29 @@ def test_project_claim_provenance_is_visible_and_can_open_backing_information() 
     assert 'L’Information source n’est pas disponible dans le scope Projet courant.' in claims
 
 
+def test_project_claim_projection_exposes_time_structured_basis_and_conflict_candidates() -> None:
+    claims = _text(CLAIMS)
+
+    assert 'request(`../agency/projects/${encodeURIComponent(id)}/claims`)' in claims
+    assert 'temporal.textContent = `Temporalité · ${pieces.join(" · ")}`' in claims
+    assert 'else pieces.push("effectivité métier non déclarée")' in claims
+    assert 'summary.textContent = `Bases structurées · ${basis.length}`' in claims
+    assert 'claim.provenance?.basis_refs' in claims
+    assert 'conflict.textContent = `À examiner · ${relevant.length} candidat' in claims
+    assert 'item.claim_type === claimType' in claims
+    assert 'section.dataset.claimConflictCandidates' in claims
+    assert 'card.dataset.claimPerspective = claimPayload.perspective.mode' in claims
+    assert 'card.dataset.claimConflictCount = String(conflictCandidates.length)' in claims
+
+
+def test_claim_projection_falls_back_to_existing_project_cache_if_enriched_read_is_unavailable() -> None:
+    claims = _text(CLAIMS)
+
+    assert 'request(`../agency/projects/${encodeURIComponent(id)}/claims`).catch(() => null)' in claims
+    assert 'const valuesSource = claimPayload?.claim_values || project.claim_values;' in claims
+    assert 'const refsSource = claimPayload?.claim_refs || project.claim_refs;' in claims
+
+
 def test_claim_provenance_remains_a_project_projection_not_a_claim_card() -> None:
     claims = _text(CLAIMS)
 
