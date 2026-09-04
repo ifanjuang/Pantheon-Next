@@ -8,12 +8,12 @@ on:
       - "implementation/qualification/external-pins.json"
       - "implementation/tools/export_external_qualification_pins.py"
       - "implementation/hermes/distribution/pantheon-standard.lock.yaml"
-      - "implementation/mvp_vertical/hermes_distribution.py"
-      - "implementation/mvp_vertical/hermes_runs_observer.py"
-      - "implementation/mvp_vertical/hermes_run_binding.py"
-      - "implementation/mvp_vertical/hermes_execution_trace.py"
-      - "implementation/mvp_vertical/hermes_runtime_return.py"
-      - "implementation/mvp_vertical/work_issues.py"
+      - "implementation/pantheon_app/hermes_distribution.py"
+      - "implementation/pantheon_app/hermes_runs_observer.py"
+      - "implementation/pantheon_app/hermes_run_binding.py"
+      - "implementation/pantheon_app/hermes_execution_trace.py"
+      - "implementation/pantheon_app/hermes_runtime_return.py"
+      - "implementation/pantheon_app/work_issues.py"
       - "implementation/tools/hermes_runtime_lab_fixture.py"
       - "implementation/tools/run_hermes_runtime_lab_acceptance.py"
       - "implementation/tools/run_hermes_runtime_lab_acceptance.sh"
@@ -90,8 +90,8 @@ jobs:
         run: |
           python3 tools/validate_hermes_execution_trace_e_acceptance.py \
             --artifacts "$RUNNER_TEMP/hermes-runtime-lab/artifacts" \
-            --runtime-return-source mvp_vertical/hermes_runtime_return.py \
-            --work-issues-source mvp_vertical/work_issues.py \
+            --runtime-return-source pantheon_app/hermes_runtime_return.py \
+            --work-issues-source pantheon_app/work_issues.py \
             --output "$RUNNER_TEMP/hermes-runtime-lab/artifacts/execution-trace-phase-e.json"
           cat "$RUNNER_TEMP/hermes-runtime-lab/artifacts/execution-trace-phase-e.json" >> "$GITHUB_STEP_SUMMARY"
 
