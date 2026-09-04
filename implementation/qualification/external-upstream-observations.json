@@ -73,6 +73,14 @@
       "observed_on": "2026-08-31",
       "delta": "none"
     },
+    "notemesh": {
+      "source": "not_observable",
+      "locator": "ChangeNode/notemesh",
+      "latest_seen": "a9011dc0ed547a7db78e3327c33b5f00ae4f0ea6",
+      "observed_on": "2026-09-03",
+      "delta": "none",
+      "note": "ChangeNode/notemesh currently publishes no GitHub Release, so the existing automated freshness checker has no supported release feed for this repository. The default branch was checked directly on 2026-09-03 and main resolved to a9011dc0ed547a7db78e3327c33b5f00ae4f0ea6, the exact qualification ref. `not_observable` describes the automated freshness source only; it does not mean the repository state was guessed. The pin remains qualification input only and does not install, activate, authorize or adopt NoteMesh."
+    },
     "graphify": {
       "source": "github_releases_latest",
       "locator": "Graphify-Labs/graphify",
