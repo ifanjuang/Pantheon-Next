@@ -7,8 +7,8 @@ on:
       - "implementation/qualification/external-pins.json"
       - "implementation/tools/export_external_qualification_pins.py"
       - "implementation/labs/haystack_retrieval/**"
-      - "implementation/mvp_vertical/retrieval.py"
-      - "implementation/mvp_vertical/retrieval_scope.py"
+      - "implementation/pantheon_app/retrieval.py"
+      - "implementation/pantheon_app/retrieval_scope.py"
       - "implementation/tests/fixtures/professional_quote_review_cases.yaml"
       - "implementation/tests/fixtures/retrieval_metier_cases.yaml"
       - "implementation/tests/test_haystack_bounded_retrieval_lab.py"
@@ -27,13 +27,13 @@ jobs:
       pgvector:
         image: pgvector/pgvector:pg16
         env:
-          POSTGRES_USER: mvp
-          POSTGRES_PASSWORD: mvp
-          POSTGRES_DB: mvp
+          POSTGRES_USER: pantheon
+          POSTGRES_PASSWORD: pantheon
+          POSTGRES_DB: pantheon
         ports:
           - 5433:5432
         options: >-
-          --health-cmd "pg_isready -U mvp -d mvp"
+          --health-cmd "pg_isready -U pantheon -d pantheon"
           --health-interval 2s
           --health-timeout 2s
           --health-retries 15
@@ -79,5 +79,5 @@ jobs:
         working-directory: implementation
         env:
           HAYSTACK_UNSAFE_DESERIALIZATION: "false"
-          MVP_PG_DSN: postgresql://mvp:mvp@localhost:5433/mvp
+          PANTHEON_PG_DSN: postgresql://pantheon:pantheon@localhost:5433/pantheon
         run: pytest -q -s tests/test_haystack_native_retrieval_comparison.py
