@@ -42,7 +42,7 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      # implementation/tests/conftest.py imports mvp_vertical for its pgvector
+      # implementation/tests/conftest.py imports pantheon_app for its pgvector
       # session guard, so any test under that directory needs the package
       # installed — the same install implementation-ci.yml performs.
       - name: Install the implementation package (with test extra)
