@@ -63,6 +63,16 @@ def test_project_claim_projection_exposes_time_structured_basis_and_conflict_can
     assert 'card.dataset.claimConflictCount = String(conflictCandidates.length)' in claims
 
 
+def test_unavailable_conflict_projection_is_visible_and_does_not_imply_absence() -> None:
+    claims = _text(CLAIMS)
+
+    assert 'card.dataset.claimConflictProjection = status || "unknown"' in claims
+    assert 'if (status !== "unavailable") return;' in claims
+    assert 'heading.textContent = "Tensions"' in claims
+    assert 'Analyse des tensions indisponible · absence de conflit non déduite' in claims
+    assert 'section.dataset.projectClaimProjection = "conflict-status"' in claims
+
+
 def test_claim_projection_falls_back_to_existing_project_cache_if_enriched_read_is_unavailable() -> None:
     claims = _text(CLAIMS)
 
