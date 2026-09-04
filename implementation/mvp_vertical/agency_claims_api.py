@@ -3,6 +3,13 @@
 Global Claim reads use the normal Agency Data read gate. Direct Claim creation is
 human only and cannot cite an Execution Result; that path is owned by the reviewed
 candidate transition in execution_result_api.
+
+Read projections keep current, temporal and conflict semantics explicit:
+
+    current projection != temporal reconstruction
+    conflict candidate != resolved contradiction
+    provenance != Evidence
+    projection != persistence
 """
 
 from __future__ import annotations
@@ -13,7 +20,7 @@ from typing import Any, Callable, Literal
 from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
-from . import agency_claims
+from . import agency_claims, project_claim_conflicts
 
 
 class ClaimBackingRefBody(BaseModel):
@@ -56,7 +63,10 @@ def install_agency_claim_routes(
             return with_connection(operation)
         except agency_claims.ClaimNotFound as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
-        except agency_claims.AgencyClaimError as exc:
+        except (
+            agency_claims.AgencyClaimError,
+            project_claim_conflicts.ProjectClaimConflictError,
+        ) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @app.get("/agency/projects/{project_id}/claims")
@@ -65,15 +75,99 @@ def install_agency_claim_routes(
         _authorized: None = Depends(require_global_agency_read),
     ) -> dict:
         claims = claim_operation(lambda conn: agency_claims.list_project_claims(conn, project_id))
-        values, refs = claim_operation(lambda conn: agency_claims.project_claim_projection(conn, project_id))
+        projected_claims = claim_operation(
+            lambda conn: agency_claims.active_project_claims(conn, project_id)
+        )
+        values, refs = claim_operation(
+            lambda conn: agency_claims.project_claim_projection(conn, project_id)
+        )
+        conflict_candidates = claim_operation(
+            lambda conn: project_claim_conflicts.detect_project_claim_conflicts(conn, project_id)
+        )
         return {
             "system_of_record": "postgres",
             "project_id": project_id,
             "claims": claims,
+            "projected_claims": projected_claims,
             "claim_values": values,
             "claim_refs": refs,
+            "perspective": {
+                "mode": "current",
+                "business_time": None,
+                "knowledge_time": None,
+                "claim_scope": "active_unsuperseded",
+            },
+            "temporal_axes": {
+                "observed_at": "observation_time",
+                "effective_at": "explicit_business_effective_start",
+                "knowledge_time": "postgres_recording_time_cutoff",
+            },
+            "conflict_candidates": conflict_candidates,
+            "conflict_candidates_scope": "active_unsuperseded_scalar_claims",
+            "conflicts_resolved": False,
             "claim_is_visible_card_family": False,
             "authorization_inferred": False,
+            "evidence_inferred": False,
+        }
+
+    @app.get("/agency/projects/{project_id}/claims/as-of")
+    def list_project_claims_as_of(
+        project_id: str,
+        business_time: datetime | None = None,
+        knowledge_time: datetime | None = None,
+        _authorized: None = Depends(require_global_agency_read),
+    ) -> dict:
+        if business_time is None and knowledge_time is None:
+            raise HTTPException(
+                status_code=422,
+                detail="business_time or knowledge_time is required for an as-of ProjectClaim read",
+            )
+
+        if business_time is not None:
+            projected_claims = claim_operation(
+                lambda conn: agency_claims.applicable_project_claims_as_of(
+                    conn,
+                    project_id,
+                    business_time,
+                    knowledge_time=knowledge_time,
+                )
+            )
+            mode = (
+                "business_and_knowledge_as_of"
+                if knowledge_time is not None
+                else "business_as_of_current_knowledge"
+            )
+        else:
+            projected_claims = claim_operation(
+                lambda conn: agency_claims.project_claims_known_as_of(
+                    conn,
+                    project_id,
+                    knowledge_time,
+                )
+            )
+            mode = "knowledge_as_of"
+
+        return {
+            "system_of_record": "postgres",
+            "project_id": project_id,
+            "claims": projected_claims,
+            "perspective": {
+                "mode": mode,
+                "business_time": business_time.isoformat() if business_time is not None else None,
+                "knowledge_time": knowledge_time.isoformat() if knowledge_time is not None else None,
+                "claim_scope": "unsuperseded_non_retired_within_requested_cutoffs",
+            },
+            "temporal_axes": {
+                "observed_at": "observation_time",
+                "effective_at": "explicit_business_effective_start",
+                "knowledge_time": "postgres_recording_time_cutoff",
+            },
+            "conflict_candidates": [],
+            "conflict_candidates_scope": "not_evaluated_for_temporal_perspective",
+            "conflicts_resolved": False,
+            "claim_is_visible_card_family": False,
+            "authorization_inferred": False,
+            "evidence_inferred": False,
         }
 
     @app.post("/agency/projects/{project_id}/claims", status_code=201)
