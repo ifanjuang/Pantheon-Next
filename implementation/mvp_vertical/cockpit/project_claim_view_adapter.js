@@ -242,6 +242,23 @@
     section.append(conflict);
   }
 
+  function appendConflictProjectionStatus(body, card, conflictProjection) {
+    const status = conflictProjection?.status || "";
+    card.dataset.claimConflictProjection = status || "unknown";
+    if (status !== "unavailable") return;
+
+    const section = document.createElement("section");
+    section.className = "v2-back-section";
+    section.dataset.projectClaimProjection = "conflict-status";
+    const heading = document.createElement("h3");
+    heading.textContent = "Tensions";
+    const content = document.createElement("p");
+    content.className = "v2-claim-provenance";
+    content.textContent = "Analyse des tensions indisponible · absence de conflit non déduite";
+    section.append(heading, content);
+    body.append(section);
+  }
+
   function renderProjection(card, project, projectSchema, claimPayload) {
     const body = card.querySelector(".v2-card-back .v2-back-body");
     if (!body) return;
@@ -254,11 +271,13 @@
     const conflictCandidates = Array.isArray(claimPayload?.conflict_candidates)
       ? claimPayload.conflict_candidates
       : [];
+    const conflictProjection = claimPayload?.conflict_projection || null;
 
     if (claimPayload?.perspective?.mode) {
       card.dataset.claimPerspective = claimPayload.perspective.mode;
     }
     card.dataset.claimConflictCount = String(conflictCandidates.length);
+    appendConflictProjectionStatus(body, card, conflictProjection);
 
     for (const field of projectSchema?.fields || []) {
       if (field.storage !== "projection" || field.semantics !== "claim") continue;
