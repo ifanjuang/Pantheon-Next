@@ -4,7 +4,7 @@ from copy import deepcopy
 
 import pytest
 
-from mvp_vertical import apu_mapping_converter, execution_results
+from pantheon_app import apu_mapping_converter, execution_results
 
 
 SOURCE = {

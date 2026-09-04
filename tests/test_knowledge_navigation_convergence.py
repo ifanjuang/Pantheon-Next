@@ -14,7 +14,7 @@ def test_knowledge_navigation_uses_category_as_backend_owner() -> None:
     assert "retired as independent backend concepts" in text
     assert "Do not persist a parallel Folder tree for Knowledge navigation" in text
 
-    assert (ROOT / "implementation/mvp_vertical/category_collection_read.py").is_file()
+    assert (ROOT / "implementation/pantheon_app/category_collection_read.py").is_file()
     assert (ROOT / "implementation/tests/test_cockpit_category_root_navigation.py").is_file()
 
 

@@ -31,7 +31,7 @@ runtime success != Evidence
 
 Read the focused owners instead:
 
-- `mvp_vertical/cockpit/` — current implementation;
+- `pantheon_app/cockpit/` — current implementation;
 - `docs/cockpit/COCKPIT_LIVING_CARDS.md` — presentation boundary;
 - `docs/architecture/cockpit-navigation-lifecycle.md` — navigation ownership;
 - `docs/architecture/ARCHITECTURE_CONVERGENCE_EXECUTION_PLAN.md` — convergence plan;

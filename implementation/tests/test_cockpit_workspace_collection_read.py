@@ -10,12 +10,12 @@ import subprocess
 import pytest
 from fastapi.testclient import TestClient
 
-from mvp_vertical.cockpit_composed import create_composed_cockpit_app
+from pantheon_app.cockpit_composed import create_composed_cockpit_app
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA_LOADER = ROOT / "mvp_vertical" / "cockpit" / "data" / "cockpit_data_loader.js"
-ASSEMBLER = ROOT / "mvp_vertical" / "cockpit" / "projection" / "child_collection_assembler.js"
+DATA_LOADER = ROOT / "pantheon_app" / "cockpit" / "data" / "cockpit_data_loader.js"
+ASSEMBLER = ROOT / "pantheon_app" / "cockpit" / "projection" / "child_collection_assembler.js"
 
 
 def _forbidden_connection():

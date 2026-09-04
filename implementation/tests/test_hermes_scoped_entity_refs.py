@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from mvp_vertical import hermes_launch_context, hermes_scoped_context
-from mvp_vertical.entity_ref import EntityRef
+from pantheon_app import hermes_launch_context, hermes_scoped_context
+from pantheon_app.entity_ref import EntityRef
 
 
 def test_context_pack_refs_use_shared_normalization_and_ordered_deduplication() -> None:

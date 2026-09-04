@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from mvp_vertical.policy_gate import (
+from pantheon_app.policy_gate import (
     StandInPolicyClient,
     enforce_consequential,
     governed_effect,

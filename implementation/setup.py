@@ -2,7 +2,7 @@
 
 The canonical schema source remains the monorepo-root ``schemas/`` tree. Before
 building a wheel or sdist, this hook stages the complete schema tree under
-``mvp_vertical/_generated_contracts``. That directory is ignored by Git and
+``pantheon_app/_generated_contracts``. That directory is ignored by Git and
 exists solely so a built artifact can validate contracts when installed without
 a repository checkout.
 """
@@ -22,7 +22,7 @@ from setuptools.command.sdist import sdist as _sdist
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 MONOREPO_ROOT = PROJECT_ROOT.parent
-PACKAGE_ROOT = PROJECT_ROOT / "mvp_vertical"
+PACKAGE_ROOT = PROJECT_ROOT / "pantheon_app"
 GENERATED_ROOT = PACKAGE_ROOT / "_generated_contracts"
 GENERATED_SCHEMAS = GENERATED_ROOT / "schemas"
 MANIFEST_PATH = PACKAGE_ROOT / "contract_manifest.py"

@@ -1,4 +1,4 @@
-from mvp_vertical import agency_schema
+from pantheon_app import agency_schema
 
 
 def test_declared_claim_types_are_unique_and_not_attributes() -> None:

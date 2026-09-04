@@ -1,4 +1,4 @@
-from mvp_vertical import agency_schema, hermes_scoped_context
+from pantheon_app import agency_schema, hermes_scoped_context
 
 
 def test_hermes_project_materialization_uses_named_context_view(monkeypatch) -> None:

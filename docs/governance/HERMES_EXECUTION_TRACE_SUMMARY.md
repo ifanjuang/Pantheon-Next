@@ -39,10 +39,10 @@ The summary remains subordinate to existing authorities only:
 - `HERMES_EXECUTION_ADMISSION_BRIDGE.md` owns execution admission and return doctrine;
 - `HERMES_RUN_LAUNCH_JUNCTION.md` owns reservation and run correlation;
 - `schemas/work_issue_slice.schema.yaml` owns the persisted Work Issue/HermesRun slice;
-- `implementation/mvp_vertical/hermes_execution_trace.py` validates the optional technical receipt against the persisted run;
+- `implementation/pantheon_app/hermes_execution_trace.py` validates the optional technical receipt against the persisted run;
 - the existing Runtime Return path persists the receipt inside `normalized_return`;
 - the external Hermes binding builds the receipt from observed or runtime-reported facts;
-- `implementation/mvp_vertical/work_activity_projection.py` exposes the already admitted receipt as read-only Cockpit data;
+- `implementation/pantheon_app/work_activity_projection.py` exposes the already admitted receipt as read-only Cockpit data;
 - the existing Work Card renderer presents that data as technical detail only.
 
 No intermediate execution-plan owner is required. Cockpit projection is not persistence, scheduling, execution or authorization.

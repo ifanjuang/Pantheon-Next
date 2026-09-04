@@ -217,8 +217,8 @@ Exit criteria:
 First target:
 
 ```text
-mvp_vertical/cockpit/v3/materials.json
--> mvp_vertical/cockpit/registries/materials.json
+pantheon_app/cockpit/v3/materials.json
+-> pantheon_app/cockpit/registries/materials.json
 ```
 
 Replace:

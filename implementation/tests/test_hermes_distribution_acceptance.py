@@ -11,7 +11,7 @@ import importlib.util
 import json
 from pathlib import Path
 
-from mvp_vertical.hermes_run_binding import ExternalHermesRunBinding
+from pantheon_app.hermes_run_binding import ExternalHermesRunBinding
 
 
 ROOT = Path(__file__).resolve().parents[1]

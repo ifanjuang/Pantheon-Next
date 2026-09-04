@@ -46,7 +46,7 @@ REGISTRY = ROOT / ".github" / "asserted-properties.json"
 
 BINDINGS = ("behavioural", "schema", "documentary", "none")
 
-IMPLEMENTATION_PACKAGES = {"mvp_vertical", "pantheon_mcp"}
+IMPLEMENTATION_PACKAGES = {"pantheon_app", "pantheon_mcp"}
 SCHEMA_LIBRARIES = {"jsonschema"}
 
 

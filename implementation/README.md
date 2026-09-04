@@ -37,7 +37,7 @@ This repository may produce candidates, observations and refusals. It must not a
 - read-only filesystem workspace projections through explicitly configured server roots;
 - direct consumption of canonical Pantheon schemas, with generated copies only inside build artifacts.
 
-The former OpenWebUI adapter package and product-specific capability routes were removed after verification that their only executable consumers were dedicated OpenWebUI tests. Native document/Knowledge APIs and Cockpit projections remain under `mvp_vertical`.
+The former OpenWebUI adapter package and product-specific capability routes were removed after verification that their only executable consumers were dedicated OpenWebUI tests. Native document/Knowledge APIs and Cockpit projections remain under `pantheon_app`.
 
 Implementation does not imply installation, health, adoption, activation or production authorization.
 
@@ -57,9 +57,9 @@ pytest -q
 Run the bounded synthetic example:
 
 ```bash
-mvp-vertical ingest --contract dossiers/devis_reprise/task_contract.yaml
+pantheon-app ingest --contract dossiers/devis_reprise/task_contract.yaml
 
-mvp-vertical run \
+pantheon-app run \
   --contract dossiers/devis_reprise/task_contract.yaml \
   --question "le devis correspond-il au périmètre du CCTP pour le lot 06 ?" \
   --output out/candidates.yaml
@@ -78,17 +78,17 @@ The runner must refuse sources and questions outside the declared Task Contract 
 Start the Cockpit candidate with separate development credentials:
 
 ```bash
-export MVP_COCKPIT_API_KEY='dev-read-key'
-export MVP_EDITOR_API_KEY='dev-editor-key'
-export MVP_HERMES_API_KEY='dev-hermes-key'
-export MVP_DOCUMENT_ROOT='./dossiers'
-export MVP_WORKSPACE_ROOTS_JSON='{"ifja-agency":"/srv/vaults/IFJA-Agence","ifja-projects":"/srv/vaults/IFJA-Projets"}'
+export PANTHEON_COCKPIT_API_KEY='dev-read-key'
+export PANTHEON_EDITOR_API_KEY='dev-editor-key'
+export PANTHEON_HERMES_API_KEY='dev-hermes-key'
+export PANTHEON_DOCUMENT_ROOT='./dossiers'
+export PANTHEON_WORKSPACE_ROOTS_JSON='{"ifja-agency":"/srv/vaults/IFJA-Agence","ifja-projects":"/srv/vaults/IFJA-Projets"}'
 
 docker compose --profile cockpit up -d --build
 curl http://127.0.0.1:8081/health
 ```
 
-`MVP_WORKSPACE_ROOTS_JSON` is an optional server-owned JSON object mapping opaque workspace references to filesystem roots. The physical paths are never projected to the browser. An absent value produces an empty Workspace collection; malformed configuration or a configured root that does not exist fails closed at application composition. A projected workspace folder is navigation only: its name or location does not make it a Pantheon Project, Category, Knowledge, Evidence or authorization scope.
+`PANTHEON_WORKSPACE_ROOTS_JSON` is an optional server-owned JSON object mapping opaque workspace references to filesystem roots. The physical paths are never projected to the browser. An absent value produces an empty Workspace collection; malformed configuration or a configured root that does not exist fails closed at application composition. A projected workspace folder is navigation only: its name or location does not make it a Pantheon Project, Category, Knowledge, Evidence or authorization scope.
 
 The document and workspace mounts are read-only from the Cockpit projection surface. Real credentials, real dossier/workspace access and runtime activation require a separate reviewed deployment decision.
 
@@ -96,10 +96,10 @@ The document and workspace mounts are read-only from the Cockpit projection surf
 
 | Path | Purpose |
 |---|---|
-| [`mvp_vertical/`](mvp_vertical/) | Python implementation, APIs, persistence and domain projections. |
-| [`mvp_vertical/cockpit/`](mvp_vertical/cockpit/) | Cockpit frontend and projection modules. |
+| [`pantheon_app/`](pantheon_app/) | Python implementation, APIs, persistence and domain projections. |
+| [`pantheon_app/cockpit/`](pantheon_app/cockpit/) | Cockpit frontend and projection modules. |
 | [`../schemas/`](../schemas/) | Canonical Pantheon contracts consumed directly from a monorepo checkout. |
-| [`mvp_vertical/sql/`](mvp_vertical/sql/) | Additive PostgreSQL schema and migrations. |
+| [`pantheon_app/sql/`](pantheon_app/sql/) | Additive PostgreSQL schema and migrations. |
 | [`tests/`](tests/) | Contract, boundary and acceptance tests. |
 | [`dossiers/`](dossiers/) | Synthetic fixtures and Task Contracts. |
 | [`tools/`](tools/) | Inventory, qualification and architecture-audit utilities. |

@@ -3,7 +3,7 @@
 import httpx
 import pytest
 
-from mvp_vertical.policy_gate import HttpPolicyClient, enforce_consequential
+from pantheon_app.policy_gate import HttpPolicyClient, enforce_consequential
 
 BASE = "http://pantheon-policy-api:8000"
 

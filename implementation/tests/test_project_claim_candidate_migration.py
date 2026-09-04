@@ -3,7 +3,7 @@ from __future__ import annotations
 import psycopg
 import pytest
 
-from mvp_vertical import agency_claims, agency_data, execution_results
+from pantheon_app import agency_claims, agency_data, execution_results
 
 
 EXPECTED_VALIDATED_CONSTRAINTS = {

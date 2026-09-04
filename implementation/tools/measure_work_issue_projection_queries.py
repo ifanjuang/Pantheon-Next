@@ -12,7 +12,7 @@ import os
 import uuid
 from typing import Any
 
-from mvp_vertical import work_issue_read, work_issues
+from pantheon_app import work_issue_read, work_issues
 
 
 class CountingCursor:
@@ -74,7 +74,7 @@ def measure(*, issue_count: int = 3) -> dict[str, Any]:
     if issue_count < 1:
         raise ValueError("issue_count must be positive")
 
-    connection = work_issues.connect(os.getenv("MVP_PG_DSN"))
+    connection = work_issues.connect(os.getenv("PANTHEON_PG_DSN"))
     case_ref = _id("query-baseline")
     try:
         _truncate(connection)

@@ -2,8 +2,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-API = ROOT / "mvp_vertical" / "hermes_handoff_api.py"
-CLIENT = ROOT / "mvp_vertical" / "cockpit" / "handoff" / "handoff_lifecycle.js"
+API = ROOT / "pantheon_app" / "hermes_handoff_api.py"
+CLIENT = ROOT / "pantheon_app" / "cockpit" / "handoff" / "handoff_lifecycle.js"
 
 
 def test_handoff_preview_and_submit_use_stable_routes_without_aliases() -> None:

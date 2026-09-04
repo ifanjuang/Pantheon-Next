@@ -20,11 +20,11 @@ Current repository state distinguishes four things:
 dashboard/                                      = voluntarily absent real dashboard module
 docs/assets/pantheon-control/                   = bounded orientation and validation-support artifacts
 mcp-server/                                     = protected read-only verification / policy artifact, where implemented
-implementation/mvp_vertical/cockpit/            = co-located executable candidate cockpit
+implementation/pantheon_app/cockpit/            = co-located executable candidate cockpit
 templates/hermes/dashboard-plugins/             = external Hermes plugin templates, inactive until installed there
 ```
 
-The former local Pantheon Control pages, project fixtures, navigation and interactive dashboard renderers have been retired from this governance/assets zone. `docs/assets/pantheon-control/README.md` and `index.html` preserve a stable documentation path toward the co-located candidate under `implementation/mvp_vertical/cockpit/`. The former `ifanjuang/pantheon-mvp` repository remains historical provenance only; it is not a second active implementation trajectory after the recorded monorepo cutoff.
+The former local Pantheon Control pages, project fixtures, navigation and interactive dashboard renderers have been retired from this governance/assets zone. `docs/assets/pantheon-control/README.md` and `index.html` preserve a stable documentation path toward the co-located candidate under `implementation/pantheon_app/cockpit/`. The former `ifanjuang/pantheon-mvp` repository remains historical provenance only; it is not a second active implementation trajectory after the recorded monorepo cutoff.
 
 A mutation-disabled synthetic Hermes renderer preview remains because protected validation checks parity with the external dashboard-plugin template. Six JavaScript classifier mirrors also remain because protected MCP tests compare their verdicts with the Python read-only classifiers. These artifacts are validation support: they are not the Pantheon Control dashboard, not a fallback cockpit, not runtime probes and not inventory producers.
 
@@ -97,14 +97,14 @@ A visible button plus confirmation may submit the single Hermes-native action de
 |---|---|
 | Absence of real `dashboard/` module | `docs/governance/authority/OBSOLETE_AND_ABSENT_INDEX.md` |
 | Candidate cockpit orientation | `docs/assets/pantheon-control/README.md`, `docs/assets/pantheon-control/index.html` |
-| Executable candidate cockpit and demo scenarios | `implementation/mvp_vertical/cockpit/` |
+| Executable candidate cockpit and demo scenarios | `implementation/pantheon_app/cockpit/` |
 | Historical former implementation repository | Git history and recorded `ifanjuang/pantheon-mvp` provenance only |
 | Synthetic external Hermes renderer preview | `docs/assets/pantheon-control/hermes-modules.html`, `docs/assets/pantheon-control/hermes-preview/` |
 | Read-only JavaScript classifier mirrors | `docs/assets/pantheon-control/`, loaded only by protected parity tests |
 | Installable external Hermes dashboard template | `templates/hermes/dashboard-plugins/pantheon-modules/` |
 | Protected read-only verification / policy artifact | `mcp-server/`, `mcp-server/docs/HTTP_API_CONTRACT.md` |
-| Repository placement boundary | `NEXT_MVP_REPOSITORY_PLACEMENT.md` |
-| Module boundary (`dashboard/`, `mcp-server/`, `implementation/`) | `CLAUDE.md`, `NEXT_MVP_REPOSITORY_PLACEMENT.md` |
+| Repository placement boundary | `REPOSITORY_PLACEMENT.md` |
+| Module boundary (`dashboard/`, `mcp-server/`, `implementation/`) | `CLAUDE.md`, `REPOSITORY_PLACEMENT.md` |
 | Invocation and connectivity preflight | `MODULE_INVOCATION_PREFLIGHT.md` |
 | Capability passports and the chokepoint | `UNIFORM_CAPABILITY_GOVERNANCE.md` |
 | Registre Probatoire | `MEMORY.md`, `EVIDENCE_MEMORY_CANONICALIZATION.md` |

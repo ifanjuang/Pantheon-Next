@@ -10,7 +10,7 @@ from pathlib import Path
 import psycopg
 import pytest
 
-from mvp_vertical import (
+from pantheon_app import (
     agency_data,
     human_access,
     human_revision_upload,
@@ -19,7 +19,7 @@ from mvp_vertical import (
     storage_retention,
     store,
 )
-from mvp_vertical.embedder import embed, to_pgvector
+from pantheon_app.embedder import embed, to_pgvector
 
 
 @pytest.fixture

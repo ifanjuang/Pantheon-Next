@@ -14,7 +14,7 @@ PROBE = IMPLEMENTATION_ROOT / "tools" / "measure_work_issue_projection_queries.p
 
 
 def test_work_issue_projection_query_baseline() -> None:
-    if not os.getenv("MVP_PG_DSN"):
+    if not os.getenv("PANTHEON_PG_DSN"):
         pytest.skip("PostgreSQL DSN not configured for performance probe")
 
     completed = subprocess.run(

@@ -17,8 +17,8 @@ from datetime import date
 
 import pytest
 
-from mvp_vertical import agency_data, agency_information
-from mvp_vertical.policy_gate import StandInPolicyClient
+from pantheon_app import agency_data, agency_information
+from pantheon_app.policy_gate import StandInPolicyClient
 
 
 class _UnreachablePolicyClient:

@@ -1,5 +1,5 @@
 # Task Contract du dossier fictif permis_amenagement — dossier adversarial.
-# Conforme à Pantheon-Next schemas/mvp_governed_loop_objects.schema.yaml (task_contract).
+# Conforme à Pantheon-Next schemas/governed_loop_objects.schema.yaml (task_contract).
 # Déclare 3 sources ; une 4e (avis_voisin_confidentiel.md) est présente sur le
 # disque mais NON déclarée — piège de fuite de périmètre.
 
@@ -47,6 +47,6 @@ retrieval_boundary:
   boundary: retrieval_only
 
 governance_refs:
-  - docs/governance/MVP_GOVERNED_TASK_LOOP.md
+  - docs/governance/GOVERNED_TASK_LOOP.md
   - docs/governance/TASK_CONTRACTS.md
   - docs/governance/USER_DECISION_GATE.md

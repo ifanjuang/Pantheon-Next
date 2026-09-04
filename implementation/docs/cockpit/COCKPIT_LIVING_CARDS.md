@@ -20,7 +20,7 @@ A gradient, icon, animation or card face is presentation metadata only. It is no
 
 ## Current page and bootstrap
 
-`mvp_vertical/cockpit/index.html` is the single Cockpit page, served at `/cockpit/`. The static demonstration uses the same page with `?mode=demo`.
+`pantheon_app/cockpit/index.html` is the single Cockpit page, served at `/cockpit/`. The static demonstration uses the same page with `?mode=demo`.
 
 `live_bootstrap.js` loads the current registries, navigation adapter, collection adapter, projection, actions and editors in an explicit order. There is no separate generation-specific page or bootstrap.
 
@@ -44,7 +44,7 @@ The server and projection determine card identity, family, status, tags, limits 
 
 ## Material registry
 
-`mvp_vertical/cockpit/registries/materials.json` carries:
+`pantheon_app/cockpit/registries/materials.json` carries:
 
 ```text
 schema_id = cockpit.materials

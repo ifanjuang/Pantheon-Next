@@ -27,7 +27,7 @@ target of the tranche.
 
 ### 1.1 `EntityRef` — the identity primitive
 
-`pantheon-mvp:mvp_vertical/entity_ref.py` defines the only cross-domain identity
+`pantheon-mvp:pantheon_app/entity_ref.py` defines the only cross-domain identity
 primitive: a frozen pair.
 
 ```text
@@ -46,7 +46,7 @@ relation semantics of its own.
 
 ### 1.2 The Cockpit map — a derived, in-memory graph
 
-`pantheon-mvp:mvp_vertical/cockpit/map/map_graph_model.js` builds a read-only projection
+`pantheon-mvp:pantheon_app/cockpit/map/map_graph_model.js` builds a read-only projection
 of the card graph into `{ nodes, links }`. Its links are **derived, never stored**, and
 use exactly two kinds:
 
@@ -281,4 +281,4 @@ observed shape != canonical shape
 - `schemas/architecture-project-understanding/mapping_review.schema.yaml`
 - `schemas/architecture-project-understanding/write_command_candidate.schema.yaml`
 - `schemas/architecture-project-understanding/write_authorization_event.schema.yaml`
-- `docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md`
+- `docs/governance/REPOSITORY_PLACEMENT.md`

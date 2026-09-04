@@ -6,13 +6,13 @@ from pathlib import Path
 
 import pytest
 
-from mvp_vertical.structured_extraction import (
+from pantheon_app.structured_extraction import (
     chunk_ref,
     compilation_id,
     compile_document,
     unit_id,
 )
-from mvp_vertical.store import normalize_subject_tags
+from pantheon_app.store import normalize_subject_tags
 
 
 def _docling_document(*, invalid_span: bool = False) -> dict:
@@ -291,7 +291,7 @@ def test_chunk_identity_is_scoped_to_immutable_compilation() -> None:
 def test_structured_migration_keeps_sources_and_authority_out_of_scope() -> None:
     sql = (
         Path(__file__).resolve().parents[1]
-        / "mvp_vertical"
+        / "pantheon_app"
         / "sql"
         / "008_structured_extraction.sql"
     ).read_text(encoding="utf-8")

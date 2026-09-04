@@ -9,8 +9,8 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 
-from mvp_vertical import pantheon_contracts
-from mvp_vertical.terminal_gate_standin import record_decision
+from pantheon_app import pantheon_contracts
+from pantheon_app.terminal_gate_standin import record_decision
 
 
 REQUEST_REF = "mvp.test.tc"
@@ -95,7 +95,7 @@ def test_supersession_is_recorded_without_rewriting():
 
 def test_decision_record_still_authorizes_nothing_and_conforms():
     import jsonschema
-    schema = pantheon_contracts.load_schema("mvp_governed_loop_objects")
+    schema = pantheon_contracts.load_schema("governed_loop_objects")
     rec = record_decision(_candidates(), decision="approve", decided_by="Camille",
                           supersedes_decision_id="mvp.test.tc.rc-001.decision.deadbeef0000")
     assert rec["external_action_authorized"] is False
@@ -111,7 +111,7 @@ def test_digests_prove_reviewed_content():
         assert len(rec[key]["value"]) == 64  # hex sha256
     # digests conform to the vendored schema (additionalProperties: true)
     import jsonschema
-    schema = pantheon_contracts.load_schema("mvp_governed_loop_objects")
+    schema = pantheon_contracts.load_schema("governed_loop_objects")
     jsonschema.validate(rec, schema)
 
 

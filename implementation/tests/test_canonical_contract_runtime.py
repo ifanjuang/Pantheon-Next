@@ -5,12 +5,12 @@ from urllib.parse import urlparse
 
 import yaml
 
-from mvp_vertical import pantheon_contracts
+from pantheon_app import pantheon_contracts
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_ROOT = REPO_ROOT / "schemas"
-RUNTIME_ROOT = REPO_ROOT / "implementation" / "mvp_vertical"
+RUNTIME_ROOT = REPO_ROOT / "implementation" / "pantheon_app"
 
 
 def _refs(value):

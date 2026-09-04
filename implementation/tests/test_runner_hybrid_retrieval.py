@@ -2,15 +2,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from mvp_vertical.contract import TaskContract
-from mvp_vertical.retrieval import HybridRetrievedChunk
-from mvp_vertical.runner import (
+from pantheon_app.contract import TaskContract
+from pantheon_app.retrieval import HybridRetrievedChunk
+from pantheon_app.runner import (
     MAX_USEFUL_DISTANCE,
     _is_useful,
     _metric_profile,
     _run,
 )
-from mvp_vertical.store import RetrievedChunk
+from pantheon_app.store import RetrievedChunk
 
 
 class _Drafter:
@@ -91,7 +91,7 @@ def test_runner_uses_hybrid_order_and_preserves_candidate_boundaries(monkeypatch
     )
 
     monkeypatch.setattr(
-        "mvp_vertical.runner.retrieve_hybrid_scoped",
+        "pantheon_app.runner.retrieve_hybrid_scoped",
         lambda *args, **kwargs: [first, second],
     )
 
@@ -120,7 +120,7 @@ def test_runner_refuses_when_hybrid_results_have_no_useful_signal(monkeypatch) -
         lexical_rank=None,
     )
     monkeypatch.setattr(
-        "mvp_vertical.runner.retrieve_hybrid_scoped",
+        "pantheon_app.runner.retrieve_hybrid_scoped",
         lambda *args, **kwargs: [weak],
     )
 

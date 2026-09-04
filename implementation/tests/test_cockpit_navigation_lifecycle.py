@@ -15,7 +15,7 @@ import subprocess
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
 ADAPTER = "collection/motion_adapter.js"
 COLLECTION_PROVIDER = COCKPIT / "collection" / "collection_provider.js"
 

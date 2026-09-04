@@ -17,7 +17,7 @@ machines — and no two of them share a guard.
 
 That paragraph was true when it was written on 2026-08-31 and stopped being true
 the next day. `4d3e99c3` wired `HttpPolicyClient` into `cockpit_shell.create_app`
-from `MVP_POLICY_API_URL` / `MVP_POLICY_API_KEY`, behind a
+from `PANTHEON_POLICY_API_URL` / `PANTHEON_POLICY_API_KEY`, behind a
 `require_policy_client` dependency that answers 503 when enforcement is
 `required` and no decision point is configured — so the Knowledge update route
 fails closed, and disabling the gate is an explicitly declared value rather than
@@ -350,7 +350,7 @@ import hashlib
 import re
 from pathlib import Path
 
-MVP = Path(__file__).resolve().parents[1] / "mvp_vertical"
+MVP = Path(__file__).resolve().parents[1] / "pantheon_app"
 
 # Verb prefixes that name an entry point which may delegate its write.
 MUTATION_PREFIXES = frozenset({"apply", "admit", "promote", "approve", "commit"})
@@ -378,7 +378,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "the doctrine. "
             "The finding is the first statement in the function: "
             "`ensure_schema(conn)`, whose body is a migration followed by "
-            "`conn.commit()`. This is the only write path in `mvp_vertical` that "
+            "`conn.commit()`. This is the only write path in `pantheon_app` that "
             "opens by committing — three functions call `ensure_schema` inline "
             "and this is the one that mutates. Under the current routes it is "
             "harmless, since `with_connection` hands out a fresh connection per "
@@ -694,7 +694,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "matching what the write installs. `cli store-reviewed-dossier` is the new "
             "production path and the composition point that makes the gate mandatory: "
             "it refuses to open a connection unless a decision point is configured or "
-            "`MVP_POLICY_ENFORCEMENT=disabled` is declared by name, the same "
+            "`PANTHEON_POLICY_ENFORCEMENT=disabled` is declared by name, the same "
             "arrangement `bind-oidc-identity` and `cockpit_shell` already use."
         ),
     },
@@ -1022,7 +1022,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "recorded as unenforced. What makes it bite is composition: the one "
             "production path, `cli.bind-oidc-identity`, refuses to open a "
             "connection unless a decision point is configured or "
-            "`MVP_POLICY_ENFORCEMENT=disabled` is declared by name. Same "
+            "`PANTHEON_POLICY_ENFORCEMENT=disabled` is declared by name. Same "
             "arrangement as `cockpit_shell.require_policy_client`, and tested "
             "by removing it."
         ),
@@ -1967,7 +1967,7 @@ def _own_calls(node: ast.AST) -> tuple[set[str], set[tuple[str, str]]]:
 
 
 def _module_functions() -> dict[str, dict[str, ast.AST]]:
-    """Every module-level function under mvp_vertical, keyed by module stem."""
+    """Every module-level function under pantheon_app, keyed by module stem."""
     out: dict[str, dict[str, ast.AST]] = {}
     for path in sorted(MVP.rglob("*.py")):
         tree = ast.parse(path.read_text(encoding="utf-8"))
@@ -2012,7 +2012,7 @@ def _writer_closure(modules: dict[str, dict[str, ast.AST]]) -> set[tuple[str, st
 
 
 def _discovered() -> set[tuple[str, str]]:
-    """Return every public mutation entry point the net can see under mvp_vertical."""
+    """Return every public mutation entry point the net can see under pantheon_app."""
     modules = _module_functions()
     writers = _writer_closure(modules)
     found: set[tuple[str, str]] = set()

@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from mvp_vertical import agency_schema
+from pantheon_app import agency_schema
 
 
 FIXTURES = Path(__file__).parent / "fixtures" / "ifja"

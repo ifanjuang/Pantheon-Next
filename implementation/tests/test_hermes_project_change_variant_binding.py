@@ -6,7 +6,7 @@ import json
 
 import pytest
 
-from mvp_vertical.hermes_run_binding import (
+from pantheon_app.hermes_run_binding import (
     ExternalHermesRunBinding,
     HermesRunBindingError,
 )

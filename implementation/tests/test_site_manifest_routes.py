@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
-from mvp_vertical import site_manifest_preview
-from mvp_vertical.cockpit_shell import create_cockpit_app
+from pantheon_app import site_manifest_preview
+from pantheon_app.cockpit_shell import create_cockpit_app
 
 
 class _Connection:

@@ -9,7 +9,7 @@ import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
 PROJECTION = COCKPIT / "projection" / "project_anatomy_projection.js"
 LOADER = COCKPIT / "data" / "cockpit_data_loader.js"
 ASSEMBLER = COCKPIT / "projection" / "child_collection_assembler.js"

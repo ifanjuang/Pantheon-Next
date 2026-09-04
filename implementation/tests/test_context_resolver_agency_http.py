@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-CONTEXT_SELECTION = ROOT / "mvp_vertical" / "cockpit" / "context" / "context_selection.js"
+CONTEXT_SELECTION = ROOT / "pantheon_app" / "cockpit" / "context" / "context_selection.js"
 
 
 def _run_node(script: str) -> subprocess.CompletedProcess[str]:
@@ -41,8 +41,8 @@ def test_context_selection_javascript_parses() -> None:
 def test_agency_http_payloads_keep_stable_identity_and_project_code_ranking() -> None:
     script = r'''
       global.window = {};
-      require("./mvp_vertical/cockpit/context_resolver.js");
-      require("./mvp_vertical/cockpit/agency_data_binding.js");
+      require("./pantheon_app/cockpit/context_resolver.js");
+      require("./pantheon_app/cockpit/agency_data_binding.js");
 
       const resolver = window.PantheonContextResolver;
       const binding = window.PantheonAgencyDataBinding.create({
@@ -102,7 +102,7 @@ def test_agency_http_payloads_keep_stable_identity_and_project_code_ranking() ->
 
 def test_context_selection_surface_is_read_only_and_requires_explicit_selection() -> None:
     javascript = CONTEXT_SELECTION.read_text(encoding="utf-8")
-    html = (ROOT / "mvp_vertical" / "cockpit" / "index.html").read_text(encoding="utf-8")
+    html = (ROOT / "pantheon_app" / "cockpit" / "index.html").read_text(encoding="utf-8")
 
     assert 'effect !== "read_only"' in javascript
     assert 'scope_widened_implicitly: false' in javascript
@@ -111,7 +111,7 @@ def test_context_selection_surface_is_read_only_and_requires_explicit_selection(
     assert 'setTimeout(() => void search(raw, generation), 180)' in javascript
     assert 'generation !== searchGeneration' in javascript
     assert 'id="v2-context-input"' in html
-    bootstrap = (ROOT / "mvp_vertical" / "cockpit" / "live_bootstrap.js").read_text(encoding="utf-8")
+    bootstrap = (ROOT / "pantheon_app" / "cockpit" / "live_bootstrap.js").read_text(encoding="utf-8")
     assert '"context_resolver.js"' in bootstrap
     assert '"agency_data_binding.js"' in bootstrap
     assert '"context/context_selection.js"' in bootstrap

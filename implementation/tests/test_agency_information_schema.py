@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from mvp_vertical import agency_schema
+from pantheon_app import agency_schema
 
 
 def test_information_registry_declares_named_views_without_granting_authority() -> None:

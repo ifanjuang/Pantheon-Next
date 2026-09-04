@@ -7,9 +7,9 @@ from pathlib import Path
 
 import pytest
 
-from mvp_vertical import store
-from mvp_vertical.contract import TaskContract
-from mvp_vertical.naming import DocumentNameError, parse_document_name
+from pantheon_app import store
+from pantheon_app.contract import TaskContract
+from pantheon_app.naming import DocumentNameError, parse_document_name
 
 
 def test_parse_strict_project_document_name() -> None:

@@ -1,6 +1,6 @@
 import json
 
-from mvp_vertical.hermes_tool_inventory import normalize_hermes_inventory, observe_hermes_tool_inventory
+from pantheon_app.hermes_tool_inventory import normalize_hermes_inventory, observe_hermes_tool_inventory
 
 
 class Response:

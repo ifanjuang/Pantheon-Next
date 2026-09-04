@@ -5,19 +5,19 @@ from pathlib import Path
 
 import pytest
 
-from mvp_vertical import (
+from pantheon_app import (
     card_tag_context,
     hermes_handoff_preview,
     tag_registry,
 )
-from mvp_vertical.work_activity_projection import (
+from pantheon_app.work_activity_projection import (
     WorkActivityProjectionError,
     project_work_activity,
 )
 
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
 REGISTRY = COCKPIT / "registries" / "tag_registry.json"
 DEMO = COCKPIT / "demo-data.json"
 DEMO_WORK = COCKPIT / "demo-work-activity.json"

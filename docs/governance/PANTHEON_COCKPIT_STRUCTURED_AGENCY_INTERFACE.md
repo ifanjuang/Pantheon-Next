@@ -366,7 +366,7 @@ A historical answer remains tied to the context snapshot used to produce it. Cha
 
 ## 11. Implementation ownership
 
-The current co-located candidate implementation lives under `implementation/mvp_vertical/cockpit/` and adjacent bounded seams.
+The current co-located candidate implementation lives under `implementation/pantheon_app/cockpit/` and adjacent bounded seams.
 
 Observed executable foundations include:
 

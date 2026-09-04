@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI
 
-from mvp_vertical.entity_relation_api import install_entity_relation_routes
+from pantheon_app.entity_relation_api import install_entity_relation_routes
 
 
 def test_entity_relation_routes_are_installed_once() -> None:

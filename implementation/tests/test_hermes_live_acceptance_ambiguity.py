@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from mvp_vertical.hermes_live_acceptance import (
+from pantheon_app.hermes_live_acceptance import (
     HermesLiveBindingAcceptance,
     SYNTHETIC_MARKER,
 )
-from mvp_vertical.hermes_run_binding import (
+from pantheon_app.hermes_run_binding import (
     HermesLaunchReplayRequiresReconciliation,
     HermesRunRegistrationUnknown,
     HermesRunSubmissionUnknown,

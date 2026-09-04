@@ -19,7 +19,7 @@ WorkIssue identity and lifecycle
 ## Reused owners
 
 ```text
-WorkIssue lifecycle       mvp_vertical.work_issues
+WorkIssue lifecycle       pantheon_app.work_issues
 Work Card metadata        work_card_metadata
 Project                    agency_projects
 Information                agency_information_cards

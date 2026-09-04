@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from mvp_vertical import resource_profiles
+from pantheon_app import resource_profiles
 
 
 def test_document_profile_exposes_format_text_images_and_tables() -> None:

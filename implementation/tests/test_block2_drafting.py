@@ -14,9 +14,9 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
-from mvp_vertical import store
-from mvp_vertical.contract import load_contract
-from mvp_vertical.drafting import (
+from pantheon_app import store
+from pantheon_app.contract import load_contract
+from pantheon_app.drafting import (
     DeterministicDrafter,
     DraftRejected,
     duty_of_care_flags,
@@ -24,8 +24,8 @@ from mvp_vertical.drafting import (
     review_flags,
     verify_draft,
 )
-from mvp_vertical.runner import run
-from mvp_vertical.store import RetrievedChunk
+from pantheon_app.runner import run
+from pantheon_app.store import RetrievedChunk
 
 
 def _chunk(source_ref: str, body: str, chunk_no: int = 0, distance: float = 0.3) -> RetrievedChunk:
@@ -90,7 +90,7 @@ def test_query_metrics_remain_trace_scoped_not_truth_scores(monkeypatch):
         _chunk("dossiers/devis_reprise/sources/cctp_lot_06.md", "Passage le plus proche", 0, 0.2),
         _chunk("dossiers/devis_reprise/sources/devis_q-2026-041.md", "Passage suivant", 1, 0.4),
     ]
-    monkeypatch.setattr("mvp_vertical.runner.retrieve_scoped", lambda *_args, **_kwargs: chunks)
+    monkeypatch.setattr("pantheon_app.runner.retrieve_scoped", lambda *_args, **_kwargs: chunks)
 
     output = run(object(), contract, "Quels passages sont proches ?")
     evidence_items = output.documents[1]["evidence_items"]

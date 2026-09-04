@@ -4,7 +4,7 @@ import json
 
 import httpx
 
-from mvp_vertical.hermes_run_binding import HermesRunsHttpClient
+from pantheon_app.hermes_run_binding import HermesRunsHttpClient
 
 
 def test_runs_client_never_sends_session_memory_header_or_provider_overrides() -> None:

@@ -7,7 +7,7 @@ import uuid
 import psycopg
 import pytest
 
-from mvp_vertical import agency_data, store, work_issue_scopes, work_issues
+from pantheon_app import agency_data, store, work_issue_scopes, work_issues
 
 
 @pytest.fixture

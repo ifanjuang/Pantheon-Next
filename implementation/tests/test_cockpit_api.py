@@ -6,8 +6,8 @@ import time
 
 from fastapi.testclient import TestClient
 
-from mvp_vertical import knowledge, store
-from mvp_vertical.cockpit_api import create_app
+from pantheon_app import knowledge, store
+from pantheon_app.cockpit_api import create_app
 
 
 DOCUMENT_ID = "doc-0123456789abcdef01234567"

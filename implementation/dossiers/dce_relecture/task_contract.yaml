@@ -1,7 +1,7 @@
 # Task Contract du dossier fictif dce_relecture — scénarios de test.
 # Inspiré d'une relecture de DCE (dossier de consultation des entreprises)
 # de maîtrise d'œuvre, entièrement anonymisé. Aucune donnée client réelle.
-# Conforme à Pantheon-Next schemas/mvp_governed_loop_objects.schema.yaml (task_contract).
+# Conforme à Pantheon-Next schemas/governed_loop_objects.schema.yaml (task_contract).
 # Un contrat n'autorise rien par lui-même ; le gate décide.
 
 object_type: task_contract
@@ -50,6 +50,6 @@ retrieval_boundary:
   boundary: retrieval_only
 
 governance_refs:
-  - docs/governance/MVP_GOVERNED_TASK_LOOP.md
+  - docs/governance/GOVERNED_TASK_LOOP.md
   - docs/governance/TASK_CONTRACTS.md
   - docs/governance/USER_DECISION_GATE.md

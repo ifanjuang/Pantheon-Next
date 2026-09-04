@@ -8,7 +8,7 @@ import jwt
 import pytest
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-from mvp_vertical import human_access
+from pantheon_app import human_access
 
 
 class _SigningKey:
@@ -81,8 +81,8 @@ def test_oidc_verifier_rejects_wrong_signature() -> None:
 
 
 def test_partial_oidc_environment_configuration_fails_instead_of_downgrading(monkeypatch) -> None:
-    monkeypatch.setenv("MVP_OIDC_ISSUER", "https://id.example.test/")
-    monkeypatch.delenv("MVP_OIDC_AUDIENCE", raising=False)
-    monkeypatch.delenv("MVP_OIDC_JWKS_URL", raising=False)
+    monkeypatch.setenv("PANTHEON_OIDC_ISSUER", "https://id.example.test/")
+    monkeypatch.delenv("PANTHEON_OIDC_AUDIENCE", raising=False)
+    monkeypatch.delenv("PANTHEON_OIDC_JWKS_URL", raising=False)
     with pytest.raises(human_access.AccessConfigurationError):
         human_access.OidcJwtVerifier.from_env_optional()

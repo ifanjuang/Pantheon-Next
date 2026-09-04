@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 
-from mvp_vertical.cockpit_shell import create_cockpit_app
+from pantheon_app.cockpit_shell import create_cockpit_app
 
 
 class _Connection:
@@ -42,7 +42,7 @@ def test_projection_migration_is_part_of_cockpit_initializer(monkeypatch) -> Non
         def close(self) -> None:
             pass
 
-    from mvp_vertical import cockpit_shell, information_projection
+    from pantheon_app import cockpit_shell, information_projection
 
     monkeypatch.setattr(cockpit_shell.store, "connect", lambda: _InitializerConnection())
     cockpit_shell.initialize_cockpit_schema()
@@ -55,7 +55,7 @@ def test_projection_migration_is_part_of_cockpit_initializer(monkeypatch) -> Non
 # initializer replays rather than to this one alone. The narrow check below is kept
 # because it fails against the file a reader of this module is looking at.
 def test_projection_startup_migration_remains_lock_light() -> None:
-    from mvp_vertical import information_projection
+    from pantheon_app import information_projection
 
     migration = information_projection.MIGRATION.read_text(encoding="utf-8")
     unguarded = re.sub(

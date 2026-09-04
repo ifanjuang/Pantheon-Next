@@ -9,9 +9,9 @@ from pathlib import Path
 
 import pytest
 
-from mvp_vertical import store
-from mvp_vertical.contract import TaskContract
-from mvp_vertical.documents import (
+from pantheon_app import store
+from pantheon_app.contract import TaskContract
+from pantheon_app.documents import (
     ConvertedDocument,
     DoclingServeClient,
     DocumentConversionError,

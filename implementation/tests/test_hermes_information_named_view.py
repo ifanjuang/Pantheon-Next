@@ -1,10 +1,10 @@
 from pathlib import Path
 
-from mvp_vertical import agency_schema
+from pantheon_app import agency_schema
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCOPED_CONTEXT = ROOT / "mvp_vertical" / "hermes_scoped_context.py"
+SCOPED_CONTEXT = ROOT / "pantheon_app" / "hermes_scoped_context.py"
 
 
 def test_hermes_information_projection_is_owned_by_named_schema_view() -> None:

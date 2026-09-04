@@ -4,10 +4,10 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-REGISTRY = ROOT / "mvp_vertical" / "cockpit" / "registries" / "card_projection_definitions.json"
-LOADER = ROOT / "mvp_vertical" / "cockpit" / "projection" / "card_projection_definition_loader.js"
-STRUCTURED_INTERFACE = ROOT / "mvp_vertical" / "cockpit" / "structured_interface.js"
-LIVE_BOOTSTRAP = ROOT / "mvp_vertical" / "cockpit" / "live_bootstrap.js"
+REGISTRY = ROOT / "pantheon_app" / "cockpit" / "registries" / "card_projection_definitions.json"
+LOADER = ROOT / "pantheon_app" / "cockpit" / "projection" / "card_projection_definition_loader.js"
+STRUCTURED_INTERFACE = ROOT / "pantheon_app" / "cockpit" / "structured_interface.js"
+LIVE_BOOTSTRAP = ROOT / "pantheon_app" / "cockpit" / "live_bootstrap.js"
 
 
 def test_root_projection_registry_is_loaded_before_classic_projection_scripts() -> None:

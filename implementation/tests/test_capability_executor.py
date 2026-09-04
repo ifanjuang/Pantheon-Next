@@ -3,12 +3,12 @@
 import httpx
 import pytest
 
-from mvp_vertical.capability_manager import (
+from pantheon_app.capability_manager import (
     CapabilityRecord,
     HermesCapabilityExecutor,
     governed_execute,
 )
-from mvp_vertical.policy_gate import StandInPolicyClient
+from pantheon_app.policy_gate import StandInPolicyClient
 
 BASE = "http://hermes:8642"
 VERIFIED_TEST_PATH = "/test/native-capability-operation"

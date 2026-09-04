@@ -51,8 +51,8 @@ EntityRef != authorization
 ## First consumers
 
 ```text
-mvp_vertical/hermes_handoff_preview.py
-mvp_vertical/card_tag_context.py
+pantheon_app/hermes_handoff_preview.py
+pantheon_app/card_tag_context.py
 ```
 
 Other modules may migrate only when they use exactly the same identity semantics. This PR does not force every `entity_id` field into the primitive.

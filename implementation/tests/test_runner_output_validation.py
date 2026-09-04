@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import pytest
 
-from mvp_vertical.runner import (
+from pantheon_app.runner import (
     RunnerInvariantError,
     _assert_conforms_to_schema,
     _detect_commitments,

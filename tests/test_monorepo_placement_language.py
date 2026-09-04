@@ -22,14 +22,14 @@ def test_active_work_rules_close_initial_import_compatibility_debt() -> None:
 
 
 def test_current_implementation_placement_is_monorepo_native() -> None:
-    placement = _read("docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md")
+    placement = _read("docs/governance/REPOSITORY_PLACEMENT.md")
     tool_card = _read("docs/governance/TOOL_CARD_MODEL.md")
     registry = _read("registries/README.md")
 
     assert "Pantheon implementation" in placement
     assert "implementation/" in placement
     assert "Pantheon implementation under `implementation/`" in tool_card
-    assert "implementation/mvp_vertical/cockpit/registries/" in registry
+    assert "implementation/pantheon_app/cockpit/registries/" in registry
 
     assert "belongs in `pantheon-mvp`" not in tool_card
     assert "`pantheon-mvp` may own operational instances" not in registry
@@ -55,7 +55,7 @@ def test_hermes_templates_use_current_hosting_owners() -> None:
 
     for text in (skills, design, claude):
         assert "HERMES_CODE_HOSTING_BOUNDARY.md" not in text
-        assert "NEXT_MVP_REPOSITORY_PLACEMENT.md" in text
+        assert "REPOSITORY_PLACEMENT.md" in text
         assert "HERMES_INTEGRATION.md" in text
 
     assert "Executable scripts, installers, provider routers, queues and schedulers do not belong in this template surface." in skills
@@ -71,7 +71,7 @@ def test_cockpit_orientation_points_to_co_located_candidate() -> None:
     control_boundary = _read("docs/governance/PANTHEON_CONTROL_BOUNDARY.md")
 
     for text in (assets, card_stack, control_readme, control_index, control_boundary):
-        assert "implementation/mvp_vertical/cockpit" in text
+        assert "implementation/pantheon_app/cockpit" in text
 
     assert "Product cockpit screens, executable product renderers, synthetic project data and runtime scenarios belong in `ifanjuang/pantheon-mvp`" not in assets
     assert "implemented cards-first frontend is owned by the external `ifanjuang/pantheon-mvp`" not in card_stack
@@ -81,7 +81,7 @@ def test_cockpit_orientation_points_to_co_located_candidate() -> None:
 
 
 def test_historical_repository_name_remains_valid_provenance() -> None:
-    placement = _read("docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md")
+    placement = _read("docs/governance/REPOSITORY_PLACEMENT.md")
     card_stack = _read("docs/assets/card-stack/README.md")
 
     assert "former repository = ifanjuang/pantheon-mvp" in placement
@@ -105,7 +105,7 @@ def test_retired_external_vertical_binding_stays_out_of_active_governance() -> N
     reviews = _read("docs/governance/reference_reviews/README.md")
     assert "`PANTHEON_MVP_VERTICAL_BINDING.md` (removed; Git history)" in obsolete
     assert "superseded / historical provenance" in reviews
-    assert "NEXT_MVP_REPOSITORY_PLACEMENT.md" in reviews
+    assert "REPOSITORY_PLACEMENT.md" in reviews
 
 
 def test_active_mcp_owners_do_not_reference_retired_policy_server_docs() -> None:
@@ -142,7 +142,7 @@ def test_superseded_external_mvp_review_stays_as_strategic_memory_only() -> None
     reviews = _read("docs/governance/reference_reviews/README.md")
     assert "Pantheon MVP Vertical bundle" in reviews
     assert "superseded / historical provenance" in reviews
-    assert "NEXT_MVP_REPOSITORY_PLACEMENT.md" in reviews
+    assert "REPOSITORY_PLACEMENT.md" in reviews
     assert "implementation/` tests" in reviews
 
 
@@ -156,11 +156,11 @@ def test_runtime_adapter_index_uses_logical_tool_card_owner() -> None:
 def test_retired_paperless_and_document_observer_paths_stay_absent() -> None:
     retired = (
         "implementation/compose.paperless.yaml",
-        "implementation/mvp_vertical/paperless.py",
-        "implementation/mvp_vertical/paperless_gateway.py",
-        "implementation/mvp_vertical/paperless_ingestion.py",
-        "implementation/mvp_vertical/document_runtime_observer.py",
-        "implementation/mvp_vertical/document_runtime_network_observer.py",
+        "implementation/pantheon_app/paperless.py",
+        "implementation/pantheon_app/paperless_gateway.py",
+        "implementation/pantheon_app/paperless_ingestion.py",
+        "implementation/pantheon_app/document_runtime_observer.py",
+        "implementation/pantheon_app/document_runtime_network_observer.py",
         "implementation/hermes/skills/pantheon-document-intake/SKILL.md",
         "docs/governance/PAPERLESS_NGX_DOCUMENT_RUNTIME.md",
         "docs/governance/HERMES_PAPERLESS_DOCUMENT_INTAKE_BINDING.md",
@@ -176,7 +176,7 @@ def test_paperless_is_not_still_advertised_by_base_compose() -> None:
     for token in (
         "paperless",
         "paperless-gateway",
-        "mvp_vertical.paperless_gateway",
+        "pantheon_app.paperless_gateway",
         "paperless_api_url",
     ):
         assert token not in compose
@@ -197,9 +197,9 @@ def test_document_source_management_can_remain_intentionally_unbound() -> None:
 def test_phase_b_keeps_current_generic_runtime_owners() -> None:
     current = (
         "implementation/compose.phase-b.yaml",
-        "implementation/mvp_vertical/source_intake.py",
-        "implementation/mvp_vertical/source_intake_api.py",
-        "implementation/mvp_vertical/runtime_observation.py",
+        "implementation/pantheon_app/source_intake.py",
+        "implementation/pantheon_app/source_intake_api.py",
+        "implementation/pantheon_app/runtime_observation.py",
     )
     for relative in current:
         assert (ROOT / relative).is_file(), relative

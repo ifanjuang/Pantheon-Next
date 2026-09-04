@@ -1,4 +1,4 @@
-"""Block 1 acceptance tests — mapped to MVP_GOVERNED_TASK_LOOP.md criteria.
+"""Block 1 acceptance tests — mapped to GOVERNED_TASK_LOOP.md criteria.
 
 Requires a running pgvector instance (docker compose up -d). Tests skip
 cleanly when the database is unreachable so unit-only environments stay
@@ -14,15 +14,15 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 
-from mvp_vertical import pantheon_contracts
-from mvp_vertical import store
-from mvp_vertical.contract import (
+from pantheon_app import pantheon_contracts
+from pantheon_app import store
+from pantheon_app.contract import (
     ContractError,
     assert_source_in_scope,
     load_contract,
     resolve_source_within,
 )
-from mvp_vertical.runner import (
+from pantheon_app.runner import (
     RunnerInvariantError,
     _assert_no_external_authorization,
     _request_scope_digest,
@@ -136,7 +136,7 @@ def test_real_fixture_conforms_to_vendored_schema():
 
 def test_scoped_retrieval_never_leaves_perimeter(conn, contract, ingested):
     # plant a chunk OUTSIDE the declared perimeter, same dossier
-    from mvp_vertical.embedder import embed, to_pgvector
+    from pantheon_app.embedder import embed, to_pgvector
     with conn.cursor() as cur:
         cur.execute(
             "INSERT INTO chunks (dossier, source_ref, chunk_no, body, embedding)"
@@ -221,7 +221,7 @@ def test_runner_never_authorizes_external_action():
 
 def test_output_validates_against_vendored_schema(conn, contract, ingested):
     import jsonschema
-    schema = pantheon_contracts.load_schema("mvp_governed_loop_objects")
+    schema = pantheon_contracts.load_schema("governed_loop_objects")
     out = run(conn, contract, "le devis de reprise correspond-il au périmètre du CCTP pour le lot 06 ?")
     for doc in out.documents:
         jsonschema.validate(doc, schema)
@@ -230,8 +230,8 @@ def test_output_validates_against_vendored_schema(conn, contract, ingested):
 # Gates 4 & 5 (adoption review): the terminal decision-gate stand-in. All
 # DB-free — the gate records a decision on a candidate stream, no pgvector.
 
-from mvp_vertical import terminal_gate_standin as gate
-from mvp_vertical.terminal_gate_standin import GateRefusal, record_decision
+from pantheon_app import terminal_gate_standin as gate
+from pantheon_app.terminal_gate_standin import GateRefusal, record_decision
 
 
 def _sample_candidates(status: str = "draft_to_review") -> list:
@@ -278,7 +278,7 @@ def test_gate_records_conforming_decision():
     assert rec["related_evidence_pack"] == "mvp.test.tc.ep-001"
     # conforms to the vendored schema (validated inside record_decision)
     import jsonschema
-    schema = pantheon_contracts.load_schema("mvp_governed_loop_objects")
+    schema = pantheon_contracts.load_schema("governed_loop_objects")
     jsonschema.validate(rec, schema)
 
 

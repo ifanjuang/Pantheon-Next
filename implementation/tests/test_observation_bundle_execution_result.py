@@ -4,7 +4,7 @@ from copy import deepcopy
 
 import pytest
 
-from mvp_vertical import execution_results
+from pantheon_app import execution_results
 
 
 PROJECT_REF = "project.contract-test"

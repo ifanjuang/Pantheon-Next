@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from mvp_vertical import agency_claims, agency_data, agency_information, work_issues
+from pantheon_app import agency_claims, agency_data, agency_information, work_issues
 
 
 FIXTURES = Path(__file__).parent / "fixtures" / "ifja"

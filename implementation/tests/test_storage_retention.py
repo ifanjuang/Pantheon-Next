@@ -9,7 +9,7 @@ from pathlib import Path
 import psycopg
 import pytest
 
-from mvp_vertical import project_documents, storage_retention, pantheon_contracts
+from pantheon_app import project_documents, storage_retention, pantheon_contracts
 
 
 PROVIDER = "agency-retention-primary"

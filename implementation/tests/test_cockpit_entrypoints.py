@@ -12,7 +12,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
 
 # Entry points that redirect somewhere, and the directory their targets resolve against.
 ENTRY_POINTS = (
@@ -39,7 +39,7 @@ def test_entry_point_redirect_targets_exist() -> None:
 def test_repository_root_opens_the_single_cockpit_page() -> None:
     html = (ROOT / "index.html").read_text(encoding="utf-8")
 
-    assert "mvp_vertical/cockpit/index.html?mode=demo" in html
+    assert "pantheon_app/cockpit/index.html?mode=demo" in html
     # The retired pages must not come back as entry points.
     assert "v2.html" not in html
     assert "v3.html" not in html

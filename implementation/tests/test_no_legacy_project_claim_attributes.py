@@ -3,7 +3,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCHEMA = ROOT / "mvp_vertical" / "agency_schema" / "project.json"
+SCHEMA = ROOT / "pantheon_app" / "agency_schema" / "project.json"
 
 
 LEGACY = {

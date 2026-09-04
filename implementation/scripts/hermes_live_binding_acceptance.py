@@ -14,20 +14,20 @@ import json
 import os
 import sys
 
-from mvp_vertical.hermes_live_acceptance import (
+from pantheon_app.hermes_live_acceptance import (
     CONTEXT_TOOLS,
     HermesLiveAcceptanceError,
     HermesLiveBindingAcceptance,
     HermesRunEventInspector,
     PantheonLiveAcceptanceInspector,
 )
-from mvp_vertical.hermes_run_binding import (
+from pantheon_app.hermes_run_binding import (
     ExternalHermesRunBinding,
     HermesRunBindingError,
     HermesRunsHttpClient,
     PantheonRunBridgeClient,
 )
-from mvp_vertical.hermes_runs_observer import (
+from pantheon_app.hermes_runs_observer import (
     HermesRunsApiObserver,
     HermesRunsObservationError,
 )

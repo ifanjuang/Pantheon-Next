@@ -14,7 +14,7 @@ source_pins:
 components:
   - component_id: run-binding
     kind: run_binding
-    path: implementation/mvp_vertical/hermes_run_binding.py
+    path: implementation/pantheon_app/hermes_run_binding.py
     digest_mode: file
     content_digest: sha256:1111111111111111111111111111111111111111111111111111111111111111
     required: true
@@ -91,7 +91,7 @@ governance_refs:
   - templates/hermes/AGENTS.md
   - templates/hermes/SKILLS.md
   - docs/governance/HERMES_RUNTIME_SURFACE_REVIEW.md
-  - docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md
+  - docs/governance/REPOSITORY_PLACEMENT.md
   - docs/governance/HERMES_INTEGRATION.md
   - docs/governance/TASK_CONTRACTS.md
   - docs/governance/CONTEXT_PACKS.md

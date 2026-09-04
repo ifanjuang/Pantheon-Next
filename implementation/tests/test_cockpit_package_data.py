@@ -10,7 +10,7 @@ PYPROJECT = ROOT / "pyproject.toml"
 
 def test_cockpit_runtime_assets_use_one_recursive_package_pattern() -> None:
     config = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
-    patterns = config["tool"]["setuptools"]["package-data"]["mvp_vertical"]
+    patterns = config["tool"]["setuptools"]["package-data"]["pantheon_app"]
 
     assert "cockpit/**/*" in patterns
     assert not any(

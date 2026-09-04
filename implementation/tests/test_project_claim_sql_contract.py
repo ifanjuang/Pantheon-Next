@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SQL = (ROOT / "mvp_vertical" / "sql" / "002_agency_data.sql").read_text(encoding="utf-8")
+SQL = (ROOT / "pantheon_app" / "sql" / "002_agency_data.sql").read_text(encoding="utf-8")
 
 
 def test_project_claim_store_is_append_only_and_semantic() -> None:

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
-from mvp_vertical import hermes_scoped_context
-from mvp_vertical.cockpit_shell import create_cockpit_app
+from pantheon_app import hermes_scoped_context
+from pantheon_app.cockpit_shell import create_cockpit_app
 
 
 class _Connection:

@@ -1,10 +1,10 @@
 from pathlib import Path
 
-from mvp_vertical import agency_schema
+from pantheon_app import agency_schema
 
 
 ROOT = Path(__file__).resolve().parents[1]
-BINDING = ROOT / "mvp_vertical" / "cockpit" / "notion_agency_binding.js"
+BINDING = ROOT / "pantheon_app" / "cockpit" / "notion_agency_binding.js"
 
 
 def test_notion_project_view_projects_only_declared_fields() -> None:

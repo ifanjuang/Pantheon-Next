@@ -15,22 +15,22 @@ Files:
 
 ## Current implementation and historical observation
 
-The cards-first executable candidate frontend is co-located under [`implementation/mvp_vertical/cockpit/`](../../../implementation/mvp_vertical/cockpit/). This `docs/assets/card-stack/` directory remains governance-grammar illustration only and does not own the executable Cockpit.
+The cards-first executable candidate frontend is co-located under [`implementation/pantheon_app/cockpit/`](../../../implementation/pantheon_app/cockpit/). This `docs/assets/card-stack/` directory remains governance-grammar illustration only and does not own the executable Cockpit.
 
 The original external implementation observation remains useful as provenance:
 
 ```text
 former repository: ifanjuang/pantheon-mvp
 historical commit: 4ee41a845ec51db3118a584db0411a300450ccbd
-historical source: mvp_vertical/cockpit/demo.html
-current source: implementation/mvp_vertical/cockpit/demo.html
+historical source: pantheon_app/cockpit/demo.html
+current source: implementation/pantheon_app/cockpit/demo.html
 ```
 
 Links:
 
-- [current co-located no-network demo source](../../../implementation/mvp_vertical/cockpit/demo.html);
-- [current co-located Cockpit assets](../../../implementation/mvp_vertical/cockpit/);
-- [historical external observation](https://github.com/ifanjuang/pantheon-mvp/tree/4ee41a845ec51db3118a584db0411a300450ccbd/mvp_vertical/cockpit).
+- [current co-located no-network demo source](../../../implementation/pantheon_app/cockpit/demo.html);
+- [current co-located Cockpit assets](../../../implementation/pantheon_app/cockpit/);
+- [historical external observation](https://github.com/ifanjuang/pantheon-mvp/tree/4ee41a845ec51db3118a584db0411a300450ccbd/pantheon_app/cockpit).
 
 The current demo uses the imported Cockpit assets and injects synthetic fixtures through the implementation demo path. Repository co-location does not make this static governance directory an executable surface, and the historical external link remains provenance only.
 

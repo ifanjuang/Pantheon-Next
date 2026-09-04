@@ -4,7 +4,7 @@ import uuid
 
 import pytest
 
-from mvp_vertical import agency_change_candidates, agency_data
+from pantheon_app import agency_change_candidates, agency_data
 
 
 def _id(prefix: str) -> str:
@@ -194,8 +194,8 @@ def test_candidate_api_is_installed_but_does_not_expose_hermes_creation() -> Non
     from pathlib import Path
 
     root = Path(__file__).resolve().parents[1]
-    api = (root / "mvp_vertical" / "agency_change_candidate_api.py").read_text(encoding="utf-8")
-    installer = (root / "mvp_vertical" / "agency_data_api.py").read_text(encoding="utf-8")
+    api = (root / "pantheon_app" / "agency_change_candidate_api.py").read_text(encoding="utf-8")
+    installer = (root / "pantheon_app" / "agency_data_api.py").read_text(encoding="utf-8")
     assert '/agency/projects/{project_id}/change-candidates' in api
     assert '/agency/change-candidates/{candidate_id}/apply' in api
     assert '/agency/change-candidates/{candidate_id}/reject' in api

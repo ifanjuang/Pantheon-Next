@@ -199,7 +199,7 @@ def test_lab_has_no_pantheon_or_isnad_decision_persistence_path() -> None:
         "isnad.api",
         "store_claim(",
         "review_queue",
-        "mvp_vertical",
+        "pantheon_app",
     )
     for token in forbidden:
         assert token not in source

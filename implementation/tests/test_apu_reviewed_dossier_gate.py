@@ -19,8 +19,8 @@ import uuid
 
 import pytest
 
-from mvp_vertical import agency_data, apu_owner, store
-from mvp_vertical.policy_gate import StandInPolicyClient
+from pantheon_app import agency_data, apu_owner, store
+from pantheon_app.policy_gate import StandInPolicyClient
 
 
 def _id(prefix: str) -> str:
@@ -246,9 +246,9 @@ def test_a_dossier_decided_by_a_non_human_is_refused(conn) -> None:
 
 
 def _run_cli(monkeypatch, capsys, tmp_path, env: dict[str, str | None]):
-    from mvp_vertical import cli
+    from pantheon_app import cli
 
-    for key in ("MVP_POLICY_API_URL", "MVP_POLICY_API_KEY", "MVP_POLICY_ENFORCEMENT"):
+    for key in ("PANTHEON_POLICY_API_URL", "PANTHEON_POLICY_API_KEY", "PANTHEON_POLICY_ENFORCEMENT"):
         monkeypatch.delenv(key, raising=False)
     for key, value in env.items():
         if value is not None:
@@ -266,7 +266,7 @@ def _run_cli(monkeypatch, capsys, tmp_path, env: dict[str, str | None]):
     monkeypatch.setattr(
         "sys.argv",
         [
-            "mvp-vertical",
+            "pantheon-app",
             "store-reviewed-dossier",
             "--dossier", str(dossier_path),
             "--actor", "human:architect",
@@ -289,10 +289,10 @@ def test_the_cli_refuses_to_install_without_a_decision_point(monkeypatch, capsys
     code, stderr = _run_cli(monkeypatch, capsys, tmp_path, {})
     assert code == 1
     assert "decision point is not configured" in stderr
-    assert "MVP_POLICY_ENFORCEMENT=disabled explicitly" in stderr
+    assert "PANTHEON_POLICY_ENFORCEMENT=disabled explicitly" in stderr
 
 
 def test_the_cli_refuses_an_unreadable_enforcement_setting(monkeypatch, capsys, tmp_path) -> None:
-    code, stderr = _run_cli(monkeypatch, capsys, tmp_path, {"MVP_POLICY_ENFORCEMENT": "maybe"})
+    code, stderr = _run_cli(monkeypatch, capsys, tmp_path, {"PANTHEON_POLICY_ENFORCEMENT": "maybe"})
     assert code == 1
     assert "must be 'required' or 'disabled'" in stderr

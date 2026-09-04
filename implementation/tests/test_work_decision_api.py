@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from mvp_vertical.cockpit_shell import create_cockpit_app
+from pantheon_app.cockpit_shell import create_cockpit_app
 
 
 def test_work_review_routes_are_installed_and_require_editor_key():
@@ -29,7 +29,7 @@ def test_decision_request_action_module_is_loaded_and_keeps_hermes_out():
     from pathlib import Path
 
     root = Path(__file__).resolve().parents[1]
-    cockpit = root / "mvp_vertical" / "cockpit"
+    cockpit = root / "pantheon_app" / "cockpit"
     bootstrap = (cockpit / "live_bootstrap.js").read_text(encoding="utf-8")
     actions = (cockpit / "actions" / "decision_request_actions.js").read_text(encoding="utf-8")
 

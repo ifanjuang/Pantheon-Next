@@ -22,10 +22,10 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
-from mvp_vertical import store
-from mvp_vertical.contract import load_contract
-from mvp_vertical.embedder import embed, to_pgvector
-from mvp_vertical.runner import MAX_USEFUL_DISTANCE, run
+from pantheon_app import store
+from pantheon_app.contract import load_contract
+from pantheon_app.embedder import embed, to_pgvector
+from pantheon_app.runner import MAX_USEFUL_DISTANCE, run
 
 ADV = ROOT / "dossiers/permis_amenagement/task_contract.yaml"
 UNDECLARED = "dossiers/permis_amenagement/sources/avis_voisin_confidentiel.md"

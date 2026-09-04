@@ -10,7 +10,7 @@ import uuid
 
 import pytest
 
-from mvp_vertical import pantheon_contracts
+from pantheon_app import pantheon_contracts
 
 CONTRACTS = (
     "source_intake_admission",
@@ -45,7 +45,7 @@ def test_unknown_contract_is_reported_as_unavailable() -> None:
 
 @pytest.fixture
 def conn():
-    from mvp_vertical import agency_data, information_projection, source_intake
+    from pantheon_app import agency_data, information_projection, source_intake
 
     try:
         connection = agency_data.connect()
@@ -74,7 +74,7 @@ def _id(prefix: str) -> str:
 
 
 def test_source_projection_conforms(conn) -> None:
-    from mvp_vertical import source_intake
+    from pantheon_app import source_intake
 
     record = source_intake.create_source(
         conn,
@@ -101,7 +101,7 @@ def test_source_projection_conforms(conn) -> None:
 def test_information_projection_conforms_before_and_after_metadata(conn) -> None:
     from datetime import date
 
-    from mvp_vertical import agency_data, agency_information, information_projection
+    from pantheon_app import agency_data, agency_information, information_projection
 
     project = agency_data.create_project(
         conn,

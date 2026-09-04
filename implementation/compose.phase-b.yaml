@@ -6,18 +6,18 @@ x-mvp-runtime: &mvp-runtime
 
 services:
   pgvector:
-    image: ${MVP_PGVECTOR_IMAGE:?set MVP_PGVECTOR_IMAGE to a reviewed pinned pgvector image}
+    image: ${PANTHEON_PGVECTOR_IMAGE:?set PANTHEON_PGVECTOR_IMAGE to a reviewed pinned pgvector image}
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${MVP_PG_USER:-pantheon_mvp}
-      POSTGRES_PASSWORD: ${MVP_PG_PASSWORD:?set MVP_PG_PASSWORD outside the repository}
-      POSTGRES_DB: ${MVP_PG_DB:-pantheon_mvp}
+      POSTGRES_USER: ${PANTHEON_PG_USER:-pantheon_mvp}
+      POSTGRES_PASSWORD: ${PANTHEON_PG_PASSWORD:?set PANTHEON_PG_PASSWORD outside the repository}
+      POSTGRES_DB: ${PANTHEON_PG_DB:-pantheon_mvp}
     volumes:
       - type: bind
-        source: ${MVP_PG_DATA_PATH:?set MVP_PG_DATA_PATH outside the repository}
+        source: ${PANTHEON_PG_DATA_PATH:?set PANTHEON_PG_DATA_PATH outside the repository}
         target: /var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${MVP_PG_USER:-pantheon_mvp} -d ${MVP_PG_DB:-pantheon_mvp}"]
+      test: ["CMD-SHELL", "pg_isready -U ${PANTHEON_PG_USER:-pantheon_mvp} -d ${PANTHEON_PG_DB:-pantheon_mvp}"]
       interval: 10s
       timeout: 5s
       retries: 20
@@ -34,24 +34,24 @@ services:
 
   cockpit-api:
     <<: *mvp-runtime
-    command: ["mvp-cockpit-api"]
+    command: ["pantheon-cockpit"]
     restart: unless-stopped
     depends_on:
       pgvector:
         condition: service_healthy
     environment:
-      MVP_PG_DSN: ${MVP_PG_DSN:?set MVP_PG_DSN outside the repository}
-      MVP_DOCUMENT_ROOT: /documents
-      MVP_COCKPIT_API_KEY: ${MVP_COCKPIT_API_KEY:?set MVP_COCKPIT_API_KEY outside the repository}
-      MVP_EDITOR_API_KEY: ${MVP_EDITOR_API_KEY:-}
-      MVP_HERMES_API_KEY: ${MVP_HERMES_API_KEY:-}
-      MVP_UPDATE_SIGNING_SECRET: ${MVP_UPDATE_SIGNING_SECRET:-}
-      MVP_COCKPIT_PUBLIC_URL: ${MVP_COCKPIT_PUBLIC_URL:-http://cockpit-api:8081}
-      MVP_COCKPIT_HOST: 0.0.0.0
-      MVP_COCKPIT_PORT: 8081
+      PANTHEON_PG_DSN: ${PANTHEON_PG_DSN:?set PANTHEON_PG_DSN outside the repository}
+      PANTHEON_DOCUMENT_ROOT: /documents
+      PANTHEON_COCKPIT_API_KEY: ${PANTHEON_COCKPIT_API_KEY:?set PANTHEON_COCKPIT_API_KEY outside the repository}
+      PANTHEON_EDITOR_API_KEY: ${PANTHEON_EDITOR_API_KEY:-}
+      PANTHEON_HERMES_API_KEY: ${PANTHEON_HERMES_API_KEY:-}
+      PANTHEON_UPDATE_SIGNING_SECRET: ${PANTHEON_UPDATE_SIGNING_SECRET:-}
+      PANTHEON_COCKPIT_PUBLIC_URL: ${PANTHEON_COCKPIT_PUBLIC_URL:-http://cockpit-api:8081}
+      PANTHEON_COCKPIT_HOST: 0.0.0.0
+      PANTHEON_COCKPIT_PORT: 8081
     volumes:
       - type: bind
-        source: ${MVP_DOCUMENT_ROOT:?set MVP_DOCUMENT_ROOT outside the repository}
+        source: ${PANTHEON_DOCUMENT_ROOT:?set PANTHEON_DOCUMENT_ROOT outside the repository}
         target: /documents
         read_only: true
     read_only: true

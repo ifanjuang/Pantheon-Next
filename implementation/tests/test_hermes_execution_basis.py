@@ -4,13 +4,13 @@ from pathlib import Path
 
 import pytest
 
-from mvp_vertical import (
+from pantheon_app import (
     hermes_execution,
     hermes_handoff_store,
     hermes_launch_context,
     hermes_scoped_context,
 )
-from mvp_vertical.hermes_execution_basis import (
+from pantheon_app.hermes_execution_basis import (
     HermesExecutionBasis,
     HermesExecutionBasisError,
 )

@@ -8,9 +8,9 @@ import time
 
 import pytest
 
-from mvp_vertical import knowledge_update
-from mvp_vertical.knowledge_update import KnowledgeUpdateError, apply_knowledge_update
-from mvp_vertical.policy_gate import StandInPolicyClient
+from pantheon_app import knowledge_update
+from pantheon_app.knowledge_update import KnowledgeUpdateError, apply_knowledge_update
+from pantheon_app.policy_gate import StandInPolicyClient
 
 SECRET = "s" * 32
 PROJECT = "P-42"
@@ -87,7 +87,7 @@ def test_chokepoint_builds_a_scoped_decision_from_the_update_inputs():
 
 
 def test_issuer_signing_secret_signs_the_decision_sent_to_the_pdp():
-    from mvp_vertical.decision_signing import sign_decision
+    from pantheon_app.decision_signing import sign_decision
 
     client = _SpyClient()  # eligible preflight, forced-invalid decision (blocks pre-DB)
     with pytest.raises(KnowledgeUpdateError):

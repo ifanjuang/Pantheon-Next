@@ -4,12 +4,12 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
 PROJECTION = COCKPIT / "projection" / "cockpit_projection.js"
 
 
 def test_project_edit_view_is_generic_and_keeps_claims_and_contacts_out() -> None:
-    registry = json.loads((ROOT / "mvp_vertical" / "agency_schema" / "project.json").read_text(encoding="utf-8"))
+    registry = json.loads((ROOT / "pantheon_app" / "agency_schema" / "project.json").read_text(encoding="utf-8"))
     edit_fields = registry["views"]["edit"]["fields"]
     assert "code" in edit_fields
     assert "display_name" in edit_fields

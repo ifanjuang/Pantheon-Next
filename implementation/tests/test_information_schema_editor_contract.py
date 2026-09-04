@@ -2,11 +2,11 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
 SCHEMA_EDITOR = COCKPIT / "schema_editor.js"
 CONTACTS_EDITOR = COCKPIT / "contacts_editor.js"
-INFORMATION_SCHEMA = ROOT / "mvp_vertical" / "agency_schema" / "information.json"
-AGENCY_INFORMATION = ROOT / "mvp_vertical" / "agency_information.py"
+INFORMATION_SCHEMA = ROOT / "pantheon_app" / "agency_schema" / "information.json"
+AGENCY_INFORMATION = ROOT / "pantheon_app" / "agency_information.py"
 
 
 def test_schema_editor_is_multi_entity_and_contacts_stay_separate() -> None:

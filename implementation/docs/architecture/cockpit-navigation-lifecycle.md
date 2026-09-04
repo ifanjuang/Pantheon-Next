@@ -24,13 +24,13 @@ Swiper est un moteur de mouvement compact remplaçable. Il ne possède ni la col
 Le contrat est défini dans :
 
 ```text
-mvp_vertical/cockpit/collection/cockpit_snapshot.js
+pantheon_app/cockpit/collection/cockpit_snapshot.js
 ```
 
 Le producteur actuel est unique :
 
 ```text
-mvp_vertical/cockpit/providers/live_provider.js
+pantheon_app/cockpit/providers/live_provider.js
 ```
 
 Le mode démonstration substitue les données sous ce producteur : `demo_bootstrap.js`
@@ -222,7 +222,7 @@ UI mode != authorization
 Le rendu structurel des cartes appartient à :
 
 ```text
-mvp_vertical/cockpit/rendering/card_renderer.js
+pantheon_app/cockpit/rendering/card_renderer.js
 ```
 
 Les présentations compactes et expanded utilisent ce même renderer. Le verso temporaire au hover est un état CSS de présentation et ne crée pas de second modèle de carte.
@@ -230,7 +230,7 @@ Les présentations compactes et expanded utilisent ce même renderer. Le verso t
 Le registre de matériaux appartient à :
 
 ```text
-mvp_vertical/cockpit/registries/materials.json
+pantheon_app/cockpit/registries/materials.json
 ```
 
 Son identité est stable :

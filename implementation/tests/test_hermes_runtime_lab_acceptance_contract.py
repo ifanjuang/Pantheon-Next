@@ -21,7 +21,7 @@ HARNESS = ROOT / "tools" / "run_hermes_runtime_lab_acceptance.py"
 FIXTURE = ROOT / "tools" / "hermes_runtime_lab_fixture.py"
 VARIANT_HARNESS = ROOT / "tools" / "run_hermes_project_variant_lab_acceptance.py"
 VARIANT_FIXTURE = ROOT / "tools" / "hermes_project_variant_lab_fixture.py"
-DISTRIBUTION = ROOT / "mvp_vertical" / "hermes_distribution.py"
+DISTRIBUTION = ROOT / "pantheon_app" / "hermes_distribution.py"
 DISTRIBUTION_AUTHORITY_REF = "1afbcdb25209fa6e411dc3792ddeb56447685ebf"
 
 
@@ -103,7 +103,7 @@ def test_sequence_uses_supported_exact_source_artifact() -> None:
     assert 'DISTRIBUTION_AUTHORITY_ROOT="$GITHUB_WORKSPACE/distribution-authority"' in raw
     assert 'PANTHEON_CONTEXT_PLUGIN_SOURCE="file://$MONOREPO_ROOT#implementation/hermes/plugins/pantheon-context-bridge"' in raw
     assert "$GITHUB_WORKSPACE/pantheon-mvp" not in raw
-    assert "MVP_ROOT=" not in raw
+    assert "PANTHEON_ROOT=" not in raw
     assert "NEXT_ROOT=" not in raw
     assert "python -m build" not in raw
     assert "bdist_wheel" not in raw
@@ -111,7 +111,7 @@ def test_sequence_uses_supported_exact_source_artifact() -> None:
     variant = VARIANT_SEQUENCE.read_text(encoding="utf-8")
     assert 'IMPLEMENTATION_ROOT="$GITHUB_WORKSPACE/monorepo/implementation"' in variant
     assert "$GITHUB_WORKSPACE/pantheon-mvp" not in variant
-    assert "MVP_ROOT=" not in variant
+    assert "PANTHEON_ROOT=" not in variant
 
 
 def test_install_activation_run_and_rollback_remain_ordered() -> None:

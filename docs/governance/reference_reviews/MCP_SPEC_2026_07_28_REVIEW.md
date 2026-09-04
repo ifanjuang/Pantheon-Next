@@ -218,7 +218,7 @@ allowed_distillation: collision clarifications; caching boundary rule; forbidden
 forbidden_import: Tasks extension as internal scheduler/queue; sampling; provider routing
 related_governance_docs: >
   MCP_POLICY_SERVER_CANDIDATE.md, EXTERNAL_TOOLS_POLICY.md, CONTEXT_PACKS.md,
-  authority/RUNTIME_ADAPTERS_AUTHORITY_INDEX.md, NEXT_MVP_REPOSITORY_PLACEMENT.md
+  authority/RUNTIME_ADAPTERS_AUTHORITY_INDEX.md, REPOSITORY_PLACEMENT.md
 status: observe
 review_notes: SDK 2.x migration completed in PR #495; optional features remain governed separately.
 ```

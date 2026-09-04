@@ -7,13 +7,13 @@ Date: 2026-08-03.
 ## Removed surface
 
 ```text
-mvp_vertical/source_verification.py
+pantheon_app/source_verification.py
 tests/test_source_verification.py
 ```
 
 ## Usage evidence
 
-The cross-repository module usage inventory classified `mvp_vertical.source_verification` as `test_only`:
+The cross-repository module usage inventory classified `pantheon_app.source_verification` as `test_only`:
 
 - no non-test Python importer;
 - no API route;

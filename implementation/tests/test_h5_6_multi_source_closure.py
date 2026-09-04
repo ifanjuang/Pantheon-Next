@@ -5,8 +5,8 @@ from copy import deepcopy
 
 import pytest
 
-from mvp_vertical import apu_write_preparation, execution_results
-from mvp_vertical.project_anatomy_projection import build_project_anatomy_projection
+from pantheon_app import apu_write_preparation, execution_results
+from pantheon_app.project_anatomy_projection import build_project_anatomy_projection
 
 
 class _FakeCursor:

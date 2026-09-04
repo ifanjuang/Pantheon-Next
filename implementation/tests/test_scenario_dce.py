@@ -22,11 +22,11 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 
-from mvp_vertical import pantheon_contracts
-from mvp_vertical import store
-from mvp_vertical.contract import load_contract
-from mvp_vertical.drafting import review_flags
-from mvp_vertical.runner import run
+from pantheon_app import pantheon_contracts
+from pantheon_app import store
+from pantheon_app.contract import load_contract
+from pantheon_app.drafting import review_flags
+from pantheon_app.runner import run
 
 CONTRACT = ROOT / "dossiers/dce_relecture/task_contract.yaml"
 
@@ -121,7 +121,7 @@ def test_out_of_perimeter_question_is_refused(conn, contract, ingested):
 
 def test_output_validates_against_vendored_schema(conn, contract, ingested):
     import jsonschema
-    schema = pantheon_contracts.load_schema("mvp_governed_loop_objects")
+    schema = pantheon_contracts.load_schema("governed_loop_objects")
     out = run(conn, contract,
               "quels points du CCAP et du CCTP restent-ils à corriger selon la relecture ?")
     for doc in out.documents:

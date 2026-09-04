@@ -6,7 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from mvp_vertical.hermes_runs_observer import (
+from pantheon_app.hermes_runs_observer import (
     HermesMemoryObservationError,
     capture_memory_status,
     parse_memory_status,

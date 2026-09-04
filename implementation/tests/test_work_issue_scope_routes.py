@@ -3,8 +3,8 @@
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.testclient import TestClient
 
-from mvp_vertical import work_issue_scopes
-from mvp_vertical.work_issue_scope_api import install_work_issue_scope_routes
+from pantheon_app import work_issue_scopes
+from pantheon_app.work_issue_scope_api import install_work_issue_scope_routes
 
 
 def _headers(token: str, *, actor: str | None = None) -> dict[str, str]:

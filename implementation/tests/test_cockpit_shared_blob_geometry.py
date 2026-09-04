@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-STYLES = ROOT / "mvp_vertical" / "cockpit" / "styles"
+STYLES = ROOT / "pantheon_app" / "cockpit" / "styles"
 
 
 def test_pantheon_affaires_pack_and_project_booster_share_one_geometry() -> None:

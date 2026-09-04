@@ -3,8 +3,8 @@ from __future__ import annotations
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.testclient import TestClient
 
-from mvp_vertical import apu_owner, project_anatomy_projection
-from mvp_vertical.project_anatomy_api import install_project_anatomy_routes
+from pantheon_app import apu_owner, project_anatomy_projection
+from pantheon_app.project_anatomy_api import install_project_anatomy_routes
 
 
 def _app() -> FastAPI:

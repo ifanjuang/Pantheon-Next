@@ -8,7 +8,7 @@ import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
-EDITOR = ROOT / "mvp_vertical" / "mobile_editor"
+EDITOR = ROOT / "pantheon_app" / "mobile_editor"
 
 
 def test_variant_review_adapter_loads_after_existing_editor() -> None:

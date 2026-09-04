@@ -4,10 +4,10 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
 CREATE = COCKPIT / "information_create.js"
 HTML = COCKPIT / "index.html"
-SCHEMA = ROOT / "mvp_vertical" / "agency_schema" / "information.json"
+SCHEMA = ROOT / "pantheon_app" / "agency_schema" / "information.json"
 
 
 def test_project_loads_removable_blank_information_creation_surface() -> None:

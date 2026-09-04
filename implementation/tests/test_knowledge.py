@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from mvp_vertical import knowledge, store
-from mvp_vertical.contract import TaskContract
+from pantheon_app import knowledge, store
+from pantheon_app.contract import TaskContract
 
 
 @pytest.fixture

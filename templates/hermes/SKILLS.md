@@ -22,7 +22,7 @@ Each `SKILL.md` must identify:
 
 Review separately: abstract function, candidate binding, installation, health, compatibility, safety, activation, task authorization and return/Evidence/human gates. No state implies the next.
 
-Skills in this repository stay declarative. Executable Pantheon adapters belong under the bounded `implementation/` responsibility governed by `docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md`; Hermes runtime execution remains external under `docs/governance/HERMES_INTEGRATION.md`. Executable scripts, installers, provider routers, queues and schedulers do not belong in this template surface.
+Skills in this repository stay declarative. Executable Pantheon adapters belong under the bounded `implementation/` responsibility governed by `docs/governance/REPOSITORY_PLACEMENT.md`; Hermes runtime execution remains external under `docs/governance/HERMES_INTEGRATION.md`. Executable scripts, installers, provider routers, queues and schedulers do not belong in this template surface.
 
 When either repository evolves, check active skills for stale routes or names, changed Claim/Evidence/ChangeCandidate semantics, changed capability and authorization gates, and dependencies presented as adopted merely because they are available.
 

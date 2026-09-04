@@ -2,12 +2,12 @@
 
 from pathlib import Path
 
-from mvp_vertical.cockpit_api import create_app
+from pantheon_app.cockpit_api import create_app
 
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
-MOBILE = ROOT / "mvp_vertical" / "mobile_editor"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
+MOBILE = ROOT / "pantheon_app" / "mobile_editor"
 
 
 class _Connection:

@@ -8,7 +8,7 @@ import uuid
 
 import pytest
 
-from mvp_vertical import (
+from pantheon_app import (
     project_document_admission,
     project_document_comparison,
     project_documents,

@@ -35,7 +35,7 @@ POST /v1/runs/{run_id}/stop
 
 ## Current Pantheon boundary
 
-`mvp_vertical.hermes_runs_observer.HermesRunsApiObserver` performs only:
+`pantheon_app.hermes_runs_observer.HermesRunsApiObserver` performs only:
 
 ```text
 GET /v1/capabilities

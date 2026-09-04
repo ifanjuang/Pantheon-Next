@@ -140,7 +140,7 @@ After runtime start, current values are available only through the exact active-
 
 ## Hermes Runs API binding
 
-The external module `mvp_vertical.hermes_run_binding.ExternalHermesRunBinding` is the execution-side junction.
+The external module `pantheon_app.hermes_run_binding.ExternalHermesRunBinding` is the execution-side junction.
 
 Before launch it requires the read-only observer to report:
 

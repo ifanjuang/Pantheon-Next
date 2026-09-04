@@ -23,7 +23,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-COMPOSED = ROOT / "mvp_vertical" / "cockpit_composed.py"
+COMPOSED = ROOT / "pantheon_app" / "cockpit_composed.py"
 
 
 def _startup_migration_modules() -> list[str]:
@@ -46,7 +46,7 @@ def _startup_migration_modules() -> list[str]:
 
 
 def _migration_path(module_name: str) -> Path:
-    module = __import__(f"mvp_vertical.{module_name}", fromlist=["MIGRATION"])
+    module = __import__(f"pantheon_app.{module_name}", fromlist=["MIGRATION"])
     return Path(module.MIGRATION)
 
 
@@ -118,7 +118,7 @@ def test_guarded_migrations_reach_their_target_schema_on_a_fresh_database() -> N
     import psycopg
     import pytest as _pytest
 
-    from mvp_vertical import store
+    from pantheon_app import store
 
     try:
         admin = psycopg.connect(store.dsn_from_env(), autocommit=True)

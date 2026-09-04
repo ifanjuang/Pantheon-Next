@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
 PROJECTION = COCKPIT / "projection" / "cockpit_projection.js"
 ASSEMBLER = COCKPIT / "projection" / "child_collection_assembler.js"
 DATA_LOADER = COCKPIT / "data" / "cockpit_data_loader.js"
@@ -36,7 +36,7 @@ def test_cockpit_javascript_parses(path: Path) -> None:
 def test_spatial_navigation_keeps_sibling_and_parent_boundaries() -> None:
     script = r'''
       global.window = {};
-      require("./mvp_vertical/cockpit/spatial_navigation.js");
+      require("./pantheon_app/cockpit/spatial_navigation.js");
       const nav = window.PantheonSpatialNavigation.create({ root_collection_id: "primary-spaces", root_item_ids: ["pantheon", "affaires", "knowledge", "tools"] });
       nav.selectSibling("affaires");
       if (nav.snapshot().current_id !== "affaires") throw new Error("root selection failed");

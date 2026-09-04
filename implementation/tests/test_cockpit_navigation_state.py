@@ -14,7 +14,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-STATE = ROOT / "mvp_vertical" / "cockpit" / "collection" / "navigation_state.js"
+STATE = ROOT / "pantheon_app" / "cockpit" / "collection" / "navigation_state.js"
 
 
 def _run_module(body: str) -> subprocess.CompletedProcess[str]:

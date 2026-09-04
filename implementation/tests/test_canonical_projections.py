@@ -1,6 +1,6 @@
 """Pure contract-shape tests for Source and Information read projections."""
 
-from mvp_vertical.canonical_projections import project_information, project_source
+from pantheon_app.canonical_projections import project_information, project_source
 
 
 def test_source_projection_uses_canonical_nested_origin_and_project_ref() -> None:

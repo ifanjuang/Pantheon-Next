@@ -2,13 +2,13 @@
 
 from pathlib import Path
 
-from mvp_vertical import apu_mapping_reviews
+from pantheon_app import apu_mapping_reviews
 
 
 ROOT = Path(__file__).resolve().parents[1]
-MIGRATION = ROOT / "mvp_vertical" / "sql" / "011_apu_mapping_reviews.sql"
-API = ROOT / "mvp_vertical" / "execution_result_api.py"
-PERSISTENCE = ROOT / "mvp_vertical" / "apu_mapping_reviews.py"
+MIGRATION = ROOT / "pantheon_app" / "sql" / "011_apu_mapping_reviews.sql"
+API = ROOT / "pantheon_app" / "execution_result_api.py"
+PERSISTENCE = ROOT / "pantheon_app" / "apu_mapping_reviews.py"
 
 
 def test_mapping_review_vocabulary_and_authority_are_bounded() -> None:

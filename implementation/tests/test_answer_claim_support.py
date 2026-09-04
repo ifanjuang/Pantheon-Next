@@ -6,10 +6,10 @@ from pathlib import Path
 
 import pytest
 
-from mvp_vertical import runner
-from mvp_vertical.contract import load_contract
-from mvp_vertical.drafting import DraftRejected, claim_support_review, verify_draft
-from mvp_vertical.store import RetrievedChunk
+from pantheon_app import runner
+from pantheon_app.contract import load_contract
+from pantheon_app.drafting import DraftRejected, claim_support_review, verify_draft
+from pantheon_app.store import RetrievedChunk
 
 
 ROOT = Path(__file__).resolve().parents[1]

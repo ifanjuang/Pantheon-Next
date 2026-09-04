@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
 LOADER = COCKPIT / "navigation" / "swiper_loader.js"
 BOOTSTRAP = COCKPIT / "live_bootstrap.js"
 MOTION = COCKPIT / "collection" / "motion_adapter.js"

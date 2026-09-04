@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 import psycopg
 import pytest
 
-from mvp_vertical import (
+from pantheon_app import (
     agency_data,
     document_revision_discussion,
     human_access,

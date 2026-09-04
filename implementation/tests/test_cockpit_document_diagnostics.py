@@ -6,7 +6,7 @@ from pathlib import Path
 def test_document_verso_projects_structured_extraction_diagnostics() -> None:
     renderer = (
         Path(__file__).resolve().parents[1]
-        / "mvp_vertical"
+        / "pantheon_app"
         / "cockpit"
         / "projection"
         / "cockpit_projection.js"
@@ -35,7 +35,7 @@ def test_document_chunk_inspection_requires_compilation_identity() -> None:
 
     renderer = (
         Path(__file__).resolve().parents[1]
-        / "mvp_vertical"
+        / "pantheon_app"
         / "cockpit"
         / "projection"
         / "cockpit_projection.js"
@@ -47,7 +47,7 @@ def test_document_chunk_inspection_requires_compilation_identity() -> None:
 
 
 def test_document_chunk_inspector_keeps_query_scores_contextual() -> None:
-    root = Path(__file__).resolve().parents[1] / "mvp_vertical" / "cockpit"
+    root = Path(__file__).resolve().parents[1] / "pantheon_app" / "cockpit"
     actions = (root / "actions" / "card_actions.js").read_text(encoding="utf-8")
     styles = (root / "styles" / "editors.css").read_text(encoding="utf-8")
 

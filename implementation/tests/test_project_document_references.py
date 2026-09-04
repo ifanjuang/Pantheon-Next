@@ -7,7 +7,7 @@ import uuid
 import psycopg
 import pytest
 
-from mvp_vertical import project_documents
+from pantheon_app import project_documents
 
 
 @pytest.fixture

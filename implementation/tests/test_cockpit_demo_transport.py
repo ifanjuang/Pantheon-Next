@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
 
 
 def _run_node(script: str) -> subprocess.CompletedProcess[str]:
@@ -94,7 +94,7 @@ def test_demo_start_waits_for_initial_projection_before_clicking_load() -> None:
       }
 
       global.Response = TestResponse;
-      const cockpitRoot = path.join(process.cwd(), "mvp_vertical", "cockpit");
+      const cockpitRoot = path.join(process.cwd(), "pantheon_app", "cockpit");
       const fixtureNames = new Set(["demo-data.json", "demo-work-activity.json", "tool_catalog.json"]);
       const listeners = new Map();
       let loadClicks = 0;
@@ -109,7 +109,7 @@ def test_demo_start_waits_for_initial_projection_before_clicking_load() -> None:
         getElementById(id) { return controls[id] || null; },
       };
       global.window = {
-        location: { href: "https://demo.invalid/mvp_vertical/cockpit/index.html?mode=demo" },
+        location: { href: "https://demo.invalid/pantheon_app/cockpit/index.html?mode=demo" },
         fetch: async input => {
           const raw = typeof input === "string" ? input : input.url;
           const name = path.basename(new URL(raw, window.location.href).pathname);
@@ -164,12 +164,12 @@ def test_demo_fixture_transport_covers_the_current_live_loader_contract() -> Non
       }
 
       global.Response = TestResponse;
-      const cockpitRoot = path.join(process.cwd(), "mvp_vertical", "cockpit");
+      const cockpitRoot = path.join(process.cwd(), "pantheon_app", "cockpit");
       const fixtureNames = new Set(["demo-data.json", "demo-work-activity.json", "tool_catalog.json"]);
       const nativeCalls = [];
 
       global.window = {
-        location: { href: "https://demo.invalid/mvp_vertical/cockpit/index.html?mode=demo" },
+        location: { href: "https://demo.invalid/pantheon_app/cockpit/index.html?mode=demo" },
         setTimeout,
         fetch: async input => {
           const raw = typeof input === "string" ? input : input.url;
@@ -199,7 +199,7 @@ def test_demo_fixture_transport_covers_the_current_live_loader_contract() -> Non
           },
         });
 
-        require("./mvp_vertical/cockpit/data/cockpit_data_loader.js");
+        require("./pantheon_app/cockpit/data/cockpit_data_loader.js");
         const api = window.PantheonCockpitDataLoader;
         if (!api?.create) throw new Error("loader API was not exposed");
         if ("routes" in api) throw new Error("loader route registry leaked into the public API");

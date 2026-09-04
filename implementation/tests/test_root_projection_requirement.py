@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-STRUCTURED_INTERFACE = ROOT / "mvp_vertical" / "cockpit" / "structured_interface.js"
+STRUCTURED_INTERFACE = ROOT / "pantheon_app" / "cockpit" / "structured_interface.js"
 
 
 def test_root_spaces_fail_closed_without_projection_definition() -> None:

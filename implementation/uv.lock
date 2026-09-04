@@ -334,7 +334,7 @@ wheels = [
 ]
 
 [[package]]
-name = "pantheon-mvp-vertical"
+name = "pantheon-app"
 version = "0.2.0"
 source = { editable = "." }
 dependencies = [

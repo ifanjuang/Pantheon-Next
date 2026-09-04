@@ -6,11 +6,11 @@ from pathlib import Path
 import pytest
 import yaml
 
-from mvp_vertical import runner
-from mvp_vertical.contract import load_contract
-from mvp_vertical.drafting import DeterministicDrafter
-from mvp_vertical.retrieval import HybridRetrievedChunk
-from mvp_vertical.store import RetrievedChunk
+from pantheon_app import runner
+from pantheon_app.contract import load_contract
+from pantheon_app.drafting import DeterministicDrafter
+from pantheon_app.retrieval import HybridRetrievedChunk
+from pantheon_app.store import RetrievedChunk
 
 
 ROOT = Path(__file__).resolve().parents[1]

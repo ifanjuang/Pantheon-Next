@@ -1,8 +1,8 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-STRUCTURED_INTERFACE = ROOT / "mvp_vertical" / "cockpit" / "structured_interface.js"
-COCKPIT_PROJECTION = ROOT / "mvp_vertical" / "cockpit" / "projection" / "cockpit_projection.js"
+STRUCTURED_INTERFACE = ROOT / "pantheon_app" / "cockpit" / "structured_interface.js"
+COCKPIT_PROJECTION = ROOT / "pantheon_app" / "cockpit" / "projection" / "cockpit_projection.js"
 
 
 def test_root_projection_is_built_only_from_the_declared_definition() -> None:

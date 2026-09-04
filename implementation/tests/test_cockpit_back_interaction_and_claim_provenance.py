@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
 HTML = COCKPIT / "index.html"
 POLICY = COCKPIT / "interactions" / "interaction_policy.js"
 CLAIMS = COCKPIT / "project_claim_view_adapter.js"

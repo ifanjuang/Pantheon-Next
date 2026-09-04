@@ -16,7 +16,7 @@ source_pins:
 components:
   - component_id: run-binding
     kind: run_binding
-    path: implementation/mvp_vertical/hermes_run_binding.py
+    path: implementation/pantheon_app/hermes_run_binding.py
     digest_mode: file
     content_digest: sha256:f53f2b11c040b04539c147ab82ca0b0920341bdfd3c597b27e7ae29db4e72186
     required: true
@@ -41,7 +41,7 @@ components:
     notes: Reads only the exact active Context Pack identified by the Hermes host session.
   - component_id: runtime-observer
     kind: runtime_observer
-    path: implementation/mvp_vertical/hermes_runs_observer.py
+    path: implementation/pantheon_app/hermes_runs_observer.py
     digest_mode: file
     content_digest: sha256:004258e0df3cdbb8694be8f324d31d2cf9ddbcc79db31bf8437d20fc206ed95d
     required: true
@@ -99,7 +99,7 @@ governance_refs:
   - templates/hermes/distribution/README.md
   - docs/governance/HERMES_RUNTIME_SURFACE_REVIEW.md
   - docs/install/HERMES_EXECUTION_BRIDGE_RUNBOOK.md
-  - docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md
+  - docs/governance/REPOSITORY_PLACEMENT.md
   - docs/governance/HERMES_INTEGRATION.md
   - docs/governance/TASK_CONTRACTS.md
   - docs/governance/CONTEXT_PACKS.md

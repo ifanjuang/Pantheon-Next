@@ -19,7 +19,7 @@ The human decides.
 | [`workflow-under-hood/`](workflow-under-hood/) | Explanatory professional workflow and evidence-gap path. | Documentation only. |
 | [`pantheon-control/`](pantheon-control/) | Stable orientation toward the co-located candidate Cockpit implementation under `implementation/`; synthetic preview of the external Hermes dashboard renderer; six read-only classifier mirrors required by protected parity tests; one still-referenced revision-lifecycle specification. | No local governance-owned dashboard. Preview and parity artifacts are non-operational validation support. |
 | [`card-stack/`](card-stack/) | Governance-grammar prototypes derived from `CARD_STACK_MODEL.md`. | Illustrative; documented non-implemented. |
-| [Candidate Cockpit source](https://github.com/ifanjuang/Pantheon-Next/tree/main/implementation/mvp_vertical/cockpit) | Current co-located implementation source. | Executable candidate implementation / not adopted or deployed by repository presence. |
+| [Candidate Cockpit source](https://github.com/ifanjuang/Pantheon-Next/tree/main/implementation/pantheon_app/cockpit) | Current co-located implementation source. | Executable candidate implementation / not adopted or deployed by repository presence. |
 | [Historical external MVP cockpit demo](https://ifanjuang.github.io/pantheon-mvp/) | Frozen public orientation to the former repository lineage; source was observed at [`7f3faf74afd59a07a9ab6026360881eb374df905`](https://github.com/ifanjuang/pantheon-mvp/tree/7f3faf74afd59a07a9ab6026360881eb374df905). | Historical demonstration only; not the current implementation source. |
 | [`pantheon-flow/entrees-sorties-memoire-d3.html`](pantheon-flow/entrees-sorties-memoire-d3.html) | Explanatory flow for context, candidates, human decision and governed records. | Documentation only. |
 | [`pantheon-rpg/`](pantheon-rpg/) | Narrative illustrations for responsibility paths. | Documentation only. |
@@ -36,7 +36,7 @@ A classifier mirror may remain only when protected tests require a second-langua
 
 Superseded mockups are removed rather than migrated. Git history and `ai_logs/` preserve the trace.
 
-See `../governance/NEXT_MVP_REPOSITORY_PLACEMENT.md` for the full boundary.
+See `../governance/REPOSITORY_PLACEMENT.md` for the full boundary.
 
 ## Status rule
 

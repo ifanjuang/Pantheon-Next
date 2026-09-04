@@ -16,7 +16,7 @@ AUTHORITY_INDEX = GOVERNANCE / "authority" / "GOVERNANCE_AUTHORITY_INDEX.md"
 NAVIGATION_REGISTRY = (
     ROOT
     / "implementation"
-    / "mvp_vertical"
+    / "pantheon_app"
     / "cockpit"
     / "registries"
     / "navigation_registry.json"

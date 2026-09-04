@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from mvp_vertical import apu_cross_family, pantheon_contracts
+from pantheon_app import apu_cross_family, pantheon_contracts
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SQL = ROOT / "mvp_vertical" / "sql" / "023_apu_cross_family_links.sql"
+SQL = ROOT / "pantheon_app" / "sql" / "023_apu_cross_family_links.sql"
 
 def test_cross_family_links_reuse_owners_without_universal_relation_vocabulary() -> None:
     sql = SQL.read_text(encoding="utf-8")
@@ -34,7 +34,7 @@ def test_decision_scope_contract_uses_canonical_contract() -> None:
 
 
 def test_cross_family_links_ignore_discarded_parallel_carrier_internals() -> None:
-    source = (ROOT / "mvp_vertical" / "apu_cross_family.py").read_text(encoding="utf-8")
+    source = (ROOT / "pantheon_app" / "apu_cross_family.py").read_text(encoding="utf-8")
     for forbidden in (
         "object_identity",
         "spatial_node",

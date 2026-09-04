@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from mvp_vertical.project_anatomy_projection import build_project_anatomy_projection
+from pantheon_app.project_anatomy_projection import build_project_anatomy_projection
 
 
 def _anatomy() -> dict:

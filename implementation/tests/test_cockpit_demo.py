@@ -2,7 +2,7 @@ from pathlib import Path
 import json
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
 
 
 def test_demo_redirects_to_current_cockpit_and_not_retired_demo_assets():

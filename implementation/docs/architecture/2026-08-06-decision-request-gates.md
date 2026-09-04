@@ -21,8 +21,8 @@ as a Decision, and does not create a Decision record.
 ## Reused owners
 
 ```text
-Decision outcome vocabulary   mvp_governed_loop_objects.schema.yaml
-WorkIssue lifecycle            mvp_vertical.work_issues
+Decision outcome vocabulary   governed_loop_objects.schema.yaml
+WorkIssue lifecycle            pantheon_app.work_issues
 WorkIssue Project scope        work_issue_scope_links
 Project                         agency_projects
 Cockpit navigation             navigation registry + projection definitions

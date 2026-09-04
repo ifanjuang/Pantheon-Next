@@ -13,7 +13,7 @@ pytest.importorskip("haystack")
 from haystack import Document
 from haystack.document_stores.in_memory import InMemoryDocumentStore
 
-from mvp_vertical.retrieval_scope import ResolvedRetrievalSource, RetrievalScopeResolution
+from pantheon_app.retrieval_scope import ResolvedRetrievalSource, RetrievalScopeResolution
 
 
 LAB = Path(__file__).resolve().parents[1] / "labs" / "haystack_retrieval" / "adapter.py"

@@ -89,7 +89,7 @@ The following remain active review areas; their existence does not imply adoptio
 - `ANSWER_VERIFICATION_GATE.md` — candidate answer-verification doctrine;
 - `DECISION_SURFACE_SPEC.md`, `SPICE_REFERENCE_DISTILLATION.md` — candidate/reference decision-surface work;
 - `DATA_PLATFORM_ARCHITECTURE.md` — data-platform boundary review;
-- `DOCUMENT_KNOWLEDGE_SLICE_CONTRACT.md`, `DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md`, `RAG_INGESTION_PIPELINE.md`, `NEXT_MVP_REPOSITORY_PLACEMENT.md` — co-located document/Knowledge implementation posture;
+- `DOCUMENT_KNOWLEDGE_SLICE_CONTRACT.md`, `DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md`, `RAG_INGESTION_PIPELINE.md`, `REPOSITORY_PLACEMENT.md` — co-located document/Knowledge implementation posture;
 - `AGENCY_DOMAIN_PACK.md`, `KNOWLEDGE_INGESTION_AND_MEMORY.md`, `WORKFLOW_LIFECYCLE.md` — candidate doctrine;
 - `PROOF_REGISTER.md` and related specifications — candidate proof-register slice;
 - `DOCUMENT_INTELLIGENCE.md`, `REVIEW_QUEUE.md`, `URGENT_REVIEW_TRIAGE.md`, `RAW_DERIVED_GOVERNED_RECORDS.md`, `EXTERNAL_TOOL_PLACEMENT_REGISTER.md` — candidate governed document/review model;

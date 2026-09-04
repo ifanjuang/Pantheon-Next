@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from mvp_vertical.runtime_observation import (
+from pantheon_app.runtime_observation import (
     RuntimeObservation,
     RuntimeObservationError,
     normalize_runtime_observation,

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from mvp_vertical import effect_preview
+from pantheon_app import effect_preview
 
 
 def _object(

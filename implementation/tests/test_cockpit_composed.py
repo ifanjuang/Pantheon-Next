@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from mvp_vertical import (
+from pantheon_app import (
     agency_change_candidate_review,
     agency_claims,
     agency_classification,
@@ -264,4 +264,4 @@ def test_console_entrypoint_targets_composed_cockpit():
     pyproject = (
         Path(__file__).resolve().parents[1] / "pyproject.toml"
     ).read_text(encoding="utf-8")
-    assert 'mvp-cockpit-api = "mvp_vertical.cockpit_composed:run"' in pyproject
+    assert 'pantheon-cockpit = "pantheon_app.cockpit_composed:run"' in pyproject

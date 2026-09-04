@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from mvp_vertical.hermes_execution_trace import validate_shape
-from mvp_vertical.hermes_run_binding import ExternalHermesRunBinding
+from pantheon_app.hermes_execution_trace import validate_shape
+from pantheon_app.hermes_run_binding import ExternalHermesRunBinding
 
 
 class _Observer:

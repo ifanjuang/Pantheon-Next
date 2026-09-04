@@ -2,7 +2,7 @@
 
 import pytest
 
-from mvp_vertical.decision_signing import (
+from pantheon_app.decision_signing import (
     sign_decision,
     signed_decision,
     signed_decision_payload,

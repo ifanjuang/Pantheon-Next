@@ -8,7 +8,7 @@ import uuid
 
 import pytest
 
-from mvp_vertical import (
+from pantheon_app import (
     agency_data,
     apu_mapping_reviews,
     apu_owner,
@@ -16,7 +16,7 @@ from mvp_vertical import (
     execution_results,
     store,
 )
-from mvp_vertical.project_anatomy_projection import get_project_anatomy_projection
+from pantheon_app.project_anatomy_projection import get_project_anatomy_projection
 
 
 @pytest.fixture

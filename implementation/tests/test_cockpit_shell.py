@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
-from mvp_vertical import effect_preview, resource_profiles, work_issue_read
-from mvp_vertical.cockpit_shell import create_cockpit_app
+from pantheon_app import effect_preview, resource_profiles, work_issue_read
+from pantheon_app.cockpit_shell import create_cockpit_app
 
 
 class _Connection:

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from mvp_vertical import effect_guard
+from pantheon_app import effect_guard
 
 
 def test_targetless_non_create_is_forced_to_unclassified_create() -> None:

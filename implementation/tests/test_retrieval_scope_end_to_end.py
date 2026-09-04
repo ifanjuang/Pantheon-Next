@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from mvp_vertical import (
+from pantheon_app import (
     agency_data,
     human_access,
     project_document_currentness,
@@ -15,8 +15,8 @@ from mvp_vertical import (
     retrieval_scope,
     store,
 )
-from mvp_vertical.contract import TaskContract
-from mvp_vertical.documents import file_digest
+from pantheon_app.contract import TaskContract
+from pantheon_app.documents import file_digest
 
 
 def _id(prefix: str) -> str:

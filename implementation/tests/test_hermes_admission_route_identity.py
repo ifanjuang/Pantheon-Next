@@ -5,8 +5,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-API = ROOT / "mvp_vertical" / "hermes_execution_api.py"
-CLIENT = ROOT / "mvp_vertical" / "cockpit" / "handoff" / "handoff_lifecycle.js"
+API = ROOT / "pantheon_app" / "hermes_execution_api.py"
+CLIENT = ROOT / "pantheon_app" / "cockpit" / "handoff" / "handoff_lifecycle.js"
 
 
 STABLE_COCKPIT_ROUTES = {

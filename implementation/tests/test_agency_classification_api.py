@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
-from mvp_vertical import agency_classification
-from mvp_vertical.cockpit_composed import create_composed_cockpit_app
+from pantheon_app import agency_classification
+from pantheon_app.cockpit_composed import create_composed_cockpit_app
 
 
 class _Connection:

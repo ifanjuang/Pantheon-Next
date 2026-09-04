@@ -31,7 +31,7 @@ SCHEMA_TO_EXAMPLE = {
     "capability_passport.schema.yaml": "capability_passport.example.yaml",
     "module_manifest.schema.yaml": "module_manifest.example.yaml",
     "shared_axes.schema.yaml": "shared_axes.example.yaml",
-    "mvp_governed_loop_objects.schema.yaml": "mvp_governed_loop_objects.example.yaml",
+    "governed_loop_objects.schema.yaml": "governed_loop_objects.example.yaml",
     "architecture-proof-register/shared.schema.yaml": "architecture-proof-register/shared.example.yaml",
     "architecture-proof-register/document_family.schema.yaml": "architecture-proof-register/document_family.example.yaml",
     "architecture-proof-register/indexed_document_version.schema.yaml": "architecture-proof-register/indexed_document_version.example.yaml",

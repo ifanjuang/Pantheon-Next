@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 import pytest
 
-from mvp_vertical import (
+from pantheon_app import (
     agency_data,
     project_document_admission,
     project_document_inbox,

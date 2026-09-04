@@ -5,12 +5,12 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 
-from mvp_vertical.contradictory_review import report_from_payload
-from mvp_vertical.contradictory_review_api import install_contradictory_review_routes
+from pantheon_app.contradictory_review import report_from_payload
+from pantheon_app.contradictory_review_api import install_contradictory_review_routes
 
 ROOT = Path(__file__).resolve().parents[1]
-MIGRATION = ROOT / "mvp_vertical" / "sql" / "003_contradictory_review_candidates.sql"
-STORE = ROOT / "mvp_vertical" / "contradictory_review_store.py"
+MIGRATION = ROOT / "pantheon_app" / "sql" / "003_contradictory_review_candidates.sql"
+STORE = ROOT / "pantheon_app" / "contradictory_review_store.py"
 
 
 def _payload() -> dict:

@@ -3,7 +3,7 @@
 const path = require("path");
 
 const loaderPath = process.argv[2]
-  || path.resolve(__dirname, "../mvp_vertical/cockpit/data/cockpit_data_loader.js");
+  || path.resolve(__dirname, "../pantheon_app/cockpit/data/cockpit_data_loader.js");
 
 const requests = [];
 

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from mvp_vertical.retrieval import reciprocal_rank_fusion
-from mvp_vertical.store import RetrievedChunk
+from pantheon_app.retrieval import reciprocal_rank_fusion
+from pantheon_app.store import RetrievedChunk
 
 
 def _chunk(source_ref: str, chunk_no: int, distance: float = 0.5) -> RetrievedChunk:

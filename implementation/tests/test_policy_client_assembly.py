@@ -9,9 +9,9 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 
-from mvp_vertical import knowledge_update
-from mvp_vertical.cockpit_shell import create_cockpit_app
-from mvp_vertical.policy_gate import HttpPolicyClient, StandInPolicyClient
+from pantheon_app import knowledge_update
+from pantheon_app.cockpit_shell import create_cockpit_app
+from pantheon_app.policy_gate import HttpPolicyClient, StandInPolicyClient
 
 APPLY_ROUTE = "/projects/{project}/knowledge/{kid}/updates/apply"
 PROJECT = "project-a"
@@ -62,14 +62,14 @@ def _post(client: TestClient):
 
 
 def test_enforcement_is_required_unless_a_deployment_says_otherwise(monkeypatch) -> None:
-    monkeypatch.delenv("MVP_POLICY_ENFORCEMENT", raising=False)
+    monkeypatch.delenv("PANTHEON_POLICY_ENFORCEMENT", raising=False)
     assert _app().state.policy_enforcement == "required"
 
 
 def test_an_unconfigured_decision_point_refuses_the_consequential_write(monkeypatch) -> None:
-    monkeypatch.delenv("MVP_POLICY_ENFORCEMENT", raising=False)
-    monkeypatch.delenv("MVP_POLICY_API_URL", raising=False)
-    monkeypatch.delenv("MVP_POLICY_API_KEY", raising=False)
+    monkeypatch.delenv("PANTHEON_POLICY_ENFORCEMENT", raising=False)
+    monkeypatch.delenv("PANTHEON_POLICY_API_URL", raising=False)
+    monkeypatch.delenv("PANTHEON_POLICY_API_KEY", raising=False)
 
     response = _post(TestClient(_app()))
 
@@ -78,8 +78,8 @@ def test_an_unconfigured_decision_point_refuses_the_consequential_write(monkeypa
 
 
 def test_read_only_surface_still_assembles_without_a_decision_point(monkeypatch) -> None:
-    monkeypatch.delenv("MVP_POLICY_API_URL", raising=False)
-    monkeypatch.delenv("MVP_POLICY_API_KEY", raising=False)
+    monkeypatch.delenv("PANTHEON_POLICY_API_URL", raising=False)
+    monkeypatch.delenv("PANTHEON_POLICY_API_KEY", raising=False)
     app = _app(api_key="read-key")
 
     assert app.state.policy_client is None
@@ -87,20 +87,20 @@ def test_read_only_surface_still_assembles_without_a_decision_point(monkeypatch)
 
 
 def test_a_configured_client_is_handed_to_the_application(monkeypatch) -> None:
-    monkeypatch.delenv("MVP_POLICY_ENFORCEMENT", raising=False)
+    monkeypatch.delenv("PANTHEON_POLICY_ENFORCEMENT", raising=False)
     client = StandInPolicyClient()
     assert _app(policy_client=client).state.policy_client is client
 
 
 def test_environment_configuration_builds_a_real_http_client(monkeypatch) -> None:
-    monkeypatch.setenv("MVP_POLICY_API_URL", "https://policy.internal")
-    monkeypatch.setenv("MVP_POLICY_API_KEY", "policy-key")
+    monkeypatch.setenv("PANTHEON_POLICY_API_URL", "https://policy.internal")
+    monkeypatch.setenv("PANTHEON_POLICY_API_KEY", "policy-key")
     assert isinstance(_app().state.policy_client, HttpPolicyClient)
 
 
 def test_a_partial_environment_does_not_half_configure_a_client(monkeypatch) -> None:
-    monkeypatch.setenv("MVP_POLICY_API_URL", "https://policy.internal")
-    monkeypatch.delenv("MVP_POLICY_API_KEY", raising=False)
+    monkeypatch.setenv("PANTHEON_POLICY_API_URL", "https://policy.internal")
+    monkeypatch.delenv("PANTHEON_POLICY_API_KEY", raising=False)
 
     app = _app()
     assert app.state.policy_client is None
@@ -108,8 +108,8 @@ def test_a_partial_environment_does_not_half_configure_a_client(monkeypatch) -> 
 
 
 def test_disabling_enforcement_must_be_stated_by_name(monkeypatch) -> None:
-    monkeypatch.delenv("MVP_POLICY_API_URL", raising=False)
-    monkeypatch.delenv("MVP_POLICY_API_KEY", raising=False)
+    monkeypatch.delenv("PANTHEON_POLICY_API_URL", raising=False)
+    monkeypatch.delenv("PANTHEON_POLICY_API_KEY", raising=False)
     observed = {}
 
     def apply(_conn, **values):
@@ -126,25 +126,25 @@ def test_disabling_enforcement_must_be_stated_by_name(monkeypatch) -> None:
 
 
 def test_an_unknown_enforcement_posture_fails_closed_at_assembly() -> None:
-    with pytest.raises(ValueError, match="MVP_POLICY_ENFORCEMENT"):
+    with pytest.raises(ValueError, match="PANTHEON_POLICY_ENFORCEMENT"):
         _app(policy_enforcement="maybe")
 
 
 def test_the_environment_can_only_select_a_declared_posture(monkeypatch) -> None:
-    monkeypatch.setenv("MVP_POLICY_ENFORCEMENT", "off")
-    with pytest.raises(ValueError, match="MVP_POLICY_ENFORCEMENT"):
+    monkeypatch.setenv("PANTHEON_POLICY_ENFORCEMENT", "off")
+    with pytest.raises(ValueError, match="PANTHEON_POLICY_ENFORCEMENT"):
         _app()
 
 
 def test_posture_is_read_case_and_whitespace_insensitively(monkeypatch) -> None:
-    monkeypatch.setenv("MVP_POLICY_ENFORCEMENT", "  Disabled ")
+    monkeypatch.setenv("PANTHEON_POLICY_ENFORCEMENT", "  Disabled ")
     assert _app().state.policy_enforcement == "disabled"
 
 
 def test_the_composed_application_carries_the_same_policy_assembly(monkeypatch) -> None:
-    from mvp_vertical.cockpit_composed import create_composed_cockpit_app
+    from pantheon_app.cockpit_composed import create_composed_cockpit_app
 
-    monkeypatch.delenv("MVP_POLICY_ENFORCEMENT", raising=False)
+    monkeypatch.delenv("PANTHEON_POLICY_ENFORCEMENT", raising=False)
     client = StandInPolicyClient()
     app = create_composed_cockpit_app(
         connect_fn=_Connection,

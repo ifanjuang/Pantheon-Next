@@ -8,10 +8,10 @@ from pathlib import Path
 import jsonschema
 import yaml
 
-from mvp_vertical import pantheon_contracts
+from pantheon_app import pantheon_contracts
 
 ROOT = Path(__file__).resolve().parents[1]
-REGISTRY_PATH = ROOT / "mvp_vertical" / "cockpit" / "registries" / "navigation_registry.json"
+REGISTRY_PATH = ROOT / "pantheon_app" / "cockpit" / "registries" / "navigation_registry.json"
 SCHEMA_PATH = pantheon_contracts.schema_path("navigation_registry")
 
 

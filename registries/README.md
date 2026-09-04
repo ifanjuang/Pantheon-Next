@@ -3,7 +3,7 @@
 Status: candidate technical foundation — documented and validation-only.
 Boundary profile: candidate_support_note.
 
-This directory defines the descriptor contract for machine-readable registry projections in the Pantheon monorepo. It does not assume that registries are new: the co-located implementation already contains operational registry instances for tags, navigation, status presentation, materials and other bounded Cockpit configuration under `implementation/mvp_vertical/cockpit/registries/`.
+This directory defines the descriptor contract for machine-readable registry projections in the Pantheon monorepo. It does not assume that registries are new: the co-located implementation already contains operational registry instances for tags, navigation, status presentation, materials and other bounded Cockpit configuration under `implementation/pantheon_app/cockpit/registries/`.
 
 A Registry is a technical mechanism for stable identifiers and bounded shared configuration. It is not a business object model, a lifecycle owner, a runtime router or a source of authorization.
 
@@ -151,10 +151,10 @@ shared file != canonical vocabulary
 Current co-located implementation instances include:
 
 ```text
-implementation/mvp_vertical/cockpit/registries/tag_registry.json
-implementation/mvp_vertical/cockpit/registries/navigation_registry.json
-implementation/mvp_vertical/cockpit/registries/status_registry.json
-implementation/mvp_vertical/cockpit/registries/materials.json
+implementation/pantheon_app/cockpit/registries/tag_registry.json
+implementation/pantheon_app/cockpit/registries/navigation_registry.json
+implementation/pantheon_app/cockpit/registries/status_registry.json
+implementation/pantheon_app/cockpit/registries/materials.json
 ```
 
 Their current intended classification is:

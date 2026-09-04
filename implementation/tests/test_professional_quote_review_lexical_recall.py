@@ -11,7 +11,7 @@ from __future__ import annotations
 import runpy
 from pathlib import Path
 
-from mvp_vertical import retrieval, retrieval_scope
+from pantheon_app import retrieval, retrieval_scope
 
 
 BASELINE = runpy.run_path(

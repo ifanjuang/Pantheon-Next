@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.testclient import TestClient
 
-from mvp_vertical import document_structure_api, document_structure_read
+from pantheon_app import document_structure_api, document_structure_read
 
 
 class _Cursor:

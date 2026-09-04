@@ -1,6 +1,6 @@
 """Tests for the policy chokepoint seam (Phase C)."""
 
-from mvp_vertical.policy_gate import (
+from pantheon_app.policy_gate import (
     GateVerdict,
     StandInPolicyClient,
     enforce_consequential,

@@ -9,14 +9,14 @@ import psycopg
 import pytest
 from pydantic import ValidationError
 
-from mvp_vertical import (
+from pantheon_app import (
     agency_classification,
     agency_data,
     project_documents,
     store,
     work_issues,
 )
-from mvp_vertical.agency_classification_api import CategoryUpdateBody
+from pantheon_app.agency_classification_api import CategoryUpdateBody
 
 
 @pytest.fixture

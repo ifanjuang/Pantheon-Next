@@ -21,7 +21,7 @@ import yaml
 
 pytest.importorskip("haystack")
 
-from mvp_vertical import retrieval, retrieval_scope
+from pantheon_app import retrieval, retrieval_scope
 
 
 ROOT = Path(__file__).resolve().parents[1]

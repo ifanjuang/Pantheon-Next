@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from mvp_vertical import knowledge, knowledge_update
+from pantheon_app import knowledge, knowledge_update
 
 
 class _Connection:

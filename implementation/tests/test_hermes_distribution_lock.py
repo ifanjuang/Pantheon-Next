@@ -5,7 +5,7 @@ from pathlib import Path
 
 import yaml
 
-from mvp_vertical.hermes_distribution import (
+from pantheon_app.hermes_distribution import (
     component_content_digest,
     evaluate,
     file_content_digest,

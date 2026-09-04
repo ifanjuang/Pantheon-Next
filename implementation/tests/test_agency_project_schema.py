@@ -4,7 +4,7 @@ import uuid
 
 import pytest
 
-from mvp_vertical import agency_data, agency_schema
+from pantheon_app import agency_data, agency_schema
 
 
 def _id(prefix: str) -> str:
@@ -151,7 +151,7 @@ def test_project_schema_is_exposed_by_agency_api_and_packaged() -> None:
     from pathlib import Path
 
     root = Path(__file__).resolve().parents[1]
-    api = (root / "mvp_vertical" / "agency_data_api.py").read_text(encoding="utf-8")
+    api = (root / "pantheon_app" / "agency_data_api.py").read_text(encoding="utf-8")
     pyproject = (root / "pyproject.toml").read_text(encoding="utf-8")
     assert '@app.get("/agency/schema/project")' in api
     assert '/v1/agency/' not in api

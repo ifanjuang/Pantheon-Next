@@ -28,7 +28,7 @@ The server remains authoritative for persisted categories and assignments. A Car
 
 The validation contract is implemented in this repository through `schemas/category_classification.schema.yaml` and its tests.
 
-The bounded operational candidate is now co-located under `implementation/mvp_vertical/`. Current owners include:
+The bounded operational candidate is now co-located under `implementation/pantheon_app/`. Current owners include:
 
 ```text
 sql/034_category_classification.sql
@@ -273,7 +273,7 @@ No migration of the historical scalar `category` field was identified in the cur
 Current progression:
 
 ```text
-1. introduce Category + CategoryAssignment owner records;            DONE — co-located under implementation/mvp_vertical/
+1. introduce Category + CategoryAssignment owner records;            DONE — co-located under implementation/pantheon_app/
 2. expose owner reads, bounded writes and integrity tests;           DONE — co-located implementation + tests
 3. map existing scalar categories explicitly where justified;       NOT DONE
 4. move Cockpit navigation to Category Card/Collection projection;   DONE — recursive collections + Connaissances root navigation

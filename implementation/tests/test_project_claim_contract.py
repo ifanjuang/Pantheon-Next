@@ -1,6 +1,6 @@
 from hashlib import sha256
 
-from mvp_vertical import pantheon_contracts
+from pantheon_app import pantheon_contracts
 
 
 def test_project_claim_schema_is_canonical_and_bounded() -> None:

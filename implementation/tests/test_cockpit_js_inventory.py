@@ -2,7 +2,7 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
 INVENTORY = ROOT / "docs" / "cockpit" / "JS_MODULE_INVENTORY.md"
 
 

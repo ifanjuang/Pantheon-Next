@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
-from mvp_vertical import knowledge_edit_variants
-from mvp_vertical.cockpit_composed import create_composed_cockpit_app
+from pantheon_app import knowledge_edit_variants
+from pantheon_app.cockpit_composed import create_composed_cockpit_app
 
 
 class _Connection:

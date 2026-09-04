@@ -7,7 +7,7 @@ import psycopg
 import pytest
 from psycopg.types.json import Jsonb
 
-from mvp_vertical import agency_claims, agency_data, execution_results
+from pantheon_app import agency_claims, agency_data, execution_results
 
 
 def _id(prefix: str) -> str:

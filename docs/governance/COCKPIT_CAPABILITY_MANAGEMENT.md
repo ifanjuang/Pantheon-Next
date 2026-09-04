@@ -137,7 +137,7 @@ The co-located implementation already contains bounded pieces of this model.
 
 ### 5.1 Capability lifecycle seam
 
-`implementation/mvp_vertical/capability_manager.py` implements a bounded candidate lifecycle seam for one supplied `CapabilityRecord` at a time.
+`implementation/pantheon_app/capability_manager.py` implements a bounded candidate lifecycle seam for one supplied `CapabilityRecord` at a time.
 
 It currently supports planning and guarded transitions for:
 

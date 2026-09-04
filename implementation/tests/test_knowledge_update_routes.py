@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
-from mvp_vertical import knowledge_update
-from mvp_vertical.cockpit_shell import create_cockpit_app
-from mvp_vertical.policy_gate import StandInPolicyClient
+from pantheon_app import knowledge_update
+from pantheon_app.cockpit_shell import create_cockpit_app
+from pantheon_app.policy_gate import StandInPolicyClient
 
 
 class _Connection:

@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 import psycopg
 import pytest
 
-from mvp_vertical import agency_data, source_intake
+from pantheon_app import agency_data, source_intake
 
 
 @pytest.fixture

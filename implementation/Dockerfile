@@ -6,7 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 COPY pyproject.toml README.md ./
-COPY mvp_vertical ./mvp_vertical
+COPY pantheon_app ./pantheon_app
 COPY openwebui ./openwebui
 
 RUN python -m pip install --no-cache-dir ".[cockpit]" \
@@ -16,4 +16,4 @@ USER pantheon
 
 EXPOSE 8081
 
-CMD ["mvp-cockpit-api"]
+CMD ["pantheon-cockpit"]

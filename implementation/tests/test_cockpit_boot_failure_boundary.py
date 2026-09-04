@@ -8,7 +8,7 @@ import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
 BOOTSTRAP = COCKPIT / "live_bootstrap.js"
 FAILURE = COCKPIT / "shell" / "boot_failure.js"
 

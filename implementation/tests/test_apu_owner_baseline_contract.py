@@ -4,12 +4,12 @@ import hashlib
 import json
 from pathlib import Path
 
-from mvp_vertical import pantheon_contracts
-from mvp_vertical import apu_owner
+from pantheon_app import pantheon_contracts
+from pantheon_app import apu_owner
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VENDOR = ROOT / "mvp_vertical" / "vendor" / "pantheon"
+VENDOR = ROOT / "pantheon_app" / "vendor" / "pantheon"
 
 
 def _blob_sha(payload: bytes) -> str:
@@ -44,7 +44,7 @@ def test_project_anatomy_is_installed_at_its_final_shape() -> None:
         "model_version = 1",
     ):
         assert discarded not in sql
-    assert not (ROOT / "mvp_vertical/sql/024_project_anatomy_v02_owner.sql").exists()
+    assert not (ROOT / "pantheon_app/sql/024_project_anatomy_v02_owner.sql").exists()
 
 
 def test_project_anatomy_contracts_use_one_canonical_path_family() -> None:
@@ -76,7 +76,7 @@ def test_project_anatomy_contracts_use_one_canonical_path_family() -> None:
 
 
 def test_runtime_has_no_discarded_reader_writer_or_migration_surface() -> None:
-    source = (ROOT / "mvp_vertical/apu_owner.py").read_text(encoding="utf-8")
+    source = (ROOT / "pantheon_app/apu_owner.py").read_text(encoding="utf-8")
     for discarded in (
         "get_project_anatomy_v02",
         "store_reviewed_v02_dossier",

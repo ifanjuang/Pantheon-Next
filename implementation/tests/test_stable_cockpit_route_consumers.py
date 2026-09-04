@@ -2,12 +2,12 @@
 
 from pathlib import Path
 
-from mvp_vertical.cockpit_shell import create_cockpit_app
+from pantheon_app.cockpit_shell import create_cockpit_app
 
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
-MOBILE_EDITOR = ROOT / "mvp_vertical" / "mobile_editor" / "app.js"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
+MOBILE_EDITOR = ROOT / "pantheon_app" / "mobile_editor" / "app.js"
 
 
 def test_composed_app_mounts_only_stable_cockpit_shell_routes() -> None:

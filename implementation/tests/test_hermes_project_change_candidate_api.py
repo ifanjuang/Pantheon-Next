@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
-from mvp_vertical import (
+from pantheon_app import (
     agency_change_candidates,
     hermes_active_context,
     hermes_scoped_context,
 )
-from mvp_vertical.cockpit_shell import create_cockpit_app
+from pantheon_app.cockpit_shell import create_cockpit_app
 
 
 class _Connection:

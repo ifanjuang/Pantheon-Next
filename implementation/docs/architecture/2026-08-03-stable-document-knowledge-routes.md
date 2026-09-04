@@ -6,7 +6,7 @@ Status: architecture convergence validation trace.
 
 ## Scope
 
-This atomic slice removes the internal `/v1` prefix from the bounded Document, Knowledge, edit-request and original-preview routes owned by `mvp_vertical/cockpit_api.py`.
+This atomic slice removes the internal `/v1` prefix from the bounded Document, Knowledge, edit-request and original-preview routes owned by `pantheon_app/cockpit_api.py`.
 
 ```text
 GET  /projects/{parent_project_id}/documents
@@ -35,11 +35,11 @@ All old `/v1/...` route declarations are removed in the same change. No aliases 
 The following consumers are migrated atomically:
 
 ```text
-mvp_vertical/cockpit/data/cockpit_data_loader.js
-mvp_vertical/cockpit/actions/card_actions.js
-mvp_vertical/cockpit/demo_bootstrap.js
-mvp_vertical/mobile_editor/app.js
-mvp_vertical/mobile_editor/sw.js
+pantheon_app/cockpit/data/cockpit_data_loader.js
+pantheon_app/cockpit/actions/card_actions.js
+pantheon_app/cockpit/demo_bootstrap.js
+pantheon_app/mobile_editor/app.js
+pantheon_app/mobile_editor/sw.js
 ```
 
 The Cockpit project bundle reads stable Document and Knowledge collections. The chunk inspector reads the stable Document chunk route. The static demo simulates the stable paths. The mobile editor uses stable project Knowledge, Markdown and edit-request routes.

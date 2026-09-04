@@ -18,7 +18,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
 SNAPSHOT = COCKPIT / "collection" / "cockpit_snapshot.js"
 LIVE_PROVIDER = COCKPIT / "providers" / "live_provider.js"
 

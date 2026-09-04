@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from mvp_vertical import hermes_cli
+from pantheon_app import hermes_cli
 
 
 class _FakeBinding:

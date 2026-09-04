@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from mvp_vertical import human_access, retrieval_scope
-from mvp_vertical.contract import TaskContract
+from pantheon_app import human_access, retrieval_scope
+from pantheon_app.contract import TaskContract
 
 
 def _contract(*sources: str) -> TaskContract:

@@ -26,7 +26,7 @@ def _clean_payloads() -> tuple[dict, dict]:
             "artifacts": [
                 {
                     "zone": "implementation",
-                    "path": "mvp_vertical/api.py",
+                    "path": "pantheon_app/api.py",
                     "posture": "implementation",
                     "generation_named": False,
                     "versioned_routes": [],
@@ -39,7 +39,7 @@ def _clean_payloads() -> tuple[dict, dict]:
             "modules": [
                 {
                     "zone": "implementation",
-                    "path": "mvp_vertical/api.py",
+                    "path": "pantheon_app/api.py",
                     "usage_state": "active_entrypoint",
                     "removal_candidate": False,
                     "parse_error": None,

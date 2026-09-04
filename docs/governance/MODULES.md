@@ -125,7 +125,7 @@ This is a responsibility topology. A successful execution does not retroactively
 | Hermes execution integration | `HERMES_INTEGRATION.md`, Task Contract/admission owners | Hermes executes externally; no self-approval or automatic Evidence promotion. |
 | External client selection | `EXTERNAL_TOOLS_POLICY.md`, `EXTERNAL_TOOL_PLACEMENT_REGISTER.md` | Clients remain replaceable; compatibility is not architecture authority. |
 | External tools/connectors | `EXTERNAL_TOOLS_POLICY.md`, `ADAPTERS_AND_BINDINGS.md` | External capability surfaces under least-capability/governed boundaries. |
-| Co-located candidate implementation | `implementation/` + `NEXT_MVP_REPOSITORY_PLACEMENT.md` | Executable candidate behavior; co-location does not transfer governance authority or adoption. |
+| Co-located candidate implementation | `implementation/` + `REPOSITORY_PLACEMENT.md` | Executable candidate behavior; co-location does not transfer governance authority or adoption. |
 
 ### E — Interaction, Projection and Workspace
 

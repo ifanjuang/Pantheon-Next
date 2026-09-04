@@ -6,7 +6,7 @@ Status: architecture convergence validation trace.
 
 ## Scope
 
-This slice removes the internal `/v1` prefix from the six routes composed directly by `mvp_vertical/cockpit_shell.py`.
+This slice removes the internal `/v1` prefix from the six routes composed directly by `pantheon_app/cockpit_shell.py`.
 
 ```text
 GET  /projects/{parent_project_id}/resource-profiles
@@ -36,8 +36,8 @@ The following routes remain versioned because they belong to the later Documents
 The route review identified two active Cockpit consumers left behind by the completed Agency migration:
 
 ```text
-mvp_vertical/cockpit/context/context_selection.js
-mvp_vertical/cockpit/information_view_adapter.js
+pantheon_app/cockpit/context/context_selection.js
+pantheon_app/cockpit/information_view_adapter.js
 ```
 
 They now use `/agency/...` and explicitly reject regression to `/v1/agency/...` through static tests.

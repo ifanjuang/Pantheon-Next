@@ -11,7 +11,7 @@ import psycopg
 import pytest
 from fastapi.testclient import TestClient
 
-from mvp_vertical import (
+from pantheon_app import (
     agency_data,
     document_revision_discussion,
     human_access,
@@ -21,7 +21,7 @@ from mvp_vertical import (
     storage_retention,
     store,
 )
-from mvp_vertical.cockpit_composed import create_composed_cockpit_app
+from pantheon_app.cockpit_composed import create_composed_cockpit_app
 
 
 class FakeVerifier:

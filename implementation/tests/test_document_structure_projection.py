@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from mvp_vertical.document_structure import (
+from pantheon_app.document_structure import (
     fragment_refs_for_chunk,
     primary_fragment_ref,
     project_document_structure,
 )
-from mvp_vertical.structured_extraction import compile_document, compilation_id
+from pantheon_app.structured_extraction import compile_document, compilation_id
 
 
 def _compiled():

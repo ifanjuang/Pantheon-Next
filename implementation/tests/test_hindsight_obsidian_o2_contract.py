@@ -61,7 +61,7 @@ def test_o2_exercises_real_reconcile_lifecycle_and_scope() -> None:
     assert "metadata" in raw and "path" in raw
     assert "pantheon_state_mutated':False" in raw
     assert "evidence_admitted':False" in raw
-    assert "MVP_ROOT" not in raw
+    assert "PANTHEON_ROOT" not in raw
 
 
 def test_o2_proves_realistic_strict_project_scope_without_new_scope_owner() -> None:

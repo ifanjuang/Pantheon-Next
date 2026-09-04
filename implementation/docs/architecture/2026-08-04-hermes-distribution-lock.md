@@ -46,7 +46,7 @@ The run binding continues to omit `model`, `provider` and `model_options`; model
 
 ## Shared validator and CLI
 
-`mvp_vertical/hermes_distribution.py` owns schema application, monorepo containment, digest, route and non-authority checks. `tools/check_hermes_distribution_lock.py` remains the CI wrapper.
+`pantheon_app/hermes_distribution.py` owns schema application, monorepo containment, digest, route and non-authority checks. `tools/check_hermes_distribution_lock.py` remains the CI wrapper.
 
 The one-shot command `pantheon-hermes` exposes `verify-distribution`, `observe`, `launch` and `reconcile`. Distribution verification accepts one `--monorepo-root`; it no longer models the former governance and implementation repositories as separate component sources.
 

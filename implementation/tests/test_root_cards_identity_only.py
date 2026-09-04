@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT_PROJECTION = ROOT / "mvp_vertical" / "cockpit" / "projection" / "cockpit_projection.js"
+COCKPIT_PROJECTION = ROOT / "pantheon_app" / "cockpit" / "projection" / "cockpit_projection.js"
 
 
 def root_cards_block() -> str:

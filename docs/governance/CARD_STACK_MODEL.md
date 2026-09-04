@@ -137,7 +137,7 @@ permitted candidate actions.
 
 Front and detail are two projections of the same identity, not separate records.
 
-The current co-located Cockpit candidate implements a front/back Card renderer through `implementation/mvp_vertical/cockpit/rendering/card_renderer.js` and related projection definitions. That implementation is evidence of a candidate renderer, not proof of adoption or production activation.
+The current co-located Cockpit candidate implements a front/back Card renderer through `implementation/pantheon_app/cockpit/rendering/card_renderer.js` and related projection definitions. That implementation is evidence of a candidate renderer, not proof of adoption or production activation.
 
 ## 5. Status projection
 

@@ -23,7 +23,7 @@ from haystack.components.retrievers.in_memory import InMemoryBM25Retriever
 from haystack.document_stores.in_memory import InMemoryDocumentStore
 from haystack.document_stores.types import DuplicatePolicy
 
-from mvp_vertical.retrieval_scope import ResolvedRetrievalSource, RetrievalScopeResolution
+from pantheon_app.retrieval_scope import ResolvedRetrievalSource, RetrievalScopeResolution
 
 
 class HaystackQualificationError(RuntimeError):

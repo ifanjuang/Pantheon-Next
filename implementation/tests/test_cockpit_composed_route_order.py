@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
-from mvp_vertical.cockpit_composed import create_composed_cockpit_app
+from pantheon_app.cockpit_composed import create_composed_cockpit_app
 
 
 def _forbidden_connection():

@@ -19,7 +19,7 @@ def valid_tree(tmp_path: Path) -> Path:
         target.write_text("", encoding="utf-8")
     (control / "index.html").write_text(
         "<!doctype html><title>orientation</title>"
-        "<p>implementation/mvp_vertical/cockpit — NON-RUNTIME</p>",
+        "<p>implementation/pantheon_app/cockpit — NON-RUNTIME</p>",
         encoding="utf-8",
     )
     return tmp_path
@@ -57,7 +57,7 @@ def test_orientation_page_cannot_load_executable_assets(tmp_path: Path) -> None:
     index.write_text(
         "<!doctype html><link rel='stylesheet' href='style.css'>"
         "<script src='app.js'></script>"
-        "<p>implementation/mvp_vertical/cockpit — NON-RUNTIME</p>",
+        "<p>implementation/pantheon_app/cockpit — NON-RUNTIME</p>",
         encoding="utf-8",
     )
     findings = MODULE.check(root)

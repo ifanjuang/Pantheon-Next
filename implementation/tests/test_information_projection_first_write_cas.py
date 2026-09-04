@@ -5,7 +5,7 @@ from datetime import date
 
 import pytest
 
-from mvp_vertical import agency_data, agency_information, information_projection
+from pantheon_app import agency_data, agency_information, information_projection
 
 
 def _id(prefix: str) -> str:

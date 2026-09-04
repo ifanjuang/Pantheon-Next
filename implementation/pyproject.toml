@@ -1,5 +1,5 @@
 [project]
-name = "pantheon-mvp-vertical"
+name = "pantheon-app"
 version = "0.2.0"
 description = "Bounded executable candidate implementation co-located in the Pantheon Next monorepo; governance authority remains separate."
 requires-python = ">=3.11"
@@ -36,9 +36,9 @@ test = [
 ]
 
 [project.scripts]
-mvp-vertical = "mvp_vertical.cli:main"
-mvp-cockpit-api = "mvp_vertical.cockpit_composed:run"
-pantheon-hermes = "mvp_vertical.hermes_cli:main"
+pantheon-app = "pantheon_app.cli:main"
+pantheon-cockpit = "pantheon_app.cockpit_composed:run"
+pantheon-hermes = "pantheon_app.hermes_cli:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -48,12 +48,12 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["mvp_vertical"]
+packages = ["pantheon_app"]
 
 # setup.py stages the complete canonical schemas/ tree into this ignored
 # directory before wheel/sdist creation. It is distribution material only.
 [tool.setuptools.package-data]
-mvp_vertical = [
+pantheon_app = [
   "_generated_contracts/**/*",
   "agency_schema/*.json",
   # Two lineages, so two patterns: sql/ holds the Agency and Cockpit sequence,

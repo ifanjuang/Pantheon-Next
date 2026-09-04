@@ -19,7 +19,7 @@ EXAMPLE_SCHEMA_PAIRS = [
     (EXAMPLES / "register_candidate.example.yaml", SCHEMAS / "register_candidate.schema.yaml"),
     (EXAMPLES / "register_link.example.yaml", SCHEMAS / "register_link.schema.yaml"),
     (EXAMPLES / "impact_review.example.yaml", SCHEMAS / "impact_review.schema.yaml"),
-    (EXAMPLES / "mvp_governed_loop_objects.example.yaml", SCHEMAS / "mvp_governed_loop_objects.schema.yaml"),
+    (EXAMPLES / "governed_loop_objects.example.yaml", SCHEMAS / "governed_loop_objects.schema.yaml"),
     (EXAMPLES / "answer_status.example.yaml", SCHEMAS / "answer_status.schema.yaml"),
     (EXAMPLES / "policy_decision.example.yaml", SCHEMAS / "policy_decision.schema.yaml"),
     (EXAMPLES / "capability_passport.example.yaml", SCHEMAS / "capability_passport.schema.yaml"),

@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from mvp_vertical.work_activity_projection import project_work_activity
+from pantheon_app.work_activity_projection import project_work_activity
 
 
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT_PROJECTION = (
-    ROOT / "mvp_vertical" / "cockpit" / "projection" / "cockpit_projection.js"
+    ROOT / "pantheon_app" / "cockpit" / "projection" / "cockpit_projection.js"
 )
 
 

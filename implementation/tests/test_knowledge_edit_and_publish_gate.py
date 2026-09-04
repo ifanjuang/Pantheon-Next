@@ -22,9 +22,9 @@ from pathlib import Path
 
 import pytest
 
-from mvp_vertical import execution_results, knowledge, knowledge_edit_variants, store
-from mvp_vertical.contract import TaskContract
-from mvp_vertical.policy_gate import StandInPolicyClient
+from pantheon_app import execution_results, knowledge, knowledge_edit_variants, store
+from pantheon_app.contract import TaskContract
+from pantheon_app.policy_gate import StandInPolicyClient
 
 
 class _UnreachablePolicyClient:

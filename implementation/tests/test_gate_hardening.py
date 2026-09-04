@@ -10,7 +10,7 @@ import copy
 
 import pytest
 
-from mvp_vertical.terminal_gate_standin import GateRefusal, allowed_decisions, record_decision
+from pantheon_app.terminal_gate_standin import GateRefusal, allowed_decisions, record_decision
 
 
 REQUEST_REF = "mvp.test.tc"

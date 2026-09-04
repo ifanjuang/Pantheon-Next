@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from mvp_vertical import (
+from pantheon_app import (
     agency_change_candidate_review,
     agency_change_candidates,
     agency_data,
@@ -206,8 +206,8 @@ def test_revision_review_event_remains_append_only(conn) -> None:
 
 def test_review_api_is_human_only_and_keeps_non_authority_flags() -> None:
     root = Path(__file__).resolve().parents[1]
-    api = (root / "mvp_vertical" / "agency_change_candidate_review_api.py").read_text(encoding="utf-8")
-    composed = (root / "mvp_vertical" / "agency_change_candidate_api.py").read_text(encoding="utf-8")
+    api = (root / "pantheon_app" / "agency_change_candidate_review_api.py").read_text(encoding="utf-8")
+    composed = (root / "pantheon_app" / "agency_change_candidate_api.py").read_text(encoding="utf-8")
 
     assert '/agency/change-candidates/{candidate_id}' in api
     assert '/agency/change-candidates/{candidate_id}/request-revision' in api

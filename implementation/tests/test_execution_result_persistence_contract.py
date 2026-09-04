@@ -2,13 +2,13 @@
 
 from pathlib import Path
 
-from mvp_vertical import execution_results
+from pantheon_app import execution_results
 
 
 ROOT = Path(__file__).resolve().parents[1]
-MIGRATION = ROOT / "mvp_vertical" / "sql" / "010_execution_results.sql"
-API = ROOT / "mvp_vertical" / "execution_result_api.py"
-COMPOSED = ROOT / "mvp_vertical" / "cockpit_composed.py"
+MIGRATION = ROOT / "pantheon_app" / "sql" / "010_execution_results.sql"
+API = ROOT / "pantheon_app" / "execution_result_api.py"
+COMPOSED = ROOT / "pantheon_app" / "cockpit_composed.py"
 
 
 def test_execution_result_vocabulary_matches_governed_contract() -> None:
@@ -88,7 +88,7 @@ def test_composed_cockpit_mounts_migration_and_routes() -> None:
 def test_disposition_acceptance_does_not_mean_apu_write() -> None:
     api_source = API.read_text(encoding="utf-8")
     persistence_source = (
-        ROOT / "mvp_vertical" / "execution_results.py"
+        ROOT / "pantheon_app" / "execution_results.py"
     ).read_text(encoding="utf-8")
     assert "accepted_for_mapping" in persistence_source
     assert "apu_mutated" in api_source

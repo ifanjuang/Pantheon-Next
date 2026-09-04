@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from mvp_vertical.contradictory_review import (
+from pantheon_app.contradictory_review import (
     AnalogousOccurrence,
     ContradictoryReviewReport,
     ReviewClaim,

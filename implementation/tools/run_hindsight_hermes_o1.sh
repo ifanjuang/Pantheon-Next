@@ -8,7 +8,7 @@ set -euo pipefail
 : "${HINDSIGHT_API_URL:?set HINDSIGHT_API_URL to a sandbox Hindsight endpoint}"
 : "${HINDSIGHT_BANK_ID:=pantheon-o1-synthetic}"
 
-MVP_ROOT="$GITHUB_WORKSPACE/pantheon-mvp"
+PANTHEON_ROOT="$GITHUB_WORKSPACE/pantheon-mvp"
 UPSTREAM_ROOT="$GITHUB_WORKSPACE/hermes-upstream"
 LAB_ROOT="$RUNNER_TEMP/hindsight-hermes-o1"
 ARTIFACTS="$LAB_ROOT/artifacts"
@@ -28,22 +28,22 @@ trap cleanup EXIT
 
 cd "$UPSTREAM_ROOT"
 test "$(git rev-parse HEAD)" = "$HERMES_RELEASE_COMMIT"
-cd "$MVP_ROOT"
+cd "$PANTHEON_ROOT"
 
 python -m pip install --disable-pip-version-check --upgrade uv
 python -m venv "$VENV"
 uv pip install --python "$VENV/bin/python" -e "$UPSTREAM_ROOT" "hindsight-client==${HINDSIGHT_VERSION}" "aiohttp==3.14.1"
-uv pip install --python "$VENV/bin/python" -e "$MVP_ROOT"
+uv pip install --python "$VENV/bin/python" -e "$PANTHEON_ROOT"
 export PATH="$VENV/bin:$PATH"
 
 hermes profile create assistant-personal --no-skills --no-alias
 hermes profile create pantheon-governed --no-skills --no-alias
 
-python "$MVP_ROOT/tools/hindsight_hermes_o1_fixture.py" --journal "$ARTIFACTS/provider-journal.jsonl" >"$ARTIFACTS/provider.log" 2>&1 &
+python "$PANTHEON_ROOT/tools/hindsight_hermes_o1_fixture.py" --journal "$ARTIFACTS/provider-journal.jsonl" >"$ARTIFACTS/provider.log" 2>&1 &
 FIXTURE_PID=$!
 for _ in $(seq 1 60); do curl -fsS "$PROVIDER_URL/health" >/dev/null && break; sleep 0.5; done
 
-python "$MVP_ROOT/tools/run_hindsight_hermes_o1.py" configure \
+python "$PANTHEON_ROOT/tools/run_hindsight_hermes_o1.py" configure \
   --hermes-home "$HERMES_HOME" \
   --hindsight-api-url "$HINDSIGHT_API_URL" \
   --hindsight-api-key "$HINDSIGHT_API_KEY" \
@@ -94,4 +94,4 @@ curl -fsS "$PROVIDER_URL/_lab/state" > "$ARTIFACTS/provider-state.json"
 
 hermes profile delete assistant-personal --yes
 printf '{"assistant_profile_removed":true,"pantheon_state_mutated":false}\n' > "$ARTIFACTS/rollback.json"
-python "$MVP_ROOT/tools/run_hindsight_hermes_o1.py" validate --artifacts "$ARTIFACTS"
+python "$PANTHEON_ROOT/tools/run_hindsight_hermes_o1.py" validate --artifacts "$ARTIFACTS"

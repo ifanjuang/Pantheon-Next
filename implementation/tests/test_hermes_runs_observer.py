@@ -5,7 +5,7 @@ from __future__ import annotations
 import httpx
 import pytest
 
-from mvp_vertical.hermes_runs_observer import (
+from pantheon_app.hermes_runs_observer import (
     HermesRunsApiObserver,
     HermesRunsObservationError,
     parse_memory_status,

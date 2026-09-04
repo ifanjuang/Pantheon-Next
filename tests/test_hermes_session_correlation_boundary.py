@@ -5,13 +5,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RUNTIME_REVIEW = ROOT / "docs" / "governance" / "HERMES_RUNTIME_SURFACE_REVIEW.md"
-RUN_BINDING = ROOT / "implementation" / "mvp_vertical" / "hermes_run_binding.py"
-LAUNCH_CONTEXT = ROOT / "implementation" / "mvp_vertical" / "hermes_launch_context.py"
-EXECUTION = ROOT / "implementation" / "mvp_vertical" / "hermes_execution.py"
+RUN_BINDING = ROOT / "implementation" / "pantheon_app" / "hermes_run_binding.py"
+LAUNCH_CONTEXT = ROOT / "implementation" / "pantheon_app" / "hermes_launch_context.py"
+EXECUTION = ROOT / "implementation" / "pantheon_app" / "hermes_execution.py"
 LAUNCH_SQL = (
     ROOT
     / "implementation"
-    / "mvp_vertical"
+    / "pantheon_app"
     / "sql"
     / "hermes"
     / "007_run_launch_reservations.sql"

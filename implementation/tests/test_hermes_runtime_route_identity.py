@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-API = ROOT / "mvp_vertical" / "hermes_execution_api.py"
+API = ROOT / "pantheon_app" / "hermes_execution_api.py"
 
 
 STABLE_RUNTIME_ROUTES = {
@@ -48,7 +48,7 @@ def test_runtime_boundary_remains_external_and_bounded() -> None:
 
 def test_project_change_candidate_route_is_stable_and_still_separate() -> None:
     project_api = (
-        ROOT / "mvp_vertical" / "hermes_project_change_candidate_api.py"
+        ROOT / "pantheon_app" / "hermes_project_change_candidate_api.py"
     ).read_text(encoding="utf-8")
 
     route = (

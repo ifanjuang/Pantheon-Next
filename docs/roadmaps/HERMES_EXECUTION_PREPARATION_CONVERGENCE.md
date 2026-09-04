@@ -38,7 +38,7 @@ Cockpit handoff preview
 ## Existing authority owners
 
 ```text
-MVP_GOVERNED_TASK_LOOP.md
+GOVERNED_TASK_LOOP.md
 → smallest governed end-to-end loop
 
 TRIPARTITE_INTERFACE_SPEC.md

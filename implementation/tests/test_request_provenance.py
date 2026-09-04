@@ -2,8 +2,8 @@
 
 from pathlib import Path
 
-from mvp_vertical.contract import load_contract
-from mvp_vertical.runner import _request_scope_digest, run
+from pantheon_app.contract import load_contract
+from pantheon_app.runner import _request_scope_digest, run
 
 
 ROOT = Path(__file__).resolve().parents[1]

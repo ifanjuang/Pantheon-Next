@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-MAP_DIR = ROOT / "mvp_vertical" / "cockpit" / "map"
+MAP_DIR = ROOT / "pantheon_app" / "cockpit" / "map"
 SCRIPTS = sorted(MAP_DIR.glob("*.js"))
 FORBIDDEN = ("fetch(", "XMLHttpRequest", "WebSocket", "localStorage", "sessionStorage")
 
@@ -93,13 +93,13 @@ def test_map_modules_expose_globals() -> None:
 
 
 def test_projection_graph_exposure_is_read_only_hook() -> None:
-    source = (ROOT / "mvp_vertical" / "cockpit" / "projection" / "cockpit_projection.js").read_text(encoding="utf-8")
+    source = (ROOT / "pantheon_app" / "cockpit" / "projection" / "cockpit_projection.js").read_text(encoding="utf-8")
     assert "window.PantheonCockpitGraph = Object.freeze(" in source
     assert "pantheon:graph-updated" in source
 
 
 def test_map_binding_is_read_only_and_parses() -> None:
-    binding = ROOT / "mvp_vertical" / "cockpit" / "map_binding.js"
+    binding = ROOT / "pantheon_app" / "cockpit" / "map_binding.js"
     assert binding.exists()
     source = binding.read_text(encoding="utf-8")
     for token in FORBIDDEN:
@@ -109,13 +109,13 @@ def test_map_binding_is_read_only_and_parses() -> None:
 
 
 def test_projection_passes_through_corroboration_refs() -> None:
-    source = (ROOT / "mvp_vertical" / "cockpit" / "projection" / "cockpit_projection.js").read_text(encoding="utf-8")
+    source = (ROOT / "pantheon_app" / "cockpit" / "projection" / "cockpit_projection.js").read_text(encoding="utf-8")
     assert "corroboration_refs" in source
     assert "contradiction_refs" in source
 
 
 def test_live_bootstrap_loads_map_modules() -> None:
-    source = (ROOT / "mvp_vertical" / "cockpit" / "live_bootstrap.js").read_text(encoding="utf-8")
+    source = (ROOT / "pantheon_app" / "cockpit" / "live_bootstrap.js").read_text(encoding="utf-8")
     for script in ("map/map_view.js", "map/map_mount.js", "map_binding.js"):
         assert script in source, f"live_bootstrap must load {script}"
 

@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from mvp_vertical import human_access, retrieval_scope, runner
-from mvp_vertical.contract import TaskContract
-from mvp_vertical.retrieval import HybridRetrievedChunk
-from mvp_vertical.store import RetrievedChunk
+from pantheon_app import human_access, retrieval_scope, runner
+from pantheon_app.contract import TaskContract
+from pantheon_app.retrieval import HybridRetrievedChunk
+from pantheon_app.store import RetrievedChunk
 
 
 SOURCE = "sources/cctp.md"

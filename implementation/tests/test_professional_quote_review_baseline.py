@@ -22,7 +22,7 @@ import psycopg
 import pytest
 import yaml
 
-from mvp_vertical import (
+from pantheon_app import (
     agency_data,
     human_access,
     project_document_currentness,
@@ -30,7 +30,7 @@ from mvp_vertical import (
     runner,
     store,
 )
-from mvp_vertical.contract import TaskContract, load_contract
+from pantheon_app.contract import TaskContract, load_contract
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,7 +48,7 @@ def _connect_or_skip():
     try:
         conn = human_access.connect()
     except psycopg.OperationalError as exc:  # pragma: no cover - local unit-only lane
-        if os.environ.get("MVP_PG_DSN"):
+        if os.environ.get("PANTHEON_PG_DSN"):
             raise
         pytest.skip(f"PostgreSQL/pgvector unreachable: {exc}")
 

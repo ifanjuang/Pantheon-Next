@@ -52,7 +52,7 @@ A definition must not contain:
 
 Pantheon-Next owns the definition contract and its boundaries.
 
-Operational definition instances are co-located with the Cockpit implementation under `implementation/mvp_vertical/cockpit/registries/`. The executable Navigation Registry owns root identity and order; Card Projection Definitions own presentation mapping only.
+Operational definition instances are co-located with the Cockpit implementation under `implementation/pantheon_app/cockpit/registries/`. The executable Navigation Registry owns root identity and order; Card Projection Definitions own presentation mapping only.
 
 The authoritative object projection remains owner-controlled for entity data, status, available actions, relations and permissions.
 

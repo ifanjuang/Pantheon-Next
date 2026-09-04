@@ -1,11 +1,11 @@
 from pathlib import Path
 
-from mvp_vertical import apu_write_preparation
+from pantheon_app import apu_write_preparation
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SQL = ROOT / "mvp_vertical" / "sql" / "012_apu_write_preparation.sql"
-API = ROOT / "mvp_vertical" / "apu_write_api.py"
+SQL = ROOT / "pantheon_app" / "sql" / "012_apu_write_preparation.sql"
+API = ROOT / "pantheon_app" / "apu_write_api.py"
 
 
 def test_write_preparation_vocabulary_is_bounded():

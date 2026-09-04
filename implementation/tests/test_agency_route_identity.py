@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from mvp_vertical.cockpit_shell import create_cockpit_app
+from pantheon_app.cockpit_shell import create_cockpit_app
 
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
 
 
 class _Connection:

@@ -4,7 +4,7 @@ from contextlib import nullcontext
 
 import pytest
 
-from mvp_vertical import apu_mapping_reviews, execution_results
+from pantheon_app import apu_mapping_reviews, execution_results
 
 
 EXECUTION = {

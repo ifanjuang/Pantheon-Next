@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from mvp_vertical.entity_ref import EntityRef, EntityRefError, unique_entity_refs
+from pantheon_app.entity_ref import EntityRef, EntityRefError, unique_entity_refs
 
 
 def test_entity_ref_normalizes_stable_identity_without_claiming_owner_existence() -> None:
@@ -63,7 +63,7 @@ def test_unique_entity_refs_enforces_caller_owned_collection_limit() -> None:
 
 
 def test_entity_ref_has_no_database_http_or_adapter_dependency() -> None:
-    path = Path(__import__("mvp_vertical.entity_ref", fromlist=["EntityRef"]).__file__)
+    path = Path(__import__("pantheon_app.entity_ref", fromlist=["EntityRef"]).__file__)
     tree = ast.parse(path.read_text(encoding="utf-8"))
     imported_roots: set[str] = set()
     for node in ast.walk(tree):

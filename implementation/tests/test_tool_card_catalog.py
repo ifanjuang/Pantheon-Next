@@ -3,7 +3,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CATALOG = ROOT / "mvp_vertical" / "cockpit" / "tool_catalog.json"
+CATALOG = ROOT / "pantheon_app" / "cockpit" / "tool_catalog.json"
 
 
 def _catalog():

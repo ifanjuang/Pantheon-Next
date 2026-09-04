@@ -1,10 +1,10 @@
 from pathlib import Path
 
-from mvp_vertical import agency_schema
+from pantheon_app import agency_schema
 
 
 ROOT = Path(__file__).resolve().parents[1]
-API = ROOT / "mvp_vertical" / "agency_data_api.py"
+API = ROOT / "pantheon_app" / "agency_data_api.py"
 
 
 def test_information_list_exposes_one_server_owned_card_contract() -> None:

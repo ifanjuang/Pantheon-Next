@@ -12,10 +12,10 @@ from pathlib import Path
 import pytest
 import yaml
 
-from mvp_vertical import store
-from mvp_vertical.contract import load_contract
-from mvp_vertical.embedder import embed, to_pgvector
-from mvp_vertical.retrieval import retrieve_hybrid_scoped, retrieve_lexical_scoped
+from pantheon_app import store
+from pantheon_app.contract import load_contract
+from pantheon_app.embedder import embed, to_pgvector
+from pantheon_app.retrieval import retrieve_hybrid_scoped, retrieve_lexical_scoped
 
 ROOT = Path(__file__).resolve().parents[1]
 CASES = yaml.safe_load(

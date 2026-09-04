@@ -34,7 +34,7 @@ external runtimes / private deployment
 
 Reverse authority transfer is forbidden. `implementation/` may demonstrate a better implementation and motivate a reviewed governance change, but executable code does not silently redefine doctrine or schemas.
 
-Repository placement follows `docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md`. The former sibling-repository decision is superseded: implementation is now co-located under `implementation/`, while responsibility and authority remain separated.
+Repository placement follows `docs/governance/REPOSITORY_PLACEMENT.md`. The former sibling-repository decision is superseded: implementation is now co-located under `implementation/`, while responsibility and authority remain separated.
 
 ## Non-negotiable boundaries
 

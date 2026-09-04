@@ -5,8 +5,8 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from mvp_vertical import project_change_variants
-from mvp_vertical.project_change_variant_api import install_project_change_variant_routes
+from pantheon_app import project_change_variants
+from pantheon_app.project_change_variant_api import install_project_change_variant_routes
 
 
 def _app(monkeypatch, *, transition=None):

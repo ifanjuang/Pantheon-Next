@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from mvp_vertical import (
+from pantheon_app import (
     agency_classification,
     agency_data,
     category_collection_read,

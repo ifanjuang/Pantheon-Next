@@ -8,7 +8,7 @@ import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
 
 
 def test_revision_review_adapter_is_loaded_after_candidate_decisions() -> None:

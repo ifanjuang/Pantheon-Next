@@ -18,7 +18,7 @@ def _discover_scripts() -> list[Path]:
     added, renamed or moved. Discovery keeps the syntax check exhaustive by
     construction; vendored third-party bundles stay excluded.
     """
-    roots = (ROOT / "mvp_vertical" / "cockpit", ROOT / "mvp_vertical" / "mobile_editor")
+    roots = (ROOT / "pantheon_app" / "cockpit", ROOT / "pantheon_app" / "mobile_editor")
     found = [
         path
         for root in roots
@@ -49,11 +49,11 @@ def test_cockpit_javascript_parses(script: Path) -> None:
 
 
 def test_cockpit_foundations_are_loaded_before_schema_renderer() -> None:
-    bootstrap = (ROOT / "mvp_vertical" / "cockpit" / "live_bootstrap.js").read_text(encoding="utf-8")
-    resolver = (ROOT / "mvp_vertical" / "cockpit" / "context_resolver.js").read_text(encoding="utf-8")
-    agency = (ROOT / "mvp_vertical" / "cockpit" / "agency_data_binding.js").read_text(encoding="utf-8")
-    notion = (ROOT / "mvp_vertical" / "cockpit" / "notion_agency_binding.js").read_text(encoding="utf-8")
-    contract = (ROOT / "mvp_vertical" / "cockpit" / "structured_interface.js").read_text(encoding="utf-8")
+    bootstrap = (ROOT / "pantheon_app" / "cockpit" / "live_bootstrap.js").read_text(encoding="utf-8")
+    resolver = (ROOT / "pantheon_app" / "cockpit" / "context_resolver.js").read_text(encoding="utf-8")
+    agency = (ROOT / "pantheon_app" / "cockpit" / "agency_data_binding.js").read_text(encoding="utf-8")
+    notion = (ROOT / "pantheon_app" / "cockpit" / "notion_agency_binding.js").read_text(encoding="utf-8")
+    contract = (ROOT / "pantheon_app" / "cockpit" / "structured_interface.js").read_text(encoding="utf-8")
 
     for script in ("structured_interface.js", "context_resolver.js", "agency_data_binding.js"):
         assert f'"{script}"' in bootstrap
@@ -109,7 +109,7 @@ def _run_node(script: str) -> subprocess.CompletedProcess[str]:
 def test_context_resolver_composes_providers_and_explains_matches() -> None:
     script = r'''
       global.window = {};
-      require("./mvp_vertical/cockpit/context_resolver.js");
+      require("./pantheon_app/cockpit/context_resolver.js");
       const resolver = window.PantheonContextResolver;
 
       (async () => {
@@ -142,8 +142,8 @@ def test_context_resolver_composes_providers_and_explains_matches() -> None:
 def test_postgres_agency_data_binding_is_default_owner_projection() -> None:
     script = r'''
       global.window = {};
-      require("./mvp_vertical/cockpit/context_resolver.js");
-      require("./mvp_vertical/cockpit/agency_data_binding.js");
+      require("./pantheon_app/cockpit/context_resolver.js");
+      require("./pantheon_app/cockpit/agency_data_binding.js");
 
       const resolver = window.PantheonContextResolver;
       const resources = window.PantheonAgencyDataBinding.defaultResources;
@@ -224,7 +224,7 @@ def test_postgres_agency_data_binding_is_default_owner_projection() -> None:
 def test_notion_selective_bidirectional_policy_rejects_undeclared_and_detects_conflict() -> None:
     script = r'''
       global.window = {};
-      require("./mvp_vertical/cockpit/notion_agency_binding.js");
+      require("./pantheon_app/cockpit/notion_agency_binding.js");
 
       const binding = window.PantheonNotionAgencyBinding.create({
         mode: "selective_bidirectional",
@@ -301,10 +301,10 @@ def test_notion_selective_bidirectional_policy_rejects_undeclared_and_detects_co
 def test_static_demo_reuses_cockpit_assets_and_blocks_network() -> None:
     # demo.html is a thin redirect to the Cockpit demo mode; it no longer embeds
     # the legacy self-contained static demo (app.js / demo.js / styles/index.css).
-    html = (ROOT / "mvp_vertical" / "cockpit" / "demo.html").read_text(
+    html = (ROOT / "pantheon_app" / "cockpit" / "demo.html").read_text(
         encoding="utf-8"
     )
-    bootstrap = (ROOT / "mvp_vertical" / "cockpit" / "demo_bootstrap.js").read_text(
+    bootstrap = (ROOT / "pantheon_app" / "cockpit" / "demo_bootstrap.js").read_text(
         encoding="utf-8"
     )
 
@@ -319,10 +319,10 @@ def test_static_demo_reuses_cockpit_assets_and_blocks_network() -> None:
 
 
 def test_mobile_editor_exposes_and_clears_device_local_data() -> None:
-    html = (ROOT / "mvp_vertical" / "mobile_editor" / "index.html").read_text(
+    html = (ROOT / "pantheon_app" / "mobile_editor" / "index.html").read_text(
         encoding="utf-8"
     )
-    javascript = (ROOT / "mvp_vertical" / "mobile_editor" / "app.js").read_text(
+    javascript = (ROOT / "pantheon_app" / "mobile_editor" / "app.js").read_text(
         encoding="utf-8"
     )
 
@@ -336,7 +336,7 @@ def test_mobile_editor_exposes_and_clears_device_local_data() -> None:
 
 
 def test_mobile_editor_recovers_legacy_offline_revisions_before_queue_cleanup() -> None:
-    javascript = (ROOT / "mvp_vertical" / "mobile_editor" / "app.js").read_text(
+    javascript = (ROOT / "pantheon_app" / "mobile_editor" / "app.js").read_text(
         encoding="utf-8"
     )
 
@@ -354,7 +354,7 @@ def test_mobile_editor_recovers_legacy_offline_revisions_before_queue_cleanup() 
 def test_removed_site_list_registry_is_not_advertised_as_runtime_configuration() -> None:
     compose = (ROOT / "docker-compose.yml").read_text(encoding="utf-8")
 
-    assert "MVP_SITE_LISTS_JSON" not in compose
+    assert "PANTHEON_SITE_LISTS_JSON" not in compose
     assert "/config" not in compose
     assert not (ROOT / "config" / "site_lists.json").exists()
     assert not (ROOT / "config" / "README.md").exists()

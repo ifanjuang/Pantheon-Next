@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from mvp_vertical.hermes_live_acceptance import (
+from pantheon_app.hermes_live_acceptance import (
     EventCollection,
     HermesLiveAcceptanceRefused,
     HermesLiveBindingAcceptance,

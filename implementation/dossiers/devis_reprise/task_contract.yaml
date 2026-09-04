@@ -1,5 +1,5 @@
 # Task Contract du dossier fictif devis_reprise — bloc 1.
-# Conforme à Pantheon-Next schemas/mvp_governed_loop_objects.schema.yaml (task_contract).
+# Conforme à Pantheon-Next schemas/governed_loop_objects.schema.yaml (task_contract).
 # Un contrat n'autorise rien par lui-même ; le gate décide.
 # declared_sources borne le périmètre de ce test ; il ne décide pas l'applicabilité professionnelle.
 
@@ -80,7 +80,7 @@ retrieval_boundary:
   boundary: retrieval_only
 
 governance_refs:
-  - docs/governance/MVP_GOVERNED_TASK_LOOP.md
+  - docs/governance/GOVERNED_TASK_LOOP.md
   - docs/governance/TASK_CONTRACTS.md
   - docs/governance/USER_DECISION_GATE.md
   - docs/domain-packs/architecture/DOCUMENT_REVIEW.md

@@ -11,7 +11,7 @@ Cockpit / OpenWebUI
         |
         | project, task, decision and review APIs
         v
-pantheon-mvp
+Pantheon Next implementation
         |
         | governed execution handoff
         v
@@ -32,7 +32,7 @@ active Revit document
 
 ## Components
 
-### pantheon-mvp interface
+### Pantheon Next implementation interface
 
 The server-facing interface owns persisted references and review state:
 
@@ -422,7 +422,7 @@ The architecture admits three connection profiles without changing capability id
 ### One workstation
 
 ```text
-Hermes and pantheon-mvp local
+Hermes and Pantheon Next implementation local
 Host Agent local
 Revit add-in local
 no Internet
@@ -431,7 +431,7 @@ no Internet
 ### Private LAN
 
 ```text
-pantheon-mvp and Hermes on a private server
+Pantheon Next implementation and Hermes on a private server
 Host Agent on the Revit workstation
 outbound authenticated connection from Host Agent
 no inbound Revit port

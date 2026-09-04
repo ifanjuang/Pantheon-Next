@@ -10,8 +10,8 @@ import pytest
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.testclient import TestClient
 
-from mvp_vertical import agency_data, agency_information, information_projection
-from mvp_vertical.information_projection_api import install_information_projection_routes
+from pantheon_app import agency_data, agency_information, information_projection
+from pantheon_app.information_projection_api import install_information_projection_routes
 
 
 def _id(prefix: str) -> str:

@@ -7,7 +7,7 @@ from contextlib import nullcontext
 
 import pytest
 
-from mvp_vertical import (
+from pantheon_app import (
     apu_owner,
     apu_write_preparation,
     execution_results,

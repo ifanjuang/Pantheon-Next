@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from mvp_vertical import project_anatomy_projection, project_document_currentness
+from pantheon_app import project_anatomy_projection, project_document_currentness
 
 
 def _shared_world() -> dict:

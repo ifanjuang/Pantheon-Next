@@ -29,7 +29,7 @@ Implemented schema files include:
 - `module_manifest.schema.yaml`;
 - `policy_decision.schema.yaml`;
 - `answer_status.schema.yaml`;
-- `mvp_governed_loop_objects.schema.yaml`;
+- `governed_loop_objects.schema.yaml`;
 - `architecture-proof-register/` — architecture proof-register validation family;
 - `architecture-project-understanding/` — Project Anatomy validation family;
 - `role_signal.schema.yaml`;

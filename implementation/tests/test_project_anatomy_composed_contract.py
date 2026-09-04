@@ -4,8 +4,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-COMPOSED = ROOT / "mvp_vertical" / "cockpit_composed.py"
-API = ROOT / "mvp_vertical" / "project_anatomy_api.py"
+COMPOSED = ROOT / "pantheon_app" / "cockpit_composed.py"
+API = ROOT / "pantheon_app" / "project_anatomy_api.py"
 
 
 def test_composed_cockpit_applies_clean_owner_and_mounts_read_projection() -> None:

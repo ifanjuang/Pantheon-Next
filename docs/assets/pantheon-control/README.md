@@ -6,13 +6,13 @@ Ce répertoire ne contient pas de second dashboard Pantheon. Le cockpit, ses ren
 
 ```text
 Pantheon-Next/implementation/
-implementation/mvp_vertical/cockpit/
+implementation/pantheon_app/cockpit/
 ```
 
 Source candidate courante :
 
 ```text
-https://github.com/ifanjuang/Pantheon-Next/tree/main/implementation/mvp_vertical/cockpit
+https://github.com/ifanjuang/Pantheon-Next/tree/main/implementation/pantheon_app/cockpit
 ```
 
 Le dépôt historique `ifanjuang/pantheon-mvp` et sa démonstration publique restent des références de provenance pour les anciens commits, PR, issues et snapshots. Ils ne constituent plus une source d’implémentation active.

@@ -27,24 +27,24 @@ def test_superseded_hosting_plans_stay_out_of_working_tree() -> None:
 
 def test_current_owners_preserve_surviving_responsibilities() -> None:
     control = _read("docs/governance/PANTHEON_CONTROL_BOUNDARY.md")
-    loop_schema = _read("schemas/mvp_governed_loop_objects.schema.yaml")
+    loop_schema = _read("schemas/governed_loop_objects.schema.yaml")
 
-    assert "`CLAUDE.md`, `NEXT_MVP_REPOSITORY_PLACEMENT.md`" in control
+    assert "`CLAUDE.md`, `REPOSITORY_PLACEMENT.md`" in control
     assert "MONOREPO_INTEGRATION_PROPOSAL.md" not in control
 
-    assert "docs/governance/MVP_GOVERNED_TASK_LOOP.md" in loop_schema
+    assert "docs/governance/GOVERNED_TASK_LOOP.md" in loop_schema
     assert "docs/governance/USER_DECISION_GATE.md" in loop_schema
     assert "MVP_VERTICAL_IMPLEMENTATION_PLAN.md" not in loop_schema
 
-    assert (ROOT / "docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md").is_file()
+    assert (ROOT / "docs/governance/REPOSITORY_PLACEMENT.md").is_file()
     assert (ROOT / "docs/governance/HERMES_INTEGRATION.md").is_file()
-    assert (ROOT / "docs/governance/MVP_GOVERNED_TASK_LOOP.md").is_file()
+    assert (ROOT / "docs/governance/GOVERNED_TASK_LOOP.md").is_file()
 
 
 def test_historical_decision_provenance_is_preserved() -> None:
     provenance = (
         "ai_logs/2026-07-08-hosting-arbitration-option-a.md",
-        "ai_logs/2026-07-07-mvp-vertical-implementation-plan.md",
+        "ai_logs/2026-07-07-pantheon-app-implementation-plan.md",
         "ai_logs/2026-06-09-monorepo-integration-proposal.md",
     )
     for relative in provenance:

@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
 REGISTRY = COCKPIT / "registries" / "materials.json"
 RETIRED_PATH = COCKPIT / "v3" / "materials.json"
 INTERACTIONS = COCKPIT / "interactions" / "card_interactions.js"

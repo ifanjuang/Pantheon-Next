@@ -26,13 +26,13 @@ import psycopg
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-MIGRATION = ROOT / "mvp_vertical" / "sql" / "015_entity_relations.sql"
+MIGRATION = ROOT / "pantheon_app" / "sql" / "015_entity_relations.sql"
 SHIPPED_MIGRATION = ROOT / "tests" / "fixtures" / "015_entity_relations_pre_review.sql"
 
 
 @pytest.fixture
 def migrated_from_shipped():
-    from mvp_vertical import (
+    from pantheon_app import (
         agency_data,
         information_projection,
         source_intake,

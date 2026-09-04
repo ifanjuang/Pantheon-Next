@@ -4,8 +4,8 @@ import json
 
 import httpx
 
-from mvp_vertical.policy_gate import HttpPolicyClient, StandInPolicyClient, governed_effect
-from mvp_vertical.policy_request import bind_decision_payload, build_preflight_payload
+from pantheon_app.policy_gate import HttpPolicyClient, StandInPolicyClient, governed_effect
+from pantheon_app.policy_request import bind_decision_payload, build_preflight_payload
 
 
 def _decision_payload():

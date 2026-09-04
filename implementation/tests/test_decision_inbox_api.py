@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.testclient import TestClient
 
-from mvp_vertical import decision_request_views
-from mvp_vertical.decision_inbox_api import install_decision_inbox_routes
+from pantheon_app import decision_request_views
+from pantheon_app.decision_inbox_api import install_decision_inbox_routes
 
 
 def test_global_decision_inbox_is_unclassified_only(monkeypatch) -> None:

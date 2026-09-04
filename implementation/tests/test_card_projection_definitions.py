@@ -5,14 +5,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEFINITIONS_PATH = (
     ROOT
-    / "mvp_vertical"
+    / "pantheon_app"
     / "cockpit"
     / "registries"
     / "card_projection_definitions.json"
 )
 NAVIGATION_PATH = (
     ROOT
-    / "mvp_vertical"
+    / "pantheon_app"
     / "cockpit"
     / "registries"
     / "navigation_registry.json"

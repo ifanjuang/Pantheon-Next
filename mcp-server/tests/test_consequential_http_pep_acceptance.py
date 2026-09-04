@@ -22,7 +22,7 @@ IMPLEMENTATION_DIR = REPO_ROOT / "implementation"
 sys.path.insert(0, str(MODULE_DIR))
 sys.path.insert(0, str(IMPLEMENTATION_DIR))
 
-from mvp_vertical.policy_gate import HttpPolicyClient, governed_effect  # noqa: E402
+from pantheon_app.policy_gate import HttpPolicyClient, governed_effect  # noqa: E402
 from pantheon_mcp import effect_qualification, gate_validation  # noqa: E402
 from pantheon_mcp.http_api import create_app  # noqa: E402
 from pantheon_mcp.service import PantheonPolicyService  # noqa: E402

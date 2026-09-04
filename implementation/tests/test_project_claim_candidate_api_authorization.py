@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
-from mvp_vertical import cockpit_composed, execution_result_api
+from pantheon_app import cockpit_composed, execution_result_api
 
 
 class DummyConnection:

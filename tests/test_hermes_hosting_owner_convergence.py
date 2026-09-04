@@ -17,7 +17,7 @@ def test_distribution_locks_use_current_hosting_owners() -> None:
     for relative in locks:
         text = _read(relative)
         assert "HERMES_CODE_HOSTING_BOUNDARY.md" not in text
-        assert "NEXT_MVP_REPOSITORY_PLACEMENT.md" in text
+        assert "REPOSITORY_PLACEMENT.md" in text
         assert "HERMES_INTEGRATION.md" in text
 
 

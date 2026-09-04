@@ -10,7 +10,7 @@ import psycopg
 import pytest
 import yaml
 
-from mvp_vertical import pantheon_contracts, project_document_currentness, project_documents
+from pantheon_app import pantheon_contracts, project_document_currentness, project_documents
 
 
 

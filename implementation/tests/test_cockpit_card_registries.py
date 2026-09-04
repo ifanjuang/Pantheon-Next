@@ -4,7 +4,7 @@ import re
 
 
 ROOT = Path(__file__).resolve().parents[1]
-REGISTRY_DIR = ROOT / "mvp_vertical" / "cockpit" / "registries"
+REGISTRY_DIR = ROOT / "pantheon_app" / "cockpit" / "registries"
 REQUIRED_TAG_KEYS = {
     "slug",
     "group",
@@ -50,7 +50,7 @@ def test_type_and_subject_tag_groups_are_explicit_and_contextual() -> None:
 
 
 def test_tag_registry_entries_have_complete_context_and_presentation_metadata() -> None:
-    icon_css = (ROOT / "mvp_vertical" / "cockpit" / "styles" / "cards.css").read_text(encoding="utf-8")
+    icon_css = (ROOT / "pantheon_app" / "cockpit" / "styles" / "cards.css").read_text(encoding="utf-8")
     radix_keys = set(re.findall(r'\.radix-icon\[data-icon="([^"]+)"\]', icon_css))
     payload = _tag_registry()
     assert payload["tags"]
@@ -82,9 +82,9 @@ def test_tag_registry_entries_have_complete_context_and_presentation_metadata() 
 
 
 def test_every_rendered_tag_has_an_icon_including_unknown_tags() -> None:
-    renderer = (ROOT / "mvp_vertical" / "cockpit" / "rendering" / "card_renderer.js").read_text(encoding="utf-8")
-    tag_icons = (ROOT / "mvp_vertical" / "cockpit" / "rendering" / "tag_icons.js").read_text(encoding="utf-8")
-    index = (ROOT / "mvp_vertical" / "cockpit" / "index.html").read_text(encoding="utf-8")
+    renderer = (ROOT / "pantheon_app" / "cockpit" / "rendering" / "card_renderer.js").read_text(encoding="utf-8")
+    tag_icons = (ROOT / "pantheon_app" / "cockpit" / "rendering" / "tag_icons.js").read_text(encoding="utf-8")
+    index = (ROOT / "pantheon_app" / "cockpit" / "index.html").read_text(encoding="utf-8")
 
     assert 'import { createTagToken } from "./tag_icons.js"' in renderer
     assert 'icon_key: "label"' in tag_icons

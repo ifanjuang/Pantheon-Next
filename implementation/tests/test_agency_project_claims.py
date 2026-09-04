@@ -4,7 +4,7 @@ import uuid
 
 import pytest
 
-from mvp_vertical import agency_claims, agency_data
+from pantheon_app import agency_claims, agency_data
 
 
 def _id(prefix: str) -> str:

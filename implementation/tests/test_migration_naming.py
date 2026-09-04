@@ -1,6 +1,6 @@
 """The migration filenames must stay unambiguous, and every one must be owned.
 
-`mvp_vertical/sql/` accumulated four duplicate numeric prefixes — `003`, `004`,
+`pantheon_app/sql/` accumulated four duplicate numeric prefixes — `003`, `004`,
 `005` and `010` — because two independent sequences were numbering into one
 directory: the Agency/Cockpit lineage and the Hermes lineage, the latter a
 contiguous `003`–`007` block. Nothing was misordered by it (every cross-file
@@ -20,8 +20,8 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-SQL = ROOT / "mvp_vertical" / "sql"
-MODULES = sorted((ROOT / "mvp_vertical").glob("*.py"))
+SQL = ROOT / "pantheon_app" / "sql"
+MODULES = sorted((ROOT / "pantheon_app").glob("*.py"))
 
 # `Path(...) / "sql" / "hermes" / "004_execution_admissions.sql"` and the
 # one-segment form both reduce to the trailing quoted segments.

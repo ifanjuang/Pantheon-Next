@@ -3,12 +3,12 @@ from pathlib import Path
 
 import pytest
 
-from mvp_vertical import agency_claims, agency_schema
+from pantheon_app import agency_claims, agency_schema
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PROJECT_SCHEMA = ROOT / "mvp_vertical" / "agency_schema" / "project.json"
-AGENCY_SQL = ROOT / "mvp_vertical" / "sql" / "002_agency_data.sql"
+PROJECT_SCHEMA = ROOT / "pantheon_app" / "agency_schema" / "project.json"
+AGENCY_SQL = ROOT / "pantheon_app" / "sql" / "002_agency_data.sql"
 
 
 LEGACY_CLAIM_ATTRIBUTES = {

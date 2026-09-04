@@ -5,8 +5,8 @@ from __future__ import annotations
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.testclient import TestClient
 
-from mvp_vertical import information_projection
-from mvp_vertical.information_projection_api import install_information_projection_routes
+from pantheon_app import information_projection
+from pantheon_app.information_projection_api import install_information_projection_routes
 
 
 class _Connection:

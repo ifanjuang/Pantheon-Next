@@ -5,8 +5,8 @@ from __future__ import annotations
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.testclient import TestClient
 
-from mvp_vertical import source_intake
-from mvp_vertical.source_intake_api import install_source_intake_routes
+from pantheon_app import source_intake
+from pantheon_app.source_intake_api import install_source_intake_routes
 
 
 class _Connection:

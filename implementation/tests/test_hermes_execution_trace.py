@@ -6,7 +6,7 @@ import copy
 
 import pytest
 
-from mvp_vertical import hermes_execution_trace
+from pantheon_app import hermes_execution_trace
 
 
 def _summary() -> dict:

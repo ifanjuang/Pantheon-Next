@@ -3,8 +3,8 @@
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.testclient import TestClient
 
-from mvp_vertical import apu_cross_family, decision_requests
-from mvp_vertical.decision_request_api import install_decision_request_routes
+from pantheon_app import apu_cross_family, decision_requests
+from pantheon_app.decision_request_api import install_decision_request_routes
 
 
 def _headers(token: str, *, actor: str | None = None) -> dict[str, str]:

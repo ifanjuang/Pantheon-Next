@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from mvp_vertical import knowledge, site_navigation_profile
+from pantheon_app import knowledge, site_navigation_profile
 
 
 class _Connection:

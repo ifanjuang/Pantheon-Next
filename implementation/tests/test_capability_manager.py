@@ -2,12 +2,12 @@
 
 import pytest
 
-from mvp_vertical.capability_manager import (
+from pantheon_app.capability_manager import (
     CapabilityRecord,
     governed_execute,
     plan_action,
 )
-from mvp_vertical.policy_gate import StandInPolicyClient
+from pantheon_app.policy_gate import StandInPolicyClient
 
 
 def _record(**kw):

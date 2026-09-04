@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
-from mvp_vertical import knowledge
-from mvp_vertical.cockpit_api import create_app
+from pantheon_app import knowledge
+from pantheon_app.cockpit_api import create_app
 
 
 class _Connection:

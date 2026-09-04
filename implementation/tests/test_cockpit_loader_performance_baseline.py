@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MEASURE = ROOT / "tools" / "measure_cockpit_loader_requests.js"
-LOADER = ROOT / "mvp_vertical" / "cockpit" / "data" / "cockpit_data_loader.js"
+LOADER = ROOT / "pantheon_app" / "cockpit" / "data" / "cockpit_data_loader.js"
 
 
 def measure() -> dict:

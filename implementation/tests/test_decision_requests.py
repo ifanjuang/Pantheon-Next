@@ -7,7 +7,7 @@ import uuid
 import psycopg
 import pytest
 
-from mvp_vertical import (
+from pantheon_app import (
     agency_data,
     decision_requests,
     store,

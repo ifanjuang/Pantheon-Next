@@ -23,11 +23,11 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 
-from mvp_vertical import pantheon_contracts
-from mvp_vertical import store
-from mvp_vertical.contract import load_contract
-from mvp_vertical.drafting import review_flags
-from mvp_vertical.runner import run
+from pantheon_app import pantheon_contracts
+from pantheon_app import store
+from pantheon_app.contract import load_contract
+from pantheon_app.drafting import review_flags
+from pantheon_app.runner import run
 
 C3_CONTRACT = ROOT / "dossiers/litige_facture/task_contract.yaml"
 C4_CONTRACT = ROOT / "dossiers/strategie_energetique/task_contract.yaml"
@@ -133,7 +133,7 @@ def test_C4_scenarios_presented_without_election(conn, c4_contract):
 
 def test_outputs_validate_against_vendored_schema(conn, c3_contract):
     import jsonschema
-    schema = pantheon_contracts.load_schema("mvp_governed_loop_objects")
+    schema = pantheon_contracts.load_schema("governed_loop_objects")
     store.ingest(conn, c3_contract, ROOT)
     out = run(conn, c3_contract, "la facture F-2026-213 est-elle réglée ?")
     for doc in out.documents:

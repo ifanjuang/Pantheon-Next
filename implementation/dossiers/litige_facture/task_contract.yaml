@@ -47,5 +47,5 @@ retrieval_boundary:
   boundary: retrieval_only
 
 governance_refs:
-  - docs/governance/MVP_GOVERNED_TASK_LOOP.md
+  - docs/governance/GOVERNED_TASK_LOOP.md
   - docs/governance/USER_DECISION_GATE.md

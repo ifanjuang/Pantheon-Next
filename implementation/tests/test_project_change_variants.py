@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from mvp_vertical import agency_data, execution_results, pantheon_contracts
+from pantheon_app import agency_data, execution_results, pantheon_contracts
 
 
 VENDOR_NAME = "project_change_variant_candidate"
@@ -19,7 +19,7 @@ def _id(prefix: str) -> str:
 
 
 def _implementation():
-    return importlib.import_module("mvp_vertical.project_change_variants")
+    return importlib.import_module("pantheon_app.project_change_variants")
 
 
 def test_project_change_variant_contract_uses_canonical_source() -> None:

@@ -7,7 +7,7 @@ import uuid
 import pytest
 from psycopg.pq import TransactionStatus
 
-from mvp_vertical import agency_data, hermes_handoff_preview, hermes_handoff_store, work_issues
+from pantheon_app import agency_data, hermes_handoff_preview, hermes_handoff_store, work_issues
 
 
 def _id(prefix: str) -> str:

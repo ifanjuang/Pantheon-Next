@@ -15,10 +15,10 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+COCKPIT = ROOT / "pantheon_app" / "cockpit"
 SCAN_ROOTS = (
     COCKPIT,
-    ROOT / "mvp_vertical" / "mobile_editor",
+    ROOT / "pantheon_app" / "mobile_editor",
 )
 
 # from "./x.js" | import "./x.js" | import("./x.js") | export ... from "./x.js"

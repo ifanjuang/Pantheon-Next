@@ -12,8 +12,8 @@ from pathlib import Path
 
 import yaml
 
-from mvp_vertical import cli
-from mvp_vertical.terminal_gate_standin import record_decision
+from pantheon_app import cli
+from pantheon_app.terminal_gate_standin import record_decision
 
 
 REQUEST_REF = "mvp.test.tc"
@@ -44,7 +44,7 @@ def test_register_cli_emits_a_candidate(tmp_path, monkeypatch):
     dpath, rec = _approved_decision(tmp_path)
     out = tmp_path / "register.yaml"
     monkeypatch.setattr(sys, "argv", [
-        "mvp-vertical", "register", "--decision-record", str(dpath),
+        "pantheon-app", "register", "--decision-record", str(dpath),
         "--retention-authorized", "--authorized-by", "Camille",
         "--statement", "Le lot 06 est limité à T2.",
         "--scope", "devis_reprise", "--output", str(out),
@@ -62,7 +62,7 @@ def test_register_cli_emits_a_candidate(tmp_path, monkeypatch):
 def test_register_cli_refuses_without_authorization(tmp_path, monkeypatch, capsys):
     dpath, _ = _approved_decision(tmp_path)
     monkeypatch.setattr(sys, "argv", [
-        "mvp-vertical", "register", "--decision-record", str(dpath),
+        "pantheon-app", "register", "--decision-record", str(dpath),
         "--authorized-by", "Camille",
         "--statement", "x", "--scope", "y",  # no --retention-authorized
     ])
@@ -74,7 +74,7 @@ def test_register_cli_refuses_a_system_authorizer(tmp_path, monkeypatch, capsys)
     # Gate 5, reused at the retention seam: the system may not authorize memory.
     dpath, _ = _approved_decision(tmp_path)
     monkeypatch.setattr(sys, "argv", [
-        "mvp-vertical", "register", "--decision-record", str(dpath),
+        "pantheon-app", "register", "--decision-record", str(dpath),
         "--retention-authorized", "--authorized-by", "system",
         "--statement", "x", "--scope", "y",
     ])

@@ -6,12 +6,12 @@ DOC = ROOT / "docs/governance/CATEGORY_CLASSIFICATION_MODEL.md"
 
 COLOCATED_ARTIFACTS = (
     ROOT / "schemas/category_classification.schema.yaml",
-    ROOT / "implementation/mvp_vertical/sql/034_category_classification.sql",
-    ROOT / "implementation/mvp_vertical/agency_classification.py",
-    ROOT / "implementation/mvp_vertical/agency_classification_api.py",
-    ROOT / "implementation/mvp_vertical/category_collection_read.py",
-    ROOT / "implementation/mvp_vertical/category_collection_read_api.py",
-    ROOT / "implementation/mvp_vertical/cockpit_card_projection.py",
+    ROOT / "implementation/pantheon_app/sql/034_category_classification.sql",
+    ROOT / "implementation/pantheon_app/agency_classification.py",
+    ROOT / "implementation/pantheon_app/agency_classification_api.py",
+    ROOT / "implementation/pantheon_app/category_collection_read.py",
+    ROOT / "implementation/pantheon_app/category_collection_read_api.py",
+    ROOT / "implementation/pantheon_app/cockpit_card_projection.py",
     ROOT / "implementation/tests/test_agency_classification.py",
     ROOT / "implementation/tests/test_agency_classification_concurrency.py",
     ROOT / "implementation/tests/test_category_collection_read.py",
@@ -26,7 +26,7 @@ def test_category_owner_reports_colocated_partial_implementation() -> None:
         assert artifact.exists(), artifact
 
     assert "bounded co-located implementation partial" in text
-    assert "implementation/mvp_vertical/" in text
+    assert "implementation/pantheon_app/" in text
     assert "Historical implementation work in `ifanjuang/pantheon-mvp` PRs #328–#331 remains provenance" in text
     assert "It is no longer the current repository placement owner" in text
 

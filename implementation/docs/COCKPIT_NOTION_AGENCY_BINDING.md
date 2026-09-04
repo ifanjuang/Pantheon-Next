@@ -17,7 +17,7 @@ Notion is not in the critical path for Cockpit or Hermes.
 
 ## Implemented seam
 
-`mvp_vertical/cockpit/notion_agency_binding.js` implements a removable, browser-local contract for:
+`pantheon_app/cockpit/notion_agency_binding.js` implements a removable, browser-local contract for:
 
 - explicit collaboration modes: `disabled`, `mirror_read_only`, `selective_bidirectional`;
 - field-policy registration;

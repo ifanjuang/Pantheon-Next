@@ -8,15 +8,15 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from mvp_vertical import workspace_collection_read
-from mvp_vertical.cockpit_composed import create_composed_cockpit_app
+from pantheon_app import workspace_collection_read
+from pantheon_app.cockpit_composed import create_composed_cockpit_app
 
 
 ROOT = Path(__file__).resolve().parents[1]
-NAVIGATION_REGISTRY = ROOT / "mvp_vertical" / "cockpit" / "registries" / "navigation_registry.json"
-PROJECTION_DEFINITIONS = ROOT / "mvp_vertical" / "cockpit" / "registries" / "card_projection_definitions.json"
-ASSEMBLER = ROOT / "mvp_vertical" / "cockpit" / "projection" / "child_collection_assembler.js"
-LOADER = ROOT / "mvp_vertical" / "cockpit" / "projection" / "navigation_registry_loader.js"
+NAVIGATION_REGISTRY = ROOT / "pantheon_app" / "cockpit" / "registries" / "navigation_registry.json"
+PROJECTION_DEFINITIONS = ROOT / "pantheon_app" / "cockpit" / "registries" / "card_projection_definitions.json"
+ASSEMBLER = ROOT / "pantheon_app" / "cockpit" / "projection" / "child_collection_assembler.js"
+LOADER = ROOT / "pantheon_app" / "cockpit" / "projection" / "navigation_registry_loader.js"
 
 
 def _forbidden_connection():
@@ -50,7 +50,7 @@ def test_runtime_workspace_config_is_server_owned_multi_root_and_does_not_leak_p
     (projects / "Affaires").mkdir()
 
     monkeypatch.setenv(
-        "MVP_WORKSPACE_ROOTS_JSON",
+        "PANTHEON_WORKSPACE_ROOTS_JSON",
         json.dumps({"ifja-agency": str(agency), "ifja-projects": str(projects)}),
     )
     client = _client()
@@ -90,7 +90,7 @@ def test_runtime_workspace_config_is_server_owned_multi_root_and_does_not_leak_p
 def test_absent_runtime_workspace_config_projects_an_empty_catalog(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.delenv("MVP_WORKSPACE_ROOTS_JSON", raising=False)
+    monkeypatch.delenv("PANTHEON_WORKSPACE_ROOTS_JSON", raising=False)
     client = _client()
 
     response = _authorized_get(client, "/cockpit/workspace-collections")
@@ -109,15 +109,15 @@ def test_invalid_runtime_workspace_config_fails_closed_at_composition(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setenv("MVP_WORKSPACE_ROOTS_JSON", "not-json")
+    monkeypatch.setenv("PANTHEON_WORKSPACE_ROOTS_JSON", "not-json")
     with pytest.raises(workspace_collection_read.WorkspaceConfigurationError):
         _client()
 
-    monkeypatch.setenv("MVP_WORKSPACE_ROOTS_JSON", json.dumps([str(tmp_path)]))
+    monkeypatch.setenv("PANTHEON_WORKSPACE_ROOTS_JSON", json.dumps([str(tmp_path)]))
     with pytest.raises(workspace_collection_read.WorkspaceConfigurationError):
         _client()
 
-    monkeypatch.setenv("MVP_WORKSPACE_ROOTS_JSON", json.dumps({"primary": str(tmp_path / "missing")}))
+    monkeypatch.setenv("PANTHEON_WORKSPACE_ROOTS_JSON", json.dumps({"primary": str(tmp_path / "missing")}))
     with pytest.raises(workspace_collection_read.WorkspaceConfigurationError):
         _client()
 

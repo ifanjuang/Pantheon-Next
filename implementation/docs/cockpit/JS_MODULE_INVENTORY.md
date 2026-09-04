@@ -2,7 +2,7 @@
 
 ## Scope
 
-This inventory describes the browser-side Cockpit code loaded from `mvp_vertical/cockpit`. It does not change Pantheon governance, authorization, Evidence, ChangeCandidate semantics, or server authority.
+This inventory describes the browser-side Cockpit code loaded from `pantheon_app/cockpit`. It does not change Pantheon governance, authorization, Evidence, ChangeCandidate semantics, or server authority.
 
 ## Current active chain
 

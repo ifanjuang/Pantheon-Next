@@ -26,13 +26,13 @@ Individual instructions remain in `skills/<skill>/SKILL.md`; profiles remain und
 
 The former `pantheon-mvp` repository name is historical provenance for the imported implementation, not an active owner or source path.
 
-Executable Pantheon adapter code remains outside this template directory under `implementation/`, governed by `docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md`; external Hermes runtime ownership and execution remain separate under `docs/governance/HERMES_INTEGRATION.md`.
+Executable Pantheon adapter code remains outside this template directory under `implementation/`, governed by `docs/governance/REPOSITORY_PLACEMENT.md`; external Hermes runtime ownership and execution remain separate under `docs/governance/HERMES_INTEGRATION.md`.
 
 ## Owner map
 
 - Pantheon Roles: `docs/governance/AGENTS.md`.
 - Repository work rules: root `CLAUDE.md`.
-- Pantheon implementation placement: `docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md`.
+- Pantheon implementation placement: `docs/governance/REPOSITORY_PLACEMENT.md`.
 - External Hermes execution boundary: `docs/governance/HERMES_INTEGRATION.md`.
 - Agent adapter: `templates/hermes/AGENTS.md`.
 - Skill collection contract: `templates/hermes/SKILLS.md`.

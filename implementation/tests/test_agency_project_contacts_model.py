@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-MVP = ROOT / "mvp_vertical"
+MVP = ROOT / "pantheon_app"
 COCKPIT = MVP / "cockpit"
 PROJECTION = COCKPIT / "projection" / "cockpit_projection.js"
 

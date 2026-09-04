@@ -8,11 +8,11 @@ The absence of a live canonical feed is an integration/deployment posture, not a
 
 ## Implemented here
 
-- `mvp_vertical/cockpit/tool_catalog.json`: concrete supplementary catalogue, not authority.
-- `mvp_vertical/hermes_tool_inventory.py`: GET-only normalization of reviewed Hermes discovery surfaces.
-- `mvp_vertical/cockpit/data/cockpit_data_loader.js`: `loadToolCatalog()` reads the catalogue as an optional collection, so an unreachable catalogue degrades visibly instead of inventing state.
-- `mvp_vertical/cockpit/projection/cockpit_projection.js`: the single Tool Card construction path. `normalizeTool()` projects the ordinary catalogue/runtime axes and the optional exact I7 fields directly on the same card model; there is no post-build decorator or browser-side governance join.
-- `mvp_vertical/cockpit/projection/child_collection_assembler.js`: resolves the Tool Card collection for spatial navigation.
+- `pantheon_app/cockpit/tool_catalog.json`: concrete supplementary catalogue, not authority.
+- `pantheon_app/hermes_tool_inventory.py`: GET-only normalization of reviewed Hermes discovery surfaces.
+- `pantheon_app/cockpit/data/cockpit_data_loader.js`: `loadToolCatalog()` reads the catalogue as an optional collection, so an unreachable catalogue degrades visibly instead of inventing state.
+- `pantheon_app/cockpit/projection/cockpit_projection.js`: the single Tool Card construction path. `normalizeTool()` projects the ordinary catalogue/runtime axes and the optional exact I7 fields directly on the same card model; there is no post-build decorator or browser-side governance join.
+- `pantheon_app/cockpit/projection/child_collection_assembler.js`: resolves the Tool Card collection for spatial navigation.
 - independent axes remain visible for catalogue, installation, native state, health, governance, update, activation, compatibility, safety and freshness.
 - consequence-bearing permissions remain known/unknown/potential; unknown is never inferred safe.
 - Haystack remains a candidate only; LlamaIndex/LangChain/LangGraph remain watch/comparison entries. No dependency is selected, installed, approved or activated by this catalogue.
