@@ -1,0 +1,124 @@
+{
+  "qualification": {
+    "issue": 958,
+    "parent_owner_issue": 660,
+    "derived_memory_owner_issue": 659,
+    "classification": "qualification_only",
+    "decision": "open",
+    "baseline_main": "4d5efa6374bd343a26c42caf082ad5242c17e7a1"
+  },
+  "candidate": {
+    "name": "official_obsidian_headless_sync",
+    "package": "obsidian-headless",
+    "observed_version": "0.0.14",
+    "observed_at": "2026-09-04",
+    "status": "open_beta",
+    "runtime": {
+      "node_min": 22,
+      "requires_active_obsidian_sync_subscription": true,
+      "linux_supported": true,
+      "linux_birthtime_preservation": false
+    },
+    "upstream_capabilities": {
+      "one_shot_sync": true,
+      "continuous_sync": true,
+      "modes": ["bidirectional", "pull-only", "mirror-remote"],
+      "conflict_strategies": ["merge", "conflict"],
+      "unlink_removes_stored_credentials": true,
+      "warning_no_desktop_and_headless_sync_same_device": true
+    },
+    "upstream_license_observation": "UNLICENSED",
+    "authority_adopted": false
+  },
+  "topologies": {
+    "A_selected_current": {
+      "components": [
+        "native_obsidian_clients",
+        "self_hosted_livesync",
+        "couchdb_ubuntu",
+        "single_livesync_cli_materializer",
+        "ubuntu_local_vault_mirror"
+      ],
+      "owner": "issue_660"
+    },
+    "B_candidate": {
+      "components": [
+        "native_obsidian_clients",
+        "official_obsidian_sync",
+        "official_obsidian_headless_materializer",
+        "ubuntu_local_vault_mirror"
+      ],
+      "owner": "issue_660_if_selected_later"
+    }
+  },
+  "acceptance_surface": [
+    "create",
+    "edit",
+    "rename",
+    "delete",
+    "offline_reconnect",
+    "concurrent_conflict",
+    "continuous_materialization",
+    "daemon_restart",
+    "ubuntu_reboot_redeploy",
+    "network_interruption_recovery",
+    "credentials_secrets_posture",
+    "backup_rollback",
+    "exactly_one_active_filesystem_sync_producer",
+    "no_hindsight_activation_or_writeback"
+  ],
+  "decision_gate": {
+    "replace_A_with_B_if": [
+      "all_required_capabilities_preserved",
+      "couchdb_removed_from_active_path",
+      "self_hosted_livesync_cli_removed_from_active_path",
+      "recovery_posture_acceptable",
+      "secrets_posture_acceptable",
+      "subscription_and_vendor_posture_acceptable",
+      "exactly_one_active_materializer"
+    ],
+    "retain_A_if": [
+      "required_offline_behavior_regresses",
+      "required_conflict_behavior_regresses",
+      "required_recovery_behavior_regresses"
+    ],
+    "reject_B_if": [
+      "parallel_sync_or_materialization_daemon_required_to_compensate"
+    ]
+  },
+  "downstream_contract": {
+    "hindsight_input": "ubuntu_local_vault_mirror",
+    "hindsight_producer": "exactly_one_hindsight_obsidian_sync",
+    "hindsight_writeback_to_vault": false,
+    "workspace_index_provider_selected_by_this_qualification": false,
+    "notemesh_selected_by_this_qualification": false
+  },
+  "invariants": [
+    "sync success != authorization",
+    "filesystem mirror != governed identity",
+    "workspace note != Evidence",
+    "provider path != governed identity",
+    "retrieved/indexed != true",
+    "projection != persistence",
+    "materializer selection != WorkspaceIndex provider selection",
+    "materializer selection != Hindsight producer selection"
+  ],
+  "runtime_observations": {
+    "live_obsidian_sync_executed": false,
+    "create_edit_rename_delete": "not_run",
+    "offline_reconnect": "not_run",
+    "conflict": "not_run",
+    "restart_reboot_redeploy": "not_run",
+    "network_recovery": "not_run",
+    "exactly_one_active_materializer": "not_run"
+  },
+  "non_goals": [
+    "production_switch",
+    "change_issue_660_current_decision",
+    "change_issue_659_owner_or_bank_model",
+    "notemesh_adoption",
+    "mcp_write_qualification",
+    "evidence_or_project_authority_mutation",
+    "deployment_864_change"
+  ]
+}
