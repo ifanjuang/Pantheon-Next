@@ -1,0 +1,26 @@
+name: Retire active MVP identity once
+
+on:
+  push:
+    branches:
+      - refactor/remove-active-mvp-identity
+
+permissions:
+  contents: write
+
+jobs:
+  rewrite:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: python scripts/retire_active_mvp_identity_once.py
+      - run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'refactor: retire active MVP implementation identity'
+          git push origin HEAD:refactor/remove-active-mvp-identity
