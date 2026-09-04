@@ -1,0 +1,73 @@
+name: Obsidian Headless Sync Q2a
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/obsidian-headless-sync-q2a.yml"
+      - "implementation/tools/run_obsidian_headless_sync_q2a.sh"
+      - "tests/test_obsidian_headless_sync_q2a_contract.py"
+      - "tests/fixtures/obsidian_headless_sync_topology_q1.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - run: pytest -q tests/test_obsidian_headless_sync_topology_q1.py tests/test_obsidian_headless_sync_q2a_contract.py
+
+  live-synthetic-observation:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: obsidian-sync-qualification
+    env:
+      OBSIDIAN_SYNC_EMAIL: ${{ secrets.OBSIDIAN_SYNC_EMAIL }}
+      OBSIDIAN_SYNC_PASSWORD: ${{ secrets.OBSIDIAN_SYNC_PASSWORD }}
+      OBSIDIAN_SYNC_VAULT: ${{ secrets.OBSIDIAN_SYNC_VAULT }}
+      OBSIDIAN_SYNC_E2EE_PASSWORD: ${{ secrets.OBSIDIAN_SYNC_E2EE_PASSWORD }}
+      PANTHEON_Q2A_RUN_ID: ${{ github.run_id }}
+    steps:
+      - name: Checkout qualification candidate
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Fail closed unless dedicated synthetic Sync inputs exist
+        shell: bash
+        run: |
+          test -n "$OBSIDIAN_SYNC_EMAIL"
+          test -n "$OBSIDIAN_SYNC_PASSWORD"
+          test -n "$OBSIDIAN_SYNC_VAULT"
+
+      - name: Install exact observed Obsidian Headless package
+        run: npm install -g obsidian-headless@0.0.14
+
+      - name: Verify exact package and CLI identity
+        shell: bash
+        run: |
+          test "$(npm list -g obsidian-headless --json | python -c 'import json,sys; print(json.load(sys.stdin)["dependencies"]["obsidian-headless"]["version"])')" = "0.0.14"
+          command -v ob
+          ob --help >/dev/null
+
+      - name: Execute bounded two-client synthetic qualification
+        shell: bash
+        run: bash implementation/tools/run_obsidian_headless_sync_q2a.sh
+
+      - name: Upload raw qualification observations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: obsidian-headless-sync-q2a-${{ github.run_id }}
+          path: ${{ runner.temp }}/obsidian-headless-sync-q2a/artifacts/
+          if-no-files-found: error
+          retention-days: 14
