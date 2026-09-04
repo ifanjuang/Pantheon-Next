@@ -72,8 +72,13 @@ def test_q949_is_qualification_only_and_adopts_no_new_authority() -> None:
 
 def test_q949_keeps_four_cognitive_layers_with_governance_orthogonal() -> None:
     data = _fixture()
-    layers = {item["layer_id"]: item for item in data["cognitive_layers"]}
+    layer_items = data["cognitive_layers"]
+    layer_ids = [item["layer_id"] for item in layer_items]
 
+    assert len(layer_items) == 4
+    assert len(set(layer_ids)) == len(layer_ids)
+
+    layers = {item["layer_id"]: item for item in layer_items}
     assert set(layers) == {
         "perception",
         "episodic_memory",
@@ -166,13 +171,28 @@ def test_q949_free_episode_can_survive_without_stable_identity_or_semantic_promo
 
 def test_q949_cross_episode_association_is_not_relation_or_identity_admission() -> None:
     data = _fixture()
-    episode = _episodes(data)["episode.zone-a.same-feature-cluster"]
+    episodes = _episodes(data)
+    episode = episodes["episode.zone-a.same-feature-cluster"]
+    episode_refs = [
+        ref["ref"]
+        for ref in episode["refs"]
+        if ref["kind"] == "episode"
+    ]
 
+    assert len(episode_refs) == 2
+    assert len(set(episode_refs)) == len(episode_refs)
+    assert all(ref in episodes for ref in episode_refs)
     assert episode["association"] == {
         "status": "candidate",
         "proposed_same_feature": True,
         "identity_represents_admitted": False,
     }
+    case = next(
+        item
+        for item in data["qualification_cases"]
+        if item["case_id"] == "Q949-CROSS-EPISODE-ASSOCIATION"
+    )
+    assert case["expected"]["linked_episode_count"] == len(episode_refs)
     assert "relation_claim" not in episode
     assert "stable_object_id" not in episode
 
@@ -242,6 +262,7 @@ def test_q949_selected_free_observation_can_use_existing_observation_bundle_with
     }
     assert claim["source_authority"] == "model_interpretation_candidate"
     assert claim["proof_status"] == "candidate"
+    assert "certainty" not in claim
     assert any(item["code"] == "identity.stable_object_unresolved" for item in bundle["gaps"])
     assert any(item["code"] == "measurement.professional_geometry_withheld" for item in bundle["withheld"])
 
