@@ -108,10 +108,10 @@ def test_candidate_hermes_distribution_snapshot_tracks_current_runtime_pin() -> 
     )
 
 
-def _pin_literals(pin: dict) -> set[str]:
-    literals = {pin["version"]}
+def _pin_literals(pin: dict) -> list[str]:
+    literals = [pin["version"]]
     if pin.get("ref"):
-        literals.add(pin["ref"])
+        literals.append(pin["ref"])
     return literals
 
 
