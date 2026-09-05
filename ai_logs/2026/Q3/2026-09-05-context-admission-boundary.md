@@ -87,6 +87,9 @@ review_recommended
 and reserves a future `requires_review` state for a concrete consumer that
 actually blocks or requires human review before the relevant effect proceeds.
 
+Focused tests explicitly refuse `disposition="requires_review"` on this advisory
+path so the semantic ceiling cannot silently regress.
+
 ## Tests
 
 Focused tests cover:
@@ -95,6 +98,7 @@ Focused tests cover:
 - clean scan remains untrusted data;
 - prompt-injection finding recommends review;
 - scanner unavailable recommends review;
+- advisory paths do not claim `requires_review`;
 - delimiter forgery neutralization;
 - unrelated tools remain outside the Pantheon admission helper;
 - the adapter calls Hermes' scanner with `scope="context"`.
@@ -102,7 +106,7 @@ Focused tests cover:
 ## Distribution
 
 Because the context bridge tree is digest-pinned, the candidate distribution lock
-must move to the new exact tree digest. The distribution remains default-off and
+moves to the new exact tree digest. The distribution remains default-off and
 does not gain task, Evidence, approval or execution authority.
 
 ## Open
