@@ -34,6 +34,10 @@ Source intake and source/project-link governance
 Docling/structured extraction where selected
 Cockpit API, Navigation Registry, Cards and governed projections
 Knowledge update preview/apply chokepoint
+human OIDC identity binding chokepoint
+Architecture Project Understanding reviewed-dossier import chokepoint
+Knowledge publish (reviewed claim) and edit-application chokepoints
+Agency Information act (supersede-and-promote) chokepoint
 policy/PEP client and effect preflight contracts
 capability lifecycle projection/management seams
 Hermes Runs observation, launch reservation/binding and active-context bridge
@@ -86,6 +90,11 @@ structured_extraction: implemented_candidate_not_deployed
 cockpit_projection: implemented_candidate_not_deployed
 policy_chokepoint_seam: implemented_not_connected
 knowledge_update_chokepoint: wired_not_connected
+human_identity_binding_chokepoint: wired_not_connected
+apu_reviewed_dossier_chokepoint: wired_not_connected
+knowledge_publish_chokepoint: wired_not_connected
+knowledge_edit_apply_chokepoint: wired_not_connected
+agency_information_act_chokepoint: wired_not_connected
 capability_management_slice: implemented_not_connected
 hermes_runs_api_observer: implemented_candidate_not_connected
 hermes_run_launch_reservation: implemented_candidate_not_connected
@@ -96,7 +105,7 @@ human_issuer_signing: implemented_not_connected
 runtime_observation_envelope: implemented_candidate
 ```
 
-A green test suite proves only that these candidate contracts remain coherent in the repository.
+A green test suite proves only that these candidate contracts remain coherent in the repository. It does not prove any of them would be admitted by a real Policy Decision Point: run against `mcp-server`'s actual `PantheonPolicyService`, five of the six chokepoints above (all but `knowledge_update_chokepoint`, which already supplies `task_contract_ref` and `evidence_pack_candidate_ref`) are refused with `blocked_pending_task_contract`. Every request declaring `writes_state: true` classifies K3, which requires those two references alongside the human decision reference; the five newer chokepoints supply only the last. Traced in `ai_logs/2026/Q3/2026-09-02-act-information-policy-facts.md`.
 
 ## Adoption gates still open
 
@@ -108,6 +117,10 @@ live target issuer registry + signed-decision round trip
 production source-path permissions and rollback proof
 human approval for activation
 real-dossier authorization
+doctrine decision on Task Contract / Evidence Pack references for human-originated
+  writes: a Task Contract governs delegated work; the five newer chokepoints gate
+  writes a human makes directly at their own keyboard, which structurally have
+  neither. Until this is resolved, those five remain refused by a real PDP.
 ```
 
 ## Final rule
