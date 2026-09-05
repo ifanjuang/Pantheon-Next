@@ -148,10 +148,10 @@ No path in this contract can emit instruction authority.
 
 ## Runtime implementation
 
-The existing Pantheon Context Bridge now registers one Hermes
-`transform_tool_result` hook.
+The existing Pantheon Context Bridge now composes Context Admission directly
+into both registered Hermes tool handlers.
 
-The transform:
+The handler boundary:
 
 1. acts only on `pantheon_context_manifest` and `pantheon_context_entity`;
 2. scans the raw model-bound result with Hermes'
@@ -167,10 +167,16 @@ The transform:
 The scanner is defense in depth. The data-only transport boundary is the primary
 invariant.
 
-## Why a transform hook
+## Why the registered-handler boundary
 
-Hermes `0.21.0` exposes `transform_tool_result` after tool execution and before the
-result is appended to the conversation.
+Hermes `0.21.0` exposes `transform_tool_result`, but that transform surface uses a
+first-valid-replacement rule. A security invariant should not depend on plugin
+registration order or on whether another transform already returned a string.
+
+The Pantheon plugin therefore wraps its own reviewed tool handlers before
+registration. The result leaves the Pantheon plugin already framed as data-only
+untrusted context. Later Hermes transforms may observe that result, but the
+Pantheon boundary itself cannot be skipped by an earlier transform callback.
 
 This is a better convergence point than:
 
@@ -240,7 +246,7 @@ Pantheon implementation.
 
 This slice is complete when:
 
-- both Pantheon context tools register one model-bound transform;
+- both Pantheon context tools register protected model-bound handlers;
 - the transform always emits `instruction_authority=none`;
 - clean scan does not imply trust;
 - findings and scanner failure require review;
