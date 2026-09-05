@@ -127,6 +127,12 @@ def test_install_activation_run_and_rollback_remain_ordered() -> None:
     assert raw.count("capture-memory-status") == 3
     assert raw.count("--allowed-tool pantheon_context_manifest") == 2
     assert raw.count("--allowed-tool pantheon_context_entity") == 2
+    assert raw.count("--allowed-tool pantheon_untrusted_read") == 2
+    assert raw.count("--allowed-tool pantheon_untrusted_search") == 2
+    assert "--required-tool pantheon_untrusted_read" not in raw
+    assert "--required-tool pantheon_untrusted_search" not in raw
+    assert raw.count("--required-tool pantheon_context_manifest") == 2
+    assert raw.count("--required-tool pantheon_context_entity") == 2
     assert "default API key unexpectedly authenticated the named profile route" in raw
     assert "profile route remained reachable after gateway rollback" in raw
     assert "trap cleanup EXIT" in raw
