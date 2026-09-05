@@ -83,7 +83,7 @@ PANTHEON_UNTRUSTED_SEARCH = {
         "type": "object",
         "properties": {
             "pattern": {"type": "string", "minLength": 1},
-            "target": {"type": "string", "enum": ["content", "name", "both"]},
+            "target": {"type": "string", "enum": ["content", "files"]},
             "path": {"type": "string", "minLength": 1},
             "file_glob": {"type": ["string", "null"]},
             "limit": {"type": "integer", "minimum": 1},
