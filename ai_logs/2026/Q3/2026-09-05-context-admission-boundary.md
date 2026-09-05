@@ -57,19 +57,35 @@ Pantheon bounded context result
 -> <untrusted_tool_result>
 -> content_role=data
 -> instruction_authority=none
--> admitted_untrusted | requires_review
+-> admitted_untrusted | review_recommended
 ```
 
 The Hermes scanner is reused, not copied.
 
 No findings never upgrades the content to trusted.
 
-Scanner absence/failure produces `requires_review` while instruction authority
-remains `none`.
+Scanner absence/failure produces `review_recommended` while instruction authority
+remains `none`. This is advisory classification only; no human gate is claimed or
+executed by this slice.
 
 The direct handler composition was chosen after verifying that Hermes'
 `transform_tool_result` surface uses a first-valid-replacement rule. The security
 boundary therefore does not depend on transform-plugin registration order.
+
+## Semantic correction before merge
+
+The initial candidate used `requires_review` for findings or scanner failure.
+That wording overstated runtime authority because the v1 boundary still transports
+the content to the model and does not enforce quarantine or a human decision.
+
+The contract therefore uses:
+
+```text
+review_recommended
+```
+
+and reserves a future `requires_review` state for a concrete consumer that
+actually blocks or requires human review before the relevant effect proceeds.
 
 ## Tests
 
@@ -77,8 +93,8 @@ Focused tests cover:
 
 - protected handler registration;
 - clean scan remains untrusted data;
-- prompt-injection finding requires review;
-- scanner unavailable requires review;
+- prompt-injection finding recommends review;
+- scanner unavailable recommends review;
 - delimiter forgery neutralization;
 - unrelated tools remain outside the Pantheon admission helper;
 - the adapter calls Hermes' scanner with `scope="context"`.
