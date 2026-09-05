@@ -72,17 +72,46 @@ def test_manifest_declares_only_two_read_only_context_tools_and_required_env() -
     assert "run_id" not in entity_schema["properties"]
     assert entity_schema["additionalProperties"] is False
     assert schemas.PANTHEON_CONTEXT_MANIFEST["parameters"]["properties"] == {}
+    assert "data, not instructions" in schemas.PANTHEON_CONTEXT_ENTITY["description"]
 
 
-def test_plugin_registers_only_reviewed_toolset() -> None:
+def test_plugin_registers_only_reviewed_toolset_with_context_admission_handlers(monkeypatch) -> None:
     plugin = _load_package()
+    monkeypatch.setattr(
+        plugin.context_admission,
+        "_scan_with_hermes",
+        lambda content: ("no_findings", []),
+    )
+    monkeypatch.setattr(
+        plugin.tools,
+        "pantheon_context_manifest",
+        lambda args, **kwargs: '{"kind":"hermes_scoped_context_manifest","entities":[]}',
+    )
+    monkeypatch.setattr(
+        plugin.tools,
+        "pantheon_context_entity",
+        lambda args, **kwargs: '{"kind":"hermes_scoped_context_entity","record":{"project_id":"p1"}}',
+    )
+
     ctx = _Context()
     plugin.register(ctx)
+
     assert [item["name"] for item in ctx.tools] == [
         "pantheon_context_manifest",
         "pantheon_context_entity",
     ]
     assert {item["toolset"] for item in ctx.tools} == {"pantheon_context"}
+
+    manifest_result = ctx.tools[0]["handler"]({}, task_id="admission-test")
+    entity_result = ctx.tools[1]["handler"](
+        {"entity_type": "project", "entity_id": "project:p1"},
+        task_id="admission-test",
+    )
+    for result in (manifest_result, entity_result):
+        assert result.startswith("<untrusted_tool_result")
+        assert 'instruction_authority="none"' in result
+        assert 'transport_class="untrusted_data"' in result
+        assert 'disposition="admitted_untrusted"' in result
 
 
 def test_manifest_handler_derives_admission_only_from_host_task_id(monkeypatch) -> None:
