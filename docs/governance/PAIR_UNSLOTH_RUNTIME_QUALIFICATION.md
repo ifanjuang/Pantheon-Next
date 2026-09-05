@@ -2,6 +2,9 @@
 
 Status: candidate qualification plan. No live lab has been executed by this document.
 
+Execution runbook: `docs/governance/PAIR_UNSLOTH_RUNTIME_Q1_RUNBOOK.md`.
+Machine-readable planning state: `tests/fixtures/pair_unsloth_runtime_q1.json`.
+
 ## Objective
 
 Determine whether NVIDIA Personal AI Router (PAIR) can safely provide the external physical inference-routing layer for Pantheon's local GPU fleet, and whether Unsloth can be used as a separate local Hermes model/provider surface, without adding a Pantheon scheduler, inference router, runtime owner, memory owner, or authorization path.
@@ -38,45 +41,73 @@ The Ubuntu deployment candidate currently runs Hermes in Docker Compose. PAIR's 
 
 These are qualification questions, not conclusions about the live environment.
 
+## Q1 execution topology
+
+The runbook uses the current known hardware topology without making it architectural authority:
+
+```text
+Linux RTX 4080 always-on
+  -> PAIR headless/TUI in isolated HOME
+  -> Unsloth in isolated source/venv/home/cache
+
+Windows RTX 4090 always-on
+  -> PAIR Desktop
+  -> second cluster node
+  -> Jobs / serving-node observation
+
+Current Pantheon Hermes container
+  -> used only for Q1C/Q1D namespace/provider compatibility checks
+```
+
+The test models, ports and temporary profile names are fixture/runbook inputs only. They are not production selections or model approvals.
+
 ## Q1 sequence
 
 ### Q1A — isolated PAIR on the always-on Linux GPU node
 
-Use an isolated test setup rather than the Pantheon Ubuntu deployment candidate. Resolve the selected PAIR artifact from the external pin registry. Record the exact installed artifact identity.
+Use an isolated PAIR HOME and a PAIR-owned Ollama rather than the Pantheon Ubuntu deployment candidate's model store. Resolve the selected PAIR artifact from the external pin registry and validate the concrete release asset before execution.
 
-Observe service lifecycle, Ollama ownership mode, standard-port proxy behavior, backend relocation when PAIR owns the engine, one-model inference, Jobs/workload visibility, and uninstall/reset behavior. Confirm model weights are retained when PAIR is removed unless the engine/model store is explicitly deleted.
+Observe service lifecycle, Ollama ownership mode, standard-port proxy behavior, backend relocation when PAIR owns the engine, one-model inference, workload visibility, and engine-uninstall behavior. Confirm the PAIR-owned model weights remain after PAIR engine uninstall, as the selected upstream release documents, while independently proving that `/srv/ai/models/ollama` did not change.
 
-No Pantheon deployment file changes are part of Q1A.
+The existing Pantheon Ollama service may be stopped only for the bounded lab window to free the proxy port; its unit, drop-in, model path and repository deployment definition are not modified. Its pre-lab state must be restored.
 
 ### Q1B — add the always-on Windows GPU node
 
-Pair the Linux and Windows nodes explicitly. Put the same bounded test model on both engines as independent copies.
+Use PAIR Desktop on Windows and `nvpair-tui` on Linux; do not run both surfaces on the same host.
 
-Generate concurrent independent requests and record which node serves them. Stop or power down one node and confirm it becomes ineligible while the remaining node continues serving. Return the node and observe whether it becomes eligible again.
+Pair the Linux and Windows nodes explicitly. Put the same bounded test model on both engines as independent copies. Distinguish successful mDNS discovery from direct-IP pairing.
+
+Generate concurrent independent requests from the Windows PAIR endpoint and use Desktop Jobs / `Ran on` as the serving-node observation surface. Stop the Linux PAIR service, confirm exclusion and continued Windows service, then restart Linux and observe whether prior membership/eligibility returns.
 
 Do not interpret success as pooled VRAM, model sharding, or one request split across machines.
 
 ### Q1C — current Hermes container to local PAIR proxy
 
-Use the current Pantheon candidate Compose networking path without first adding a workaround. Send a bounded Hermes/provider request to the local PAIR proxy.
+Use the current Pantheon candidate Compose networking path without first adding a workaround. A transport probe must originate inside the actual `pantheon-hermes` container network namespace and target `host.docker.internal` at the local PAIR client endpoint.
 
-Record the HTTP status, PAIR error if any, and the caller network identity visible at the proxy boundary. In particular, do not pre-record `403` as the result merely because source review indicates a loopback-only gate.
+Record HTTP status, PAIR error if any, container/source network identity and the current Compose hash. In particular, do not pre-record `403` merely because source review indicates a loopback-only gate.
 
-If the current path is refused, end Q1C with an observed finding. Host networking, native Hermes, or a relay are separate candidate experiments and must not be smuggled into the same result.
+If the current path is refused, end Q1C with that observed finding. Host networking, native Hermes, mTLS client access or a relay are separate candidate experiments and must not be smuggled into the same result. The Compose hash must remain unchanged.
 
 ### Q1D — Unsloth through the existing Hermes provider seam
 
-Resolve the Unsloth target from the external pin registry and run an isolated local Unsloth endpoint.
+Resolve the Unsloth target from the external pin registry and check out that exact source into an isolated venv, Studio home and model cache.
 
-Configure the existing Hermes candidate with a named custom OpenAI-compatible provider pointing to that endpoint. Do not use `unsloth start hermes` for this qualification because the target question is provider compatibility with the existing Hermes runtime, not creation of a second session-scoped Hermes home.
+Bind the Unsloth API only to the host-side Docker bridge gateway needed by the current Hermes container; do not use wildcard/LAN exposure merely for the lab.
 
-Observe endpoint health, streaming, tool-call round trip, context behavior, provider error behavior, and whether the `pantheon-governed` Hermes profile remains unchanged outside the explicit provider configuration under test.
+Do not use `unsloth start hermes`. Use the selected Hermes runtime already present in the container, create a fresh temporary `pantheon-q1-unsloth` profile, and configure only that profile with a named custom OpenAI-compatible provider. Do not clone `pantheon-governed`, because Hermes profile cloning would copy `.env` and other configuration that Q1 does not need.
+
+Observe endpoint health, streaming, structured tool-call output, a bounded Hermes tool round trip under normal approval policy, context behavior, explicit provider-error behavior, absence of silent fallback, and rollback of the temporary profile/server.
+
+Hash `pantheon-governed` before and after Q1D. It must remain unchanged.
 
 Unsloth does not enter the PAIR cluster in Q1. Current PAIR engine support and generic external OpenAI-compatible endpoint support are separate upstream concerns.
 
 ### Q1E — classify without activating
 
-Classify PAIR and Unsloth independently as `accepted`, `rejected`, or `unresolved` candidates from recorded observations. A PAIR result must not automatically decide Unsloth, and vice versa.
+Create one sanitized observation row for every required check before classification. Each row must carry check/stage/host/action, expected and actual observation, status, artifact reference and timestamps; no PINs, secrets, prompts or generated response bodies are admitted into the observation record.
+
+Classify PAIR and Unsloth independently as `accepted`, `rejected`, or `unresolved` candidates from those records. A PAIR result must not automatically decide Unsloth, and vice versa.
 
 Before any later deployment PR, the review must explicitly resolve or retain as open:
 
@@ -90,7 +121,7 @@ Before any later deployment PR, the review must explicitly resolve or retain as 
 
 ## Q1 done gate
 
-Q1 is complete only when every required check in `tests/fixtures/pair_unsloth_runtime_q1.json` has a real recorded result and the two candidates have an explicit classification.
+Q1 is complete only when every required check in `tests/fixtures/pair_unsloth_runtime_q1.json` has a real sanitized observation row and the two candidates have an explicit classification.
 
 The Q1 planning PR must remain `live_executed = false` and every stage `not_run`. A later observation PR may change those fields only from actual lab records.
 
