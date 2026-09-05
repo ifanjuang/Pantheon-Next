@@ -12,7 +12,7 @@ No live lab was executed by this change.
 main = fd39f1d377d57eb2dc03060c0f93b21763b745b7
 ```
 
-No open Pantheon PR matching PAIR, Unsloth, Hermes inference routing, or an external physical inference router was found before the branch was created.
+No parallel Pantheon PR for PAIR/Unsloth inference routing was found before the branch was created. The existing Hermes Desktop PR remains draft and is not treated as current `main` authority.
 
 Existing owners reused:
 
@@ -26,9 +26,15 @@ No new scheduler, provider router, runtime owner, resource type, persistence pat
 
 ## Upstream observations used
 
-PAIR source review establishes a request-level router around supported engines and paired nodes. One request runs on one eligible node; PAIR does not pool VRAM or shard a request across machines. Its plaintext local-client ingress is loopback-only while paired peer ingress uses mTLS. Its current documented engine surface is Ollama and LM Studio.
+PAIR source/documentation review establishes a request-level router around supported engines and paired nodes. One request runs on one eligible node; PAIR does not pool VRAM or shard one request across machines. Its plaintext local-client ingress is loopback-only while paired peer ingress uses mTLS. Its current documented engine surface is Ollama and LM Studio.
 
-Unsloth source review establishes a current release with a local OpenAI-compatible serving surface. Its convenience `unsloth start hermes` path may resolve/install Hermes and writes a session-scoped Hermes configuration. Pantheon does not need that second Hermes configuration for the question under test because the existing Hermes runtime already supports custom OpenAI-compatible providers.
+PAIR's terminal interface is appropriate for the headless Linux node, but its own documentation says the TUI does not expose the per-request serving-node identity. The Q1 topology therefore uses PAIR Desktop on the Windows node as the Jobs / `Ran on` observation surface and `nvpair-tui` on Linux. Desktop and TUI are never launched together on one host.
+
+PAIR's engine-lifecycle documentation also states that uninstalling a PAIR-installed engine leaves downloaded model files in the engine store. Q1 therefore tests this property explicitly rather than assuming it, while separately proving that the Pantheon-owned `/srv/ai/models/ollama` store is unchanged.
+
+Unsloth source review establishes a local OpenAI-compatible serving surface and a one-line `unsloth run` server that generates an API key. The Q1 runbook resolves the selected source from the canonical Pantheon pin, uses an isolated source checkout/venv/Studio home/HF cache, and binds the endpoint only to the host-side Docker bridge gateway needed by the current Hermes container.
+
+The convenience `unsloth start hermes` path is deliberately excluded. The selected Hermes runtime already supports named custom OpenAI-compatible providers.
 
 These are upstream observations, not live Pantheon runtime facts.
 
@@ -36,17 +42,62 @@ These are upstream observations, not live Pantheon runtime facts.
 
 The Ubuntu deployment candidate currently owns Ollama lifecycle and configures it on the standard Ollama port. PAIR may want that same port for its compatibility proxy and may relocate a PAIR-managed backend. Exact coexistence/ownership behavior must be executed before any deployment change.
 
-Hermes currently runs in Docker Compose in the Ubuntu candidate. Because PAIR's plaintext client gate is loopback-only, the current container-to-host path may be refused. That outcome is deliberately left `not_run`; the qualification contract forbids pre-recording the expected HTTP status from source review alone.
+Hermes currently runs in Docker Compose in the Ubuntu candidate and has `host.docker.internal:host-gateway`. Because PAIR's plaintext client gate is loopback-only, the current container-to-host path may be refused. That outcome remains `not_run`; Q1C probes from the real `pantheon-hermes` network namespace and records the actual HTTP/transport result before any workaround.
+
+## Executable runbook convergence
+
+The planning slice now contains `docs/governance/PAIR_UNSLOTH_RUNTIME_Q1_RUNBOOK.md` with explicit:
+
+- Linux and Windows preparation;
+- qualification-pin export rather than duplicated current version literals;
+- release-asset digest validation;
+- isolated PAIR HOME/XDG state;
+- bounded stop/restore of the current system Ollama only to free the PAIR proxy port;
+- port/process/backend observations;
+- model-store before/after manifests;
+- Windows pairing, concurrent burst, failover and rejoin;
+- peer-scoped firewall changes only when necessary and explicit rollback;
+- current Hermes-container namespace probe without `network_mode: host` or relay;
+- pinned Unsloth source checkout, isolated venv/home/cache and Docker-bridge-only bind;
+- OpenAI model-list, streaming and structured-tool checks;
+- a temporary Hermes profile using a named custom provider;
+- normal Hermes approval policy for one harmless tool round trip, with no `--yolo`;
+- deliberate invalid-provider-key check to detect silent fallback;
+- governed-profile hash before/after;
+- observation-row schema and independent candidate decision gates;
+- stop conditions rather than workaround-by-default behavior.
+
+An initially considered `pantheon-governed` profile clone was rejected during runbook review. Hermes profile cloning copies `.env` and configuration; Q1 does not need those secrets. The final runbook creates a fresh `pantheon-q1-unsloth` profile with no bundled skills and writes only the temporary provider/model/memory-off posture. `pantheon-governed` is read only through a metadata hash before/after and must not change.
 
 ## Q1 stages
 
-1. isolated PAIR on the always-on Linux GPU node;
-2. Linux + Windows PAIR cluster with the same bounded test model on both nodes;
+1. isolated PAIR on the always-on Linux RTX 4080 node;
+2. Linux + Windows RTX 4090 PAIR cluster with the same bounded test model on both nodes;
 3. current Hermes container networking path against the local PAIR proxy;
-4. Unsloth as a custom OpenAI-compatible provider of the existing Hermes candidate, without `unsloth start hermes`;
-5. independent candidate classification with no activation.
+4. isolated Unsloth as a named custom OpenAI-compatible provider of the existing Hermes runtime, without `unsloth start hermes`;
+5. independent candidate classification from sanitized observation rows with no activation.
 
 The machine-readable fixture starts with `live_executed = false` and every stage `result = not_run`.
+
+## Observation structure
+
+Every required check must eventually produce a sanitized row containing:
+
+```text
+check_id
+stage_id
+host
+command_or_action
+expected_observation
+actual_observation
+status
+artifact_ref
+started_at
+ended_at
+notes
+```
+
+Secrets, pairing PINs, prompt bodies and generated response bodies are excluded.
 
 ## Authority ceiling
 
@@ -67,6 +118,7 @@ runtime success != Evidence
 implementation/qualification/external-pins.json
 implementation/qualification/external-upstream-observations.json
 docs/governance/PAIR_UNSLOTH_RUNTIME_QUALIFICATION.md
+docs/governance/PAIR_UNSLOTH_RUNTIME_Q1_RUNBOOK.md
 tests/fixtures/pair_unsloth_runtime_q1.json
 tests/test_pair_unsloth_runtime_q1_contract.py
 ai_logs/2026/Q3/2026-09-05-pair-unsloth-runtime-q1.md
@@ -76,9 +128,10 @@ ai_logs/2026/Q3/2026-09-05-pair-unsloth-runtime-q1.md
 
 - no `deployment/ubuntu/release.env` change;
 - no `deployment/ubuntu/install-node` change;
+- no production Compose change;
 - no Hermes distribution lock change;
-- no PAIR installation;
-- no Unsloth installation;
+- no PAIR installation executed;
+- no Unsloth installation executed;
 - no runtime activation;
 - no task authorization;
 - no Evidence admission.
