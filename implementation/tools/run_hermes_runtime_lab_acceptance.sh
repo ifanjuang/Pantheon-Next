@@ -206,6 +206,8 @@ pantheon-hermes observe \
   --memory-status-receipt "$LAB_ARTIFACTS/memory-status-observe.json" \
   --allowed-tool pantheon_context_manifest \
   --allowed-tool pantheon_context_entity \
+  --allowed-tool pantheon_untrusted_read \
+  --allowed-tool pantheon_untrusted_search \
   --required-tool pantheon_context_manifest \
   --required-tool pantheon_context_entity \
   --output "$LAB_ARTIFACTS/runtime-observation.json"
@@ -220,6 +222,8 @@ pantheon-hermes launch \
   --memory-status-receipt "$LAB_ARTIFACTS/memory-status-launch.json" \
   --allowed-tool pantheon_context_manifest \
   --allowed-tool pantheon_context_entity \
+  --allowed-tool pantheon_untrusted_read \
+  --allowed-tool pantheon_untrusted_search \
   --required-tool pantheon_context_manifest \
   --required-tool pantheon_context_entity \
   --admission-id admission-hermes-020-lab \
