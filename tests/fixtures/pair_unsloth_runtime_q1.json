@@ -1,6 +1,6 @@
 {
   "schema_id": "pantheon.pair_unsloth_runtime_qualification_q1",
-  "revision": 1,
+  "revision": 2,
   "status": "candidate",
   "live_executed": false,
   "objective": "Qualify PAIR as an external local-inference routing candidate and Unsloth as a separate Hermes-compatible local inference/training candidate without changing Pantheon runtime authority, deployment, activation, or task authorization.",
@@ -23,7 +23,7 @@
     "unsloth_model": "unsloth/Qwen3.5-4B-GGUF:UD-Q4_K_XL",
     "unsloth_context_tokens": 16384,
     "unsloth_api_port": 18888,
-    "unsloth_bind_scope": "docker_bridge_gateway_only",
+    "unsloth_bind_scope": "docker_bridge_gateway_scoped",
     "hermes_temporary_profile": "pantheon-q1-unsloth"
   },
   "observation_record_fields": [
@@ -103,11 +103,12 @@
     {
       "stage_id": "q1d_unsloth_as_existing_hermes_custom_provider",
       "host_role": "isolated_local_unsloth_endpoint_plus_existing_hermes_candidate",
-      "purpose": "Observe Unsloth through the existing Hermes custom OpenAI-compatible provider seam using a fresh temporary profile, without launching a second Hermes home or mutating pantheon-governed.",
+      "purpose": "Observe Unsloth through the existing Hermes custom OpenAI-compatible provider seam using a fresh temporary profile, while capturing the effective runtime dependency closure and avoiding mutation of pantheon-governed.",
       "required_checks": [
         "exact_unsloth_artifact_identity",
         "unsloth_runtime_and_cache_isolated",
-        "docker_bridge_only_bind",
+        "runtime_dependency_closure_captured",
+        "docker_bridge_scoped_bind",
         "openai_compatible_endpoint_health",
         "existing_hermes_custom_provider_configuration",
         "fresh_temporary_hermes_profile",
