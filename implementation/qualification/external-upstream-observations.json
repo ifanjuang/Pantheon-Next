@@ -21,6 +21,22 @@
       "delta": "none",
       "note": "Observed from the current stable GitHub release v2026.8.31 (Hermes Agent 0.21.0), whose annotated release tag resolves to commit 29112bef099274229cadff79cdff7bf7b99c4b77. This refresh records upstream state only; the qualification pin is owned separately and installation, activation, task authorization and Evidence admission remain unchanged."
     },
+    "personal-ai-router": {
+      "source": "github_releases_latest",
+      "locator": "NVIDIA/Personal-AI-Router",
+      "latest_seen": "v0.1.1",
+      "observed_on": "2026-09-05",
+      "delta": "none",
+      "note": "Observed from NVIDIA Personal AI Router release v0.1.1. The source review confirms request-level routing across paired nodes, Ollama/LM Studio support, loopback-only plaintext client ingress, cluster mTLS, and no cross-machine VRAM pooling. This record is upstream observation only; the separate qualification pin selects the candidate artifact and no Pantheon deployment or activation follows from this observation."
+    },
+    "unsloth": {
+      "source": "github_releases_latest",
+      "locator": "unslothai/unsloth",
+      "latest_seen": "v0.1.806-beta",
+      "observed_on": "2026-09-05",
+      "delta": "none",
+      "note": "Observed from the current GitHub release v0.1.806-beta. The tagged source exposes an OpenAI-compatible local server path and an `unsloth start hermes` convenience path that writes a session-scoped Hermes configuration. Pantheon qualification deliberately targets Unsloth as a separate provider candidate through the existing Hermes custom-provider seam rather than selecting a second Hermes runtime. Observation does not install, activate, authorize, or admit Evidence."
+    },
     "hindsight": {
       "source": "github_releases_latest",
       "locator": "vectorize-io/hindsight",
