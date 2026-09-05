@@ -45,10 +45,10 @@ contain source-derived or user-controlled text.
 
 ## Change
 
-Added a model-bound `transform_tool_result` hook to the existing
-`pantheon-context-bridge`.
+Composed Context Admission directly into both registered model-bound handlers
+of the existing `pantheon-context-bridge`.
 
-The hook:
+The handler boundary:
 
 ```text
 Pantheon bounded context result
@@ -67,16 +67,20 @@ No findings never upgrades the content to trusted.
 Scanner absence/failure produces `requires_review` while instruction authority
 remains `none`.
 
+The direct handler composition was chosen after verifying that Hermes'
+`transform_tool_result` surface uses a first-valid-replacement rule. The security
+boundary therefore does not depend on transform-plugin registration order.
+
 ## Tests
 
 Focused tests cover:
 
-- hook registration;
+- protected handler registration;
 - clean scan remains untrusted data;
 - prompt-injection finding requires review;
 - scanner unavailable requires review;
 - delimiter forgery neutralization;
-- unrelated tools remain outside the Pantheon hook;
+- unrelated tools remain outside the Pantheon admission helper;
 - the adapter calls Hermes' scanner with `scope="context"`.
 
 ## Distribution
