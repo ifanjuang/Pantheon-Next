@@ -7,16 +7,17 @@ plugin/skill integration inside Pantheon.
 
 ## Verified baseline
 
-- Pantheon `main`: `a7080fa7997f47594332db3f3c7cece265beb3fb` after PR #972.
+- Work started from Pantheon `main` at `a7080fa7997f47594332db3f3c7cece265beb3fb` after PR #972.
+- The final candidate was subsequently rebased/qualified against newer `main`
+  after PR #970.
 - Existing Pantheon plugin: `implementation/hermes/plugins/pantheon-context-bridge`.
 - Existing Context Admission v1 already frames Pantheon context as data-only and
   reuses Hermes threat patterns as advisory metadata.
 - Pantheon Hermes qualification pin remains `0.21.0` / `v2026.8.31`.
 - Qualified Hermes exposes `pre_gateway_dispatch`, fail-closed `pre_tool_call`,
   `PluginContext.dispatch_tool`, and `PluginContext.register_skill`.
-- Current Hermes upstream observed during the same check:
-  `9dd6634c5635321cf38840cc30e9b51226689128`.
-- No open Pantheon PR already implemented the requested external-content gate.
+- No parallel Pantheon PR was found that already implemented this
+  external-content boundary.
 
 ## Convergence decision
 
@@ -41,8 +42,9 @@ Changes:
     `pre_tool_call`;
   - recognizes Hermes document-cache paths as high-confidence external ingress;
   - keeps bounded best-effort roots learned from common clone/download commands;
-  - exposes guarded read/search handler factories that delegate to native
-    Hermes tools and frame their results;
+  - exposes root-bounded guarded read/search handler factories that delegate to
+    native Hermes tools only after path validation and frame returned text as
+    data-only;
 - added `pantheon_untrusted_read` and `pantheon_untrusted_search` schemas;
 - registered `pre_gateway_dispatch` and `pre_tool_call` hooks;
 - bundled `untrusted-content-reading` via `ctx.register_skill`;
@@ -50,23 +52,68 @@ Changes:
   document-cache blocking, normal local reads, bounded fetch-root propagation,
   guarded tool delegation and boundary framing.
 
-## Refinement after review
+## First refinement before review
 
-The first plugin draft overclaimed two heuristic areas. They were narrowed
-before merge:
+The first plugin draft overclaimed two heuristic areas. They were narrowed:
 
 - `curl URL` no longer invents a local provenance root because curl writes to
   stdout by default; tracking occurs only for `-o` / `--output` or
   `-O` / `--remote-name`;
 - `execute_code` literal-path inspection was removed. Arbitrary code execution
-  is now explicitly outside v1 mediation rather than represented by a weak regex
+  is explicitly outside v1 mediation rather than represented by a weak regex
   that could be mistaken for a security boundary.
 
 The Hermes runtime labs also revealed a useful governance check: the existing
 profile allowlist correctly rejected the two newly registered guarded tools as
-unexpected. The qualification policy is therefore updated so all four plugin
-tools are allowed while only `pantheon_context_manifest` and
-`pantheon_context_entity` remain required for the synthetic context-binding run.
+unexpected. Qualification policy was updated so all four plugin tools are
+allowed while only `pantheon_context_manifest` and `pantheon_context_entity`
+remain required for the synthetic context-binding run.
+
+## Ready-for-review security findings
+
+After the first complete six-workflow green run and marking PR #975 ready, the
+automated code review identified five additional path-boundary issues. Two were
+P1 and three P2, so the PR was not merged despite green CI.
+
+Observed problems:
+
+1. `pantheon_untrusted_read` / `pantheon_untrusted_search` could dispatch an
+   arbitrary host-readable path because framing prevented instruction authority
+   but did not constrain filesystem disclosure;
+2. direct `search_files` rooted above a protected directory could still return
+   snippets from the protected tree;
+3. lexical-only containment could be bypassed by symlink aliases;
+4. case-insensitive curl option parsing could treat `-O` as `-o` and remember
+   the URL as a destination path;
+5. path-qualified readers such as `/bin/cat` were not recognized by the shell
+   reader gate.
+
+## Hardening applied
+
+- guarded read/search now refuse any path that is not both lexically and
+  canonically contained in one known external root;
+- this also refuses a symlink inside an external tree that resolves to an
+  unrelated local file, preventing guarded tools from becoming generic host
+  filesystem readers;
+- direct path detection checks both lexical and resolved forms, so an outside
+  symlink alias into a protected root is still blocked;
+- direct `search_files` is blocked when its scope is inside a protected root or
+  contains one;
+- common shell content readers are recognized by basename even when invoked via
+  a path such as `/bin/cat`;
+- `curl -o` and `curl -O` parsing is case-sensitive and separate;
+- path-qualified common fetch commands are still treated only as best-effort
+  provenance hints, not governed truth;
+- focused regression tests cover every review finding plus symlink escape from
+  a protected root.
+
+The resulting invariant is stronger and clearer:
+
+```text
+framed-as-data != permission to read arbitrary filesystem content
+known external path != arbitrary local path
+CI success != security review complete
+```
 
 ## Governance preserved
 
@@ -91,9 +138,13 @@ relocation and copied-content taint are not claimed as solved. A future native
 Hermes provenance API should replace this tracking rather than coexist as a
 second authority.
 
-## Remaining work
+## Current verification state
 
-- obtain the new deterministic context-bridge digest after the final plugin tree
-  change and update the distribution lock;
-- run the focused/full implementation CI and both Hermes labs;
-- mark PR #975 ready only if the complete qualification suite is green.
+- first review-ready head `f185132ed04c8cac7367199a3309c522bf230578` had all six workflows green;
+- post-review hardening changed the plugin tree and therefore intentionally
+  invalidated the previous digest;
+- Architecture Audit recomputed the hardened plugin digest as
+  `sha256:752cccdf182fe47ea643ee4a398df97b604384eb8aa6611840a7fd5d1d34cc3d`;
+- the distribution lock was updated to that exact digest;
+- final merge remains blocked until the hardened head again passes the complete
+  workflow set and the review threads are reconciled.
