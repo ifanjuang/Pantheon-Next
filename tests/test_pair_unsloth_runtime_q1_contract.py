@@ -26,7 +26,7 @@ def test_q1_targets_existing_external_pin_authority() -> None:
     pins = _pins()
 
     assert fixture["schema_id"] == "pantheon.pair_unsloth_runtime_qualification_q1"
-    assert fixture["revision"] == 1
+    assert fixture["revision"] == 2
     assert fixture["status"] == "candidate"
     assert fixture["live_executed"] is False
 
@@ -92,6 +92,7 @@ def test_q1_runbook_matches_the_bounded_lab_topology() -> None:
     assert str(inputs["unsloth_context_tokens"]) in text
     assert str(inputs["unsloth_api_port"]) in text
     assert inputs["hermes_temporary_profile"] in text
+    assert inputs["unsloth_bind_scope"] == "docker_bridge_gateway_scoped"
 
 
 def test_pair_lab_preserves_physical_routing_ceiling_and_rollback() -> None:
@@ -142,7 +143,8 @@ def test_unsloth_is_isolated_and_uses_a_fresh_temporary_hermes_profile() -> None
     text = _runbook()
 
     assert "unsloth_runtime_and_cache_isolated" in checks
-    assert "docker_bridge_only_bind" in checks
+    assert "runtime_dependency_closure_captured" in checks
+    assert "docker_bridge_scoped_bind" in checks
     assert "existing_hermes_custom_provider_configuration" in checks
     assert "fresh_temporary_hermes_profile" in checks
     assert "no_unsloth_start_hermes_path" in checks
@@ -157,7 +159,12 @@ def test_unsloth_is_isolated_and_uses_a_fresh_temporary_hermes_profile() -> None
     assert "docker network inspect bridge" in text
     assert "hermes profile create pantheon-q1-unsloth --no-skills" in text
     assert "Do not clone `pantheon-governed`" in text
-    assert "Do not use `--yolo`" in text
+    assert "Do not use Hermes `--yolo`" in text
+    assert "runtime dependency closure" in text
+    assert "importlib.metadata" in text
+    assert "torch.version.cuda" in text
+    assert "llama-server" in text
+    assert "bridge-scoped" in text
 
 
 def test_q1_observation_rows_are_structured_before_classification() -> None:
