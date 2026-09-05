@@ -32,6 +32,12 @@ from mvp_vertical.hermes_runs_observer import (
     HermesRunsObservationError,
 )
 
+DEFAULT_ALLOWED_TOOLS = (
+    *CONTEXT_TOOLS,
+    "pantheon_untrusted_read",
+    "pantheon_untrusted_search",
+)
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -68,8 +74,8 @@ def build_parser() -> argparse.ArgumentParser:
         default=[],
         help=(
             "Concrete Hermes tool allowed on the reviewed acceptance profile. "
-            "Repeat for additional separately reviewed tools. Defaults to the two "
-            "Pantheon context tools only."
+            "Repeat for additional separately reviewed tools. Defaults to the reviewed "
+            "Pantheon context plugin surface; only the two context tools are required."
         ),
     )
     parser.add_argument("--run-live", action="store_true")
@@ -85,7 +91,7 @@ def _build_observer(args: argparse.Namespace) -> HermesRunsApiObserver:
         raise HermesLiveAcceptanceError(
             "HERMES_API_SERVER_KEY is required for Hermes API observation"
         )
-    allowed_tools = args.allowed_tool or list(CONTEXT_TOOLS)
+    allowed_tools = args.allowed_tool or list(DEFAULT_ALLOWED_TOOLS)
     return HermesRunsApiObserver(
         args.hermes_url,
         args.hermes_key,
