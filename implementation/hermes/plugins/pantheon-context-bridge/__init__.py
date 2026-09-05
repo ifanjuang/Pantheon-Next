@@ -34,20 +34,14 @@ def register(ctx):
         name="pantheon_context_manifest",
         toolset="pantheon_context",
         schema=schemas.PANTHEON_CONTEXT_MANIFEST,
-        handler=_protected_handler(
-            "pantheon_context_manifest",
-            tools.pantheon_context_manifest,
-        ),
+        handler=_protected_handler("pantheon_context_manifest", tools.pantheon_context_manifest),
         description="Read the exact admitted Pantheon context manifest for this Hermes session.",
     )
     ctx.register_tool(
         name="pantheon_context_entity",
         toolset="pantheon_context",
         schema=schemas.PANTHEON_CONTEXT_ENTITY,
-        handler=_protected_handler(
-            "pantheon_context_entity",
-            tools.pantheon_context_entity,
-        ),
+        handler=_protected_handler("pantheon_context_entity", tools.pantheon_context_entity),
         description="Read one exact entity already admitted for this Hermes session.",
     )
     ctx.register_tool(
@@ -65,13 +59,12 @@ def register(ctx):
         toolset="pantheon_context",
         schema=schemas.PANTHEON_UNTRUSTED_SEARCH,
         handler=external_content.make_guarded_search_handler(ctx),
-        description=(
-            "Search externally sourced files through data-only Context Admission."
-        ),
+        description="Search externally sourced files through data-only Context Admission.",
     )
 
     ctx.register_hook("pre_gateway_dispatch", external_content.pre_gateway_dispatch)
     ctx.register_hook("pre_tool_call", external_content.pre_tool_call)
+    ctx.register_hook("post_tool_call", external_content.post_tool_call)
 
     ctx.register_skill(
         "untrusted-content-reading",
