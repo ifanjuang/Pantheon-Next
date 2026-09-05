@@ -64,7 +64,7 @@ def _scan_with_hermes(content: str) -> tuple[str, list[str]]:
 
 
 def _disposition(scan_status: str) -> str:
-    return "admitted_untrusted" if scan_status == "no_findings" else "requires_review"
+    return "admitted_untrusted" if scan_status == "no_findings" else "review_recommended"
 
 
 def protect_model_bound_result(
