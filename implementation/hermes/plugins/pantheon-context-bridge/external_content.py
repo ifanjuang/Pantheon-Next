@@ -12,10 +12,10 @@ plugin hooks to keep known-external content on a data-only path:
   and apply the same Context Admission framing before returning content.
 
 Known-untrusted paths are the Hermes document cache plus bounded roots learned
-from common external fetch commands during the current task. This is a
-compatibility boundary, not a replacement for a future native Hermes provenance
-API. ``execute_code`` with dynamically constructed paths and exotic shell
-indirections remain out of scope.
+from a small set of common external fetch commands during the current task. This
+is a compatibility boundary, not a replacement for a future native Hermes
+provenance API. Dynamic code paths, shell indirection, archive relocation and
+copied-content taint remain out of scope.
 """
 
 from __future__ import annotations
@@ -36,8 +36,16 @@ _GIT_CLONE_RE = re.compile(
 _GH_REPO_CLONE_RE = re.compile(
     r"\bgh\s+repo\s+clone\s+(?:-{1,2}[\w-]+(?:[= ]\S+)?\s+)*(\S+)(?:\s+([^\s&|;]+))?"
 )
-_FETCH_DEST_RE = re.compile(
-    r"(?:^|\s)(?:-o|-O|--output|--output-document)(?:=|\s+)(\S+)",
+_CURL_DEST_RE = re.compile(
+    r"(?:^|\s)(?:-o|--output)(?:=|\s+)(\S+)",
+    re.IGNORECASE,
+)
+_CURL_REMOTE_NAME_RE = re.compile(
+    r"(?:^|\s)(?:-O|--remote-name)(?:\s|$)",
+    re.IGNORECASE,
+)
+_WGET_DEST_RE = re.compile(
+    r"(?:^|\s)(?:-O|--output-document)(?:=|\s+)(\S+)",
     re.IGNORECASE,
 )
 _FETCH_URL_RE = re.compile(r"https?://[^\s'\";&|]+", re.IGNORECASE)
@@ -82,8 +90,17 @@ def _basename_from_url(url: str) -> str:
     return name or "fetched"
 
 
+def _url_destination(command: str, cwd: str, destination: str | None) -> str:
+    if destination:
+        return _resolve_relative(destination, cwd)
+    url_match = _FETCH_URL_RE.search(command or "")
+    if not url_match:
+        return ""
+    return _resolve_relative(_basename_from_url(url_match.group(0)), cwd)
+
+
 def _extract_fetch_roots(command: str, cwd: str) -> list[str]:
-    """Recognize common commands that land externally controlled content on disk."""
+    """Return best-effort path hints only when a command is expected to write files."""
 
     roots: list[str] = []
     for pattern in (_GIT_CLONE_RE, _GH_REPO_CLONE_RE):
@@ -94,18 +111,27 @@ def _extract_fetch_roots(command: str, cwd: str) -> list[str]:
             if resolved:
                 roots.append(resolved)
 
-    if re.search(r"(?:^|\s)(?:curl|wget)\s", command or "", re.IGNORECASE):
-        destination_match = _FETCH_DEST_RE.search(command)
+    if re.search(r"(?:^|\s)curl\s", command or "", re.IGNORECASE):
+        destination_match = _CURL_DEST_RE.search(command)
         if destination_match:
             resolved = _resolve_relative(destination_match.group(1), cwd)
             if resolved:
                 roots.append(resolved)
-        else:
-            url_match = _FETCH_URL_RE.search(command)
-            if url_match:
-                resolved = _resolve_relative(_basename_from_url(url_match.group(0)), cwd)
-                if resolved:
-                    roots.append(resolved)
+        elif _CURL_REMOTE_NAME_RE.search(command):
+            resolved = _url_destination(command, cwd, None)
+            if resolved:
+                roots.append(resolved)
+
+    if re.search(r"(?:^|\s)wget\s", command or "", re.IGNORECASE):
+        destination_match = _WGET_DEST_RE.search(command)
+        resolved = _url_destination(
+            command,
+            cwd,
+            destination_match.group(1) if destination_match else None,
+        )
+        if resolved:
+            roots.append(resolved)
+
     return roots
 
 
@@ -214,15 +240,6 @@ def pre_tool_call(
         ):
             return _blocked_message(tool_name)
         _remember_roots(task_id, new_roots)
-
-    if tool_name == "execute_code":
-        # Bounded defense-in-depth for literal paths only. Dynamic path construction
-        # remains a documented gap; do not claim this as filesystem mediation.
-        code = str(args.get("code") or args.get("source") or "")
-        normalized_code = os.path.normcase(code)
-        for root in roots:
-            if root and os.path.normcase(root) in normalized_code:
-                return _blocked_message(tool_name)
 
     return None
 
