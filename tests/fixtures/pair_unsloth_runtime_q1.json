@@ -9,6 +9,36 @@
     "unsloth": "unsloth",
     "hermes": "hermes-agent"
   },
+  "runbook": {
+    "path": "docs/governance/PAIR_UNSLOTH_RUNTIME_Q1_RUNBOOK.md",
+    "linux_pair_surface": "nvpair_tui_isolated_home",
+    "windows_pair_surface": "desktop_jobs_observation",
+    "unsloth_install_surface": "pinned_source_isolated_venv_and_home",
+    "hermes_unsloth_surface": "fresh_temporary_profile_in_existing_runtime",
+    "secrets_persisted_in_artifacts": false,
+    "production_compose_mutation_allowed": false
+  },
+  "lab_inputs": {
+    "pair_model": "qwen3.5:4b",
+    "unsloth_model": "unsloth/Qwen3.5-4B-GGUF:UD-Q4_K_XL",
+    "unsloth_context_tokens": 16384,
+    "unsloth_api_port": 18888,
+    "unsloth_bind_scope": "docker_bridge_gateway_only",
+    "hermes_temporary_profile": "pantheon-q1-unsloth"
+  },
+  "observation_record_fields": [
+    "check_id",
+    "stage_id",
+    "host",
+    "command_or_action",
+    "expected_observation",
+    "actual_observation",
+    "status",
+    "artifact_ref",
+    "started_at",
+    "ended_at",
+    "notes"
+  ],
   "current_seams_under_test": {
     "ubuntu_ollama_lifecycle_owner": "pantheon-node bootstrap candidate",
     "ubuntu_ollama_default_port": 11434,
@@ -24,7 +54,7 @@
     {
       "stage_id": "q1a_pair_linux_isolated",
       "host_role": "always_on_linux_gpu_node",
-      "purpose": "Observe PAIR with an isolated Ollama test instance before touching the Pantheon Ubuntu deployment candidate.",
+      "purpose": "Observe PAIR with an isolated PAIR-owned Ollama test instance before touching the Pantheon Ubuntu deployment candidate.",
       "required_checks": [
         "exact_pair_artifact_identity",
         "pair_service_start_stop",
@@ -33,7 +63,8 @@
         "backend_relocation_if_pair_managed",
         "single_model_inference",
         "jobs_observation",
-        "pair_uninstall_keeps_model_weights"
+        "pair_uninstall_keeps_model_weights",
+        "pantheon_ollama_store_unchanged_after_rollback"
       ],
       "result": "not_run"
     },
@@ -43,6 +74,7 @@
       "purpose": "Observe request-level routing across two heterogeneous always-on nodes with the same test model available on both.",
       "required_checks": [
         "explicit_pairing",
+        "discovery_vs_direct_ip_pairing_distinguished",
         "same_model_independent_copy_on_both_nodes",
         "concurrent_request_distribution",
         "node_power_off_or_service_stop_excludes_node",
@@ -63,24 +95,31 @@
         "http_status_and_pair_error_recorded",
         "caller_network_identity_recorded",
         "no_403_assumed_before_execution",
-        "no_relay_or_host_network_change_in_q1"
+        "no_relay_or_host_network_change_in_q1",
+        "compose_hash_unchanged"
       ],
       "result": "not_run"
     },
     {
       "stage_id": "q1d_unsloth_as_existing_hermes_custom_provider",
       "host_role": "isolated_local_unsloth_endpoint_plus_existing_hermes_candidate",
-      "purpose": "Observe Unsloth through the existing Hermes custom OpenAI-compatible provider seam without launching a second Hermes home or changing the pantheon-governed profile.",
+      "purpose": "Observe Unsloth through the existing Hermes custom OpenAI-compatible provider seam using a fresh temporary profile, without launching a second Hermes home or mutating pantheon-governed.",
       "required_checks": [
         "exact_unsloth_artifact_identity",
+        "unsloth_runtime_and_cache_isolated",
+        "docker_bridge_only_bind",
         "openai_compatible_endpoint_health",
         "existing_hermes_custom_provider_configuration",
+        "fresh_temporary_hermes_profile",
         "no_unsloth_start_hermes_path",
         "streaming",
+        "structured_tool_call",
         "tool_call_round_trip",
         "context_behavior",
         "provider_error_behavior",
-        "pantheon_governed_profile_not_mutated"
+        "no_silent_provider_fallback",
+        "pantheon_governed_profile_not_mutated",
+        "temporary_profile_and_server_rollback"
       ],
       "result": "not_run"
     },
@@ -89,6 +128,7 @@
       "host_role": "review_only",
       "purpose": "Classify PAIR and Unsloth independently as accepted, rejected, or unresolved candidates from recorded observations.",
       "required_checks": [
+        "all_required_checks_have_observation_rows",
         "pair_classified_independently",
         "unsloth_classified_independently",
         "port_ownership_conflict_resolved_or_left_open",
