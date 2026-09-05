@@ -9,6 +9,7 @@ on:
       - "implementation/tools/export_external_qualification_pins.py"
       - "implementation/tools/run_hermes_context_read_q1.py"
       - "tests/test_hermes_context_read_q1_contract.py"
+      - "ai_logs/2026/Q3/2026-09-06-hermes-context-read-q1.md"
 
 permissions:
   contents: read
