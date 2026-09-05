@@ -9,7 +9,8 @@ plugin hooks to keep known-external content on a data-only path:
 - ``pre_tool_call`` blocks direct model reads/searches of known-untrusted paths
   and common terminal content-read commands touching those paths;
 - guarded plugin tools delegate to Hermes' native ``read_file`` / ``search_files``
-  and apply the same Context Admission framing before returning content.
+  only for paths already inside a known-untrusted root, then apply the same
+  Context Admission framing before returning content.
 
 Known-untrusted paths are the Hermes document cache plus bounded roots learned
 from a small set of common external fetch commands during the current task. This
@@ -30,29 +31,36 @@ from typing import Any, Iterable
 from . import context_admission
 
 _INLINE_CONTENT_RE = re.compile(r"(?m)^\[Content of [^\]\n]+\]:\s*$")
+_COMMAND_PREFIX = r"(?:^|[;&|]\s*|\s)(?:[^\s;&|]*[\\/])?"
 _GIT_CLONE_RE = re.compile(
-    r"\bgit\s+clone\s+(?:-{1,2}[\w-]+(?:[= ]\S+)?\s+)*(\S+)(?:\s+([^\s&|;]+))?"
+    _COMMAND_PREFIX
+    + r"git(?:\.exe)?\s+clone\s+(?:-{1,2}[\w-]+(?:[= ]\S+)?\s+)*(\S+)(?:\s+([^\s&|;]+))?",
+    re.IGNORECASE,
 )
 _GH_REPO_CLONE_RE = re.compile(
-    r"\bgh\s+repo\s+clone\s+(?:-{1,2}[\w-]+(?:[= ]\S+)?\s+)*(\S+)(?:\s+([^\s&|;]+))?"
-)
-_CURL_DEST_RE = re.compile(
-    r"(?:^|\s)(?:-o|--output)(?:=|\s+)(\S+)",
+    _COMMAND_PREFIX
+    + r"gh(?:\.exe)?\s+repo\s+clone\s+(?:-{1,2}[\w-]+(?:[= ]\S+)?\s+)*(\S+)(?:\s+([^\s&|;]+))?",
     re.IGNORECASE,
 )
-_CURL_REMOTE_NAME_RE = re.compile(
-    r"(?:^|\s)(?:-O|--remote-name)(?:\s|$)",
+_CURL_COMMAND_RE = re.compile(
+    _COMMAND_PREFIX + r"curl(?:\.exe)?(?:\s|$)",
     re.IGNORECASE,
 )
-_WGET_DEST_RE = re.compile(
-    r"(?:^|\s)(?:-O|--output-document)(?:=|\s+)(\S+)",
+_WGET_COMMAND_RE = re.compile(
+    _COMMAND_PREFIX + r"wget(?:\.exe)?(?:\s|$)",
     re.IGNORECASE,
 )
+# curl short options are case-sensitive: -o names a local output while -O uses
+# the remote basename. Keep these parsers separate and case-sensitive.
+_CURL_DEST_RE = re.compile(r"(?:^|\s)(?:-o|--output)(?:=|\s+)(\S+)")
+_CURL_REMOTE_NAME_RE = re.compile(r"(?:^|\s)(?:-O|--remote-name)(?:\s|$)")
+_WGET_DEST_RE = re.compile(r"(?:^|\s)(?:-O|--output-document)(?:=|\s+)(\S+)")
 _FETCH_URL_RE = re.compile(r"https?://[^\s'\";&|]+", re.IGNORECASE)
 _SHELL_SPLIT_RE = re.compile(r"[\s|&;]+")
 _TERMINAL_CONTENT_READER_RE = re.compile(
-    r"(?:^|[;&|]\s*|\s)(?:cat|head|tail|less|more|strings|grep|rg|sed|awk|type|"
-    r"get-content|gc|select-string|unzip\s+-p)\b",
+    _COMMAND_PREFIX
+    + r"(?:(?:cat|head|tail|less|more|strings|grep|rg|sed|awk|type|get-content|gc|"
+    r"select-string)(?:\.exe)?\b|unzip(?:\.exe)?\s+-p\b)",
     re.IGNORECASE,
 )
 
@@ -71,7 +79,21 @@ def _task_key(task_id: str) -> str:
 
 
 def _normalize(path: str) -> str:
+    """Return the lexical absolute path without following symlinks."""
+
     return os.path.normcase(os.path.normpath(os.path.abspath(os.path.expanduser(path))))
+
+
+def _canonical(path: str) -> str:
+    """Resolve existing symlink components while tolerating missing leaf paths."""
+
+    return os.path.normcase(os.path.normpath(os.path.realpath(_normalize(path))))
+
+
+def _path_forms(path: str) -> set[str]:
+    if not path:
+        return set()
+    return {_normalize(path), _canonical(path)}
 
 
 def _resolve_relative(raw: str, cwd: str) -> str:
@@ -111,7 +133,7 @@ def _extract_fetch_roots(command: str, cwd: str) -> list[str]:
             if resolved:
                 roots.append(resolved)
 
-    if re.search(r"(?:^|\s)curl\s", command or "", re.IGNORECASE):
+    if _CURL_COMMAND_RE.search(command or ""):
         destination_match = _CURL_DEST_RE.search(command)
         if destination_match:
             resolved = _resolve_relative(destination_match.group(1), cwd)
@@ -122,7 +144,7 @@ def _extract_fetch_roots(command: str, cwd: str) -> list[str]:
             if resolved:
                 roots.append(resolved)
 
-    if re.search(r"(?:^|\s)wget\s", command or "", re.IGNORECASE):
+    if _WGET_COMMAND_RE.search(command or ""):
         destination_match = _WGET_DEST_RE.search(command)
         resolved = _url_destination(
             command,
@@ -166,18 +188,64 @@ def _roots_for_task(task_id: str) -> set[str]:
     return _document_cache_roots() | dynamic
 
 
+def _contains(candidate: str, root: str) -> bool:
+    try:
+        return os.path.commonpath([candidate, root]) == root
+    except (ValueError, OSError):
+        return False
+
+
 def _path_under_any_root(path: str, roots: Iterable[str]) -> bool:
+    """Detect a protected path through either lexical or canonical containment."""
+
+    candidate_forms = _path_forms(path)
+    if not candidate_forms:
+        return False
+    for root in roots:
+        for normalized_root in _path_forms(root):
+            if any(_contains(candidate, normalized_root) for candidate in candidate_forms):
+                return True
+    return False
+
+
+def _path_safely_under_any_root(path: str, roots: Iterable[str]) -> bool:
+    """Require both lexical and resolved targets to stay within one protected root.
+
+    This stricter check is used before guarded native dispatch so a symlink that
+    starts inside an external tree but resolves to an unrelated local file cannot
+    turn the guarded tool into an arbitrary filesystem reader.
+    """
+
     if not path:
         return False
-    candidate = _normalize(path)
+    lexical_candidate = _normalize(path)
+    canonical_candidate = _canonical(path)
     for root in roots:
-        normalized_root = _normalize(root)
-        try:
-            common = os.path.commonpath([candidate, normalized_root])
-        except (ValueError, OSError):
-            continue
-        if common == normalized_root:
+        lexical_root = _normalize(root)
+        canonical_root = _canonical(root)
+        if _contains(lexical_candidate, lexical_root) and _contains(
+            canonical_candidate, canonical_root
+        ):
             return True
+    return False
+
+
+def _path_intersects_any_root(path: str, roots: Iterable[str]) -> bool:
+    """Return true when a search scope contains or is contained by a protected root."""
+
+    candidate_forms = _path_forms(path)
+    if not candidate_forms:
+        return False
+    for root in roots:
+        root_forms = _path_forms(root)
+        for candidate in candidate_forms:
+            for normalized_root in root_forms:
+                try:
+                    common = os.path.commonpath([candidate, normalized_root])
+                except (ValueError, OSError):
+                    continue
+                if common in {candidate, normalized_root}:
+                    return True
     return False
 
 
@@ -189,7 +257,7 @@ def _command_touches_root(command: str, cwd: str, roots: Iterable[str]) -> bool:
         token = token.strip().strip("'\"")
         if not token or token.startswith("-") or "://" in token:
             continue
-        if _path_under_any_root(_resolve_relative(token, cwd), roots):
+        if _path_intersects_any_root(_resolve_relative(token, cwd), roots):
             return True
     return False
 
@@ -200,7 +268,8 @@ def _blocked_message(tool_name: str) -> dict[str, str]:
         "message": (
             f"{tool_name} was blocked for content with external/untrusted provenance. "
             "Use pantheon_untrusted_read for a file or pantheon_untrusted_search for a "
-            "search so returned text is framed as data with no instruction authority."
+            "search inside the protected external root so returned text is framed as data "
+            "with no instruction authority."
         ),
     }
 
@@ -227,7 +296,7 @@ def pre_tool_call(
 
     if tool_name == "search_files":
         path = str(args.get("path") or ".")
-        if _path_under_any_root(path, roots):
+        if _path_intersects_any_root(path, roots):
             return _blocked_message(tool_name)
 
     if tool_name == "terminal":
@@ -326,9 +395,23 @@ def _native_read_args(args: dict) -> dict:
     return out
 
 
+def _guarded_task_id(kwargs: dict[str, Any]) -> str:
+    return str(kwargs.get("task_id") or "")
+
+
+def _require_guarded_path(tool_name: str, path: str, task_id: str) -> None:
+    if not _path_safely_under_any_root(path, _roots_for_task(task_id)):
+        raise PermissionError(
+            f"{tool_name} refused a path outside the known external/untrusted roots"
+        )
+
+
 def make_guarded_read_handler(ctx: Any):
     def handler(args: dict, **kwargs: Any) -> str:
-        del kwargs
+        args = args if isinstance(args, dict) else {}
+        path = str(args.get("path") or "")
+        task_id = _guarded_task_id(kwargs)
+        _require_guarded_path("pantheon_untrusted_read", path, task_id)
         token = _GUARDED_DISPATCH.set(True)
         try:
             result = ctx.dispatch_tool("read_file", _native_read_args(args))
@@ -345,8 +428,10 @@ def make_guarded_read_handler(ctx: Any):
 
 def make_guarded_search_handler(ctx: Any):
     def handler(args: dict, **kwargs: Any) -> str:
-        del kwargs
         forwarded = dict(args or {})
+        path = str(forwarded.get("path") or "")
+        task_id = _guarded_task_id(kwargs)
+        _require_guarded_path("pantheon_untrusted_search", path, task_id)
         token = _GUARDED_DISPATCH.set(True)
         try:
             result = ctx.dispatch_tool("search_files", forwarded)
