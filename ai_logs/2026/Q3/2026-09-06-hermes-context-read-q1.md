@@ -31,7 +31,7 @@ Only one project-context type is selected; `SOUL.md` is a separate HERMES_HOME s
 
 The exact pin also owns context truncation. Its no-explicit-config/no-context-length fallback is 20,000 characters; the source supports a model-window-derived dynamic cap and an explicit `context_file_max_chars` override. Over-cap content is represented with retained head and tail plus an explicit truncation marker rather than as a complete read.
 
-These are upstream-source observations. They are not yet observations of the user's Ubuntu target.
+These are upstream-source observations. They are not observations of the user's Ubuntu target.
 
 ## Repository change
 
@@ -62,6 +62,32 @@ The Q1 exercises:
 - head/tail truncation with an intentionally omitted middle sentinel for one over-cap file;
 - a non-empty context tier from the official offline prompt-size diagnostic.
 
+## Executed observation
+
+PR #982 workflow run `33998891896` completed successfully against the exact canonical pin. The installed package reported `Hermes Agent v0.21.0 (2026.8.31)` and the checkout SHA matched `29112bef099274229cadff79cdff7bf7b99c4b77`.
+
+Observed synthetic results:
+
+```text
+default/effective fallback cap = 20,000 chars
+below-cap AGENTS.md input = 1,057 chars
+below-cap EOF sentinel = present
+below-cap truncation marker = absent
+
+over-cap AGENTS.md input = 26,000 chars
+over-cap head sentinel = present
+over-cap middle sentinel = absent
+over-cap tail sentinel = present
+over-cap truncation marker = present
+
+offline prompt-size context tier = 133 bytes
+offline prompt-size system prompt = 2,782 bytes
+```
+
+The runtime also emitted its own truncation warning for the over-cap synthetic file. The Q1 confirmed HERMES.md priority, git-root-to-cwd AGENTS composition, cwd-only CLAUDE behavior and non-loading of README.md / DESIGN.md / SKILLS.md when no recognized project-context file exists.
+
+The observation artifact records source/output digests for the bounded cases and keeps `target_installation_observed=false`.
+
 ## Boundary preserved
 
 ```text
@@ -79,4 +105,4 @@ The emitted artifact fixes all authority/effect flags false and explicitly recor
 
 ## Status
 
-`prepared_pending_ci` at commit creation. The workflow must execute on the PR before this Q1 can claim exact-pin laboratory observation. Even after it passes, real Ubuntu/Hermes target observation remains open and must reuse the target/operator qualification path rather than being inferred from GitHub-hosted CI.
+`exact_pin_ci_observed_passed` for the synthetic GitHub-hosted Q1. Real Ubuntu/Hermes target observation remains open and must reuse the target/operator qualification path rather than being inferred from this CI result.
