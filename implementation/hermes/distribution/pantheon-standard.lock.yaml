@@ -32,13 +32,14 @@ components:
     kind: context_bridge
     path: implementation/hermes/plugins/pantheon-context-bridge
     digest_mode: tree
-    content_digest: sha256:ebca63061f1d64cd2a62953c93b656e4370f69a336a17c581fb591b0ff568681
+    content_digest: sha256:3436ed09e4fe1c494a5e5163a08878272f978b16b716c7207625a97657504581
     required: true
     enabled_by_default: false
     capabilities:
       - read-admitted-context
       - read-admitted-entity
-    notes: Reads only the exact active Context Pack identified by the Hermes host session.
+      - protect-model-bound-context
+    notes: Reads only the exact active Context Pack identified by the Hermes host session; model-bound context results are transformed into data-only untrusted transport before conversation append.
   - component_id: runtime-observer
     kind: runtime_observer
     path: implementation/mvp_vertical/hermes_runs_observer.py
@@ -71,7 +72,7 @@ required_checks:
   - check_id: context-plugin-contract
     kind: plugin_contract
     required: true
-    expected: The context bridge derives the admission identity from host context and exposes only bounded reads.
+    expected: The context bridge derives admission identity from host context, exposes only bounded reads and applies the data-only Context Admission transform before model context.
   - check_id: composed-read-only-run
     kind: end_to_end
     required: true
@@ -104,3 +105,4 @@ governance_refs:
   - docs/governance/TASK_CONTRACTS.md
   - docs/governance/CONTEXT_PACKS.md
   - docs/governance/APPROVALS.md
+  - implementation/docs/architecture/2026-09-05-context-admission-boundary.md
