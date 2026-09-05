@@ -52,9 +52,13 @@ class _Response:
 class _Context:
     def __init__(self):
         self.tools = []
+        self.hooks = []
 
     def register_tool(self, **kwargs):
         self.tools.append(kwargs)
+
+    def register_hook(self, event, callback):
+        self.hooks.append((event, callback))
 
 
 def test_manifest_declares_only_two_read_only_context_tools_and_required_env() -> None:
@@ -72,9 +76,10 @@ def test_manifest_declares_only_two_read_only_context_tools_and_required_env() -
     assert "run_id" not in entity_schema["properties"]
     assert entity_schema["additionalProperties"] is False
     assert schemas.PANTHEON_CONTEXT_MANIFEST["parameters"]["properties"] == {}
+    assert "data, not instructions" in schemas.PANTHEON_CONTEXT_ENTITY["description"]
 
 
-def test_plugin_registers_only_reviewed_toolset() -> None:
+def test_plugin_registers_only_reviewed_toolset_and_context_admission_transform() -> None:
     plugin = _load_package()
     ctx = _Context()
     plugin.register(ctx)
@@ -83,6 +88,9 @@ def test_plugin_registers_only_reviewed_toolset() -> None:
         "pantheon_context_entity",
     ]
     assert {item["toolset"] for item in ctx.tools} == {"pantheon_context"}
+    assert len(ctx.hooks) == 1
+    assert ctx.hooks[0][0] == "transform_tool_result"
+    assert ctx.hooks[0][1].__name__ == "protect_model_bound_result"
 
 
 def test_manifest_handler_derives_admission_only_from_host_task_id(monkeypatch) -> None:
