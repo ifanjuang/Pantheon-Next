@@ -218,6 +218,7 @@ review recommendation is not itself an approval requirement.
 
 A future `requires_review` status is reserved for a concrete consumer that
 enforces a human decision or quarantine before the relevant effect proceeds.
+Focused tests refuse `requires_review` on the current advisory path.
 
 ## Non-goals
 
@@ -257,6 +258,7 @@ This slice is complete when:
 - the transform always emits `instruction_authority=none`;
 - clean scan does not imply trust;
 - findings and scanner failure recommend review without claiming an enforced gate;
+- advisory paths cannot emit `requires_review`;
 - forged delimiters are neutralized;
 - unrelated Hermes tools are untouched;
 - the pinned distribution digest includes the transform;
