@@ -15,11 +15,12 @@ from copy import deepcopy
 from typing import Any, Iterable
 
 
-RELATION_SEMANTICS_VERSION = "apu-relation-semantics-v1"
+RELATION_SEMANTICS_VERSION = "apu-relation-semantics-candidate-v1"
 CONTEXT_SLICE_VERSION = "apu-object-context-v1"
 
-# Minimal reviewed semantics for relation names already present in the Project
-# Anatomy doctrine. Absence from this mapping means "opaque", not invalid.
+# Minimal candidate semantics for relation names already present in the Project
+# Anatomy doctrine. These properties are proposals until a governed relation
+# registry admits them. Absence from this mapping means "opaque", not invalid.
 _RELATION_SEMANTICS: dict[str, dict[str, Any]] = {
     "identity.represents": {
         "directionality": "directed",
@@ -85,7 +86,7 @@ class ProjectAnatomyContextError(ValueError):
 
 
 def relation_semantics(relation_type: str) -> dict[str, Any]:
-    """Return explanatory relation metadata without inferring a relation fact."""
+    """Return candidate relation metadata without inferring a relation fact."""
     relation_type = str(relation_type or "").strip()
     if not relation_type:
         raise ProjectAnatomyContextError("relation_type is required")
@@ -100,7 +101,7 @@ def relation_semantics(relation_type: str) -> dict[str, Any]:
         }
     return {
         "relation_type": relation_type,
-        "status": "reviewed_projection_semantics",
+        "status": "candidate_projection_semantics",
         "semantics_version": RELATION_SEMANTICS_VERSION,
         **deepcopy(semantics),
         "creates_relation_claim": False,
