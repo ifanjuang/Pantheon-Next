@@ -1,6 +1,6 @@
 name: pantheon-context-bridge
-version: "0.1.0"
-description: Read-only access to the exact Pantheon context admitted for the current Hermes session
+version: "0.2.0"
+description: Read-only access to exact admitted Pantheon context with data-only model transport
 provides_tools:
   - pantheon_context_manifest
   - pantheon_context_entity

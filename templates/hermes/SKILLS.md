@@ -26,4 +26,27 @@ Skills in this repository stay declarative. Executable Pantheon adapters belong 
 
 When either repository evolves, check active skills for stale routes or names, changed Claim/Evidence/ChangeCandidate semantics, changed capability and authorization gates, and dependencies presented as adopted merely because they are available.
 
+## Context read budget
+
+Instruction and orientation material is a context cost paid by the runtime that actually loads it. Keep that cost observable without turning a byte target into authority.
+
+Repository-side template review therefore uses two bounded rules:
+
+- the top-level `templates/hermes/*.md` orientation surface is kept under a small CI review ceiling; the ceiling is a regression ratchet, not a Hermes token limit and not proof that every file is loaded at startup;
+- each durable convention has one owner. Other templates reference the owner instead of copying the rule body merely for convenience.
+
+A deployed runtime or adapter that declares a mandatory instruction/read set must qualify the real set separately. Record the exact files, per-file bytes and the runtime-observed token/read behavior when measurable. Do not concatenate several mandatory files into one read merely to save tool calls when the runtime can silently truncate outputs; read them separately or use an equivalent complete-read mechanism.
+
+If the selected runtime/read API can silently truncate a mandatory file, qualification must include a complete-read check such as an end sentinel, returned byte count, digest, or another deterministic equivalent supported by that runtime. Absence of complete-read proof is a runtime limitation to surface, not permission to assume the tail was read.
+
+```text
+repository size check != deployed runtime observation
+file present != file read completely
+context loaded != instruction authorized
+smaller prompt != permission to drop governance
+rule duplicated != rule reinforced
+```
+
+When reducing the read set, remove duplication and move explanatory history off the mandatory path before weakening live constraints. Verify the inventory of retained rules/references after the cut; a smaller file is not an improvement if a required boundary disappeared.
+
 Runtime Profile and Runtime Observation support described by open PRs remains candidate until those PRs merge. A textual review is not runtime acceptance against an exact external installation.
