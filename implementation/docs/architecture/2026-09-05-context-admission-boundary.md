@@ -132,7 +132,7 @@ instruction_authority = none
 transport_class = untrusted_data
 scanner_authority = advisory_only
 scan_status = no_findings | findings | unavailable | error
-disposition = admitted_untrusted | requires_review
+disposition = admitted_untrusted | review_recommended
 ```
 
 Invariant:
@@ -142,6 +142,7 @@ scanner clean != trusted
 retrieved/context data != instruction
 Context Pack inclusion != Evidence
 successful tool read != authorization
+review recommendation != enforced human gate
 ```
 
 No path in this contract can emit instruction authority.
@@ -161,7 +162,7 @@ The handler boundary:
    `<untrusted_tool_result>` boundary used by Hermes;
 5. labels the result explicitly as data with `instruction_authority="none"`;
 6. marks a clean scan `admitted_untrusted`, never trusted;
-7. marks findings, scanner failure or scanner absence `requires_review`;
+7. marks findings, scanner failure or scanner absence `review_recommended`;
 8. does not redact or mutate the preserved source or Pantheon owner record.
 
 The scanner is defense in depth. The data-only transport boundary is the primary
@@ -195,22 +196,28 @@ If Hermes' threat scanner is unavailable or raises:
 
 ```text
 scan_status = unavailable | error
-disposition = requires_review
+disposition = review_recommended
 instruction_authority = none
 ```
 
 The boundary therefore does not silently upgrade trust because a scanner failed.
+`review_recommended` is an advisory classification only. This v1 slice does not
+block transport or claim that a human review gate has been executed.
 
 If the scanner finds an attack pattern:
 
 ```text
 scan_status = findings
-disposition = requires_review
+disposition = review_recommended
 instruction_authority = none
 ```
 
 The content remains analyzable as quoted/source material inside the untrusted
-boundary. A finding does not become a truth verdict about the document.
+boundary. A finding does not become a truth verdict about the document, and a
+review recommendation is not itself an approval requirement.
+
+A future `requires_review` status is reserved for a concrete consumer that
+enforces a human decision or quarantine before the relevant effect proceeds.
 
 ## Non-goals
 
@@ -249,7 +256,7 @@ This slice is complete when:
 - both Pantheon context tools register protected model-bound handlers;
 - the transform always emits `instruction_authority=none`;
 - clean scan does not imply trust;
-- findings and scanner failure require review;
+- findings and scanner failure recommend review without claiming an enforced gate;
 - forged delimiters are neutralized;
 - unrelated Hermes tools are untouched;
 - the pinned distribution digest includes the transform;
