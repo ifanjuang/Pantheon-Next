@@ -176,6 +176,62 @@ def test_fetch_root_without_task_id_still_uses_bounded_default_scope(plugin, tmp
     assert blocked and blocked["action"] == "block"
 
 
+def test_bare_curl_stdout_does_not_invent_local_file_provenance(plugin, tmp_path) -> None:
+    workdir = tmp_path / "work"
+    workdir.mkdir()
+    task_id = "task-curl-stdout"
+
+    assert plugin.external_content.pre_tool_call(
+        "terminal",
+        {"command": "curl https://example.test/payload.txt", "workdir": str(workdir)},
+        task_id=task_id,
+    ) is None
+    assert plugin.external_content.pre_tool_call(
+        "read_file",
+        {"path": str(workdir / "payload.txt")},
+        task_id=task_id,
+    ) is None
+
+
+def test_curl_explicit_output_is_tracked_as_best_effort_provenance(plugin, tmp_path) -> None:
+    workdir = tmp_path / "work"
+    workdir.mkdir()
+    task_id = "task-curl-file"
+
+    assert plugin.external_content.pre_tool_call(
+        "terminal",
+        {
+            "command": "curl https://example.test/payload.txt -o external.txt",
+            "workdir": str(workdir),
+        },
+        task_id=task_id,
+    ) is None
+    blocked = plugin.external_content.pre_tool_call(
+        "read_file",
+        {"path": str(workdir / "external.txt")},
+        task_id=task_id,
+    )
+    assert blocked and blocked["action"] == "block"
+
+
+def test_execute_code_is_not_claimed_as_filesystem_mediation(plugin, tmp_path) -> None:
+    workdir = tmp_path / "work"
+    workdir.mkdir()
+    task_id = "task-code-gap"
+    assert plugin.external_content.pre_tool_call(
+        "terminal",
+        {"command": "git clone https://example.test/poison.git extrepo", "workdir": str(workdir)},
+        task_id=task_id,
+    ) is None
+
+    result = plugin.external_content.pre_tool_call(
+        "execute_code",
+        {"code": f"print(open({str(workdir / 'extrepo' / 'README.md')!r}).read())"},
+        task_id=task_id,
+    )
+    assert result is None
+
+
 def test_search_under_document_cache_is_blocked(plugin, monkeypatch, tmp_path) -> None:
     hermes_home = tmp_path / "hermes"
     cache = hermes_home / "cache" / "documents"
