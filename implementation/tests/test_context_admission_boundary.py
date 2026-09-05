@@ -57,6 +57,7 @@ def test_prompt_injection_finding_recommends_review_but_never_gains_instruction_
     assert wrapped is not None
     assert 'findings="prompt_injection"' in wrapped
     assert 'disposition="review_recommended"' in wrapped
+    assert 'disposition="requires_review"' not in wrapped
     assert 'instruction_authority="none"' in wrapped
     assert "Ignore all previous instructions" in wrapped
 
@@ -73,6 +74,7 @@ def test_missing_scanner_recommends_review_without_exposing_instruction_authorit
     assert wrapped is not None
     assert 'scan_status="unavailable"' in wrapped
     assert 'disposition="review_recommended"' in wrapped
+    assert 'disposition="requires_review"' not in wrapped
     assert 'instruction_authority="none"' in wrapped
 
 
