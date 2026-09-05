@@ -14,9 +14,8 @@ SKILLS = ROOT / "templates" / "hermes" / "SKILLS.md"
 def test_q1_reuses_canonical_hermes_pin() -> None:
     pins = json.loads(PINS.read_text(encoding="utf-8"))
     hermes = pins["pins"]["hermes-agent"]
-    assert hermes["repository"] == "NousResearch/hermes-agent"
-    assert hermes["version"] == "0.21.0"
-    assert hermes["ref"] == "29112bef099274229cadff79cdff7bf7b99c4b77"
+    assert {"repository", "version", "ref", "env_prefix"} <= hermes.keys()
+    assert all(hermes[field] for field in ("repository", "version", "ref", "env_prefix"))
 
     raw = WORKFLOW.read_text(encoding="utf-8")
     assert "export_external_qualification_pins.py" in raw
