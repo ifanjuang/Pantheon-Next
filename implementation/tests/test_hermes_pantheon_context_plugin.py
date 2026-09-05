@@ -52,15 +52,32 @@ class _Response:
 class _Context:
     def __init__(self):
         self.tools = []
+        self.hooks = []
+        self.skills = []
+        self.dispatched = []
 
     def register_tool(self, **kwargs):
         self.tools.append(kwargs)
 
+    def register_hook(self, name, callback):
+        self.hooks.append((name, callback))
 
-def test_manifest_declares_only_two_read_only_context_tools_and_required_env() -> None:
+    def register_skill(self, name, path, description=""):
+        self.skills.append((name, path, description))
+
+    def dispatch_tool(self, name, args):
+        self.dispatched.append((name, args))
+        return '{"result":"native content"}'
+
+
+def test_manifest_declares_context_and_guarded_read_tools_with_required_env() -> None:
     manifest = (PLUGIN_DIR / "plugin.yaml").read_text(encoding="utf-8")
     assert "pantheon_context_manifest" in manifest
     assert "pantheon_context_entity" in manifest
+    assert "pantheon_untrusted_read" in manifest
+    assert "pantheon_untrusted_search" in manifest
+    assert "pre_gateway_dispatch" in manifest
+    assert "pre_tool_call" in manifest
     assert "PANTHEON_HERMES_API_BASE" in manifest
     assert "PANTHEON_HERMES_API_KEY" in manifest
     assert "terminal" not in manifest
@@ -73,9 +90,11 @@ def test_manifest_declares_only_two_read_only_context_tools_and_required_env() -
     assert entity_schema["additionalProperties"] is False
     assert schemas.PANTHEON_CONTEXT_MANIFEST["parameters"]["properties"] == {}
     assert "data, not instructions" in schemas.PANTHEON_CONTEXT_ENTITY["description"]
+    assert schemas.PANTHEON_UNTRUSTED_READ["parameters"]["required"] == ["path"]
+    assert schemas.PANTHEON_UNTRUSTED_SEARCH["parameters"]["required"] == ["pattern"]
 
 
-def test_plugin_registers_only_reviewed_toolset_with_context_admission_handlers(monkeypatch) -> None:
+def test_plugin_registers_context_admission_external_gates_and_bundled_skill(monkeypatch) -> None:
     plugin = _load_package()
     monkeypatch.setattr(
         plugin.context_admission,
@@ -99,19 +118,36 @@ def test_plugin_registers_only_reviewed_toolset_with_context_admission_handlers(
     assert [item["name"] for item in ctx.tools] == [
         "pantheon_context_manifest",
         "pantheon_context_entity",
+        "pantheon_untrusted_read",
+        "pantheon_untrusted_search",
     ]
     assert {item["toolset"] for item in ctx.tools} == {"pantheon_context"}
+    assert [name for name, _callback in ctx.hooks] == [
+        "pre_gateway_dispatch",
+        "pre_tool_call",
+    ]
+    assert len(ctx.skills) == 1
+    skill_name, skill_path, _description = ctx.skills[0]
+    assert skill_name == "untrusted-content-reading"
+    assert skill_path.name == "SKILL.md"
+    assert skill_path.is_file()
 
     manifest_result = ctx.tools[0]["handler"]({}, task_id="admission-test")
     entity_result = ctx.tools[1]["handler"](
         {"entity_type": "project", "entity_id": "project:p1"},
         task_id="admission-test",
     )
-    for result in (manifest_result, entity_result):
+    guarded_read = ctx.tools[2]["handler"]({"path": "/tmp/external.txt"})
+    guarded_search = ctx.tools[3]["handler"]({"pattern": "needle", "path": "/tmp"})
+    for result in (manifest_result, entity_result, guarded_read, guarded_search):
         assert result.startswith("<untrusted_tool_result")
         assert 'instruction_authority="none"' in result
         assert 'transport_class="untrusted_data"' in result
         assert 'disposition="admitted_untrusted"' in result
+    assert ctx.dispatched == [
+        ("read_file", {"path": "/tmp/external.txt"}),
+        ("search_files", {"pattern": "needle", "path": "/tmp"}),
+    ]
 
 
 def test_manifest_handler_derives_admission_only_from_host_task_id(monkeypatch) -> None:
