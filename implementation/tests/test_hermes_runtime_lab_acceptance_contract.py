@@ -180,7 +180,8 @@ def test_harness_fails_closed_and_does_not_claim_target_acceptance() -> None:
     assert '"evidence_admitted": False' in raw
     assert '"source_artifact_digest": source_digest' in raw
     assert '"hermes_version": expected_version' in raw
-    assert "EXPECTED_TOOLS" in raw
+    assert "EXPECTED_ALLOWED_TOOLS" in raw
+    assert "EXPECTED_REQUIRED_TOOLS" in raw
     assert "EXPECTED_COMPONENTS" in raw
     assert "X-Hermes-Session-Key reached a fixture" in raw
     assert 'rollback.get("plugin_disabled") is True' in raw
