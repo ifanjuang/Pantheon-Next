@@ -93,7 +93,9 @@ If the current path is refused, end Q1C with that observed finding. Host network
 
 Resolve the Unsloth target from the external pin registry and check out that exact source into an isolated venv, Studio home and model cache.
 
-Bind the Unsloth API only to the host-side Docker bridge gateway needed by the current Hermes container; do not use wildcard/LAN exposure merely for the lab.
+After dependency installation and `unsloth studio setup`, capture the effective runtime closure before claiming reproducibility: Python version, installed Python package versions, Torch version and CUDA view, and the identity/hash of the effective `llama-server`/llama.cpp runtime when discoverable. If a dynamically resolved component cannot be identified, record that check as `unresolved`; do not infer it from the Unsloth source pin.
+
+Bind the Unsloth API to the host-side Docker bridge gateway needed by the current Hermes container; do not use wildcard/LAN exposure merely for the lab. This is a bridge-scoped exposure, not proof that Hermes is the only container able to reach it. Record the bridge/network identity actually used.
 
 Do not use `unsloth start hermes`. Use the selected Hermes runtime already present in the container, create a fresh temporary `pantheon-q1-unsloth` profile, and configure only that profile with a named custom OpenAI-compatible provider. Do not clone `pantheon-governed`, because Hermes profile cloning would copy `.env` and other configuration that Q1 does not need.
 
@@ -114,7 +116,7 @@ Before any later deployment PR, the review must explicitly resolve or retain as 
 - Ollama process/port ownership between the Pantheon bootstrap candidate and PAIR;
 - Hermes container access to PAIR's local client ingress;
 - rollback behavior;
-- exact runtime artifact identities;
+- exact runtime artifact identities, including dynamically resolved Unsloth dependencies actually used in Q1D;
 - supported model/engine scope;
 - network exposure and telemetry posture;
 - whether the resulting topology removes duplication rather than adding another routing path.
