@@ -707,9 +707,63 @@ PATH="$Q1_UNSLOTH_VENV/bin:$PATH" unsloth --help \
 
 The Studio runtime, llama.cpp build and HF model cache must remain under Q1-controlled paths where the selected Unsloth code permits it. Record any dependency that escapes these paths as an observation.
 
-### 9.2 Bind Unsloth only to the Docker bridge gateway
+### 9.1.1 Capture the effective runtime dependency closure
+
+`UNSLOTH_REF` identifies the selected Unsloth source, not every dependency dynamically resolved by the environment or Studio setup. Capture what will actually execute before treating Q1D as reproducible.
+
+```bash
+"$Q1_UNSLOTH_VENV/bin/python" - <<'PY' \
+  > "$Q1_ARTIFACTS/q1d-python-runtime-closure.json"
+import importlib.metadata as md
+import json
+import platform
+import sys
+
+payload = {
+    "python": sys.version,
+    "platform": platform.platform(),
+    "packages": sorted(
+        {
+            (dist.metadata.get("Name") or "<unnamed>"): dist.version
+            for dist in md.distributions()
+        }.items()
+    ),
+}
+try:
+    import torch
+    payload["torch"] = {
+        "version": torch.__version__,
+        "cuda": torch.version.cuda,
+        "cuda_available": torch.cuda.is_available(),
+    }
+except Exception as exc:
+    payload["torch_error"] = type(exc).__name__
+
+print(json.dumps(payload, indent=2, sort_keys=True))
+PY
+
+: > "$Q1_ARTIFACTS/q1d-llama-runtime-files.txt"
+while IFS= read -r -d '' file; do
+  printf '%s\t' "$file" >> "$Q1_ARTIFACTS/q1d-llama-runtime-files.txt"
+  sha256sum "$file" >> "$Q1_ARTIFACTS/q1d-llama-runtime-files.txt"
+done < <(
+  find "$Q1_UNSLOTH_HOME" "$XDG_CACHE_HOME" "$Q1_UNSLOTH_VENV" \
+    -type f \( -name 'llama-server' -o -name 'llama-cli' \) -print0 2>/dev/null
+)
+
+if [ ! -s "$Q1_ARTIFACTS/q1d-llama-runtime-files.txt" ]; then
+  printf 'unresolved_before_server_start\n' \
+    > "$Q1_ARTIFACTS/q1d-llama-runtime-files.txt"
+fi
+```
+
+PASS `runtime_dependency_closure_captured` requires the Python/Torch/CUDA environment to be recorded and the effective llama.cpp/`llama-server` runtime to be identified either here or from the running server process in section 9.2. If a dynamically resolved runtime cannot be identified, record the check as `unresolved`; do not infer it from the Unsloth source pin.
+
+### 9.2 Bind Unsloth to the Docker bridge gateway (bridge-scoped)
 
 Use the host-side bridge gateway already reachable from the Hermes container rather than `0.0.0.0`.
+
+This is a bridge-scoped exposure. It is not proof that only `pantheon-hermes` can reach the endpoint; other containers attached to a compatible bridge may also be able to reach it. Record the actual bridge identity instead of calling the endpoint Hermes-only.
 
 ```bash
 export Q1_DOCKER_GATEWAY="$(docker network inspect bridge -f '{{(index .IPAM.Config 0).Gateway}}')"
@@ -719,6 +773,8 @@ case "$Q1_DOCKER_GATEWAY" in
 esac
 printf '%s\n' "$Q1_DOCKER_GATEWAY" \
   > "$Q1_ARTIFACTS/q1d-docker-gateway.txt"
+docker network inspect bridge --format '{{json .IPAM.Config}}' \
+  > "$Q1_ARTIFACTS/q1d-docker-bridge-ipam.json"
 ```
 
 Start in tmux:
@@ -742,6 +798,17 @@ unsloth run \
   --port "$UNSLOTH_Q1_PORT" \
   --api-key-name pantheon-q1
 ```
+
+From another shell, capture the actual serving process/listener without storing response content:
+
+```bash
+ps -eo pid,args | grep -E '[u]nsloth|[l]lama-server' \
+  > "$Q1_ARTIFACTS/q1d-server-process.txt" || true
+sudo ss -ltnp | grep -E ":${UNSLOTH_Q1_PORT}\\b" \
+  > "$Q1_ARTIFACTS/q1d-server-listener.txt" || true
+```
+
+If section 9.1.1 could not identify the llama.cpp runtime, use this process observation to locate and hash the actual `llama-server` executable. If that still cannot be established, keep `runtime_dependency_closure_captured = unresolved`.
 
 Copy the temporary API key shown by Unsloth into the operator shell without writing it to disk:
 
@@ -1077,7 +1144,9 @@ A Q1C loopback refusal rejects the current container/plaintext path; it does not
 Unsloth may be classified `accepted` for a later provider/deployment-design PR only if observations establish:
 
 - exact selected source identity;
+- effective runtime dependency closure, including Python/Torch/CUDA and the actual llama.cpp/`llama-server` identity when discoverable;
 - isolated OpenAI-compatible endpoint;
+- bridge-scoped bind explicitly distinguished from Hermes-only access;
 - streaming;
 - structured tool-call output;
 - Hermes one-shot through the named custom provider;
