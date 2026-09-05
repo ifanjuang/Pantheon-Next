@@ -75,18 +75,27 @@ document text.
 
 ### Local/extracted file reads
 
-Known external paths include:
+Known external paths include high-confidence Hermes ingress locations:
 
 - the Hermes document cache under the active `HERMES_HOME`;
 - an explicit `HERMES_DOCUMENT_CACHE_DIR`;
-- the standard sandbox-visible `/root/.hermes/cache/documents` path;
-- bounded per-task roots learned from common `git clone`, `gh repo clone`,
-  `curl`, and `wget` terminal commands.
+- the standard sandbox-visible `/root/.hermes/cache/documents` path.
 
-`pre_tool_call` blocks direct model reads/searches of those paths through
-`read_file`, `search_files`, and common shell content-reader commands. Literal
-known-root references in `execute_code` receive bounded defense-in-depth, but
-this is not claimed as complete filesystem mediation.
+The plugin also keeps bounded per-task **best-effort provenance hints** for a
+small set of common terminal fetches: `git clone`, `gh repo clone`, `wget`, and
+`curl` only when curl is expected to create a file (`-o` / `--output` or
+`-O` / `--remote-name`). A bare `curl URL` writes to stdout and therefore does
+not invent a local external-file root.
+
+`pre_tool_call` blocks direct model reads/searches of covered paths through
+`read_file`, `search_files`, and common shell content-reader commands. These
+heuristics are defense-in-depth hints, not a provenance authority and not a
+complete shell parser.
+
+`execute_code` is intentionally not claimed as mediated by this v1 plugin. A
+literal-path regex would create an impression of coverage without controlling
+dynamic path construction, imports, subprocesses, or copied taint. That surface
+remains an explicit gap for a future native Hermes provenance mechanism.
 
 The plugin does not override Hermes built-ins and requests no `tools.override`
 capability.
@@ -109,13 +118,29 @@ the model when to select the guarded tools and restates the authority
 invariants. The skill is guidance only; deleting or ignoring it must not remove
 the executable hook/tool gates.
 
+## Qualified tool surface
+
+The governed Hermes profile may expose four Pantheon plugin tools:
+
+```text
+pantheon_context_manifest
+pantheon_context_entity
+pantheon_untrusted_read
+pantheon_untrusted_search
+```
+
+For the existing synthetic context-binding acceptance, only the first two remain
+required. The guarded read/search tools are allowed but not required; adding a
+capability to the reviewed plugin surface must not silently turn that capability
+into a mandatory execution step.
+
 ## Failure posture
 
 - Missing/failed Hermes threat scanner: content remains untrusted and receives
   `review_recommended`; no trust upgrade occurs.
 - Forged Context Admission delimiters in source text are neutralized before
   framing.
-- Missing task id: fetch provenance uses one bounded default runtime scope
+- Missing task id: fetch provenance hints use one bounded default runtime scope
   rather than silently disabling tracking.
 - Ambiguous gateway caption: combined text is demoted to data rather than
   guessing which bytes came from the user.
@@ -128,11 +153,11 @@ the executable hook/tool gates.
 This slice is not a filesystem sandbox, DLP system, malware scanner, approval
 engine, Evidence admission path, or complete shell parser.
 
-Known limits include dynamically constructed paths inside arbitrary
-`execute_code`, shell indirection such as `sh -c`, redirections not recognized by
-the bounded fetch parser, archive extraction into a different tree, and content
-copied from an untrusted root into an unrelated path. These remain explicit
-uncertainties rather than hidden claims.
+Known limits include arbitrary `execute_code`, shell indirection such as
+`sh -c`, redirections not recognized by the bounded fetch parser, archive
+extraction into a different tree, and content copied from an untrusted root into
+an unrelated path. These remain explicit uncertainties rather than hidden
+claims.
 
 A future native Hermes provenance API should replace the compatibility
 root-tracking portion while keeping Pantheon's authority invariant unchanged.
@@ -149,6 +174,8 @@ The candidate slice is complete when:
 5. inline attachment data is separated from a provable user caption or fully
    demoted when ambiguous;
 6. the skill is bundled in the same plugin tree;
-7. focused tests pass and the distribution tree digest is updated;
-8. no installation, activation, task, Evidence, approval, or execution
+7. runtime/lab allowlists distinguish the four allowed plugin tools from the
+   two context tools required by the synthetic context run;
+8. focused tests pass and the distribution tree digest is updated;
+9. no installation, activation, task, Evidence, approval, or execution
    authority is added.
