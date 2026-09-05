@@ -1,12 +1,18 @@
 """Pantheon context bridge — Hermes plugin registration.
 
-This plugin exposes read-only context tools only. Installation or enablement of the
-plugin is an external Hermes capability action and is not performed by this repo.
-Every registered model-bound handler applies Context Admission before its result
-leaves the Pantheon plugin.
+The plugin exposes bounded Pantheon context reads plus guarded read/search paths
+for content with external provenance. Installation or enablement remains an
+external Hermes capability action and is not performed by this repository.
+
+Executable security invariants live in plugin handlers/hooks. The bundled skill
+is guidance only and grants no authority.
 """
 
-from . import context_admission, schemas, tools
+from pathlib import Path
+
+from . import context_admission, external_content, schemas, tools
+
+_PLUGIN_DIR = Path(__file__).resolve().parent
 
 
 def _protected_handler(tool_name, handler):
@@ -43,4 +49,32 @@ def register(ctx):
             tools.pantheon_context_entity,
         ),
         description="Read one exact entity already admitted for this Hermes session.",
+    )
+    ctx.register_tool(
+        name="pantheon_untrusted_read",
+        toolset="pantheon_context",
+        schema=schemas.PANTHEON_UNTRUSTED_READ,
+        handler=external_content.make_guarded_read_handler(ctx),
+        description=(
+            "Read an uploaded, downloaded, cloned, emailed, or otherwise external file "
+            "through data-only Context Admission."
+        ),
+    )
+    ctx.register_tool(
+        name="pantheon_untrusted_search",
+        toolset="pantheon_context",
+        schema=schemas.PANTHEON_UNTRUSTED_SEARCH,
+        handler=external_content.make_guarded_search_handler(ctx),
+        description=(
+            "Search externally sourced files through data-only Context Admission."
+        ),
+    )
+
+    ctx.register_hook("pre_gateway_dispatch", external_content.pre_gateway_dispatch)
+    ctx.register_hook("pre_tool_call", external_content.pre_tool_call)
+
+    ctx.register_skill(
+        "untrusted-content-reading",
+        _PLUGIN_DIR / "skills" / "untrusted-content-reading" / "SKILL.md",
+        "Use guarded read/search paths for uploaded or otherwise external content.",
     )
