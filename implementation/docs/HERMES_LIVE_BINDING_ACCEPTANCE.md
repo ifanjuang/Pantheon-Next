@@ -98,16 +98,32 @@ No professional/real dossier should be used for this proof.
 
 ## Reviewed tool surface
 
-Without an explicit `--allowed-tool`, the helper accepts only:
+Without an explicit `--allowed-tool`, the helper accepts the reviewed Pantheon
+context plugin surface:
+
+```text
+pantheon_context_manifest
+pantheon_context_entity
+pantheon_untrusted_read
+pantheon_untrusted_search
+```
+
+Only the two context tools remain required for the synthetic context-binding
+acceptance:
 
 ```text
 pantheon_context_manifest
 pantheon_context_entity
 ```
 
-Additional tools must be named individually with repeated `--allowed-tool` arguments and therefore remain an operator-reviewed expansion.
+The guarded read/search tools are allowed because they are part of the installed
+reviewed plugin surface, but the synthetic acceptance does not have to invoke
+them. Additional tools outside this four-tool surface must still be named
+individually with repeated `--allowed-tool` arguments and therefore remain an
+operator-reviewed expansion.
 
 ```text
+allowed tool != required tool
 plugin installed != profile qualified
 profile reachable != safe
 prompt says read-only != tool authority removed
@@ -287,7 +303,8 @@ No secrets are intentionally projected.
 
 - the actual synthetic run;
 - its configured provider/model selection;
-- the two reviewed context tools when the synthetic prompt calls them;
+- the reviewed Pantheon plugin tools exposed by the qualified profile;
+- the two required context tools when the synthetic prompt calls them;
 - runtime status/events/output.
 
 ### External acceptance helper executes
