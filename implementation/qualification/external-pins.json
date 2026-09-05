@@ -14,6 +14,20 @@
         "ref": ["HERMES_RELEASE_COMMIT", "HERMES_COMMIT"]
       }
     },
+    "personal-ai-router": {
+      "kind": "git",
+      "env_prefix": "PAIR",
+      "repository": "NVIDIA/Personal-AI-Router",
+      "version": "0.1.1",
+      "ref": "13b68115fa2c9c1d94f1ead1358f8d5a527cfecf"
+    },
+    "unsloth": {
+      "kind": "git",
+      "env_prefix": "UNSLOTH",
+      "repository": "unslothai/unsloth",
+      "version": "0.1.806-beta",
+      "ref": "d90c0320664ef9812a1fb1d2a31f0977feaf7916"
+    },
     "hindsight": {
       "kind": "container",
       "env_prefix": "HINDSIGHT",
