@@ -94,7 +94,9 @@ def test_manifest_declares_context_and_guarded_read_tools_with_required_env() ->
     assert schemas.PANTHEON_UNTRUSTED_SEARCH["parameters"]["required"] == ["pattern"]
 
 
-def test_plugin_registers_context_admission_external_gates_and_bundled_skill(monkeypatch) -> None:
+def test_plugin_registers_context_admission_external_gates_and_bundled_skill(
+    monkeypatch, tmp_path
+) -> None:
     plugin = _load_package()
     monkeypatch.setattr(
         plugin.context_admission,
@@ -132,21 +134,32 @@ def test_plugin_registers_context_admission_external_gates_and_bundled_skill(mon
     assert skill_path.name == "SKILL.md"
     assert skill_path.is_file()
 
-    manifest_result = ctx.tools[0]["handler"]({}, task_id="admission-test")
+    task_id = "admission-test"
+    external_root = tmp_path / "external"
+    external_root.mkdir()
+    external_file = external_root / "external.txt"
+    plugin.external_content._TASK_ROOTS.clear()
+    plugin.external_content._remember_roots(task_id, [str(external_root)])
+
+    manifest_result = ctx.tools[0]["handler"]({}, task_id=task_id)
     entity_result = ctx.tools[1]["handler"](
         {"entity_type": "project", "entity_id": "project:p1"},
-        task_id="admission-test",
+        task_id=task_id,
     )
-    guarded_read = ctx.tools[2]["handler"]({"path": "/tmp/external.txt"})
-    guarded_search = ctx.tools[3]["handler"]({"pattern": "needle", "path": "/tmp"})
+    guarded_read = ctx.tools[2]["handler"](
+        {"path": str(external_file)}, task_id=task_id
+    )
+    guarded_search = ctx.tools[3]["handler"](
+        {"pattern": "needle", "path": str(external_root)}, task_id=task_id
+    )
     for result in (manifest_result, entity_result, guarded_read, guarded_search):
         assert result.startswith("<untrusted_tool_result")
         assert 'instruction_authority="none"' in result
         assert 'transport_class="untrusted_data"' in result
         assert 'disposition="admitted_untrusted"' in result
     assert ctx.dispatched == [
-        ("read_file", {"path": "/tmp/external.txt"}),
-        ("search_files", {"pattern": "needle", "path": "/tmp"}),
+        ("read_file", {"path": str(external_file)}),
+        ("search_files", {"pattern": "needle", "path": str(external_root)}),
     ]
 
 
