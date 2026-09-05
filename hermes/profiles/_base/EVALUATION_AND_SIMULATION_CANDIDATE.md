@@ -20,6 +20,7 @@ It may support:
 ```text
 pre-execution simulation
 trajectory evaluation
+post-decision proposal/outcome feedback
 guardrail signaling
 risk note generation
 Evidence Pack Candidate preparation
@@ -64,6 +65,7 @@ simulation_runner
 persona_suite
 scenario_set
 trajectory_eval
+proposal_outcome_feedback
 guardrail_signal
 trace_summary
 simulation_evidence_summary
@@ -130,6 +132,46 @@ Scenario sets should remain minimal. Expanding beyond the Task Contract requires
 May inspect the path rather than only final text, including source selection, assumption handling, scope preservation, tool-use sequence, risk escalation, approval boundary and memory boundary.
 
 A trajectory evaluation is a review signal, never final authority.
+
+### proposal_outcome_feedback
+
+May evaluate real reviewed cases after the human decision or bounded effect is known, using the records already owned by the data platform / approval / audit responsibilities rather than creating a second feedback ledger.
+
+The smallest useful comparison keeps references to:
+
+```text
+candidate/proposal identity and version
+human disposition or decision reference
+actual resulting object/effect reference when one exists
+later correction/reversal reference when one exists
+```
+
+Derived review metrics may include:
+
+```text
+acceptance
+material override
+abstention / held / unresolved
+reformulation or reclassification
+proposal-to-decision duration
+later correction or reversal
+```
+
+Metrics should be recomputed from the referenced proposal and actual outcome where possible. Do not treat a manually stamped outcome label as stronger than the underlying records when they disagree. Report the evaluated class, time window and sample size so small or heterogeneous samples are not presented as a universal model score.
+
+An override is a disagreement signal to inspect, not automatically a model error: the proposal may have been underspecified, the human may have changed scope, new Evidence may have arrived, or the correct professional action may genuinely be to abstain. Read material disagreements individually before proposing a reusable change.
+
+This feedback may support an `Improvement Candidate`, but it must not automatically rewrite prompts, skills, policies, doctrine, routing, model bindings or memory. Persistent acceptance is not approval authority; persistent disagreement is not permission to bypass the human gate.
+
+Existing proposal, approval, execution and audit records remain owned by their current Pantheon/data-platform contracts, including `docs/governance/DATA_PLATFORM_ARCHITECTURE.md`. This candidate only describes a derived evaluation view over those records.
+
+```text
+metric != truth
+override != model error
+acceptance != Evidence
+feedback observation != memory promotion
+correlation != authorization
+```
 
 ### guardrail_signal
 
