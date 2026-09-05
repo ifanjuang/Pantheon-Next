@@ -14,7 +14,8 @@ plugin hooks to keep known-external content on a data-only path:
 Known-untrusted paths are the Hermes document cache plus bounded roots learned
 from common external fetch commands during the current task. This is a
 compatibility boundary, not a replacement for a future native Hermes provenance
-API. ``execute_code`` and exotic shell indirections remain out of scope.
+API. ``execute_code`` with dynamically constructed paths and exotic shell
+indirections remain out of scope.
 """
 
 from __future__ import annotations
@@ -54,6 +55,11 @@ _GUARDED_DISPATCH: ContextVar[bool] = ContextVar(
 _ROOTS_LOCK = threading.Lock()
 _TASK_ROOTS: dict[str, set[str]] = {}
 _MAX_TRACKED_TASKS = 256
+_DEFAULT_TASK_KEY = "__pantheon_default_task__"
+
+
+def _task_key(task_id: str) -> str:
+    return str(task_id or "").strip() or _DEFAULT_TASK_KEY
 
 
 def _normalize(path: str) -> str:
@@ -118,17 +124,19 @@ def _document_cache_roots() -> set[str]:
 
 def _remember_roots(task_id: str, roots: Iterable[str]) -> None:
     clean = {root for root in roots if root}
-    if not task_id or not clean:
+    if not clean:
         return
+    key = _task_key(task_id)
     with _ROOTS_LOCK:
-        if task_id not in _TASK_ROOTS and len(_TASK_ROOTS) >= _MAX_TRACKED_TASKS:
+        if key not in _TASK_ROOTS and len(_TASK_ROOTS) >= _MAX_TRACKED_TASKS:
             _TASK_ROOTS.pop(next(iter(_TASK_ROOTS)))
-        _TASK_ROOTS.setdefault(task_id, set()).update(clean)
+        _TASK_ROOTS.setdefault(key, set()).update(clean)
 
 
 def _roots_for_task(task_id: str) -> set[str]:
+    key = _task_key(task_id)
     with _ROOTS_LOCK:
-        dynamic = set(_TASK_ROOTS.get(task_id or "", set()))
+        dynamic = set(_TASK_ROOTS.get(key, set()))
     return _document_cache_roots() | dynamic
 
 
@@ -192,10 +200,9 @@ def pre_tool_call(
             return _blocked_message(tool_name)
 
     if tool_name == "search_files":
-        for key in ("path", "directory", "root", "cwd"):
-            value = args.get(key)
-            if isinstance(value, str) and _path_under_any_root(value, roots):
-                return _blocked_message(tool_name)
+        path = str(args.get("path") or ".")
+        if _path_under_any_root(path, roots):
+            return _blocked_message(tool_name)
 
     if tool_name == "terminal":
         command = str(args.get("command") or "")
