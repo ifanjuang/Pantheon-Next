@@ -337,11 +337,25 @@ def test_unexecuted_compound_fetch_cannot_authorize_broad_root(
         )
         is None
     )
-    assert plugin.external_content._pending_roots_for_task(task_id) == set()
+    assert plugin.external_content._pending_roots_for_task(task_id) == {"/"}
     assert plugin.external_content._TASK_ROOTS.get(task_id, set()) == set()
 
     ctx = Context()
     guarded_read = plugin.external_content.make_guarded_read_handler(ctx)
+    with pytest.raises(PermissionError):
+        guarded_read({"path": str(local_file)}, task_id=task_id)
+    assert ctx.calls == []
+
+    plugin.external_content.post_tool_call(
+        "terminal",
+        {"command": command, "workdir": str(workdir)},
+        {"output": "", "exit_code": 1, "error": "command failed"},
+        task_id=task_id,
+        status="error",
+    )
+    assert plugin.external_content._pending_roots_for_task(task_id) == set()
+    assert plugin.external_content._taint_roots_for_task(task_id) == set()
+    assert plugin.external_content._TASK_ROOTS.get(task_id, set()) == set()
     with pytest.raises(PermissionError):
         guarded_read({"path": str(local_file)}, task_id=task_id)
     assert ctx.calls == []
