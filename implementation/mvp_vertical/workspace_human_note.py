@@ -36,6 +36,7 @@ _START_MARKER = "# >>> Pantheon workspace note"
 _END_MARKER = "# <<< Pantheon workspace note"
 _START_RE = re.compile(r"(?m)^# >>> Pantheon workspace note\r?\n")
 _END_RE = re.compile(r"(?m)^# <<< Pantheon workspace note(?:\r?\n|$)")
+_DOCUMENT_END_RE = re.compile(r"(?m)^\.\.\.[ \t]*(?:#.*)?(?:\r?\n|$)")
 _NAMESPACE = "pantheon_workspace"
 _SIDECAR_NAME = "document.yaml"
 
@@ -69,10 +70,7 @@ def _secure_open_directory(root: Path, relative_path: str) -> int:
                 dir_fd=current,
             )
             opened.append(current)
-        result = opened.pop()
-        for descriptor in reversed(opened):
-            os.close(descriptor)
-        return result
+        return opened.pop()
     except FileNotFoundError as exc:
         raise WorkspaceHumanNoteError("workspace note parent directory does not exist") from exc
     except OSError as exc:
@@ -87,7 +85,7 @@ def _secure_open_directory(root: Path, relative_path: str) -> int:
                 pass
 
 
-def _read_sidecar_bytes(parent_fd: int) -> bytes | None:
+def _open_sidecar(parent_fd: int) -> int | None:
     try:
         fd = os.open(_SIDECAR_NAME, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=parent_fd)
     except FileNotFoundError:
@@ -96,11 +94,16 @@ def _read_sidecar_bytes(parent_fd: int) -> bytes | None:
         if exc.errno in {errno.ELOOP, errno.EMLINK}:
             raise WorkspaceHumanNoteError("document.yaml symlinks are not writable") from exc
         raise WorkspaceHumanNoteError("document.yaml cannot be opened safely") from exc
+    observed = os.fstat(fd)
+    if not stat_module.S_ISREG(observed.st_mode):
+        os.close(fd)
+        raise WorkspaceHumanNoteError("document.yaml is not a regular file")
+    return fd
 
+
+def _read_fd(fd: int) -> bytes:
     try:
-        observed = os.fstat(fd)
-        if not stat_module.S_ISREG(observed.st_mode):
-            raise WorkspaceHumanNoteError("document.yaml is not a regular file")
+        os.lseek(fd, 0, os.SEEK_SET)
         chunks: list[bytes] = []
         while True:
             block = os.read(fd, 1024 * 1024)
@@ -110,12 +113,55 @@ def _read_sidecar_bytes(parent_fd: int) -> bytes | None:
         return b"".join(chunks)
     except OSError as exc:
         raise WorkspaceHumanNoteError("document.yaml cannot be read safely") from exc
+
+
+def _read_sidecar_bytes(parent_fd: int) -> bytes | None:
+    fd = _open_sidecar(parent_fd)
+    if fd is None:
+        return None
+    try:
+        return _read_fd(fd)
     finally:
         os.close(fd)
 
 
 def _manifest_digest(raw: bytes | None) -> str | None:
     return hashlib.sha256(raw).hexdigest() if raw is not None else None
+
+
+def _capture_existing_metadata(parent_fd: int, expected_digest: str) -> dict:
+    """Capture access metadata from the same inode whose bytes match the write basis."""
+    fd = _open_sidecar(parent_fd)
+    if fd is None:
+        raise WorkspaceHumanNoteConflict("document.yaml disappeared before replacement")
+    try:
+        raw = _read_fd(fd)
+        if _manifest_digest(raw) != expected_digest:
+            raise WorkspaceHumanNoteConflict(
+                "document.yaml changed while access metadata was being captured"
+            )
+        observed = os.fstat(fd)
+        if not all(hasattr(os, name) for name in ("listxattr", "getxattr", "setxattr")):
+            raise WorkspaceHumanNoteError(
+                "platform cannot preserve document.yaml extended access metadata"
+            )
+        try:
+            xattrs = tuple(
+                (name, os.getxattr(fd, name))
+                for name in os.listxattr(fd)
+            )
+        except OSError as exc:
+            raise WorkspaceHumanNoteError(
+                "document.yaml extended access metadata cannot be read safely"
+            ) from exc
+        return {
+            "mode": stat_module.S_IMODE(observed.st_mode),
+            "uid": observed.st_uid,
+            "gid": observed.st_gid,
+            "xattrs": xattrs,
+        }
+    finally:
+        os.close(fd)
 
 
 def _decode_manifest(raw: bytes | None) -> tuple[str, dict]:
@@ -197,6 +243,18 @@ def _render_fragment(source_relative_path: str, human_note: str) -> str:
     return f"{_START_MARKER}\n{body}\n{_END_MARKER}\n"
 
 
+def _append_fragment(text: str, replacement: str) -> str:
+    """Append inside the existing YAML document, before an explicit ``...`` end marker."""
+    document_ends = list(_DOCUMENT_END_RE.finditer(text))
+    if document_ends:
+        marker = document_ends[-1]
+        prefix = text[: marker.start()]
+        separator = "" if not prefix or prefix.endswith(("\n", "\r")) else "\n"
+        return prefix + separator + replacement + text[marker.start() :]
+    separator = "" if text.endswith(("\n", "\r")) else "\n"
+    return text + separator + replacement
+
+
 def _replace_fragment(text: str, managed_range: tuple[int, int] | None, replacement: str) -> str:
     if managed_range is not None:
         start, end = managed_range
@@ -205,19 +263,59 @@ def _replace_fragment(text: str, managed_range: tuple[int, int] | None, replacem
         return text
     if not text:
         return replacement
-    separator = "" if text.endswith(("\n", "\r")) else "\n"
-    return text + separator + replacement
+    return _append_fragment(text, replacement)
 
 
-def _atomic_replace(parent_fd: int, raw: bytes) -> None:
+def _apply_existing_metadata(fd: int, metadata: dict) -> None:
+    try:
+        current = os.fstat(fd)
+        if current.st_uid != metadata["uid"] or current.st_gid != metadata["gid"]:
+            os.fchown(fd, metadata["uid"], metadata["gid"])
+        os.fchmod(fd, metadata["mode"])
+        for name, value in metadata["xattrs"]:
+            os.setxattr(fd, name, value)
+
+        verified = os.fstat(fd)
+        if (
+            verified.st_uid != metadata["uid"]
+            or verified.st_gid != metadata["gid"]
+            or stat_module.S_IMODE(verified.st_mode) != metadata["mode"]
+        ):
+            raise WorkspaceHumanNoteError(
+                "document.yaml ownership or mode could not be preserved"
+            )
+        actual_xattrs = {
+            name: os.getxattr(fd, name)
+            for name in os.listxattr(fd)
+        }
+        expected_xattrs = dict(metadata["xattrs"])
+        if actual_xattrs != expected_xattrs:
+            raise WorkspaceHumanNoteError(
+                "document.yaml extended access metadata could not be preserved"
+            )
+    except WorkspaceHumanNoteError:
+        raise
+    except OSError as exc:
+        raise WorkspaceHumanNoteError(
+            "document.yaml access metadata could not be preserved"
+        ) from exc
+
+
+def _atomic_replace(parent_fd: int, raw: bytes, metadata: dict | None) -> None:
     temp_name = f".{_SIDECAR_NAME}.pantheon-{uuid.uuid4().hex}.tmp"
     flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW
     fd: int | None = None
     try:
-        fd = os.open(temp_name, flags, 0o644, dir_fd=parent_fd)
+        create_mode = metadata["mode"] if metadata is not None else 0o600
+        fd = os.open(temp_name, flags, create_mode, dir_fd=parent_fd)
+        if metadata is not None:
+            _apply_existing_metadata(fd, metadata)
         offset = 0
         while offset < len(raw):
-            offset += os.write(fd, raw[offset:])
+            written = os.write(fd, raw[offset:])
+            if written <= 0:
+                raise WorkspaceHumanNoteError("document.yaml temporary write made no progress")
+            offset += written
         os.fsync(fd)
         os.close(fd)
         fd = None
@@ -228,6 +326,8 @@ def _atomic_replace(parent_fd: int, raw: bytes) -> None:
             dst_dir_fd=parent_fd,
         )
         os.fsync(parent_fd)
+    except WorkspaceHumanNoteError:
+        raise
     except OSError as exc:
         raise WorkspaceHumanNoteError("document.yaml could not be replaced atomically") from exc
     finally:
@@ -326,10 +426,10 @@ def write_workspace_human_note(
         if updated_raw == (raw or b""):
             return read_workspace_human_note(workspace_roots, workspace_ref, normalized)
 
-        # Recheck immediately before the atomic replace. This is an optimistic
-        # concurrency gate, not a claim that external editors participate in a
-        # filesystem-wide transaction protocol.
-        if _manifest_digest(_read_sidecar_bytes(parent_fd)) != current_digest:
+        # Recheck immediately before the effect. The metadata capture for an
+        # existing sidecar is tied to the same exact digest basis.
+        latest = _read_sidecar_bytes(parent_fd)
+        if _manifest_digest(latest) != current_digest:
             raise WorkspaceHumanNoteConflict(
                 "document.yaml changed while the note was being prepared"
             )
@@ -346,7 +446,12 @@ def write_workspace_human_note(
                 except OSError as exc:
                     raise WorkspaceHumanNoteError("document.yaml could not be removed") from exc
         else:
-            _atomic_replace(parent_fd, updated_raw)
+            metadata = (
+                _capture_existing_metadata(parent_fd, current_digest)
+                if raw is not None and current_digest is not None
+                else None
+            )
+            _atomic_replace(parent_fd, updated_raw, metadata)
     finally:
         os.close(parent_fd)
 
