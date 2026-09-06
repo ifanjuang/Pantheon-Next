@@ -34,10 +34,6 @@ class WorkspacePathNotDirectory(WorkspaceCollectionReadError):
     """A collection read targeted an entry that is not a directory."""
 
 
-class WorkspacePathNotFile(WorkspaceCollectionReadError):
-    """A file-detail read targeted an entry that is not a regular file."""
-
-
 class WorkspaceConfigurationError(WorkspaceCollectionReadError):
     """The server-side workspace mapping is invalid."""
 
@@ -127,15 +123,6 @@ def normalize_relative_path(relative_path: str | None) -> str:
     return "" if normalized == "." else normalized
 
 
-def _reject_hidden_components(relative_path: str) -> None:
-    """Do not make explicitly addressed paths wider than directory navigation."""
-    for part in PurePosixPath(relative_path).parts if relative_path else ():
-        if part == "_VAULT.md" or part.startswith("."):
-            raise WorkspacePathNotFound(
-                f"workspace path is not exposed by the read projection: {relative_path!r}"
-            )
-
-
 def _reject_symlink_components(root: Path, relative_path: str) -> None:
     """Keep the first slice symlink-free, even when a link would stay in-root."""
     current = root
@@ -147,9 +134,8 @@ def _reject_symlink_components(root: Path, relative_path: str) -> None:
             )
 
 
-def _resolve_entry(root: Path, relative_path: str) -> Path:
-    """Resolve one normalized visible path under one configured workspace root."""
-    _reject_hidden_components(relative_path)
+def _resolve_directory(root: Path, relative_path: str) -> Path:
+    """Resolve a normalized path under one root and require a real directory."""
     _reject_symlink_components(root, relative_path)
     target = (root / relative_path).resolve()
     root_real = root.resolve()
@@ -161,27 +147,9 @@ def _resolve_entry(root: Path, relative_path: str) -> Path:
         raise WorkspacePathNotFound(
             f"workspace path does not exist: {relative_path!r}"
         )
-    return target
-
-
-def _resolve_directory(root: Path, relative_path: str) -> Path:
-    """Resolve a normalized path under one root and require a real directory."""
-    target = _resolve_entry(root, relative_path)
     if not target.is_dir():
         raise WorkspacePathNotDirectory(
             f"workspace collection target is not a directory: {relative_path!r}"
-        )
-    return target
-
-
-def _resolve_file(root: Path, relative_path: str) -> Path:
-    """Resolve one visible regular file without following a symlink."""
-    if not relative_path:
-        raise WorkspacePathNotFile("workspace file path is required")
-    target = _resolve_entry(root, relative_path)
-    if not target.is_file():
-        raise WorkspacePathNotFile(
-            f"workspace entry is not a regular file: {relative_path!r}"
         )
     return target
 
@@ -199,12 +167,6 @@ def _child_collection_href(workspace_ref: str, relative_path: str) -> str:
     return f"/cockpit/workspace-collections/{encoded_ref}?{query}"
 
 
-def _entry_detail_href(workspace_ref: str, relative_path: str) -> str:
-    encoded_ref = quote(workspace_ref, safe="")
-    query = urlencode({"path": relative_path})
-    return f"/cockpit/workspace-entries/{encoded_ref}?{query}"
-
-
 def _media_type(path: Path) -> str:
     return mimetypes.guess_type(path.name)[0] or "application/octet-stream"
 
@@ -215,69 +177,8 @@ def _file_kind(path: Path, media_type: str) -> str:
     return "file"
 
 
-def _basic_file_metadata(path: Path) -> dict:
-    """Return cheap reconstructible facts suitable for collection Cards."""
-    try:
-        byte_size = path.stat().st_size
-    except OSError as exc:
-        raise WorkspaceCollectionReadError(
-            f"workspace file cannot be inspected: {path.name!r}"
-        ) from exc
-    media_type = _media_type(path)
-    return {
-        "filename": path.name,
-        "extension": path.suffix.casefold(),
-        "media_type": media_type,
-        "byte_size": byte_size,
-        "file_kind": _file_kind(path, media_type),
-    }
-
-
-def _sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    try:
-        with path.open("rb") as stream:
-            for block in iter(lambda: stream.read(1024 * 1024), b""):
-                digest.update(block)
-    except OSError as exc:
-        raise WorkspaceCollectionReadError(
-            f"workspace file cannot be hashed: {path.name!r}"
-        ) from exc
-    return digest.hexdigest()
-
-
-def _exact_file_metadata(path: Path) -> dict:
-    """Observe digest/stat from one stable file version or fail closed for retry."""
-    try:
-        before = path.stat()
-    except OSError as exc:
-        raise WorkspaceCollectionReadError(
-            f"workspace file cannot be inspected: {path.name!r}"
-        ) from exc
-    digest = _sha256_file(path)
-    try:
-        after = path.stat()
-    except OSError as exc:
-        raise WorkspaceCollectionReadError(
-            f"workspace file changed during observation: {path.name!r}"
-        ) from exc
-    if (before.st_size, before.st_mtime_ns) != (after.st_size, after.st_mtime_ns):
-        raise WorkspaceCollectionReadError(
-            f"workspace file changed during observation; retry: {path.name!r}"
-        )
-    media_type = _media_type(path)
-    return {
-        "filename": path.name,
-        "extension": path.suffix.casefold(),
-        "media_type": media_type,
-        "byte_size": after.st_size,
-        "file_kind": _file_kind(path, media_type),
-        "digest_sha256": digest,
-        "filesystem_modified_at": datetime.fromtimestamp(
-            after.st_mtime,
-            tz=timezone.utc,
-        ).isoformat(),
-    }
+def _relative_child_path(parent: str, name: str) -> str:
+    return PurePosixPath(parent, name).as_posix() if parent else PurePosixPath(name).as_posix()
 
 
 def _adjacent_document_sidecar(path: Path, relative_path: str) -> dict:
@@ -300,6 +201,29 @@ def _adjacent_document_sidecar(path: Path, relative_path: str) -> dict:
         "relative_path": sidecar_ref,
         "parsed": False,
         "identity_mapping_resolved": False,
+    }
+
+
+def _basic_file_metadata(path: Path, relative_path: str) -> dict:
+    """Return cheap reconstructible facts suitable for ordinary Card navigation."""
+    try:
+        stat = path.stat()
+    except OSError as exc:
+        raise WorkspaceCollectionReadError(
+            f"workspace file cannot be inspected: {path.name!r}"
+        ) from exc
+    media_type = _media_type(path)
+    return {
+        "filename": path.name,
+        "extension": path.suffix.casefold(),
+        "media_type": media_type,
+        "byte_size": stat.st_size,
+        "file_kind": _file_kind(path, media_type),
+        "filesystem_modified_at": datetime.fromtimestamp(
+            stat.st_mtime,
+            tz=timezone.utc,
+        ).isoformat(),
+        "adjacent_document_sidecar": _adjacent_document_sidecar(path, relative_path),
     }
 
 
@@ -352,26 +276,31 @@ def _workspace_card(
             "create_action": None,
         }
     elif file_entry is not None:
-        observed = _basic_file_metadata(file_entry)
+        observed = _basic_file_metadata(file_entry, relative_path)
+        sidecar = observed["adjacent_document_sidecar"]
         if observed["file_kind"] == "pdf":
             card["category"] = "PDF"
-            card["summary"] = "PDF du workspace — projection en lecture seule"
+            card["summary"] = "PDF du workspace — observation locale reconstructible"
         card["workspace_file"] = observed
+        card["qualification"] = {
+            "status": "workspace_observation_only",
+            "identity_mapping": "not_resolved_by_workspace_projection",
+            "automatic_document_admission": False,
+        }
+        card["authority"] = {
+            "governed_identity": False,
+            "is_evidence": False,
+            "is_memory": False,
+            "is_persisted": False,
+        }
         card["back"].extend(
             [
                 ["Type MIME", observed["media_type"]],
                 ["Taille (octets)", str(observed["byte_size"])],
+                ["Modifié (filesystem)", observed["filesystem_modified_at"]],
+                ["document.yaml adjacent", sidecar["state"]],
             ]
         )
-        card["entry_detail"] = {
-            "state": "available",
-            "load_action": {
-                "kind": "entry_read",
-                "href": _entry_detail_href(workspace_ref, relative_path),
-            },
-            "observation": "on_read",
-            "persisted": False,
-        }
     return card
 
 
@@ -396,10 +325,6 @@ def get_workspace_catalog(workspace_roots: Mapping[str, Path]) -> dict:
         },
         "cards_are_projections": True,
     }
-
-
-def _relative_child_path(parent: str, name: str) -> str:
-    return PurePosixPath(parent, name).as_posix() if parent else PurePosixPath(name).as_posix()
 
 
 def get_workspace_collection(
@@ -465,61 +390,7 @@ def get_workspace_collection(
             "can_add": False,
         },
         "cards_are_projections": True,
-    }
-
-
-def get_workspace_entry(
-    workspace_roots: Mapping[str, Path],
-    workspace_ref: str,
-    relative_path: str,
-) -> dict:
-    """Observe one exact file lazily and return a reconstructible Cockpit Card.
-
-    The read intentionally computes the digest on demand instead of hashing every
-    file during a directory listing. Re-reading after a filesystem change yields
-    a new observation; nothing here is cached or persisted.
-    """
-    root = workspace_roots.get(workspace_ref)
-    if root is None:
-        raise WorkspaceNotFound(f"unknown workspace_ref: {workspace_ref!r}")
-
-    normalized = normalize_relative_path(relative_path)
-    entry = _resolve_file(root, normalized)
-    card = _workspace_card(
-        workspace_ref=workspace_ref,
-        relative_path=normalized,
-        name=entry.name,
-        kind="file",
-        file_entry=entry,
-    )
-
-    observed = _exact_file_metadata(entry)
-    card["workspace_file"] = observed
-    card["adjacent_document_sidecar"] = _adjacent_document_sidecar(entry, normalized)
-    card["qualification"] = {
-        "status": "workspace_observation_only",
-        "identity_mapping": "not_resolved_by_workspace_projection",
-        "automatic_document_admission": False,
-    }
-    card["authority"] = {
-        "governed_identity": False,
-        "is_evidence": False,
-        "is_memory": False,
-        "is_persisted": False,
-    }
-    card["back"].extend(
-        [
-            ["SHA-256", observed["digest_sha256"]],
-            ["Modifié (filesystem)", observed["filesystem_modified_at"]],
-            ["document.yaml adjacent", card["adjacent_document_sidecar"]["state"]],
-        ]
-    )
-
-    return {
-        "card": card,
-        "card_is_projection": True,
         "observation_persisted": False,
-        "source_binary_included": False,
         "content_parsed": False,
         "hindsight_required": False,
         "non_equivalences": [
