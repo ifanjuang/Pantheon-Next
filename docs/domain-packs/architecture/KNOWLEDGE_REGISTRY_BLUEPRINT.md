@@ -40,6 +40,9 @@ adapters execute, the proof constrains, the human decides.
 
 ## What the registry holds
 
+Status of this section: **to verify — not reconciled with the enforced
+`knowledge_family` enum.** See #989.
+
 Each registry entry is a governed knowledge item, not a fact. Candidate
 categories:
 
@@ -50,8 +53,23 @@ categories:
 - `supplier_product` — product and supplier data, technical sheets.
 - `precedent` — prior projects or external references used by analogy.
 
-Categories align with `docs/governance/KNOWLEDGE_TAXONOMY.md`; they extend it for
-the architecture domain, they do not replace it.
+These are candidate categories of this blueprint. They are **not** the vocabulary
+a Knowledge item is validated against today: `schemas/document_knowledge_slice.schema.yaml`
+defines `knowledge_family` as a closed enum (`referentiels`, `responsabilite`,
+`methodologie`, `techniques`, `reglementations`), which
+`implementation/mvp_vertical/knowledge.py` enforces on every write. Three
+categories above correspond approximately to enum members under different names,
+and `lesson_learned`, `supplier_product` and `precedent` have no storable family
+at all. Authoring a Knowledge item against this list is refused at write time.
+
+Which vocabulary governs — and where the three unmapped categories belong — is a
+maintainer decision recorded in #989, deliberately deferred until #827 shows
+which categories real professional work needs.
+
+`docs/governance/KNOWLEDGE_TAXONOMY.md` remains the governing owner for the
+governance-lifecycle categories (`Raw Source`, `Knowledge Item`, `Evidence Item`,
+…). It defines no subject-matter family axis, so this blueprint specializes the
+architecture domain alongside it rather than extending an axis it owns.
 
 ## How entries map to the governance vocabulary
 
