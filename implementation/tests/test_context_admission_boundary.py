@@ -28,7 +28,7 @@ def test_context_result_is_always_data_only() -> None:
 
     assert wrapped is not None
     assert wrapped.startswith('<untrusted_tool_result source="pantheon_context_entity">')
-    assert 'contract="pantheon.context-admission.v1"' in wrapped
+    assert 'contract="pantheon.context-admission.v2"' in wrapped
     assert 'content_role="data"' in wrapped
     assert 'instruction_authority="none"' in wrapped
     assert 'transport_class="untrusted_data"' in wrapped

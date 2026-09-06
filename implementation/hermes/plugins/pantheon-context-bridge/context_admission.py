@@ -13,7 +13,11 @@ from __future__ import annotations
 import re
 from typing import Any
 
-CONTRACT_VERSION = "pantheon.context-admission.v1"
+# v2 removed `scanner_authority`, `scan_status` and `disposition` from the
+# emitted envelope. That is a shape change, so it takes a new version rather
+# than a redefinition of v1 — a version string that can mean two shapes is
+# worth nothing to the consumer it exists for.
+CONTRACT_VERSION = "pantheon.context-admission.v2"
 MODEL_BOUND_CONTEXT_TOOLS = frozenset(
     {
         "pantheon_context_manifest",

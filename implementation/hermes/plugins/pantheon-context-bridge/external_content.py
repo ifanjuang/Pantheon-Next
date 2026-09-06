@@ -32,7 +32,10 @@ from . import context_admission
 # ceasing to match.
 QUALIFIED_HERMES_VERSION = "0.21.0"
 
-INLINE_CONTENT_MARKER_PATTERN = r"(?m)^\[Content of [^\]\n]+\]:\s*$"
+# `[^\n]+` rather than `[^\]\n]+`: an attachment named `report [final].pdf`
+# produces `[Content of report [final].pdf]:`, which a bracket-excluding class
+# cannot match — and an unmatched marker means no framing at all.
+INLINE_CONTENT_MARKER_PATTERN = r"(?m)^\[Content of [^\n]+\]:\s*$"
 _INLINE_CONTENT_RE = re.compile(INLINE_CONTENT_MARKER_PATTERN)
 
 # Order matters and must not differ by message shape: the same logical message

@@ -129,6 +129,43 @@ asserts it. The two existing negative assertions (`terminal`, `write`) were kept
 as they are — the added comment is worded to satisfy them rather than to relax
 them.
 
+## Second review pass: two findings from automated review, both real
+
+**A bracket in a filename disabled the boundary.** `[^\]\n]+` cannot match the
+marker produced by `report [final].pdf` — an ordinary name — so the attachment
+reached the model unframed. The same fail-open class this change exists to close,
+missed in the first pass and found by review on `e2d688c6`:
+
+```text
+[Content of note.txt]:                MATCHES
+[Content of report [final].pdf]:      NO MATCH
+[Content of CCTP [v2] annexe.pdf]:    NO MATCH
+```
+
+Widened to `[^\n]+`, with regression cases for bracketed names and for the
+over-match direction (an embedded marker, a missing colon, a stray space) so the
+wider class cannot quietly accept more than a marker.
+
+**The v1 contract document described an implementation that no longer exists.**
+`implementation/docs/architecture/2026-09-05-context-admission-boundary.md`
+defined `pantheon.context-admission.v1` as emitting `scanner_authority`,
+`scan_status` and `disposition` and as calling `scan_for_threats` — and it is
+referenced from the distribution lock, so it is a live governance reference
+rather than a dated trace.
+
+The sharper half was not that the document lagged. It is that the envelope lost
+three attributes while keeping the same contract string, so
+`pantheon.context-admission.v1` meant two different shapes depending on the
+build. Bumped to `v2` and the document rewritten to match: contract block,
+runtime steps, failure posture and completion criteria, with a short record of
+what v1 was and why the number moved. A version string that can mean two shapes
+is worth nothing to the consumer it exists for.
+
+The failure-posture section is now honest in a way it could not be before: v2 has
+no runtime dependency that can fail, so the only remaining failure mode is the
+boundary not being *reached* — and both such modes are named, with the version
+pin that keeps marker drift from being silent.
+
 ## Boundary
 
 Boundary profile applies: `candidate_support_note`.
@@ -148,7 +185,7 @@ Memory behavior: none.
 ## Verification
 
 ```text
-implementation/tests/     1366 passed, 408 skipped
+implementation/tests/     1368 passed, 408 skipped
 tests/                     675 passed
 distribution lock          OK (context-bridge tree digest re-locked)
 check_status_headers.py    OK
@@ -174,4 +211,5 @@ metadata absent     != content safe
 green CI            != boundary reachable
 declared surface    != registered surface
 suffix match        != appended caption
+same contract name  != same contract shape
 ```
