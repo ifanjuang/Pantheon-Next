@@ -5,13 +5,6 @@ Boundary profile: candidate_support_note.
 
 This document maps relationships between governance objects already defined elsewhere. It does not own those objects and does not replace their authoritative documents.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-The human decides.
-```
-
 ## Purpose
 
 The map answers one question:

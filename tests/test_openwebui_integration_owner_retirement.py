@@ -32,7 +32,7 @@ DOCTRINE_ROOTS = (GOV, ROOT / "docs" / "domain-packs")
 
 # Candidate-doctrine residue frozen as it stands. Ratchet only: entries may be
 # removed as documents are fixed, never added. Removing the class of problem is
-# #787's boundary-profile migration, not this list.
+# #996's boundary-profile migration, not this list.
 KNOWN_CANDIDATE_OPENWEBUI_RESIDUES = {
     "docs/governance/AGENTTRANSFER_HERMES_ARTIFACT_TRANSFER.md",
     "docs/governance/ANSWER_VERIFICATION_GATE.md",
@@ -40,14 +40,12 @@ KNOWN_CANDIDATE_OPENWEBUI_RESIDUES = {
     "docs/governance/AUTHORITY_INDEX_DECOMPOSITION_PLAN.md",
     "docs/governance/BOOTSTRAP_INSTALLATION_LADDER.md",
     "docs/governance/CAPABILITY_REGISTRY.md",
-    "docs/governance/COCKPIT_ARCHITECTURE.md",
     "docs/governance/CONTEXT_STACK.md",
     "docs/governance/DATA_PLATFORM_ARCHITECTURE.md",
     "docs/governance/DOCUMENT_INTELLIGENCE.md",
     "docs/governance/EVIDENCE_MEMORY_CANONICALIZATION.md",
     "docs/governance/EVIDENCE_MEMORY_DEV_PLAN.md",
     "docs/governance/GLOSSARY.md",
-    "docs/governance/GOVERNANCE_OBJECT_RELATIONSHIP_MAP.md",
     "docs/governance/ITERATIVE_DELIBERATION_LIFECYCLE.md",
     "docs/governance/LOCAL_INSTALLATION_AND_CHANNELS.md",
     "docs/governance/MAINTAINER_ACTIONS.md",
@@ -86,7 +84,6 @@ KNOWN_CANDIDATE_OPENWEBUI_RESIDUES = {
     "docs/governance/URGENT_REVIEW_TRIAGE.md",
     "docs/governance/WORKFLOW_DEPTH_POLICY.md",
     "docs/governance/WORK_ISSUE_AND_DELEGATED_MERGE_MODEL.md",
-    "docs/governance/concept-model/README.md",
     "docs/governance/examples/mvp_vertical_fixture/FAILING_FIXTURE.md",
     "docs/governance/examples/mvp_vertical_fixture/GOVERNANCE_INVARIANTS.md",
     "docs/governance/examples/mvp_vertical_fixture/LOCAL_VALIDATOR_DESIGN.md",
@@ -180,7 +177,7 @@ def test_candidate_doctrine_openwebui_residue_is_bounded_and_only_shrinks():
     This is a ratchet, not a sweep. The set below is seeded with what exists today so
     CI stays green and no document is forced to change; `unexpected` refuses any new
     occurrence, and `no_longer_present` forces an entry to be dropped as soon as it is
-    fixed. The list can therefore only shrink. `#787`'s boundary-profile migration is
+    fixed. The list can therefore only shrink. `#996`'s boundary-profile migration is
     what removes the class of problem; this only stops it growing meanwhile.
     """
     offender_paths = _residue_paths(DOCTRINE_ROOTS, current_authority=False)

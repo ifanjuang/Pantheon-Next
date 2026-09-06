@@ -6,13 +6,6 @@ Owner context: issue #374, `APPROVALS.md`, `catalog/schemas/handoff-decision.sch
 
 This specification translates existing decision, scope and temporal rules into a deterministic read-only resolver. It does not create a new decision doctrine, approval engine, authorization token, identity service, runtime callback, scheduler, queue or external action.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-The human decides.
-```
-
 ## Function boundary
 
 ```text

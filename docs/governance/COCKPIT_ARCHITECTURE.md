@@ -5,13 +5,6 @@ Boundary profile: validation_only_trace.
 
 This document maps the existing owners that compose the Pantheon Cockpit. It does not create a new cockpit ontology, UI framework, renderer, state machine, resolver, runtime, approval engine, memory engine or authority layer.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-The human decides.
-```
-
 ## Purpose
 
 The Cockpit is the product composition of existing governed objects and projection grammars.
