@@ -246,14 +246,38 @@ def _sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _filesystem_modified_at(path: Path) -> str:
+def _exact_file_metadata(path: Path) -> dict:
+    """Observe digest/stat from one stable file version or fail closed for retry."""
     try:
-        modified = path.stat().st_mtime
+        before = path.stat()
     except OSError as exc:
         raise WorkspaceCollectionReadError(
-            f"workspace file timestamp cannot be observed: {path.name!r}"
+            f"workspace file cannot be inspected: {path.name!r}"
         ) from exc
-    return datetime.fromtimestamp(modified, tz=timezone.utc).isoformat()
+    digest = _sha256_file(path)
+    try:
+        after = path.stat()
+    except OSError as exc:
+        raise WorkspaceCollectionReadError(
+            f"workspace file changed during observation: {path.name!r}"
+        ) from exc
+    if (before.st_size, before.st_mtime_ns) != (after.st_size, after.st_mtime_ns):
+        raise WorkspaceCollectionReadError(
+            f"workspace file changed during observation; retry: {path.name!r}"
+        )
+    media_type = _media_type(path)
+    return {
+        "filename": path.name,
+        "extension": path.suffix.casefold(),
+        "media_type": media_type,
+        "byte_size": after.st_size,
+        "file_kind": _file_kind(path, media_type),
+        "digest_sha256": digest,
+        "filesystem_modified_at": datetime.fromtimestamp(
+            after.st_mtime,
+            tz=timezone.utc,
+        ).isoformat(),
+    }
 
 
 def _adjacent_document_sidecar(path: Path, relative_path: str) -> dict:
@@ -336,7 +360,7 @@ def _workspace_card(
         card["back"].extend(
             [
                 ["Type MIME", observed["media_type"]],
-                ["Taille (octets)", observed["byte_size"]],
+                ["Taille (octets)", str(observed["byte_size"])],
             ]
         )
         card["entry_detail"] = {
@@ -469,9 +493,7 @@ def get_workspace_entry(
         file_entry=entry,
     )
 
-    observed = dict(card["workspace_file"])
-    observed["digest_sha256"] = _sha256_file(entry)
-    observed["filesystem_modified_at"] = _filesystem_modified_at(entry)
+    observed = _exact_file_metadata(entry)
     card["workspace_file"] = observed
     card["adjacent_document_sidecar"] = _adjacent_document_sidecar(entry, normalized)
     card["qualification"] = {
