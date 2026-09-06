@@ -53,23 +53,3 @@ def install_workspace_collection_read_routes(
             raise HTTPException(status_code=404, detail=str(exc)) from exc
         except workspace_collection_read.WorkspaceCollectionReadError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
-
-    @app.get("/cockpit/workspace-entries/{workspace_ref}")
-    def get_workspace_entry(
-        workspace_ref: str,
-        path: str = Query(..., min_length=1, max_length=4096),
-        _authorized: None = Depends(require_read_key),
-    ) -> dict:
-        try:
-            return workspace_collection_read.get_workspace_entry(
-                roots,
-                workspace_ref,
-                path,
-            )
-        except (
-            workspace_collection_read.WorkspaceNotFound,
-            workspace_collection_read.WorkspacePathNotFound,
-        ) as exc:
-            raise HTTPException(status_code=404, detail=str(exc)) from exc
-        except workspace_collection_read.WorkspaceCollectionReadError as exc:
-            raise HTTPException(status_code=422, detail=str(exc)) from exc
