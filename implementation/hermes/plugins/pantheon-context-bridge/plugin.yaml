@@ -1,9 +1,15 @@
 name: pantheon-context-bridge
-version: "0.2.0"
-description: Read-only access to exact admitted Pantheon context with data-only model transport
+version: "0.3.0"
+description: Read-only admitted Pantheon context plus data-only protection for known external content
 provides_tools:
   - pantheon_context_manifest
   - pantheon_context_entity
+  - pantheon_untrusted_read
+  - pantheon_untrusted_search
+provides_hooks:
+  - pre_gateway_dispatch
+  - pre_tool_call
+  - post_tool_call
 requires_env:
   - name: PANTHEON_HERMES_API_BASE
     description: Base URL of the bounded Pantheon Hermes execution API

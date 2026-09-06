@@ -202,14 +202,22 @@ def test_operator_runbook_matches_governed_profile_memory_cli_contract() -> None
     observe = runbook.split("pantheon-hermes observe", 1)[1].split("```", 1)[0]
     assert '--expected-profile "${HERMES_GOVERNED_PROFILE}"' in observe
     assert "--memory-status-receipt memory-status-observe.json" in observe
-    assert observe.count("--allowed-tool") == 2
+    assert observe.count("--allowed-tool") == 4
     assert observe.count("--required-tool") == 2
+    assert "--allowed-tool pantheon_untrusted_read" in observe
+    assert "--allowed-tool pantheon_untrusted_search" in observe
+    assert "--required-tool pantheon_untrusted_read" not in observe
+    assert "--required-tool pantheon_untrusted_search" not in observe
 
     launch = runbook.split("pantheon-hermes launch", 1)[1].split("```", 1)[0]
     assert '--expected-profile "${HERMES_GOVERNED_PROFILE}"' in launch
     assert "--memory-status-receipt memory-status-launch.json" in launch
-    assert launch.count("--allowed-tool") == 2
+    assert launch.count("--allowed-tool") == 4
     assert launch.count("--required-tool") == 2
+    assert "--allowed-tool pantheon_untrusted_read" in launch
+    assert "--allowed-tool pantheon_untrusted_search" in launch
+    assert "--required-tool pantheon_untrusted_read" not in launch
+    assert "--required-tool pantheon_untrusted_search" not in launch
     assert "--admission-id admission-<ID>" in launch
 
     assert "profile_surface.status = qualified" in runbook

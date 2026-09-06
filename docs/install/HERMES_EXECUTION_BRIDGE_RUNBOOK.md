@@ -124,14 +124,19 @@ docker exec -it <HERMES_CONTAINER> \
   hermes plugins enable pantheon-context-bridge
 ```
 
-The plugin exposes only:
+The reviewed plugin surface exposes:
 
 ```text
 pantheon_context_manifest
 pantheon_context_entity
+pantheon_untrusted_read
+pantheon_untrusted_search
 ```
 
-It must not expose global search, global listing, arbitrary source dereferencing or mutation.
+The two `pantheon_untrusted_*` tools are guarded data-only read/search paths for
+known external content. They add no Evidence, write, approval or task authority.
+The plugin must not expose global search, global listing, arbitrary source
+dereferencing or mutation.
 
 ## 5. Capture the governed profile memory posture
 
@@ -192,10 +197,15 @@ pantheon-hermes observe \
   --memory-status-receipt memory-status-observe.json \
   --allowed-tool pantheon_context_manifest \
   --allowed-tool pantheon_context_entity \
+  --allowed-tool pantheon_untrusted_read \
+  --allowed-tool pantheon_untrusted_search \
   --required-tool pantheon_context_manifest \
   --required-tool pantheon_context_entity \
   --output runtime-observation.json
 ```
+
+The guarded read/search tools are allowed because they are part of the reviewed
+plugin surface; they are not required for a context-only run.
 
 Verify the actual nested result paths:
 
@@ -282,6 +292,8 @@ pantheon-hermes launch \
   --memory-status-receipt memory-status-launch.json \
   --allowed-tool pantheon_context_manifest \
   --allowed-tool pantheon_context_entity \
+  --allowed-tool pantheon_untrusted_read \
+  --allowed-tool pantheon_untrusted_search \
   --required-tool pantheon_context_manifest \
   --required-tool pantheon_context_entity \
   --admission-id admission-<ID> \

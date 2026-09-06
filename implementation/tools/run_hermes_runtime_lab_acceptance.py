@@ -25,7 +25,13 @@ ADMISSION_ID = "admission-hermes-020-lab"
 PROFILE_KEY = "hermes-profile-lab-key"
 DEFAULT_KEY = "hermes-default-lab-key"
 PANTHEON_KEY = "pantheon-lab-key"
-EXPECTED_TOOLS = {"pantheon_context_manifest", "pantheon_context_entity"}
+EXPECTED_ALLOWED_TOOLS = {
+    "pantheon_context_manifest",
+    "pantheon_context_entity",
+    "pantheon_untrusted_read",
+    "pantheon_untrusted_search",
+}
+EXPECTED_REQUIRED_TOOLS = {"pantheon_context_manifest", "pantheon_context_entity"}
 EXPECTED_COMPONENTS = {"run-binding", "context-bridge", "runtime-observer"}
 SHA256_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 
@@ -133,7 +139,8 @@ def configure(hermes_home: Path, fixture_url: str) -> dict[str, Any]:
             "memory_tool": "off",
             "session_memory_key": "absent",
         },
-        "expected_tools": sorted(EXPECTED_TOOLS),
+        "expected_allowed_tools": sorted(EXPECTED_ALLOWED_TOOLS),
+        "expected_required_tools": sorted(EXPECTED_REQUIRED_TOOLS),
         "production_activation": False,
         "future_task_authorization": False,
     }
@@ -259,7 +266,15 @@ def validate(artifacts: Path) -> dict[str, Any]:
         "wrong toolset platform",
     )
     tool_surface = observation.get("tool_surface") or {}
-    _require(set(tool_surface.get("active_tools") or []) == EXPECTED_TOOLS, "wrong tools")
+    active_tools = set(tool_surface.get("active_tools") or [])
+    required_tools = set(tool_surface.get("required_tools") or [])
+    _require(active_tools == EXPECTED_ALLOWED_TOOLS, "wrong allowed tools")
+    _require(required_tools == EXPECTED_REQUIRED_TOOLS, "wrong required tools")
+    _require(not (tool_surface.get("unexpected_tools") or []), "unexpected tools present")
+    _require(
+        not (tool_surface.get("missing_required_tools") or []),
+        "required tools missing",
+    )
     _require(
         observation.get("memory_posture", {}).get("status") == "qualified",
         "memory posture not qualified",
@@ -333,7 +348,8 @@ def validate(artifacts: Path) -> dict[str, Any]:
         "profile": PROFILE,
         "profile_route": f"/p/{PROFILE}",
         "distribution_components": sorted(EXPECTED_COMPONENTS),
-        "tool_surface": sorted(EXPECTED_TOOLS),
+        "allowed_tool_surface": sorted(EXPECTED_ALLOWED_TOOLS),
+        "required_tool_surface": sorted(EXPECTED_REQUIRED_TOOLS),
         "memory_posture": "qualified_off",
         "synthetic_run_completed": True,
         "context_manifest_read": True,
