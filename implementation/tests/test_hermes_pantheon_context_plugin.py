@@ -9,7 +9,12 @@ from pathlib import Path
 
 import pytest
 
-PLUGIN_DIR = Path(__file__).resolve().parents[1] / "hermes" / "plugins" / "pantheon-context-bridge"
+PLUGIN_DIR = (
+    Path(__file__).resolve().parents[1]
+    / "hermes"
+    / "plugins"
+    / "pantheon-context-bridge"
+)
 
 
 def _load_module(filename: str, name: str):
@@ -78,6 +83,7 @@ def test_manifest_declares_context_and_guarded_read_tools_with_required_env() ->
     assert "pantheon_untrusted_search" in manifest
     assert "pre_gateway_dispatch" in manifest
     assert "pre_tool_call" in manifest
+    assert "post_tool_call" in manifest
     assert "PANTHEON_HERMES_API_BASE" in manifest
     assert "PANTHEON_HERMES_API_KEY" in manifest
     assert "terminal" not in manifest
@@ -127,6 +133,7 @@ def test_plugin_registers_context_admission_external_gates_and_bundled_skill(
     assert [name for name, _callback in ctx.hooks] == [
         "pre_gateway_dispatch",
         "pre_tool_call",
+        "post_tool_call",
     ]
     assert len(ctx.skills) == 1
     skill_name, skill_path, _description = ctx.skills[0]
@@ -139,6 +146,8 @@ def test_plugin_registers_context_admission_external_gates_and_bundled_skill(
     external_root.mkdir()
     external_file = external_root / "external.txt"
     plugin.external_content._TASK_ROOTS.clear()
+    plugin.external_content._TASK_TAINT_ROOTS.clear()
+    plugin.external_content._PENDING_FETCHES.clear()
     plugin.external_content._remember_roots(task_id, [str(external_root)])
 
     manifest_result = ctx.tools[0]["handler"]({}, task_id=task_id)
@@ -195,7 +204,9 @@ def test_manifest_handler_derives_admission_only_from_host_task_id(monkeypatch) 
     assert seen["actor"] == "hermes-plugin:pantheon-context-bridge"
 
 
-def test_entity_handler_uses_host_admission_and_only_model_selected_in_scope_entity(monkeypatch) -> None:
+def test_entity_handler_uses_host_admission_and_only_model_selected_in_scope_entity(
+    monkeypatch,
+) -> None:
     tools = _load_module("tools.py", "pantheon_context_bridge_tools_entity_test")
     monkeypatch.setenv("PANTHEON_HERMES_API_BASE", "https://pantheon.example")
     monkeypatch.setenv("PANTHEON_HERMES_API_KEY", "secret")
@@ -205,7 +216,9 @@ def test_entity_handler_uses_host_admission_and_only_model_selected_in_scope_ent
         del timeout
         seen["url"] = request.full_url
         seen["method"] = request.get_method()
-        return _Response({"kind": "hermes_scoped_context_entity", "record": {"project_id": "p1"}})
+        return _Response(
+            {"kind": "hermes_scoped_context_entity", "record": {"project_id": "p1"}}
+        )
 
     monkeypatch.setattr(tools, "urlopen", fake_urlopen)
     out = json.loads(
@@ -243,5 +256,7 @@ def test_missing_plugin_environment_fails_closed(monkeypatch) -> None:
     tools = _load_module("tools.py", "pantheon_context_bridge_tools_env_test")
     monkeypatch.delenv("PANTHEON_HERMES_API_BASE", raising=False)
     monkeypatch.delenv("PANTHEON_HERMES_API_KEY", raising=False)
-    out = json.loads(tools.pantheon_context_manifest({}, task_id="admission-123"))
+    out = json.loads(
+        tools.pantheon_context_manifest({}, task_id="admission-123")
+    )
     assert "environment is incomplete" in out["error"]
