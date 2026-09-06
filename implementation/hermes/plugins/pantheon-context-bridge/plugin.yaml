@@ -1,6 +1,6 @@
 name: pantheon-context-bridge
-version: "0.2.0"
-description: Read-only access to exact admitted Pantheon context with data-only model transport
+version: "0.3.0"
+description: Exact admitted Pantheon context plus deterministic data-only gateway attachment framing
 provides_tools:
   - pantheon_context_manifest
   - pantheon_context_entity
