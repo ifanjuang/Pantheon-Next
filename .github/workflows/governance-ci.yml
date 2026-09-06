@@ -4,7 +4,11 @@ on:
   push:
     branches: [main]
     tags: ["v*"]
+  # `edited` is required, not cosmetic: check_roles_rites_spaces_change.py reads
+  # PR_BODY, and rerun_failed_jobs replays the original event payload, so a body
+  # that is corrected after the fact can only be re-read by a fresh event.
   pull_request:
+    types: [opened, synchronize, reopened, edited]
 
 permissions:
   contents: read
