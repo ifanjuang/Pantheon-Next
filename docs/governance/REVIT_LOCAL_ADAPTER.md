@@ -1,7 +1,7 @@
 # Revit Local Adapter Boundary
 
 Status: candidate support doctrine — canonical local-adapter boundary — documented non-implemented.
-Boundary profile: external runtime adapter.
+Boundary profile: candidate_support_note.
 
 This document is the single authority for the placement of a future local Revit adapter in the Pantheon ecosystem. It specializes the generic Bridge, Task Contract, Context Pack, capability, workflow and runtime-return contracts without creating a second governance model.
 
