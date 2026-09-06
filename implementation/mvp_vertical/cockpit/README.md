@@ -94,6 +94,24 @@ workspace projection != governed identity
 
 Physical configured roots stay server-side. The projection rejects path traversal and symlink traversal and does not infer domain identity from directory structure.
 
+Direct collection reads now include only cheap reconstructible file facts such as MIME type and byte size. Selecting one file can call the bounded entry-detail read, which observes the current SHA-256 digest, filesystem modification timestamp and whether an adjacent `document.yaml` exists. That detail read does not parse the sidecar, ingest the file, allocate a Document identity, include source bytes or use Hindsight.
+
+```text
+filesystem appearance / drop
+→ next Workspace collection read exposes the file Card
+→ file detail read reconstructs exact local metadata
+→ no watcher, cache or persistence required
+
+adjacent document.yaml observed
+!= manifest valid
+!= identity mapping resolved
+
+PDF metadata observed
+!= PDF content understood
+```
+
+Digest calculation is lazy so a directory containing many large PDFs is not fully hashed merely to render its child Cards. Re-reading the detail after a file changes recomputes the observation from the current bytes.
+
 Workspace currently occupies a primary root because a bounded source and projection already exist. That root placement remains reversible product navigation; it does not promote folders into governed identities.
 
 ## Competence / Capability boundary
