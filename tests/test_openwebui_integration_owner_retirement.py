@@ -16,6 +16,93 @@ PUBLIC_DIAGRAMS = (
 # owner-coherent follow-up slices reduce the set to zero.
 KNOWN_CURRENT_AUTHORITY_OPENWEBUI_RESIDUES = set()
 
+FORBIDDEN_OWNERSHIP_PHRASES = (
+    "OpenWebUI owns the cockpit surface",
+    "user visibility or decision capture -> OpenWebUI",
+    "OpenWebUI exposes.",
+    "OpenWebUI may expose",
+    "OpenWebUI may display",
+    "through Agora, OpenWebUI",
+)
+
+# Doctrine surfaces scanned for retired-owner residue. `docs/governance/` carries
+# the canonical/active guarantee; `docs/domain-packs/` was covered by no guard at
+# all until #993 swept its boundary triads by hand.
+DOCTRINE_ROOTS = (GOV, ROOT / "docs" / "domain-packs")
+
+# Candidate-doctrine residue frozen as it stands. Ratchet only: entries may be
+# removed as documents are fixed, never added. Removing the class of problem is
+# #787's boundary-profile migration, not this list.
+KNOWN_CANDIDATE_OPENWEBUI_RESIDUES = {
+    "docs/governance/AGENTTRANSFER_HERMES_ARTIFACT_TRANSFER.md",
+    "docs/governance/ANSWER_VERIFICATION_GATE.md",
+    "docs/governance/ARCHITECTURAL_PROJECT_GRAPH.md",
+    "docs/governance/AUTHORITY_INDEX_DECOMPOSITION_PLAN.md",
+    "docs/governance/BOOTSTRAP_INSTALLATION_LADDER.md",
+    "docs/governance/CAPABILITY_REGISTRY.md",
+    "docs/governance/COCKPIT_ARCHITECTURE.md",
+    "docs/governance/CONTEXT_STACK.md",
+    "docs/governance/DATA_PLATFORM_ARCHITECTURE.md",
+    "docs/governance/DOCUMENT_INTELLIGENCE.md",
+    "docs/governance/EVIDENCE_MEMORY_CANONICALIZATION.md",
+    "docs/governance/EVIDENCE_MEMORY_DEV_PLAN.md",
+    "docs/governance/GLOSSARY.md",
+    "docs/governance/GOVERNANCE_OBJECT_RELATIONSHIP_MAP.md",
+    "docs/governance/ITERATIVE_DELIBERATION_LIFECYCLE.md",
+    "docs/governance/LOCAL_INSTALLATION_AND_CHANNELS.md",
+    "docs/governance/MAINTAINER_ACTIONS.md",
+    "docs/governance/MAINTAINER_RELEASE_AND_LICENSE_CHECKLIST.md",
+    "docs/governance/MARKDOWN_DOSSIER_WORKFLOW.md",
+    "docs/governance/METHOD_CARD_HERMES_HANDOFF_SPECIALIZATION.md",
+    "docs/governance/METHOD_CARD_MODEL.md",
+    "docs/governance/MISSING_INFORMATION_DISCIPLINE.md",
+    "docs/governance/MODULE_INVOCATION_PREFLIGHT.md",
+    "docs/governance/NANGO_HERMES_CONNECTOR_GATEWAY.md",
+    "docs/governance/NARRATIVE.md",
+    "docs/governance/NAS_INSTALLATION_PROFILES.md",
+    "docs/governance/PADDLEOCR_HERMES_SKILL_NOTE.md",
+    "docs/governance/PANTHEON_COCKPIT_UX_SPEC.md",
+    "docs/governance/PANTHEON_CONTROL_BOUNDARY.md",
+    "docs/governance/PANTHEON_CONTROL_INTENT_LOG.md",
+    "docs/governance/PANTHEON_CONTROL_PLANE_BOUNDARY.md",
+    "docs/governance/PANTHEON_GRAPH_MODEL.md",
+    "docs/governance/PANTHEON_REVIT_FIRST_SANDBOX_ACTION_CONTRACT.md",
+    "docs/governance/PANTHEON_REVIT_GATE.md",
+    "docs/governance/PANTHEON_REVIT_GATE_2027_PROTOTYPE_PLAN.md",
+    "docs/governance/PANTHEON_REVIT_GATE_DEVELOPER_DOSSIER.md",
+    "docs/governance/PANTHEON_REVIT_LOCAL_SANDBOX_EXCEPTION.md",
+    "docs/governance/POSTGRES_PROPERTY_GRAPH_CAPABILITY.md",
+    "docs/governance/PROGRAM_AND_CONFORMANCE.md",
+    "docs/governance/REASONING_MODES_LIBRARY.md",
+    "docs/governance/REFUSAL_FIXTURES.md",
+    "docs/governance/REGISTRE_PROBATOIRE_DIRECTION.md",
+    "docs/governance/REPOSITORY_REVIEW_WATCHER.md",
+    "docs/governance/REVIEW_QUEUE.md",
+    "docs/governance/ROLE_DIALOGUE_TRACE.md",
+    "docs/governance/SPICE_REFERENCE_DISTILLATION.md",
+    "docs/governance/TASK_CONTRACT_REVISIONS.md",
+    "docs/governance/TRIPARTITE_INTERFACE_SPEC.md",
+    "docs/governance/UNDERSTAND_ANYTHING_HERMES_ADAPTER.md",
+    "docs/governance/URGENT_REVIEW_TRIAGE.md",
+    "docs/governance/WORKFLOW_DEPTH_POLICY.md",
+    "docs/governance/WORK_ISSUE_AND_DELEGATED_MERGE_MODEL.md",
+    "docs/governance/concept-model/README.md",
+    "docs/governance/examples/mvp_vertical_fixture/FAILING_FIXTURE.md",
+    "docs/governance/examples/mvp_vertical_fixture/GOVERNANCE_INVARIANTS.md",
+    "docs/governance/examples/mvp_vertical_fixture/LOCAL_VALIDATOR_DESIGN.md",
+    "docs/governance/examples/mvp_vertical_fixture/OBJECT_SHAPE_RECONCILIATION.md",
+    "docs/governance/examples/mvp_vertical_fixture/README.md",
+    "docs/governance/examples/mvp_vertical_fixture/SCHEMA_ALIGNMENT.md",
+    "docs/governance/examples/mvp_vertical_fixture/SOURCE_RETRIEVAL_PLACEMENT.md",
+    "docs/governance/examples/mvp_vertical_fixture/VALIDATION_PLAN.md",
+    "docs/governance/examples/mvp_vertical_fixture/VALIDATION_REPORT_SHAPE.md",
+    "docs/governance/examples/mvp_vertical_fixture/VOCABULARY_TIGHTENING.md",
+    "docs/governance/reference_reviews/MCP_SPEC_2026_07_28_REVIEW.md",
+    "docs/governance/rites/EXTERNAL_REPO_QUALIFICATION_RITE.md",
+    "docs/governance/rites/RITE_TRIGGER_CATALOGUE.md",
+    "docs/domain-packs/architecture/HISTORICAL_ARCHITECTURE_RECONCILIATION.md",
+}
+
 
 def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
@@ -52,32 +139,62 @@ def test_no_active_governance_doc_depends_on_removed_owner():
     assert offenders == []
 
 
-def test_active_governance_openwebui_ownership_residue_is_explicitly_bounded():
-    forbidden = (
-        "OpenWebUI owns the cockpit surface",
-        "user visibility or decision capture -> OpenWebUI",
-        "OpenWebUI exposes.",
-        "OpenWebUI may expose",
-        "OpenWebUI may display",
-        "through Agora, OpenWebUI",
-    )
-    offenders = []
-    for path in GOV.rglob("*.md"):
-        if path == OBSOLETE:
-            continue
-        text = _read(path)
-        if not _is_current_authority(text):
-            continue
-        for phrase in forbidden:
-            if phrase in text:
-                offenders.append((path.relative_to(ROOT).as_posix(), phrase))
+def _residue_paths(roots, *, current_authority: bool) -> set[str]:
+    """Paths under ``roots`` stating a retired-owner phrase, by authority class.
 
-    offender_paths = {path for path, _ in offenders}
+    One traversal shared by both residue tests so the phrase list cannot drift
+    between them: the current-authority guarantee and the candidate ratchet must
+    always be measuring the same thing.
+    """
+    found: set[str] = set()
+    for root in roots:
+        for path in root.rglob("*.md"):
+            if path == OBSOLETE:
+                continue
+            text = _read(path)
+            if _is_current_authority(text) is not current_authority:
+                continue
+            if any(phrase in text for phrase in FORBIDDEN_OWNERSHIP_PHRASES):
+                found.add(path.relative_to(ROOT).as_posix())
+    return found
+
+
+def test_active_governance_openwebui_ownership_residue_is_explicitly_bounded():
+    offender_paths = _residue_paths((GOV,), current_authority=True)
     unexpected = offender_paths - KNOWN_CURRENT_AUTHORITY_OPENWEBUI_RESIDUES
     no_longer_present = KNOWN_CURRENT_AUTHORITY_OPENWEBUI_RESIDUES - offender_paths
 
     assert unexpected == set()
     assert no_longer_present == set()
+
+
+def test_candidate_doctrine_openwebui_residue_is_bounded_and_only_shrinks():
+    """Candidate doctrine was outside every guard, which is why it rotted.
+
+    `_is_current_authority` deliberately admits only canonical/active/active-support
+    documents, so the entire body of candidate doctrine — the large majority of this
+    repository's Markdown — was never scanned. The residue there is real: a reader of
+    a candidate document is told a retired integration is the current exposure
+    surface, and nothing contradicted it.
+
+    This is a ratchet, not a sweep. The set below is seeded with what exists today so
+    CI stays green and no document is forced to change; `unexpected` refuses any new
+    occurrence, and `no_longer_present` forces an entry to be dropped as soon as it is
+    fixed. The list can therefore only shrink. `#787`'s boundary-profile migration is
+    what removes the class of problem; this only stops it growing meanwhile.
+    """
+    offender_paths = _residue_paths(DOCTRINE_ROOTS, current_authority=False)
+    unexpected = offender_paths - KNOWN_CANDIDATE_OPENWEBUI_RESIDUES
+    no_longer_present = KNOWN_CANDIDATE_OPENWEBUI_RESIDUES - offender_paths
+
+    assert unexpected == set(), (
+        "a candidate document newly states a retired integration as the current "
+        "exposure surface; state the current owner instead of adding to the debt"
+    )
+    assert no_longer_present == set(), (
+        "a listed residue is fixed — remove it from KNOWN_CANDIDATE_OPENWEBUI_RESIDUES "
+        "so the remaining debt stays exact"
+    )
 
 
 def test_decision_learning_and_placement_surfaces_are_client_agnostic():
