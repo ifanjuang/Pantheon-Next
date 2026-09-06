@@ -14,12 +14,53 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **872**.
+Total indexed entries: **913**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-09-06 | `2026/Q3/2026-09-06-retire-openwebui-triad-architecture.md` | Twenty-one architecture documents still named a retired integration as the exposure surface |
+| 2026-09-06 | `2026/Q3/2026-09-06-ratchet-candidate-openwebui-residue.md` | The retirement guard was green because it never looked at candidate doctrine |
+| 2026-09-06 | `2026/Q3/2026-09-06-obsidian-workspace-knowledge-convergence.md` | 2026-09-06 — Obsidian workspace knowledge convergence |
+| 2026-09-06 | `2026/Q3/2026-09-06-knowledge-family-divergence-marker.md` | The architecture Knowledge blueprint names a vocabulary the schema refuses |
+| 2026-09-06 | `2026/Q3/2026-09-06-hermes-external-context-minimal-v1.md` | Hermes external context minimal v1 |
+| 2026-09-06 | `2026/Q3/2026-09-06-hermes-context-read-q1.md` | 2026-09-06 — Hermes context-read Q1 |
+| 2026-09-06 | `2026/Q3/2026-09-06-governance-ci-listen-to-body-edits.md` | A body-driven check lived in a workflow that ignored body edits |
+| 2026-09-06 | `2026/Q3/2026-09-06-enforcement-and-exercised-authority-audit.md` | An architecture assessment, measured rather than impressionistic |
+| 2026-09-06 | `2026/Q3/2026-09-06-boundary-profile-vocabulary-conformance.md` | The boundary-profile vocabulary had an owner, a rule and no check |
+| 2026-09-06 | `2026/Q3/2026-09-06-boundary-profile-inherit-role-separation.md` | Seven documents declared a boundary profile and restated the boundary anyway |
+| 2026-09-05 | `2026/Q3/2026-09-05-proposal-outcome-feedback-metrics.md` | 2026-09-05 — proposal/outcome feedback metrics |
+| 2026-09-05 | `2026/Q3/2026-09-05-pair-unsloth-runtime-q1.md` | 2026-09-05 — PAIR + Unsloth runtime Q1 qualification planning |
+| 2026-09-05 | `2026/Q3/2026-09-05-obsidian-operational-health-pilot.md` | 2026-09-05 — Obsidian operational-health pilot |
+| 2026-09-05 | `2026/Q3/2026-09-05-hermes-improvement-path.md` | Hermes improvement path — converged on evaluation first |
+| 2026-09-05 | `2026/Q3/2026-09-05-hermes-context-read-budget.md` | 2026-09-05 — Hermes context read budget |
+| 2026-09-05 | `2026/Q3/2026-09-05-context-admission-boundary.md` | 2026-09-05 — Context Admission boundary |
+| 2026-09-04 | `2026/Q3/2026-09-04-project-claim-conflict-candidates.md` | 2026-09-04 — ProjectClaim conflict candidates |
+| 2026-09-04 | `2026/Q3/2026-09-04-project-claim-cockpit-perspective.md` | 2026-09-04 — ProjectClaim Cockpit perspective convergence |
+| 2026-09-04 | `2026/Q3/2026-09-04-governed-document-identity-candidates.md` | 2026-09-04 — Governed document identity candidates |
+| 2026-09-03 | `2026/Q3/2026-09-03-spatial-perception-episodic-qualification.md` | Spatial perception + episodic memory qualification |
+| 2026-09-03 | `2026/Q3/2026-09-03-refresh-governance-status.md` | implementation/GOVERNANCE_STATUS.md went stale the same way WHAT_RUNS.md did |
+| 2026-09-03 | `2026/Q3/2026-09-03-qualification-infrastructure-convergence.md` | External qualification infrastructure convergence |
+| 2026-09-03 | `2026/Q3/2026-09-03-project-claim-temporal-reads.md` | ProjectClaim temporal reads — knowledge time and business time stay distinct |
+| 2026-09-03 | `2026/Q3/2026-09-03-project-claim-structured-provenance.md` | 2026-09-03 — ProjectClaim structured provenance |
+| 2026-09-03 | `2026/Q3/2026-09-03-markdowndb-structural-index-qualification.md` | MarkdownDB structural-index qualification — completed convergence |
+| 2026-09-03 | `2026/Q3/2026-09-03-governed-cognitive-ecology-grammar.md` | 2026-09-03 — Governed cognitive ecology grammar |
+| 2026-09-03 | `2026/Q3/2026-09-03-free-episodic-spatial-memory.md` | Free episodic memory and derived spatial perception convergence |
+| 2026-09-03 | `2026/Q3/2026-09-03-direct-human-policy-gates.md` | Direct human effects are not delegated runtime tasks |
+| 2026-09-03 | `2026/Q3/2026-09-03-authority-topology-convergence.md` | Authority topology convergence before temporal ProjectClaim work |
+| 2026-09-03 | `2026/Q3/2026-09-03-authority-audit-repin.md` | Repin Architecture Audit to accepted ownership topology revision 4 |
+| 2026-09-02 | `2026/Q3/2026-09-02-release-checkpoint-0.1.65.md` | Release checkpoint 0.1.65 |
+| 2026-09-02 | `2026/Q3/2026-09-02-refresh-what-runs.md` | Refreshing WHAT_RUNS.md's chokepoint row |
+| 2026-09-02 | `2026/Q3/2026-09-02-refresh-what-runs-final.md` | WHAT_RUNS.md went stale within the hour, again |
+| 2026-09-02 | `2026/Q3/2026-09-02-mutation-review-batch-fourteen.md` | Reading the last twenty-one mutation entry points |
 | 2026-09-02 | `2026/Q3/2026-09-02-mutation-inventory-refresh.md` | Refreshing a governance record the code had left behind |
+| 2026-09-02 | `2026/Q3/2026-09-02-govern-the-identity-binding.md` | Governing the act that makes an external identity a governed principal |
+| 2026-09-02 | `2026/Q3/2026-09-02-gate-store-reviewed-dossier.md` | Routing the reviewed-dossier import through the chokepoint |
+| 2026-09-02 | `2026/Q3/2026-09-02-gate-knowledge-edit-and-publish.md` | Routing Knowledge publication and edit-application through the chokepoint |
+| 2026-09-02 | `2026/Q3/2026-09-02-gate-act-working-information.md` | Routing acting an Information version through the chokepoint |
+| 2026-09-02 | `2026/Q3/2026-09-02-dead-parameter-and-replay-lookup.md` | Removing a flag that promised a guard, and a lookup that discarded its key |
+| 2026-09-02 | `2026/Q3/2026-09-02-apu-application-serialization.md` | Serialising the APU write application against its own rejection |
+| 2026-09-02 | `2026/Q3/2026-09-02-act-information-policy-facts.md` | The act gate told the decision point it reached outside Pantheon |
 | 2026-09-01 | `2026/Q3/2026-09-01-aci-distillation-finish.md` | ACI distillation finish — 2026-09-01 |
 | 2026-08-31 | `2026/Q3/2026-08-31-remediation-batch-1-lab-honesty.md` | 2026-08-31 — remediation batch 1: make a green lab mean something again |
 | 2026-08-31 | `2026/Q3/2026-08-31-professional-private-source-patterns.md` | #827 — sanitized private-source-derived professional review patterns |
