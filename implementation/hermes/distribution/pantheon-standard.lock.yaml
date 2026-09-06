@@ -32,7 +32,7 @@ components:
     kind: context_bridge
     path: implementation/hermes/plugins/pantheon-context-bridge
     digest_mode: tree
-    content_digest: sha256:752cccdf182fe47ea643ee4a398df97b604384eb8aa6611840a7fd5d1d34cc3d
+    content_digest: sha256:4fa85488ccb441989df7709f2f26f93ec95c208b2c2e049a34c02a7c6d80832e
     required: true
     enabled_by_default: false
     capabilities:
@@ -42,7 +42,7 @@ components:
       - guard-known-external-content
       - read-untrusted-content
       - search-untrusted-content
-    notes: Reads only exact admitted Pantheon context and provides plugin-only data boundaries for known external content; guarded read/search are restricted to known external roots, no built-in Hermes tool is overridden, and the bundled skill is guidance rather than authority.
+    notes: Reads only exact admitted Pantheon context and provides plugin-only data boundaries for known external content; guarded read/search are restricted to intrinsically external or post-success observed eligible roots, while pending/taint-only destinations may block ordinary reads without granting guarded-read scope. No built-in Hermes tool is overridden, and the bundled skill is guidance rather than authority.
   - component_id: runtime-observer
     kind: runtime_observer
     path: implementation/mvp_vertical/hermes_runs_observer.py
