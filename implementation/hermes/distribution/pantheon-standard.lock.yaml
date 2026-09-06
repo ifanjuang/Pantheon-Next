@@ -42,7 +42,14 @@ components:
       - guard-known-external-content
       - read-untrusted-content
       - search-untrusted-content
-    notes: Reads only exact admitted Pantheon context and provides plugin-only data boundaries for known external content; guarded read/search are restricted to stable intrinsic external roots or roots explicitly admitted by a plugin-controlled governed operation. Shell fetch hints are deny-only: they may create pending/taint state that blocks ordinary reads, but they never create guarded-read eligibility. No built-in Hermes tool is overridden, and the bundled skill is guidance rather than authority.
+    notes: >-
+      Reads only exact admitted Pantheon context and provides plugin-only data boundaries
+      for known external content; guarded read/search are restricted to stable intrinsic
+      external roots or roots explicitly admitted by a plugin-controlled governed
+      operation. Shell fetch hints are deny-only: they may create pending/taint state
+      that blocks ordinary reads, but they never create guarded-read eligibility. No
+      built-in Hermes tool is overridden, and the bundled skill is guidance rather than
+      authority.
   - component_id: runtime-observer
     kind: runtime_observer
     path: implementation/mvp_vertical/hermes_runs_observer.py
