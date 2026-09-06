@@ -46,17 +46,20 @@ _WGET_DEST_RE = re.compile(
     r"(?:^|\s)(?:-O|--output-document)(?:=|\s+)(\S+)"
 )
 _FETCH_URL_RE = re.compile(r"https?://[^\s'\";&|]+", re.IGNORECASE)
-_SHELL_SPLIT_RE = re.compile(r"[\s|&;]+")
 # Shell composition/comments make an overall terminal result insufficient to
 # prove that a matched fetch sub-expression executed. Candidates are still
 # tracked as pending/taint-only, but are never promoted to guarded-read scope.
-_SHELL_CONTROL_RE = re.compile(r"(?:&&|\|\||[;&|<>`#\n\r])")
+# Command substitution/grouping is included explicitly: outer-command success
+# cannot prove the nested fetch succeeded.
+_SHELL_CONTROL_RE = re.compile(r"(?:&&|\|\||\$\(|[(){};&|<>`#\n\r])")
 _TERMINAL_CONTENT_READER_RE = re.compile(
     _COMMAND_PREFIX
     + r"(?:(?:cat|head|tail|less|more|strings|grep|rg|sed|awk|type|get-content|gc|"
     r"select-string)(?:\.exe)?\b|unzip(?:\.exe)?\s+-p\b)",
     re.IGNORECASE,
 )
+_CURL_BASENAMES = {"curl", "curl.exe"}
+_SHELL_OPERATOR_TOKENS = {"&&", "||", ";", "|", "&", "(", ")", "{", "}"}
 
 _GUARDED_DISPATCH: ContextVar[bool] = ContextVar(
     "pantheon_guarded_untrusted_dispatch",
@@ -128,58 +131,92 @@ def _command_basename(token: str) -> str:
     return str(token or "").replace("\\", "/").rsplit("/", 1)[-1].lower()
 
 
-def _curl_candidate(command: str, cwd: str) -> tuple[str, str] | None:
-    """Parse curl output options with shell quoting preserved by shlex.
+def _curl_indexes(tokens: list[str]) -> list[int]:
+    return [
+        index
+        for index, token in enumerate(tokens)
+        if _command_basename(token) in _CURL_BASENAMES
+    ]
 
-    Supports ``-o file``, ``-oFILE``, ``-o=FILE``, ``--output FILE``,
-    ``--output=FILE`` and remote-name forms. Short-option case is preserved.
+
+def _curl_detection_is_promotable(command: str) -> bool:
+    """A detected curl is promotable only when curl is the executed command.
+
+    A later ``curl`` token may merely be data passed to another executable. We
+    still retain its destinations as pending/taint-only candidates, but never
+    let success of the outer command promote them to guarded-read authority.
     """
 
     tokens = _shell_tokens(command)
-    curl_index = next(
-        (
-            index
-            for index, token in enumerate(tokens)
-            if _command_basename(token) in {"curl", "curl.exe"}
-        ),
-        None,
-    )
-    if curl_index is None:
-        return None
+    indexes = _curl_indexes(tokens)
+    if not indexes:
+        return True
+    return indexes == [0]
 
-    args = tokens[curl_index + 1 :]
-    destination: str | None = None
-    remote_name = False
-    urls: list[str] = []
-    index = 0
-    while index < len(args):
-        token = args[index]
-        if token in {"-o", "--output"}:
-            if index + 1 < len(args):
-                destination = args[index + 1]
-                index += 2
-                continue
-        elif token.startswith("--output="):
-            destination = token.split("=", 1)[1]
-        elif token.startswith("-o="):
-            destination = token[3:]
-        elif token.startswith("-o") and token not in {"-o", "-O"}:
-            destination = token[2:]
-        elif token in {"-O", "--remote-name"}:
-            remote_name = True
 
-        if token.lower().startswith(("http://", "https://")):
-            urls.append(token)
-        index += 1
+def _curl_candidates(command: str, cwd: str) -> list[tuple[str, str]]:
+    """Parse every curl output destination while preserving shell quoting.
 
-    if destination:
-        resolved = _resolve_relative(destination, cwd)
-        return (resolved, "file") if resolved else None
-    if remote_name:
-        url = urls[0] if urls else ""
-        resolved = _resolve_relative(_basename_from_url(url), cwd) if url else ""
-        return (resolved, "file") if resolved else None
-    return None
+    Supports repeated ``-o file``, ``-oFILE``, ``-o=FILE``, ``--output FILE``,
+    ``--output=FILE`` and remote-name forms. Detection may be conservative for
+    compound commands because such candidates are deny-only and never promoted.
+    """
+
+    tokens = _shell_tokens(command)
+    indexes = _curl_indexes(tokens)
+    if not indexes:
+        return []
+
+    candidates: list[tuple[str, str]] = []
+    for curl_index in indexes:
+        args = tokens[curl_index + 1 :]
+        urls = [
+            token
+            for token in args
+            if token.lower().startswith(("http://", "https://"))
+        ]
+        remote_name = False
+        index = 0
+        while index < len(args):
+            token = args[index]
+            destination: str | None = None
+            if token in {"-o", "--output"}:
+                if index + 1 < len(args):
+                    destination = args[index + 1]
+                    index += 2
+                else:
+                    index += 1
+            elif token.startswith("--output="):
+                destination = token.split("=", 1)[1]
+                index += 1
+            elif token.startswith("-o="):
+                destination = token[3:]
+                index += 1
+            elif token.startswith("-o") and token not in {"-o", "-O"}:
+                destination = token[2:]
+                index += 1
+            elif token in {"-O", "--remote-name"}:
+                remote_name = True
+                index += 1
+            else:
+                index += 1
+
+            if destination:
+                resolved = _resolve_relative(destination, cwd)
+                if resolved:
+                    candidates.append((resolved, "file"))
+
+        if remote_name:
+            for url in urls:
+                resolved = _resolve_relative(_basename_from_url(url), cwd)
+                if resolved:
+                    candidates.append((resolved, "file"))
+
+    unique: list[tuple[str, str]] = []
+    for candidate in candidates:
+        if candidate not in unique:
+            unique.append(candidate)
+    return unique
 
 
 def _extract_fetch_candidates(command: str, cwd: str) -> list[tuple[str, str]]:
@@ -193,9 +230,7 @@ def _extract_fetch_candidates(command: str, cwd: str) -> list[tuple[str, str]]:
             if resolved:
                 candidates.append((resolved, "tree"))
 
-    curl = _curl_candidate(command, cwd)
-    if curl:
-        candidates.append(curl)
+    candidates.extend(_curl_candidates(command, cwd))
 
     if _WGET_COMMAND_RE.search(command or ""):
         match = _WGET_DEST_RE.search(command)
@@ -286,28 +321,46 @@ def _clear_taint_roots(task_id: str, roots: Iterable[str]) -> None:
     _forget_in_map(_TASK_TAINT_ROOTS, task_id, roots)
 
 
-def _roots_for_task(task_id: str) -> set[str]:
-    """Roots eligible for guarded native read/search delegation."""
-
+def _dynamic_roots_for_task(task_id: str) -> set[str]:
     key = _task_key(task_id)
     with _ROOTS_LOCK:
-        dynamic = set(_TASK_ROOTS.get(key, set()))
-    return _document_cache_roots() | dynamic
+        return set(_TASK_ROOTS.get(key, set()))
+
+
+def _roots_for_task(task_id: str) -> set[str]:
+    """Roots blocked from ordinary tools; not all are guarded-read eligible."""
+
+    return _document_cache_roots() | _dynamic_roots_for_task(task_id)
 
 
 def _eligible_root_records(task_id: str) -> list[tuple[str, str]]:
+    """Return only roots whose canonical boundary is already trustworthy.
+
+    Dynamic roots must have been pinned at promotion. Intrinsic document-cache
+    roots are never lazily pinned from their first guarded access; they are
+    eligible only while the configured lexical root is not a symlink and still
+    resolves to itself. A replaced/symlinked cache therefore fails closed.
+    """
+
     records: list[tuple[str, str]] = []
     key = _task_key(task_id)
-    roots = sorted(_roots_for_task(task_id))
+
+    for root in sorted(_document_cache_roots()):
+        lexical = _normalize(root)
+        if os.path.islink(lexical):
+            continue
+        canonical = _canonical(lexical)
+        if canonical != lexical:
+            continue
+        records.append((lexical, canonical))
+
     with _ROOTS_LOCK:
-        for root in roots:
+        dynamic = sorted(_TASK_ROOTS.get(key, set()))
+        for root in dynamic:
             lexical = _normalize(root)
-            identity_key = (key, lexical)
-            pinned = _ROOT_CANONICAL_IDENTITIES.get(identity_key)
-            if pinned is None:
-                pinned = _canonical(lexical)
-                _ROOT_CANONICAL_IDENTITIES[identity_key] = pinned
-            records.append((lexical, pinned))
+            pinned = _ROOT_CANONICAL_IDENTITIES.get((key, lexical))
+            if pinned is not None:
+                records.append((lexical, pinned))
     return records
 
 
@@ -404,10 +457,17 @@ def _path_intersects_any_root(path: str, roots: Iterable[str]) -> bool:
 
 
 def _command_touches_root(command: str, cwd: str, roots: Iterable[str]) -> bool:
+    """Use shell-aware tokenization so quoted paths remain one path argument."""
+
     roots = set(roots)
-    for token in _SHELL_SPLIT_RE.split(command or ""):
-        token = token.strip().strip("'\"")
-        if not token or token.startswith("-") or "://" in token:
+    for token in _shell_tokens(command):
+        token = str(token or "").strip()
+        if (
+            not token
+            or token in _SHELL_OPERATOR_TOKENS
+            or token.startswith("-")
+            or "://" in token
+        ):
             continue
         resolved = _resolve_relative(token, cwd)
         if _path_intersects_any_root(resolved, roots):
@@ -441,7 +501,10 @@ def _record_pending_fetch(
     record = {
         "command": command,
         "cwd": _normalize(cwd),
-        "promotable": not bool(_SHELL_CONTROL_RE.search(command or "")),
+        "promotable": (
+            not bool(_SHELL_CONTROL_RE.search(command or ""))
+            and _curl_detection_is_promotable(command)
+        ),
         "candidates": [
             (_normalize(path), kind, _fingerprint(path))
             for path, kind in candidates
