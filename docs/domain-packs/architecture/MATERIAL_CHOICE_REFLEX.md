@@ -9,7 +9,7 @@ It does not implement a runtime, search tool, PLU checker, ABF checker, estimato
 It defines a candidate reflex for simple material-choice questions that may become consequential when they touch regulation, prior decisions, cost, technique, contract, insurance or external communication.
 
 ```text
-OpenWebUI exposes.
+Optional runtime clients may expose interaction.
 Hermes Agent executes.
 Pantheon Next governs.
 ```

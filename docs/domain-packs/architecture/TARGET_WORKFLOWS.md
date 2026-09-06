@@ -7,7 +7,7 @@ This document consolidates the architecture-agency workflow examples into one ta
 It does not implement a runtime, connector, OpenWebUI action, Hermes skill, Gmail sender, Telegram listener, WhatsApp integration, form filler, image analyzer, document generator, PDF exporter or memory engine.
 
 ```text
-OpenWebUI exposes.
+Optional runtime clients may expose interaction.
 Hermes Agent executes.
 Pantheon Next governs.
 ```

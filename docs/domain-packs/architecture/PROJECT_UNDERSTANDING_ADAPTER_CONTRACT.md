@@ -9,7 +9,7 @@ The adapter may read PDF/drawings, IFC, images, photographs, Revit or another ad
 It is documentation only. It implements no reader, OCR, vision model, extractor, Revit add-in, IFC engine or connector. It specializes the generic `BRIDGE_CONTRACT.md` and `ADAPTERS_AND_BINDINGS.md` for the APU family.
 
 ```text
-OpenWebUI exposes.
+Optional runtime clients may expose interaction.
 Hermes Agent executes/orchestrates.
 Pantheon Next governs.
 The human decides consequential effects.

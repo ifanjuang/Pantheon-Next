@@ -9,7 +9,7 @@ It is not legal advice, accounting validation, payment approval, contract interp
 It does not implement a runtime, connector, OCR pipeline, accounting tool, Notion write, email sending, payment workflow, insurance verification service, approval engine or Registre Probatoire entry.
 
 ```text
-OpenWebUI exposes.
+Optional runtime clients may expose interaction.
 Hermes Agent executes.
 Pantheon Next governs.
 ```

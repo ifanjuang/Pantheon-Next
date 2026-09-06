@@ -11,7 +11,7 @@ It defines a compact operating model so architecture-domain method objects remai
 Filename note: this document keeps its historical filename for now. The term `reflex` is narrowed by `METHOD_TAXONOMY.md` and no longer means every reusable architecture pattern.
 
 ```text
-OpenWebUI exposes.
+Optional runtime clients may expose interaction.
 Hermes Agent executes.
 Pantheon Next governs.
 ```

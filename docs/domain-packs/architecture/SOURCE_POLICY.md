@@ -12,7 +12,7 @@ It does not validate any source by itself.
 It does not create a retrieval runtime, RAG system, web crawler, vector database, OpenWebUI Knowledge configuration, Hermes skill, regulatory checker, evidence engine, memory engine, approval engine or external action.
 
 ```text
-OpenWebUI exposes.
+Optional runtime clients may expose interaction.
 Hermes Agent executes.
 Pantheon Next governs.
 ```

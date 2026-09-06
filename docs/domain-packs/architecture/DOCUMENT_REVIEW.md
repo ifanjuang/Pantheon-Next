@@ -9,7 +9,7 @@ It is documentation only.
 It does not implement a professional authority, document processor, OCR pipeline, vector index, graph runtime, database schema, OpenWebUI template, Hermes skill, approval system, memory engine or automatic action.
 
 ```text
-OpenWebUI exposes.
+Optional runtime clients may expose interaction.
 Hermes Agent executes.
 Pantheon Next governs.
 ```

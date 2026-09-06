@@ -10,7 +10,7 @@ This document defines how Pantheon Next should frame architecture-domain questio
 It is not a RAG engine. It is not a graph runtime. It is not an agent, checker, scheduler, queue, approval engine, memory engine, OpenWebUI extension, Hermes skill, database schema or implementation plan.
 
 ```text
-OpenWebUI exposes.
+Optional runtime clients may expose interaction.
 Hermes Agent executes.
 Pantheon Next governs.
 The architect decides.

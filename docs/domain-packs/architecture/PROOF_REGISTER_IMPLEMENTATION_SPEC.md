@@ -9,7 +9,7 @@ It is a specification only.
 It does not create migrations, tables, RLS policies, Directus collections, object storage, OpenWebUI forms, Hermes skills, queues, schedulers, approval systems, memory systems or connectors.
 
 ```text
-OpenWebUI exposes.
+Optional runtime clients may expose interaction.
 Hermes Agent executes.
 Pantheon Next governs.
 ```

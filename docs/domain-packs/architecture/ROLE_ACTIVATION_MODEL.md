@@ -15,7 +15,7 @@ It does not implement agents, role executors, role routing, multi-agent loops, w
 It defines how architecture-domain role qualities express themselves freely but boundedly, without making every role visible on every request.
 
 ```text
-OpenWebUI exposes.
+Optional runtime clients may expose interaction.
 Hermes Agent executes.
 Pantheon Next governs.
 ```
