@@ -55,6 +55,7 @@ from .project_anatomy_api import install_project_anatomy_routes
 from .project_change_variant_api import install_project_change_variant_routes
 from .work_issue_scope_api import install_work_issue_scope_routes
 from .workspace_collection_read_api import install_workspace_collection_read_routes
+from .workspace_qualification_api import install_workspace_qualification_routes
 
 
 def initialize_composed_schema() -> None:
@@ -208,6 +209,14 @@ def create_composed_cockpit_app(**kwargs):
         app,
         workspace_roots=workspace_roots,
         require_read_key=require_read_key,
+    )
+    install_workspace_qualification_routes(
+        app,
+        workspace_roots=app.state.workspace_roots,
+        with_connection=with_connection,
+        require_read_key=require_read_key,
+        require_editor_key=require_editor_key,
+        require_human_actor=require_human_actor,
     )
     install_contradictory_review_routes(
         app,

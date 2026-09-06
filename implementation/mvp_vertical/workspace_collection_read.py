@@ -11,7 +11,9 @@ from __future__ import annotations
 import hashlib
 import json
 import mimetypes
+import os
 import re
+import stat as stat_module
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Mapping
@@ -32,6 +34,14 @@ class WorkspacePathNotFound(WorkspaceCollectionReadError):
 
 class WorkspacePathNotDirectory(WorkspaceCollectionReadError):
     """A collection read targeted an entry that is not a directory."""
+
+
+class WorkspacePathNotFile(WorkspaceCollectionReadError):
+    """An exact file observation targeted an entry that is not a regular file."""
+
+
+class WorkspaceFileChanged(WorkspaceCollectionReadError):
+    """The exact file changed while a byte-basis observation was being computed."""
 
 
 class WorkspaceConfigurationError(WorkspaceCollectionReadError):
@@ -123,8 +133,17 @@ def normalize_relative_path(relative_path: str | None) -> str:
     return "" if normalized == "." else normalized
 
 
+def _reject_hidden_components(relative_path: str) -> None:
+    """Keep exact reads inside the same visible namespace as collection navigation."""
+    for part in PurePosixPath(relative_path).parts if relative_path else ():
+        if part == "_VAULT.md" or part.startswith("."):
+            raise WorkspacePathNotFound(
+                f"workspace path is not exposed by the read projection: {relative_path!r}"
+            )
+
+
 def _reject_symlink_components(root: Path, relative_path: str) -> None:
-    """Keep the first slice symlink-free, even when a link would stay in-root."""
+    """Keep ordinary projection reads symlink-free."""
     current = root
     for part in PurePosixPath(relative_path).parts if relative_path else ():
         current = current / part
@@ -134,8 +153,8 @@ def _reject_symlink_components(root: Path, relative_path: str) -> None:
             )
 
 
-def _resolve_directory(root: Path, relative_path: str) -> Path:
-    """Resolve a normalized path under one root and require a real directory."""
+def _resolve_entry(root: Path, relative_path: str) -> Path:
+    _reject_hidden_components(relative_path)
     _reject_symlink_components(root, relative_path)
     target = (root / relative_path).resolve()
     root_real = root.resolve()
@@ -147,9 +166,27 @@ def _resolve_directory(root: Path, relative_path: str) -> Path:
         raise WorkspacePathNotFound(
             f"workspace path does not exist: {relative_path!r}"
         )
+    return target
+
+
+def _resolve_directory(root: Path, relative_path: str) -> Path:
+    """Resolve a normalized path under one root and require a real directory."""
+    target = _resolve_entry(root, relative_path)
     if not target.is_dir():
         raise WorkspacePathNotDirectory(
             f"workspace collection target is not a directory: {relative_path!r}"
+        )
+    return target
+
+
+def _resolve_file(root: Path, relative_path: str) -> Path:
+    """Resolve one visible regular file for cheap, reconstructible observation."""
+    if not relative_path:
+        raise WorkspacePathNotFile("workspace file path is required")
+    target = _resolve_entry(root, relative_path)
+    if not target.is_file():
+        raise WorkspacePathNotFile(
+            f"workspace entry is not a regular file: {relative_path!r}"
         )
     return target
 
@@ -204,14 +241,7 @@ def _adjacent_document_sidecar(path: Path, relative_path: str) -> dict:
     }
 
 
-def _basic_file_metadata(path: Path, relative_path: str) -> dict:
-    """Return cheap reconstructible facts suitable for ordinary Card navigation."""
-    try:
-        stat = path.stat()
-    except OSError as exc:
-        raise WorkspaceCollectionReadError(
-            f"workspace file cannot be inspected: {path.name!r}"
-        ) from exc
+def _metadata_from_stat(path: Path, relative_path: str, stat: os.stat_result) -> dict:
     media_type = _media_type(path)
     return {
         "filename": path.name,
@@ -224,6 +254,145 @@ def _basic_file_metadata(path: Path, relative_path: str) -> dict:
             tz=timezone.utc,
         ).isoformat(),
         "adjacent_document_sidecar": _adjacent_document_sidecar(path, relative_path),
+    }
+
+
+def _basic_file_metadata(path: Path, relative_path: str) -> dict:
+    """Return cheap reconstructible facts suitable for ordinary Card navigation."""
+    try:
+        observed_stat = path.stat()
+    except OSError as exc:
+        raise WorkspaceCollectionReadError(
+            f"workspace file cannot be inspected: {path.name!r}"
+        ) from exc
+    return _metadata_from_stat(path, relative_path, observed_stat)
+
+
+def _stat_identity(stat: os.stat_result) -> tuple[int, int, int, int, int]:
+    return (
+        stat.st_dev,
+        stat.st_ino,
+        stat.st_size,
+        stat.st_mtime_ns,
+        stat.st_ctime_ns,
+    )
+
+
+def _secure_open_workspace_file(root: Path, relative_path: str) -> int:
+    """Open each path component relative to the configured root with no-follow semantics."""
+    if not hasattr(os, "O_NOFOLLOW") or not hasattr(os, "O_DIRECTORY"):
+        raise WorkspaceCollectionReadError(
+            "exact workspace observation requires O_NOFOLLOW and O_DIRECTORY support"
+        )
+    _reject_hidden_components(relative_path)
+    parts = PurePosixPath(relative_path).parts
+    if not parts:
+        raise WorkspacePathNotFile("workspace file path is required")
+
+    root_fd: int | None = None
+    directory_fds: list[int] = []
+    try:
+        root_fd = os.open(
+            root,
+            os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+        )
+        parent_fd = root_fd
+        for part in parts[:-1]:
+            next_fd = os.open(
+                part,
+                os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                dir_fd=parent_fd,
+            )
+            directory_fds.append(next_fd)
+            parent_fd = next_fd
+        file_fd = os.open(
+            parts[-1],
+            os.O_RDONLY | os.O_NOFOLLOW,
+            dir_fd=parent_fd,
+        )
+        file_stat = os.fstat(file_fd)
+        if not stat_module.S_ISREG(file_stat.st_mode):
+            os.close(file_fd)
+            raise WorkspacePathNotFile(
+                f"workspace entry is not a regular file: {relative_path!r}"
+            )
+        return file_fd
+    except FileNotFoundError as exc:
+        raise WorkspacePathNotFound(
+            f"workspace path does not exist: {relative_path!r}"
+        ) from exc
+    except OSError as exc:
+        raise WorkspaceCollectionReadError(
+            f"workspace file cannot be opened without following links: {relative_path!r}"
+        ) from exc
+    finally:
+        for descriptor in reversed(directory_fds):
+            os.close(descriptor)
+        if root_fd is not None:
+            os.close(root_fd)
+
+
+def _exact_file_metadata(root: Path, relative_path: str) -> dict:
+    """Return metadata and digest from one stable descriptor, then verify path identity."""
+    entry_path = root / relative_path
+    digest = hashlib.sha256()
+    file_fd = _secure_open_workspace_file(root, relative_path)
+    try:
+        with os.fdopen(file_fd, "rb", closefd=True) as stream:
+            before = os.fstat(stream.fileno())
+            for block in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(block)
+            after = os.fstat(stream.fileno())
+    except OSError as exc:
+        raise WorkspaceCollectionReadError(
+            f"workspace file cannot be hashed safely: {relative_path!r}"
+        ) from exc
+
+    if _stat_identity(before) != _stat_identity(after):
+        raise WorkspaceFileChanged(
+            f"workspace file changed while hashing: {relative_path!r}"
+        )
+
+    verify_fd = _secure_open_workspace_file(root, relative_path)
+    try:
+        current = os.fstat(verify_fd)
+    finally:
+        os.close(verify_fd)
+    if _stat_identity(after) != _stat_identity(current):
+        raise WorkspaceFileChanged(
+            f"workspace file was replaced while hashing: {relative_path!r}"
+        )
+
+    observed = _metadata_from_stat(entry_path, relative_path, after)
+    observed["digest_sha256"] = digest.hexdigest()
+    return observed
+
+
+def observe_workspace_file(
+    workspace_roots: Mapping[str, Path],
+    workspace_ref: str,
+    relative_path: str,
+    *,
+    include_digest: bool = False,
+) -> dict:
+    """Observe one exact visible file without promoting it to a governed object."""
+    root = workspace_roots.get(workspace_ref)
+    if root is None:
+        raise WorkspaceNotFound(f"unknown workspace_ref: {workspace_ref!r}")
+    normalized = normalize_relative_path(relative_path)
+    if include_digest:
+        observed = _exact_file_metadata(root, normalized)
+    else:
+        entry = _resolve_file(root, normalized)
+        observed = _basic_file_metadata(entry, normalized)
+    return {
+        "workspace_ref": workspace_ref,
+        "relative_path": normalized,
+        "workspace_entry_id": _entry_id(workspace_ref, normalized),
+        "workspace_file": observed,
+        "observation_persisted": False,
+        "content_parsed": False,
+        "governed_identity": False,
     }
 
 
