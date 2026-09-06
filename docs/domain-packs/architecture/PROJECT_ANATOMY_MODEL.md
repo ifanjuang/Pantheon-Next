@@ -1,7 +1,7 @@
 # Project Anatomy — Conceptual Model
 
 Status: candidate support doctrine — frozen conceptual target.
-Boundary profile: architecture_project_understanding_projection.
+Boundary profile: candidate_support_note.
 Current contract generation: V0.2.
 Frozen: 2026-08-07.
 

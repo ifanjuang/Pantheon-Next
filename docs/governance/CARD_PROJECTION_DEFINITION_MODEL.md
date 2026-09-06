@@ -1,7 +1,7 @@
 # Card Projection Definition Model
 
 Status: active support doctrine — implementation-bounded.
-Boundary profile: projection_definition.
+Boundary profile: active_support_doctrine.
 
 ## Purpose
 
