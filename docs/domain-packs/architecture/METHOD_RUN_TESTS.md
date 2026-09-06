@@ -9,7 +9,7 @@ This document tests whether Method Cards, Hermes handoff discipline and the Card
 It does not implement a workflow engine, Hermes skill, UI, schema, approval engine, memory engine, connector, scheduler, queue or external action.
 
 ```text
-OpenWebUI exposes.
+Optional runtime clients may expose interaction.
 Hermes Agent executes.
 Pantheon Next governs.
 ```

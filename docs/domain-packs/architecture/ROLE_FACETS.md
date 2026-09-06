@@ -9,7 +9,7 @@ It does not implement agents, role executors, multi-agent loops, workflow engine
 It defines how architecture-domain gods / roles may be described as multi-faceted guardians without becoming autonomous agents or decorative labels.
 
 ```text
-OpenWebUI exposes.
+Optional runtime clients may expose interaction.
 Hermes Agent executes.
 Pantheon Next governs.
 ```

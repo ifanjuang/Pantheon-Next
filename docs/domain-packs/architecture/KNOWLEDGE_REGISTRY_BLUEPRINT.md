@@ -13,7 +13,7 @@ pipeline, OCR, vector index, embedding store, graph backend or external
 connector. Entries it describes remain candidates until reviewed.
 
 ```text
-OpenWebUI exposes.
+Optional runtime clients may expose interaction.
 Hermes Agent executes.
 Pantheon Next governs.
 ```

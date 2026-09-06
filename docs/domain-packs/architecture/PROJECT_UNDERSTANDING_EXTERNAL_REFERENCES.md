@@ -12,7 +12,7 @@ no external tool as canonical. Every entry is candidate / to verify until audite
 output quality).
 
 ```text
-OpenWebUI exposes.
+Optional runtime clients may expose interaction.
 Hermes Agent executes.
 Pantheon Next governs.
 ```

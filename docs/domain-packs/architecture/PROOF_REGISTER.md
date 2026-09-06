@@ -9,7 +9,7 @@ It is documentation only.
 It does not implement a SQL schema, migration, Directus cockpit, Postgres table, object storage, pgvector index, provenance graph, queue runtime, scheduler, OpenWebUI action, Hermes skill, connector, approval engine or memory engine.
 
 ```text
-OpenWebUI exposes.
+Optional runtime clients may expose interaction.
 Hermes Agent executes.
 Pantheon Next governs.
 ```

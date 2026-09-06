@@ -9,7 +9,7 @@ It does not implement a runtime, workflow engine, router, scheduler, queue, UI, 
 It defines a vocabulary correction for architecture-domain governance so that `reflex` remains a narrow term instead of becoming a generic name for every method.
 
 ```text
-OpenWebUI exposes.
+Optional runtime clients may expose interaction.
 Hermes Agent executes.
 Pantheon Next governs.
 ```

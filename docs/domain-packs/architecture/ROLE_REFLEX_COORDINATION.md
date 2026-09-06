@@ -9,7 +9,7 @@ It does not implement an agent loop, workflow engine, micro-workflow runtime, ro
 It defines a non-executable coordination model for how a main architecture approach may be enriched by role-owned reflexes without becoming an usine a gaz.
 
 ```text
-OpenWebUI exposes.
+Optional runtime clients may expose interaction.
 Hermes Agent executes.
 Pantheon Next governs.
 ```

@@ -9,7 +9,7 @@ This document specializes `METHOD_CARD_MODEL.md` for architecture practice.
 It does not implement a UI, renderer, workflow engine, method selector, source validator, RAG system, OCR pipeline, PDF tool, email sender, approval engine, memory engine, Hermes skill, connector, schema, test or external action.
 
 ```text
-OpenWebUI exposes.
+Optional runtime clients may expose interaction.
 Hermes Agent executes.
 Pantheon Next governs.
 ```
