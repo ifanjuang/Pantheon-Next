@@ -34,8 +34,10 @@ repository presence != selected architecture
 
 | Area | Current status | Meaning / boundary |
 |---|---|---|
-| Hermes Agent | external execution runtime / target deployment state must be observed separately | Hermes owns runtime interaction/execution capabilities. Pantheon governs consequential status and admission boundaries; repository code does not prove target enforcement. |
-| Hermes Web/dashboard | selected interaction baseline | Current target client for chat, sessions and runtime controls. Client operation does not create Pantheon governance state. |
+| Hermes Agent | external execution runtime / current candidate target 0.21.0 / target deployment state must be observed separately | Hermes owns runtime interaction/execution capabilities. Pantheon governs consequential status and admission boundaries; repository code does not prove target enforcement. |
+| Hermes Desktop | selected rich interaction direction / external / deployment not observed by this repo | Current target host for rich chat/runtime interaction, including a topology where Desktop controls an authenticated Hermes backend on another machine. Client reachability does not qualify the remote runtime or create Pantheon governance state. |
+| Hermes Web/dashboard | selected browser/admin fallback and remote-backend service surface | Browser interaction, runtime administration and the remotely reachable Hermes service surface remain useful where selected. It is no longer the sole preferred rich interaction client and it does not become a Pantheon projection owner. |
+| A2UI on Hermes Desktop | qualification direction / not implemented on current `main` | Candidate declarative presentation layer for generated UI inside the Hermes interaction surface. The former Cockpit-targeted lab PR #882 was closed unmerged after the host decision changed. `A2UI surface != governed object`; `UI action != authorization`. |
 | `willscott-v2/hermes-mobile-pwa` | external client candidate / compatible by source review / not selected or installed by this repo | Thin mobile/PWA client using Hermes dashboard REST/WebSocket/auth surfaces. Replaceable client only; deployment/auth/network posture remains separate. |
 | Obsidian workspace | selected workspace direction / external | Human-authored Markdown notes and editable working projections. Obsidian is not a DMS, Evidence store, governed Project identity or Registre Probatoire. |
 | Hindsight | external derived-memory/index candidate with prior bounded qualification | Recall/index layer only where selected. Memory/retrieval does not become truth or Evidence. |
@@ -50,6 +52,7 @@ repository presence != selected architecture
 | Pantheon Cockpit adoption | executable candidate / not adopted | Live deployment, data bindings and operational acceptance remain separate decisions. |
 | Obsidian/Hindsight synchronization topology | partially qualified / external stabilization work remains | Real client/offline/conflict and deployment hardening remain separate from repository CI. |
 | Hermes external dashboard/plugin helpers | existing templates and candidates where present | Installation/enablement and live target state must be observed externally. |
+| Hermes Desktop remote-runtime topology | source-supported deployment direction / not live-qualified here | Observe the exact Desktop build, exact remote Hermes artifact, authentication, network exposure, backend identity, tool envelope and disconnect/reconnect behavior before governed use. `connection succeeds != governed runtime qualified`. |
 
 ## Refused target integrations and historical provenance
 
@@ -60,7 +63,8 @@ architecture_status: refused
 current_target_role: none
 implementation_adapter_status: removed from executable candidate
 replacement responsibilities:
-  runtime interaction -> Hermes Web/dashboard + compatible Hermes clients
+  rich runtime interaction -> Hermes Desktop
+  browser/admin/runtime service -> Hermes Web/dashboard + compatible Hermes clients
   governed projections -> Pantheon Cockpit
 ```
 
@@ -113,14 +117,22 @@ External runtimes may contain their own schedulers, queues or provider mechanics
 ## Current target composition
 
 ```text
-Hermes Web/dashboard
-  + optional replaceable Hermes mobile/PWA client
+Hermes Desktop
+  selected rich interaction host
         |
+        | local or authenticated remote Hermes backend
+        v
 Hermes Agent
         |
 Pantheon governance/admission boundaries
         |
 Pantheon Cockpit for governed projections
+
+Hermes Web/dashboard
+  -> browser/admin fallback and remote-backend service surface
+
+A2UI
+  -> presentation candidate to qualify inside Hermes Desktop, not Cockpit authority
 
 Obsidian -> human Markdown workspace
 Hindsight/runtime memory -> optional derived recall
@@ -131,13 +143,13 @@ See `TARGET_ARCHITECTURE.md` for the directional map and `CORE_CONCEPTS_MAP.md` 
 
 ## Protected-path rule
 
-`implementation/`, `mcp-server/`, schemas, tests, CI, Docker/environment material and other protected paths require their normal review discipline. A documentation decision to refuse a dependency does not authorize deleting protected implementation code without consumer/test verification.
+`implementation/`, `mcp-server/`, schemas, tests, CI, Docker/environment material and other protected paths require their normal review discipline. A documentation decision to refuse a dependency or select a client direction does not authorize protected implementation changes, installation or activation.
 
 ## Next reconciliation
 
-The next bounded protected audit is the residual OpenWebUI compatibility/reference surface. It must distinguish provenance from active incoming links and remove only superseded paths whose consumers are demonstrably gone.
+The next bounded implementation qualification for generated UI is the Hermes Desktop host seam: reuse only the protocol guard/render observations still relevant from closed PR #882, verify the exact current Hermes pin and Desktop plugin/transcript contribution contract, and prove that generated UI produces only bounded intent until the existing effect gate admits more.
 
-Do not create a replacement chat frontend, DMS, observer, registry or runtime merely to preserve historical shape.
+Do not create a replacement chat frontend, second Cockpit UI owner, DMS, observer, registry or runtime merely to preserve historical shape.
 
 ## Final rule
 
@@ -145,5 +157,5 @@ Do not create a replacement chat frontend, DMS, observer, registry or runtime me
 State what exists.
 State what is selected.
 State what is only historical provenance.
-Do not confuse any of those with production adoption or authorization.
+Do not confuse a remote connection, rendered UI or green qualification lab with production adoption or authorization.
 ```
