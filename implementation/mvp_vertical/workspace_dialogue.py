@@ -34,8 +34,8 @@ class WorkspaceDialogueConflict(WorkspaceDialogueError):
 
 
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
-_MAX_PRIOR_SUMMARY = 2_400
-_MAX_PRIOR_PAYLOAD = 1_800
+_MAX_PRIOR_SUMMARY = 1_800
+_MAX_PRIOR_PAYLOAD = 1_200
 
 
 def _workspace_source_parts(source_ref: str) -> tuple[str, str, str]:
@@ -43,9 +43,12 @@ def _workspace_source_parts(source_ref: str) -> tuple[str, str, str]:
     if parsed.scheme != "workspace" or not parsed.netloc:
         raise WorkspaceDialogueConflict("prior handoff does not carry a Workspace source reference")
     workspace_ref = unquote(parsed.netloc)
-    relative_path = workspace_collection_read.normalize_relative_path(
-        unquote(parsed.path.lstrip("/"))
-    )
+    try:
+        relative_path = workspace_collection_read.normalize_relative_path(
+            unquote(parsed.path.lstrip("/"))
+        )
+    except workspace_collection_read.WorkspaceCollectionReadError as exc:
+        raise WorkspaceDialogueConflict("prior Workspace source reference has an invalid path") from exc
     digest_values = parse_qs(parsed.query).get("sha256") or []
     digest = digest_values[0].casefold() if len(digest_values) == 1 else ""
     if not _SHA256_RE.fullmatch(digest):
@@ -92,7 +95,10 @@ def _project_scope(
     except agency_data.ProjectNotFound as exc:
         raise WorkspaceDialogueError(str(exc)) from exc
 
-    normalized_path = workspace_collection_read.normalize_relative_path(relative_path)
+    try:
+        normalized_path = workspace_collection_read.normalize_relative_path(relative_path)
+    except workspace_collection_read.WorkspaceCollectionReadError as exc:
+        raise WorkspaceDialogueError(str(exc)) from exc
     try:
         handoff = hermes_handoff_store.get_handoff_snapshot(conn, handoff_id)
     except hermes_handoff_store.HandoffSubmissionError as exc:
