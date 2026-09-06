@@ -83,6 +83,38 @@ historical and must not be rewritten. Deciding that boundary file by file is the
 remaining work; this slice covers only the domain pack, where all 21 are live
 candidate doctrine.
 
+## The Roles/Rites/Spaces guard fired, and was right to
+
+Three of the 21 files are `ROLE_` owner surfaces
+(`ROLE_ACTIVATION_MODEL.md`, `ROLE_FACETS.md`, `ROLE_REFLEX_COORDINATION.md`),
+which `.github/scripts/check_roles_rites_spaces_change.py` treats as sensitive
+via its `docs/domain-packs/architecture/ROLE_` prefix rule. It requires the pull
+request body to declare eight sections — `Change level`, `Observed need`,
+`Existing owners checked`, `Overlap analysis`, `Affected consumers`,
+`Migration and rollback`, `Authority impact`, `Runtime impact` — with
+`Change level` starting at `editorial`, `guidance` or `semantic`. The first PR
+body had none of them, so CI went red.
+
+Declared `editorial`: one boundary line per file, no Role, Rite or governed Space
+added, removed, renamed or re-scoped, every other line byte-identical.
+
+Two mechanical facts worth recording, because they cost a cycle:
+
+```text
+rerun_failed_jobs replays the original event payload
+-> PR_BODY stays frozen at the body as it was when the PR opened
+-> a body-only fix can never be picked up by a re-run
+
+governance-ci.yml declares `pull_request:` with no `types:` filter
+-> default types are opened / synchronize / reopened
+-> editing a PR body triggers `edited`, which fires nothing
+```
+
+So a fix that lives in the PR body requires a subsequent commit to produce a
+fresh `synchronize` payload. This log entry is that commit's content: the guard
+interaction belongs in the intervention record regardless, and an empty commit
+to kick CI is forbidden.
+
 ## Boundary
 
 Boundary profile applies: `candidate_support_doctrine`.
