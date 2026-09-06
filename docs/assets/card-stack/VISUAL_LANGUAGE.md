@@ -6,13 +6,6 @@ Owner: `docs/governance/CARD_STACK_MODEL.md`.
 
 This guide translates the existing Card Stack projection grammar into a bounded visual system. It creates no new governed object, lifecycle, status vocabulary, renderer, resolver, runtime, approval engine, memory engine or external action.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-The human decides.
-```
-
 ## Shared anatomy
 
 Every expanded card uses the same reading order:

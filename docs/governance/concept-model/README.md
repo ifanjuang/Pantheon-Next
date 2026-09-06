@@ -7,13 +7,6 @@ This directory maps existing Pantheon concepts to their current owner documents 
 
 It creates no new concept owner, ontology, knowledge-graph runtime, documentation generator, Lens engine, Perspective router, resolver, approval engine, memory engine or execution path.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-The human decides.
-```
-
 ## Files
 
 - `CONCEPT_MATRIX.md` — owner and placement map for the first tested concept set;

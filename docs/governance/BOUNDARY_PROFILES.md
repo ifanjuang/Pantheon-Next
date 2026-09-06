@@ -22,6 +22,24 @@ It does not reduce responsibility.
 
 If a document touches a protected path, proposes an external action, changes execution status, changes memory behavior, changes approval behavior or changes a runtime surface, the specific boundary must still be explicit.
 
+## Inherited role separation
+
+`docs/governance/ARCHITECTURE.md` (active doctrine) owns the role separation, and every profile inherits it:
+
+```text
+Hermes-compatible clients handle runtime interaction.
+Hermes Agent executes externally.
+Pantheon Cockpit exposes governed projections.
+Pantheon Next governs consequential status.
+The human decides.
+```
+
+A document that declares a `Boundary profile` therefore does not need to restate it, and should not.
+
+Restating it is not false. It is duplication, and duplication is what makes a change to the separation expensive: retiring one named client required sweeping the same sentence out of documents one by one, because each held its own copy instead of inheriting the owner's.
+
+Inheritance covers the generic separation only. A document that names a specific exposure, execution, governance or approval surface is making a concrete claim about that surface and must state it with the fields below.
+
 ## Boundary fields
 
 For concrete capabilities, repos, skills, connectors, workflows or runtime changes, prefer explicit fields:

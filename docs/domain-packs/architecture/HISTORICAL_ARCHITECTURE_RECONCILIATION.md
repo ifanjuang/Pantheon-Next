@@ -10,12 +10,6 @@ It does not import a retired runtime by bulk copy.
 
 It does not create a runtime, API endpoint, schema, test, operation, platform component, OpenWebUI configuration, Hermes skill, memory engine, approval engine or external action.
 
-```text
-Optional runtime clients may expose interaction.
-Hermes Agent executes.
-Pantheon Next governs.
-```
-
 ## Purpose
 
 Pantheon Next is doctrinally stronger than its historical predecessor.

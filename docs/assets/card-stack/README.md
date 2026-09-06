@@ -120,10 +120,3 @@ Cluster != authorization scope
 ## Boundary
 
 No production UI, state machine, schema, workflow engine, runtime command, OpenWebUI plugin, Hermes skill, approval engine, memory engine or external action is implemented here.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-The human decides.
-```
