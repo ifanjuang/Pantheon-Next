@@ -10,7 +10,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import mimetypes
 import re
+from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Mapping
 from urllib.parse import quote, urlencode
@@ -165,12 +167,73 @@ def _child_collection_href(workspace_ref: str, relative_path: str) -> str:
     return f"/cockpit/workspace-collections/{encoded_ref}?{query}"
 
 
+def _media_type(path: Path) -> str:
+    return mimetypes.guess_type(path.name)[0] or "application/octet-stream"
+
+
+def _file_kind(path: Path, media_type: str) -> str:
+    if media_type == "application/pdf" or path.suffix.casefold() == ".pdf":
+        return "pdf"
+    return "file"
+
+
+def _relative_child_path(parent: str, name: str) -> str:
+    return PurePosixPath(parent, name).as_posix() if parent else PurePosixPath(name).as_posix()
+
+
+def _adjacent_document_sidecar(path: Path, relative_path: str) -> dict:
+    """Observe only sidecar presence; do not parse, validate or infer a binding."""
+    sidecar = path.parent / "document.yaml"
+    if sidecar.is_symlink():
+        state = "unsupported_symlink"
+        sidecar_ref = None
+    elif sidecar.is_file():
+        state = "present"
+        parent = PurePosixPath(relative_path).parent
+        sidecar_ref = PurePosixPath(parent, "document.yaml").as_posix()
+        if sidecar_ref == "./document.yaml":
+            sidecar_ref = "document.yaml"
+    else:
+        state = "absent"
+        sidecar_ref = None
+    return {
+        "state": state,
+        "relative_path": sidecar_ref,
+        "parsed": False,
+        "identity_mapping_resolved": False,
+    }
+
+
+def _basic_file_metadata(path: Path, relative_path: str) -> dict:
+    """Return cheap reconstructible facts suitable for ordinary Card navigation."""
+    try:
+        stat = path.stat()
+    except OSError as exc:
+        raise WorkspaceCollectionReadError(
+            f"workspace file cannot be inspected: {path.name!r}"
+        ) from exc
+    media_type = _media_type(path)
+    return {
+        "filename": path.name,
+        "extension": path.suffix.casefold(),
+        "media_type": media_type,
+        "byte_size": stat.st_size,
+        "file_kind": _file_kind(path, media_type),
+        "filesystem_modified_at": datetime.fromtimestamp(
+            stat.st_mtime,
+            tz=timezone.utc,
+        ).isoformat(),
+        "adjacent_document_sidecar": _adjacent_document_sidecar(path, relative_path),
+    }
+
+
 def _workspace_card(
     *,
     workspace_ref: str,
     relative_path: str,
     name: str,
     kind: str,
+    file_entry: Path | None = None,
 ) -> dict:
     entity_id = _entry_id(workspace_ref, relative_path)
     is_directory = kind == "directory"
@@ -212,6 +275,32 @@ def _workspace_card(
             "can_add": False,
             "create_action": None,
         }
+    elif file_entry is not None:
+        observed = _basic_file_metadata(file_entry, relative_path)
+        sidecar = observed["adjacent_document_sidecar"]
+        if observed["file_kind"] == "pdf":
+            card["category"] = "PDF"
+            card["summary"] = "PDF du workspace — observation locale reconstructible"
+        card["workspace_file"] = observed
+        card["qualification"] = {
+            "status": "workspace_observation_only",
+            "identity_mapping": "not_resolved_by_workspace_projection",
+            "automatic_document_admission": False,
+        }
+        card["authority"] = {
+            "governed_identity": False,
+            "is_evidence": False,
+            "is_memory": False,
+            "is_persisted": False,
+        }
+        card["back"].extend(
+            [
+                ["Type MIME", observed["media_type"]],
+                ["Taille (octets)", str(observed["byte_size"])],
+                ["Modifié (filesystem)", observed["filesystem_modified_at"]],
+                ["document.yaml adjacent", sidecar["state"]],
+            ]
+        )
     return card
 
 
@@ -236,10 +325,6 @@ def get_workspace_catalog(workspace_roots: Mapping[str, Path]) -> dict:
         },
         "cards_are_projections": True,
     }
-
-
-def _relative_child_path(parent: str, name: str) -> str:
-    return PurePosixPath(parent, name).as_posix() if parent else PurePosixPath(name).as_posix()
 
 
 def get_workspace_collection(
@@ -271,9 +356,11 @@ def get_workspace_collection(
             if entry.is_dir():
                 kind = "directory"
                 kind_order = 0
+                file_entry = None
             elif entry.is_file():
                 kind = "file"
                 kind_order = 1
+                file_entry = entry
             else:
                 continue
         except OSError as exc:
@@ -287,6 +374,7 @@ def get_workspace_collection(
             relative_path=child_path,
             name=name,
             kind=kind,
+            file_entry=file_entry,
         )
         projected.append((kind_order, name.casefold(), name, card))
 
@@ -302,4 +390,14 @@ def get_workspace_collection(
             "can_add": False,
         },
         "cards_are_projections": True,
+        "observation_persisted": False,
+        "content_parsed": False,
+        "hindsight_required": False,
+        "non_equivalences": [
+            "workspace path != governed identity",
+            "file observed != Document admitted",
+            "manifest present != identity mapping resolved",
+            "PDF observed != PDF content understood",
+            "projection != persistence",
+        ],
     }
