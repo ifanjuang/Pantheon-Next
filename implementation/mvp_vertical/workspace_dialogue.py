@@ -86,7 +86,7 @@ def _project_scope(
     workspace_ref: str,
     relative_path: str,
     handoff_id: str,
-) -> tuple[dict, str]:
+) -> tuple[dict, str, str]:
     project_id = str(project_id or "").strip()
     if not project_id:
         raise WorkspaceDialogueError("project_id is required and must be selected explicitly")
@@ -116,7 +116,7 @@ def _project_scope(
     prior_workspace_ref, prior_path, prior_digest = _workspace_source_parts(str(refs[0]))
     if prior_workspace_ref != workspace_ref or prior_path != normalized_path:
         raise WorkspaceDialogueConflict("prior handoff is bound to another Workspace source")
-    return handoff, prior_digest
+    return handoff, prior_digest, normalized_path
 
 
 def read_workspace_dialogue_turn(
@@ -128,22 +128,15 @@ def read_workspace_dialogue_turn(
     relative_path: str,
     handoff_id: str,
 ) -> dict:
-    """Project one qualification turn without creating conversational authority."""
-    try:
-        observation = workspace_collection_read.observe_workspace_file(
-            workspace_roots,
-            workspace_ref,
-            relative_path,
-            include_digest=False,
-        )
-    except workspace_collection_read.WorkspaceCollectionReadError as exc:
-        raise WorkspaceDialogueError(str(exc)) from exc
-
-    handoff, prior_digest = _project_scope(
+    """Project one stored qualification turn without requiring current source bytes."""
+    # `workspace_roots` remains in the public seam because the same request shape
+    # is used by rework. Historical read deliberately does not dereference it.
+    _ = workspace_roots
+    handoff, prior_digest, normalized_path = _project_scope(
         conn,
         project_id=project_id,
         workspace_ref=workspace_ref,
-        relative_path=observation["relative_path"],
+        relative_path=relative_path,
         handoff_id=handoff_id,
     )
     try:
@@ -184,7 +177,7 @@ def read_workspace_dialogue_turn(
         "work_issue_id": handoff["work_issue_id"],
         "project_id": project_id,
         "workspace_ref": workspace_ref,
-        "relative_path": observation["relative_path"],
+        "relative_path": normalized_path,
         "source_basis_sha256": prior_digest,
         "turn_state": turn_state,
         "work_issue": work_projection.get("work_issue"),
