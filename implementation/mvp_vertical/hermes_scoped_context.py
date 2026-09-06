@@ -27,6 +27,7 @@ from . import (
     agency_directory,
     agency_information,
     agency_schema,
+    apu_object_read,
     knowledge,
     store,
     work_issue_read,
@@ -45,6 +46,7 @@ MATERIALIZABLE_TYPES = {
     "document",
     "knowledge",
     "work_issue",
+    "stable_object",
 }
 
 PERSON_FIELDS = (
@@ -319,6 +321,17 @@ def materialize_context_entity(
             "record_owner_system": "postgres",
         }
 
+    if entity_type == "stable_object":
+        raw = apu_object_read.get_stable_object_context(
+            conn,
+            object_id=_strip_prefix(entity_id, "stable_object:"),
+        )
+        return {
+            "record": raw,
+            "representation": None,
+            "record_owner_system": "postgres_apu_object_projection",
+        }
+
     if entity_type == "person":
         raw = agency_directory.get_person(conn, _strip_prefix(entity_id, "person:"))
         return {
@@ -491,6 +504,7 @@ def get_context_entity(
         agency_directory.AgencyDirectoryError,
         agency_information.AgencyInformationError,
         agency_schema.AgencySchemaError,
+        apu_object_read.ApuObjectReadError,
         knowledge.KnowledgeNotFound,
         work_issues.WorkIssueError,
         KeyError,
