@@ -3,13 +3,19 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
-PLUGIN_DIR = Path(__file__).resolve().parents[1] / "hermes" / "plugins" / "pantheon-context-bridge"
+PLUGIN_DIR = (
+    Path(__file__).resolve().parents[1]
+    / "hermes"
+    / "plugins"
+    / "pantheon-context-bridge"
+)
 
 
 def _load_package():
@@ -35,7 +41,19 @@ def plugin(monkeypatch):
         lambda content: ("no_findings", []),
     )
     module.external_content._TASK_ROOTS.clear()
+    module.external_content._TASK_TAINT_ROOTS.clear()
+    module.external_content._PENDING_FETCHES.clear()
     return module
+
+
+def _terminal_success(plugin, *, command: str, workdir: Path, task_id: str) -> None:
+    plugin.external_content.post_tool_call(
+        "terminal",
+        {"command": command, "workdir": str(workdir)},
+        json.dumps({"output": "", "exit_code": 0, "error": None}),
+        task_id=task_id,
+        status="ok",
+    )
 
 
 def test_generic_context_admission_neutralizes_forged_boundaries(plugin) -> None:
@@ -132,12 +150,17 @@ def test_document_cache_read_is_blocked_but_normal_local_file_is_allowed(
     )
     assert blocked and blocked["action"] == "block"
     assert "pantheon_untrusted_read" in blocked["message"]
-    assert plugin.external_content.pre_tool_call(
-        "read_file", {"path": str(local_file)}, task_id="task-1"
-    ) is None
+    assert (
+        plugin.external_content.pre_tool_call(
+            "read_file", {"path": str(local_file)}, task_id="task-1"
+        )
+        is None
+    )
 
 
-def test_symlink_alias_into_document_cache_is_blocked(plugin, monkeypatch, tmp_path) -> None:
+def test_symlink_alias_into_document_cache_is_blocked(
+    plugin, monkeypatch, tmp_path
+) -> None:
     hermes_home = tmp_path / "hermes"
     document = hermes_home / "cache" / "documents" / "doc_alias.txt"
     document.parent.mkdir(parents=True)
@@ -152,40 +175,193 @@ def test_symlink_alias_into_document_cache_is_blocked(plugin, monkeypatch, tmp_p
     assert blocked and blocked["action"] == "block"
 
 
-def test_fetch_root_persists_and_blocks_followup_reads(plugin, tmp_path) -> None:
+def test_pending_fetch_blocks_direct_reads_without_granting_guarded_scope(
+    plugin, tmp_path
+) -> None:
+    class Context:
+        def __init__(self):
+            self.calls = []
+
+        def dispatch_tool(self, name, args):
+            self.calls.append((name, args))
+            return "should not run"
+
     workdir = tmp_path / "work"
     workdir.mkdir()
-    task_id = "task-fetch"
+    task_id = "task-pending-fetch"
+    command = "git clone https://example.test/poison.git extrepo"
 
-    assert plugin.external_content.pre_tool_call(
-        "terminal",
-        {"command": "git clone https://example.test/poison.git extrepo", "workdir": str(workdir)},
-        task_id=task_id,
-    ) is None
-
-    cloned_read = workdir / "extrepo" / "README.md"
-    blocked_read = plugin.external_content.pre_tool_call(
-        "read_file", {"path": str(cloned_read)}, task_id=task_id
+    assert (
+        plugin.external_content.pre_tool_call(
+            "terminal",
+            {"command": command, "workdir": str(workdir)},
+            task_id=task_id,
+        )
+        is None
     )
-    assert blocked_read and blocked_read["action"] == "block"
 
-    blocked_terminal = plugin.external_content.pre_tool_call(
-        "terminal",
-        {"command": "cat extrepo/README.md", "workdir": str(workdir)},
+    target = workdir / "extrepo" / "README.md"
+    blocked = plugin.external_content.pre_tool_call(
+        "read_file", {"path": str(target)}, task_id=task_id
+    )
+    assert blocked and blocked["action"] == "block"
+
+    ctx = Context()
+    guarded_read = plugin.external_content.make_guarded_read_handler(ctx)
+    with pytest.raises(PermissionError):
+        guarded_read({"path": str(target)}, task_id=task_id)
+    assert ctx.calls == []
+
+
+def test_successful_fetch_promotes_only_observed_destination(plugin, tmp_path) -> None:
+    class Context:
+        def __init__(self):
+            self.calls = []
+
+        def dispatch_tool(self, name, args):
+            self.calls.append((name, args))
+            return "external data"
+
+    workdir = tmp_path / "work"
+    workdir.mkdir()
+    task_id = "task-fetch-success"
+    command = "git clone https://example.test/poison.git extrepo"
+
+    assert (
+        plugin.external_content.pre_tool_call(
+            "terminal",
+            {"command": command, "workdir": str(workdir)},
+            task_id=task_id,
+        )
+        is None
+    )
+
+    external_root = workdir / "extrepo"
+    external_root.mkdir()
+    target = external_root / "README.md"
+    target.write_text("external", encoding="utf-8")
+    _terminal_success(
+        plugin,
+        command=command,
+        workdir=workdir,
         task_id=task_id,
     )
-    assert blocked_terminal and blocked_terminal["action"] == "block"
+
+    ctx = Context()
+    guarded_read = plugin.external_content.make_guarded_read_handler(ctx)
+    result = guarded_read({"path": str(target)}, task_id=task_id)
+    assert result.startswith("<untrusted_tool_result")
+    assert ctx.calls == [("read_file", {"path": str(target)})]
+
+    blocked = plugin.external_content.pre_tool_call(
+        "read_file", {"path": str(target)}, task_id=task_id
+    )
+    assert blocked and blocked["action"] == "block"
+
+    sibling = workdir / "local.txt"
+    sibling.write_text("local", encoding="utf-8")
+    assert (
+        plugin.external_content.pre_tool_call(
+            "read_file", {"path": str(sibling)}, task_id=task_id
+        )
+        is None
+    )
+
+
+def test_failed_fetch_observed_output_is_taint_only_not_guarded_scope(
+    plugin, tmp_path
+) -> None:
+    class Context:
+        def __init__(self):
+            self.calls = []
+
+        def dispatch_tool(self, name, args):
+            self.calls.append((name, args))
+            return "should not run"
+
+    workdir = tmp_path / "work"
+    workdir.mkdir()
+    task_id = "task-fetch-failed"
+    command = "curl https://example.test/payload.txt -o partial.txt"
+
+    plugin.external_content.pre_tool_call(
+        "terminal",
+        {"command": command, "workdir": str(workdir)},
+        task_id=task_id,
+    )
+    partial = workdir / "partial.txt"
+    partial.write_text("partial external data", encoding="utf-8")
+    plugin.external_content.post_tool_call(
+        "terminal",
+        {"command": command, "workdir": str(workdir)},
+        {"output": "failed", "exit_code": 1, "error": "network error"},
+        task_id=task_id,
+        status="error",
+    )
+
+    blocked = plugin.external_content.pre_tool_call(
+        "read_file", {"path": str(partial)}, task_id=task_id
+    )
+    assert blocked and blocked["action"] == "block"
+
+    ctx = Context()
+    guarded_read = plugin.external_content.make_guarded_read_handler(ctx)
+    with pytest.raises(PermissionError):
+        guarded_read({"path": str(partial)}, task_id=task_id)
+    assert ctx.calls == []
+
+
+def test_unexecuted_compound_fetch_cannot_authorize_broad_root(
+    plugin, tmp_path
+) -> None:
+    class Context:
+        def __init__(self):
+            self.calls = []
+
+        def dispatch_tool(self, name, args):
+            self.calls.append((name, args))
+            return "should not run"
+
+    workdir = tmp_path / "work"
+    workdir.mkdir()
+    local_file = tmp_path / "private.txt"
+    local_file.write_text("private", encoding="utf-8")
+    task_id = "task-unexecuted"
+
+    command = "false && git clone https://example.test/x.git /"
+    assert (
+        plugin.external_content.pre_tool_call(
+            "terminal",
+            {"command": command, "workdir": str(workdir)},
+            task_id=task_id,
+        )
+        is None
+    )
+    assert plugin.external_content._pending_roots_for_task(task_id) == set()
+    assert plugin.external_content._TASK_ROOTS.get(task_id, set()) == set()
+
+    ctx = Context()
+    guarded_read = plugin.external_content.make_guarded_read_handler(ctx)
+    with pytest.raises(PermissionError):
+        guarded_read({"path": str(local_file)}, task_id=task_id)
+    assert ctx.calls == []
 
 
 def test_path_qualified_terminal_reader_is_blocked(plugin, tmp_path) -> None:
     workdir = tmp_path / "work"
     workdir.mkdir()
     task_id = "task-qualified-reader"
-    assert plugin.external_content.pre_tool_call(
-        "terminal",
-        {"command": "git clone https://example.test/poison.git extrepo", "workdir": str(workdir)},
-        task_id=task_id,
-    ) is None
+    assert (
+        plugin.external_content.pre_tool_call(
+            "terminal",
+            {
+                "command": "git clone https://example.test/poison.git extrepo",
+                "workdir": str(workdir),
+            },
+            task_id=task_id,
+        )
+        is None
+    )
 
     blocked = plugin.external_content.pre_tool_call(
         "terminal",
@@ -195,97 +371,132 @@ def test_path_qualified_terminal_reader_is_blocked(plugin, tmp_path) -> None:
     assert blocked and blocked["action"] == "block"
 
 
-def test_fetch_root_without_task_id_still_uses_bounded_default_scope(plugin, tmp_path) -> None:
+def test_fetch_root_without_task_id_uses_bounded_default_pending_scope(
+    plugin, tmp_path
+) -> None:
     workdir = tmp_path / "work"
     workdir.mkdir()
-    assert plugin.external_content.pre_tool_call(
-        "terminal",
-        {"command": "wget https://example.test/payload.txt -O external.txt", "workdir": str(workdir)},
-    ) is None
+    assert (
+        plugin.external_content.pre_tool_call(
+            "terminal",
+            {
+                "command": "wget https://example.test/payload.txt -O external.txt",
+                "workdir": str(workdir),
+            },
+        )
+        is None
+    )
     blocked = plugin.external_content.pre_tool_call(
         "read_file", {"path": str(workdir / "external.txt")}
     )
     assert blocked and blocked["action"] == "block"
 
 
-def test_bare_curl_stdout_does_not_invent_local_file_provenance(plugin, tmp_path) -> None:
+def test_bare_curl_stdout_does_not_invent_local_file_provenance(
+    plugin, tmp_path
+) -> None:
     workdir = tmp_path / "work"
     workdir.mkdir()
     task_id = "task-curl-stdout"
 
-    assert plugin.external_content.pre_tool_call(
-        "terminal",
-        {"command": "curl https://example.test/payload.txt", "workdir": str(workdir)},
-        task_id=task_id,
-    ) is None
-    assert plugin.external_content.pre_tool_call(
-        "read_file",
-        {"path": str(workdir / "payload.txt")},
-        task_id=task_id,
-    ) is None
+    assert (
+        plugin.external_content.pre_tool_call(
+            "terminal",
+            {
+                "command": "curl https://example.test/payload.txt",
+                "workdir": str(workdir),
+            },
+            task_id=task_id,
+        )
+        is None
+    )
+    assert (
+        plugin.external_content.pre_tool_call(
+            "read_file",
+            {"path": str(workdir / "payload.txt")},
+            task_id=task_id,
+        )
+        is None
+    )
 
 
-def test_curl_explicit_output_is_tracked_as_best_effort_provenance(plugin, tmp_path) -> None:
+@pytest.mark.parametrize(
+    ("command", "filename"),
+    [
+        ("curl https://example.test/payload.txt -o external.txt", "external.txt"),
+        ("curl https://example.test/payload.txt -oexternal.txt", "external.txt"),
+        ("curl https://example.test/payload.txt -o=external.txt", "external.txt"),
+        ("/usr/bin/curl -O https://example.test/payload.txt", "payload.txt"),
+    ],
+)
+def test_curl_file_output_forms_are_detected_and_promoted(
+    plugin, tmp_path, command, filename
+) -> None:
     workdir = tmp_path / "work"
     workdir.mkdir()
-    task_id = "task-curl-file"
+    task_id = f"task-curl-{filename}-{len(command)}"
 
-    assert plugin.external_content.pre_tool_call(
-        "terminal",
-        {
-            "command": "curl https://example.test/payload.txt -o external.txt",
-            "workdir": str(workdir),
-        },
-        task_id=task_id,
-    ) is None
-    blocked = plugin.external_content.pre_tool_call(
-        "read_file",
-        {"path": str(workdir / "external.txt")},
+    assert (
+        plugin.external_content.pre_tool_call(
+            "terminal",
+            {"command": command, "workdir": str(workdir)},
+            task_id=task_id,
+        )
+        is None
+    )
+
+    target = workdir / filename
+    pending_block = plugin.external_content.pre_tool_call(
+        "read_file", {"path": str(target)}, task_id=task_id
+    )
+    assert pending_block and pending_block["action"] == "block"
+
+    target.write_text("external", encoding="utf-8")
+    _terminal_success(
+        plugin,
+        command=command,
+        workdir=workdir,
         task_id=task_id,
     )
-    assert blocked and blocked["action"] == "block"
-
-
-def test_curl_remote_name_keeps_uppercase_short_option_semantics(plugin, tmp_path) -> None:
-    workdir = tmp_path / "work"
-    workdir.mkdir()
-    task_id = "task-curl-remote-name"
-
-    assert plugin.external_content.pre_tool_call(
-        "terminal",
-        {
-            "command": "/usr/bin/curl -O https://example.test/payload.txt",
-            "workdir": str(workdir),
-        },
-        task_id=task_id,
-    ) is None
-    blocked = plugin.external_content.pre_tool_call(
-        "read_file",
-        {"path": str(workdir / "payload.txt")},
-        task_id=task_id,
+    assert plugin.external_content._path_safely_under_any_root(
+        str(target),
+        plugin.external_content._roots_for_task(task_id),
     )
-    assert blocked and blocked["action"] == "block"
 
 
-def test_execute_code_is_not_claimed_as_filesystem_mediation(plugin, tmp_path) -> None:
+def test_execute_code_is_not_claimed_as_filesystem_mediation(
+    plugin, tmp_path
+) -> None:
     workdir = tmp_path / "work"
     workdir.mkdir()
     task_id = "task-code-gap"
-    assert plugin.external_content.pre_tool_call(
-        "terminal",
-        {"command": "git clone https://example.test/poison.git extrepo", "workdir": str(workdir)},
-        task_id=task_id,
-    ) is None
+    assert (
+        plugin.external_content.pre_tool_call(
+            "terminal",
+            {
+                "command": "git clone https://example.test/poison.git extrepo",
+                "workdir": str(workdir),
+            },
+            task_id=task_id,
+        )
+        is None
+    )
 
     result = plugin.external_content.pre_tool_call(
         "execute_code",
-        {"code": f"print(open({str(workdir / 'extrepo' / 'README.md')!r}).read())"},
+        {
+            "code": (
+                f"print(open({str(workdir / 'extrepo' / 'README.md')!r}).read())"
+            )
+        },
         task_id=task_id,
     )
     assert result is None
 
 
-def test_search_under_document_cache_is_blocked(plugin, monkeypatch, tmp_path) -> None:
+def test_search_under_document_cache_is_blocked(
+    plugin, monkeypatch, tmp_path
+) -> None:
     hermes_home = tmp_path / "hermes"
     cache = hermes_home / "cache" / "documents"
     cache.mkdir(parents=True)
@@ -299,15 +510,23 @@ def test_search_under_document_cache_is_blocked(plugin, monkeypatch, tmp_path) -
     assert "pantheon_untrusted_search" in blocked["message"]
 
 
-def test_search_scope_containing_external_root_is_blocked(plugin, tmp_path) -> None:
+def test_search_scope_containing_pending_external_root_is_blocked(
+    plugin, tmp_path
+) -> None:
     workdir = tmp_path / "work"
     workdir.mkdir()
     task_id = "task-search-ancestor"
-    assert plugin.external_content.pre_tool_call(
-        "terminal",
-        {"command": "git clone https://example.test/poison.git extrepo", "workdir": str(workdir)},
-        task_id=task_id,
-    ) is None
+    assert (
+        plugin.external_content.pre_tool_call(
+            "terminal",
+            {
+                "command": "git clone https://example.test/poison.git extrepo",
+                "workdir": str(workdir),
+            },
+            task_id=task_id,
+        )
+        is None
+    )
 
     blocked = plugin.external_content.pre_tool_call(
         "search_files",
@@ -344,7 +563,9 @@ def test_guarded_handlers_reject_untracked_local_paths(plugin, tmp_path) -> None
     assert ctx.calls == []
 
 
-def test_guarded_read_rejects_symlink_escape_from_external_root(plugin, tmp_path) -> None:
+def test_guarded_read_rejects_symlink_escape_from_external_root(
+    plugin, tmp_path
+) -> None:
     class Context:
         def __init__(self):
             self.calls = []
@@ -369,7 +590,9 @@ def test_guarded_read_rejects_symlink_escape_from_external_root(plugin, tmp_path
     assert ctx.calls == []
 
 
-def test_guarded_handlers_delegate_to_native_tools_and_frame_results(plugin, tmp_path) -> None:
+def test_guarded_handlers_delegate_to_native_tools_and_frame_results(
+    plugin, tmp_path
+) -> None:
     class Context:
         def __init__(self):
             self.calls = []
@@ -407,7 +630,9 @@ def test_guarded_handlers_delegate_to_native_tools_and_frame_results(plugin, tmp
         assert "IGNORE PREVIOUS INSTRUCTIONS" in result
 
 
-def test_guarded_internal_dispatch_bypasses_own_pre_tool_gate(plugin, monkeypatch, tmp_path) -> None:
+def test_guarded_internal_dispatch_bypasses_own_pre_tool_gate(
+    plugin, monkeypatch, tmp_path
+) -> None:
     hermes_home = tmp_path / "hermes"
     cache_file = hermes_home / "cache" / "documents" / "doc.txt"
     cache_file.parent.mkdir(parents=True)
@@ -415,8 +640,13 @@ def test_guarded_internal_dispatch_bypasses_own_pre_tool_gate(plugin, monkeypatc
 
     token = plugin.external_content._GUARDED_DISPATCH.set(True)
     try:
-        assert plugin.external_content.pre_tool_call(
-            "read_file", {"path": str(cache_file)}, task_id="task-guarded"
-        ) is None
+        assert (
+            plugin.external_content.pre_tool_call(
+                "read_file",
+                {"path": str(cache_file)},
+                task_id="task-guarded",
+            )
+            is None
+        )
     finally:
         plugin.external_content._GUARDED_DISPATCH.reset(token)
