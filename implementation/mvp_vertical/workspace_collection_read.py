@@ -13,6 +13,7 @@ import json
 import mimetypes
 import os
 import re
+import stat as stat_module
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Mapping
@@ -142,7 +143,7 @@ def _reject_hidden_components(relative_path: str) -> None:
 
 
 def _reject_symlink_components(root: Path, relative_path: str) -> None:
-    """Keep the first slice symlink-free, even when a link would stay in-root."""
+    """Keep ordinary projection reads symlink-free."""
     current = root
     for part in PurePosixPath(relative_path).parts if relative_path else ():
         current = current / part
@@ -179,7 +180,7 @@ def _resolve_directory(root: Path, relative_path: str) -> Path:
 
 
 def _resolve_file(root: Path, relative_path: str) -> Path:
-    """Resolve one visible regular file without following any symlink component."""
+    """Resolve one visible regular file for cheap, reconstructible observation."""
     if not relative_path:
         raise WorkspacePathNotFile("workspace file path is required")
     target = _resolve_entry(root, relative_path)
@@ -240,14 +241,7 @@ def _adjacent_document_sidecar(path: Path, relative_path: str) -> dict:
     }
 
 
-def _basic_file_metadata(path: Path, relative_path: str) -> dict:
-    """Return cheap reconstructible facts suitable for ordinary Card navigation."""
-    try:
-        stat = path.stat()
-    except OSError as exc:
-        raise WorkspaceCollectionReadError(
-            f"workspace file cannot be inspected: {path.name!r}"
-        ) from exc
+def _metadata_from_stat(path: Path, relative_path: str, stat: os.stat_result) -> dict:
     media_type = _media_type(path)
     return {
         "filename": path.name,
@@ -263,6 +257,17 @@ def _basic_file_metadata(path: Path, relative_path: str) -> dict:
     }
 
 
+def _basic_file_metadata(path: Path, relative_path: str) -> dict:
+    """Return cheap reconstructible facts suitable for ordinary Card navigation."""
+    try:
+        observed_stat = path.stat()
+    except OSError as exc:
+        raise WorkspaceCollectionReadError(
+            f"workspace file cannot be inspected: {path.name!r}"
+        ) from exc
+    return _metadata_from_stat(path, relative_path, observed_stat)
+
+
 def _stat_identity(stat: os.stat_result) -> tuple[int, int, int, int, int]:
     return (
         stat.st_dev,
@@ -273,29 +278,94 @@ def _stat_identity(stat: os.stat_result) -> tuple[int, int, int, int, int]:
     )
 
 
-def _exact_sha256(path: Path) -> str:
-    """Hash one opened file version and fail closed if that version changes."""
-    digest = hashlib.sha256()
+def _secure_open_workspace_file(root: Path, relative_path: str) -> int:
+    """Open each path component relative to the configured root with no-follow semantics."""
+    if not hasattr(os, "O_NOFOLLOW") or not hasattr(os, "O_DIRECTORY"):
+        raise WorkspaceCollectionReadError(
+            "exact workspace observation requires O_NOFOLLOW and O_DIRECTORY support"
+        )
+    _reject_hidden_components(relative_path)
+    parts = PurePosixPath(relative_path).parts
+    if not parts:
+        raise WorkspacePathNotFile("workspace file path is required")
+
+    root_fd: int | None = None
+    directory_fds: list[int] = []
     try:
-        with path.open("rb") as stream:
+        root_fd = os.open(
+            root,
+            os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+        )
+        parent_fd = root_fd
+        for part in parts[:-1]:
+            next_fd = os.open(
+                part,
+                os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                dir_fd=parent_fd,
+            )
+            directory_fds.append(next_fd)
+            parent_fd = next_fd
+        file_fd = os.open(
+            parts[-1],
+            os.O_RDONLY | os.O_NOFOLLOW,
+            dir_fd=parent_fd,
+        )
+        file_stat = os.fstat(file_fd)
+        if not stat_module.S_ISREG(file_stat.st_mode):
+            os.close(file_fd)
+            raise WorkspacePathNotFile(
+                f"workspace entry is not a regular file: {relative_path!r}"
+            )
+        return file_fd
+    except FileNotFoundError as exc:
+        raise WorkspacePathNotFound(
+            f"workspace path does not exist: {relative_path!r}"
+        ) from exc
+    except OSError as exc:
+        raise WorkspaceCollectionReadError(
+            f"workspace file cannot be opened without following links: {relative_path!r}"
+        ) from exc
+    finally:
+        for descriptor in reversed(directory_fds):
+            os.close(descriptor)
+        if root_fd is not None:
+            os.close(root_fd)
+
+
+def _exact_file_metadata(root: Path, relative_path: str) -> dict:
+    """Return metadata and digest from one stable descriptor, then verify path identity."""
+    entry_path = root / relative_path
+    digest = hashlib.sha256()
+    file_fd = _secure_open_workspace_file(root, relative_path)
+    try:
+        with os.fdopen(file_fd, "rb", closefd=True) as stream:
             before = os.fstat(stream.fileno())
             for block in iter(lambda: stream.read(1024 * 1024), b""):
                 digest.update(block)
             after = os.fstat(stream.fileno())
-        current = path.stat()
     except OSError as exc:
         raise WorkspaceCollectionReadError(
-            f"workspace file cannot be hashed safely: {path.name!r}"
+            f"workspace file cannot be hashed safely: {relative_path!r}"
         ) from exc
+
     if _stat_identity(before) != _stat_identity(after):
         raise WorkspaceFileChanged(
-            f"workspace file changed while hashing: {path.name!r}"
+            f"workspace file changed while hashing: {relative_path!r}"
         )
+
+    verify_fd = _secure_open_workspace_file(root, relative_path)
+    try:
+        current = os.fstat(verify_fd)
+    finally:
+        os.close(verify_fd)
     if _stat_identity(after) != _stat_identity(current):
         raise WorkspaceFileChanged(
-            f"workspace file was replaced while hashing: {path.name!r}"
+            f"workspace file was replaced while hashing: {relative_path!r}"
         )
-    return digest.hexdigest()
+
+    observed = _metadata_from_stat(entry_path, relative_path, after)
+    observed["digest_sha256"] = digest.hexdigest()
+    return observed
 
 
 def observe_workspace_file(
@@ -310,10 +380,11 @@ def observe_workspace_file(
     if root is None:
         raise WorkspaceNotFound(f"unknown workspace_ref: {workspace_ref!r}")
     normalized = normalize_relative_path(relative_path)
-    entry = _resolve_file(root, normalized)
-    observed = _basic_file_metadata(entry, normalized)
     if include_digest:
-        observed["digest_sha256"] = _exact_sha256(entry)
+        observed = _exact_file_metadata(root, normalized)
+    else:
+        entry = _resolve_file(root, normalized)
+        observed = _basic_file_metadata(entry, normalized)
     return {
         "workspace_ref": workspace_ref,
         "relative_path": normalized,
