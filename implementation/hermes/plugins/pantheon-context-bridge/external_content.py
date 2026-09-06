@@ -68,7 +68,7 @@ _ROOTS_LOCK = threading.Lock()
 _TASK_ROOTS: dict[str, set[str]] = {}
 _TASK_TAINT_ROOTS: dict[str, set[str]] = {}
 _PENDING_FETCHES: dict[str, list[dict[str, Any]]] = {}
-_ROOT_CANONICAL_IDENTITIES: dict[str, str] = {}
+_ROOT_CANONICAL_IDENTITIES: dict[tuple[str, str], str] = {}
 _MAX_TRACKED_TASKS = 256
 _MAX_PENDING_PER_TASK = 32
 _DEFAULT_TASK_KEY = "__pantheon_default_task__"
@@ -271,10 +271,11 @@ def _forget_in_map(
 
 def _remember_roots(task_id: str, roots: Iterable[str]) -> None:
     clean = {_normalize(root) for root in roots if root}
+    key = _task_key(task_id)
     _remember_in_map(_TASK_ROOTS, task_id, clean)
     with _ROOTS_LOCK:
         for root in clean:
-            _ROOT_CANONICAL_IDENTITIES[root] = _canonical(root)
+            _ROOT_CANONICAL_IDENTITIES[(key, root)] = _canonical(root)
 
 
 def _remember_taint_roots(task_id: str, roots: Iterable[str]) -> None:
@@ -296,14 +297,16 @@ def _roots_for_task(task_id: str) -> set[str]:
 
 def _eligible_root_records(task_id: str) -> list[tuple[str, str]]:
     records: list[tuple[str, str]] = []
+    key = _task_key(task_id)
     roots = sorted(_roots_for_task(task_id))
     with _ROOTS_LOCK:
         for root in roots:
             lexical = _normalize(root)
-            pinned = _ROOT_CANONICAL_IDENTITIES.get(lexical)
+            identity_key = (key, lexical)
+            pinned = _ROOT_CANONICAL_IDENTITIES.get(identity_key)
             if pinned is None:
                 pinned = _canonical(lexical)
-                _ROOT_CANONICAL_IDENTITIES[lexical] = pinned
+                _ROOT_CANONICAL_IDENTITIES[identity_key] = pinned
             records.append((lexical, pinned))
     return records
 
