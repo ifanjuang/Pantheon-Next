@@ -1,7 +1,7 @@
 """Pantheon context bridge — Hermes plugin registration.
 
 The plugin exposes bounded Pantheon context reads plus guarded read/search paths
-for content with external provenance. Installation or enablement remains an
+for explicitly eligible external content. Installation or enablement remains an
 external Hermes capability action and is not performed by this repository.
 
 Executable security invariants live in plugin handlers/hooks. The bundled skill
@@ -50,8 +50,8 @@ def register(ctx):
         schema=schemas.PANTHEON_UNTRUSTED_READ,
         handler=external_content.make_guarded_read_handler(ctx),
         description=(
-            "Read an uploaded, downloaded, cloned, emailed, or otherwise external file "
-            "through data-only Context Admission."
+            "Read explicitly eligible external content through data-only Context Admission. "
+            "Shell fetch hints never create eligibility."
         ),
     )
     ctx.register_tool(
@@ -59,7 +59,10 @@ def register(ctx):
         toolset="pantheon_context",
         schema=schemas.PANTHEON_UNTRUSTED_SEARCH,
         handler=external_content.make_guarded_search_handler(ctx),
-        description="Search externally sourced files through data-only Context Admission.",
+        description=(
+            "Search explicitly eligible external content through data-only Context Admission. "
+            "Shell fetch hints never create eligibility."
+        ),
     )
 
     ctx.register_hook("pre_gateway_dispatch", external_content.pre_gateway_dispatch)
@@ -69,5 +72,5 @@ def register(ctx):
     ctx.register_skill(
         "untrusted-content-reading",
         _PLUGIN_DIR / "skills" / "untrusted-content-reading" / "SKILL.md",
-        "Use guarded read/search paths for uploaded or otherwise external content.",
+        "Use guarded read/search paths for eligible external content.",
     )
