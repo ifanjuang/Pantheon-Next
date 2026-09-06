@@ -7,8 +7,9 @@ Scope: Pantheon-owned Hermes plugin only; no Hermes fork or core patch
 ## Objective
 
 Extend the existing Pantheon Context Admission boundary so uploaded, downloaded,
-cloned, emailed, or otherwise external file content can be read by Hermes without
-acquiring instruction authority.
+cloned, emailed, or otherwise external file content can be used by Hermes
+without acquiring instruction authority or turning a data boundary into generic
+filesystem read authority.
 
 The implementation must remain replaceable by a future native Hermes provenance
 API and must not create a second document-ingestion, Evidence, approval, or
@@ -17,128 +18,143 @@ execution authority.
 ## Verified baselines
 
 Pantheon work started from `main` at
-`a7080fa7997f47594332db3f3c7cece265beb3fb` after PR #972 and the candidate was
-subsequently requalified against the newer `main` after PR #970.
+`a7080fa7997f47594332db3f3c7cece265beb3fb`. Before final hardening, current
+Pantheon `main` was rechecked at `305e5474e49af6842c8781355fa0cb9161dba9c9`.
+The intervening main changes do not overlap the files changed by this candidate.
 
-Pantheon continues to qualify Hermes `0.21.0` / `v2026.8.31`. That qualified
-runtime already exposes all extension surfaces used here:
+The canonical Pantheon qualification registry currently pins Hermes Agent
+`0.21.0` at commit `29112bef099274229cadff79cdff7bf7b99c4b77`.
+That exact qualified runtime exposes the extension surfaces used here:
 
-- `pre_gateway_dispatch`, a directive hook that may rewrite inbound
-  `MessageEvent.text` before gateway dispatch;
-- `pre_tool_call`, a policy hook whose block decision is fail-closed on hook
-  timeout;
-- `PluginContext.dispatch_tool(...)`, which lets a plugin call native tools
-  without replacing them;
-- `PluginContext.register_skill(...)`, which registers a namespaced read-only
-  plugin skill.
+- `pre_gateway_dispatch`, which may rewrite inbound `MessageEvent.text`;
+- `pre_tool_call`, a fail-closed policy hook before dispatch;
+- `post_tool_call`, emitted after normal, error, blocked, or cancelled tool
+  completion with observer-grade `status` (`ok`, `error`, `blocked`,
+  `cancelled`), `result`, and the original tool identity/arguments;
+- `PluginContext.dispatch_tool(...)`, for native tool delegation without
+  replacing Hermes built-ins;
+- `PluginContext.register_skill(...)`, for the namespaced read-only guidance
+  skill.
 
-No parallel Pantheon implementation or open PR was found that already owned this
-external-content boundary.
+No parallel Pantheon implementation owns this boundary.
 
-## Existing authorities reused
+## Existing authority reused
 
 The existing `pantheon-context-bridge` remains the only plugin artifact because
-it already owns the data-only Context Admission framing used by model-bound
-Pantheon context.
-
-The shared invariant remains:
+it already owns model-bound Context Admission.
 
 ```text
 retrieved content != instruction
 source preservation != trust
 clean scan != trusted
 memory != Evidence
+successful execution != authorization
 successful read != authorization
 projection != persistence
 best-effort provenance hint != governed provenance truth
 ```
 
-`context_admission.py` exposes one generic `protect_untrusted_content(...)`
-primitive. The existing Pantheon context tools continue to call the same
-contract through `protect_model_bound_result(...)`. There is no second delimiter
-or scanner implementation.
+`context_admission.py` exposes the shared `protect_untrusted_content(...)`
+primitive. Existing Pantheon context tools use the same contract through
+`protect_model_bound_result(...)`; there is no second delimiter or scanner.
 
-## Plugin surface
-
-### Inbound gateway text
+## Inbound gateway text
 
 `pre_gateway_dispatch` detects adapter-inlined document content marked with the
-existing Hermes `[Content of <name>]:` form when document media is attached.
+Hermes `[Content of <name>]:` form when document media is attached.
 
-If the platform raw message exposes a caption that is provably the suffix of the
-normalized event text, the plugin wraps only the attachment prefix as untrusted
-data and leaves the verified caption outside the boundary as user-authored text.
+If the raw platform message exposes a caption that is provably the suffix of the
+normalized event text, only the attachment prefix is wrapped as untrusted data
+and the verified caption remains outside the boundary. If separation cannot be
+proven, the combined text is demoted to data and fixed plugin guidance asks the
+model to ask the user what action is wanted.
 
-If the caption cannot be separated without guessing, the plugin demotes the
-whole combined text to data and appends fixed plugin guidance asking the model
-to ask the user what action they want. It never guesses a user instruction from
-document text.
+## File provenance compatibility layer
 
-### Local/extracted file reads
+Intrinsic high-confidence external ingress includes:
 
-Known external paths include high-confidence Hermes ingress locations:
+- `$HERMES_HOME/cache/documents`;
+- explicit `HERMES_DOCUMENT_CACHE_DIR`;
+- sandbox-visible `/root/.hermes/cache/documents`.
 
-- the Hermes document cache under the active `HERMES_HOME`;
-- an explicit `HERMES_DOCUMENT_CACHE_DIR`;
-- the standard sandbox-visible `/root/.hermes/cache/documents` path.
+Dynamic fetch recognition is intentionally narrower and split into three
+states:
 
-The plugin also keeps bounded per-task **best-effort provenance hints** for a
-small set of common terminal fetches: `git clone`, `gh repo clone`, `wget`, and
-`curl` only when curl is expected to create a file (`-o` / `--output` or
-`-O` / `--remote-name`). A bare `curl URL` writes to stdout and therefore does
-not invent a local external-file root. Short option case is preserved so
-`curl -O` cannot be confused with `curl -o`.
+1. **pending candidate** — inferred from a simple supported fetch command before
+   execution; may block ordinary reads but grants no guarded-read scope;
+2. **eligible external root** — promoted only after `post_tool_call` reports
+   `status="ok"`, the structured terminal result reports `exit_code == 0` with
+   no error, and the expected destination is observably created or changed;
+3. **taint-only root** — an expected destination is observably changed after an
+   error/ambiguous outcome; it remains blocked from ordinary reads but still
+   grants no guarded-read scope.
 
-`pre_tool_call` blocks direct model reads of covered paths through `read_file`,
-and blocks `search_files` when its search scope either lies inside a protected
-root or contains one. This prevents an ancestor search such as `/work` from
-returning snippets from a protected `/work/ext` tree.
+Supported best-effort producers are `git clone`, `gh repo clone`, `wget`, and
+file-producing curl forms. Bare `curl URL` does not create provenance. Curl
+short-option case is preserved and the parser recognizes `-o file`, `-ofile`,
+`-o=file`, `--output file`, `--output=file`, and `-O`/`--remote-name`.
 
-Common shell content-reader commands are also blocked when they touch or contain
-a protected root. Path-qualified readers such as `/bin/cat` are recognized as
-well as bare command names.
+Compound shell programs (`&&`, `||`, pipes, separators, redirections and related
+control syntax) are never promoted because an overall command status cannot
+prove that the fetch sub-expression executed. In particular,
+`false && git clone ... /` cannot turn `/` into guarded-reader scope.
 
-Path checks consider both lexical paths and resolved symlink targets. This keeps
-an outside alias pointing into a protected root from bypassing the gate while
-also preventing guarded delegation from following a symlink inside a protected
-tree out to an unrelated local file.
+For clone/tree candidates, promotion additionally requires that the destination
+did not exist before and exists as a directory afterward. Existing broad paths
+such as `/`, `/etc`, or `/tmp` therefore cannot become eligible merely because a
+command names them. File candidates must be newly created or observably changed.
 
-These heuristics are defense-in-depth hints, not a provenance authority and not
-a complete shell parser.
+This state is bounded, process-local compatibility state. It is not governed
+provenance truth.
 
-`execute_code` is intentionally not claimed as mediated by this v1 plugin. A
-literal-path regex would create an impression of coverage without controlling
-dynamic path construction, imports, subprocesses, or copied taint. That surface
-remains an explicit gap for a future native Hermes provenance mechanism.
+## Covered direct read paths
 
-The plugin does not override Hermes built-ins and requests no `tools.override`
-capability.
+`pre_tool_call` blocks ordinary `read_file` and intersecting `search_files`
+access across intrinsic, eligible, pending, and taint-only roots. Ancestor
+search scopes are blocked when they contain a protected root.
 
-### Guarded tools
+Common shell readers are also blocked when touching protected content,
+including path-qualified forms such as `/bin/cat`.
 
-`pantheon_untrusted_read` delegates to Hermes-native `read_file` and applies
-Context Admission to the complete result, but only after proving that the
-requested path remains lexically and canonically inside a known external root.
-An arbitrary local path is refused before native dispatch.
+Path checks use lexical and canonical forms. This blocks an outside symlink into
+a protected root and prevents guarded delegation from following an inside
+symlink out to unrelated local data.
 
-`pantheon_untrusted_search` applies the same root-bounded rule before delegating
-to Hermes-native `search_files`, then applies Context Admission to returned
-snippets.
+`execute_code` is explicitly outside v1 filesystem mediation. A weak literal
+regex is not treated as a security boundary.
 
-An internal `ContextVar` marks those delegated calls so the plugin never blocks
-its own already-validated guarded dispatch if host lifecycle execution invokes
-`pre_tool_call` there.
+## Guarded tools
 
-### Bundled skill
+`pantheon_untrusted_read` and `pantheon_untrusted_search` delegate to native
+Hermes tools and frame returned text as data-only, but only for **eligible**
+external roots:
 
-The plugin registers `untrusted-content-reading` as a namespaced skill. It tells
-the model when to select the guarded tools and restates the authority
-invariants. The skill is guidance only; deleting or ignoring it must not remove
-the executable hook/tool gates.
+- intrinsic document-cache roots; or
+- dynamic roots promoted after the post-success observation contract above.
+
+Pending and taint-only roots deliberately do not authorize guarded delegation.
+Arbitrary local paths and symlink escapes are refused before native dispatch.
+An internal `ContextVar` prevents the plugin from blocking its own validated
+native delegation.
+
+This distinction is essential:
+
+```text
+blocked as potentially external != authorized for guarded read
+terminal returned success != task/effect authorization
+framed as data != permission to read arbitrary files
+```
+
+## Bundled skill
+
+`untrusted-content-reading` is namespaced guidance only. It now states that a
+blocked path may be retried through a guarded tool only if the guarded tool
+accepts that path. A pending/taint-only refusal must not be bypassed through
+`terminal` or `execute_code`.
 
 ## Qualified tool surface
 
-The governed Hermes profile may expose four Pantheon plugin tools:
+The governed profile may expose:
 
 ```text
 pantheon_context_manifest
@@ -147,78 +163,69 @@ pantheon_untrusted_read
 pantheon_untrusted_search
 ```
 
-For the existing synthetic context-binding acceptance, only the first two remain
-required. The guarded read/search tools are allowed but not required; adding a
-capability to the reviewed plugin surface must not silently turn that capability
-into a mandatory execution step.
+Only the first two remain required by the existing synthetic context-binding
+acceptance. Guarded read/search are allowed capabilities, not mandatory steps.
 
-## Review hardening
+## Security-review hardening
 
-The ready-for-review pass found five concrete bypasses and all were treated as
-merge blockers rather than waived because the earlier CI was green:
+Review findings were treated as merge blockers even when CI was green. The
+candidate now covers:
 
-1. guarded read/search could be used as arbitrary host filesystem readers;
-2. direct `search_files` from an ancestor scope could include protected roots;
-3. lexical-only containment could be bypassed with symlink aliases;
-4. case-insensitive curl short-option parsing confused `-O` with `-o`;
-5. path-qualified shell readers such as `/bin/cat` were not recognized.
+1. arbitrary-path disclosure through guarded readers;
+2. ancestor `search_files` scopes containing external roots;
+3. lexical symlink aliases into protected content;
+4. guarded symlink escapes out of protected roots;
+5. curl `-O` versus `-o` case semantics;
+6. attached curl output syntax `-oFILE`;
+7. path-qualified shell readers such as `/bin/cat`;
+8. pre-execution fetch hints accidentally becoming guarded-read authorization.
 
-The implementation now closes those cases and adds explicit regression tests.
-This preserves the distinction:
-
-```text
-CI success != security review complete
-framed-as-data != permission to read arbitrary files
-known external root != arbitrary filesystem scope
-```
+The last item is resolved structurally through the qualified Hermes
+`post_tool_call` lifecycle rather than by adding another security manager.
 
 ## Failure posture
 
 - Missing/failed Hermes threat scanner: content remains untrusted and receives
   `review_recommended`; no trust upgrade occurs.
-- Forged Context Admission delimiters in source text are neutralized before
-  framing.
-- Missing task id: fetch provenance hints use one bounded default runtime scope
-  rather than silently disabling tracking.
-- Guarded path outside known external roots: refused before native dispatch.
-- Guarded symlink escape from an external root: refused before native dispatch.
-- Ambiguous gateway caption: combined text is demoted to data rather than
-  guessing which bytes came from the user.
-- Plugin disabled/not installed: this Pantheon-owned protection is absent;
-  installation/activation remains an external operator action and the
-  distribution lock does not claim otherwise.
+- Forged Context Admission delimiters are neutralized before framing.
+- Missing task id: bounded default runtime state is used rather than silently
+  disabling protection.
+- Guarded path outside eligible roots: refused before native dispatch.
+- Pending or failed/ambiguous fetch path: ordinary reads remain blocked, but the
+  guarded tools do not gain authority from that state.
+- Ambiguous gateway caption: combined text is demoted to data.
+- Plugin disabled/not installed: this Pantheon protection is absent;
+  installation/activation remains an external operator action.
 
 ## Non-goals and limits
 
 This slice is not a filesystem sandbox, DLP system, malware scanner, approval
-engine, Evidence admission path, or complete shell parser.
+engine, Evidence admission path, or complete shell/provenance engine.
 
-Known limits include arbitrary `execute_code`, shell indirection such as
-`sh -c`, redirections not recognized by the bounded fetch parser, archive
-extraction into a different tree, and content copied from an untrusted root into
-an unrelated path. These remain explicit uncertainties rather than hidden
-claims.
-
-A future native Hermes provenance API should replace the compatibility
-root-tracking portion while keeping Pantheon's authority invariant unchanged.
+Known limits include arbitrary `execute_code`, exotic shell indirection,
+unrecognized producer syntax, archive relocation, copied-content taint, and
+process-lifetime loss of dynamic compatibility state. A future native Hermes
+provenance API should replace the compatibility tracking rather than coexist as
+a second authority.
 
 ## Completion criteria
 
-The candidate slice is complete when:
+The candidate is complete when:
 
-1. qualified Hermes `v2026.8.31` supports every plugin API used;
-2. ordinary local files remain on ordinary Hermes read/search paths;
-3. known external paths cannot be directly read/search-resulted to the model
-   through the covered core tools, including ancestor search scopes and symlink
-   aliases;
-4. guarded tools refuse paths outside known external roots and symlink escapes;
-5. admitted guarded results always return `instruction_authority="none"`;
-6. inline attachment data is separated from a provable user caption or fully
+1. the exact pinned Hermes runtime supports all used plugin APIs;
+2. ordinary local files remain on ordinary Hermes paths;
+3. covered external/pending/taint paths cannot enter model context through
+   ordinary covered readers/searches;
+4. guarded tools accept only eligible roots and reject arbitrary paths/symlink
+   escapes;
+5. dynamic eligibility requires `post_tool_call status=ok`, terminal success,
+   and observable destination creation/change;
+6. admitted guarded results always carry `instruction_authority="none"`;
+7. gateway attachment data is separated from a provable caption or fully
    demoted when ambiguous;
-7. the skill is bundled in the same plugin tree;
-8. runtime/lab allowlists distinguish the four allowed plugin tools from the
-   two context tools required by the synthetic context run;
-9. focused tests, both Hermes labs, architecture/governance checks and the full
-   implementation suite pass with the final distribution tree digest;
-10. no installation, activation, task, Evidence, approval, or execution
-    authority is added.
+8. runtime allowlists distinguish four allowed plugin tools from two required
+   context tools;
+9. focused tests, both Hermes labs, governance/architecture gates and the full
+   implementation suite pass on the final head and exact distribution digest;
+10. no installation, activation, task, Evidence, approval, persistence, memory,
+    or execution authority is added.
