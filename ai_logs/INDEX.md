@@ -14,12 +14,13 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **913**.
+Total indexed entries: **914**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
 | 2026-09-06 | `2026/Q3/2026-09-06-retire-openwebui-triad-architecture.md` | Twenty-one architecture documents still named a retired integration as the exposure surface |
+| 2026-09-06 | `2026/Q3/2026-09-06-reconcile-boundary-profile-vocabulary.md` | The drift had one cause: no term for what a document *is* |
 | 2026-09-06 | `2026/Q3/2026-09-06-ratchet-candidate-openwebui-residue.md` | The retirement guard was green because it never looked at candidate doctrine |
 | 2026-09-06 | `2026/Q3/2026-09-06-obsidian-workspace-knowledge-convergence.md` | 2026-09-06 — Obsidian workspace knowledge convergence |
 | 2026-09-06 | `2026/Q3/2026-09-06-knowledge-family-divergence-marker.md` | The architecture Knowledge blueprint names a vocabulary the schema refuses |
