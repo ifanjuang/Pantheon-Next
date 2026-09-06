@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import json
 import uuid
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -39,6 +40,16 @@ def _digest(value: Any) -> str:
     return hashlib.sha256(_canonical(value).encode("utf-8")).hexdigest()
 
 
+def _jsonable(value: Any) -> Any:
+    if isinstance(value, datetime):
+        return value.isoformat()
+    if isinstance(value, dict):
+        return {key: _jsonable(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_jsonable(item) for item in value]
+    return value
+
+
 def _existing_by_idempotency(conn: psycopg.Connection, idempotency_key: str) -> dict | None:
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
@@ -47,6 +58,24 @@ def _existing_by_idempotency(conn: psycopg.Connection, idempotency_key: str) -> 
         )
         row = cur.fetchone()
     return dict(row) if row else None
+
+
+def get_handoff_snapshot(conn: psycopg.Connection, handoff_id: str) -> dict:
+    """Read one immutable handoff snapshot without changing execution state."""
+    handoff_id = str(handoff_id or "").strip()
+    if not handoff_id:
+        raise HandoffSubmissionError("handoff_id is required")
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            "SELECT * FROM cockpit_hermes_handoffs WHERE handoff_id = %s",
+            (handoff_id,),
+        )
+        row = cur.fetchone()
+    if row is None:
+        raise HandoffSubmissionError(f"unknown Cockpit Hermes handoff: {handoff_id}")
+    snapshot = _jsonable(dict(row))
+    snapshot["work_issue"] = work_issue_read.get_issue_record(conn, snapshot["work_issue_id"])
+    return snapshot
 
 
 def _result_from_row(conn: psycopg.Connection, row: dict) -> dict:

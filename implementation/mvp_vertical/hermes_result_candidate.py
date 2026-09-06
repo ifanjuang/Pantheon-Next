@@ -129,6 +129,14 @@ def _row_by_run(conn: psycopg.Connection, run_id: str) -> dict | None:
     return _jsonable(dict(row)) if row else None
 
 
+def get_result_candidate_for_run(conn: psycopg.Connection, run_id: str) -> dict | None:
+    """Read the immutable rich candidate owned by one Hermes run, when present."""
+    run_id = str(run_id or "").strip()
+    if not run_id:
+        raise HermesResultCandidateError("run_id is required")
+    return _row_by_run(conn, run_id)
+
+
 def _row_by_idempotency(conn: psycopg.Connection, idempotency_key: str) -> dict | None:
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
