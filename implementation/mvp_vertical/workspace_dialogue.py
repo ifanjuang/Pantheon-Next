@@ -94,19 +94,6 @@ def _project_scope(
 
     normalized_path = workspace_collection_read.normalize_relative_path(relative_path)
     try:
-        current_observation = workspace_collection_read.observe_workspace_file(
-            workspace_roots={},
-            workspace_ref="",
-            relative_path="",
-        )
-    except Exception:
-        # Deliberately unused placeholder removed below. Keeping project/source
-        # binding independent from filesystem access lets the caller select the
-        # appropriate cheap or exact observation path.
-        current_observation = None
-    del current_observation
-
-    try:
         handoff = hermes_handoff_store.get_handoff_snapshot(conn, handoff_id)
     except hermes_handoff_store.HandoffSubmissionError as exc:
         raise WorkspaceDialogueError(str(exc)) from exc
