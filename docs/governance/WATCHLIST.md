@@ -101,6 +101,7 @@ archive
 | Coding agents | SmallCode, terminal agents, patch agents | patch discipline, controlled execution | coding runtime inside Pantheon |
 | Professional verticalization | legal, medical, architectural or regulated-domain assistants | domain playbooks, review gates, source discipline | professional agent becomes authority |
 | Prompting and reasoning methods | ReAct, debate, reflection, LLM-as-judge | method discipline and review signals | method becomes hidden orchestration |
+| OpenBIM and IFC evolution | IFC5/IFCX, IFC JSON serializations, parsers, geometry analysis and workflow tools | future-proof adapter mappings, spatial analysis and inspectable BIM workflows | external schema, parser or workflow becomes Pantheon ontology or authority |
 
 ## Current RAG and document-evaluation watch items
 
@@ -123,6 +124,32 @@ These records are observation and triage only. They do not approve Claude Code, 
 | Reference | Type | Pantheon interest | Primary risk | Status |
 |---|---|---|---|---|
 | `hesreallyhim/awesome-claude-code` | Claude Code ecosystem catalogue / awesome list | Map skills, hooks, MCP servers, sandboxes, memory/context persistence, observability, cost monitoring and security tooling into Capability Slot review without adopting dependencies. Route `SKILL.md`-style resources to `SKILL_WATCHLIST.md`; route execution candidates to `HERMES_CAPABILITY_BINDINGS.md`; route operational-state patterns to `PANTHEON_CONTROL_PLANE_BOUNDARY.md`. | Catalogue treated as trust registry, install queue, plugin marketplace, MCP catalogue, provider router plan, proof of safety or evidence of approval. | boundary_required |
+
+## Current IFC / OpenBIM watch items
+
+Observed 2026-09-06 while converging Project Anatomy and Hermes context. These records do not select an IFC runtime, parser, serialization, schema generation, geometry engine or workflow UI. IFC remains a source language / adapter profile; Project Anatomy remains the project-understanding model.
+
+| Reference | Type | Pantheon interest | Primary risk | Status |
+|---|---|---|---|---|
+| `buildingSMART/IFC5-development` | official IFC 5 alpha examples and evolving TypeSpec / IFCX direction | track future schema composition and keep IFC mappings replaceable rather than binding Project Anatomy to IFC 4.3 | preliminary examples treated as stable production schema or imported as Pantheon ontology | observe |
+| `buildingsmart-community/ifcJSON` | IFC4/4.3 JSON serialization and round-trip design reference | historical reference for JSON representation, distributed exchange and schema mapping | inactive 2021 repository treated as current IFC future direction or selected interchange runtime | archive |
+| `GeometryGym/GeometryGymIFC` | active C# multi-version IFC parser / generator | candidate reference for future .NET/Revit-side parsing where a demonstrated adapter need is not covered by the selected binding | parser library becomes canonical project identity, schema authority or mandatory Pantheon dependency | method_review_required |
+| `IfcOpenShell/voxelization_toolkit` | voxel-based building geometry analysis toolkit | robust derived spatial analysis for volume, reachability, exterior/interior and later #949-style perception/spatial qualification | derived voxel result treated as surveyed geometry, compliance truth or Project Anatomy fact | pattern_candidate |
+| `louistrue/ifc-flow` | node-based IFC manipulation and analysis application using IfcOpenShell/Pyodide | workflow and UX patterns for inspectable IFC filters, relationships, quantities, spatial queries and transformations | application workflow becomes Pantheon orchestration; IFC mutations bypass governed effects; AGPL application absorbed as core dependency | boundary_required |
+| `ifcquery/ifcplusplus` | legacy C++ IFC parser / geometry library | historical parser reference only | upstream explicitly describes the project as more-or-less archived; new Pantheon work would bind to a superseded implementation | archive |
+
+Distillation posture:
+
+```text
+IFC schema/version != Pantheon ontology
+IFC id != stable project identity
+parser success != project truth
+geometry analysis != professional measurement
+workflow execution != authorization
+external reference != dependency selection
+```
+
+The next IFC-specific review should be driven by a demonstrated adapter or Knowledge need. It should prefer mapping profiles and source provenance over adding IFC entity classes to the Project Anatomy core.
 
 ## Triage path
 
