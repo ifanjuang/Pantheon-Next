@@ -189,69 +189,170 @@ That existing slice is not a universal OCR/derivative authority. Extension requi
 
 ## 11. Obsidian-facing conversion posture
 
-The Obsidian workspace has a narrower human-facing need: place a PDF/office document in the vault, convert it to readable Markdown and reorganize the note later.
+The Obsidian workspace has a narrower human-facing need: preserve the exact source file, optionally produce readable Markdown when that is useful to a person or to the already-qualified Markdown ingestion path, and avoid turning every structured record into a note.
 
-Current qualified working direction from 2026-08-19:
-
-```text
-SourceDown = selected workspace conversion surface
-Docling = preferred structural-analysis candidate where available
-OCR-AI / L3-N0X/obsidian-marker = later comparison candidate
-```
-
-SourceDown publicly documents MarkItDown as its default engine, optional Docling/Marker engines, imported/existing-file conversion, generated Markdown plus source/conversion metadata, adjacent extracted assets, numbered duplicate filenames and desktop-only operation in the reviewed listing.
-
-Public material did not establish whether SourceDown preserves the complete `DoclingDocument`, exposes all Docling pipeline options, or can independently route structured JSON/assets. Those remain qualification questions.
+Current operator choice recorded on 2026-09-06:
 
 ```text
-SourceDown selected for workspace use != Pantheon document runtime adopted
-SourceDown conversion success != professionally validated
-SourceDown Markdown != original source
-duplicate filename handling != professional revision semantics
+exact PDF / office source = preserved source representation
+OCR-AI / L3-N0X/obsidian-marker = selected optional/manual workspace PDF-to-Markdown convenience surface
+Docling = preferred document_structural_analysis candidate under #662
+Hindsight native file retain = not selected in the current qualified workspace producer path
+SourceDown = historical prior workspace choice, not the current selected daily conversion surface
 ```
 
-OCR-AI remains a later candidate, not a second active pipeline.
+This selection is intentionally narrow. It does **not** classify Marker as the winning structural-analysis provider, does not close #662, does not adopt Marker as a Pantheon dependency and does not require a Markdown derivative for every binary source.
 
-## 12. Markdown quality convergence order
+```text
+Marker workspace selection != structural-analysis qualification
+Marker conversion success != professionally validated
+Marker Markdown != original source
+Markdown present != source replacement
+no Markdown derivative != source unavailable
+```
 
-Do not introduce a generic AI Markdown cleaner before exhausting the structured path.
+The ordinary manual path is therefore:
+
+```text
+exact PDF source
+-> optional OCR-AI / Marker conversion in Obsidian
+-> readable Markdown derivative
+-> existing designated hindsight-obsidian-sync producer when that Markdown is inside admitted sync scope
+-> Hindsight derived recall
+```
+
+Do not simultaneously activate a second native-PDF Hindsight producer for the same source merely because `/files/retain` exists. Native Hindsight file ingestion may be re-qualified later if it demonstrates a real simplification over the existing Markdown producer lifecycle.
+
+The earlier SourceDown qualification logs remain historical provenance and are not rewritten to pretend that the earlier operator choice never existed.
+
+## 12. Workspace metadata and human notes
+
+The Workspace/Cockpit may observe or derive document metadata without serializing every field into Markdown.
+
+Keep three classes distinct:
+
+```text
+reconstructible observation
+= filename, MIME, digest, filesystem timestamps, parser-derived structure, detected index/date/type candidates
+
+human-authored workspace material
+= notes, comments, corrections, intentionally authored summaries or Markdown knowledge
+
+derived cache/projection
+= generated summary, essentials, extracted index/date candidates, optional Markdown representation
+```
+
+For index/date/reference extraction, preserve what was actually observed and where it was observed before any professional admission:
+
+```yaml
+extracted:
+  issuer_reference_candidates:
+    - value: A-203
+      source_locator: title_block
+  index_candidates:
+    - value: D
+      source_locator: title_block
+  date_candidates:
+    - value: 2026-08-28
+      label_observed: Date
+      role_candidate: issue_date
+      source_locator: title_block
+```
+
+```text
+detected index != admitted Document version
+highest-looking index != purpose-specific currentness
+date printed in document != receipt date
+date printed in document != effective date
+human note != extracted fact
+derived summary != Evidence
+```
+
+No new production `document.yaml` or workspace-metadata schema is adopted by this posture. Reuse the existing Workspace Manifest Inspector candidate, Professional Document owners and `document_knowledge_slice` structure contract. Persist only non-reconstructible human material or explicitly useful derived cache when justified; routing remains calculated where existing owners can calculate it.
+
+A derived summary may retain its exact source basis, for example:
+
+```yaml
+derived_summary:
+  text: Plan architectural du RDC...
+  based_on_digest: <exact source digest>
+  generation_status: generated_unreviewed
+```
+
+When the exact source digest changes, the old summary is stale rather than silently current.
+
+## 13. Markdown, Hindsight and Project Anatomy
+
+Do not make Markdown or Hindsight the universal interchange format for structured project state.
+
+Use Markdown when it has direct human/workspace value:
+
+```text
+human-authored notes
+reviewable summaries
+meeting notes
+reusable editorial Knowledge
+optional Marker/OCR derivative
+optional reconstructible project narrative such as Projet.md
+```
+
+The designated Hindsight reference path remains one-way:
+
+```text
+Obsidian Markdown
+-> designated hindsight-obsidian-sync producer
+-> Hindsight derived bank
+-> bounded read/recall consumers
+```
+
+```text
+Hindsight recall != truth
+memory != Evidence
+Hindsight ingestion != governed persistence
+```
+
+Do not manufacture Markdown copies solely to push these structures through Hindsight:
+
+```text
+document_structure
+Observation Bundle
+Project Anatomy stable_objects
+Project Anatomy attribute_claims
+Project Anatomy relation_claims
+governed Professional Document/currentness records
+```
+
+When document analysis produces project semantics, use the existing path:
 
 ```text
 exact source
--> SourceDown workspace conversion
--> selected structural parser profile
--> parser-native repair
--> existing deterministic compilation/rendering seam
--> targeted agentic repair only when ambiguity remains
--> final Markdown projection
--> optional one-way Hindsight synchronization
+-> document structural/semantic analysis when needed
+-> canonical Observation Bundle
+-> existing review/application path
+-> Project Anatomy
+-> bounded Hermes/Cockpit projection
 ```
 
-Docling heading-level inference should be qualified before adding downstream hierarchy repair. Deterministic cleanup may normalize whitespace, Markdown heading syntax, stable lists, known table structure and asset/link presentation, but must not paraphrase clauses, change numbers/units or invent missing content.
-
-Docling Agent remains a targeted fallback candidate for ambiguous structural repair only when the exact structured document is available and deterministic/native repair proved insufficient. Agentic repair output remains a traced derivative.
-
-Hindsight remains downstream derived memory/index:
+Hermes may read admitted Project Anatomy through its bounded Project Anatomy context seam. An optional `Projet.md` may summarize that state for human consultation and Hindsight recall, but it remains a reconstructible projection and must not become the only persistence path or a second project-knowledge authority.
 
 ```text
-Obsidian Markdown source -> designated sync -> Hindsight derived bank -> bounded read consumers
-Hindsight recall != truth
-memory != Evidence
+Projet.md != Project Anatomy
+projection != persistence
+source observation != project truth
 ```
 
-## 13. Qualification sequence
+## 14. Structural-analysis qualification sequence
 
-Before implementing another parser, cleaner or agentic repair path, compare on one frozen control source:
+The workspace convenience choice does not pre-judge #662. Structural-analysis providers remain compared on one frozen IFJA corpus through the existing `document_structural_analysis` responsibility.
+
+Current posture:
 
 ```text
-A. SourceDown current/default profile
-B. SourceDown + current Docling profile where selectable
-C. Docling native heading hierarchy where exposed
-D. deterministic presentation normalization only if defects remain
-E. targeted Docling Agent repair only if structured ambiguity remains
-F. OCR-AI later as a separate workspace UX/parser candidate
+Docling = preferred candidate / bounded implementation path
+Marker = candidate to qualify for structural analysis
+other candidates = remain under #662 as recorded there
 ```
 
-Record exact identities, source digest, configuration, output digest, structured-artifact availability, heading/reading-order/table/asset behavior, edit survival and duplicate-document behavior.
+Before replacing the structural-analysis binding or adding parser-specific downstream code, record exact identities, source/config/output digests, structured JSON availability, hierarchy/reading-order/table/assets behavior, reconversion behavior, provenance quality and operational cost.
 
-No new adapter is justified until this comparison demonstrates a gap the existing SourceDown + Docling + compilation responsibilities cannot cover.
+No new adapter is justified until the comparison demonstrates a gap the existing structural-analysis and deterministic compilation responsibilities cannot cover.
