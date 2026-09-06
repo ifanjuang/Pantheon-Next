@@ -1,7 +1,7 @@
 # External Tools Policy
 
 Status: active support doctrine — external capability review and risk policy.
-Boundary profile: external_capability_review.
+Boundary profile: active_support_doctrine.
 
 External tools are capabilities.
 

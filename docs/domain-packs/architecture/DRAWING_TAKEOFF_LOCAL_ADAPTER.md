@@ -1,7 +1,7 @@
 # Drawing Takeoff Local Adapter Boundary
 
 Status: candidate support doctrine — documented non-implemented.
-Boundary profile: architecture source adapter specialization.
+Boundary profile: candidate_support_note.
 Date: 2026-08-07.
 
 This document specializes `PROJECT_UNDERSTANDING_ADAPTER_CONTRACT.md` for a local drawing and quantity-takeoff engine. It records how a tool such as OpenTakeoff may be used by Pantheon without becoming a Pantheon authority, a Revit dependency, an economy authority or a project database.

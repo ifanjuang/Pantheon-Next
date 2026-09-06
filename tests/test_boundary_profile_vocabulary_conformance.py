@@ -31,21 +31,10 @@ PLACEHOLDER = "<profile_name>"
 EXCLUDED_PREFIXES = ("ai_logs/", ".git/")
 EXCLUDED_SUBSTRINGS = ("/build/",)
 
-# Live documents declaring a profile the owner does not define. Ratchet only:
-# entries may be removed as each is reconciled, never added. The reconciliation
-# decision — adopt, converge or retire, per name — is #1000's, not this list's.
-KNOWN_UNDEFINED_PROFILE_DECLARATIONS = {
-    ("docs/domain-packs/architecture/DRAWING_TAKEOFF_LOCAL_ADAPTER.md", "architecture source adapter specialization"),
-    ("docs/domain-packs/architecture/PROJECT_ANATOMY_KNOWLEDGE_STRUCTURE.md", "architecture_project_understanding_projection"),
-    ("docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md", "architecture_project_understanding_projection"),
-    ("docs/governance/AGENT_PLUGINS_INTEROPERABILITY.md", "external_reference_review"),
-    ("docs/governance/CARD_PROJECTION_DEFINITION_MODEL.md", "projection_definition"),
-    ("docs/governance/EVIDENCE_TOPOLOGY.md", "active_governance_doctrine"),
-    ("docs/governance/EXTERNAL_TOOLS_POLICY.md", "external_capability_review"),
-    ("docs/governance/HERMES_INTEGRATION.md", "external_runtime_integration"),
-    ("docs/governance/HERMES_RUNTIME_SURFACE_REVIEW.md", "external_reference_review"),
-    ("docs/governance/REVIT_LOCAL_ADAPTER.md", "external runtime adapter"),
-}
+# Empty since #1000 reconciled the vocabulary: every live declaration now names a
+# profile BOUNDARY_PROFILES.md defines. The ratchet stays as the floor — a new
+# undefined name fails `unexpected` immediately, with no seeded debt to hide in.
+KNOWN_UNDEFINED_PROFILE_DECLARATIONS: set[tuple[str, str]] = set()
 
 
 def _defined_profiles() -> set[str]:
