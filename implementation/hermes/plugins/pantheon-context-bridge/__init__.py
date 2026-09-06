@@ -1,12 +1,12 @@
-"""Pantheon context bridge — Hermes plugin registration.
+"""Pantheon context bridge — bounded model-context transport for Hermes.
 
-This plugin exposes read-only context tools only. Installation or enablement of the
-plugin is an external Hermes capability action and is not performed by this repo.
-Every registered model-bound handler applies Context Admission before its result
-leaves the Pantheon plugin.
+The plugin exposes only exact admitted Pantheon context reads and one gateway hook
+that demotes adapter-inlined document attachments to data before model dispatch.
+It does not mediate terminal/filesystem provenance, install itself, authorize a
+task, persist memory or admit Evidence.
 """
 
-from . import context_admission, schemas, tools
+from . import context_admission, external_content, schemas, tools
 
 
 def _protected_handler(tool_name, handler):
@@ -44,3 +44,4 @@ def register(ctx):
         ),
         description="Read one exact entity already admitted for this Hermes session.",
     )
+    ctx.register_hook("pre_gateway_dispatch", external_content.pre_gateway_dispatch)

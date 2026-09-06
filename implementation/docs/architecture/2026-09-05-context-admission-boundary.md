@@ -121,31 +121,46 @@ without the same indirect-prompt-injection framing.
 The problem is not professional document admission. It is the final
 model-context transport boundary.
 
-## Context Admission v1 contract
+## Context Admission v2 contract
 
-The first contract is intentionally small:
+The emitted envelope is deterministic:
 
 ```text
-contract = pantheon.context-admission.v1
+contract = pantheon.context-admission.v2
 content_role = data
 instruction_authority = none
 transport_class = untrusted_data
-scanner_authority = advisory_only
-scan_status = no_findings | findings | unavailable | error
-disposition = admitted_untrusted | review_recommended
 ```
 
 Invariant:
 
 ```text
-scanner clean != trusted
 retrieved/context data != instruction
+attachment content != user request
 Context Pack inclusion != Evidence
 successful tool read != authorization
-review recommendation != enforced human gate
+absent scanner != content clean
 ```
 
 No path in this contract can emit instruction authority.
+
+### What v1 was, and why v2 is a new number
+
+v1 additionally emitted `scanner_authority`, `scan_status` and `disposition`,
+derived from Hermes' `tools.threat_patterns.scan_for_threats(scope="context")`.
+
+Those attributes never changed the outcome — content was framed as data whether
+the scan was clean, found something, or could not run at all. A field that reads
+like a verdict and decides nothing invites the `no findings -> safe` reading this
+repository forbids, so it was removed rather than kept as decoration.
+
+Removing three emitted attributes changes the envelope's shape, so it takes a new
+version. Redefining v1 in place would leave one version string meaning two shapes,
+which is worth nothing to the consumer the string exists for.
+
+Observation is not restored here. Nothing currently records that content arrived
+carrying injection patterns; that is a separate observation/risk path and must not
+re-enter the transport decision.
 
 ## Runtime implementation
 
@@ -155,18 +170,23 @@ into both registered Hermes tool handlers.
 The handler boundary:
 
 1. acts only on `pantheon_context_manifest` and `pantheon_context_entity`;
-2. scans the raw model-bound result with Hermes'
-   `tools.threat_patterns.scan_for_threats(scope="context")`;
-3. neutralizes forged admission/delimiter tokens in source content;
-4. wraps the complete result in the same semantic
+2. neutralizes forged admission/delimiter tokens in source content;
+3. wraps the complete result in the same semantic
    `<untrusted_tool_result>` boundary used by Hermes;
-5. labels the result explicitly as data with `instruction_authority="none"`;
-6. marks a clean scan `admitted_untrusted`, never trusted;
-7. marks findings, scanner failure or scanner absence `review_recommended`;
-8. does not redact or mutate the preserved source or Pantheon owner record.
+4. labels the result explicitly as data with `instruction_authority="none"`;
+5. consults no scanner and reads no runtime state, so the same input always
+   produces the same envelope;
+6. does not redact or mutate the preserved source or Pantheon owner record.
 
-The scanner is defense in depth. The data-only transport boundary is the primary
-invariant.
+The data-only transport boundary is the whole invariant. There is no second,
+weaker layer behind it whose failure could be mistaken for safety.
+
+A registered `pre_gateway_dispatch` hook applies the same framing to
+adapter-inlined gateway document attachments. The upstream `[Content of ...]:`
+marker alone selects it: media and cache metadata are not consulted, because an
+adapter that omits a mime type must not be able to switch the boundary off. A
+human-authored caption is kept outside the data block only when it stands on its
+own trailing line; every ambiguous case demotes the whole message to data.
 
 ## Why the registered-handler boundary
 
@@ -192,33 +212,26 @@ framed.
 
 ## Failure posture
 
-If Hermes' threat scanner is unavailable or raises:
+v2 has no runtime dependency that can fail. There is no scanner to be absent, no
+import to raise and no status to degrade: every admitted input produces the same
+envelope, so there is no path on which a failure could be read as a clean result.
+
+The failure modes that remain are the boundary not being *reached*:
 
 ```text
-scan_status = unavailable | error
-disposition = review_recommended
-instruction_authority = none
+the upstream inline marker changes shape   -> attachment framing does not apply
+an adapter inlines content without it      -> attachment framing does not apply
 ```
 
-The boundary therefore does not silently upgrade trust because a scanner failed.
-`review_recommended` is an advisory classification only. This v1 slice does not
-block transport or claim that a human review gate has been executed.
+Neither is silent by construction. `QUALIFIED_HERMES_VERSION` in
+`external_content.py` is pinned against the distribution lock's Hermes runtime
+version, so bumping the runtime fails a test and forces the marker to be
+re-verified rather than quietly ceasing to match. The marker itself accepts any
+filename that contains no line break, including bracketed names.
 
-If the scanner finds an attack pattern:
-
-```text
-scan_status = findings
-disposition = review_recommended
-instruction_authority = none
-```
-
-The content remains analyzable as quoted/source material inside the untrusted
-boundary. A finding does not become a truth verdict about the document, and a
-review recommendation is not itself an approval requirement.
-
-A future `requires_review` status is reserved for a concrete consumer that
-enforces a human decision or quarantine before the relevant effect proceeds.
-Focused tests refuse `requires_review` on the current advisory path.
+Content that reaches the boundary is never blocked, redacted or quarantined. It
+is framed. Framing is not a truth verdict about the document, and it is not an
+approval requirement.
 
 ## Non-goals
 
@@ -256,12 +269,15 @@ This slice is complete when:
 
 - both Pantheon context tools register protected model-bound handlers;
 - the transform always emits `instruction_authority=none`;
-- clean scan does not imply trust;
-- findings and scanner failure recommend review without claiming an enforced gate;
-- advisory paths cannot emit `requires_review`;
+- the envelope is deterministic: no scanner, no runtime state, no status field;
+- adapter-inlined gateway attachments are framed on the marker alone, with media
+  and cache metadata unable to switch the boundary off;
+- a caption leaves the data block only when it stands on its own trailing line;
+- the inline marker is pinned to the qualified Hermes runtime version, so drift
+  fails a test instead of passing silently;
 - forged delimiters are neutralized;
 - unrelated Hermes tools are untouched;
-- the pinned distribution digest includes the transform;
+- the pinned distribution digest includes the transform and the hook;
 - focused tests cover these invariants.
 
 The implementation remains default-off because the Pantheon Hermes distribution
