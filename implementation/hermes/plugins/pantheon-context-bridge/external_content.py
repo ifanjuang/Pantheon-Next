@@ -1,21 +1,21 @@
 """Plugin-local protection for externally sourced files and gateway attachments.
 
 Known external content stays on a data-only path without overriding Hermes core
-tools. Gateway attachments are framed before model dispatch; direct reads and
+tools. Gateway attachments are framed before model dispatch; ordinary reads and
 searches of protected roots are blocked; guarded plugin tools may delegate to
-native read/search only inside an eligible external root.
+native read/search only inside an explicitly eligible external root.
 
-Hermes document-cache roots are intrinsic high-confidence ingress. Fetch
-destinations inferred from terminal commands are best-effort compatibility
-hints. Pending and taint-only roots are deny-only. Dynamic roots become eligible
-only after a simple fetch command succeeds and the expected destination is
-observably created or changed. Mutable eligible-root identities are pinned at
-admission so later symlink replacement cannot widen read authority.
+Hermes document-cache roots are intrinsic high-confidence ingress. Destinations
+inferred from terminal ``git clone``, ``gh repo clone``, ``curl`` and ``wget``
+commands are compatibility hints used only to deny unframed reads. Shell hints
+never grant guarded-read eligibility: after terminal completion an observably
+created or changed destination becomes taint-only, regardless of command status.
+This keeps ``successful execution != authorization`` executable rather than
+trying to infer positive authority from partial shell semantics.
 """
 
 from __future__ import annotations
 
-import json
 import os
 import re
 import shlex
@@ -42,16 +42,8 @@ _WGET_COMMAND_RE = re.compile(
     _COMMAND_PREFIX + r"wget(?:\.exe)?(?:\s|$)",
     re.IGNORECASE,
 )
-_WGET_DEST_RE = re.compile(
-    r"(?:^|\s)(?:-O|--output-document)(?:=|\s+)(\S+)"
-)
+_WGET_DEST_RE = re.compile(r"(?:^|\s)(?:-O|--output-document)(?:=|\s+)(\S+)")
 _FETCH_URL_RE = re.compile(r"https?://[^\s'\";&|]+", re.IGNORECASE)
-# Shell composition/comments make an overall terminal result insufficient to
-# prove that a matched fetch sub-expression executed. Candidates are still
-# tracked as pending/taint-only, but are never promoted to guarded-read scope.
-# Command substitution/grouping is included explicitly: outer-command success
-# cannot prove the nested fetch succeeded.
-_SHELL_CONTROL_RE = re.compile(r"(?:&&|\|\||\$\(|[(){};&|<>`#\n\r])")
 _TERMINAL_CONTENT_READER_RE = re.compile(
     _COMMAND_PREFIX
     + r"(?:(?:cat|head|tail|less|more|strings|grep|rg|sed|awk|type|get-content|gc|"
@@ -66,8 +58,8 @@ _GUARDED_DISPATCH: ContextVar[bool] = ContextVar(
     default=False,
 )
 _ROOTS_LOCK = threading.Lock()
-# Eligible dynamic roots. Kept as a set for compatibility with existing focused
-# contracts; canonical identity is stored separately and pinned at admission.
+# Positive dynamic eligibility is reserved for explicit plugin-controlled
+# admission. Shell provenance never writes this map.
 _TASK_ROOTS: dict[str, set[str]] = {}
 _TASK_TAINT_ROOTS: dict[str, set[str]] = {}
 _PENDING_FETCHES: dict[str, list[dict[str, Any]]] = {}
@@ -139,27 +131,12 @@ def _curl_indexes(tokens: list[str]) -> list[int]:
     ]
 
 
-def _curl_detection_is_promotable(command: str) -> bool:
-    """A detected curl is promotable only when curl is the executed command.
-
-    A later ``curl`` token may merely be data passed to another executable. We
-    still retain its destinations as pending/taint-only candidates, but never
-    let success of the outer command promote them to guarded-read authority.
-    """
-
-    tokens = _shell_tokens(command)
-    indexes = _curl_indexes(tokens)
-    if not indexes:
-        return True
-    return indexes == [0]
-
-
 def _curl_candidates(command: str, cwd: str) -> list[tuple[str, str]]:
-    """Parse every curl output destination while preserving shell quoting.
+    """Collect every file-producing curl destination as a deny-only hint.
 
-    Supports repeated ``-o file``, ``-oFILE``, ``-o=FILE``, ``--output FILE``,
-    ``--output=FILE`` and remote-name forms. Detection may be conservative for
-    compound commands because such candidates are deny-only and never promoted.
+    Shell-aware tokenization preserves quoted filenames and repeated ``-o``
+    destinations. False-positive detection can only cause conservative blocking;
+    it cannot create guarded-read authority.
     """
 
     tokens = _shell_tokens(command)
@@ -220,6 +197,8 @@ def _curl_candidates(command: str, cwd: str) -> list[tuple[str, str]]:
 
 
 def _extract_fetch_candidates(command: str, cwd: str) -> list[tuple[str, str]]:
+    """Return bounded shell provenance hints for blocking/taint only."""
+
     candidates: list[tuple[str, str]] = []
 
     for pattern in (_GIT_CLONE_RE, _GH_REPO_CLONE_RE):
@@ -242,7 +221,6 @@ def _extract_fetch_candidates(command: str, cwd: str) -> list[tuple[str, str]]:
         if resolved:
             candidates.append((resolved, "file"))
 
-    # Preserve discovery order without duplicating the same path/kind pair.
     unique: list[tuple[str, str]] = []
     for candidate in candidates:
         if candidate not in unique:
@@ -305,6 +283,8 @@ def _forget_in_map(
 
 
 def _remember_roots(task_id: str, roots: Iterable[str]) -> None:
+    """Explicitly admit plugin-controlled roots; never called from shell hints."""
+
     clean = {_normalize(root) for root in roots if root}
     key = _task_key(task_id)
     _remember_in_map(_TASK_ROOTS, task_id, clean)
@@ -318,6 +298,8 @@ def _remember_taint_roots(task_id: str, roots: Iterable[str]) -> None:
 
 
 def _clear_taint_roots(task_id: str, roots: Iterable[str]) -> None:
+    """Compatibility helper for future explicit re-admission paths."""
+
     _forget_in_map(_TASK_TAINT_ROOTS, task_id, roots)
 
 
@@ -334,12 +316,12 @@ def _roots_for_task(task_id: str) -> set[str]:
 
 
 def _eligible_root_records(task_id: str) -> list[tuple[str, str]]:
-    """Return only roots whose canonical boundary is already trustworthy.
+    """Return intrinsic stable roots plus explicitly admitted dynamic roots.
 
-    Dynamic roots must have been pinned at promotion. Intrinsic document-cache
-    roots are never lazily pinned from their first guarded access; they are
-    eligible only while the configured lexical root is not a symlink and still
-    resolves to itself. A replaced/symlinked cache therefore fails closed.
+    Intrinsic document-cache roots are never lazily trusted through a changed
+    canonical identity: a symlinked/replaced cache fails closed. Dynamic records
+    exist only when another plugin-controlled operation explicitly called
+    ``_remember_roots``; shell heuristics never reach this map.
     """
 
     records: list[tuple[str, str]] = []
@@ -424,15 +406,11 @@ def _path_safely_under_any_root(path: str, roots: Iterable[str]) -> bool:
 
 
 def _path_safely_under_eligible_root(path: str, task_id: str) -> bool:
-    """Require a still-stable root identity pinned when eligibility was granted."""
-
     if not path:
         return False
     lexical_candidate = _normalize(path)
     canonical_candidate = _canonical(path)
     for lexical_root, pinned_canonical_root in _eligible_root_records(task_id):
-        # The root itself is mutable. Replacing it with a symlink must revoke
-        # this authorization path rather than redefining its canonical scope.
         if _canonical(lexical_root) != pinned_canonical_root:
             continue
         if _contains(lexical_candidate, lexical_root) and _contains(
@@ -501,10 +479,6 @@ def _record_pending_fetch(
     record = {
         "command": command,
         "cwd": _normalize(cwd),
-        "promotable": (
-            not bool(_SHELL_CONTROL_RE.search(command or ""))
-            and _curl_detection_is_promotable(command)
-        ),
         "candidates": [
             (_normalize(path), kind, _fingerprint(path))
             for path, kind in candidates
@@ -534,27 +508,8 @@ def _pop_pending_fetch(task_id: str, command: str, cwd: str) -> dict[str, Any] |
     return None
 
 
-def _terminal_succeeded(result: Any) -> bool:
-    value = result
-    if isinstance(value, str):
-        try:
-            value = json.loads(value)
-        except (TypeError, json.JSONDecodeError):
-            return False
-    return (
-        isinstance(value, dict)
-        and value.get("exit_code") == 0
-        and not value.get("error")
-    )
-
-
-def _observably_changed_candidates(
-    record: dict[str, Any],
-) -> tuple[list[str], list[str]]:
-    """Return (observed, promotion-safe) destination paths."""
-
+def _observably_changed_candidates(record: dict[str, Any]) -> list[str]:
     observed: list[str] = []
-    promotion_safe: list[str] = []
     for path, kind, before in record.get("candidates", []):
         after = _fingerprint(path)
         if after is None:
@@ -562,14 +517,9 @@ def _observably_changed_candidates(
         if kind == "tree":
             if before is None and os.path.isdir(path):
                 observed.append(path)
-                # A clone destination root itself must not be a symlink when
-                # entering eligible scope.
-                if not os.path.islink(path):
-                    promotion_safe.append(path)
         elif kind == "file" and os.path.isfile(path) and (before is None or after != before):
             observed.append(path)
-            promotion_safe.append(path)
-    return observed, promotion_safe
+    return observed
 
 
 def _blocked_message(tool_name: str) -> dict[str, str]:
@@ -577,9 +527,9 @@ def _blocked_message(tool_name: str) -> dict[str, str]:
         "action": "block",
         "message": (
             f"{tool_name} was blocked for content with external/untrusted provenance. "
-            "Use pantheon_untrusted_read for an eligible external file or "
-            "pantheon_untrusted_search for an eligible external search scope so returned "
-            "text is framed as data with no instruction authority."
+            "Use pantheon_untrusted_read/search only when the path is intrinsically "
+            "eligible or explicitly admitted by a governed plugin operation. Shell "
+            "fetch hints are deny-only and never grant guarded-read authority."
         ),
     }
 
@@ -632,16 +582,16 @@ def post_tool_call(
     status: str = "",
     **kwargs: Any,
 ) -> None:
-    """Resolve pending fetch provenance after Hermes reports tool completion.
+    """Resolve shell provenance hints without ever granting read authority.
 
-    Only a simple promotable command with ``status == 'ok'``, terminal
-    ``exit_code == 0`` and an observably changed promotion-safe destination can
-    become eligible. Compound/commented, failed, ambiguous, or unsafe-root
-    observations remain taint-only. A later successful rewrite can clear taint
-    for exactly the destinations it safely re-admits.
+    Any expected destination that is observably created or changed becomes
+    taint-only. Success, failure or outer-command status cannot promote it into
+    ``_TASK_ROOTS``. This deliberately trades some convenience for a much
+    smaller authority surface and removes shell parsing from the positive trust
+    path.
     """
 
-    del kwargs
+    del kwargs, result, status
     if tool_name != "terminal":
         return
 
@@ -652,22 +602,8 @@ def post_tool_call(
     if record is None:
         return
 
-    observed, promotion_safe = _observably_changed_candidates(record)
-    if not observed:
-        return
-
-    can_promote = (
-        record.get("promotable") is True
-        and status == "ok"
-        and _terminal_succeeded(result)
-    )
-    if can_promote and promotion_safe:
-        _remember_roots(task_id, promotion_safe)
-        _clear_taint_roots(task_id, promotion_safe)
-        unsafe_observed = set(observed) - set(promotion_safe)
-        if unsafe_observed:
-            _remember_taint_roots(task_id, unsafe_observed)
-    else:
+    observed = _observably_changed_candidates(record)
+    if observed:
         _remember_taint_roots(task_id, observed)
 
 
