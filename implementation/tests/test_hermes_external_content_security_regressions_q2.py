@@ -1,4 +1,4 @@
-"""Security regressions for the external-content provenance state machine."""
+"""Security regressions for deny-only shell provenance."""
 
 from __future__ import annotations
 
@@ -55,7 +55,7 @@ def _complete_terminal(external, task_id: str, command: str, cwd: Path) -> None:
     )
 
 
-def test_curl_token_passed_to_another_program_is_taint_only(external, tmp_path) -> None:
+def test_curl_token_passed_to_another_program_can_only_taint(external, tmp_path) -> None:
     task_id = "q2-noncommand-curl"
     target = tmp_path / "credential"
     command = (
@@ -79,7 +79,7 @@ def test_curl_token_passed_to_another_program_is_taint_only(external, tmp_path) 
         external._require_guarded_path("pantheon_untrusted_read", str(target), task_id)
 
 
-def test_command_substitution_fetch_can_never_promote(external, tmp_path) -> None:
+def test_command_substitution_fetch_can_never_authorize(external, tmp_path) -> None:
     task_id = "q2-command-substitution"
     target = tmp_path / "out"
     command = f"echo $( curl https://example.test/a -o {target} )"
@@ -123,7 +123,7 @@ def test_symlinked_intrinsic_document_cache_is_not_guarded_read_authority(
         )
 
 
-def test_curl_tracks_every_explicit_output_destination(external, tmp_path) -> None:
+def test_curl_tracks_every_explicit_output_destination_as_taint(external, tmp_path) -> None:
     task_id = "q2-multi-output"
     first = tmp_path / "first file"
     second = tmp_path / "second file"
@@ -146,7 +146,10 @@ def test_curl_tracks_every_explicit_output_destination(external, tmp_path) -> No
     second.write_text("b", encoding="utf-8")
     _complete_terminal(external, task_id, command, tmp_path)
 
-    assert {str(first), str(second)}.issubset(external._TASK_ROOTS[task_id])
+    assert external._TASK_ROOTS.get(task_id, set()) == set()
+    assert {str(first), str(second)}.issubset(
+        external._taint_roots_for_task(task_id)
+    )
 
 
 def test_terminal_reader_preserves_quoted_path_with_spaces(external, tmp_path) -> None:
@@ -173,3 +176,20 @@ def test_quoted_attached_curl_output_remains_exact(external, tmp_path) -> None:
         str(tmp_path),
     )
     assert roots == [str(tmp_path / "external file.txt")]
+
+
+def test_simple_successful_curl_still_never_enters_positive_root_map(
+    external, tmp_path
+) -> None:
+    task_id = "q2-simple-curl"
+    target = tmp_path / "out.txt"
+    command = "curl https://example.test/a -o out.txt"
+    external.pre_tool_call(
+        "terminal",
+        {"command": command, "workdir": str(tmp_path)},
+        task_id=task_id,
+    )
+    target.write_text("external", encoding="utf-8")
+    _complete_terminal(external, task_id, command, tmp_path)
+    assert external._TASK_ROOTS.get(task_id, set()) == set()
+    assert str(target) in external._taint_roots_for_task(task_id)
