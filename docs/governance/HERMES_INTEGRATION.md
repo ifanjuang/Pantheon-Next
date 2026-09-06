@@ -1,7 +1,7 @@
 # Hermes Integration
 
 Status: active doctrine — integration boundary stabilization.
-Boundary profile: external_runtime_integration.
+Boundary profile: active_governance_doctrine.
 
 Hermes Agent is the selected external execution runtime for Pantheon-governed work.
 

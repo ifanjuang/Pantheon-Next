@@ -1,7 +1,7 @@
 # Project Anatomy Knowledge Structure
 
 Status: candidate support note — discussion-recovery annex, documentation only.
-Boundary profile: architecture_project_understanding_projection.
+Boundary profile: candidate_support_note.
 Date: 2026-08-06.
 
 This annex records only the Project Anatomy requirements that were not explicit

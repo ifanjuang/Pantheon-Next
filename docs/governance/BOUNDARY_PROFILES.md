@@ -22,6 +22,23 @@ It does not reduce responsibility.
 
 If a document touches a protected path, proposes an external action, changes execution status, changes memory behavior, changes approval behavior or changes a runtime surface, the specific boundary must still be explicit.
 
+## A profile classifies the document, not its subject
+
+Choose the profile from what the document **is and does**, never from what it is about.
+
+A policy governing external tools is active support doctrine. A review of one external runtime is an external reference review. Both are "about external things"; only the second one is one.
+
+This is the distinction that failed in practice. Where the vocabulary offered no term for what a document *is*, authors reached for a label describing its *subject*:
+
+```text
+external runtime adapter
+architecture source adapter specialization
+architecture_project_understanding_projection
+projection_definition
+```
+
+Each of those is a vocabulary of one, useful to no other document. A subject belongs in the title and in the `Status:` line, not in this slot.
+
 ## Inherited role separation
 
 `docs/governance/ARCHITECTURE.md` (active doctrine) owns the role separation, and every profile inherits it:
@@ -105,6 +122,60 @@ automatic_approval: false
 ```
 
 Active support doctrine must remain compatible with canonical doctrine and `AUTHORITY_INDEX.md`.
+
+### `active_governance_doctrine`
+
+Use for a document that **is** accepted doctrine — canonical or active — rather than one that supports it.
+
+Means:
+
+```text
+doctrine: true
+runtime: false
+implementation: false
+external_action: false
+memory_promotion: false
+automatic_approval: false
+```
+
+Authority comes from the `Status:` header and `AUTHORITY_INDEX.md`, never from this line. Declaring the profile does not promote a document to doctrine.
+
+### `external_reference_review`
+
+Use for a review of an external specification, runtime, tool or capability that Pantheon has not adopted.
+
+Means:
+
+```text
+installed: false
+adopted: false
+activated: false
+task_authorized: false
+runtime: false
+external_action: false
+memory_promotion: false
+```
+
+Reviewing something is not selecting it. A recorded external fact is provenance rather than a commitment, and its currentness decays, so a review names the version it read.
+
+### `bounded_implementation_change`
+
+Use for a change under `implementation/` that runs — code, persistence, projections, adapters and their tests.
+
+Means:
+
+```text
+implementation: true
+runtime: candidate
+approval: false
+authorization: false
+evidence_admission: false
+memory_promotion: false
+external_action: false
+canonical_override: false
+```
+
+This is the only profile that admits executable behavior, so it is exactly where `implementation success != authorization` has to be said out loud. Passing tests are implementation evidence; they approve no effect, admit no Evidence and move no doctrine.
 
 ### `validation_only_trace`
 
