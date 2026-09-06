@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import mimetypes
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
@@ -32,6 +33,14 @@ class WorkspacePathNotFound(WorkspaceCollectionReadError):
 
 class WorkspacePathNotDirectory(WorkspaceCollectionReadError):
     """A collection read targeted an entry that is not a directory."""
+
+
+class WorkspacePathNotFile(WorkspaceCollectionReadError):
+    """An exact file observation targeted an entry that is not a regular file."""
+
+
+class WorkspaceFileChanged(WorkspaceCollectionReadError):
+    """The exact file changed while a byte-basis observation was being computed."""
 
 
 class WorkspaceConfigurationError(WorkspaceCollectionReadError):
@@ -123,6 +132,15 @@ def normalize_relative_path(relative_path: str | None) -> str:
     return "" if normalized == "." else normalized
 
 
+def _reject_hidden_components(relative_path: str) -> None:
+    """Keep exact reads inside the same visible namespace as collection navigation."""
+    for part in PurePosixPath(relative_path).parts if relative_path else ():
+        if part == "_VAULT.md" or part.startswith("."):
+            raise WorkspacePathNotFound(
+                f"workspace path is not exposed by the read projection: {relative_path!r}"
+            )
+
+
 def _reject_symlink_components(root: Path, relative_path: str) -> None:
     """Keep the first slice symlink-free, even when a link would stay in-root."""
     current = root
@@ -134,8 +152,8 @@ def _reject_symlink_components(root: Path, relative_path: str) -> None:
             )
 
 
-def _resolve_directory(root: Path, relative_path: str) -> Path:
-    """Resolve a normalized path under one root and require a real directory."""
+def _resolve_entry(root: Path, relative_path: str) -> Path:
+    _reject_hidden_components(relative_path)
     _reject_symlink_components(root, relative_path)
     target = (root / relative_path).resolve()
     root_real = root.resolve()
@@ -147,9 +165,27 @@ def _resolve_directory(root: Path, relative_path: str) -> Path:
         raise WorkspacePathNotFound(
             f"workspace path does not exist: {relative_path!r}"
         )
+    return target
+
+
+def _resolve_directory(root: Path, relative_path: str) -> Path:
+    """Resolve a normalized path under one root and require a real directory."""
+    target = _resolve_entry(root, relative_path)
     if not target.is_dir():
         raise WorkspacePathNotDirectory(
             f"workspace collection target is not a directory: {relative_path!r}"
+        )
+    return target
+
+
+def _resolve_file(root: Path, relative_path: str) -> Path:
+    """Resolve one visible regular file without following any symlink component."""
+    if not relative_path:
+        raise WorkspacePathNotFile("workspace file path is required")
+    target = _resolve_entry(root, relative_path)
+    if not target.is_file():
+        raise WorkspacePathNotFile(
+            f"workspace entry is not a regular file: {relative_path!r}"
         )
     return target
 
@@ -224,6 +260,68 @@ def _basic_file_metadata(path: Path, relative_path: str) -> dict:
             tz=timezone.utc,
         ).isoformat(),
         "adjacent_document_sidecar": _adjacent_document_sidecar(path, relative_path),
+    }
+
+
+def _stat_identity(stat: os.stat_result) -> tuple[int, int, int, int, int]:
+    return (
+        stat.st_dev,
+        stat.st_ino,
+        stat.st_size,
+        stat.st_mtime_ns,
+        stat.st_ctime_ns,
+    )
+
+
+def _exact_sha256(path: Path) -> str:
+    """Hash one opened file version and fail closed if that version changes."""
+    digest = hashlib.sha256()
+    try:
+        with path.open("rb") as stream:
+            before = os.fstat(stream.fileno())
+            for block in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(block)
+            after = os.fstat(stream.fileno())
+        current = path.stat()
+    except OSError as exc:
+        raise WorkspaceCollectionReadError(
+            f"workspace file cannot be hashed safely: {path.name!r}"
+        ) from exc
+    if _stat_identity(before) != _stat_identity(after):
+        raise WorkspaceFileChanged(
+            f"workspace file changed while hashing: {path.name!r}"
+        )
+    if _stat_identity(after) != _stat_identity(current):
+        raise WorkspaceFileChanged(
+            f"workspace file was replaced while hashing: {path.name!r}"
+        )
+    return digest.hexdigest()
+
+
+def observe_workspace_file(
+    workspace_roots: Mapping[str, Path],
+    workspace_ref: str,
+    relative_path: str,
+    *,
+    include_digest: bool = False,
+) -> dict:
+    """Observe one exact visible file without promoting it to a governed object."""
+    root = workspace_roots.get(workspace_ref)
+    if root is None:
+        raise WorkspaceNotFound(f"unknown workspace_ref: {workspace_ref!r}")
+    normalized = normalize_relative_path(relative_path)
+    entry = _resolve_file(root, normalized)
+    observed = _basic_file_metadata(entry, normalized)
+    if include_digest:
+        observed["digest_sha256"] = _exact_sha256(entry)
+    return {
+        "workspace_ref": workspace_ref,
+        "relative_path": normalized,
+        "workspace_entry_id": _entry_id(workspace_ref, normalized),
+        "workspace_file": observed,
+        "observation_persisted": False,
+        "content_parsed": False,
+        "governed_identity": False,
     }
 
 
