@@ -1,8 +1,7 @@
-"""Acceptance tests for lazy reconstructible Workspace file observation."""
+"""Acceptance tests for reconstructible Workspace file metadata Cards."""
 
 from __future__ import annotations
 
-import hashlib
 import json
 from pathlib import Path
 
@@ -34,13 +33,14 @@ def _write_pdf(path: Path, payload: bytes = b"%PDF-1.4\nsynthetic-pdf\n%%EOF\n")
     path.write_bytes(payload)
 
 
-def test_workspace_collection_projects_lightweight_pdf_metadata_and_lazy_detail(
+def test_workspace_collection_projects_pdf_metadata_directly_on_existing_card(
     tmp_path: Path,
 ) -> None:
     plans = tmp_path / "Plans"
     plans.mkdir()
     pdf = plans / "Plan-RDC-D.pdf"
     _write_pdf(pdf)
+    (plans / "document.yaml").write_text("not: a production schema\n", encoding="utf-8")
 
     client = _client(tmp_path)
     response = _authorized_get(
@@ -48,83 +48,47 @@ def test_workspace_collection_projects_lightweight_pdf_metadata_and_lazy_detail(
         "/cockpit/workspace-collections/ifja-projects?path=Plans",
     )
     assert response.status_code == 200
-    items = response.json()["collection"]["items"]
-    assert len(items) == 1
-
-    card = items[0]
-    assert card["title"] == "Plan-RDC-D.pdf"
-    assert card["category"] == "PDF"
-    assert card["workspace_entry_kind"] == "file"
-    assert card["workspace_file"] == {
-        "filename": "Plan-RDC-D.pdf",
-        "extension": ".pdf",
-        "media_type": "application/pdf",
-        "byte_size": pdf.stat().st_size,
-        "file_kind": "pdf",
-    }
-    assert "digest_sha256" not in card["workspace_file"]
-    assert card["entry_detail"]["observation"] == "on_read"
-    assert card["entry_detail"]["persisted"] is False
-    assert card["entry_detail"]["load_action"]["kind"] == "entry_read"
-
-    serialized = json.dumps(response.json(), ensure_ascii=False)
-    assert str(tmp_path) not in serialized
-    assert "document_id" not in serialized
-    assert "hindsight" not in serialized.casefold()
-
-
-def test_workspace_pdf_detail_observes_digest_timestamp_and_sidecar_without_admission(
-    tmp_path: Path,
-) -> None:
-    plans = tmp_path / "Plans"
-    plans.mkdir()
-    pdf = plans / "Plan-RDC-D.pdf"
-    _write_pdf(pdf)
-    # Presence is observed only. The workspace reader must not parse or trust it.
-    (plans / "document.yaml").write_text("not: a production schema\n", encoding="utf-8")
-
-    client = _client(tmp_path)
-    collection = _authorized_get(
-        client,
-        "/cockpit/workspace-collections/ifja-projects?path=Plans",
-    ).json()
-    pdf_card = next(item for item in collection["collection"]["items"] if item["title"] == pdf.name)
-
-    response = _authorized_get(client, pdf_card["entry_detail"]["load_action"]["href"])
-    assert response.status_code == 200
     body = response.json()
-    card = body["card"]
-    observed = card["workspace_file"]
+    items = body["collection"]["items"]
+    pdf_card = next(item for item in items if item["title"] == pdf.name)
 
+    assert pdf_card["category"] == "PDF"
+    assert pdf_card["workspace_entry_kind"] == "file"
+    observed = pdf_card["workspace_file"]
+    assert observed["filename"] == "Plan-RDC-D.pdf"
+    assert observed["extension"] == ".pdf"
     assert observed["media_type"] == "application/pdf"
     assert observed["byte_size"] == pdf.stat().st_size
-    assert observed["digest_sha256"] == hashlib.sha256(pdf.read_bytes()).hexdigest()
+    assert observed["file_kind"] == "pdf"
     assert observed["filesystem_modified_at"].endswith("+00:00")
-    assert card["adjacent_document_sidecar"] == {
+    assert observed["adjacent_document_sidecar"] == {
         "state": "present",
         "relative_path": "Plans/document.yaml",
         "parsed": False,
         "identity_mapping_resolved": False,
     }
-    assert card["qualification"] == {
+    assert pdf_card["qualification"] == {
         "status": "workspace_observation_only",
         "identity_mapping": "not_resolved_by_workspace_projection",
         "automatic_document_admission": False,
     }
-    assert card["authority"] == {
+    assert pdf_card["authority"] == {
         "governed_identity": False,
         "is_evidence": False,
         "is_memory": False,
         "is_persisted": False,
     }
-    assert body["card_is_projection"] is True
+    assert ["Type MIME", "application/pdf"] in pdf_card["back"]
+    assert ["document.yaml adjacent", "present"] in pdf_card["back"]
+
+    assert body["cards_are_projections"] is True
     assert body["observation_persisted"] is False
-    assert body["source_binary_included"] is False
     assert body["content_parsed"] is False
     assert body["hindsight_required"] is False
 
     serialized = json.dumps(body, ensure_ascii=False)
     for forbidden in (
+        "digest_sha256",
         "document_family_id",
         "document_version_id",
         "current_for_execution",
@@ -134,55 +98,58 @@ def test_workspace_pdf_detail_observes_digest_timestamp_and_sidecar_without_admi
         assert forbidden not in serialized
 
 
-def test_workspace_pdf_detail_recomputes_digest_after_file_change(
+def test_workspace_file_observation_reconstructs_changed_size_and_timestamp_on_reread(
     tmp_path: Path,
 ) -> None:
     pdf = tmp_path / "Etude-G2.pdf"
     _write_pdf(pdf, b"%PDF-1.4\nversion-one\n%%EOF\n")
     client = _client(tmp_path)
-    detail = "/cockpit/workspace-entries/ifja-projects?path=Etude-G2.pdf"
+    path = "/cockpit/workspace-collections/ifja-projects"
 
-    first = _authorized_get(client, detail)
+    first = _authorized_get(client, path)
     assert first.status_code == 200
-    first_digest = first.json()["card"]["workspace_file"]["digest_sha256"]
+    first_card = next(item for item in first.json()["collection"]["items"] if item["title"] == pdf.name)
 
-    _write_pdf(pdf, b"%PDF-1.4\nversion-two-with-change\n%%EOF\n")
-    second = _authorized_get(client, detail)
+    _write_pdf(pdf, b"%PDF-1.4\nversion-two-with-more-content\n%%EOF\n")
+    second = _authorized_get(client, path)
     assert second.status_code == 200
-    second_digest = second.json()["card"]["workspace_file"]["digest_sha256"]
+    second_card = next(item for item in second.json()["collection"]["items"] if item["title"] == pdf.name)
 
-    assert first_digest != second_digest
-    assert second_digest == hashlib.sha256(pdf.read_bytes()).hexdigest()
+    assert first_card["entity_id"] == second_card["entity_id"]
+    assert first_card["workspace_file"]["byte_size"] != second_card["workspace_file"]["byte_size"]
+    assert second_card["workspace_file"]["byte_size"] == pdf.stat().st_size
     assert second.json()["observation_persisted"] is False
 
 
-def test_workspace_file_detail_is_bounded_to_visible_regular_files(tmp_path: Path) -> None:
-    folder = tmp_path / "Plans"
-    folder.mkdir()
-    hidden = tmp_path / ".secret.pdf"
-    _write_pdf(hidden)
+def test_workspace_observation_does_not_expose_hidden_or_symlink_entries(tmp_path: Path) -> None:
+    visible = tmp_path / "Plans"
+    visible.mkdir()
+    _write_pdf(visible / "Plan.pdf")
+    _write_pdf(tmp_path / ".secret.pdf")
+    (tmp_path / "_VAULT.md").write_text("hidden", encoding="utf-8")
+    (tmp_path / "link.pdf").symlink_to(visible / "Plan.pdf")
+
+    client = _client(tmp_path)
+    response = _authorized_get(client, "/cockpit/workspace-collections/ifja-projects")
+    assert response.status_code == 200
+    titles = [item["title"] for item in response.json()["collection"]["items"]]
+
+    assert "Plans" in titles
+    assert ".secret.pdf" not in titles
+    assert "_VAULT.md" not in titles
+    assert "link.pdf" not in titles
+
+
+def test_workspace_observation_keeps_non_pdf_files_generic(tmp_path: Path) -> None:
+    note = tmp_path / "Note.md"
+    note.write_text("# Note\n", encoding="utf-8")
     client = _client(tmp_path)
 
-    traversal = _authorized_get(
-        client,
-        "/cockpit/workspace-entries/ifja-projects?path=../outside.pdf",
-    )
-    assert traversal.status_code == 422
+    response = _authorized_get(client, "/cockpit/workspace-collections/ifja-projects")
+    assert response.status_code == 200
+    card = next(item for item in response.json()["collection"]["items"] if item["title"] == note.name)
 
-    directory = _authorized_get(
-        client,
-        "/cockpit/workspace-entries/ifja-projects?path=Plans",
-    )
-    assert directory.status_code == 422
-
-    hidden_response = _authorized_get(
-        client,
-        "/cockpit/workspace-entries/ifja-projects?path=.secret.pdf",
-    )
-    assert hidden_response.status_code == 404
-
-    missing = _authorized_get(
-        client,
-        "/cockpit/workspace-entries/ifja-projects?path=missing.pdf",
-    )
-    assert missing.status_code == 404
+    assert card["category"] == "Fichier"
+    assert card["workspace_file"]["media_type"] in {"text/markdown", "text/plain"}
+    assert card["workspace_file"]["file_kind"] == "file"
+    assert card["qualification"]["automatic_document_admission"] is False
