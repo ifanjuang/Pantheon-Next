@@ -39,7 +39,7 @@ Knowledge cue != requirement applicability
 Hermes interpretation != governed claim or decision
 ```
 
-Repository qualification already protects the bounded multi-owner context composition path. The live cognitive proof that Hermes can turn this semantic superposition into materially better multidisciplinary project understanding remains open under [#986](https://github.com/ifanjuang/Pantheon-Next/issues/986). No new ContextGraph, Lens Engine or métier-specific reasoning owner is assumed by this hypothesis.
+Repository qualification already protects the bounded multi-owner context composition path. Automated contradiction detection currently covers scalar Claim values only: geometric and relational contradictions are held and shown, but not detected, so an empty conflict list means no scalar value disagrees rather than nothing disagrees. The live cognitive proof that Hermes can turn this semantic superposition into materially better multidisciplinary project understanding remains open under [#986](https://github.com/ifanjuang/Pantheon-Next/issues/986). No new ContextGraph, Lens Engine or métier-specific reasoning owner is assumed by this hypothesis.
 
 ## Bitemporal claim history
 

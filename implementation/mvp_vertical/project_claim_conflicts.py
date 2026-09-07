@@ -46,6 +46,10 @@ LIMITATIONS = [
     "same project and claim_type does not prove identical professional scope",
     "effective_at is only an explicit start; no validity end is inferred",
     "detector output is a review candidate and does not select a winning Claim",
+    # `SCAN_SCOPE` states this as configuration; it belongs here too, because this
+    # list is what travels to a consumer. An empty candidate list otherwise reads
+    # as "nothing contradicts" when it only means "no scalar value contradicts".
+    "scalar Claim values only; geometric and relational contradictions are outside this detector",
 ]
 
 AUTHORITY = {

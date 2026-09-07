@@ -39,7 +39,7 @@ repère Knowledge != applicabilité d’une exigence
 interprétation Hermes != claim gouverné ni décision
 ```
 
-La qualification du dépôt protège déjà le chemin de composition de contexte borné entre plusieurs owners. La preuve cognitive live que Hermes transforme effectivement cette superposition sémantique en une meilleure compréhension multidisciplinaire du projet reste ouverte dans [#986](https://github.com/ifanjuang/Pantheon-Next/issues/986). Cette hypothèse n’impose aucun ContextGraph, Lens Engine ou owner de raisonnement métier supplémentaire.
+La qualification du dépôt protège déjà le chemin de composition de contexte borné entre plusieurs owners. La détection automatique de contradiction porte aujourd’hui sur les seules valeurs scalaires : les contradictions géométriques et relationnelles sont conservées et affichées, mais non détectées — une liste de conflits vide signifie donc qu’aucune valeur scalaire ne diverge, pas que rien ne diverge. La preuve cognitive live que Hermes transforme effectivement cette superposition sémantique en une meilleure compréhension multidisciplinaire du projet reste ouverte dans [#986](https://github.com/ifanjuang/Pantheon-Next/issues/986). Cette hypothèse n’impose aucun ContextGraph, Lens Engine ou owner de raisonnement métier supplémentaire.
 
 ## Historique bitemporel des claims
 
