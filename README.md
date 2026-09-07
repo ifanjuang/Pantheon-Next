@@ -41,6 +41,40 @@ Hermes interpretation != governed claim or decision
 
 Repository qualification already protects the bounded multi-owner context composition path. The live cognitive proof that Hermes can turn this semantic superposition into materially better multidisciplinary project understanding remains open under [#986](https://github.com/ifanjuang/Pantheon-Next/issues/986). No new ContextGraph, Lens Engine or métier-specific reasoning owner is assumed by this hypothesis.
 
+## Bitemporal claim history
+
+Alongside semantic continuity, the executable candidate under `implementation/`
+already separates two time axes for every `ProjectClaim`:
+
+```text
+effective_at    = the explicit business-effective start the source asserts
+                  (e.g. "this partition is 200mm as of the DCE index of March 2026")
+observed_at     = when the assertion or its support was itself observed
+knowledge_time  = when the system came to know it (implicit: recording time)
+```
+
+A missing `effective_at` is never silently replaced by `observed_at` or by
+recording time. Superseding a Claim never rewrites its predecessor; the prior
+row remains, and an as-of read can reconstruct **both** what was believed at a
+past business time and what was known at a past system time:
+
+```text
+business_and_knowledge_as_of      -> what was believed, as it was known then
+business_as_of_current_knowledge  -> what was believed then, under everything known since
+```
+
+This is implemented, not a hypothesis: `agency_claims.applicable_project_claims_as_of`
+enforces it today. The current read of "what was believed" does not yet extend to
+"was this contested at the time" — an as-of read is presently silent on
+conflicting Claims from the same period; see [#1012](https://github.com/ifanjuang/Pantheon-Next/issues/1012).
+
+```text
+observed != effective
+current knowledge != knowledge at the time
+a later Claim != an erased earlier one
+reconstructable belief != professional truth
+```
+
 ## System boundary
 
 | Component | Responsibility |

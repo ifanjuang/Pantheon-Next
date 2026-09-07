@@ -1,18 +1,13 @@
 # Missing Information Discipline
 
 Status: candidate — transverse discipline for required information, missing information, assumptions and deductions.
+Boundary profile: candidate_support_note.
 
 This document is not canonical doctrine yet.
 
 It does not implement a runtime, extractor, router, scheduler, queue, UI, schema, memory engine, approval engine, document generator or automatic question-asking system.
 
 It defines a candidate governance rule for all workflows that produce professional outputs from incomplete sources.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 
@@ -160,6 +155,50 @@ optional:
   output quality improves, but the task is not materially affected.
 ```
 
+## Contradiction handling
+
+A contradiction is not a gap.
+
+The Core rule's loop — search, cross-check, infer or ask — assumes that more
+searching moves a question toward resolution. A contradiction breaks that
+assumption: once two admitted sources make incompatible claims about the same
+object, further searching does not resolve the tension. It can only add a third
+opinion. The `source_found_conflicting` search outcome above is therefore not
+one more case of "not yet found" — it is a different terminal state, reached
+instead of "found" rather than on the way to it.
+
+```text
+gap            -> search reduces uncertainty
+contradiction  -> search cannot reduce the tension, only the sources cited
+```
+
+The discipline for a contradiction is preservation, not resolution:
+
+```text
+record both (or all) conflicting claims explicitly;
+preserve provenance, revision and scope for each;
+do not silently prefer one source, one date or one format over another;
+do not average, merge or split the difference between conflicting values;
+expose the tension rather than resolving it into a single output value;
+route to a human decision when the contradiction is consequential.
+```
+
+This is already implemented, not merely proposed, for scalar ProjectClaims:
+`implementation/mvp_vertical/project_claim_conflicts.py` detects unresolved
+tension between active Claims and is explicit that detection is not resolution
+(`resolves_conflict: False`, `merges_identity: False`). Its own limitations
+state that the detector reaches only scalar Claim values; a contradiction
+between representations, geometry or relations is not detected there and must
+still be caught by this discipline's search and ask policies until a
+demonstrated need justifies extending it.
+
+```text
+conflict detected  != conflict resolved
+contradiction      != gap
+more searching     != tension reduced
+one source winning != contradiction handled
+```
+
 ## Assumption Ledger
 
 Any inferred or assumed element must be tracked.
@@ -224,7 +263,7 @@ Ask the user when:
 ```text
 information is blocking;
 information is ambiguous and affects consequence;
-multiple sources conflict;
+multiple sources conflict and the contradiction is consequential (see Contradiction handling above — asking here means presenting the tension, not asking which source to discard);
 the target object is unclear;
 the project / phase / recipient is unclear;
 an image does not show enough;
