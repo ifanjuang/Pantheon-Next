@@ -219,17 +219,18 @@ def _relative_child_path(parent: str, name: str) -> str:
 
 
 def _adjacent_document_sidecar(path: Path, relative_path: str) -> dict:
-    """Observe only sidecar presence; do not parse, validate or infer a binding."""
-    sidecar = path.parent / "document.yaml"
+    """Observe the per-source info sidecar; do not parse or infer a binding."""
+    sidecar_name = f"{path.stem}.yaml"
+    sidecar = path.parent / sidecar_name
     if sidecar.is_symlink():
         state = "unsupported_symlink"
         sidecar_ref = None
     elif sidecar.is_file():
         state = "present"
         parent = PurePosixPath(relative_path).parent
-        sidecar_ref = PurePosixPath(parent, "document.yaml").as_posix()
-        if sidecar_ref == "./document.yaml":
-            sidecar_ref = "document.yaml"
+        sidecar_ref = PurePosixPath(parent, sidecar_name).as_posix()
+        if sidecar_ref == f"./{sidecar_name}":
+            sidecar_ref = sidecar_name
     else:
         state = "absent"
         sidecar_ref = None
@@ -467,7 +468,7 @@ def _workspace_card(
                 ["Type MIME", observed["media_type"]],
                 ["Taille (octets)", str(observed["byte_size"])],
                 ["Modifié (filesystem)", observed["filesystem_modified_at"]],
-                ["document.yaml adjacent", sidecar["state"]],
+                ["Infos YAML adjacentes", sidecar["state"]],
             ]
         )
     return card
