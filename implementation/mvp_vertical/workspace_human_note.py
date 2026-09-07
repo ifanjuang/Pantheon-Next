@@ -36,16 +36,21 @@ class WorkspaceHumanNoteConflict(WorkspaceHumanNoteError):
 
 _START_MARKER = "# >>> Pantheon workspace info"
 _END_MARKER = "# <<< Pantheon workspace info"
-_START_RE = re.compile(r"(?m)^# >>> Pantheon workspace info\r?\n")
-_END_RE = re.compile(r"(?m)^# <<< Pantheon workspace info(?:\r?\n|$)")
+_START_RE = re.compile(r"(?m)^# >>> Pantheon workspace (?:info|note)\r?\n")
+_END_RE = re.compile(r"(?m)^# <<< Pantheon workspace (?:info|note)(?:\r?\n|$)")
 _DOCUMENT_END_RE = re.compile(r"(?m)^\.\.\.[ \t]*(?:#.*)?(?:\r?\n|$)")
 _NAMESPACE = "pantheon_workspace"
 
 
 def _sidecar_name(source_relative_path: str) -> str:
-    name = PurePosixPath(source_relative_path).stem.strip()
-    if not name:
+    source = PurePosixPath(source_relative_path)
+    name = source.stem
+    if not name.strip():
         raise WorkspaceHumanNoteError("workspace source basename is required for its info sidecar")
+    if source.suffix.casefold() == ".yaml":
+        raise WorkspaceHumanNoteError(
+            "YAML workspace sources cannot use the same basename Infos sidecar"
+        )
     return f"{name}.yaml"
 
 
