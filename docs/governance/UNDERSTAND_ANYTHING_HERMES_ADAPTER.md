@@ -1,6 +1,7 @@
 # Understand-Anything Hermes Adapter
 
 Status: support doctrine — Hermes Skill Candidate specification, not implemented.
+Boundary profile: candidate_support_note.
 
 This document defines how Understand-Anything may be considered as a bounded Hermes-side structural analysis capability.
 
@@ -9,12 +10,6 @@ It does not install Understand-Anything.
 It does not install Hermes skills.
 
 It does not create a Pantheon runtime, plugin manager, tool runtime, GraphRAG runtime, knowledge graph runtime, scheduler, queue, provider router, automatic memory promotion mechanism or OpenWebUI extension.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

@@ -1,18 +1,13 @@
 # Method Card Model
 
 Status: candidate support doctrine — generic Method Card grammar for governed AI use.
+Boundary profile: candidate_support_note.
 
 Runtime status: non-executable.
 
 This document defines how Method Cards appear in Pantheon as visible, reviewable, role-proposed structures for AI work.
 
 It does not implement a UI, method selector, reasoning engine, workflow engine, router, scheduler, queue, agent loop, approval engine, memory engine, Hermes skill, schema, connector or external action.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Placement
 

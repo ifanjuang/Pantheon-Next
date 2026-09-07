@@ -1,16 +1,11 @@
 # Tripartite Interface Specification
 
 Status: candidate support doctrine — documented non-implemented interface grammar.
+Boundary profile: candidate_support_note.
 
 This document defines the operational interface grammar between the exposure surface, the execution runtime, Pantheon governance, and the optional Pantheon MCP policy surface.
 
 It does not implement an API, endpoint, bridge, queue, scheduler, workflow runner, provider router, OpenWebUI extension, Hermes skill, MCP tool, approval engine, memory engine or external action.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 Abstract form:
 

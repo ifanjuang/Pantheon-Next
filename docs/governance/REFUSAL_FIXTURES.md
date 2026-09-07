@@ -1,16 +1,11 @@
 # Refusal Fixtures
 
 Status: candidate support doctrine — refusal fixture catalog, documented non-implemented.
+Boundary profile: candidate_support_note.
 
 This document defines reusable refusal fixtures for OpenWebUI, Hermes, Pantheon and the Pantheon MCP policy surface.
 
 It does not implement tests, schemas, CI, runtime behavior, MCP tools, OpenWebUI actions, Hermes skills, external actions, approval behavior or memory promotion.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

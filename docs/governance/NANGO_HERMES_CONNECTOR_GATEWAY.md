@@ -1,6 +1,7 @@
 # Nango Hermes Connector Gateway
 
 Status: support doctrine — Hermes connector gateway candidate specification, not implemented.
+Boundary profile: candidate_support_note.
 
 This document defines how Nango may be considered as a bounded Hermes-side connector gateway for third-party APIs.
 
@@ -15,12 +16,6 @@ It does not add credentials.
 It does not install Hermes skills.
 
 It does not create a Pantheon runtime, tool runtime, provider router, scheduler, queue, message bus, MCP layer, plugin manager, connector marketplace, automatic approval mechanism, automatic memory promotion mechanism or OpenWebUI extension.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

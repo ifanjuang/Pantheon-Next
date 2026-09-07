@@ -1,16 +1,11 @@
 # Pantheon Control — single boundary document
 
 Status: candidate support doctrine — to verify. Consolidates the Pantheon Control family into one slim boundary note. Candidate until reviewed.
+Boundary profile: candidate_support_note.
 
 This document is the boundary reference for the Pantheon Control concept and future dashboard-facing verification surface. It does not mean a real `dashboard/` module currently exists.
 
 It absorbs and supersedes the larger Pantheon Control drafts proposed in PR #67 and PR #72, which remain readable in their closed PRs as background material.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Current repository placement
 

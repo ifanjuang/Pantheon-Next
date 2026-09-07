@@ -1,18 +1,13 @@
 # Pantheon Revit — First Sandbox Action Contract
 
 Status: candidate support doctrine — first Revit sandbox action contract. Repository state: documented non-implemented.
+Boundary profile: candidate_support_note.
 
 This document defines the first bounded Revit sandbox action contract for the future local Revit plugin / Hermes-side adapter.
 
 It does not implement a Revit plugin.
 
 It does not add a Revit add-in, `.addin` manifest, C# project, local relay, MCP server, schema, test, Docker file, operations file, platform service, runtime worker, queue, scheduler, OpenWebUI plugin, Hermes skill or production automation.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

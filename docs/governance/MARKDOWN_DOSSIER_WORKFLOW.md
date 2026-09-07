@@ -1,16 +1,11 @@
 # Markdown Dossier Workflow
 
 Status: to verify — active governance proposal, documented, not implemented.
+Boundary profile: candidate_support_note.
 
 This document defines a governed workflow for producing professional dossiers progressively in Markdown.
 
 It does not define a Pantheon editor runtime, hidden workflow runner, scheduler, queue, provider router, automatic memory system, OpenWebUI plugin implementation or Hermes tool implementation.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

@@ -1,6 +1,7 @@
 # Local Installation and Governed Channels
 
 Status: product direction — governance framing — implementation to verify capability by capability.
+Boundary profile: candidate_support_note.
 
 This document explains how Pantheon Next should describe local installation, model choice and everyday work channels.
 
@@ -13,12 +14,6 @@ It is not a provider configuration document.
 It is not a connector specification.
 
 It is not a runtime implementation plan.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

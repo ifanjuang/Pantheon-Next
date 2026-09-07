@@ -1,18 +1,13 @@
 # Repository Review Watcher
 
 Status: candidate governance support doctrine  
+Boundary profile: candidate_support_note.
 Runtime status: non-executable  
 Authority class: candidate / to verify
 
 This document defines a candidate governance manifest for watching repository activity and preparing review notes.
 
 It does not implement a runtime, cron job, webhook endpoint, scheduler, queue, worker, provider router, dashboard integration, database table, Hermes skill, OpenWebUI Action, GitHub App, Notion automation, automatic approval, automatic memory promotion or external action.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

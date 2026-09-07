@@ -1,16 +1,11 @@
 # Answer Verification Gate
 
 Status: candidate / to verify — central doctrine proposal for memory-first answers, evidence escalation and consequential response status.
+Boundary profile: candidate_support_note.
 
 This document is doctrine candidate only.
 
 It does not implement a runtime, retrieval layer, checker, approval engine, evidence store, memory engine, scheduler, queue, MCP server, OpenWebUI extension, Hermes skill, database rule or automatic decision system.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

@@ -1,16 +1,11 @@
 # NAS Installation Profiles
 
 Status: candidate orientation — NAS installation profiles, acceleration classes and redirection patterns.
+Boundary profile: candidate_support_note.
 
 This document is a candidate orientation, not an implementation.
 
 It does not create Docker configuration, compose files, scripts, packages, firewall rules, reverse proxy rules, VPN setup, DNS records, GPU drivers, runtime services, queue, scheduler, memory engine, vector database, GraphRAG runtime, LangGraph runtime, Langflow runtime, Hermes command surface or external connector.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

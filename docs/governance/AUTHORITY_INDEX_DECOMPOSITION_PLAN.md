@@ -1,16 +1,11 @@
 # Authority Index Decomposition Plan
 
 Status: validation-only / decomposition plan — not authority replacement.
+Boundary profile: validation_only_trace.
 
 Repository state: documented non-implemented.
 
 This document proposes how to reduce the length of `docs/governance/AUTHORITY_INDEX.md` without weakening its role. It does not split the file, modify the coverage script, create a schema, implement a registry runtime or change authority classes.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## 1. Problem
 

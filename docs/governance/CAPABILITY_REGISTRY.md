@@ -1,16 +1,11 @@
 # Capability Registry
 
 Status: candidate / to verify — governance declaration of capabilities, organized as a dependency graph for governed composition.
+Boundary profile: candidate_support_note.
 
 A capability registry is a governance declaration of *what capabilities exist*, *what each may and may not do*, and *which other capabilities each one depends on*. It is the index from which HEPHAISTOS forges a Workflow Manifest candidate (`WORKFLOW_SCHEMA.md`).
 
 It is not a runtime. It is not a skill installer. It is not a plugin manager. It is not a tool dispatch table. It does not execute, schedule, queue or route anything.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Candidate posture
 

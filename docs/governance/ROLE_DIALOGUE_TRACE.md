@@ -1,16 +1,11 @@
 # Role Dialogue Trace
 
 Status: candidate orientation — observable workflow trace, role dialogue and cockpit log.
+Boundary profile: candidate_support_note.
 
 This document is a candidate orientation, not an implementation.
 
 It does not create a workflow runtime, agent loop, queue, scheduler, hidden chain-of-thought recorder, approval engine, memory engine, skill runtime, file watcher, registry writer, connector gateway, LangGraph runtime, Langflow runtime or Hermes command surface.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

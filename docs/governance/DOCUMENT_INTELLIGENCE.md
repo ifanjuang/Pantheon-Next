@@ -1,18 +1,13 @@
 # Document Intelligence
 
 Status: candidate support doctrine — governed document intelligence boundary and evidence chain.
+Boundary profile: candidate_support_note.
 
 This document defines how Pantheon Next frames document intelligence without becoming a document-processing runtime, OCR pipeline, vector database, graph runtime, scheduler, queue or automatic decision system.
 
 It is documentation only.
 
 It does not implement ingestion, OCR, chunking, embeddings, graph storage, review queues, database tables, OpenWebUI actions, Hermes skills, connectors, approvals or memory promotion.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 In abstract form:
 

@@ -1,18 +1,13 @@
 # Iterative Deliberation Lifecycle
 
 Status: candidate support doctrine — model for how multi-turn AI deliberation maps onto governed candidates, gates and registers.
+Boundary profile: candidate_support_note.
 
 This document is not canonical doctrine yet.
 
 It does not implement a runtime, conversation engine, chat memory, summarizer, workflow engine, scheduler, queue, router, approval engine, memory engine, OpenWebUI Function, Hermes skill, connector or external action.
 
 It defines how a long correction-and-clarification dialogue with an AI — many round-trips before a draft compte rendu (CR), more round-trips, then a finalized CR — is read in Pantheon terms without turning every message into a governance event.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

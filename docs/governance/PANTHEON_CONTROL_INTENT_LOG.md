@@ -1,6 +1,7 @@
 # Pantheon Control — Intent Log
 
 Status: candidate — to verify.
+Boundary profile: candidate_support_note.
 
 Date: 2026-06-21
 
@@ -8,12 +9,6 @@ Related issue:
 
 ```text
 https://github.com/ifanjuang/Pantheon-Next/issues/192
-```
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
 ```
 
 ## Purpose

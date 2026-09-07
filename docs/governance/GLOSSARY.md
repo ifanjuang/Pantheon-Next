@@ -1,16 +1,11 @@
 # Glossary
 
 Status: canonical — phase 1 terminology baseline.
+Boundary profile: active_governance_doctrine.
 
 This glossary clarifies Pantheon Next vocabulary. It also records the one governed rename in progress: "memory" is reserved to Hermès, and Pantheon governs the `Registre Probatoire` in place of "Canonical Memory" (see `REGISTRE_PROBATOIRE_DIRECTION.md`). This file is the owner of the certainty and decision axes.
 
 ## Core doctrine
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Terms
 

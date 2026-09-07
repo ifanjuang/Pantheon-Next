@@ -1,16 +1,11 @@
 # Pantheon Revit Gate — local architecture plugin framing
 
 Status: candidate support doctrine — Pantheon Revit Gate framing. Repository state: documented non-implemented.
+Boundary profile: candidate_support_note.
 
 This dossier frames a **local Revit architecture plugin** governed by Pantheon. The plugin is runtime and lives outside Pantheon, on the architect's machine and/or Hermes local side. Pantheon governs the vocabulary of capability status, evidence, traceability, approval posture and later regulation. Nothing here is implemented.
 
 It implements no plugin, no Revit add-in, no MCP server, no schema, no test, no Docker and no operations change. It does not claim the plugin exists.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Current arbitration — V0 Free Exploration Mode
 

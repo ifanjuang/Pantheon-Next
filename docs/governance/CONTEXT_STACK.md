@@ -1,18 +1,13 @@
 # Context Stack
 
 Status: candidate support doctrine — dynamic context-card stack and context sufficiency watch.
+Boundary profile: candidate_support_note.
 
 Runtime status: non-executable.
 
 This document defines a governed model for composing, reviewing and adapting the visible context used by a professional cockpit, assistant surface or execution runtime.
 
 It does not implement a UI, dashboard, context engine, retrieval engine, router, scheduler, queue, agent loop, context optimizer, automatic approval system, automatic memory promotion, Hermes skill, OpenWebUI Function, OpenWebUI Tool, OpenWebUI Pipe, OpenWebUI Action or external runtime behavior.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

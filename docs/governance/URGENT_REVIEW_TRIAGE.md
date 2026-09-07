@@ -1,18 +1,13 @@
 # Urgent Review Triage
 
 Status: candidate support doctrine — urgency qualification rule for review items.
+Boundary profile: candidate_support_note.
 
 This document defines how Pantheon Next qualifies urgent fiches before they enter or move inside a review queue.
 
 It is documentation only.
 
 It does not implement a task manager, scheduler, notification system, queue runtime, assignment system, OpenWebUI action, Hermes skill, database table, priority engine or automatic decision system.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 In abstract form:
 

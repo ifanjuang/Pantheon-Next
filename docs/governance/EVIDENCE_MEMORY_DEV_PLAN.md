@@ -1,6 +1,7 @@
 # Evidence Memory Development Plan
 
 Status: candidate support note — documented non-implemented.
+Boundary profile: candidate_support_note.
 
 Related note: [`EVIDENCE_MEMORY_CANONICALIZATION.md`](EVIDENCE_MEMORY_CANONICALIZATION.md)
 
@@ -9,12 +10,6 @@ Tracking issue: #68.
 This plan translates the Evidence → Memory doctrine into a development sequence.
 
 It does not implement a schema, tests, runtime, API, migration, queue, scheduler, approval engine, memory engine, vector store, mem0 integration or Hermes memory integration.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Development principle
 
