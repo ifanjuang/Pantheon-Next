@@ -40,7 +40,7 @@ def test_workspace_collection_projects_pdf_metadata_directly_on_existing_card(
     plans.mkdir()
     pdf = plans / "Plan-RDC-D.pdf"
     _write_pdf(pdf)
-    (plans / "document.yaml").write_text("not: a production schema\n", encoding="utf-8")
+    (plans / "Plan-RDC-D.yaml").write_text("not: a production schema\n", encoding="utf-8")
 
     client = _client(tmp_path)
     response = _authorized_get(
@@ -63,7 +63,7 @@ def test_workspace_collection_projects_pdf_metadata_directly_on_existing_card(
     assert observed["filesystem_modified_at"].endswith("+00:00")
     assert observed["adjacent_document_sidecar"] == {
         "state": "present",
-        "relative_path": "Plans/document.yaml",
+        "relative_path": "Plans/Plan-RDC-D.yaml",
         "parsed": False,
         "identity_mapping_resolved": False,
     }
@@ -79,7 +79,7 @@ def test_workspace_collection_projects_pdf_metadata_directly_on_existing_card(
         "is_persisted": False,
     }
     assert ["Type MIME", "application/pdf"] in pdf_card["back"]
-    assert ["document.yaml adjacent", "present"] in pdf_card["back"]
+    assert ["Infos YAML adjacentes", "present"] in pdf_card["back"]
 
     assert body["cards_are_projections"] is True
     assert body["observation_persisted"] is False

@@ -1,11 +1,13 @@
 """Bounded human-authored note editing for one exact Workspace source.
 
 This module owns only one low-consequence fragment inside an adjacent
-``document.yaml``. It does not adopt a full document manifest schema, infer a
-Document identity, qualify the source, write Evidence, or authorize Hermes.
+``<source-basename>.yaml`` info sidecar. It does not adopt a full document
+manifest schema, infer a Document identity, qualify the source, write Evidence,
+or authorize Hermes.
 
 The managed fragment is delimited so unrelated YAML bytes/comments can remain
-untouched instead of round-tripping an unknown future manifest through PyYAML.
+untouched instead of round-tripping an unknown future info carrier through
+PyYAML.
 """
 
 from __future__ import annotations
@@ -29,22 +31,34 @@ class WorkspaceHumanNoteError(ValueError):
 
 
 class WorkspaceHumanNoteConflict(WorkspaceHumanNoteError):
-    """The caller's manifest basis or source binding is stale/conflicting."""
+    """The caller's sidecar basis or source binding is stale/conflicting."""
 
 
-_START_MARKER = "# >>> Pantheon workspace note"
-_END_MARKER = "# <<< Pantheon workspace note"
-_START_RE = re.compile(r"(?m)^# >>> Pantheon workspace note\r?\n")
-_END_RE = re.compile(r"(?m)^# <<< Pantheon workspace note(?:\r?\n|$)")
+_START_MARKER = "# >>> Pantheon workspace info"
+_END_MARKER = "# <<< Pantheon workspace info"
+_START_RE = re.compile(r"(?m)^# >>> Pantheon workspace (?:info|note)\r?\n")
+_END_RE = re.compile(r"(?m)^# <<< Pantheon workspace (?:info|note)(?:\r?\n|$)")
 _DOCUMENT_END_RE = re.compile(r"(?m)^\.\.\.[ \t]*(?:#.*)?(?:\r?\n|$)")
 _NAMESPACE = "pantheon_workspace"
-_SIDECAR_NAME = "document.yaml"
+
+
+def _sidecar_name(source_relative_path: str) -> str:
+    source = PurePosixPath(source_relative_path)
+    name = source.stem
+    if not name.strip():
+        raise WorkspaceHumanNoteError("workspace source basename is required for its info sidecar")
+    if source.suffix.casefold() == ".yaml":
+        raise WorkspaceHumanNoteError(
+            "YAML workspace sources cannot use the same basename Infos sidecar"
+        )
+    return f"{name}.yaml"
 
 
 def _sidecar_relative_path(source_relative_path: str) -> str:
     parent = PurePosixPath(source_relative_path).parent
-    value = PurePosixPath(parent, _SIDECAR_NAME).as_posix()
-    return _SIDECAR_NAME if value == f"./{_SIDECAR_NAME}" else value
+    sidecar_name = _sidecar_name(source_relative_path)
+    value = PurePosixPath(parent, sidecar_name).as_posix()
+    return sidecar_name if value == f"./{sidecar_name}" else value
 
 
 def _secure_open_directory(root: Path, relative_path: str) -> int:
@@ -85,23 +99,23 @@ def _secure_open_directory(root: Path, relative_path: str) -> int:
                 pass
 
 
-def _open_sidecar(parent_fd: int) -> int | None:
+def _open_sidecar(parent_fd: int, sidecar_name: str) -> int | None:
     try:
-        fd = os.open(_SIDECAR_NAME, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=parent_fd)
+        fd = os.open(sidecar_name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=parent_fd)
     except FileNotFoundError:
         return None
     except OSError as exc:
         if exc.errno in {errno.ELOOP, errno.EMLINK}:
-            raise WorkspaceHumanNoteError("document.yaml symlinks are not writable") from exc
-        raise WorkspaceHumanNoteError("document.yaml cannot be opened safely") from exc
+            raise WorkspaceHumanNoteError(f"{sidecar_name} symlinks are not writable") from exc
+        raise WorkspaceHumanNoteError(f"{sidecar_name} cannot be opened safely") from exc
     observed = os.fstat(fd)
     if not stat_module.S_ISREG(observed.st_mode):
         os.close(fd)
-        raise WorkspaceHumanNoteError("document.yaml is not a regular file")
+        raise WorkspaceHumanNoteError(f"{sidecar_name} is not a regular file")
     return fd
 
 
-def _read_fd(fd: int) -> bytes:
+def _read_fd(fd: int, sidecar_name: str) -> bytes:
     try:
         os.lseek(fd, 0, os.SEEK_SET)
         chunks: list[bytes] = []
@@ -112,15 +126,15 @@ def _read_fd(fd: int) -> bytes:
             chunks.append(block)
         return b"".join(chunks)
     except OSError as exc:
-        raise WorkspaceHumanNoteError("document.yaml cannot be read safely") from exc
+        raise WorkspaceHumanNoteError(f"{sidecar_name} cannot be read safely") from exc
 
 
-def _read_sidecar_bytes(parent_fd: int) -> bytes | None:
-    fd = _open_sidecar(parent_fd)
+def _read_sidecar_bytes(parent_fd: int, sidecar_name: str) -> bytes | None:
+    fd = _open_sidecar(parent_fd, sidecar_name)
     if fd is None:
         return None
     try:
-        return _read_fd(fd)
+        return _read_fd(fd, sidecar_name)
     finally:
         os.close(fd)
 
@@ -129,30 +143,27 @@ def _manifest_digest(raw: bytes | None) -> str | None:
     return hashlib.sha256(raw).hexdigest() if raw is not None else None
 
 
-def _capture_existing_metadata(parent_fd: int, expected_digest: str) -> dict:
+def _capture_existing_metadata(parent_fd: int, sidecar_name: str, expected_digest: str) -> dict:
     """Capture access metadata from the same inode whose bytes match the write basis."""
-    fd = _open_sidecar(parent_fd)
+    fd = _open_sidecar(parent_fd, sidecar_name)
     if fd is None:
-        raise WorkspaceHumanNoteConflict("document.yaml disappeared before replacement")
+        raise WorkspaceHumanNoteConflict(f"{sidecar_name} disappeared before replacement")
     try:
-        raw = _read_fd(fd)
+        raw = _read_fd(fd, sidecar_name)
         if _manifest_digest(raw) != expected_digest:
             raise WorkspaceHumanNoteConflict(
-                "document.yaml changed while access metadata was being captured"
+                f"{sidecar_name} changed while access metadata was being captured"
             )
         observed = os.fstat(fd)
         if not all(hasattr(os, name) for name in ("listxattr", "getxattr", "setxattr")):
             raise WorkspaceHumanNoteError(
-                "platform cannot preserve document.yaml extended access metadata"
+                f"platform cannot preserve {sidecar_name} extended access metadata"
             )
         try:
-            xattrs = tuple(
-                (name, os.getxattr(fd, name))
-                for name in os.listxattr(fd)
-            )
+            xattrs = tuple((name, os.getxattr(fd, name)) for name in os.listxattr(fd))
         except OSError as exc:
             raise WorkspaceHumanNoteError(
-                "document.yaml extended access metadata cannot be read safely"
+                f"{sidecar_name} extended access metadata cannot be read safely"
             ) from exc
         return {
             "mode": stat_module.S_IMODE(observed.st_mode),
@@ -164,55 +175,61 @@ def _capture_existing_metadata(parent_fd: int, expected_digest: str) -> dict:
         os.close(fd)
 
 
-def _decode_manifest(raw: bytes | None) -> tuple[str, dict]:
+def _decode_manifest(raw: bytes | None, sidecar_name: str) -> tuple[str, dict]:
     if raw is None:
         return "", {}
     try:
         text = raw.decode("utf-8")
     except UnicodeDecodeError as exc:
-        raise WorkspaceHumanNoteError("document.yaml must be UTF-8") from exc
+        raise WorkspaceHumanNoteError(f"{sidecar_name} must be UTF-8") from exc
     try:
         value = yaml.safe_load(text) if text.strip() else {}
     except yaml.YAMLError as exc:
-        raise WorkspaceHumanNoteError("document.yaml is invalid YAML") from exc
+        raise WorkspaceHumanNoteError(f"{sidecar_name} is invalid YAML") from exc
     if value is None:
         value = {}
     if not isinstance(value, dict):
-        raise WorkspaceHumanNoteError("document.yaml root must be a mapping")
+        raise WorkspaceHumanNoteError(f"{sidecar_name} root must be a mapping")
     return text, value
 
 
-def _managed_range(text: str) -> tuple[int, int] | None:
+def _managed_range(text: str, sidecar_name: str) -> tuple[int, int] | None:
     starts = list(_START_RE.finditer(text))
     ends = list(_END_RE.finditer(text))
     if not starts and not ends:
         return None
     if len(starts) != 1 or len(ends) != 1 or starts[0].start() >= ends[0].start():
-        raise WorkspaceHumanNoteError("document.yaml has an invalid Pantheon note fragment")
+        raise WorkspaceHumanNoteError(f"{sidecar_name} has an invalid Pantheon info fragment")
     return starts[0].start(), ends[0].end()
 
 
-def _note_state(raw: bytes | None, source_relative_path: str) -> dict:
-    text, manifest = _decode_manifest(raw)
-    managed_range = _managed_range(text)
+def _note_state(raw: bytes | None, source_relative_path: str, sidecar_name: str) -> dict:
+    text, manifest = _decode_manifest(raw, sidecar_name)
+    managed_range = _managed_range(text, sidecar_name)
     namespace = manifest.get(_NAMESPACE)
     if namespace is not None and not isinstance(namespace, dict):
         raise WorkspaceHumanNoteError("pantheon_workspace must be a mapping")
     if namespace is not None and managed_range is None:
         raise WorkspaceHumanNoteConflict(
-            "document.yaml already owns pantheon_workspace outside the managed note fragment"
+            f"{sidecar_name} already owns pantheon_workspace outside the managed info fragment"
         )
     namespace = namespace or {}
-    source_path = namespace.get("source_path")
+    source_file = namespace.get("source_file")
+    legacy_source_path = namespace.get("source_path")
     note = namespace.get("human_note")
-    if source_path is not None and not isinstance(source_path, str):
+    if source_file is not None and not isinstance(source_file, str):
+        raise WorkspaceHumanNoteError("pantheon_workspace.source_file must be a string")
+    if legacy_source_path is not None and not isinstance(legacy_source_path, str):
         raise WorkspaceHumanNoteError("pantheon_workspace.source_path must be a string")
+    if source_file is None and legacy_source_path:
+        source_file = PurePosixPath(legacy_source_path).name
     if note is not None and not isinstance(note, str):
         raise WorkspaceHumanNoteError("pantheon_workspace.human_note must be a string")
 
-    if source_path is None:
+    expected_source_file = PurePosixPath(source_relative_path).name
+    if source_file is None:
         binding_state = "unbound"
-    elif source_path == source_relative_path:
+    elif source_file == expected_source_file:
         binding_state = "bound"
     else:
         binding_state = "mismatch"
@@ -221,7 +238,7 @@ def _note_state(raw: bytes | None, source_relative_path: str) -> dict:
         "text": text,
         "manifest": manifest,
         "managed_range": managed_range,
-        "source_path": source_path,
+        "source_file": source_file,
         "human_note": note or "",
         "binding_state": binding_state,
     }
@@ -230,7 +247,7 @@ def _note_state(raw: bytes | None, source_relative_path: str) -> dict:
 def _render_fragment(source_relative_path: str, human_note: str) -> str:
     payload = {
         _NAMESPACE: {
-            "source_path": source_relative_path,
+            "source_file": PurePosixPath(source_relative_path).name,
             "human_note": human_note,
         }
     }
@@ -266,7 +283,7 @@ def _replace_fragment(text: str, managed_range: tuple[int, int] | None, replacem
     return _append_fragment(text, replacement)
 
 
-def _apply_existing_metadata(fd: int, metadata: dict) -> None:
+def _apply_existing_metadata(fd: int, metadata: dict, sidecar_name: str) -> None:
     try:
         current = os.fstat(fd)
         if current.st_uid != metadata["uid"] or current.st_gid != metadata["gid"]:
@@ -282,46 +299,43 @@ def _apply_existing_metadata(fd: int, metadata: dict) -> None:
             or stat_module.S_IMODE(verified.st_mode) != metadata["mode"]
         ):
             raise WorkspaceHumanNoteError(
-                "document.yaml ownership or mode could not be preserved"
+                f"{sidecar_name} ownership or mode could not be preserved"
             )
-        actual_xattrs = {
-            name: os.getxattr(fd, name)
-            for name in os.listxattr(fd)
-        }
+        actual_xattrs = {name: os.getxattr(fd, name) for name in os.listxattr(fd)}
         expected_xattrs = dict(metadata["xattrs"])
         if actual_xattrs != expected_xattrs:
             raise WorkspaceHumanNoteError(
-                "document.yaml extended access metadata could not be preserved"
+                f"{sidecar_name} extended access metadata could not be preserved"
             )
     except WorkspaceHumanNoteError:
         raise
     except OSError as exc:
         raise WorkspaceHumanNoteError(
-            "document.yaml access metadata could not be preserved"
+            f"{sidecar_name} access metadata could not be preserved"
         ) from exc
 
 
-def _atomic_replace(parent_fd: int, raw: bytes, metadata: dict | None) -> None:
-    temp_name = f".{_SIDECAR_NAME}.pantheon-{uuid.uuid4().hex}.tmp"
+def _atomic_replace(parent_fd: int, sidecar_name: str, raw: bytes, metadata: dict | None) -> None:
+    temp_name = f".{sidecar_name}.pantheon-{uuid.uuid4().hex}.tmp"
     flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW
     fd: int | None = None
     try:
         create_mode = metadata["mode"] if metadata is not None else 0o600
         fd = os.open(temp_name, flags, create_mode, dir_fd=parent_fd)
         if metadata is not None:
-            _apply_existing_metadata(fd, metadata)
+            _apply_existing_metadata(fd, metadata, sidecar_name)
         offset = 0
         while offset < len(raw):
             written = os.write(fd, raw[offset:])
             if written <= 0:
-                raise WorkspaceHumanNoteError("document.yaml temporary write made no progress")
+                raise WorkspaceHumanNoteError(f"{sidecar_name} temporary write made no progress")
             offset += written
         os.fsync(fd)
         os.close(fd)
         fd = None
         os.replace(
             temp_name,
-            _SIDECAR_NAME,
+            sidecar_name,
             src_dir_fd=parent_fd,
             dst_dir_fd=parent_fd,
         )
@@ -329,7 +343,7 @@ def _atomic_replace(parent_fd: int, raw: bytes, metadata: dict | None) -> None:
     except WorkspaceHumanNoteError:
         raise
     except OSError as exc:
-        raise WorkspaceHumanNoteError("document.yaml could not be replaced atomically") from exc
+        raise WorkspaceHumanNoteError(f"{sidecar_name} could not be replaced atomically") from exc
     finally:
         if fd is not None:
             try:
@@ -348,7 +362,7 @@ def _context(
     workspace_roots: Mapping[str, str | Path],
     workspace_ref: str,
     relative_path: str,
-) -> tuple[str, int]:
+) -> tuple[str, str, int]:
     try:
         observation = workspace_collection_read.observe_workspace_file(
             workspace_roots,
@@ -365,7 +379,7 @@ def _context(
     parent = PurePosixPath(normalized).parent.as_posix()
     if parent == ".":
         parent = ""
-    return normalized, _secure_open_directory(Path(root), parent)
+    return normalized, _sidecar_name(normalized), _secure_open_directory(Path(root), parent)
 
 
 def read_workspace_human_note(
@@ -374,10 +388,10 @@ def read_workspace_human_note(
     relative_path: str,
 ) -> dict:
     """Read the one managed human note without inferring document identity."""
-    normalized, parent_fd = _context(workspace_roots, workspace_ref, relative_path)
+    normalized, sidecar_name, parent_fd = _context(workspace_roots, workspace_ref, relative_path)
     try:
-        raw = _read_sidecar_bytes(parent_fd)
-        state = _note_state(raw, normalized)
+        raw = _read_sidecar_bytes(parent_fd, sidecar_name)
+        state = _note_state(raw, normalized, sidecar_name)
         return {
             "workspace_ref": workspace_ref,
             "relative_path": normalized,
@@ -402,22 +416,22 @@ def write_workspace_human_note(
     human_note: str,
     expected_manifest_digest: str | None,
 ) -> dict:
-    """Apply one explicit human note with optimistic manifest-digest protection."""
+    """Apply one explicit human note with optimistic sidecar-digest protection."""
     if not isinstance(human_note, str):
         raise WorkspaceHumanNoteError("human_note must be a string")
     note = human_note.rstrip()
-    normalized, parent_fd = _context(workspace_roots, workspace_ref, relative_path)
+    normalized, sidecar_name, parent_fd = _context(workspace_roots, workspace_ref, relative_path)
     try:
-        raw = _read_sidecar_bytes(parent_fd)
+        raw = _read_sidecar_bytes(parent_fd, sidecar_name)
         current_digest = _manifest_digest(raw)
         if current_digest != expected_manifest_digest:
             raise WorkspaceHumanNoteConflict(
-                "document.yaml changed since it was read; refresh the note before saving"
+                f"{sidecar_name} changed since it was read; refresh the note before saving"
             )
-        state = _note_state(raw, normalized)
+        state = _note_state(raw, normalized, sidecar_name)
         if state["binding_state"] == "mismatch":
             raise WorkspaceHumanNoteConflict(
-                "document.yaml Pantheon note is bound to another workspace source"
+                f"{sidecar_name} Pantheon note is bound to another workspace source"
             )
 
         replacement = _render_fragment(normalized, note) if note else ""
@@ -426,32 +440,30 @@ def write_workspace_human_note(
         if updated_raw == (raw or b""):
             return read_workspace_human_note(workspace_roots, workspace_ref, normalized)
 
-        # Recheck immediately before the effect. The metadata capture for an
-        # existing sidecar is tied to the same exact digest basis.
-        latest = _read_sidecar_bytes(parent_fd)
+        latest = _read_sidecar_bytes(parent_fd, sidecar_name)
         if _manifest_digest(latest) != current_digest:
             raise WorkspaceHumanNoteConflict(
-                "document.yaml changed while the note was being prepared"
+                f"{sidecar_name} changed while the note was being prepared"
             )
 
         if not updated_text.strip():
             if raw is not None:
                 try:
-                    os.unlink(_SIDECAR_NAME, dir_fd=parent_fd)
+                    os.unlink(sidecar_name, dir_fd=parent_fd)
                     os.fsync(parent_fd)
                 except FileNotFoundError as exc:
                     raise WorkspaceHumanNoteConflict(
-                        "document.yaml disappeared while the note was being saved"
+                        f"{sidecar_name} disappeared while the note was being saved"
                     ) from exc
                 except OSError as exc:
-                    raise WorkspaceHumanNoteError("document.yaml could not be removed") from exc
+                    raise WorkspaceHumanNoteError(f"{sidecar_name} could not be removed") from exc
         else:
             metadata = (
-                _capture_existing_metadata(parent_fd, current_digest)
+                _capture_existing_metadata(parent_fd, sidecar_name, current_digest)
                 if raw is not None and current_digest is not None
                 else None
             )
-            _atomic_replace(parent_fd, updated_raw, metadata)
+            _atomic_replace(parent_fd, sidecar_name, updated_raw, metadata)
     finally:
         os.close(parent_fd)
 
