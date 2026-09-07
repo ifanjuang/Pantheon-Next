@@ -134,6 +134,12 @@ def test_different_effective_starts_are_temporal_ambiguity_not_contradiction(con
     assert candidate["classification"] == "temporal_ambiguity"
     assert candidate["comparison"]["effective_time_relation"] == "different_explicit_start"
     assert "validity end" in " ".join(candidate["limitations"])
+    # An empty candidate list must not be readable as "nothing contradicts": the
+    # detector never looks at geometric or relational Claims, and says so to the
+    # consumer rather than only in its own configuration constant.
+    limitations = " ".join(candidate["limitations"])
+    assert "scalar Claim values only" in limitations
+    assert "geometric and relational" in limitations
 
 
 def test_missing_effective_time_is_not_invented(conn) -> None:
@@ -406,6 +412,24 @@ def test_conflict_candidate_persistence_is_append_only(conn) -> None:
                 "DELETE FROM agency_project_claim_conflict_candidates WHERE conflict_candidate_id=%s",
                 (candidate["conflict_candidate_id"],),
             )
+
+
+def test_limitations_state_the_scalar_scope_to_the_consumer() -> None:
+    """An empty candidate list must not read as "nothing contradicts".
+
+    `SCAN_SCOPE` states the scalar restriction as configuration. `LIMITATIONS` is
+    what actually travels to a consumer with every candidate, so the restriction
+    belongs there too: the detector never looks at geometric or relational
+    Claims, and a reader has no other way to learn that from the output.
+
+    Deliberately module-level rather than candidate-level: the guarantee is a
+    property of the detector, and this must hold where no database is available.
+    """
+
+    limitations = " ".join(project_claim_conflicts.LIMITATIONS)
+    assert "scalar Claim values only" in limitations
+    assert "geometric and relational" in limitations
+    assert project_claim_conflicts.SCAN_SCOPE == "active_unsuperseded_scalar_claims"
 
 
 def test_p3_exposes_detection_but_no_public_persistence_entry_point() -> None:
