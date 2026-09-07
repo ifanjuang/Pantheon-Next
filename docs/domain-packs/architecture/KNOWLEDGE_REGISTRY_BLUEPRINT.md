@@ -21,11 +21,12 @@ Pantheon Next governs.
 ## Purpose
 
 An architecture practice reuses a body of knowledge across projects:
-regulations, agency standards, typical construction details, lessons learned,
-supplier and product data, and precedents. This blueprint describes how such
-knowledge is **registered as governed entries** — with a source, an authority
-level and a status — so it can be referenced without being silently treated as
-truth.
+regulations, agency standards, typical construction details, and precedents.
+This blueprint describes how such knowledge is **registered as governed
+entries** — with a source, an authority level and a status — so it can be
+referenced without being silently treated as truth. (Lessons learned and
+supplier/product data were considered and rejected as Knowledge families —
+see "Two orphans resolved" below.)
 
 ## Placement: blueprint in Pantheon, mapping outside
 
