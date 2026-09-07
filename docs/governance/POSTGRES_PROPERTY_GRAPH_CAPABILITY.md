@@ -1,16 +1,11 @@
 # PostgreSQL Property Graph Capability
 
 Status: candidate support doctrine — documented non-implemented.
+Boundary profile: candidate_support_note.
 
 This note records PostgreSQL Property Graph as an optional future read layer over governed relationships.
 
 It does not adopt PostgreSQL 19, create a schema migration, install a dependency, add a graph runtime, authorize Hermes execution, expose an OpenWebUI feature, approve external action or promote memory.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 Allowed interpretation:
 

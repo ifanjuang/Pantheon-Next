@@ -1,6 +1,7 @@
 # Work Issue and Delegated Merge Model
 
 Status: candidate support doctrine — documented non-implemented / to verify.
+Boundary profile: candidate_support_note.
 
 Date: 2026-07-18
 
@@ -9,9 +10,6 @@ This document defines the missing work-object boundary between cards, Hermes exe
 It does not implement a schema, API, issue tracker, queue, scheduler, Hermes Skill, OpenWebUI Function, worker, merge adapter, test or external action.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
 The human defines consequential authority.
 ```
 

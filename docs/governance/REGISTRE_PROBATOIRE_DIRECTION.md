@@ -1,16 +1,11 @@
 # Registre Probatoire — Direction note
 
 Status: validation-only — direction record. It captures a decision and orients
+Boundary profile: validation_only_trace.
 the executor; it does not itself rewrite the affected doctrine or touch any
 protected path.
 
 Decision date: 2026-06-07.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Decision captured
 

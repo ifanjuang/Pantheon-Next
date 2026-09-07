@@ -1,6 +1,7 @@
 # Reasoning Modes Library
 
 Status: candidate support doctrine — governance frame for a candidate Guide de compétence on reasoning modes.
+Boundary profile: candidate_support_note.
 
 This document is not canonical doctrine yet.
 
@@ -8,12 +9,6 @@ It does not implement a reasoning engine, mode selector, router, agent runtime, 
 
 It classifies and bounds the reasoning-mode library held at
 `templates/competence/reasoning_modes_guide_candidate.json`.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## What the library is
 

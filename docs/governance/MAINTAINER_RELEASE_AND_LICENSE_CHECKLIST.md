@@ -1,6 +1,7 @@
 # Maintainer release and licence checklist
 
 Status: validation-only / maintainer checklist.
+Boundary profile: validation_only_trace.
 
 Related issues:
 
@@ -13,12 +14,6 @@ Related issues:
 This document records maintainer actions that are outside the assistant connector and outside Pantheon runtime scope.
 
 It does not implement a runtime, release system, legal decision, history rewrite, approval engine, memory engine, scheduler, queue, provider router or external action.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## 1. Version tag checklist
 

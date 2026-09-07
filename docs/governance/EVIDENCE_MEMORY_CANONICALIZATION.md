@@ -1,18 +1,13 @@
 # Registre Probatoire — evidence canonicalization
 
 Status: candidate support note — documented non-implemented. Reframed under the Registre Probatoire direction (see `GLOSSARY.md`, `REGISTRE_PROBATOIRE_DIRECTION.md`). This is the central document for the `Registre Probatoire`, the evidence register that replaces the former "Registre Probatoire entry".
+Boundary profile: candidate_support_note.
 
 Tracking issue: #68.
 
 This note captures the intended governance model for turning sources and evidence into scoped, reviewable, versioned, dated and cited register entries. Certainty uses the `E0–E4` scale owned by `GLOSSARY.md`.
 
 It does not implement a database schema, runtime, connector, queue, approval engine, memory engine, vector store, mem0 integration, Hermes memory integration, automatic promotion rule or automatic dependency resolver.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

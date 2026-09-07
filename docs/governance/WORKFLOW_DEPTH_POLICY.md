@@ -1,18 +1,13 @@
 # Workflow Depth Policy
 
 Status: candidate — proportional governance and workflow-depth control.
+Boundary profile: candidate_support_note.
 
 This document is not canonical doctrine yet.
 
 It does not implement a router, scheduler, queue, agent loop, background worker, automatic triage system, approval engine, memory engine, user interface or runtime behavior.
 
 It defines a candidate policy for keeping Pantheon workflows useful, fast and proportionate.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

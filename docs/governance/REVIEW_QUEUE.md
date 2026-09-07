@@ -1,18 +1,13 @@
 # Review Queue
 
 Status: candidate support doctrine — governed review queue rule.
+Boundary profile: candidate_support_note.
 
 This document defines the governance rule for a review queue that surfaces doubtful, conflicting, stale, low-confidence or consequential items to a human decision.
 
 It is documentation only.
 
 It does not implement a queue, scheduler, database table, UI gesture, swipe interface, notification system, OpenWebUI action, Hermes skill, workflow runtime, approval engine or memory engine.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 In abstract form:
 

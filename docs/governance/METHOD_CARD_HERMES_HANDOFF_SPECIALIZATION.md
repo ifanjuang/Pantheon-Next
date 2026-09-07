@@ -1,6 +1,7 @@
 # Method Card Hermes Handoff Specialization
 
 Status: candidate support doctrine — documented non-implemented / to verify.
+Boundary profile: candidate_support_note.
 
 Date: 2026-06-30
 
@@ -9,12 +10,6 @@ This document specializes the governed execution handoff for Method Cards.
 It does not replace `CAPABILITY_PLACEMENT.md`, `TASK_CONTRACTS.md`, `EVIDENCE_PACK.md`, `APPROVALS.md`, `USER_DECISION_GATE.md` or any canonical governed execution handoff doctrine.
 
 It does not implement a runtime, Hermes skill, OpenWebUI Function, bridge, connector, scheduler, queue, provider router, approval engine, memory engine, schema, test or external action.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

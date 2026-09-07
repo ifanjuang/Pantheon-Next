@@ -1,6 +1,7 @@
 # AgentTransfer Hermes Artifact Transfer Candidate
 
 Status: candidate support doctrine — Hermes-side artifact-transfer binding note. Repository state: documented non-implemented.
+Boundary profile: candidate_support_note.
 
 This document classifies `shehryarsaroya/agenttransfer` as a possible Hermes-side binding for governed artifact transfer between agents, humans and external runtimes.
 
@@ -9,12 +10,6 @@ It does not install AgentTransfer.
 It does not add a dependency.
 
 It does not create a Pantheon runtime, installer, scheduler, queue, MCP host, plugin manager, provider router, file-transfer service, storage backend, email relay, approval engine, memory engine, evidence engine, OpenWebUI plugin, Docker file, `.env`, schema, test, operation file or platform service.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Capability slot
 

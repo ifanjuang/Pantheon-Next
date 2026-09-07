@@ -1,18 +1,13 @@
 # Maintainer Actions
 
 Status: validation-only / maintainer-only operational checklist.
+Boundary profile: validation_only_trace.
 
 Date: 2026-07-01
 
 This document records actions that cannot be completed safely by the assistant connector.
 
 It does not create doctrine, approve a merge, rewrite history, create a tag, determine licence rights, execute Hermes, create runtime behavior, create a scheduler, create a queue, approve external actions or promote memory.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Why this exists
 

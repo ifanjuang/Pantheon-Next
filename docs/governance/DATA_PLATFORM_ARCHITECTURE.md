@@ -1,6 +1,7 @@
 # Data Platform Architecture
 
 Status: candidate governance support doctrine  
+Boundary profile: candidate_support_note.
 Scope: Postgres, Directus, storage, connectors, professional data registers  
 Runtime status: non-executable
 
@@ -680,12 +681,6 @@ Before promotion into active doctrine, the repository should clarify:
 ### Promotion condition
 
 The candidate set may be promoted only when it preserves the existing Pantheon boundary:
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 And when it keeps the reconciled data-platform boundary intact:
 

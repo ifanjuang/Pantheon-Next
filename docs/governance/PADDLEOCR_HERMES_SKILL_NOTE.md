@@ -1,6 +1,7 @@
 # PaddleOCR Hermes Skill Placement Note
 
 Status: candidate adapter note — documentation only.
+Boundary profile: candidate_support_note.
 
 This document records the placement decision for PaddleOCR as a possible document-extraction adapter.
 
@@ -13,12 +14,6 @@ It does not define a Hermes skill runtime.
 It does not define an OpenWebUI plugin, Action, Tool, Function, Pipe, Pipeline or Knowledge importer.
 
 It does not introduce a scheduler, queue, provider router, hidden ingestion runtime, automatic evidence approval or automatic memory promotion.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Decision
 

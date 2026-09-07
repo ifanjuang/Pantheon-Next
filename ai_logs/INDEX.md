@@ -14,7 +14,7 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **919**.
+Total indexed entries: **920**.
 
 | Date | Log | Subject |
 |---|---|---|
@@ -24,6 +24,7 @@ Total indexed entries: **919**.
 | 2026-09-07 | `2026/Q3/2026-09-07-enforce-ai-logs-index-in-ci.md` | The index said "generated" and nothing checked it |
 | 2026-09-07 | `2026/Q3/2026-09-07-contradiction-is-not-a-gap.md` | Two doctrines that name the same thing had never referenced each other |
 | 2026-09-07 | `2026/Q3/2026-09-07-claim-conflict-scalar-scope.md` | An empty conflict list read as "nothing contradicts" |
+| 2026-09-07 | `2026/Q3/2026-09-07-boundary-profile-migration-governance-root.md` | First real slice of #996: 48 docs/governance/ root documents |
 | 2026-09-06 | `2026/Q3/2026-09-06-retire-openwebui-triad-architecture.md` | Twenty-one architecture documents still named a retired integration as the exposure surface |
 | 2026-09-06 | `2026/Q3/2026-09-06-reconcile-boundary-profile-vocabulary.md` | The drift had one cause: no term for what a document *is* |
 | 2026-09-06 | `2026/Q3/2026-09-06-ratchet-candidate-openwebui-residue.md` | The retirement guard was green because it never looked at candidate doctrine |

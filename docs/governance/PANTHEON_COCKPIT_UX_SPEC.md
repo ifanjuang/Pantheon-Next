@@ -1,16 +1,11 @@
 # Pantheon Cockpit UX Specification
 
 Status: candidate — to verify.
+Boundary profile: candidate_support_note.
 
 This document is a product and governance UX candidate for the future Pantheon-facing cockpit, discussion surface and drafting surface.
 
 It does not implement a UI, runtime, chat engine, editor, plugin, bridge, provider router, scheduler, queue, approval engine, memory engine, OpenWebUI Function, Hermes skill, Google Apps Script, Office add-in or external connector.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ```text
 The exposure surface exposes.

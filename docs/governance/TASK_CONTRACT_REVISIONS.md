@@ -1,6 +1,7 @@
 # Task Contract Revisions
 
 Status: reference — independently maintained in Pantheon Next.
+Boundary profile: active_support_doctrine.
 
 Historical provenance is preserved in git history; this file has no external source dependency.
 
@@ -17,12 +18,6 @@ It is not a scheduler.
 It is not a retry mechanism.
 
 It does not let Hermes or any runtime mutate its own authority silently.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Principle
 

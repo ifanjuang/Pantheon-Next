@@ -1,14 +1,9 @@
 # Module Invocation Preflight
 
 Status: candidate — to verify. This document captures a proposed doctrine for invoking governance roles, rites, places and external connections before a module is used.
+Boundary profile: candidate_support_note.
 
 This document is documentation only. It does not implement a UI, API gateway, MCP server, connector runtime, scheduler, queue, plugin manager, role executor, rite executor or automatic approval system.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

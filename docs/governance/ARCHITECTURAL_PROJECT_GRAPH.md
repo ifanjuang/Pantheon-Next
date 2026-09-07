@@ -1,16 +1,11 @@
 # Architectural Project Graph
 
 Status: candidate orientation — architecture domain graph, visualization and boundary note.
+Boundary profile: candidate_support_note.
 
 This document is a candidate orientation, not an implementation.
 
 It does not create a graph database, BIM runtime, IFC parser, GraphRAG runtime, vector database, memory engine, approval engine, evidence register, project database, UI component or external action.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

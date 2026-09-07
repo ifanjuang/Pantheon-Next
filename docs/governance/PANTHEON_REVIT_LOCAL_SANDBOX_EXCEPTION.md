@@ -1,18 +1,13 @@
 # Pantheon Revit Local Sandbox Exception
 
 Status: candidate support doctrine — Revit local sandbox exception. Repository state: documented non-implemented.
+Boundary profile: candidate_support_note.
 
 This document defines a controlled exception for early Revit local sandbox exploration through a future local plugin / Hermes-side adapter.
 
 It does not implement a Revit plugin.
 
 It does not add a Revit add-in, `.addin` manifest, C# project, MCP server, schema, test, Docker file, operations file, platform service, runtime worker, queue, scheduler, connector, OpenWebUI plugin or production automation.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

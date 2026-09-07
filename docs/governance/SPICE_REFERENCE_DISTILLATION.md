@@ -1,16 +1,11 @@
 # Spice Reference Distillation
 
 Status: reference distillation — external pattern review, not doctrine by itself.
+Boundary profile: external_reference_review.
 
 This document distills useful patterns from `Dyalwayshappy/Spice` for Pantheon Next.
 
 It does not install Spice, create a runtime, create a Hermes skill, create an OpenWebUI plugin, create a decision engine, create an approval engine, create memory behavior or authorize external execution.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 Canonical boundaries remain governed by:
 

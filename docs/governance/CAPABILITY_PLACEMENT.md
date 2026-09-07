@@ -1,6 +1,7 @@
 # Capability Placement
 
 Status: active support doctrine — capability placement, future integration boundaries and non-runtime architecture.
+Boundary profile: active_support_doctrine.
 
 This document defines where capabilities should live when Pantheon Next uses replaceable exposure clients, Hermes Agent, Langflow, LangGraph, Langfuse, GraphRAG or another external system.
 

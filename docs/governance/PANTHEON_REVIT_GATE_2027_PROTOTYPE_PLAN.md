@@ -1,16 +1,11 @@
 # Pantheon Revit Gate — Revit 2027 Prototype Plan
 
 Status: candidate support doctrine — documented non-implemented.
+Boundary profile: candidate_support_note.
 
 Repository state: documented non-implemented.
 
 This document is a planning note for a future local Revit 2027 add-in. It does not implement a plugin, Revit add-in, MCP server, local API, relay, schema, test, Docker file or operations change.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## 0. External version signal
 

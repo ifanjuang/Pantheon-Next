@@ -1,16 +1,11 @@
 # Bootstrap Installation Ladder
 
 Status: candidate orientation — cold-start installation sequence and dependency ladder.
+Boundary profile: candidate_support_note.
 
 This document is a candidate orientation, not an implementation.
 
 It does not create Docker configuration, compose files, install scripts, packages, system services, firewall rules, reverse proxy rules, VPN setup, DNS records, SSH keys, secrets, GPU drivers, runtime services, Portainer setup, OpenWebUI setup, Hermes setup, queue, scheduler, memory engine, vector database, GraphRAG runtime, LangGraph runtime, Langflow runtime or connector gateway.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

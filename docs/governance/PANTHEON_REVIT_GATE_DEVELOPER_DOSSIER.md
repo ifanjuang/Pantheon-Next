@@ -1,12 +1,7 @@
 # Pantheon Revit Gate — Developer Dossier
 
 Status: candidate support doctrine — documented non-implemented.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Boundary profile: candidate_support_note.
 
 This dossier is documentation only. It describes a future local Revit add-in that
 does not exist yet. Nothing here is built; there is no runtime, no plugin code,

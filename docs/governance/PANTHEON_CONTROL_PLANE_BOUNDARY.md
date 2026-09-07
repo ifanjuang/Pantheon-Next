@@ -1,6 +1,7 @@
 # Pantheon Control Plane Boundary
 
 Status: candidate support doctrine — control-plane boundary. Repository state: documented non-implemented.
+Boundary profile: candidate_support_note.
 
 This document clarifies how Pantheon Next may govern operational state for external runtimes without becoming the runtime, installer, scheduler, queue, provider router, MCP host, plugin manager, memory engine or approval engine.
 
@@ -11,12 +12,6 @@ It does not install tools.
 It does not add schemas.
 
 It does not create operations, platform, Docker, `.env`, service, queue, scheduler, connector runtime, OpenWebUI plugin, Hermes skill or automatic approval mechanism.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

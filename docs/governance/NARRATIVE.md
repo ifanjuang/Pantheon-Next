@@ -1,6 +1,7 @@
 # Pantheon Next Narrative
 
 Status: illustrative — active narrative, non-runtime metaphor.
+Boundary profile: documentation_only.
 
 Pantheon Next can be represented as a governed antique city at the center of a world of possibilities.
 
@@ -9,12 +10,6 @@ This narrative is explanatory.
 It is not an implementation model.
 
 It does not introduce a runtime, an execution graph, a scheduler, a provider router, a memory automaton or an autonomous agent system.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## The central phrase
 
