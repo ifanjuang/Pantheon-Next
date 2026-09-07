@@ -10,6 +10,37 @@ Ce n’est pas un runtime d’agent, un scheduler, une queue, un routeur de prov
 
 Le dépôt héberge également, en monorepo, une implémentation candidate exécutable bornée sous `implementation/`. La co-localisation dans le même dépôt ne transfère aucune autorité de gouvernance à ce code.
 
+## Continuité sémantique d’un projet
+
+L’hypothèse architecturale actuelle de Pantheon est qu’une compréhension globale utile du projet doit émerger de **plusieurs représentations hétérogènes qui convergent vers les mêmes identités gouvernées et relations explicites**, plutôt que d’aplatir toutes les sources dans une vérité canonique unique.
+
+```text
+plans / coupes / IFC / photos
+        -> source_representations + claims
+CCTP / documents projet / comptes rendus
+        -> requirements projet + Information + contexte sourcé
+Knowledge
+        -> repères réutilisables d’interprétation
+
+l’ensemble
+        -> stable_objects + relations explicites
+        -> Context Pack borné
+        -> Hermes
+        -> compréhension du projet pertinente pour la tâche
+```
+
+Un projet peut donc conserver simultanément plusieurs claims sourcés concernant le même objet, y compris lorsqu’ils se contredisent. Le système doit préserver leur provenance, leur indice, leur statut et leur portée afin que les contradictions et les informations manquantes restent visibles au lieu d’être arbitrées silencieusement.
+
+```text
+plusieurs sources alignées != vérité fusionnée
+même stable_object != une valeur source canonique unique
+contenu récupéré != vérité
+repère Knowledge != applicabilité d’une exigence
+interprétation Hermes != claim gouverné ni décision
+```
+
+La qualification du dépôt protège déjà le chemin de composition de contexte borné entre plusieurs owners. La preuve cognitive live que Hermes transforme effectivement cette superposition sémantique en une meilleure compréhension multidisciplinaire du projet reste ouverte dans [#986](https://github.com/ifanjuang/Pantheon-Next/issues/986). Cette hypothèse n’impose aucun ContextGraph, Lens Engine ou owner de raisonnement métier supplémentaire.
+
 ## Frontière du système
 
 | Composant | Responsabilité |

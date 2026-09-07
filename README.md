@@ -10,6 +10,37 @@ It is not an agent runtime, scheduler, queue, provider router, installer, plugin
 
 The repository is also the monorepo host for a bounded executable candidate implementation under `implementation/`. Repository co-location does not transfer governance authority to that code.
 
+## Semantic continuity of a project
+
+Pantheon’s current architectural hypothesis is that a useful global understanding of a project should emerge from **several heterogeneous representations converging on the same governed identities and explicit relations**, rather than from flattening every source into one canonical truth.
+
+```text
+drawings / sections / IFC / photos
+        -> source representations + claims
+CCTP / project documents / site records
+        -> project-specific requirements + Information + source-backed context
+Knowledge
+        -> reusable interpretation cues
+
+all of the above
+        -> stable object identities + explicit relations
+        -> bounded Context Pack
+        -> Hermes
+        -> task-relevant project understanding
+```
+
+A project may therefore keep several source-backed claims about the same object at the same time, including conflicting ones. The system should preserve their provenance, revision, status and scope so that contradictions and missing context remain visible instead of being silently resolved.
+
+```text
+multiple sources aligned != merged truth
+same stable object != one canonical source value
+retrieved content != truth
+Knowledge cue != requirement applicability
+Hermes interpretation != governed claim or decision
+```
+
+Repository qualification already protects the bounded multi-owner context composition path. The live cognitive proof that Hermes can turn this semantic superposition into materially better multidisciplinary project understanding remains open under [#986](https://github.com/ifanjuang/Pantheon-Next/issues/986). No new ContextGraph, Lens Engine or métier-specific reasoning owner is assumed by this hypothesis.
+
 ## System boundary
 
 | Component | Responsibility |
