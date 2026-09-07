@@ -79,6 +79,12 @@ jobs:
           fi
           echo "OK: ai_logs/ and ai_logs/README.md present."
 
+      - name: ai_logs/INDEX.md is current
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/check_ai_logs_index_current.py
+
       - name: Governance files do not suggest Pantheon executes
         shell: bash
         run: |

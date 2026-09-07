@@ -14,13 +14,14 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **918**.
+Total indexed entries: **919**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
 | 2026-09-07 | `2026/Q3/2026-09-07-workspace-source-package-info-sidecar.md` | 2026-09-07 — Workspace source package and per-source Infos sidecar |
 | 2026-09-07 | `2026/Q3/2026-09-07-exact-source-materialization-contract.md` | 2026-09-07 — Exact source materialization convergence |
+| 2026-09-07 | `2026/Q3/2026-09-07-enforce-ai-logs-index-in-ci.md` | The index said "generated" and nothing checked it |
 | 2026-09-07 | `2026/Q3/2026-09-07-contradiction-is-not-a-gap.md` | Two doctrines that name the same thing had never referenced each other |
 | 2026-09-07 | `2026/Q3/2026-09-07-claim-conflict-scalar-scope.md` | An empty conflict list read as "nothing contradicts" |
 | 2026-09-06 | `2026/Q3/2026-09-06-retire-openwebui-triad-architecture.md` | Twenty-one architecture documents still named a retired integration as the exposure surface |
