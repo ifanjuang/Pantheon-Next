@@ -8,8 +8,14 @@ check. This closes that gap the same way the rest of this workflow works: import
 the generator's own logic rather than reimplementing it, so the two can never
 silently diverge from each other.
 
+This is a distinct check from `check_index_coverage.py`, despite the similar
+name: that script verifies `AUTHORITY_INDEX.md` coverage of authority-bearing
+governance docs and deliberately excludes `ai_logs/` (traces are not authority).
+Neither script covers the other's file.
+
     generated != enforced
     stated contract != checked contract
+    index coverage != index currentness
 
 Usage: python3 .github/scripts/check_ai_logs_index_current.py
 """

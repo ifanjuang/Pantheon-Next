@@ -56,6 +56,11 @@ FUTURE_OR_GROUPED = {
     "docs/governance/rites/",
     "templates/",
     "examples/",
+    # ai_logs/ is excluded here because AUTHORITY_INDEX.md indexes
+    # authority-bearing governance docs, and ai_logs/ entries are traces, not
+    # authority. This is not "ai_logs/INDEX.md coverage" despite the name
+    # similarity: that file has its own dedicated check,
+    # check_ai_logs_index_current.py, which verifies it against its generator.
     "ai_logs/",
     "schemas/",
     "tests/",
