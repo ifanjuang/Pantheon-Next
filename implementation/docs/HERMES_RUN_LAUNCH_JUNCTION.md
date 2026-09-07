@@ -138,6 +138,109 @@ launch snapshot != future current owner value
 
 After runtime start, current values are available only through the exact active-context read path. A later owner revision may therefore differ from the immutable launch snapshot.
 
+## Exact admitted source materialization
+
+Workspace `source_refs` can identify an exact admitted source basis without making that source content available to Hermes. The current boundaries stay explicit:
+
+```text
+Launch Context Snapshot: source_binary_included = false
+Scoped Hermes Context:   source_dereference_available = false
+```
+
+Those values remain `false`. Exact source materialization must not be implemented by widening the Pantheon context plugin into a generic source browser or by embedding source binaries in the launch snapshot.
+
+The execution-side seam is instead:
+
+```text
+exact source_ref already present in the admitted Context Pack
+        ↓
+external Run Binding resolves only that declared source
+        ↓
+secure exact read + SHA-256 verification against the admitted digest
+        ↓
+0..n transient source representations
+        ↓
+Context Admission v2 framing as untrusted data
+        ↓
+bounded Hermes run material
+```
+
+For the Workspace path, the first implementation target is the already-issued form:
+
+```text
+workspace://<workspace_ref>/<relative_path>?sha256=<digest>
+```
+
+Materialization must preserve the exact source basis. The implementation must reuse the existing Workspace exact-read/no-follow/digest discipline rather than introduce arbitrary path reads, folder scans or implicit sibling discovery.
+
+At minimum:
+
+```text
+workspace_ref must resolve through an explicitly configured Workspace root
+relative_path must remain inside that root
+symlink/path replacement must be refused
+source SHA-256 must equal the admitted digest
+missing/changed source must fail closed
+no folder scan or global search is implied by one source_ref
+```
+
+A verified source may produce more than one transient representation because architectural sources are not reducible to one extraction channel:
+
+```text
+structural/text representation
+  -> existing DocumentConverter abstraction
+  -> bounded provider such as the current Docling Serve adapter
+
+visual representation
+  -> future bounded page/image adapter when qualified
+
+other representation
+  -> only through a separately reviewed replaceable adapter
+```
+
+`Docling` is therefore one current structural-analysis provider, not the architecture of source materialization. A future visual adapter must not create a second source identity, second document owner or parallel persistence path.
+
+All model-bound extracted/rasterized/transcribed content is source data, not instruction authority. Before it is included in Hermes model input it must use the existing Context Admission v2 framing or an exactly equivalent reviewed boundary:
+
+```text
+content_role = data
+instruction_authority = none
+transport_class = untrusted_data
+```
+
+Transport does not make the content true, Evidence, approved, applicable or professionally validated.
+
+The materialization is transient by default:
+
+```text
+materialized source bytes != persisted Document
+transient Markdown/JSON != Workspace Contenu
+transient visual pages != new source
+conversion success != source truth
+conversion success != Evidence
+Hermes interpretation != Project Anatomy claim
+```
+
+No `<basename>.md`, Document, Knowledge, Evidence or canonical record is created merely because a qualification run needed the source content.
+
+The separate explicit Workspace effect remains:
+
+```text
+Qualifier
+= exact source -> transient run material -> Hermes candidate
+
+Ingérer
+= exact source -> reviewed structural-analysis path -> persistent <basename>.md Contenu
+```
+
+The same replaceable conversion abstraction may be reused by both paths; transient versus persistent effect must remain explicit.
+
+The contract permits a bounded set of explicitly admitted source refs in one run. The first executable proof should stay narrower and demonstrate one exact Workspace PDF end to end before widening to multi-source materialization. Multi-source composition must still require every source to be explicitly admitted; it must not infer project-wide vault access.
+
+The implementation must also define bounded source byte size, conversion timeout and model-bound representation size. A conversion or materialization failure is a visible refusal/capability gap, never a reason to widen scope or silently substitute another source.
+
+This seam exists to enable real qualification such as #986, where the product value is not merely that Hermes can read a PDF but that it can keep admitted contradictory sources separate and surface the contradiction before a professional decision.
+
 ## Hermes Runs API binding
 
 The external module `mvp_vertical.hermes_run_binding.ExternalHermesRunBinding` is the execution-side junction.
@@ -301,12 +404,14 @@ technical receipt != Evidence
 ### External Run Binding executes
 
 - read-only capability/toolset observation;
+- exact admitted source materialization needed for one launch;
+- transient source conversion through reviewed replaceable adapters;
 - one launch reservation request;
 - exactly one native Hermes `/v1/runs` submission;
 - start callback registration;
 - optional explicit one-shot status reconciliation.
 
-It owns no queue, scheduler, retry worker or autonomous monitor.
+It owns no source identity, Document persistence, queue, scheduler, retry worker or autonomous monitor.
 
 ### Cockpit / OpenWebUI exposes
 
@@ -332,6 +437,9 @@ It does not receive Hermes or Pantheon service credentials through this candidat
 - model-selected admission or run identity;
 - global Agency Data search through the context plugin;
 - source binary dereference through the context plugin;
+- source materialization widening beyond exact admitted refs;
+- implicit folder/project scan from a source ref;
+- transient conversion being persisted as Contenu/Document/Evidence automatically;
 - plugin installation implying approval;
 - runtime success being treated as Evidence or professional truth.
 
@@ -346,6 +454,9 @@ one-shot launch binding                implemented candidate
 one-shot status reconciliation         implemented candidate
 active-context server resolution       implemented candidate
 Hermes context plugin                  implemented candidate
+exact Workspace source materialization not implemented
+structural/text transient adapter use  not wired into Run Binding
+visual transient adapter               not implemented
 task_id == Runs session_id live proof  to verify
 live Hermes target                     not connected
 plugin installation                    not performed
