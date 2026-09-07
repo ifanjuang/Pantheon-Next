@@ -221,6 +221,14 @@ def _relative_child_path(parent: str, name: str) -> str:
 def _adjacent_document_sidecar(path: Path, relative_path: str) -> dict:
     """Observe the per-source info sidecar; do not parse or infer a binding."""
     sidecar_name = f"{path.stem}.yaml"
+    if path.name.casefold() == sidecar_name.casefold():
+        return {
+            "state": "unsupported_source_collision",
+            "relative_path": None,
+            "parsed": False,
+            "identity_mapping_resolved": False,
+        }
+
     sidecar = path.parent / sidecar_name
     if sidecar.is_symlink():
         state = "unsupported_symlink"
