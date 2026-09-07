@@ -53,7 +53,6 @@ KNOWN_CANDIDATE_OPENWEBUI_RESIDUES = {
     "docs/governance/MARKDOWN_DOSSIER_WORKFLOW.md",
     "docs/governance/METHOD_CARD_HERMES_HANDOFF_SPECIALIZATION.md",
     "docs/governance/METHOD_CARD_MODEL.md",
-    "docs/governance/MISSING_INFORMATION_DISCIPLINE.md",
     "docs/governance/MODULE_INVOCATION_PREFLIGHT.md",
     "docs/governance/NANGO_HERMES_CONNECTOR_GATEWAY.md",
     "docs/governance/NARRATIVE.md",

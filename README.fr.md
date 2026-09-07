@@ -41,6 +41,42 @@ interprétation Hermes != claim gouverné ni décision
 
 La qualification du dépôt protège déjà le chemin de composition de contexte borné entre plusieurs owners. La détection automatique de contradiction porte aujourd’hui sur les seules valeurs scalaires : les contradictions géométriques et relationnelles sont conservées et affichées, mais non détectées — une liste de conflits vide signifie donc qu’aucune valeur scalaire ne diverge, pas que rien ne diverge. La preuve cognitive live que Hermes transforme effectivement cette superposition sémantique en une meilleure compréhension multidisciplinaire du projet reste ouverte dans [#986](https://github.com/ifanjuang/Pantheon-Next/issues/986). Cette hypothèse n’impose aucun ContextGraph, Lens Engine ou owner de raisonnement métier supplémentaire.
 
+## Historique bitemporel des claims
+
+En complément de la continuité sémantique, la candidate exécutable sous
+`implementation/` sépare déjà deux axes temporels pour chaque `ProjectClaim` :
+
+```text
+effective_at    = le début métier explicite affirmé par la source
+                  (ex. « cette cloison fait 200mm à l’indice DCE de mars 2026 »)
+observed_at     = le moment où l’assertion ou son support a été observé
+knowledge_time  = le moment où le système en a pris connaissance (temps d’enregistrement)
+```
+
+Un `effective_at` manquant n’est jamais remplacé silencieusement par `observed_at`
+ou par le temps d’enregistrement. Superséder un claim ne réécrit jamais son
+prédécesseur ; la ligne précédente subsiste, et une lecture « as-of » permet de
+reconstruire à la fois ce qui était cru à une date métier passée et ce qui était
+su à une date système passée :
+
+```text
+business_and_knowledge_as_of      -> ce qui était cru, tel que su à l’époque
+business_as_of_current_knowledge  -> ce qui était cru alors, à la lumière de tout ce qu’on sait depuis
+```
+
+Ceci est implémenté, non une hypothèse : `agency_claims.applicable_project_claims_as_of`
+l’applique aujourd’hui. La lecture actuelle de « ce qui était cru » ne s’étend
+pas encore à « est-ce que cela faisait débat à l’époque » — une lecture as-of
+reste aujourd’hui silencieuse sur des claims contradictoires de la même période ;
+voir [#1012](https://github.com/ifanjuang/Pantheon-Next/issues/1012).
+
+```text
+observé != effectif
+connaissance actuelle != connaissance à l’époque
+un claim plus récent != un claim antérieur effacé
+croyance reconstructible != vérité professionnelle
+```
+
 ## Frontière du système
 
 | Composant | Responsabilité |

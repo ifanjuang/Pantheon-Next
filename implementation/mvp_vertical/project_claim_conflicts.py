@@ -9,6 +9,13 @@ store only the identities and detector result required to preserve the historica
 tension. ProjectClaim value, time and provenance remain owned by the immutable
 ProjectClaims and are reconstructed when a candidate is read.
 
+`docs/governance/MISSING_INFORMATION_DISCIPLINE.md` (candidate) owns the policy
+this module mechanizes for scalar Claims: a contradiction is preserved and
+exposed, never averaged, merged or silently decided by source preference. That
+document also states the boundary this module does not cross — geometric and
+relational contradictions are outside `SCAN_SCOPE` and remain that document's
+search/ask responsibility until a demonstrated need extends detection here.
+
     conflict detected != conflict resolved
     candidate != Decision
     provenance difference != authority
