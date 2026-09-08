@@ -105,7 +105,21 @@ human_issuer_signing: implemented_not_connected
 runtime_observation_envelope: implemented_candidate
 ```
 
-A green test suite proves only that these candidate contracts remain coherent in the repository. It does not prove any of them would be admitted by a real Policy Decision Point: run against `mcp-server`'s actual `PantheonPolicyService`, five of the six chokepoints above (all but `knowledge_update_chokepoint`, which already supplies `task_contract_ref` and `evidence_pack_candidate_ref`) are refused with `blocked_pending_task_contract`. Every request declaring `writes_state: true` classifies K3, which requires those two references alongside the human decision reference; the five newer chokepoints supply only the last. Traced in `ai_logs/2026/Q3/2026-09-02-act-information-policy-facts.md`.
+A green test suite proves only that these candidate contracts remain coherent in
+the repository. It does not prove production admission or activation.
+
+The repository policy path now distinguishes direct human governed-state
+effects from delegated runtime work. The five reviewed direct-human intents
+(`bind_oidc_identity`, `store_reviewed_dossier`,
+`publish_knowledge_reviewed`, `apply_edit_request`, and
+`act_working_information`) remain K3/C2 and blocked until an exact human
+decision is verified, but they do not fabricate a Task Contract or Evidence
+Pack solely because they write local governed state. Unknown, delegated, or
+external-effect requests remain fail-conservative and keep the applicable Task
+Contract and Evidence requirements. This correction and its closed intent set
+are traced in
+`ai_logs/2026/Q3/2026-09-03-direct-human-policy-gates.md` and exercised by the
+policy/PEP tests.
 
 ## Adoption gates still open
 
@@ -117,10 +131,6 @@ live target issuer registry + signed-decision round trip
 production source-path permissions and rollback proof
 human approval for activation
 real-dossier authorization
-doctrine decision on Task Contract / Evidence Pack references for human-originated
-  writes: a Task Contract governs delegated work; the five newer chokepoints gate
-  writes a human makes directly at their own keyboard, which structurally have
-  neither. Until this is resolved, those five remain refused by a real PDP.
 ```
 
 ## Final rule
