@@ -1,14 +1,9 @@
 # Exemple fictif — Résidence Les Tilleuls
 
 Status: illustrative example — fictional development fixture. Non-consultative, non-binding, candidate-only.
+Boundary profile: documentation_only.
 
 This example is documentation only. It is not legal advice, not a conformity verdict, not a professional conclusion and not a Registre Probatoire entry.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Scenario
 

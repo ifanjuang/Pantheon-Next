@@ -1,6 +1,7 @@
 # Exemple — Composition gouvernée bout-en-bout (CERFA forgé par Héphaïstos)
 
 Status: fictional professional example — documented, non-implemented.
+Boundary profile: documentation_only.
 
 Cet exemple montre la **mécanique** de la composition gouvernée : comment, à partir
 d'une demande, Héphaïstos *forge* une recette (un Workflow Manifest candidat) en
@@ -14,12 +15,6 @@ contrôle qualité, trace), voir l'exemple narratif voisin
 
 Doctrine de référence : `CAPABILITY_REGISTRY.md`, `WORKFLOW_SCHEMA.md`
 (section *Governed composition*), `REQUEST_LIFECYCLE.md`, `EVIDENCE_PACK.md`.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## 0. La demande et le cap
 

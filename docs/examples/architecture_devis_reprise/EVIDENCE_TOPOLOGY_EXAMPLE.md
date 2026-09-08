@@ -1,6 +1,7 @@
 # Evidence Topology Example — Architecture / MOE
 
 Status: fictional example — educational support only.
+Boundary profile: documentation_only.
 
 This example applies `docs/governance/EVIDENCE_TOPOLOGY.md` to an architecture / maîtrise d’œuvre dossier.
 
@@ -13,12 +14,6 @@ It is not a reception decision.
 It is not a liability opinion.
 
 It is not an implementation file.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Scenario
 

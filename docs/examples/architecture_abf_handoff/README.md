@@ -1,16 +1,11 @@
 # Example — Architecture / Urbanisme — Governed Handoff for ABF / mairie reply
 
 Status: fictional professional example — educational support only.
+Boundary profile: documentation_only.
 
 This example shows how Pantheon frames a sensitive architecture / urbanisme task before an execution runtime prepares a draft.
 
 It is not legal advice, planning advice, administrative advice or architectural validation. It does not replace the architect's judgment, site knowledge, client instruction, planning authority position, ABF consultation or professional liability review.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Scenario
 

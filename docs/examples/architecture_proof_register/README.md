@@ -1,16 +1,11 @@
 # Architecture Proof Register — Vertical Example
 
 Status: example — fictional, documented non-implemented.
+Boundary profile: candidate_support_note.
 
 This example tests the interaction between architecture target workflows, document intake, source qualification, proof candidates, answer verification candidates, review triggers and human decision.
 
 It does not implement a schema, database, dashboard, runtime, connector, RAG engine, provenance graph, approval engine, memory engine, OpenWebUI action, Hermes skill, form filler, image analyzer, PDF exporter, scheduler, queue or external action.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

@@ -1,6 +1,7 @@
 # Example — Architecture / MOE — Pre-Execution Simulation Before Client Email
 
 Status: fictional professional example — educational support only.
+Boundary profile: documentation_only.
 
 This example extends `docs/examples/architecture_devis_reprise/README.md` with a pre-execution simulation step.
 
@@ -11,12 +12,6 @@ It is not technical validation.
 It is not insurance advice.
 
 It does not replace the architect's professional judgment, site knowledge, contractual review, contradictory verification or liability analysis.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

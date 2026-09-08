@@ -4,12 +4,7 @@ Status: validation-only / governed vertical slice — a schema-valid, machine-ch
 end-to-end dossier proving the governance loop is coherent. Fictional (Maison Lierre
 extension, a complementary quote). It **executes nothing**; Hermes and OpenWebUI run
 outside the repo (see `RUNBOOK.md`).
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+Boundary profile: validation_only_trace.
 
 ## What this proves (and what it does not)
 
