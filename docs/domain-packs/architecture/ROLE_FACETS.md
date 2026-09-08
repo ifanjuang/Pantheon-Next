@@ -1,18 +1,13 @@
 # Architecture Role Facets
 
 Status: candidate — architecture-domain model for role qualities, expression, reflexes, consultations, rites, gates and limits.
+Boundary profile: candidate_support_note.
 
 This document is not canonical doctrine yet.
 
 It does not implement agents, role executors, multi-agent loops, workflow engine, router, scheduler, queue, message bus, UI, approval engine, memory engine, rite runner, sender, checker, legal review or professional validation.
 
 It defines how architecture-domain gods / roles may be described as multi-faceted guardians without becoming autonomous agents or decorative labels.
-
-```text
-Optional runtime clients may expose interaction.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

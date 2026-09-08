@@ -1,6 +1,7 @@
 # Architecture Role Expression Model
 
 Status: candidate — architecture-domain model for contextual expression of role qualities / facets.
+Boundary profile: candidate_support_note.
 
 Filename note: this document keeps its historical filename for now: `ROLE_ACTIVATION_MODEL.md`.
 
@@ -13,12 +14,6 @@ This document is not canonical doctrine yet.
 It does not implement agents, role executors, role routing, multi-agent loops, workflow runtime, scheduler, queue, message bus, UI, approval engine, memory engine, rite runner, sender, checker, legal review or professional validation.
 
 It defines how architecture-domain role qualities express themselves freely but boundedly, without making every role visible on every request.
-
-```text
-Optional runtime clients may expose interaction.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

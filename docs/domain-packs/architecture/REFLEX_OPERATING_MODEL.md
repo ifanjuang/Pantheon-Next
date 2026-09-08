@@ -1,6 +1,7 @@
 # Architecture Method and Reflex Operating Model
 
 Status: candidate — operating model for architecture-domain methods and narrow reflexes.
+Boundary profile: candidate_support_note.
 
 This document is not canonical doctrine yet.
 
@@ -9,12 +10,6 @@ It does not implement a runtime, agent router, workflow engine, scheduler, queue
 It defines a compact operating model so architecture-domain method objects remain composable, bounded and usable without becoming an usine a gaz.
 
 Filename note: this document keeps its historical filename for now. The term `reflex` is narrowed by `METHOD_TAXONOMY.md` and no longer means every reusable architecture pattern.
-
-```text
-Optional runtime clients may expose interaction.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

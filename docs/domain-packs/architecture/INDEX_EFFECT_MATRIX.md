@@ -1,26 +1,13 @@
 # Architecture Index Effect Matrix
 
 Status: candidate support doctrine — index effect matrix for architecture documents.
+Boundary profile: candidate_support_note.
 
 This document defines a candidate matrix for interpreting document indices / versions in architecture practice.
 
 It is documentation only.
 
 It does not implement a SQL schema, migration, Postgres table, Directus cockpit, document versioning engine, storage backend, approval engine, OpenWebUI action, Hermes skill, queue runtime, scheduler or connector.
-
-```text
-Optional runtime clients may expose interaction.
-Hermes Agent executes.
-Pantheon Next governs.
-```
-
-In abstract form:
-
-```text
-The exposure surface exposes.
-The execution runtime executes.
-Pantheon governs.
-```
 
 ## Purpose
 

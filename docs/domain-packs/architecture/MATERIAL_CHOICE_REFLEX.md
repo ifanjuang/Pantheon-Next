@@ -1,18 +1,13 @@
 # Architecture Material Choice Reflex
 
 Status: candidate — architecture-domain reflex for material and facade-choice questions.
+Boundary profile: candidate_support_note.
 
 This document is not canonical doctrine yet.
 
 It does not implement a runtime, search tool, PLU checker, ABF checker, estimator, CCTP generator, Notion write, approval engine, memory engine or external communication workflow.
 
 It defines a candidate reflex for simple material-choice questions that may become consequential when they touch regulation, prior decisions, cost, technique, contract, insurance or external communication.
-
-```text
-Optional runtime clients may expose interaction.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

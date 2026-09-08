@@ -1,18 +1,13 @@
 # Architecture Proof Register Implementation Spec
 
 Status: implementation candidate — documented, not implemented.
+Boundary profile: candidate_support_note.
 
 This document defines a compact implementation candidate for the architecture proof register and indexed document version model.
 
 It is a specification only.
 
 It does not create migrations, tables, RLS policies, Directus collections, object storage, OpenWebUI forms, Hermes skills, queues, schedulers, approval systems, memory systems or connectors.
-
-```text
-Optional runtime clients may expose interaction.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

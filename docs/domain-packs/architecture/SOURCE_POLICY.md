@@ -4,18 +4,13 @@ Status: candidate support doctrine — architecture_fr source policy.
 Repository state: documented non-implemented.  
 Domain pack target: `architecture_fr`.  
 Origin: distillation from `HISTORICAL_ARCHITECTURE_RECONCILIATION.md` after PR #151.
+Boundary profile: candidate_support_note.
 
 This document defines how sources enter, constrain and support architecture-domain work in Pantheon Next.
 
 It does not validate any source by itself.
 
 It does not create a retrieval runtime, RAG system, web crawler, vector database, OpenWebUI Knowledge configuration, Hermes skill, regulatory checker, evidence engine, memory engine, approval engine or external action.
-
-```text
-Optional runtime clients may expose interaction.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 
