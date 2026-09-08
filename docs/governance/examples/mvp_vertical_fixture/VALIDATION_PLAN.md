@@ -1,18 +1,13 @@
 # MVP Fixture Validation Plan
 
 Status: candidate support note — validation plan — documented non-implemented.
+Boundary profile: candidate_support_note.
 
 Date: 2026-07-08
 
 This plan defines how the MVP vertical fixture should be validated later.
 
 It adds no validator, command, CI workflow, runtime, database mapping, OpenWebUI feature, Hermes contract, approval engine or memory promotion.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Inputs
 

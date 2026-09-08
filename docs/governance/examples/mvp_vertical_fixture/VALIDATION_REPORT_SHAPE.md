@@ -1,18 +1,13 @@
 # MVP Validation Report Shape
 
 Status: candidate support note — expected report shape — documented non-implemented.
+Boundary profile: candidate_support_note.
 
 Date: 2026-07-08
 
 This note explains how to read `validation_report.example.yaml`.
 
 It adds no validator, command, CI workflow, runtime, database mapping, OpenWebUI feature, Hermes contract, approval engine or memory promotion.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

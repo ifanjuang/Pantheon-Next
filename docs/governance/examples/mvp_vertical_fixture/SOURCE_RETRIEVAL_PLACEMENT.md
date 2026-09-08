@@ -1,18 +1,13 @@
 # MVP Source Manifest / Retrieval Trace Placement
 
 Status: candidate support note — placement decision — documented non-implemented.
+Boundary profile: candidate_support_note.
 
 Date: 2026-07-08
 
 This note closes the placement question left open by the MVP fixture and schema alignment work.
 
 It adds no schema, validator, command, CI workflow, runtime, database mapping, OpenWebUI feature, Hermes contract, approval engine or memory promotion.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Decision
 

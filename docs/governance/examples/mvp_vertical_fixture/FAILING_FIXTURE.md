@@ -1,18 +1,13 @@
 # Deliberate Failing MVP Fixture
 
 Status: candidate support note — failing fixture note — documented non-implemented.
+Boundary profile: candidate_support_note.
 
 Date: 2026-07-08
 
 This note explains `failing_external_action.fixture.yaml` and its expected report.
 
 It adds no validator, command, CI workflow, runtime, database mapping, OpenWebUI feature, Hermes contract, approval engine or memory promotion.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

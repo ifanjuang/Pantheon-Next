@@ -1,18 +1,13 @@
 # MVP Governance Invariants
 
 Status: candidate support note — invariant registry — documented non-implemented.
+Boundary profile: candidate_support_note.
 
 Date: 2026-07-08
 
 This registry names the governance invariants used by the MVP vertical fixture, validation plan and expected reports.
 
 It adds no validator, command, CI workflow, runtime, database mapping, OpenWebUI feature, Hermes contract, approval engine or memory promotion.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

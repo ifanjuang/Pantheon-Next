@@ -1,18 +1,13 @@
 # MVP Object Shape Reconciliation
 
 Status: candidate support note — reconciliation note — documented non-implemented.
+Boundary profile: candidate_support_note.
 
 Date: 2026-07-07
 
 This note compares the compact vertical fixture with the earlier illustrative MVP object examples.
 
 It adds no schema, validator, runtime, database migration, OpenWebUI feature, Hermes skill, approval engine or memory engine.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Compared files
 
