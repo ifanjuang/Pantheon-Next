@@ -1,6 +1,7 @@
 # Architecture workflow — governed ERP fire-safety notice preparation
 
 Status: fictional example — educational support only.
+Boundary profile: documentation_only.
 
 This example shows how Pantheon can govern the preparation of a candidate ERP fire-safety notice without treating the AI output as regulatory validation or external authorization.
 
@@ -11,9 +12,6 @@ It is not architectural, legal, fire-safety, regulatory, insurance or engineerin
 It does not validate any real ERP classification, notice, plan, alarm requirement, evacuation path, local risk category or administrative filing.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
 The Registre Probatoire proves.
 The human decides.
 ```

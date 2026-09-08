@@ -1,6 +1,7 @@
 # Architecture decision — memory versus Registre Probatoire
 
 Status: fictional example — educational support only.
+Boundary profile: documentation_only.
 
 This example shows why Pantheon must distinguish runtime memory from the Registre Probatoire when a professional asks a consequential project question.
 
@@ -11,9 +12,6 @@ It is not architectural, legal, contractual or financial advice.
 It does not validate any real project decision.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
 The Registre Probatoire proves.
 The human decides.
 ```

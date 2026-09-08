@@ -1,6 +1,7 @@
 # Exemple — Composition gouvernée : candidature marché public (DC1/DC2)
 
 Status: fictional professional example — documented, non-implemented.
+Boundary profile: documentation_only.
 
 Deuxième exemple bout-en-bout de la composition gouvernée, sur un **autre** dossier
 que le CERFA. Objectif : montrer que la même mécanique (registre → forge → deux
@@ -12,12 +13,6 @@ détaille la mécanique. Ici on insiste sur la **réutilisation** et sur ce qui 
 
 Doctrine : `CAPABILITY_REGISTRY.md`, `WORKFLOW_SCHEMA.md` (*Governed composition*),
 `REQUEST_LIFECYCLE.md`, `EVIDENCE_PACK.md`.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## 0. Demande et cap
 

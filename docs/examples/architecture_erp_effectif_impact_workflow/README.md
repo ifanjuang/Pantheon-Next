@@ -1,6 +1,7 @@
 # Architecture workflow — ERP occupancy / effectif impact review
 
 Status: fictional example — educational support only.
+Boundary profile: documentation_only.
 
 This example shows how Pantheon can govern a professional workflow where a client email and an attached document may change project assumptions.
 
@@ -11,9 +12,6 @@ It is not architectural, contractual, insurance, structural, fire-safety or regu
 It does not validate any real ERP position, drawing, width, alarm requirement, classification or notice.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
 The Registre Probatoire proves.
 The human decides.
 ```

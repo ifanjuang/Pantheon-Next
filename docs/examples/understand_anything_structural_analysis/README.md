@@ -1,6 +1,7 @@
 # Understand-Anything Structural Analysis Example
 
 Status: fictional example — educational support only.
+Boundary profile: documentation_only.
 
 This example shows how Pantheon Next could frame an external structural-analysis tool such as Understand-Anything without installing it, approving it or treating its graph as truth.
 
@@ -11,12 +12,6 @@ It is not a runtime specification.
 It is not an install guide.
 
 It does not authorize Hermes, OpenWebUI or Pantheon Next to run an external tool.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Scenario
 

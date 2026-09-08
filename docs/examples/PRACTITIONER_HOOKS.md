@@ -1,6 +1,7 @@
 # Practitioner Hook Topics
 
 Status: fictional example planning — educational support only.
+Boundary profile: documentation_only.
 
 This document lists practical scenarios that may interest non-technical professionals faster than abstract governance doctrine.
 
@@ -9,12 +10,6 @@ It does not define implementation.
 It does not create runtime behavior.
 
 It does not provide legal, medical, technical, accounting, financial or professional advice.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Core principle
 
