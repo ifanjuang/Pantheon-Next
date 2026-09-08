@@ -1,6 +1,7 @@
 # Pantheon RPG Visual System
 
 Status: conceptual visual asset — not implemented governance doctrine.
+Boundary profile: documentation_only.
 
 This directory defines the visual design, narrative structure and development roadmap for the Pantheon Next RPG poster series.
 
@@ -22,15 +23,7 @@ The human decides.
 Validated content remains.
 ```
 
-The visual metaphor must preserve the central project doctrine:
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
-
-For public-facing visuals, this doctrine is translated into game-world language:
+For public-facing visuals, the project doctrine is translated into game-world language:
 
 ```text
 The interface is the visible cockpit.

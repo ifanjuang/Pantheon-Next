@@ -1,16 +1,11 @@
 # Pantheon RPG Visual Corrections
 
 Status: visual production guidance — documentation only.
+Boundary profile: documentation_only.
 
 This document guides future corrections of the Pantheon RPG reference boards.
 
 It does not define implementation, runtime behavior, agents, connectors, generated Evidence Packs or memory automation.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Core decision
 

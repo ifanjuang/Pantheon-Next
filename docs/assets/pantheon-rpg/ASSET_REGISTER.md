@@ -1,6 +1,7 @@
 # Pantheon RPG Asset Register
 
 Status: visual asset registry — documentation only.
+Boundary profile: documentation_only.
 
 This file records Pantheon RPG visual assets used or considered for README and documentation.
 
@@ -9,12 +10,6 @@ It is not governance doctrine.
 It is not implementation.
 
 It does not claim that a visual board implements a capability.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Registry rule
 

@@ -1,13 +1,11 @@
 # Pantheon ecosystem map
 
 Status: visual support asset — documentation only.
+Boundary profile: documentation_only.
 
 This folder contains an interactive HTML map showing why Pantheon Next needs a governance layer between professional users, AI execution, runtime memory, cockpit views and probative records.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
 The Registre Probatoire proves.
 The human decides.
 ```

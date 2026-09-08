@@ -4,10 +4,20 @@ Status: implementation candidate — integration contract for the bounded `mcp-s
 
 This contract describes how Hermes may call the Pantheon MCP Policy Server to frame work without Pantheon executing the work.
 
+This document names a concrete surface (the bounded `mcp-server/` module) rather
+than restating the generic separation, so it declares the boundary fields
+directly instead of a `Boundary profile` line (`BOUNDARY_PROFILES.md`'s
+"Inherited role separation" covers only the generic case):
+
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+exposed_by:  OpenWebUI, or another Hermes-compatible client
+executed_by: Hermes Agent, outside Pantheon
+governed_by: Pantheon Next, via the bounded mcp-server Policy Server
+             (read-only / validation / candidate-preparation only)
+approved_by: the human, at the gate
+forbidden:   execute business work; send externally; write files or state;
+             approve a result; promote memory or write a Registre Probatoire
+             entry; install, schedule, queue or route providers
 ```
 
 ## Boundary

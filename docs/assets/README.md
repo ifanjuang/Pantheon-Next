@@ -1,15 +1,9 @@
 # Assets Registry
 
 Status: active support index — documentation and validation-support assets only.
+Boundary profile: active_support_doctrine.
 
 This directory contains explanatory, governance-grammar and bounded read-only parity assets. It is not runtime, an approval surface, a memory engine or a source of professional truth.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-The human decides.
-```
 
 ## Current assets
 

@@ -1,16 +1,11 @@
 # Landing page — stack, local deployment and access revision
 
 Status: candidate editorial patch.
+Boundary profile: candidate_support_note.
 
 This document defines the next landing-page revision before editing `docs/index.html` directly.
 
 It is not doctrine, not runtime behavior and not an implementation.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon governs.
-```
 
 ## Purpose
 
