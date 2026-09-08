@@ -10,102 +10,57 @@ metadata:
 
 # IFJA project context (runtime routing candidate)
 
-Non-executable Hermes skill candidate. It selects and combines existing runtime/source paths for IFJA professional work. It owns no Pantheon governance, source authority, persistence, memory promotion or external-effect authorization.
+Non-executable Hermes skill candidate. It routes IFJA professional work to existing context, source and policy capabilities. It owns no Pantheon governance, source authority, persistence or external-effect authorization.
 
 ## When to use
 
-Use when IFJA work involves an affaire, project, client, contractor, professional document, prior correspondence, technical or regulatory reference, legal/contractual/responsibility question, or a professional action that requires source-aware context.
+Use when work involves an affaire/project, professional documents or correspondence, technical/regulatory/legal/contractual/responsibility analysis, or a professional action that needs source-aware context.
 
 Do not use merely for generic conversation when no professional workspace context or governed boundary is relevant.
 
-## Route context and sources
+## Routing
 
-### 1. Resolve the working context
+### 1. Resolve context only when useful
 
-Identify the active affaire/project when relevant from the user request and available context. Use Hindsight only when associative recall materially helps identify prior context, actors, chronology, earlier positions or the likely dossier.
+Identify the active affaire/project from the request and available context. Use Hindsight when associative recall materially helps with prior context, actors, chronology, earlier positions or dossier resolution.
 
 ```text
 Hindsight recall != source authority
 memory recalled != Evidence
 ```
 
-### 2. Prefer the professional workspace before external research
+### 2. Workspace first
 
-Use the currently admitted workspace bindings. Do not hard-code filesystem paths, Hindsight bank IDs or provider-specific names in this skill.
+Use admitted workspace bindings; do not hard-code filesystem paths, Hindsight bank IDs or provider-specific names.
 
-Use `AFFAIRES` for dossier-specific material, such as:
+- `AFFAIRES` -> dossier-specific facts, history, correspondence, contracts, CCTP, estimates, schedules, plans and project records.
+- `DOCUMENTAIRES` -> transversal technical, standards/DTU, regulatory, legal, contractual, responsibility, jurisprudence and professional reference material.
+- `AFFAIRES` + `DOCUMENTAIRES` -> consult both in parallel when a dossier-specific question must be tested against a transversal professional rule.
 
-- project history and chronology;
-- client, contractor and consultant correspondence;
-- meeting reports and site records;
-- contracts, markets, CCTP, estimates and schedules;
-- project drawings, documents and prior positions;
-- facts specific to one affaire.
+Keep the two source families distinguishable in the synthesis.
 
-Use `DOCUMENTAIRES` for transversal professional references, such as:
+### 3. External research only when it adds material value
 
-- construction techniques and methods;
-- standards, DTU and technical guidance;
-- regulation;
-- legal, contractual and professional-responsibility references;
-- jurisprudence, doctrine and professional guidance;
-- relevant reference or product documentation.
+After workspace retrieval, assess whether the material is sufficient, current and non-contradictory. When information is missing, stale, uncertain, conflicting, inherently current, or needs authoritative current verification, reuse the existing `source-research` skill/capability under its current contract.
 
-When a dossier-specific question must be tested against a transversal professional rule, consult `AFFAIRES` and `DOCUMENTAIRES` in parallel when useful, then preserve their provenance separately in the synthesis.
-
-```text
-AFFAIRES = dossier-specific source material
-DOCUMENTAIRES = transversal professional reference material
-AFFAIRES + DOCUMENTAIRES = applied professional analysis when both are needed
-```
-
-### 3. Escalate to external research only for a material gap
-
-After workspace retrieval, assess whether the material is sufficient, current and non-contradictory for the question.
-
-Use external research when it materially improves the answer, for example when:
-
-- required information is missing from the workspace;
-- an internal reference may be stale or its currentness is uncertain;
-- current law, regulation, standards status or official technical information matters;
-- an authoritative external verification is needed;
-- important sources conflict or a challenge search is warranted;
-- the requested fact is inherently current and not maintained internally.
-
-When external research is admitted, reuse the existing `source-research` skill/capability and its current contract. Do not create a second web/research workflow here.
-
-Before external retrieval, minimize unnecessary private or dossier-specific detail. Prefer an abstracted query when it can answer the same question. Workspace access does not authorize external disclosure.
+Do not create a second web/research workflow here. Before external retrieval, minimize private or dossier-specific detail and prefer an abstracted query when it can answer the same question.
 
 ```text
 vault first != vault always sufficient
-external research available != external research necessary
-private local context != permission to disclose it externally
+workspace access != external disclosure authorization
 ```
 
-### 4. Consult Pantheon at governed boundaries
+### 4. Pantheon only at governed boundaries
 
-If the request may cross a governed boundary, consult the current Pantheon policy service through the admitted MCP binding, using `classify_request` when that remains the exposed contract.
+When the request may involve professional/contractual/financial consequence, Evidence or approval, governed status or protected mutation, external transmission/action, memory/Register promotion, or another consequential decision boundary, consult the current Pantheon policy service through the admitted MCP binding, using `classify_request` when that remains the exposed contract.
 
-Relevant boundaries include, as applicable:
+Pass observable request facts and scope. Do not derive K/V/C, approval levels or gate rules in this skill. Follow the policy data returned by Pantheon. Do not call Pantheon mechanically for trivial consultation unless the current doctrine, Task Contract or binding requires it.
 
-- professional, contractual or financial consequence;
-- Evidence, validation or approval;
-- governed status or protected mutation;
-- external transmission or consequential action;
-- memory/Register promotion or other governed persistence;
-- a decision or authorization boundary owned by Pantheon.
+### 5. Execute without changing authority
 
-Send observable request facts and scope to Pantheon. Do not derive K/V/C, approval levels or gate rules in this skill. Follow the policy data returned by Pantheon, including Task Contract, Evidence, gate, blocking and allowed-output requirements when present.
+Hermes may search, read, compare, analyze, calculate, draft and delegate within the admitted boundary. Parallelize independent retrieval when useful, especially `AFFAIRES` + `DOCUMENTAIRES` and already-justified currentness checks.
 
-Do not call Pantheon mechanically for trivial consultation unless the current doctrine, Task Contract or binding requires it.
-
-### 5. Execute with provenance preserved
-
-Hermes may read, search, compare, calculate, analyze documents/images/plans/data, draft candidates and delegate independent work within the admitted boundary.
-
-Parallelize independent retrieval when useful, especially `AFFAIRES` + `DOCUMENTAIRES`, multiple independent documents, or an already-justified external currentness check.
-
-Keep material source families distinguishable in the result. Surface missing information, contradiction, freshness limits and uncertainty instead of flattening them into confidence.
+Preserve provenance and surface missing information, contradiction, freshness limits and uncertainty.
 
 ## Final invariants
 
@@ -120,4 +75,4 @@ candidate != Decision
 projection != persistence
 ```
 
-This skill routes work. Existing source capabilities retrieve and research. Pantheon governs consequential status and authorization.
+This skill routes work. Existing capabilities retrieve and research. Pantheon governs consequential status and authorization.
