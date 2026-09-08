@@ -15,18 +15,18 @@ def test_ifja_project_context_routes_existing_sources_without_new_authority():
     assert "governed_by: docs/governance/HERMES_INTEGRATION.md" in text
 
     assert "Hindsight recall != source authority" in text
-    assert "Use `AFFAIRES` for dossier-specific material" in text
-    assert "Use `DOCUMENTAIRES` for transversal professional references" in text
-    assert "consult `AFFAIRES` and `DOCUMENTAIRES` in parallel" in text
-    assert "Prefer the professional workspace before external research" in text
+    assert "`AFFAIRES` -> dossier-specific" in text
+    assert "`DOCUMENTAIRES` -> transversal" in text
+    assert "consult both in parallel" in text
+    assert "### 2. Workspace first" in text
     assert "reuse the existing `source-research` skill/capability" in text
-    assert "Prefer an abstracted query" in text
+    assert "prefer an abstracted query" in text
 
     assert "using `classify_request` when that remains the exposed contract" in text
     assert "Do not derive K/V/C" in text
     assert "Do not call Pantheon mechanically for trivial consultation" in text
 
-    assert "Do not hard-code filesystem paths, Hindsight bank IDs or provider-specific names" in text
+    assert "do not hard-code filesystem paths, Hindsight bank IDs or provider-specific names" in text
     assert "retrieved != truth" in text
     assert "Hindsight != Evidence" in text
     assert "runtime success != authorization" in text
