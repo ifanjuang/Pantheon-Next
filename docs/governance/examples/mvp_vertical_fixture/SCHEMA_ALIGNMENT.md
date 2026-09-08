@@ -1,18 +1,13 @@
 # MVP Fixture / Schema Alignment
 
 Status: candidate support note — alignment note — documented non-implemented.
+Boundary profile: candidate_support_note.
 
 Date: 2026-07-08
 
 This note compares the original vertical fixture with the candidate schema bundle introduced in `schemas/mvp_governed_loop_objects.schema.yaml`.
 
 It adds no validator, test, CI, runtime, database mapping, OpenWebUI feature, Hermes contract, approval engine or memory promotion.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Files
 

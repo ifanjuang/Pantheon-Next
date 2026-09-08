@@ -1,16 +1,11 @@
 # MCP Specification 2026-07-28 — upstream review
 
 Status: external reference — reconciled with the current implementation.
+Boundary profile: external_reference_review.
 
 Reviewed source: `https://blog.modelcontextprotocol.io/posts/2026-07-28/`
 Upstream object: Model Context Protocol specification, revision `2026-07-28`.
 Review date: 2026-07-31
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 This review evaluates the 2026-07-28 MCP specification release against the
 bounded `mcp-server/` module. The review itself changes no runtime. The

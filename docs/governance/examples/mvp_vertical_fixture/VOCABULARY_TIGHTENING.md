@@ -1,18 +1,13 @@
 # MVP Vocabulary Tightening
 
 Status: candidate support note — vocabulary note — documented non-implemented.
+Boundary profile: candidate_support_note.
 
 Date: 2026-07-08
 
 This note records vocabulary corrections made after reviewing the MVP vertical fixture sequence.
 
 It adds no validator, command, CI workflow, runtime, database mapping, OpenWebUI feature, Hermes contract, approval engine or memory promotion.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Corrections
 

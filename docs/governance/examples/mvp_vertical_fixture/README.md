@@ -1,18 +1,13 @@
 # MVP Vertical Fixture
 
 Status: example fixture — non-normative; documented non-implemented.
+Boundary profile: documentation_only.
 
 Date: 2026-07-07
 
 This fixture demonstrates one complete governed task loop as ordered YAML documents.
 
 It is not a schema, runtime, test, database migration, OpenWebUI feature, Hermes skill, approval engine or memory engine.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

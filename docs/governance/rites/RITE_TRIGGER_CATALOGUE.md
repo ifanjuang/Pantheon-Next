@@ -2,18 +2,13 @@
 
 Status: candidate / to verify — direction for operationalizing the rites as a
 deterministic question catalogue.
+Boundary profile: candidate_support_note.
 
 Distilled from the external deterministic-metacognition pattern reviewed in
 `../reference_reviews/SELF_INSPECT_MCP.md`, importing none of it.
 
 This note proposes a shape; it does not add a runtime, MCP server, classifier,
 scheduler, trigger engine, approval engine or automatic memory promotion engine.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Intent
 
