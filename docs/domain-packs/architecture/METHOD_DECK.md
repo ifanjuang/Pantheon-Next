@@ -1,18 +1,13 @@
 # Architecture Method Deck
 
 Status: candidate support doctrine — architecture-domain Method Cards for governed AI use in agency workflows.
+Boundary profile: candidate_support_note.
 
 Runtime status: non-executable.
 
 This document specializes `METHOD_CARD_MODEL.md` for architecture practice.
 
 It does not implement a UI, renderer, workflow engine, method selector, source validator, RAG system, OCR pipeline, PDF tool, email sender, approval engine, memory engine, Hermes skill, connector, schema, test or external action.
-
-```text
-Optional runtime clients may expose interaction.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

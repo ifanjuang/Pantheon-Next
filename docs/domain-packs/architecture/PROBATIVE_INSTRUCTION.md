@@ -4,15 +4,13 @@ Status: candidate support doctrine — architecture-domain instruction method.
 Repository state: documented non-implemented.  
 Domain pack target: architecture agency / architecture_fr.  
 Runtime status: non-executable.
+Boundary profile: candidate_support_note.
 
 This document defines how Pantheon Next should frame architecture-domain questions that require source retrieval, professional qualification, responsibility review and human decision.
 
 It is not a RAG engine. It is not a graph runtime. It is not an agent, checker, scheduler, queue, approval engine, memory engine, OpenWebUI extension, Hermes skill, database schema or implementation plan.
 
 ```text
-Optional runtime clients may expose interaction.
-Hermes Agent executes.
-Pantheon Next governs.
 The architect decides.
 The validated remains.
 ```

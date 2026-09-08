@@ -1,16 +1,11 @@
 # Architecture Target Workflows
 
 Status: candidate support document — target workflow synthesis, documented non-implemented.
+Boundary profile: candidate_support_note.
 
 This document consolidates the architecture-agency workflow examples into one target model.
 
 It does not implement a runtime, connector, OpenWebUI action, Hermes skill, Gmail sender, Telegram listener, WhatsApp integration, form filler, image analyzer, document generator, PDF exporter or memory engine.
-
-```text
-Optional runtime clients may expose interaction.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

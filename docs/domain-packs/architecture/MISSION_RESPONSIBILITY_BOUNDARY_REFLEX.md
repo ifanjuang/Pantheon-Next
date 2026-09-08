@@ -1,18 +1,13 @@
 # Architecture Mission and Responsibility Boundary Reflex
 
 Status: candidate — architecture-domain reflex for mission scope and responsibility boundaries.
+Boundary profile: candidate_support_note.
 
 This document is not canonical doctrine yet.
 
 It does not implement legal review, insurance review, contract management, approval engine, email sending, Notion write, runtime behavior or professional validation.
 
 It defines a candidate reflex for detecting when an answer, draft, site report line, technical comment, financial review or external reply may exceed the architect's mission or imply an unwanted responsibility.
-
-```text
-Optional runtime clients may expose interaction.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

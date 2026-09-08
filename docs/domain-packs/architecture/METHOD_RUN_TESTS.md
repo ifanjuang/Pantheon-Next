@@ -1,18 +1,13 @@
 # Architecture Method Run Tests
 
 Status: candidate support examples — compact architecture-domain run tests for Method Cards, Hermes handoff and cockpit density.
+Boundary profile: candidate_support_note.
 
 Runtime status: non-executable.
 
 This document tests whether Method Cards, Hermes handoff discipline and the Card Stack cockpit grammar reduce confusion in real architecture-agency situations.
 
 It does not implement a workflow engine, Hermes skill, UI, schema, approval engine, memory engine, connector, scheduler, queue or external action.
-
-```text
-Optional runtime clients may expose interaction.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Relationship with `METHOD_DECK.md`
 

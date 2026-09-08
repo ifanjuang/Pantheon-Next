@@ -1,6 +1,7 @@
 # Architecture Project Understanding — External References
 
 Status: candidate / to verify — external reference register (candidate-only, non-canonical).
+Boundary profile: candidate_support_note.
 
 This document is an **external reference register** for the Architecture Project
 Understanding work. It lists standards, libraries, tools, datasets and research
@@ -10,12 +11,6 @@ It is documentation only. It adds no runtime, no schema, no dependency, and adop
 no external tool as canonical. Every entry is candidate / to verify until audited
 (licence, maintenance, security, read-only vs write, Hermes/local compatibility,
 output quality).
-
-```text
-Optional runtime clients may expose interaction.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Placement rule
 

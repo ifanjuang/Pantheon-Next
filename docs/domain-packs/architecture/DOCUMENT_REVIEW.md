@@ -1,18 +1,13 @@
 # Architecture Document Review
 
 Status: candidate support doctrine — first architecture-domain document review slice.
+Boundary profile: candidate_support_note.
 
 This document applies `DOMAIN_PACK_SPEC.md` and `DOCUMENT_INTELLIGENCE.md` to architecture practice.
 
 It is documentation only.
 
 It does not implement a professional authority, document processor, OCR pipeline, vector index, graph runtime, database schema, OpenWebUI template, Hermes skill, approval system, memory engine or automatic action.
-
-```text
-Optional runtime clients may expose interaction.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

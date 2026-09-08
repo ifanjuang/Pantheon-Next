@@ -1,6 +1,7 @@
 # Architecture Knowledge Registry Blueprint
 
 Status: candidate support doctrine — blueprint for the architecture knowledge registry (documentation only).
+Boundary profile: candidate_support_note.
 
 This document is the Pantheon-side **blueprint** for how an architecture
 practice's reusable knowledge is registered and governed. It resolves
@@ -11,12 +12,6 @@ Pantheon; the runnable mapping lives outside Pantheon.
 It is documentation only. It does not implement a registry runtime, ingestion
 pipeline, OCR, vector index, embedding store, graph backend or external
 connector. Entries it describes remain candidates until reviewed.
-
-```text
-Optional runtime clients may expose interaction.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

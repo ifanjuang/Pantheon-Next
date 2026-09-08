@@ -1,18 +1,13 @@
 # Architecture Role Reflex Coordination
 
 Status: candidate — coordination model for role-owned reflexes, consultations, rites and Zeus arbitration inside architecture-domain approaches.
+Boundary profile: candidate_support_note.
 
 This document is not canonical doctrine yet.
 
 It does not implement an agent loop, workflow engine, micro-workflow runtime, router, scheduler, queue, message bus, UI, memory engine, approval engine, rite runner, role executor, checker, sender or external action.
 
 It defines a non-executable coordination model for how a main architecture approach may be enriched by role-owned reflexes without becoming an usine a gaz.
-
-```text
-Optional runtime clients may expose interaction.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

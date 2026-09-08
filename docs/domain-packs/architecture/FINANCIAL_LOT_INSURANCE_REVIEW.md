@@ -1,18 +1,13 @@
 # Architecture Financial, Lot Scope and Insurance Review
 
 Status: candidate — workflow doctrine for architecture-domain review of invoices, quotes, extra works, lot allocation and insurance coverage.
+Boundary profile: candidate_support_note.
 
 This document is not canonical doctrine yet.
 
 It is not legal advice, accounting validation, payment approval, contract interpretation authority, professional validation, insurer confirmation or execution instruction.
 
 It does not implement a runtime, connector, OCR pipeline, accounting tool, Notion write, email sending, payment workflow, insurance verification service, approval engine or Registre Probatoire entry.
-
-```text
-Optional runtime clients may expose interaction.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

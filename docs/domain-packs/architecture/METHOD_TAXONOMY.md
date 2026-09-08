@@ -1,18 +1,13 @@
 # Architecture Method Taxonomy
 
 Status: candidate — terminology and placement taxonomy for architecture-domain methods, approaches, disciplines, strategies, procedures, tactics and reflexes.
+Boundary profile: candidate_support_note.
 
 This document is not canonical doctrine yet.
 
 It does not implement a runtime, workflow engine, router, scheduler, queue, UI, memory engine, approval engine, document generator, checker, sender or external action.
 
 It defines a vocabulary correction for architecture-domain governance so that `reflex` remains a narrow term instead of becoming a generic name for every method.
-
-```text
-Optional runtime clients may expose interaction.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 
