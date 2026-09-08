@@ -1,7 +1,7 @@
 # Pantheon RPG Visual Corrections
 
 Status: visual production guidance — documentation only.
-Boundary profile: documentation_only.
+Boundary profile: candidate_support_note.
 
 This document guides future corrections of the Pantheon RPG reference boards.
 

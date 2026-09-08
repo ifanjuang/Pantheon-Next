@@ -1,7 +1,7 @@
 # Pantheon RPG Visual Prompts
 
 Status: visual production guidance — documentation only.
-Boundary profile: documentation_only.
+Boundary profile: non_executable_template.
 
 This document collects prompt patterns for future Pantheon RPG visual boards.
 

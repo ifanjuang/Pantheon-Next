@@ -10,7 +10,7 @@ directly instead of a `Boundary profile` line (`BOUNDARY_PROFILES.md`'s
 "Inherited role separation" covers only the generic case):
 
 ```text
-exposed_by:  OpenWebUI, or another Hermes-compatible client
+exposed_by:  Hermes Web/dashboard, or another compatible client
 executed_by: Hermes Agent, outside Pantheon
 governed_by: Pantheon Next, via the bounded mcp-server Policy Server
              (read-only / validation / candidate-preparation only)

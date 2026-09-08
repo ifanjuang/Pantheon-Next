@@ -1,7 +1,7 @@
 # Pantheon RPG Visual Roadmap
 
 Status: visual production guidance — documentation only.
-Boundary profile: documentation_only.
+Boundary profile: candidate_support_note.
 
 This roadmap organizes future Pantheon RPG boards into a clearer production sequence.
 

@@ -16,10 +16,23 @@ triad now declare a profile, chosen by reading each document's own
 `Status:` line and content:
 
 ```text
-7  documentation_only        pantheon-map/README.md, workflow-under-hood/
-                              README.md, and 5 pantheon-rpg/ visual-
-                              production files - explanatory support
-                              material, proposing nothing
+4  documentation_only        workflow-under-hood/README.md and 3
+                              pantheon-rpg/ visual-production files
+                              (ASSET_REGISTER.md, README.md) - explanatory
+                              support material, proposing nothing
+1  non_executable_template   pantheon-rpg/PROMPTS.md (corrected from an
+                              initial documentation_only choice per Codex
+                              review on #1025: it is a library of
+                              ready-to-use image-generation prompts, the
+                              exact undeployed-template case
+                              BOUNDARY_PROFILES.md defines this profile
+                              for - not merely explanatory prose)
+2  candidate_support_note    pantheon-rpg/ROADMAP.md and CORRECTIONS.md
+                              (corrected from documentation_only per the
+                              same review: both prioritize and direct
+                              future production work with acceptance
+                              criteria - proposing a direction, not just
+                              explaining one)
 1  active_support_doctrine   docs/assets/README.md itself - it operationalizes
                               already-accepted placement rules (see
                               NEXT_MVP_REPOSITORY_PLACEMENT.md) for how
@@ -42,14 +55,23 @@ triad now declare a profile, chosen by reading each document's own
                               proactively rather than after correction)
 ```
 
-Two files carried a locally meaningful second block beyond the generic
-triad, kept verbatim: `pantheon-map/README.md` and `workflow-under-hood/
-README.md` both keep "The Registre Probatoire proves. / The human
-decides." (not covered by generic inheritance, per the #1017/#1022/#1024
-exception precedent). `pantheon-rpg/README.md` keeps its "game-world
-translation" block (interface/workshops/city language) since that
-translation is the document's own local content, not boilerplate - only
-the bare 3-line triad immediately above it was removed.
+`pantheon-map/README.md` was also corrected from `documentation_only` to
+explicit boundary fields: its own "The map shows" section names concrete
+exposure, execution, governance, approval and record responsibilities
+(the same shape as the mcp-server contract below), which
+`BOUNDARY_PROFILES.md` excludes from profile inheritance. The fields'
+`exposed_by` value uses current doctrine language ("Hermes Web/dashboard,
+or another compatible client"), not the map's own retired-product label
+("OpenWebUI") from its descriptive prose - avoiding the same mistake
+caught on the mcp-server contract below.
+
+`workflow-under-hood/README.md` keeps "The Registre Probatoire proves. /
+The human decides." beyond the generic triad (not covered by generic
+inheritance, per the #1017/#1022/#1024 exception precedent).
+`pantheon-rpg/README.md` keeps its "game-world translation" block
+(interface/workshops/city language) since that translation is the
+document's own local content, not boilerplate - only the bare 3-line
+triad immediately above it was removed.
 
 ### Decision 2: `mcp-server/docs/HERMES_INTEGRATION_CONTRACT.md` needed explicit fields, not a profile line
 
@@ -63,6 +85,14 @@ governed_by / approved_by / forbidden` fields the document already had
 the content for (its own existing "It may" / "It must not" lists), rather
 than reducing it to a `Boundary profile:` line that would misrepresent a
 concrete claim as generic inheritance.
+
+Codex review on #1025 caught that the `exposed_by` value as first written
+said "OpenWebUI, or another Hermes-compatible client" - reintroducing the
+retired-owner naming that #995's ratchet and this whole migration exist to
+remove, inside a brand-new field written specifically to state a concrete
+claim correctly. Corrected to "Hermes Web/dashboard, or another compatible
+client," matching `CLAUDE.md`'s current runtime-policy language. Applied
+the same correction to `pantheon-map/README.md`'s new fields above.
 
 None of the 11 documents touched here were on `KNOWN_CANDIDATE_
 OPENWEBUI_RESIDUES` (#995's ratchet, verified by grep); that list is
