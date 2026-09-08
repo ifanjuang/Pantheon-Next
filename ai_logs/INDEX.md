@@ -14,11 +14,12 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **921**.
+Total indexed entries: **922**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-09-08 | `2026/Q3/2026-09-08-direct-human-status-reconciliation.md` | Direct-human policy status reconciliation |
 | 2026-09-07 | `2026/Q3/2026-09-07-workspace-source-package-info-sidecar.md` | 2026-09-07 — Workspace source package and per-source Infos sidecar |
 | 2026-09-07 | `2026/Q3/2026-09-07-knowledge-family-orphan-decisions.md` | Two of #989's three orphan categories resolved by maintainer decision |
 | 2026-09-07 | `2026/Q3/2026-09-07-exact-source-materialization-contract.md` | 2026-09-07 — Exact source materialization convergence |
