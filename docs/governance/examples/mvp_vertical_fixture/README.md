@@ -1,7 +1,7 @@
 # MVP Vertical Fixture
 
 Status: example fixture — non-normative; documented non-implemented.
-Boundary profile: candidate_support_note.
+Boundary profile: documentation_only.
 
 Date: 2026-07-07
 

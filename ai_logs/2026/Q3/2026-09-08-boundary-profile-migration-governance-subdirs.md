@@ -12,10 +12,17 @@ Profiles chosen by reading each document's own `Status:` line and framing,
 not by pattern-matching text:
 
 ```text
-10  candidate_support_note   the 9 mvp_vertical_fixture notes + README
-                              (each proposes/frames a candidate direction;
-                              the README documents a non-normative example
-                              fixture, grouped with its siblings)
+ 9  candidate_support_note   the 9 mvp_vertical_fixture notes (each
+                              proposes/frames a candidate direction)
+ 1  documentation_only       mvp_vertical_fixture/README.md (corrected from
+                              an initial candidate_support_note choice per
+                              Codex review on #1020: it only explains an
+                              existing fictional fixture and is explicitly
+                              non-normative, not a candidate direction -
+                              grouping it with its siblings was exactly the
+                              mistake BOUNDARY_PROFILES.md warns against:
+                              classify what the document is and does, not
+                              what it sits next to)
  2  candidate_support_note   EXTERNAL_REPO_QUALIFICATION_RITE.md,
                               RITE_TRIGGER_CATALOGUE.md (both explicitly
                               "candidate", proposing an unadopted procedure)
