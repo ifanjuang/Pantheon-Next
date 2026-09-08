@@ -11,16 +11,17 @@ Profiles chosen by reading each document's own `Status:` line and content,
 not by pattern-matching text:
 
 ```text
-17  candidate_support_note    all candidate/to-verify/implementation-candidate
+18  candidate_support_note    all candidate/to-verify/implementation-candidate
                                documents that propose, explore or frame a
-                               direction not yet accepted
- 1  external_reference_review PROJECT_UNDERSTANDING_EXTERNAL_REFERENCES.md
-                               (an external reference register listing
-                               standards/libraries/tools Pantheon has not
-                               adopted - matches the profile's own meaning
-                               almost word for word: "adds no runtime, no
-                               schema, no dependency, and adopts no
-                               external tool as canonical")
+                               direction not yet accepted, including
+                               PROJECT_UNDERSTANDING_EXTERNAL_REFERENCES.md
+                               (corrected from an initial external_reference_
+                               review choice per Codex review on #1022: that
+                               profile requires a completed, version-pinned
+                               review, and this document explicitly says
+                               every entry is still awaiting audit - listing
+                               external things is not itself a completed
+                               review of them)
  1  candidate_support_note    PROBATIVE_INSTRUCTION.md, with a documented
                                local exception: its triad block carried two
                                extra distinct lines ("The architect decides."

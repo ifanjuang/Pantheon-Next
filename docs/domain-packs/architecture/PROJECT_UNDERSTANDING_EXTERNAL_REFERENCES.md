@@ -1,7 +1,7 @@
 # Architecture Project Understanding — External References
 
 Status: candidate / to verify — external reference register (candidate-only, non-canonical).
-Boundary profile: external_reference_review.
+Boundary profile: candidate_support_note.
 
 This document is an **external reference register** for the Architecture Project
 Understanding work. It lists standards, libraries, tools, datasets and research
