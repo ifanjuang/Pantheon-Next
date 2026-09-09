@@ -1,9 +1,23 @@
 #!/usr/bin/env python3
 """Fail if ai_logs/INDEX.md does not match what the generator would produce.
 
-Temporary branch diagnostic: on mismatch, print the exact expected generated index
-between stable markers so the PR can reconcile the generated file without changing
-its generator or governance semantics. This diagnostic must be reverted before merge.
+The index states its own contract: it is generated, and `generate_ai_logs_index.py`
+must be run after adding a log. Nothing enforced that — 39 of 245 Q3 entries were
+found missing on 2026-09-06, discovered only by reading the file, not by any
+check. This closes that gap the same way the rest of this workflow works: import
+the generator's own logic rather than reimplementing it, so the two can never
+silently diverge from each other.
+
+This is a distinct check from `check_index_coverage.py`, despite the similar
+name: that script verifies `AUTHORITY_INDEX.md` coverage of authority-bearing
+governance docs and deliberately excludes `ai_logs/` (traces are not authority).
+Neither script covers the other's file.
+
+    generated != enforced
+    stated contract != checked contract
+    index coverage != index currentness
+
+Usage: python3 .github/scripts/check_ai_logs_index_current.py
 """
 from __future__ import annotations
 
@@ -25,10 +39,10 @@ def main() -> int:
     if actual == expected:
         print("OK: ai_logs/INDEX.md matches the generator output.")
         return 0
-    print("FAIL: ai_logs/INDEX.md is stale.")
-    print("---BEGIN-EXPECTED-AI-LOG-INDEX---")
-    print(expected, end="")
-    print("---END-EXPECTED-AI-LOG-INDEX---")
+    print(
+        "FAIL: ai_logs/INDEX.md is stale.\n"
+        "Run `python3 .github/scripts/generate_ai_logs_index.py` and commit the result."
+    )
     return 1
 
 
