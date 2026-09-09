@@ -23,7 +23,7 @@ Total indexed entries: **928**.
 | 2026-09-09 | `2026/Q3/2026-09-09-athena-reasoning-hestia-context.md` | 2026-09-09 — Athena reasoning and Hestia situated-context convergence |
 | 2026-09-09 | `2026/Q3/2026-09-09-athena-live-referent-ambiguity-rebuild.md` | 2026-09-09 — Athena live referent ambiguity rebuild |
 | 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-governance-subdirs.md` | 2026-09-08 — Boundary profile migration: docs/governance/ subdirectories |
-| 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-examples.md` | 2026-09-08 — Boundary profile migration: docs/governance/ examples |
+| 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-examples.md` | 2026-09-08 — Boundary profile migration: docs/examples/ |
 | 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-domain-packs-architecture.md` | 2026-09-08 — Boundary profile migration: docs/domain-packs/architecture/ |
 | 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-assets-and-scope-decisions.md` | 2026-09-08 — Boundary profile migration: docs/assets/, and #996's two open scope decisions |
 | 2026-09-07 | `2026/Q3/2026-09-07-workspace-source-package-info-sidecar.md` | 2026-09-07 — Workspace source package and per-source Infos sidecar |
@@ -39,7 +39,7 @@ Total indexed entries: **928**.
 | 2026-09-06 | `2026/Q3/2026-09-06-obsidian-workspace-knowledge-convergence.md` | 2026-09-06 — Obsidian workspace knowledge convergence |
 | 2026-09-06 | `2026/Q3/2026-09-06-knowledge-family-divergence-marker.md` | The architecture Knowledge blueprint names a vocabulary the schema refuses |
 | 2026-09-06 | `2026/Q3/2026-09-06-hermes-external-context-minimal-v1.md` | Hermes external context minimal v1 |
-| 2026-09-06 | `2026/Q3/2026-09-06-hermes-context-read-q1.md` | 2026-09-06 — Hermes context read Q1 |
+| 2026-09-06 | `2026/Q3/2026-09-06-hermes-context-read-q1.md` | 2026-09-06 — Hermes context-read Q1 |
 | 2026-09-06 | `2026/Q3/2026-09-06-governance-ci-listen-to-body-edits.md` | A body-driven check lived in a workflow that ignored body edits |
 | 2026-09-06 | `2026/Q3/2026-09-06-enforcement-and-exercised-authority-audit.md` | An architecture assessment, measured rather than impressionistic |
 | 2026-09-06 | `2026/Q3/2026-09-06-boundary-profile-vocabulary-conformance.md` | The boundary-profile vocabulary had an owner, a rule and no check |
@@ -63,7 +63,7 @@ Total indexed entries: **928**.
 | 2026-09-03 | `2026/Q3/2026-09-03-free-episodic-spatial-memory.md` | Free episodic memory and derived spatial perception convergence |
 | 2026-09-03 | `2026/Q3/2026-09-03-direct-human-policy-gates.md` | Direct human effects are not delegated runtime tasks |
 | 2026-09-03 | `2026/Q3/2026-09-03-authority-topology-convergence.md` | Authority topology convergence before temporal ProjectClaim work |
-| 2026-09-03 | `2026/Q3/2026-09-03-authority-audit-repin.md` | Authority Audit repin to accepted ownership topology revision 4 |
+| 2026-09-03 | `2026/Q3/2026-09-03-authority-audit-repin.md` | Repin Architecture Audit to accepted ownership topology revision 4 |
 | 2026-09-02 | `2026/Q3/2026-09-02-release-checkpoint-0.1.65.md` | Release checkpoint 0.1.65 |
 | 2026-09-02 | `2026/Q3/2026-09-02-refresh-what-runs.md` | Refreshing WHAT_RUNS.md's chokepoint row |
 | 2026-09-02 | `2026/Q3/2026-09-02-refresh-what-runs-final.md` | WHAT_RUNS.md went stale within the hour, again |
@@ -82,15 +82,15 @@ Total indexed entries: **928**.
 | 2026-08-31 | `2026/Q3/2026-08-31-o3-qualification-retirement.md` | Historical O3 qualification retirement |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-work-issue-lifecycle.md` | Mutation review: the Work Issue lifecycle — and a hole in the net |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-source-intake.md` | Mutation review: Source intake |
-| 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-knowledge-edit-chain.md` | Mutation review: Knowledge edit chain |
+| 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-knowledge-edit-chain.md` | Mutation review: the Knowledge edit chain |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-information-projection.md` | Mutation review: the Information Card projection |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-human-access-grants.md` | The two live human-access mutation points |
-| 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-hermes-execution-boundary.md` | Mutation review: Hermes execution boundary |
+| 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-hermes-execution-boundary.md` | Mutation review: the Hermes execution boundary |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-first-nine.md` | First nine consequential-mutation entry points reviewed |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-entity-relation-canonization.md` | Mutation review: canonizing an Entity relation |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-edit-variants.md` | Mutation review: the A/B edit variant review |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-decision-requests.md` | Mutation review: the Decision Request inbox |
-| 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-classification-cluster.md` | Mutation review: the agency_classification cluster, and two attribution mechanisms |
+| 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-classification-cluster.md` | The agency_classification cluster, and two attribution mechanisms |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-apu-write-authorization.md` | Mutation review: APU write authorization and governed Claims |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-agency-information.md` | Mutation review: the Agency Information series |
 | 2026-08-31 | `2026/Q3/2026-08-31-former-mvp-retirement-audit.md` | 2026-08-31 — former pantheon-mvp retirement audit |
@@ -341,7 +341,7 @@ Total indexed entries: **928**.
 | 2026-07-08 | `2026-07-08-readme-entry-refactor.md` | 2026-07-08 — README entry refactor |
 | 2026-07-08 | `2026-07-08-public-cockpit-wording-rule.md` | 2026-07-08 — Public cockpit wording rule |
 | 2026-07-08 | `2026-07-08-non-equivalence-rules-dedup.md` | Non-equivalence rules dedup pass |
-| 2026-07-08 | `2026-07-08-mvp-vocabulary-invariants.md` | AI log — MVP vocabulary invariants tightening |
+| 2026-07-08 | `2026-07-08-mvp-vocabulary-invariants.md` | AI log — MVP vocabulary and invariants tightening |
 | 2026-07-08 | `2026-07-08-mvp-validation-report-shape.md` | AI log — MVP validation report shape |
 | 2026-07-08 | `2026-07-08-mvp-validation-plan.md` | AI log — MVP validation plan |
 | 2026-07-08 | `2026-07-08-mvp-prevalidator-consolidation.md` | AI log — MVP prevalidator consolidation |
