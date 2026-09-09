@@ -1,18 +1,13 @@
 # Hermes Profile Constitution Adapter
 
 Status: adapter candidate — profile-routing constitution for Hermes execution profiles.
+Boundary profile: candidate_support_note.
 
 This file is not canonical Pantheon doctrine.
 
 It is not a Hermes configuration file, gateway routing file, Kanban board, dispatcher, scheduler, queue, approval mechanism, memory mechanism, profile installer or runtime manifest.
 
 It does not create, install, start, route or authorize any Hermes profile.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

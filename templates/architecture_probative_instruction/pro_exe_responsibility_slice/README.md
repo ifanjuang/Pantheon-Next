@@ -1,6 +1,7 @@
 # PRO / EXE Responsibility Slice
 
 Status: template — candidate-only architecture probative instruction slice, documented non-implemented.
+Boundary profile: non_executable_template.
 
 This template materializes the first narrow use case of `docs/domain-packs/architecture/PROBATIVE_INSTRUCTION.md`:
 
@@ -11,9 +12,6 @@ Does this request, drawing, note or wording risk making the agency appear to pro
 It is not a runtime, Hermes skill, OpenWebUI function, checklist engine, contract validator, legal opinion, engineering validation, approval engine, memory engine or external communication tool.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
 The architect decides.
 The validated remains.
 ```

@@ -1,6 +1,7 @@
 # Role Drift Early Warning Slice
 
 Status: template — candidate-only architecture probative instruction slice, documented non-implemented.
+Boundary profile: non_executable_template.
 
 This slice detects early drift in architecture projects where the practical roles of project owner, architect / MOE, contractors, AMO, BET or replacement contractors begin to blur.
 
@@ -9,9 +10,6 @@ It is based on anonymized ChatGPT project-context patterns from `_maf` and `_aff
 It is not a legal opinion, insurance act, admission, project record, proof-register entry, external communication tool or runtime.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
 The architect reviews.
 The human decides.
 ```

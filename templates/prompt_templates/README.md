@@ -1,6 +1,7 @@
 # Prompt Templates
 
 Status: candidate support note — non-executable prompt template group — documented non-implemented.
+Boundary profile: candidate_support_note.
 
 This directory contains reusable prompt templates for professional drafting, review, evidence extraction and decision support.
 
@@ -8,12 +9,6 @@ The files are not system prompts for a deployed model.
 They are not Hermes skills.
 They are not OpenWebUI Functions, Pipes, Filters or Actions.
 They are not runtime configuration.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Purpose
 

@@ -1,13 +1,7 @@
 # Pantheon Next — Consolidation, Cockpit and Resolver Roadmap
 
 Status: validation-only roadmap — documented non-implemented.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-The human decides.
-```
+Boundary profile: candidate_support_note.
 
 ## Purpose
 

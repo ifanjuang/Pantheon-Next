@@ -1,6 +1,7 @@
 # Session Handoff Template
 
 Status: template support — derived from `docs/governance/rites/REFONDATION_DE_SESSION.md`.
+Boundary profile: non_executable_template.
 
 This template supports a clean transition from an overgrown or polluted AI session to a fresh working context.
 
@@ -11,12 +12,6 @@ It is not an approval record.
 It is not an executable workflow.
 
 Use it only to preserve continuity while keeping status, evidence, unresolved risks and human decision boundaries visible.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Core rule
 
