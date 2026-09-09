@@ -14,13 +14,14 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **927**.
+Total indexed entries: **928**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
 | 2026-09-09 | `2026/Q3/2026-09-09-boundary-profile-migration-final-slice.md` | 2026-09-09 — Boundary profile migration: final slice (templates/, hermes/profiles/, docs/roadmaps/) |
 | 2026-09-09 | `2026/Q3/2026-09-09-athena-reasoning-hestia-context.md` | 2026-09-09 — Athena reasoning and Hestia situated-context convergence |
+| 2026-09-09 | `2026/Q3/2026-09-09-athena-live-referent-ambiguity-rebuild.md` | 2026-09-09 — Athena live referent ambiguity rebuild |
 | 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-governance-subdirs.md` | 2026-09-08 — Boundary profile migration: docs/governance/ subdirectories |
 | 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-examples.md` | 2026-09-08 — Boundary profile migration: docs/examples/ |
 | 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-domain-packs-architecture.md` | 2026-09-08 — Boundary profile migration: docs/domain-packs/architecture/ |

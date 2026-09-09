@@ -49,6 +49,10 @@ uncertainties, missing context and consulted source references. Do not treat ret
 content, Knowledge or runtime success as truth, Evidence or professional validation.
 """.strip()
 
+IDENTITY_NONDETERMINANT = "IDENTITY-NONDETERMINANT"
+IDENTITY_DETERMINANT = "IDENTITY-DETERMINANT"
+VARIANTS = ("A", "B", IDENTITY_NONDETERMINANT, IDENTITY_DETERMINANT)
+
 CCTP_SOURCE_REF = "synthetic_sources/cctp_cloison.md"
 KNOWLEDGE_SOURCE_REF = "synthetic_sources/reperes_revue.md"
 
@@ -251,12 +255,21 @@ def _supporting_context(
 
 def _scenario(conn: psycopg.Connection, *, variant: str, actor: str) -> dict[str, str]:
     token = uuid.uuid4().hex
+    identity_variant = variant in {IDENTITY_NONDETERMINANT, IDENTITY_DETERMINANT}
     project_id = _id(f"project.synthetic-p2-{variant.lower()}", token)
     project = agency_data.create_project(
         conn,
         project_id=project_id,
-        code=f"P2{variant.upper()}-{token[:10]}".upper(),
-        display_name=f"Qualification synthétique P2 {variant.upper()}",
+        code=(
+            f"P2I{'D' if variant == IDENTITY_DETERMINANT else 'N'}-{token[:10]}".upper()
+            if identity_variant
+            else f"P2{variant.upper()}-{token[:10]}".upper()
+        ),
+        display_name=(
+            "Qualification synthétique P2 identité"
+            if identity_variant
+            else f"Qualification synthétique P2 {variant.upper()}"
+        ),
         description="Fixture synthétique non client pour qualification live Hermès P2.",
         actor=actor,
         actor_kind="human",
@@ -266,6 +279,7 @@ def _scenario(conn: psycopg.Connection, *, variant: str, actor: str) -> dict[str
 
     ids = {
         "partition": _id("apu.synthetic-p2.partition", token),
+        "partition_alt": _id("apu.synthetic-p2.partition-alt", token),
         "corridor": _id("apu.synthetic-p2.corridor", token),
         "office": _id("apu.synthetic-p2.office", token),
         "door": _id("apu.synthetic-p2.door", token),
@@ -274,46 +288,97 @@ def _scenario(conn: psycopg.Connection, *, variant: str, actor: str) -> dict[str
     }
     representation_id = _id("representation.synthetic-p2", token)
 
-    apu_owner.store_reviewed_dossier(
-        conn,
-        project_id=project_id,
-        stable_objects=[
-            _stable(project_id, ids["partition"], "element", "Cloison P2"),
-            _stable(project_id, ids["corridor"], "spatial", "Circulation P2"),
-            _stable(project_id, ids["office"], "spatial", "Bureau P2"),
-            _stable(project_id, ids["door"], "element", "Porte P2"),
-            _stable(project_id, ids["duct"], "system", "Réseau technique P2"),
-            _stable(project_id, ids["unrelated"], "element", "Objet hors contexte P2"),
-        ],
-        source_representations=[_representation(project_id, representation_id)],
-        attribute_claims=[
+    stable_objects = [
+        _stable(project_id, ids["partition"], "element", "Cloison P2"),
+        _stable(project_id, ids["corridor"], "spatial", "Circulation P2"),
+        _stable(project_id, ids["office"], "spatial", "Bureau P2"),
+        _stable(project_id, ids["door"], "element", "Porte P2"),
+        _stable(project_id, ids["duct"], "system", "Réseau technique P2"),
+        _stable(project_id, ids["unrelated"], "element", "Objet hors contexte P2"),
+    ]
+    attribute_claims = [
+        _attribute(
+            ids["partition"],
+            _id("attribute.synthetic-p2.partition", token),
+            representation_id,
+            "geometry.thickness",
+            120,
+            "mm",
+        ),
+        _attribute(
+            ids["corridor"],
+            _id("attribute.synthetic-p2.corridor", token),
+            representation_id,
+            "geometry.clear_width",
+            1400,
+            "mm",
+        ),
+    ]
+    if identity_variant:
+        stable_objects.append(
+            _stable(project_id, ids["partition_alt"], "element", "Cloison P2")
+        )
+        attribute_claims.append(
             _attribute(
-                ids["partition"],
-                _id("attribute.synthetic-p2.partition", token),
+                ids["partition_alt"],
+                _id("attribute.synthetic-p2.partition-alt", token),
                 representation_id,
                 "geometry.thickness",
                 120,
                 "mm",
-            ),
-            _attribute(
+            )
+        )
+
+    relation_claims = []
+    if variant != IDENTITY_NONDETERMINANT:
+        office_subject = (
+            ids["partition_alt"] if variant == IDENTITY_DETERMINANT else ids["partition"]
+        )
+        relation_claims = [
+            _relation(
+                ids["partition"],
                 ids["corridor"],
-                _id("attribute.synthetic-p2.corridor", token),
+                _id("relation.synthetic-p2.corridor", token),
                 representation_id,
-                "geometry.clear_width",
-                1400,
-                "mm",
+                "spatial.adjacent_to",
             ),
-        ],
-        relation_claims=[
-            _relation(ids["partition"], ids["corridor"], _id("relation.synthetic-p2.corridor", token), representation_id, "spatial.adjacent_to"),
-            _relation(ids["partition"], ids["office"], _id("relation.synthetic-p2.office", token), representation_id, "spatial.adjacent_to"),
-            _relation(ids["door"], ids["partition"], _id("relation.synthetic-p2.door", token), representation_id, "architecture.hosted_by"),
-            _relation(ids["duct"], ids["partition"], _id("relation.synthetic-p2.duct", token), representation_id, "building_services.passes_through"),
-        ],
+            _relation(
+                office_subject,
+                ids["office"],
+                _id("relation.synthetic-p2.office", token),
+                representation_id,
+                "spatial.adjacent_to",
+            ),
+            _relation(
+                ids["door"],
+                ids["partition"],
+                _id("relation.synthetic-p2.door", token),
+                representation_id,
+                "architecture.hosted_by",
+            ),
+            _relation(
+                ids["duct"],
+                ids["partition"],
+                _id("relation.synthetic-p2.duct", token),
+                representation_id,
+                "building_services.passes_through",
+            ),
+        ]
+
+    apu_owner.store_reviewed_dossier(
+        conn,
+        project_id=project_id,
+        stable_objects=stable_objects,
+        source_representations=[_representation(project_id, representation_id)],
+        attribute_claims=attribute_claims,
+        relation_claims=relation_claims,
         review_ref=f"fixture:synthetic-p2:{token}",
         actor="system:p2-live-fixture",
         idempotency_key=f"p2-live-{token}-apu",
     )
+
+    if identity_variant:
+        return {"token": token, "project_id": project_id, **ids}
 
     information = agency_information.create_information(
         conn,
@@ -362,25 +427,59 @@ def prepare_p2_live_admission(
         raise P2LiveFixtureError("preparation requires explicit SYNTHETIC_ONLY acknowledgement")
     variant = str(variant or "").strip().upper()
     actor = str(actor or "").strip()
-    if variant not in {"A", "B"}:
-        raise P2LiveFixtureError("variant must be A or B")
+    if variant not in VARIANTS:
+        raise P2LiveFixtureError(
+            "variant must be A, B, IDENTITY-NONDETERMINANT or IDENTITY-DETERMINANT"
+        )
     if not actor:
         raise P2LiveFixtureError("a human operator actor is required")
 
     state = _scenario(conn, variant=variant, actor=actor)
-    selected = [_entity("stable_object", state["partition"])]
-    if variant == "B":
-        selected.extend(
-            [
-                _entity("stable_object", state["corridor"]),
-                _entity("stable_object", state["office"]),
-                _entity("stable_object", state["door"]),
-                _entity("stable_object", state["duct"]),
-                _entity("information", state["information_id"]),
-                _entity("document", state["document_id"]),
-                _entity("knowledge", state["knowledge_id"]),
-            ]
-        )
+    identity_ambiguity: dict[str, Any] | None = None
+    if variant in {"A", "B"}:
+        selected = [_entity("stable_object", state["partition"])]
+        if variant == "B":
+            selected.extend(
+                [
+                    _entity("stable_object", state["corridor"]),
+                    _entity("stable_object", state["office"]),
+                    _entity("stable_object", state["door"]),
+                    _entity("stable_object", state["duct"]),
+                    _entity("information", state["information_id"]),
+                    _entity("document", state["document_id"]),
+                    _entity("knowledge", state["knowledge_id"]),
+                ]
+            )
+    else:
+        determinant = variant == IDENTITY_DETERMINANT
+        candidate_target_refs = [
+            _entity("stable_object", state["partition"]),
+            _entity("stable_object", state["partition_alt"]),
+        ]
+        selected = list(candidate_target_refs)
+        if determinant:
+            selected.extend(
+                [
+                    _entity("stable_object", state["corridor"]),
+                    _entity("stable_object", state["office"]),
+                    _entity("stable_object", state["door"]),
+                    _entity("stable_object", state["duct"]),
+                ]
+            )
+        identity_ambiguity = {
+            "class": "determinant" if determinant else "non_determinant",
+            "candidate_target_refs": candidate_target_refs,
+            "qualification_expectation": (
+                "ask_targeted_identity_clarification"
+                if determinant
+                else "continue_with_explicit_uncertainty"
+            ),
+            "safe_non_success_fallback": (
+                "explicitly_refuse_to_conclude" if determinant else None
+            ),
+            "silent_identity_selection_allowed": False,
+            "cognitive_result_observed": False,
+        }
 
     envelope = {
         "root_entity": {
@@ -415,8 +514,25 @@ def prepare_p2_live_admission(
         idempotency_key=f"p2-live-{state['token']}-admission",
         ttl_seconds=ttl_seconds,
     )
-    if admission.get("admission_state") != "admitted" or not admission.get("ready_for_external_runtime"):
+    if admission.get("admission_state") != "admitted" or not admission.get(
+        "ready_for_external_runtime"
+    ):
         raise P2LiveFixtureError("fresh synthetic admission is not ready for the external runtime")
+
+    non_equivalences = [
+        "synthetic fixture != professional project truth",
+        "Knowledge candidate != applicable requirement",
+        "Execution Admission != Hermes run",
+        "prepared admission != runtime authorization beyond this bounded task",
+        "technical receipt != Evidence",
+    ]
+    if identity_ambiguity is not None:
+        non_equivalences.extend(
+            [
+                "two admitted candidates != one selected target",
+                "identity clarification != sibling claim validation",
+            ]
+        )
 
     return {
         "object_type": "p2_live_admission_preparation_receipt",
@@ -431,28 +547,28 @@ def prepare_p2_live_admission(
         "expires_at": admission["expires_at"],
         "selected_context": selected,
         "unrelated_object_ref": _entity("stable_object", state["unrelated"]),
+        "identity_ambiguity": identity_ambiguity,
         "execution_started": False,
         "hermes_run_created": False,
-        "knowledge_review_status": "generated_unreviewed",
+        "knowledge_review_status": (
+            "generated_unreviewed" if variant in {"A", "B"} else None
+        ),
         "apu_review_ref_is_synthetic_fixture": True,
         "technical_receipt_is_evidence": False,
         "professional_validation": False,
         "production_authorization": False,
-        "non_equivalences": [
-            "synthetic fixture != professional project truth",
-            "Knowledge candidate != applicable requirement",
-            "Execution Admission != Hermes run",
-            "prepared admission != runtime authorization beyond this bounded task",
-            "technical receipt != Evidence",
-        ],
+        "non_equivalences": non_equivalences,
     }
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Prepare a fresh synthetic P2 A/B admission for live Hermes qualification."
+        description=(
+            "Prepare a fresh synthetic P2 A/B or identity-ambiguity admission "
+            "for live Hermes qualification."
+        )
     )
-    parser.add_argument("--variant", choices=("A", "B"), required=True)
+    parser.add_argument("--variant", choices=VARIANTS, required=True)
     parser.add_argument("--ack", default="")
     parser.add_argument(
         "--actor",
