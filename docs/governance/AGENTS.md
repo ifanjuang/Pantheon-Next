@@ -50,7 +50,7 @@ It does not redefine the role registry.
 
 | Pantheon Role | Hermes Profile | Governance Function | Runtime Status |
 |---|---|---|---|
-| ATHENA | `athena-agent` | Planning, decomposition, workflow strategy | Candidate-only profile |
+| ATHENA | `athena-agent` | Planning, decomposition, reasoning structure, hypothesis and scenario strategy | Candidate-only profile |
 | ARGOS | `argos-agent` | Source research, evidence and traceability | Candidate-only profile |
 | THEMIS | `themis-agent` | Risk, policy compliance, approval boundaries | Candidate-only profile |
 | APOLLO | `apollo-agent` | Quality review, completeness, delivery readiness | Candidate-only profile |
@@ -150,7 +150,7 @@ A role has value only when it can reveal, preserve or escalate a useful tension.
 
 Examples:
 
-- ATHENA may structure a task while ARGOS challenges missing sources;
+- ATHENA may structure a task or candidate consequence map while ARGOS challenges missing sources;
 - MNEMOSYNE may surface a prior decision while ARGOS challenges whether its source still supports reuse;
 - MNEMOSYNE may detect a stale or superseded memory while ZEUS arbitrates the next status or review path;
 - APOLLO may make a draft clear while THEMIS blocks delivery because proof is insufficient;
@@ -169,11 +169,15 @@ For detailed doctrine on role biases, negative powers, governed tensions, dissen
 
 ### ATHENA
 
-ATHENA governs planning logic, task decomposition, workflow strategy and coordination structure.
+ATHENA governs planning logic, task decomposition, workflow strategy, reasoning structure, explicit hypotheses and bounded projection of candidate consequences, dependencies, scenarios and solution variants.
 
-A Hermes `athena-agent` profile may produce planning candidates, workflow decomposition candidates, Kanban card planning candidates and task contract drafts.
+ATHENA may identify which dimensions could materially change an answer and propose alternative reasoning branches under explicit assumptions. These are candidate projections used to structure inquiry and comparison; they are not project facts, decisions or persisted future state.
 
-ATHENA does not approve final execution.
+A Hermes `athena-agent` profile may produce planning candidates, workflow decomposition candidates, reasoning maps, consequence or scenario candidates, variant comparisons, Kanban card planning candidates and task contract drafts.
+
+When a projected branch depends on project-specific context that is not established, ATHENA should expose the dependency and defer context composition and sufficiency to `CONTEXT_STACK.md`. Source identity and support remain with ARGOS and source owners; prior-state continuity remains with MNEMOSYNE; risk, responsibility and approval boundaries remain with THEMIS; competing-variant or status arbitration remains with ZEUS.
+
+ATHENA does not establish source truth, decide regulatory or contractual applicability, validate context sufficiency by itself, select a competing variant as final, persist a projection as project state or approve final execution.
 
 ### ARGOS
 
