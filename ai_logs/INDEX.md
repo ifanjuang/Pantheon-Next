@@ -21,9 +21,9 @@ Total indexed entries: **928**.
 | — | `LOG_FORMAT.md` | AI Log Format |
 | 2026-09-09 | `2026/Q3/2026-09-09-boundary-profile-migration-final-slice.md` | 2026-09-09 — Boundary profile migration: final slice (templates/, hermes/profiles/, docs/roadmaps/) |
 | 2026-09-09 | `2026/Q3/2026-09-09-athena-reasoning-hestia-context.md` | 2026-09-09 — Athena reasoning and Hestia situated-context convergence |
-| 2026-09-08 | `2026/Q3/2026-09-08-p2-live-identity-ambiguity.md` | 2026-09-08 — P2 live identity ambiguity preparation |
+| 2026-09-09 | `2026/Q3/2026-09-09-athena-live-referent-ambiguity-rebuild.md` | 2026-09-09 — Athena live referent ambiguity rebuild |
 | 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-governance-subdirs.md` | 2026-09-08 — Boundary profile migration: docs/governance/ subdirectories |
-| 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-examples.md` | 2026-09-08 — Boundary profile migration: docs/examples/ |
+| 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-examples.md` | 2026-09-08 — Boundary profile migration: docs/governance/ examples |
 | 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-domain-packs-architecture.md` | 2026-09-08 — Boundary profile migration: docs/domain-packs/architecture/ |
 | 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-assets-and-scope-decisions.md` | 2026-09-08 — Boundary profile migration: docs/assets/, and #996's two open scope decisions |
 | 2026-09-07 | `2026/Q3/2026-09-07-workspace-source-package-info-sidecar.md` | 2026-09-07 — Workspace source package and per-source Infos sidecar |
@@ -39,7 +39,7 @@ Total indexed entries: **928**.
 | 2026-09-06 | `2026/Q3/2026-09-06-obsidian-workspace-knowledge-convergence.md` | 2026-09-06 — Obsidian workspace knowledge convergence |
 | 2026-09-06 | `2026/Q3/2026-09-06-knowledge-family-divergence-marker.md` | The architecture Knowledge blueprint names a vocabulary the schema refuses |
 | 2026-09-06 | `2026/Q3/2026-09-06-hermes-external-context-minimal-v1.md` | Hermes external context minimal v1 |
-| 2026-09-06 | `2026/Q3/2026-09-06-hermes-context-read-q1.md` | 2026-09-06 — Hermes context-read Q1 |
+| 2026-09-06 | `2026/Q3/2026-09-06-hermes-context-read-q1.md` | 2026-09-06 — Hermes context read Q1 |
 | 2026-09-06 | `2026/Q3/2026-09-06-governance-ci-listen-to-body-edits.md` | A body-driven check lived in a workflow that ignored body edits |
 | 2026-09-06 | `2026/Q3/2026-09-06-enforcement-and-exercised-authority-audit.md` | An architecture assessment, measured rather than impressionistic |
 | 2026-09-06 | `2026/Q3/2026-09-06-boundary-profile-vocabulary-conformance.md` | The boundary-profile vocabulary had an owner, a rule and no check |
@@ -63,7 +63,7 @@ Total indexed entries: **928**.
 | 2026-09-03 | `2026/Q3/2026-09-03-free-episodic-spatial-memory.md` | Free episodic memory and derived spatial perception convergence |
 | 2026-09-03 | `2026/Q3/2026-09-03-direct-human-policy-gates.md` | Direct human effects are not delegated runtime tasks |
 | 2026-09-03 | `2026/Q3/2026-09-03-authority-topology-convergence.md` | Authority topology convergence before temporal ProjectClaim work |
-| 2026-09-03 | `2026/Q3/2026-09-03-authority-audit-repin.md` | Repin Architecture Audit to accepted ownership topology revision 4 |
+| 2026-09-03 | `2026/Q3/2026-09-03-authority-audit-repin.md` | Authority Audit repin to accepted ownership topology revision 4 |
 | 2026-09-02 | `2026/Q3/2026-09-02-release-checkpoint-0.1.65.md` | Release checkpoint 0.1.65 |
 | 2026-09-02 | `2026/Q3/2026-09-02-refresh-what-runs.md` | Refreshing WHAT_RUNS.md's chokepoint row |
 | 2026-09-02 | `2026/Q3/2026-09-02-refresh-what-runs-final.md` | WHAT_RUNS.md went stale within the hour, again |
@@ -82,15 +82,15 @@ Total indexed entries: **928**.
 | 2026-08-31 | `2026/Q3/2026-08-31-o3-qualification-retirement.md` | Historical O3 qualification retirement |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-work-issue-lifecycle.md` | Mutation review: the Work Issue lifecycle — and a hole in the net |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-source-intake.md` | Mutation review: Source intake |
-| 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-knowledge-edit-chain.md` | Mutation review: the Knowledge edit chain |
+| 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-knowledge-edit-chain.md` | Mutation review: Knowledge edit chain |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-information-projection.md` | Mutation review: the Information Card projection |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-human-access-grants.md` | The two live human-access mutation points |
-| 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-hermes-execution-boundary.md` | Mutation review: the Hermes execution boundary |
+| 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-hermes-execution-boundary.md` | Mutation review: Hermes execution boundary |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-first-nine.md` | First nine consequential-mutation entry points reviewed |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-entity-relation-canonization.md` | Mutation review: canonizing an Entity relation |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-edit-variants.md` | Mutation review: the A/B edit variant review |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-decision-requests.md` | Mutation review: the Decision Request inbox |
-| 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-classification-cluster.md` | The agency_classification cluster, and two attribution mechanisms |
+| 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-classification-cluster.md` | Mutation review: the agency_classification cluster, and two attribution mechanisms |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-apu-write-authorization.md` | Mutation review: APU write authorization and governed Claims |
 | 2026-08-31 | `2026/Q3/2026-08-31-mutation-review-agency-information.md` | Mutation review: the Agency Information series |
 | 2026-08-31 | `2026/Q3/2026-08-31-former-mvp-retirement-audit.md` | 2026-08-31 — former pantheon-mvp retirement audit |
@@ -205,7 +205,7 @@ Total indexed entries: **928**.
 | 2026-08-08 | `2026/Q3/2026-08-08-landing-readme-system-diagrams.md` | Landing and README system diagrams |
 | 2026-08-08 | `2026/Q3/2026-08-08-document-purpose-currentness.md` | Document purpose-specific currentness convergence — 2026-08-08 |
 | 2026-08-08 | `2026/Q3/2026-08-08-apu-v02-adapter-convergence.md` | APU V0.2 adapter chokepoint convergence |
-| 2026-08-07 | `2026/Q3/2026-08-07-revit-v02-observation-contract.md` | AI Log — Revit 2027 / Project Anatomy V0.2 observation contract |
+| 2026-08-07 | `2026/Q3/2026-08-07-revit-v02-observation-contract.md` | AI log — Revit 2027 / Project Anatomy V0.2 observation contract |
 | 2026-08-07 | `2026/Q3/2026-08-07-retrieval-coverage-verified-state.md` | Retrieval coverage verified state |
 | 2026-08-07 | `2026/Q3/2026-08-07-project-change-variant-contract.md` | Project change variant candidate contract |
 | 2026-08-07 | `2026/Q3/2026-08-07-project-anatomy-v02-frozen-model.md` | AI log — Project Anatomy V0.2 conceptual freeze |
@@ -303,7 +303,7 @@ Total indexed entries: **928**.
 | 2026-07-15 | `2026-07-15-mcp-consultation-contract.md` | MCP consultation contract and bounded architecture explanations |
 | 2026-07-15 | `2026-07-15-mcp-authority-resolution-wiki.md` | AI log — MCP authority resolution and governance wiki |
 | 2026-07-15 | `2026-07-15-ifixai-placement-review.md` | iFixAi external placement review |
-| 2026-07-15 | `2026-07-15-honest-packaging-release-contract.md` | AI log — honest packaging release contract |
+| 2026-07-15 | `2026-07-15-honest-packaging-release-contract.md` | AI log — honest packaging and release contract |
 | 2026-07-15 | `2026-07-15-hermes-pantheon-modules-dashboard.md` | Hermes Pantheon Modules dashboard plugin |
 | 2026-07-15 | `2026-07-15-hermes-native-mcp-wiki-config.md` | Hermes-native MCP policy/wiki configuration |
 | 2026-07-15 | `2026-07-15-hermes-governed-night-operations.md` | Hermes governed night operations |
@@ -394,14 +394,14 @@ Total indexed entries: **928**.
 | 2026-07-04 | `2026-07-04_revit_free_exploration_v0.md` | AI Log — Revit Free Exploration V0 |
 | 2026-07-04 | `2026-07-04_revit_2027_prototype_plan.md` | AI Log — Revit 2027 Prototype Plan |
 | 2026-07-04 | `2026-07-04_post_pr_cleanup_external_run_issue.md` | AI log — post-PR cleanup and external run issue |
-| 2026-07-04 | `2026-07-04_maintainer_release_license_checklist.md` | AI log — maintainer actions for tags, PDF purge and licence |
+| 2026-07-04 | `2026-07-04_maintainer_release_license_checklist.md` | AI log — maintainer release and licence checklist |
 | 2026-07-04 | `2026-07-04_external_live_run_protocol.md` | AI log — external live run protocol |
 | 2026-07-04 | `2026-07-04_authority_index_decomposition_plan_review.md` | AI Log — Authority Index Decomposition Plan Review (PR #276) |
 | 2026-07-04 | `2026-07-04_authority_index_decomposition_plan.md` | AI Log — Authority Index Decomposition Plan |
 | 2026-07-04 | `2026-07-04-governed-method-standard.md` | AI Log — Governed Method Standard |
 | 2026-07-04 | `2026-07-04-governed-autonomy-gradient.md` | AI Log — Governed Autonomy Gradient |
 | 2026-07-04 | `2026-07-04-control-ux-density-pass.md` | AI Log — Pantheon Control UX density pass |
-| 2026-07-04 | `2026-07-04-control-revit-connector-status.md` | AI Log — Pantheon Control Revit connector status |
+| 2026-07-04 | `2026-07-04-control-revit-connector-status.md` | AI Log — Revit connector status in Pantheon Control |
 | 2026-07-04 | `2026-07-04-control-consolidation-pass.md` | AI Log — Pantheon Control consolidation pass |
 | 2026-07-04 | `2026-07-04-analyse-complete-repository.md` | 2026-07-04 — Analyse complète du dépôt (audit externe) |
 | 2026-07-03 | `2026-07-03_landing_path_note.md` | AI log — landing path note |
@@ -411,7 +411,7 @@ Total indexed entries: **928**.
 | 2026-07-03 | `2026-07-03-post-claude-cleanup-step1.md` | AI log — post-Claude cleanup step 1 |
 | 2026-07-03 | `2026-07-03-pantheon-control-html-editorial-audit.md` | AI Log — Pantheon Control HTML editorial audit |
 | 2026-07-03 | `2026-07-03-openwebui-template-primitive-map.md` | AI log — map the OpenWebUI template classes to real primitives |
-| 2026-07-03 | `2026-07-03-open-branch-landing-plan-update.md` | AI log — open branch landing roadmap update |
+| 2026-07-03 | `2026-07-03-open-branch-roadmap-update.md` | AI log — open branch landing roadmap update |
 | 2026-07-03 | `2026-07-03-hermes-v018-card-adapter-projection.md` | AI Log — Hermes v0.18 card and adapter projection |
 | 2026-07-03 | `2026-07-03-hermes-page-agent-integration.md` | AI Log — Hermes Page-Agent Integration Framing |
 | 2026-07-03 | `2026-07-03-hermes-agent-v018-release-review.md` | AI Log — Hermes Agent v0.18.0 release boundary review |
@@ -487,7 +487,7 @@ Total indexed entries: **928**.
 | 2026-06-27 | `2026-06-27-competence-model-vocabulary.md` | AI Log — Competence model vocabulary |
 | 2026-06-27 | `2026-06-27-card-stack-scenes-decks-reconciliation.md` | AI Log — Card Stack Model reconciled to scenes / decks / constellation |
 | 2026-06-27 | `2026-06-27-card-stack-role-quality-alignment.md` | AI Log — Card stack role quality alignment |
-| 2026-06-27 | `2026-06-27-card-stack-model-candidate.md` | AI Log — Card stack model candidate |
+| 2026-06-27 | `2026-06-27-card-stack-model-candidate.md` | AI Log — Card Stack Model candidate |
 | 2026-06-27 | `2026-06-27-card-stack-knowledge-corpus-alignment.md` | AI Log — Card stack knowledge corpus alignment |
 | 2026-06-27 | `2026-06-27-card-stack-cluster-indexation.md` | AI Log — Card stack cluster indexation |
 | 2026-06-27 | `2026-06-27-authority-index-truncation-repair.md` | AI Log — Repair truncated tail of AUTHORITY_INDEX.md |
