@@ -1,18 +1,13 @@
 # MCP External Tool Review Template
 
 Status: template — non-executable.
+Boundary profile: non_executable_template.
 
 Repo state: documented non-implemented.
 
 This template is used to review an MCP server, resource, prompt or tool before it is treated as eligible for a Pantheon-governed workflow.
 
 It does not approve installation, dependency adoption, execution, external action, memory promotion or delivery.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Reference
 
