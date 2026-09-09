@@ -15,6 +15,8 @@ def test_ifja_project_context_routes_existing_sources_without_new_authority():
     assert "governed_by: docs/governance/HERMES_INTEGRATION.md" in text
 
     assert "Hindsight recall != source authority" in text
+    assert "bounded candidate set" in text
+    assert "do not silently merge or select an identity" in text
     assert "`AFFAIRES` -> dossier-specific" in text
     assert "`DOCUMENTAIRES` -> transversal" in text
     assert "consult both in parallel" in text
@@ -22,7 +24,9 @@ def test_ifja_project_context_routes_existing_sources_without_new_authority():
     assert "reuse the existing `source-research` skill/capability" in text
     assert "prefer an abstracted query" in text
 
-    assert "using `classify_request` when that remains the exposed contract" in text
+    assert "bounded HTTP policy service" in text
+    assert "do not assume that the consultation-only MCP binding exposes classification" in text
+    assert "return a Capability Gap" in text
     assert "Do not derive K/V/C" in text
     assert "Do not call Pantheon mechanically for trivial consultation" in text
 
