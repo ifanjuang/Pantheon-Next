@@ -306,6 +306,17 @@ Context sufficient for external transmission: no.
 Context sufficient for memory promotion: no.
 ```
 
+Sufficiency is relative to the level of conclusion being requested. The same admitted material may be enough to explore a hypothesis and still be insufficient to assert project conformity, issue a professional instruction or transmit a consequential conclusion.
+
+```text
+sufficient for orientation != sufficient for project conclusion
+visible != measured
+measured != documented
+retrieved opinion != current applicable opinion
+planned != installed
+installed != observed current state
+```
+
 ## Context Stack Change Candidate
 
 When the active context is not appropriate for the question or task, the system may surface a Context Stack Change Candidate.
@@ -346,6 +357,10 @@ scope_mixed
 context_stale
 target_referent_ambiguous
 reasoning_dependency_unestablished
+conclusion_level_changes
+current_state_uncertain
+observation_quality_insufficient
+competent_actor_opinion_relevant
 project_specific_fact_used_as_general
 knowledge_needed_but_absent
 technical_consequence_detected
@@ -404,8 +419,8 @@ request targeted clarification when target distinction materially affects the al
 flag stale context
 ask ATHENA which candidate dependencies or dimensions could materially change the reasoning
 ask MNEMOSYNE whether prior naming, discussion or project history helps frame the referent
-ask ARGOS to verify source state
-ask THEMIS to review risk created by missing context
+ask ARGOS to verify source state or authority
+ask THEMIS to review risk created by missing context or competence boundary
 ask ZEUS to arbitrate sufficiency or blocking status
 ```
 
@@ -420,6 +435,9 @@ using project facts as general knowledge
 using general knowledge without project fit
 mixing agency preference with doctrine
 using stale context as if current
+using a photo as if it proved hidden composition, exact dimension or compliance
+using an old plan, note or site observation as if it described current state
+continuing retrieval after remaining unknowns can no longer change the permitted conclusion
 loading too much dossier material without need
 ```
 
@@ -471,32 +489,33 @@ If HESTIA reveals a risk-bearing gap, THEMIS should review consequence.
 
 If HESTIA reveals no safe procedure, ZEUS should arbitrate or escalate to the user.
 
-### Reasoning-context loop
+### Non-authoritative reasoning-context composition example
 
-For a situated professional question, context sufficiency and reasoning may legitimately form a short bounded loop without becoming a router, graph engine or autonomous agent loop:
+The following is a Context Stack composition example, not a canonical inter-role sequence or workflow. `GOVERNANCE_COLLEGE.md` remains the owner of role interaction doctrine. HESTIA is still candidate, so this example must not be read as a required college step.
+
+For a situated professional question, a bounded composition may look like:
 
 ```text
-ATHENA
-  -> propose explicit hypotheses and the bounded dimensions that could materially change the answer
+ATHENA viewpoint
+  -> expose explicit hypotheses and bounded dimensions that could materially change the answer
 
-CONTEXT STACK / HESTIA candidate
-  -> expose whether the corresponding Project, referent, typology, location, technical,
+CONTEXT STACK / HESTIA candidate viewpoint
+  -> expose whether corresponding Project, referent, typology, location, technical,
      regulatory, contractual or actor context is established, missing, stale or ambiguous
 
-ARGOS / MNEMOSYNE when needed
-  -> verify source state or frame relevant prior state/history through admitted routes
+ARGOS / MNEMOSYNE viewpoints when relevant
+  -> challenge source state or frame prior state/history through admitted routes
 
-ATHENA
-  -> resume candidate consequence / risk / scenario / solution projection with the now-bounded context
+ATHENA viewpoint
+  -> refine candidate consequence / risk / scenario / solution projection with bounded context
 
-THEMIS when triggered
+THEMIS viewpoint when relevant
   -> challenge responsibility, competence, policy or applicability boundaries
 
-ZEUS only when needed
-  -> arbitrate status or procedure if competing paths remain materially unresolved
+ZEUS only under the canonical college doctrine when arbitration is actually required
 ```
 
-This loop does not require every role on every request. It should stop as soon as the context is sufficient for the intended answer status or the remaining uncertainty is explicitly carried.
+This illustration does not require every viewpoint, prescribe their order or authorize a runtime loop. It should stop as soon as the context is sufficient for the intended answer status or the remaining uncertainty is explicitly carried.
 
 ```text
 candidate reasoning dependency != established project fact
@@ -510,17 +529,89 @@ successful retrieval != Evidence
 
 The full Context Stack should not appear for every question.
 
-Use the minimum effective context required by:
+Use the minimum effective context required by the intended answer and its consequences. Relevant factors include:
 
 ```text
-question type
+question type and specificity
 subject type
+intended level of conclusion
+project complexity and interface breadth
 phase
+consequence magnitude
+reversibility of a wrong conclusion or action
+temporal/current-state dependency
+observation quality
+source and competent-actor authority
 risk
-external effect
+recipient or external effect
 memory impact
 source dependency
 scope breadth
+```
+
+These factors are not a numeric score and do not create a runtime mode. They guide proportional context and answer posture.
+
+### Rigor proportionality and stopping rule
+
+The required rigor is not a fixed property of the wording alone. It depends on what the answer will claim and on the situated professional consequence.
+
+```text
+general orientation
+-> general Knowledge / current regulatory source when needed
+-> no project-specific conclusion implied
+
+situated project analysis
+-> identify Project/Case, referent, phase and materially relevant dependencies
+-> use current admitted project/source context
+
+source-backed professional conclusion
+-> require the material source, version, applicability and current-state questions to be sufficiently established
+
+external or durable consequential effect
+-> add the applicable responsibility, approval, transmission and Evidence expectations
+```
+
+Phase changes the expected attention but is not an automatic risk score:
+
+```text
+ESQ / diagnostic
+-> wider exploration is acceptable when assumptions remain explicit
+
+APS / APD
+-> material interdisciplinary assumptions should increasingly be stabilized
+
+PRO / DCE
+-> source precision, interfaces and prescriptions matter more
+
+EXE / VISA
+-> exact version, exact detail, current interface and mission boundary matter strongly
+
+DET / chantier
+-> distinguish designed, ordered, installed and actually observed state; date site observations
+
+reception / consequential closure
+-> high attention to current observation, reserve/evidence status and responsibility boundaries
+```
+
+Observation method limits the conclusion it can support:
+
+```text
+photo may support visible condition or referent framing
+photo does not by itself establish hidden composition, exact dimension or global compliance
+plan may support intended design state
+plan does not by itself prove installed state
+BET / bureau de controle / specialist opinion may be the competent source for a bounded question
+opinion found != opinion current, applicable or finally accepted
+```
+
+A current baseline should remain visible when a proposed change is being evaluated. ATHENA may compare bounded alternatives, including doing nothing, so the user's proposed solution is not silently treated as selected.
+
+Stop adding context when the remaining unknowns cannot materially change the permitted level of conclusion. The system may still expose those unknowns, but `more information exists` is not a reason to widen the dossier indefinitely.
+
+```text
+information available != information relevant
+information relevant != information material to this conclusion
+more retrieval != more legitimacy
 ```
 
 Examples:
@@ -529,11 +620,13 @@ Examples:
 |---|---|
 | simple reformulation | Subject Context + Action Context |
 | client-facing email | Subject Context + Relationship Context + Risk Context + Action Context |
-| PLU question | Project Context + Location Context + Typology Context + Regulatory Context |
+| general regulatory orientation | Subject Context + current Knowledge/Regulatory source as needed; no Project conclusion |
+| project PLU question | Project Context + Location Context + Typology Context + Regulatory Context |
 | DTU / technical issue | Subject Context + Technical Context + Document Context + Risk Context |
 | CCAP / contract issue | Project Context + Contractual Context + Document Context + Risk Context |
 | visa EXE | Phase Context + Technical Context + Contractual Context + Document Context + Action Context |
 | situated object / change-impact question | Subject Context + Project Context + Technical Context, then only the relation/regulatory/history cards materially required |
+| current chantier condition | Project Context + Subject Context + Phase Context + Temporal Context + Technical/Document Context appropriate to the observation |
 | memory proposal | Subject Context + Evidence Context + Scope Context + Memory Context |
 | external transmission | Action Context + Transmission Context + Risk Context + Approval Context |
 
@@ -727,16 +820,21 @@ Before using a Context Stack for consequential work, verify:
 
 ```text
 1. The question is stated.
-2. The active subject is identified.
-3. The project referent or bounded candidate set is visible when the question is situated.
-4. Scope is visible.
-5. Project-specific and general material are separated.
-6. Missing context is marked.
-7. Stale or non-dated context is marked.
-8. Source-dependent claims point to sources or Evidence expectations.
-9. The expected output status is visible.
-10. Any external effect is blocked unless approval path exists.
-11. Any memory effect remains candidate until validation.
+2. The intended level of conclusion is visible.
+3. The active subject is identified.
+4. The project referent or bounded candidate set is visible when the question is situated.
+5. Scope and phase are visible when they can change the answer.
+6. Project-specific and general material are separated.
+7. The relevant project state/time is explicit when currentness matters.
+8. Observation mode and its limits are visible when facts depend on observation.
+9. Missing context is marked.
+10. Stale or non-dated context is marked.
+11. Source-dependent claims point to sources or Evidence expectations and competent-actor authority is not silently substituted.
+12. Consequence and reversibility are considered proportionally; they do not become automatic verdicts.
+13. The expected output status and recipient/effect are visible.
+14. Retrieval/context widening stops when remaining unknowns cannot materially change the allowed conclusion.
+15. Any external effect is blocked unless approval path exists.
+16. Any memory effect remains candidate until validation.
 ```
 
 ## Status and next review
