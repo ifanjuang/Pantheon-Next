@@ -306,6 +306,17 @@ Context sufficient for external transmission: no.
 Context sufficient for memory promotion: no.
 ```
 
+Sufficiency is relative to the level of conclusion being requested. The same admitted material may be enough to explore a hypothesis and still be insufficient to assert project conformity, issue a professional instruction or transmit a consequential conclusion.
+
+```text
+sufficient for orientation != sufficient for project conclusion
+visible != measured
+measured != documented
+retrieved opinion != current applicable opinion
+planned != installed
+installed != observed current state
+```
+
 ## Context Stack Change Candidate
 
 When the active context is not appropriate for the question or task, the system may surface a Context Stack Change Candidate.
@@ -344,6 +355,12 @@ memory_promotion_requested
 source_conflict_detected
 scope_mixed
 context_stale
+target_referent_ambiguous
+reasoning_dependency_unestablished
+conclusion_level_changes
+current_state_uncertain
+observation_quality_insufficient
+competent_actor_opinion_relevant
 project_specific_fact_used_as_general
 knowledge_needed_but_absent
 technical_consequence_detected
@@ -378,13 +395,16 @@ HESTIA does not produce Evidence.
 
 HESTIA does not approve, transmit, canonize, promote memory or execute work.
 
-HESTIA watches the Context Stack and may propose Context Stack Change Candidates.
+HESTIA watches the Context Stack and may propose Context Stack Change Candidates. Her candidate jurisdiction is the situated validity of the working context: the active Project/Case, phase, location, target referent or bounded target set, scope, relevance, freshness and sufficiency needed for the requested level of answer.
 
 Useful bias:
 
 ```text
-context sufficiency, context scope, context relevance, context staleness and context overload
+situated referent grounding, context sufficiency, context scope,
+context relevance, context staleness and context overload
 ```
+
+A referent may legitimately remain a bounded candidate set. HESTIA must not convert several plausible governed identities into one selected identity merely to make reasoning easier.
 
 May propose:
 
@@ -393,9 +413,14 @@ add missing context
 remove irrelevant context
 limit scope
 mark mixed scope
+mark a target referent unresolved
+preserve a bounded target candidate set
+request targeted clarification when target distinction materially affects the allowed answer
 flag stale context
-ask ARGOS to verify source state
-ask THEMIS to review risk created by missing context
+ask ATHENA which candidate dependencies or dimensions could materially change the reasoning
+ask MNEMOSYNE whether prior naming, discussion or project history helps frame the referent
+ask ARGOS to verify source state or authority
+ask THEMIS to review risk created by missing context or competence boundary
 ask ZEUS to arbitrate sufficiency or blocking status
 ```
 
@@ -403,10 +428,16 @@ May challenge:
 
 ```text
 answering from too little context
+silently selecting one identity from several plausible candidates
+treating a colloquial alias as a governed identity without support
+loading the whole project to resolve a local referent
 using project facts as general knowledge
 using general knowledge without project fit
 mixing agency preference with doctrine
 using stale context as if current
+using a photo as if it proved hidden composition, exact dimension or compliance
+using an old plan, note or site observation as if it described current state
+continuing retrieval after remaining unknowns can no longer change the permitted conclusion
 loading too much dossier material without need
 ```
 
@@ -418,6 +449,16 @@ context_insufficient_for_memory_promotion
 context_scope_conflict
 context_stale_for_regulatory_claim
 context_overloaded
+target_referent_materially_ambiguous
+```
+
+HESTIA does not decide by herself which possible context dimension is materially consequential to the substantive reasoning. ATHENA may propose those reasoning dependencies; HESTIA watches whether the corresponding situation, referent and context are sufficiently established for the intended answer status.
+
+```text
+referent candidate set != merged identity
+context available != context relevant
+context relevant != context sufficient
+context sufficient != source true
 ```
 
 Final arbitration remains with ZEUS.
@@ -429,37 +470,148 @@ The human decides when a User Decision Gate is required.
 Context watch does not replace existing roles.
 
 ```text
-ATHENA structures the task and plan.
+ATHENA structures the task, hypotheses, reasoning dependencies and candidate projections.
 ARGOS challenges source state and provenance.
+MNEMOSYNE challenges stale/superseded prior state and may expose relevant naming/history.
 THEMIS challenges risk, liability and approval boundaries.
 APOLLO challenges clarity and delivery readiness.
 HEPHAISTOS prepares artifact candidates.
 IRIS challenges transmission conditions.
 ZEUS arbitrates status and next procedure.
-HESTIA, if adopted, watches context sufficiency and scope.
+HESTIA, if adopted, watches situated referent, context sufficiency and scope.
 ```
 
 If HESTIA reveals a missing source, ARGOS should review source sufficiency.
+
+If HESTIA reveals a stale or historically ambiguous designation, MNEMOSYNE may frame the relevant prior state or naming context without turning memory into truth.
 
 If HESTIA reveals a risk-bearing gap, THEMIS should review consequence.
 
 If HESTIA reveals no safe procedure, ZEUS should arbitrate or escalate to the user.
 
+### Non-authoritative reasoning-context composition example
+
+The following is a Context Stack composition example, not a canonical inter-role sequence or workflow. `GOVERNANCE_COLLEGE.md` remains the owner of role interaction doctrine. HESTIA is still candidate, so this example must not be read as a required college step.
+
+For a situated professional question, a bounded composition may look like:
+
+```text
+ATHENA viewpoint
+  -> expose explicit hypotheses and bounded dimensions that could materially change the answer
+
+CONTEXT STACK / HESTIA candidate viewpoint
+  -> expose whether corresponding Project, referent, typology, location, technical,
+     regulatory, contractual or actor context is established, missing, stale or ambiguous
+
+ARGOS / MNEMOSYNE viewpoints when relevant
+  -> challenge source state or frame prior state/history through admitted routes
+
+ATHENA viewpoint
+  -> refine candidate consequence / risk / scenario / solution projection with bounded context
+
+THEMIS viewpoint when relevant
+  -> challenge responsibility, competence, policy or applicability boundaries
+
+ZEUS only under the canonical college doctrine when arbitration is actually required
+```
+
+This illustration does not require every viewpoint, prescribe their order or authorize a runtime loop. It should stop as soon as the context is sufficient for the intended answer status or the remaining uncertainty is explicitly carried.
+
+```text
+candidate reasoning dependency != established project fact
+projection != persistence
+possible risk != established non-compliance
+possible solution != design decision
+successful retrieval != Evidence
+```
+
 ## Proportional activation
 
 The full Context Stack should not appear for every question.
 
-Use the minimum effective context required by:
+Use the minimum effective context required by the intended answer and its consequences. Relevant factors include:
 
 ```text
-question type
+question type and specificity
 subject type
+intended level of conclusion
+project complexity and interface breadth
 phase
+consequence magnitude
+reversibility of a wrong conclusion or action
+temporal/current-state dependency
+observation quality
+source and competent-actor authority
 risk
-external effect
+recipient or external effect
 memory impact
 source dependency
 scope breadth
+```
+
+These factors are not a numeric score and do not create a runtime mode. They guide proportional context and answer posture.
+
+### Rigor proportionality and stopping rule
+
+The required rigor is not a fixed property of the wording alone. It depends on what the answer will claim and on the situated professional consequence.
+
+```text
+general orientation
+-> general Knowledge / current regulatory source when needed
+-> no project-specific conclusion implied
+
+situated project analysis
+-> identify Project/Case, referent, phase and materially relevant dependencies
+-> use current admitted project/source context
+
+source-backed professional conclusion
+-> require the material source, version, applicability and current-state questions to be sufficiently established
+
+external or durable consequential effect
+-> add the applicable responsibility, approval, transmission and Evidence expectations
+```
+
+Phase changes the expected attention but is not an automatic risk score:
+
+```text
+ESQ / diagnostic
+-> wider exploration is acceptable when assumptions remain explicit
+
+APS / APD
+-> material interdisciplinary assumptions should increasingly be stabilized
+
+PRO / DCE
+-> source precision, interfaces and prescriptions matter more
+
+EXE / VISA
+-> exact version, exact detail, current interface and mission boundary matter strongly
+
+DET / chantier
+-> distinguish designed, ordered, installed and actually observed state; date site observations
+
+reception / consequential closure
+-> high attention to current observation, reserve/evidence status and responsibility boundaries
+```
+
+Observation method limits the conclusion it can support:
+
+```text
+photo may support visible condition or referent framing
+photo does not by itself establish hidden composition, exact dimension or global compliance
+plan may support intended design state
+plan does not by itself prove installed state
+BET / bureau de controle / specialist opinion may be the competent source for a bounded question
+opinion found != opinion current, applicable or finally accepted
+```
+
+A current baseline should remain visible when a proposed change is being evaluated. ATHENA may compare bounded alternatives, including doing nothing, so the user's proposed solution is not silently treated as selected.
+
+Stop adding context when the remaining unknowns cannot materially change the permitted level of conclusion. The system may still expose those unknowns, but `more information exists` is not a reason to widen the dossier indefinitely.
+
+```text
+information available != information relevant
+information relevant != information material to this conclusion
+more retrieval != more legitimacy
 ```
 
 Examples:
@@ -468,10 +620,13 @@ Examples:
 |---|---|
 | simple reformulation | Subject Context + Action Context |
 | client-facing email | Subject Context + Relationship Context + Risk Context + Action Context |
-| PLU question | Project Context + Location Context + Typology Context + Regulatory Context |
+| general regulatory orientation | Subject Context + current Knowledge/Regulatory source as needed; no Project conclusion |
+| project PLU question | Project Context + Location Context + Typology Context + Regulatory Context |
 | DTU / technical issue | Subject Context + Technical Context + Document Context + Risk Context |
 | CCAP / contract issue | Project Context + Contractual Context + Document Context + Risk Context |
 | visa EXE | Phase Context + Technical Context + Contractual Context + Document Context + Action Context |
+| situated object / change-impact question | Subject Context + Project Context + Technical Context, then only the relation/regulatory/history cards materially required |
+| current chantier condition | Project Context + Subject Context + Phase Context + Temporal Context + Technical/Document Context appropriate to the observation |
 | memory proposal | Subject Context + Evidence Context + Scope Context + Memory Context |
 | external transmission | Action Context + Transmission Context + Risk Context + Approval Context |
 
@@ -573,6 +728,23 @@ Possible ZEUS status:
 insufficient_for_source_backed_claim until dated source and zone are verified
 ```
 
+### Situated project referent and consequence question
+
+Examples include `cette porte doit être réglée` from a photo, `quel meuble est prévu dans la salle de bain enfant ?` when plans say `SDB A` / `SDB B`, or `si on décale la porte du bureau 1, est-ce que cela fonctionne ?`.
+
+The minimum handling is not a global project traversal:
+
+```text
+human designation / photo / local question
+-> bounded referent candidate(s) from admitted project context
+-> preserve several candidates if the designation is not yet determining
+-> ATHENA identifies only the consequence dimensions that could materially change the answer
+-> add only the corresponding context cards
+-> clarify the referent only when the distinction changes the permitted conclusion
+```
+
+For the office-door example, an evacuation-distance or ERP dependency may justify Regulatory/Typology Context; a known BET or prior opinion may justify Project/Document/Memory Context. Those cards are added because the reasoning exposes a dependency, not because every architectural question loads every available dossier fact.
+
 ## UX projection
 
 The cockpit may display the Context Stack as cards.
@@ -648,15 +820,21 @@ Before using a Context Stack for consequential work, verify:
 
 ```text
 1. The question is stated.
-2. The active subject is identified.
-3. Scope is visible.
-4. Project-specific and general material are separated.
-5. Missing context is marked.
-6. Stale or non-dated context is marked.
-7. Source-dependent claims point to sources or Evidence expectations.
-8. The expected output status is visible.
-9. Any external effect is blocked unless approval path exists.
-10. Any memory effect remains candidate until validation.
+2. The intended level of conclusion is visible.
+3. The active subject is identified.
+4. The project referent or bounded candidate set is visible when the question is situated.
+5. Scope and phase are visible when they can change the answer.
+6. Project-specific and general material are separated.
+7. The relevant project state/time is explicit when currentness matters.
+8. Observation mode and its limits are visible when facts depend on observation.
+9. Missing context is marked.
+10. Stale or non-dated context is marked.
+11. Source-dependent claims point to sources or Evidence expectations and competent-actor authority is not silently substituted.
+12. Consequence and reversibility are considered proportionally; they do not become automatic verdicts.
+13. The expected output status and recipient/effect are visible.
+14. Retrieval/context widening stops when remaining unknowns cannot materially change the allowed conclusion.
+15. Any external effect is blocked unless approval path exists.
+16. Any memory effect remains candidate until validation.
 ```
 
 ## Status and next review
@@ -678,6 +856,7 @@ Open questions:
 
 ```text
 Should HESTIA become a canonical Pantheon Role, or remain a cockpit-facing context-watch label?
+Should situated referent grounding remain a HESTIA quality if HESTIA is promoted, or stay a shared clarification function?
 Should Context Stack Change Candidate receive a schema later?
 Should Context Card families be standardized in the architecture domain pack first?
 How much of this belongs in cockpit UX versus general doctrine?
