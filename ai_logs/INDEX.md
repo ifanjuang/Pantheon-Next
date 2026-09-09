@@ -14,11 +14,12 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **925**.
+Total indexed entries: **926**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-09-08 | `2026/Q3/2026-09-08-p2-live-identity-ambiguity.md` | 2026-09-08 — P2 live identity ambiguity preparation |
 | 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-governance-subdirs.md` | 2026-09-08 — Boundary profile migration: docs/governance/ subdirectories |
 | 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-examples.md` | 2026-09-08 — Boundary profile migration: docs/examples/ |
 | 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-domain-packs-architecture.md` | 2026-09-08 — Boundary profile migration: docs/domain-packs/architecture/ |
@@ -300,7 +301,7 @@ Total indexed entries: **925**.
 | 2026-07-15 | `2026-07-15-mcp-consultation-contract.md` | MCP consultation contract and bounded architecture explanations |
 | 2026-07-15 | `2026-07-15-mcp-authority-resolution-wiki.md` | AI log — MCP authority resolution and governance wiki |
 | 2026-07-15 | `2026-07-15-ifixai-placement-review.md` | iFixAi external placement review |
-| 2026-07-15 | `2026-07-15-honest-packaging-release-contract.md` | AI log — honest packaging and release contract |
+| 2026-07-15 | `2026-07-15-honest-packaging-release-contract.md` | AI log — honest packaging release contract |
 | 2026-07-15 | `2026-07-15-hermes-pantheon-modules-dashboard.md` | Hermes Pantheon Modules dashboard plugin |
 | 2026-07-15 | `2026-07-15-hermes-native-mcp-wiki-config.md` | Hermes-native MCP policy/wiki configuration |
 | 2026-07-15 | `2026-07-15-hermes-governed-night-operations.md` | Hermes governed night operations |
@@ -398,7 +399,7 @@ Total indexed entries: **925**.
 | 2026-07-04 | `2026-07-04-governed-method-standard.md` | AI Log — Governed Method Standard |
 | 2026-07-04 | `2026-07-04-governed-autonomy-gradient.md` | AI Log — Governed Autonomy Gradient |
 | 2026-07-04 | `2026-07-04-control-ux-density-pass.md` | AI Log — Pantheon Control UX density pass |
-| 2026-07-04 | `2026-07-04-control-revit-connector-status.md` | AI Log — Revit connector status in Pantheon Control |
+| 2026-07-04 | `2026-07-04-control-revit-connector-status.md` | AI Log — Pantheon Control Revit connector status |
 | 2026-07-04 | `2026-07-04-control-consolidation-pass.md` | AI Log — Pantheon Control consolidation pass |
 | 2026-07-04 | `2026-07-04-analyse-complete-repository.md` | 2026-07-04 — Analyse complète du dépôt (audit externe) |
 | 2026-07-03 | `2026-07-03_landing_path_note.md` | AI log — landing path note |
