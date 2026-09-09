@@ -1,5 +1,10 @@
 # 2026-09-09 — Boundary profile migration: final slice (templates/, hermes/profiles/, docs/roadmaps/)
 
+Date: 2026-09-09
+
+Status: validation-only trace — documented non-implemented.
+Boundary profile: validation_only_trace.
+
 ## Change
 
 Migrated the last 7 documents restating the exposure/execution/governance
@@ -67,9 +72,15 @@ rather than leaving a residual count.
 
 ## Boundary
 
-Documentation-only change. No Status line changed beyond adding
-`Boundary profile:` lines; no authority gained or lost, no schema, test
-logic or CI workflow touched.
+Boundary profile applies: `validation_only_trace`.
+
+Protected paths touched: no.
+Runtime impact: none.
+Authority impact: none — no `Status:` line changed beyond adding
+`Boundary profile:` lines.
+Schema/test/CI impact: none.
+External action: none.
+Memory behavior: none.
 
 ## Verification
 
