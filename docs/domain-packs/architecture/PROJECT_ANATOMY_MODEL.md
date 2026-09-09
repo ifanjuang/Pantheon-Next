@@ -360,7 +360,7 @@ A lens is a projection policy, not another graph or truth store.
 
 A project may keep one human-readable Markdown working note in its authorized Obsidian/Markdown workspace to expose the current spatial understanding to humans and Hermes. A filename such as `connaissance_spatiale.md` is an illustrative workspace convention only; its name or path is not a Pantheon contract or governed identity.
 
-This note is project-scoped derived working material. It is not reusable agency Knowledge by default, not an original source, not a fifth Project Anatomy primitive, not a canonical spatial truth store and not Evidence.
+The generated projection is project-scoped derived working material. It is not reusable agency Knowledge by default, not an original professional source, not a fifth Project Anatomy primitive, not a canonical spatial truth store and not Evidence. When a human intentionally authors or corrects content in this note, that authored content is also workspace-source input under the existing workspace source rule; the edit does not become an admitted Project Anatomy fact merely because it is written in Markdown.
 
 Where useful, the projection should retain or resolve enough provenance to identify the baseline it reflects, for example:
 
@@ -380,6 +380,7 @@ The default maintenance posture is delta-first and search-before-create:
 ```text
 applicable source / Revision Set change
 -> identify the changed source set and affected spatial scope
+-> include intentionally authored workspace-source edits in the maintenance input
 -> refresh only the observations/context needed for that scope
 -> compare against the existing spatial working note
 -> prepare a traceable delta candidate
@@ -387,14 +388,15 @@ applicable source / Revision Set change
 -> preserve prior history / superseded statements where materially relevant
 ```
 
-A professional index change triggers re-evaluation; it does not by itself authorize a semantic overwrite or establish applicability.
+A professional index change triggers re-evaluation; it does not by itself authorize a semantic overwrite or establish applicability. Automated maintenance must not silently overwrite intentionally authored human content; a material conflict between refreshed derived observations and human-authored workspace-source content remains explicit for review.
 
 ```text
 higher index != automatically truer
 new index != automatically applicable
 new source != spatial change confirmed
+generated projection != original professional source
+intentional human edit = workspace-source input, not automatic Project Anatomy fact
 workspace note != Project Anatomy authority
-workspace note != source
 workspace note != Evidence
 generated delta != accepted project fact
 human edit != permission for silent regeneration
