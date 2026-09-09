@@ -22,11 +22,14 @@ Do not use merely for generic conversation when no professional workspace contex
 
 ### 1. Resolve context only when useful
 
-Identify the active affaire/project from the request and available context. Use Hindsight when associative recall materially helps with prior context, actors, chronology, earlier positions or dossier resolution.
+Ground the active affaire/project from the request and available context. When project identity or the target referent is ambiguous, preserve the unresolved possibilities as a bounded candidate set; do not silently merge or select an identity merely to make reasoning easier. If the distinction would materially change the answer, permitted action or consequence, request targeted clarification or return a safe non-conclusion. If it would not, continue only from supported shared facts while carrying the uncertainty explicitly.
+
+Use Hindsight when associative recall materially helps with prior context, actors, chronology, earlier positions or dossier resolution.
 
 ```text
 Hindsight recall != source authority
 memory recalled != Evidence
+bounded referent candidate set != merged identity
 ```
 
 ### 2. Workspace first
@@ -52,7 +55,9 @@ workspace access != external disclosure authorization
 
 ### 4. Pantheon only at governed boundaries
 
-When the request may involve professional/contractual/financial consequence, Evidence or approval, governed status or protected mutation, external transmission/action, memory/Register promotion, or another consequential decision boundary, consult the current Pantheon policy service through the admitted MCP binding, using `classify_request` when that remains the exposed contract.
+When the request may involve professional/contractual/financial consequence, Evidence or approval, governed status or protected mutation, external transmission/action, memory/Register promotion, or another consequential decision boundary, consult the currently selected Pantheon policy binding.
+
+The current repository decision interface is the bounded HTTP policy service described by `mcp-server/docs/HTTP_API_CONTRACT.md`. Invoke `classify_request` through a binding that actually exposes that operation; do not assume that the consultation-only MCP binding exposes classification. If the selected deployed binding cannot provide the required decision operation, stop before the consequential effect and return a Capability Gap rather than inventing policy locally.
 
 Pass observable request facts and scope. Do not derive K/V/C, approval levels or gate rules in this skill. Follow the policy data returned by Pantheon. Do not call Pantheon mechanically for trivial consultation unless the current doctrine, Task Contract or binding requires it.
 
