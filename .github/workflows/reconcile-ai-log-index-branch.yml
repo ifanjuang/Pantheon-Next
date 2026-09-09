@@ -1,0 +1,36 @@
+name: Temporary PR 1030 AI-log index reconcile
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    paths:
+      - "ai_logs/**"
+      - ".github/workflows/reconcile-ai-log-index-branch.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    if: github.event.pull_request.number == 1030 && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - name: Regenerate exact AI-log index
+        run: python3 .github/scripts/generate_ai_logs_index.py
+      - name: Commit generated index when changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- ai_logs/INDEX.md; then
+            echo "ai_logs/INDEX.md already matches generator output"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ai_logs/INDEX.md
+          git commit -m "chore(ai-log): regenerate index exactly"
+          git push origin "HEAD:${{ github.event.pull_request.head.ref }}"
