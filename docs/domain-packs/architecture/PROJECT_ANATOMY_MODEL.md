@@ -356,6 +356,54 @@ Cockpit display != persisted authority
 
 A lens is a projection policy, not another graph or truth store.
 
+### Human-readable project spatial working projection
+
+A project may keep one human-readable Markdown working note in its authorized Obsidian/Markdown workspace to expose the current spatial understanding to humans and Hermes. A filename such as `connaissance_spatiale.md` is an illustrative workspace convention only; its name or path is not a Pantheon contract or governed identity.
+
+This note is project-scoped derived working material. It is not reusable agency Knowledge by default, not an original source, not a fifth Project Anatomy primitive, not a canonical spatial truth store and not Evidence.
+
+Where useful, the projection should retain or resolve enough provenance to identify the baseline it reflects, for example:
+
+```text
+project_ref
+revision_set_ref / professional index when applicable
+exact source / document / model refs used
+last evaluated time
+observed coverage
+known uncertainties / contradictions / withheld areas
+```
+
+Its readable content may summarize levels, spaces, spatial relations, openings, circulation, access, zones and other project structure when those statements are supported by the admitted context. The note may also preserve unresolved alternatives or missing context rather than forcing one interpretation.
+
+The default maintenance posture is delta-first and search-before-create:
+
+```text
+applicable source / Revision Set change
+-> identify the changed source set and affected spatial scope
+-> refresh only the observations/context needed for that scope
+-> compare against the existing spatial working note
+-> prepare a traceable delta candidate
+-> apply a bounded workspace patch through the authorized workspace writer
+-> preserve prior history / superseded statements where materially relevant
+```
+
+A professional index change triggers re-evaluation; it does not by itself authorize a semantic overwrite or establish applicability.
+
+```text
+higher index != automatically truer
+new index != automatically applicable
+new source != spatial change confirmed
+workspace note != Project Anatomy authority
+workspace note != source
+workspace note != Evidence
+generated delta != accepted project fact
+human edit != permission for silent regeneration
+```
+
+If the newly applicable baseline contains no spatially material change, the readable note may remain materially unchanged while the re-evaluation provenance/currentness signal records that result honestly.
+
+The Revit adapter never owns this workspace write. Revit observes or executes locally under its own admitted operation and returns Observation Bundles/results. Hermes may compare those observations with the current workspace note and prepare or apply an authorized workspace patch. Pantheon continues to govern scope, status, provenance and consequential admission.
+
 ## 13. Observation Bundles for Hermes and adapters
 
 Hermes and adapters must not be coupled to PostgreSQL persistence shapes and must not mutate APU authority directly.
