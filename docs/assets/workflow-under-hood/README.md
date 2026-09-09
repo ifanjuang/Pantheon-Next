@@ -1,6 +1,7 @@
 # Architecture workflow under the hood
 
 Status: visual support asset — documentation only.
+Boundary profile: documentation_only.
 
 This folder contains a static explanatory HTML page showing how a professional architecture workflow may stay simple for the practitioner while exposing the governed under-the-hood steps when needed.
 
@@ -68,9 +69,6 @@ It does not create:
 The page is an explanatory cockpit mockup. It follows the doctrine:
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
 The Registre Probatoire proves.
 The human decides.
 ```

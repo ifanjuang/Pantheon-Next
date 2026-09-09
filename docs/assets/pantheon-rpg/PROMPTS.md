@@ -1,16 +1,11 @@
 # Pantheon RPG Visual Prompts
 
 Status: visual production guidance — documentation only.
+Boundary profile: non_executable_template.
 
 This document collects prompt patterns for future Pantheon RPG visual boards.
 
 It does not define implementation, runtime behavior, agents, connectors, generated Evidence Packs or memory automation.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Prompt doctrine
 

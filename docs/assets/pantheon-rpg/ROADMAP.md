@@ -1,16 +1,11 @@
 # Pantheon RPG Visual Roadmap
 
 Status: visual production guidance — documentation only.
+Boundary profile: candidate_support_note.
 
 This roadmap organizes future Pantheon RPG boards into a clearer production sequence.
 
 It does not define implementation, runtime behavior, agents, connectors, generated Evidence Packs or memory automation.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
 
 ## Strategic answer
 

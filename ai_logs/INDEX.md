@@ -14,7 +14,7 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **924**.
+Total indexed entries: **925**.
 
 | Date | Log | Subject |
 |---|---|---|
@@ -22,6 +22,7 @@ Total indexed entries: **924**.
 | 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-governance-subdirs.md` | 2026-09-08 — Boundary profile migration: docs/governance/ subdirectories |
 | 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-examples.md` | 2026-09-08 — Boundary profile migration: docs/examples/ |
 | 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-domain-packs-architecture.md` | 2026-09-08 — Boundary profile migration: docs/domain-packs/architecture/ |
+| 2026-09-08 | `2026/Q3/2026-09-08-boundary-profile-migration-assets-and-scope-decisions.md` | 2026-09-08 — Boundary profile migration: docs/assets/, and #996's two open scope decisions |
 | 2026-09-07 | `2026/Q3/2026-09-07-workspace-source-package-info-sidecar.md` | 2026-09-07 — Workspace source package and per-source Infos sidecar |
 | 2026-09-07 | `2026/Q3/2026-09-07-knowledge-family-orphan-decisions.md` | Two of #989's three orphan categories resolved by maintainer decision |
 | 2026-09-07 | `2026/Q3/2026-09-07-exact-source-materialization-contract.md` | 2026-09-07 — Exact source materialization convergence |

@@ -4,10 +4,24 @@ Status: visual support asset — documentation only.
 
 This folder contains an interactive HTML map showing why Pantheon Next needs a governance layer between professional users, AI execution, runtime memory, cockpit views and probative records.
 
+This map names concrete exposure, execution, governance, approval and record
+responsibilities (see "The map shows" below) rather than restating the
+generic separation, so it declares the boundary fields directly instead of
+a `Boundary profile` line:
+
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+exposed_by:  Hermes Web/dashboard, or another compatible client
+executed_by: Hermes Agent
+governed_by: Pantheon Next (scope, status, evidence, approvals and
+             external-action boundaries)
+approved_by: the human, at the decision gate
+forbidden:   treating Hermes runtime memory as authority; citing a
+             database row, Notion view or synchronized cockpit as the
+             probative source of truth; the blocked shortcuts named below
+             (Hermes memory -> client commitment, database row -> proof)
+```
+
+```text
 The Registre Probatoire proves.
 The human decides.
 ```
