@@ -16,10 +16,13 @@
     "hermes-agent": {
       "source": "github_releases_latest",
       "locator": "NousResearch/hermes-agent",
-      "latest_seen": "v2026.8.31",
-      "observed_on": "2026-09-02",
-      "delta": "none",
-      "note": "Observed from the current stable GitHub release v2026.8.31 (Hermes Agent 0.21.0), whose annotated release tag resolves to commit 29112bef099274229cadff79cdff7bf7b99c4b77. This refresh records upstream state only; the qualification pin is owned separately and installation, activation, task authorization and Evidence admission remain unchanged."
+      "latest_seen": "v2026.9.7",
+      "observed_on": "2026-09-09",
+      "delta": {
+        "state": "open",
+        "reason": "Hermes Agent v0.21.1 / v2026.9.7 is newer than Pantheon's current 0.21.0 qualification pin; the installed runtime has not yet been observed and no adoption decision has been made."
+      },
+      "note": "Observed from the current stable GitHub release v2026.9.7 (Hermes Agent 0.21.1), published 2026-09-07. The annotated tag resolves to commit 2237be355906fbe6065ce1815711eee52b2d646e. Pantheon still pins Hermes Agent 0.21.0 separately; this refresh records an open upstream delta only and does not select, install, activate, authorize or qualify 0.21.1."
     },
     "personal-ai-router": {
       "source": "github_releases_latest",
