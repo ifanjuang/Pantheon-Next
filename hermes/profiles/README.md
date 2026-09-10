@@ -41,7 +41,7 @@ When actual retrieval is required, an admitted external executor may perform it 
 
 The folders in this directory describe functional execution profiles such as document intake, evidence review or repository maintenance.
 
-They do not select the runtime memory, retrieval or OpenWebUI enrichment posture by themselves.
+They do not select the runtime memory, retrieval, model, tool, plugin, MCP or OpenWebUI enrichment posture by themselves.
 
 Every functional profile that receives a Pantheon Task Contract must inherit the `pantheon-governed` runtime mode defined in `PROFILE_CONSTITUTION.md`.
 
@@ -49,13 +49,24 @@ Every functional profile that receives a Pantheon Task Contract must inherit the
 functional profile
 + pantheon-governed runtime mode
 + admitted Task Contract
-+ explicit tool allowlist
++ qualified observable runtime capability surface
 = candidate execution posture
 ```
 
 `pantheon-governed` is a runtime mode, not a Pantheon Role and not automatically an additional functional profile folder.
 
-The governed mode requires all Hermes memory inputs to be inert for the admitted run:
+Inside an admitted Task Contract, Hermes may choose among the qualified runtime mechanisms that satisfy the same objective and constraints. Pantheon does not pin a concrete tool merely because one implementation happened to be used previously.
+
+```text
+Task Contract constrains legitimacy
+Hermes selects execution means
+runtime mechanism may change
+boundary must not change silently
+```
+
+A different tool, skill, plugin, model, MCP connection or delegation mechanism does not require a new governance concept when it stays inside the same admitted scope, data-exposure posture, effect ceiling and approval boundary. A mechanism that would widen any of those must return a Capability Gap or request the applicable gate before use.
+
+The governed mode keeps runtime memory inert by default. Memory inputs may be admitted separately only when their exact provider/path, scope, exposure and write behavior are qualified for the task boundary. Baseline posture remains:
 
 ```text
 external provider: off
@@ -76,9 +87,11 @@ profile route reachable != profile safe
 hermes memory off != built-in memory injection off
 external provider absent from tool list != external memory proven off
 memory tool absent != memory injection disabled
+qualified capability != consequential effect authorized
+runtime choice != governance decision
 ```
 
-If the active runtime mode or complete memory posture cannot be observed, the profile remains `not_qualified` for governed execution and must emit a Capability Gap.
+If the active runtime mode or the material memory/tool/capability posture cannot be observed sufficiently for the task boundary, the profile remains `not_qualified` for governed execution and must emit a Capability Gap.
 
 ## Adapter constitution
 
