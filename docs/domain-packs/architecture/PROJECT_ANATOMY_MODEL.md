@@ -383,9 +383,9 @@ applicable source / Revision Set change
 -> include intentionally authored workspace-source edits in the maintenance input
 -> refresh only the observations/context needed for that scope
 -> compare against the existing spatial working note
--> prepare a traceable delta candidate
+-> prepare a traceable delta candidate, including the exact prior text/provenance for statements that would be superseded
+-> preserve that prior state in the governed maintenance trace before invoking the writer
 -> apply a bounded workspace patch through the authorized workspace writer
--> preserve prior history / superseded statements where materially relevant
 ```
 
 A professional index change triggers re-evaluation; it does not by itself authorize a semantic overwrite or establish applicability. Automated maintenance must not silently overwrite intentionally authored human content; a material conflict between refreshed derived observations and human-authored workspace-source content remains explicit for review.
