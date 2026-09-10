@@ -1,5 +1,55 @@
 # Changelog
 
+## 0.1.66 - 2026-09-10
+
+Hermes-first test checkpoint after the post-0.1.65 convergence cycle. This
+heading records the repository state selected for controlled runtime testing.
+It does not claim a published tag, installed deployment, provider adoption,
+professional validation or production authorization.
+
+### Added
+
+- Project-context and exact-document routing for IFJA professional work, with
+  explicit project continuity, alias/identity separation and the distinction
+  `mentioned != exact source present != relevant content inspected`.
+- ProjectClaim provenance, temporal-read and conflict-candidate structures,
+  plus project/document identity and workspace source-materialization
+  qualification paths.
+- Context-admission and external-context candidate surfaces for Hermes, with
+  bounded retrieval and source/data exposure rules.
+- Qualification material for PAIR + Unsloth, Obsidian/Hindsight workspace
+  composition and related runtime/source boundaries.
+
+### Changed
+
+- Hermes integration converged on adaptive runtime selection: Pantheon bounds
+  legitimacy, scope, data exposure, effect ceilings and approvals while Hermes
+  may choose qualified tools, skills, plugins, MCP capabilities, models and
+  delegation inside that admitted boundary.
+- Boundary-profile vocabulary and placement were migrated across governance,
+  architecture-domain, examples, assets, templates and Hermes profile
+  documentation, reducing duplicated authority prose and retired-owner drift.
+- Workspace, memory, Evidence, exact-source and governed-identity distinctions
+  were tightened so retrieval, filesystem organization, derivatives and
+  runtime success cannot silently acquire authority.
+- CI now enforces additional authority/boundary consistency, AI-log index
+  currentness and qualification contracts introduced during the convergence
+  cycle.
+
+### Test checkpoint
+
+The selected source checkpoint is `main@bc2ac9a80c662f252ebf3749775c00f061edcd58`
+before this version-only release PR. Open experimental work such as Google
+Drive provider qualification remains outside this checkpoint until separately
+rebased, reviewed and admitted.
+
+```text
+checkpoint versioned != tag published
+green CI             != runtime qualified
+runtime qualified     != effect authorized
+test deployment       != production adoption
+```
+
 ## 0.1.65 - 2026-09-02
 
 Consequential-mutation inventory closed and one chokepoint gap wired. This
