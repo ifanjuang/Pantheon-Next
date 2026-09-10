@@ -1,0 +1,50 @@
+schema_version: 1
+organization: IFJA
+status: observed_local_binding
+
+generic_skill:
+  name: ifja-project-context
+  required_contract: true
+
+sources:
+  affaires:
+    logical_name: AFFAIRES
+    hermes_binding: hindsight-affaires
+    hindsight_bank: IFJA_AFFAIRES
+    purpose: dossier-specific professional material
+    project_path_hints:
+      - "_Projets/{designation}"
+      - "Projets/{designation}"
+      - "Notion/_Affaires/{designation}.md"
+  documentaires:
+    logical_name: DOCUMENTAIRES
+    hermes_binding: hindsight-documentaires
+    hindsight_bank: IFJA_DOCUMENTAIRES
+    purpose: transversal professional reference material
+  conversation_memory:
+    logical_name: HERMES_MEMORY
+    hindsight_bank: hermes
+    purpose: recent conversation and continuity leads only
+  live_project_state:
+    logical_name: NOTION
+    hermes_binding: notion
+    use_when: explicitly requested or indexed freshness is materially uncertain
+
+retrieval:
+  exact_discovery_first: list_documents
+  exact_document_read: get_document
+  associative_retrieval: recall
+  maximum_recall_calls_per_question: 2
+  maximum_candidate_documents: 5
+  recent_project_second_recall: HERMES_MEMORY
+
+documents:
+  textual_analysis_binding: Doclin
+  visual_analysis_binding: marker
+  physical_affaires_root: /srv/pantheon/obsidian-affaires
+
+boundaries:
+  config_values_are_not_doctrine: true
+  alias_is_not_governed_identity: true
+  memory_is_not_business_source: true
+  extracted_content_is_not_evidence_admission: true

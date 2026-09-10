@@ -24,6 +24,7 @@ Pantheon Cockpit     -> governed Cards/navigation/decision/status projections
 | Pantheon activity projection skill candidate | `templates/hermes/skills/pantheon-activity-projection/SKILL.md` | Hermes | conversation projection skill candidate | non-executable |
 | IFJA project context skill candidate | `templates/hermes/skills/ifja-project-context/SKILL.md` | Hermes | skill candidate | non-executable |
 | Source research skill candidate | `templates/hermes/skills/source-research/SKILL.md` | Hermes | skill candidate | non-executable |
+| IFJA project context skill candidate | `templates/hermes/skills/ifja-project-context/SKILL.md` | Hermes | skill candidate | non-executable |
 | Source research summary Workflow Manifest | `templates/source_research_summary_workflow_manifest.template.yaml` | Pantheon | workflow governance candidate | non-executable |
 | Visual focus skill candidate | `templates/hermes/skills/visual-focus/SKILL.md` | Hermes | skill candidate | non-executable |
 | Checkpoint manifest | `templates/hermes/run_manifests/checkpoint_manifest.template.yaml` | Hermes | run manifest candidate | non-executable |

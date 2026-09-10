@@ -1,0 +1,4 @@
+interface:
+  display_name: "IFJA Project Context"
+  short_description: "Résout et encadre le contexte projet IFJA"
+  default_prompt: "Use $ifja-project-context to resolve the relevant IFJA project context and preserve its source and policy boundaries."

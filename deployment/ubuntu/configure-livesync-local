@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+CONFIG_ROOT="/etc/pantheon-node"
+SECRETS_FILE="$CONFIG_ROOT/secrets.env"
+COUCHDB_URL="http://127.0.0.1:5984"
+LIVESYNC_DATABASE="pantheon-obsidian"
+
+log() { printf '[pantheon-livesync] %s\n' "$*"; }
+die() { printf '[pantheon-livesync] ERROR: %s\n' "$*" >&2; exit 1; }
+
+[[ ${EUID:-$(id -u)} -eq 0 ]] || die "run this command as root (sudo)"
+[[ -f "$SECRETS_FILE" ]] || die "missing $SECRETS_FILE"
+command -v curl >/dev/null 2>&1 || die "curl is required"
+command -v jq >/dev/null 2>&1 || die "jq is required"
+command -v openssl >/dev/null 2>&1 || die "openssl is required"
+
+# shellcheck disable=SC1090
+source "$SECRETS_FILE"
+: "${COUCHDB_USER:?missing COUCHDB_USER in secrets.env}"
+: "${COUCHDB_PASSWORD:?missing COUCHDB_PASSWORD in secrets.env}"
+
+couch_config() {
+  local section="$1" key="$2" value="$3"
+  curl -fsS --user "$COUCHDB_USER:$COUCHDB_PASSWORD" \
+    -H 'Content-Type: application/json' -X PUT \
+    "$COUCHDB_URL/_node/_local/_config/$section/$key" \
+    --data "$(jq -Rn --arg value "$value" '$value')" >/dev/null
+}
+
+curl -fsS --user "$COUCHDB_USER:$COUCHDB_PASSWORD" "$COUCHDB_URL/_up" >/dev/null \
+  || die "CouchDB is not healthy at $COUCHDB_URL"
+
+log "applying the reviewed local Obsidian CORS and authenticated-access posture"
+couch_config chttpd require_valid_user true
+couch_config chttpd_auth require_valid_user true
+couch_config httpd WWW-Authenticate 'Basic realm="couchdb"'
+couch_config httpd enable_cors true
+couch_config chttpd enable_cors true
+couch_config cors credentials true
+couch_config cors origins 'app://obsidian.md,capacitor://localhost,http://localhost'
+couch_config cors headers 'accept,authorization,content-type,origin,referer,cache-control,x-requested-with'
+couch_config cors methods 'GET,PUT,POST,HEAD,DELETE,OPTIONS,PATCH'
+couch_config cors max_age 3600
+couch_config couchdb max_document_size 50000000
+couch_config chttpd max_http_request_size 4294967296
+
+response_file="$(mktemp)"
+trap 'rm -f "$response_file"' EXIT
+status="$(curl -sS --user "$COUCHDB_USER:$COUCHDB_PASSWORD" \
+  -H 'Content-Type: application/json' -X PUT \
+  -o "$response_file" -w '%{http_code}' "$COUCHDB_URL/$LIVESYNC_DATABASE")"
+case "$status" in
+  201) log "created CouchDB database $LIVESYNC_DATABASE" ;;
+  412) log "CouchDB database $LIVESYNC_DATABASE already exists" ;;
+  *) die "database creation returned HTTP $status: $(cat "$response_file")" ;;
+esac
+
+if ! grep -q '^LIVESYNC_PASSPHRASE=' "$SECRETS_FILE"; then
+  umask 077
+  printf 'LIVESYNC_PASSPHRASE=%s\n' "$(openssl rand -hex 32)" >> "$SECRETS_FILE"
+fi
+chmod 600 "$SECRETS_FILE"
+
+log "configuration prepared"
+printf '%s\n' \
+  "CouchDB URL:  $COUCHDB_URL" \
+  "Database:     $LIVESYNC_DATABASE" \
+  "Username:     $COUCHDB_USER" \
+  "Secrets:      $SECRETS_FILE (root-only; password and passphrase are not printed)"

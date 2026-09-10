@@ -1,0 +1,4 @@
+interface:
+  display_name: "IFJA Vault Search"
+  short_description: "Recherche sourcée dans l'organisation IFJA"
+  default_prompt: "Use $ifja-vault-search to resolve the useful IFJA context and answer from the exact admitted sources."

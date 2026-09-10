@@ -20,10 +20,14 @@ COMFYUI_REF="${RELEASE_COMFYUI_REF:?release.env missing RELEASE_COMFYUI_REF}"
 UV_VERSION="${RELEASE_UV_VERSION:?release.env missing RELEASE_UV_VERSION}"
 COMFYUI_PYTHON="${RELEASE_COMFYUI_PYTHON:?release.env missing RELEASE_COMFYUI_PYTHON}"
 TORCH_VERSION="${RELEASE_TORCH_VERSION:?release.env missing RELEASE_TORCH_VERSION}"
+TORCHVISION_VERSION="${RELEASE_TORCHVISION_VERSION:?release.env missing RELEASE_TORCHVISION_VERSION}"
+TORCHAUDIO_VERSION="${RELEASE_TORCHAUDIO_VERSION:?release.env missing RELEASE_TORCHAUDIO_VERSION}"
 TORCH_INDEX="${RELEASE_TORCH_INDEX:?release.env missing RELEASE_TORCH_INDEX}"
 LIVESYNC_REPOSITORY="https://github.com/vrtmrz/obsidian-livesync.git"
 LIVESYNC_REF="${RELEASE_LIVESYNC_REF:?release.env missing RELEASE_LIVESYNC_REF}"
 LIVESYNC_IMAGE="${RELEASE_LIVESYNC_IMAGE:?release.env missing RELEASE_LIVESYNC_IMAGE}"
+LIVESYNC_BUILD_NPM_VERSION="${RELEASE_LIVESYNC_BUILD_NPM_VERSION:?release.env missing RELEASE_LIVESYNC_BUILD_NPM_VERSION}"
+HERMES_LOCAL_OVERRIDE="$SCRIPT_DIR/compose.hermes-local.yaml"
 
 STATE_ROOT="/srv/pantheon"
 AI_ROOT="/srv/ai"
@@ -45,6 +49,11 @@ log() { printf '[pantheon-node] %s\n' "$*"; }
 warn() { printf '[pantheon-node] WARNING: %s\n' "$*" >&2; }
 die() { printf '[pantheon-node] ERROR: %s\n' "$*" >&2; exit 1; }
 have() { command -v "$1" >/dev/null 2>&1; }
+git_in_service_repo() {
+  local repo="$1"
+  shift
+  git -c "safe.directory=$repo" -C "$repo" "$@"
+}
 
 usage() {
   cat <<'USAGE'
@@ -216,7 +225,7 @@ prepare_layout() {
   install -d -m 0711 "$APP_ROOT"
   install -d -m 0755 "$STATE_ROOT" "$AI_ROOT"
   install -d -m 0750 \
-    "$STATE_ROOT/hermes" "$STATE_ROOT/couchdb" "$STATE_ROOT/hindsight" \
+    "$STATE_ROOT/hermes" "$STATE_ROOT/couchdb" \
     "$STATE_ROOT/livesync/db" "$STATE_ROOT/obsidian" "$STATE_ROOT/backups" \
     "$AI_ROOT/comfyui-output"
   # Service-owned children remain private; these parents only need traversal.
@@ -227,9 +236,6 @@ prepare_layout() {
 prepare_service_permissions() {
   # Official images/users write these bind mounts. Keep permissions narrow but usable.
   chown -R 5984:5984 "$STATE_ROOT/couchdb" 2>/dev/null || warn "could not set CouchDB bind-mount ownership to uid 5984"
-  if ((ENABLE_HINDSIGHT == 1)); then
-    chown -R 1000:1000 "$STATE_ROOT/hindsight" 2>/dev/null || warn "could not set Hindsight bind-mount ownership to uid 1000"
-  fi
 }
 
 ensure_secrets() {
@@ -268,14 +274,18 @@ COMFYUI_REF=$COMFYUI_REF
 UV_VERSION=$UV_VERSION
 COMFYUI_PYTHON=$COMFYUI_PYTHON
 TORCH_VERSION=$TORCH_VERSION
+TORCHVISION_VERSION=$TORCHVISION_VERSION
+TORCHAUDIO_VERSION=$TORCHAUDIO_VERSION
 TORCH_INDEX=$TORCH_INDEX
 LIVESYNC_REF=$LIVESYNC_REF
 LIVESYNC_IMAGE=$LIVESYNC_IMAGE
+LIVESYNC_BUILD_NPM_VERSION=$LIVESYNC_BUILD_NPM_VERSION
 EOF_VERSIONS
   chmod 640 "$CONFIG_ROOT/versions.env"
 }
 
 write_compose() {
+  [[ -f "$HERMES_LOCAL_OVERRIDE" ]] || die "Hermes local-Ollama Compose override is missing: $HERMES_LOCAL_OVERRIDE"
   cat > "$APP_ROOT/compose.yaml" <<'EOF_COMPOSE'
 services:
   couchdb:
@@ -297,6 +307,11 @@ services:
     command: gateway run
     volumes:
       - /srv/pantheon/hermes:/opt/data
+      # Keep the host path identical so Hermes can pass PDF paths to the
+      # host-side Docling MCP service without path translation.
+      - /srv/pantheon/obsidian:/srv/pantheon/obsidian
+      - /srv/pantheon/obsidian-affaires:/srv/pantheon/obsidian-affaires
+      - /srv/pantheon/obsidian-documentaires:/srv/pantheon/obsidian-documentaires
     ports:
       - "${NODE_BIND_ADDRESS}:8642:8642"
       - "${NODE_BIND_ADDRESS}:9119:9119"
@@ -317,7 +332,7 @@ services:
     restart: unless-stopped
     profiles: ["hindsight"]
     volumes:
-      - /srv/pantheon/hindsight:/home/hindsight/.pg0
+      - pantheon-hindsight-data:/home/hindsight/.pg0
     ports:
       - "${NODE_BIND_ADDRESS}:8888:8888"
       - "${NODE_BIND_ADDRESS}:9999:9999"
@@ -325,7 +340,13 @@ services:
       HINDSIGHT_API_WORKER_ID: "pantheon-node"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+volumes:
+  pantheon-hindsight-data:
+    name: pantheon-hindsight-data
 EOF_COMPOSE
+
+  install -m 0644 "$HERMES_LOCAL_OVERRIDE" "$APP_ROOT/compose.hermes-local.yaml"
 
   cat > "$APP_ROOT/compose-env" <<EOF_ENV
 NODE_BIND_ADDRESS=$NODE_BIND_ADDRESS
@@ -338,20 +359,24 @@ EOF_ENV
 }
 
 compose() {
-  docker compose --env-file "$APP_ROOT/compose-env" -f "$APP_ROOT/compose.yaml" "$@"
+  docker compose --env-file "$APP_ROOT/compose-env" \
+    -f "$APP_ROOT/compose.yaml" -f "$APP_ROOT/compose.hermes-local.yaml" "$@"
 }
 
 install_ollama() {
   log "installing Ollama $OLLAMA_VERSION"
   curl -fsSL https://ollama.com/install.sh | OLLAMA_VERSION="$OLLAMA_VERSION" sh
   install -d -m 0755 /etc/systemd/system/ollama.service.d
-  cat > /etc/systemd/system/ollama.service.d/pantheon-node.conf <<EOF_OLLAMA
+  # Use a late-sorting managed drop-in so an older generic override.conf cannot
+  # silently lower the context window required by Hermes Agent.
+  cat > /etc/systemd/system/ollama.service.d/zz-pantheon-node.conf <<EOF_OLLAMA
 [Service]
 Environment="OLLAMA_HOST=$NODE_BIND_ADDRESS:11434"
 Environment="OLLAMA_MODELS=$AI_ROOT/models/ollama"
 Environment="OLLAMA_KEEP_ALIVE=1m"
 Environment="OLLAMA_NUM_PARALLEL=1"
 Environment="OLLAMA_MAX_LOADED_MODELS=1"
+Environment="OLLAMA_CONTEXT_LENGTH=65536"
 EOF_OLLAMA
   install -d -m 0755 "$AI_ROOT/models/ollama"
   if id -u ollama >/dev/null 2>&1; then chown -R ollama:ollama "$AI_ROOT/models/ollama"; fi
@@ -367,24 +392,39 @@ install_uv() {
   "$APP_ROOT/uv/bin/python" -m pip install "uv==$UV_VERSION"
 }
 
+make_managed_python_executable() {
+  # uv may preserve restrictive ownership/modes from its managed-Python
+  # archive. Virtual environments link to that interpreter, so service users
+  # need read/traverse access throughout the managed runtime tree.
+  chmod -R a+rX "$UV_PYTHON_INSTALL_DIR"
+}
+
 install_comfyui() {
   log "installing ComfyUI $COMFYUI_REF with Python $COMFYUI_PYTHON"
   id -u comfyui >/dev/null 2>&1 || useradd --system --home-dir /var/lib/comfyui --create-home --shell /usr/sbin/nologin comfyui
   install_uv
-  local src="$APP_ROOT/ComfyUI"
+  local src="$APP_ROOT/ComfyUI" managed_python
   if [[ ! -d "$src/.git" ]]; then
     git clone https://github.com/Comfy-Org/ComfyUI.git "$src"
   fi
-  git -C "$src" fetch --tags --force
-  git -C "$src" checkout --detach "$COMFYUI_REF"
+  git_in_service_repo "$src" fetch --tags --force
+  git_in_service_repo "$src" checkout --detach "$COMFYUI_REF"
   "$APP_ROOT/uv/bin/uv" python install "$COMFYUI_PYTHON"
+  make_managed_python_executable
+  managed_python="$("$APP_ROOT/uv/bin/uv" python find --managed-python "$COMFYUI_PYTHON")"
+  [[ "$managed_python" == "$UV_PYTHON_INSTALL_DIR/"* ]] \
+    || die "uv resolved ComfyUI Python outside $UV_PYTHON_INSTALL_DIR: $managed_python"
   rm -rf "$src/.venv"
-  "$APP_ROOT/uv/bin/uv" venv --python "$COMFYUI_PYTHON" "$src/.venv"
-  "$APP_ROOT/uv/bin/uv" pip install --python "$src/.venv/bin/python" "torch==$TORCH_VERSION" torchvision torchaudio --index-url "$TORCH_INDEX"
+  "$APP_ROOT/uv/bin/uv" venv --python "$managed_python" "$src/.venv"
+  "$APP_ROOT/uv/bin/uv" pip install --python "$src/.venv/bin/python" \
+    "torch==$TORCH_VERSION" "torchvision==$TORCHVISION_VERSION" "torchaudio==$TORCHAUDIO_VERSION" \
+    --index-url "$TORCH_INDEX"
   "$APP_ROOT/uv/bin/uv" pip install --python "$src/.venv/bin/python" -r "$src/requirements.txt"
   install -d -o comfyui -g comfyui -m 0755 "$AI_ROOT/comfyui-output"
   install -d -o comfyui -g comfyui -m 0755 "$AI_ROOT/cache/huggingface"
   chown -R comfyui:comfyui "$src" "$AI_ROOT/comfyui-output" "$AI_ROOT/cache/huggingface"
+  runuser -u comfyui -- test -x "$src/.venv/bin/python" \
+    || die "ComfyUI's managed Python is not executable by the comfyui service user"
   cat > /etc/systemd/system/comfyui.service <<EOF_COMFY
 [Unit]
 Description=ComfyUI
@@ -429,18 +469,31 @@ install_pantheon_checkout() {
 install_livesync() {
   ((ENABLE_LIVESYNC == 1)) || return 0
   log "building qualified LiveSync CLI source at $LIVESYNC_REF"
-  local src="$APP_ROOT/obsidian-livesync"
+  local src="$APP_ROOT/obsidian-livesync" patched_dockerfile npm_injections
   if [[ ! -d "$src/.git" ]]; then git clone "$LIVESYNC_REPOSITORY" "$src"; fi
   git -C "$src" fetch origin "$LIVESYNC_REF"
   git -C "$src" checkout --detach "$LIVESYNC_REF"
-  docker build -f "$src/src/apps/cli/Dockerfile" -t "$LIVESYNC_IMAGE" "$src"
+  patched_dockerfile="$(mktemp)"
+  sed "/^[[:space:]]*RUN npm install/i RUN npm install --global npm@$LIVESYNC_BUILD_NPM_VERSION --no-audit --no-fund" \
+    "$src/src/apps/cli/Dockerfile" > "$patched_dockerfile"
+  npm_injections="$(grep -Fc "npm@$LIVESYNC_BUILD_NPM_VERSION" "$patched_dockerfile")"
+  if [[ "$npm_injections" != 2 ]]; then
+    rm -f "$patched_dockerfile"
+    die "expected two pinned npm injections in the derived LiveSync Dockerfile; found $npm_injections"
+  fi
+  if ! docker build -f "$patched_dockerfile" -t "$LIVESYNC_IMAGE" "$src"; then
+    rm -f "$patched_dockerfile"
+    die "LiveSync image build failed"
+  fi
+  rm -f "$patched_dockerfile"
 
   cat > /usr/local/bin/livesync-cli-node <<EOF_WRAPPER
 #!/bin/sh
 exec docker run --rm --network host \\
+  -e LIVESYNC_DB_PATH=/data/db \\
   -v $STATE_ROOT/livesync/db:/data/db \\
   -v $STATE_ROOT/obsidian:/data/vault \\
-  $LIVESYNC_IMAGE /data/db --vault /data/vault "\$@"
+  $LIVESYNC_IMAGE --vault /data/vault "\$@"
 EOF_WRAPPER
   chmod 755 /usr/local/bin/livesync-cli-node
 
@@ -450,11 +503,11 @@ Description=Self-hosted LiveSync headless daemon
 After=docker.service network-online.target
 Requires=docker.service
 Wants=network-online.target
-ConditionPathExists=$STATE_ROOT/livesync/db/settings.json
+ConditionPathExists=$STATE_ROOT/livesync/db/.livesync/settings.json
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/docker run --rm --name pantheon-livesync-headless --network host -v $STATE_ROOT/livesync/db:/data/db -v $STATE_ROOT/obsidian:/data/vault $LIVESYNC_IMAGE /data/db --vault /data/vault daemon --interval 30
+ExecStart=/usr/bin/docker run --rm --name pantheon-livesync-headless --network host -e LIVESYNC_DB_PATH=/data/db -v $STATE_ROOT/livesync/db:/data/db -v $STATE_ROOT/obsidian:/data/vault $LIVESYNC_IMAGE --settings /data/db/.livesync/settings.json --vault /data/vault daemon --interval 30
 ExecStop=-/usr/bin/docker stop -t 20 pantheon-livesync-headless
 Restart=on-failure
 RestartSec=5
@@ -471,12 +524,13 @@ start_containers() {
   compose up -d couchdb
   if [[ -t 0 && ! -f "$STATE_ROOT/hermes/config.yaml" ]]; then
     log "Hermes first-time setup will run interactively. Secrets remain under $STATE_ROOT/hermes."
+    compose stop hermes >/dev/null 2>&1 || true
     compose run --rm hermes setup || warn "Hermes setup did not complete; container will not be started automatically"
   fi
   if [[ -f "$STATE_ROOT/hermes/config.yaml" || -f "$STATE_ROOT/hermes/.env" ]]; then
     compose up -d hermes
   else
-    warn "Hermes is installed but not configured. Run: docker compose --env-file $APP_ROOT/compose-env -f $APP_ROOT/compose.yaml run --rm hermes setup"
+    warn "Hermes is installed but not configured. Run: docker compose --env-file $APP_ROOT/compose-env -f $APP_ROOT/compose.yaml -f $APP_ROOT/compose.hermes-local.yaml run --rm hermes setup"
   fi
   if ((ENABLE_HINDSIGHT == 1)); then
     compose --profile hindsight pull hindsight
