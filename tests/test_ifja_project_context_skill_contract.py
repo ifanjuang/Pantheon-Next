@@ -50,12 +50,16 @@ def test_ifja_project_context_routes_existing_sources_without_new_authority():
     assert registry.count(skill_path) == 1
 
 
-def test_project_resolution_keeps_alias_and_continuity_bounded():
+def test_project_resolution_keeps_alias_continuity_and_identity_bounded():
     text = PROJECT_RESOLUTION.read_text(encoding="utf-8")
 
     assert "User statements take precedence over earlier assistant wording" in text
     assert "conversation-local working referent" in text
     assert "Ask for targeted clarification only when choosing between them would materially change" in text
+    assert "conversation target != governed identity" in text
+    assert "Hindsight lead != source confirmation" in text
+    assert "A source-backed or governed identity is stronger confirmation than Hindsight recall" in text
+    assert "The third case reopens resolution; it does not authorize an automatic switch" in text
     assert "alias match != governed identity" in text
     assert "folder name != governed identity" in text
     assert "conversation continuity != durable persistence" in text
