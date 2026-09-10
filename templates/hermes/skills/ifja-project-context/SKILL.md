@@ -24,12 +24,15 @@ Do not use merely for generic conversation when no professional workspace contex
 
 Ground the active affaire/project from the request and available context. When project identity or the target referent is ambiguous, preserve the unresolved possibilities as a bounded candidate set; do not silently merge or select an identity merely to make reasoning easier. If the distinction would materially change the answer, permitted action or consequence, request targeted clarification or return a safe non-conclusion. If it would not, continue only from supported shared facts while carrying the uncertainty explicitly.
 
+Once an affaire/project is sufficiently grounded, keep it as the conversation-local working referent for elliptical follow-ups until the user selects another one or material evidence makes the referent uncertain. For detailed resolution and alias handling, use [references/project-resolution.md](references/project-resolution.md).
+
 Use Hindsight when associative recall materially helps with prior context, actors, chronology, earlier positions or dossier resolution.
 
 ```text
 Hindsight recall != source authority
 memory recalled != Evidence
 bounded referent candidate set != merged identity
+conversation continuity != governed persistence
 ```
 
 ### 2. Workspace first
@@ -41,6 +44,8 @@ Use admitted workspace bindings; do not hard-code filesystem paths, Hindsight ba
 - `AFFAIRES` + `DOCUMENTAIRES` -> consult both in parallel when a dossier-specific question must be tested against a transversal professional rule.
 
 Keep the two source families distinguishable in the synthesis.
+
+For claims about plans, PDFs or other professional documents, keep `mentioned != exact source present != relevant content inspected`. When content inspection matters, use [references/document-inspection.md](references/document-inspection.md).
 
 ### 3. External research only when it adds material value
 
@@ -74,6 +79,8 @@ retrieved != truth
 Hindsight != Evidence
 workspace source != governed truth
 external source != automatic authority
+mentioned != exact source present
+exact source present != relevant content inspected
 model agreement != Evidence
 runtime success != authorization
 candidate != Decision
