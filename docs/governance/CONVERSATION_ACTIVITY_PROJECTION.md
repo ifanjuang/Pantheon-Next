@@ -7,28 +7,39 @@ Boundary profile: candidate_support_note.
 
 Expose meaningful progress from Pantheon-governed Hermes work in chat surfaces without turning the chat into a technical log and without exposing hidden chain-of-thought.
 
-The user-facing grammar stays compact but must expose both the symbolic Pantheon identity and its plain semantic meaning.
+The user-facing grammar separates identity from the observable description:
 
 ```text
-[icon] [name] · [semantic label] — [brief observable rationale]
+[icon] [name] · [semantic label]
+[brief observable rationale]
+
 ```
+
+The blank line after the description separates successive milestones. Color is optional presentation enrichment only; meaning must remain complete through icon, name, semantic label and text.
 
 Examples:
 
 ```text
-🦉 Athena · Analyse / structuration — Le C2 est plus ancien que le DCE. Je vérifie si son estimation reste cohérente avec le périmètre actuel.
+🦉 Athena · Analyse / structuration
+Le C2 est plus ancien que le DCE. Je vérifie si son estimation reste cohérente avec le périmètre actuel.
 
-⚙ Hermes · Exécution — C2 et CCTP retrouvés. Je poursuis sur les dernières pièces identifiées.
+⚙ Hermes · Exécution
+C2 et CCTP retrouvés. Je poursuis sur les dernières pièces identifiées.
 
-⚖ Themis · Risque / conformité — Cette réponse engage une information financière : validation humaine nécessaire.
+⚖ Themis · Risque / conformité
+Cette réponse engage une information financière : validation humaine nécessaire.
+
 ```
 
-The same dual-label rule applies when a Rite or governed Space becomes materially relevant to the visible progression.
+The same dual-label rule applies when a Rite or governed Space becomes materially relevant.
 
 ```text
-🔁 Concordance des Sources · Rite de vérification — Les pièces financières ne portent pas toutes le même périmètre. Je compare leur date, leur portée et leurs contradictions avant de conclure.
+🔁 Concordance des Sources · Rite de vérification
+Les pièces financières ne portent pas toutes le même périmètre. Leur concordance doit être qualifiée avant de conclure.
 
-🏛 Agora · Espace de délibération — Deux lectures restent défendables. La divergence est rendue visible pour décision plutôt que lissée automatiquement.
+🏛 Agora · Espace de délibération
+Deux lectures restent défendables. La divergence est rendue visible pour décision plutôt que lissée automatiquement.
+
 ```
 
 This is a projection of observable work, not a new reasoning system, workflow engine, role system, Rite system, Space system or authority layer.
@@ -51,7 +62,7 @@ A conversation activity line does not replace any of those objects and is not it
 
 ## Semantic identity rule
 
-The mythological or symbolic name must never be the only explanation presented to the user when the semantic function is known.
+The symbolic name must never be the only explanation when the semantic function is known.
 
 ```text
 Athena
@@ -61,7 +72,7 @@ Athena · Analyse / structuration
 = preferred compact display
 ```
 
-The presentation label explains the current responsibility without redefining the underlying object.
+Presentation labels explain current responsibility without redefining the underlying object.
 
 ```text
 symbolic name != semantic authority
@@ -97,9 +108,7 @@ Adapters may expose other bounded runtime or boundary identities only when their
 
 ### Rites
 
-A Rite is a governed method, not an actor. When a Rite materially affects the current progression, display its governed name plus a short method label.
-
-Examples:
+A Rite is a governed method, not an actor. When a Rite materially affects current progression, display its governed name plus a short method label.
 
 ```text
 🔁 Divergence Contrôlée · Rite d'exploration
@@ -109,7 +118,7 @@ Examples:
 🔁 Refondation de Session · Rite de recadrage
 ```
 
-The label is explanatory only. Rite lifecycle, authorization, closure and retained outputs remain owned by the Rite doctrine.
+The label is explanatory only.
 
 ```text
 rite visible != rite authorized
@@ -117,13 +126,9 @@ rite selected != rite running
 rite completed != output approved
 ```
 
-A Rite should appear in chat only when its invocation, result, tension or closure materially helps the user understand why the work changed direction.
-
 ### Governed Spaces
 
-A governed Space is a durable distinction between kinds of activity. When a Space materially explains where an activity or deliberation belongs, display its governed name plus its semantic purpose.
-
-Examples based on current doctrine:
+A governed Space is a durable distinction between kinds of activity. Show it only when it materially explains where activity or deliberation belongs.
 
 ```text
 🏛 Agora · Espace de délibération
@@ -131,7 +136,7 @@ Examples based on current doctrine:
 📚 Governance Reference Space · Référentiel de gouvernance
 ```
 
-The exact visible label should follow the active Cockpit/navigation owner when a localized product label already exists.
+The exact visible label follows the active owner when a localized product label already exists.
 
 ```text
 space visible != space owns object
@@ -164,6 +169,186 @@ Hermes success != Pantheon validation
 channel delivery != action authorization
 ```
 
+## What the projection should make understandable
+
+The projection is not primarily an activity monitor. Its purpose is to make governed transformation understandable.
+
+At any meaningful point, the user should be able to answer five questions:
+
+```text
+Why this step?
+What does it rely on?
+What changed?
+What still blocks progress?
+Who or what must act next?
+```
+
+The most valuable visible changes are changes in legitimacy, evidence coverage, contradiction, risk, authorization posture and decision state.
+
+### Trigger / why now
+
+When useful, expose the observable condition that caused a meaningful change of responsibility or method.
+
+```text
+🦉 Athena · Analyse / structuration
+Le DCE est plus récent que le C2. Cette version plus récente déclenche une vérification du périmètre financier.
+
+```
+
+The trigger is an observable reason summary, never hidden chain-of-thought.
+
+### Information legitimacy ladder
+
+Pantheon should make it possible to understand how an information item changes status without implying certainty that has not been established.
+
+```text
+retrieved
+-> source identified
+-> scope/version qualified
+-> corroborated or contradicted
+-> usable with stated limits
+-> Evidence Pack Candidate when applicable
+-> human-approved only at the applicable gate
+```
+
+The renderer may expose the current relevant stage, but must not manufacture intermediate states merely for visual progression.
+
+```text
+retrieved != true
+source identified != Evidence
+corroborated != approved
+Evidence Pack Candidate != Evidence
+runtime success != authorization
+```
+
+### Material alternatives and discarded paths
+
+When a branch materially affected the result, the user may be shown the retained and rejected alternatives with a short observable reason.
+
+```text
+Voies examinées
+✓ conserver C2 comme repère historique
+✕ présenter 120 k€ comme coût actuel arrêté — périmètre trop ancien
+→ recalcul depuis le DCE actuel — encore ouvert
+```
+
+Do not expose scratchpad branches, token-level alternatives or internal model deliberation. Only project alternatives that correspond to observable governed choices, evidence differences, scope differences or explicit decisions.
+
+### Material tensions
+
+A material tension may be exposed when it explains why Pantheon does not immediately converge.
+
+```text
+⚡ Tension active · rapidité ↔ fiabilité financière
+Athena considère l'enveloppe exploitable pour cadrer ; Themis limite son usage pour une affirmation destinée au client.
+```
+
+A tension is not a theatrical debate. It must correspond to distinct governed responsibilities or a real unresolved trade-off.
+
+### Coverage instead of synthetic confidence
+
+Do not invent a generic AI confidence percentage.
+
+Prefer observable coverage indicators:
+
+```text
+Sources attendues : 3/3 retrouvées
+Version applicable : vérifiée
+Contradictions : 1 ouverte
+Evidence : candidate
+Validation : requise
+```
+
+A percentage may be shown only when a runtime or governed procedure actually measures a defined quantity, such as pages processed. Measured progress is not epistemic confidence.
+
+### Current holder and next action
+
+The user should be able to see where the task currently waits.
+
+```text
+Pantheon  cadrage ✓
+Hermes    recherche ✓
+Athena    analyse ✓
+Themis    réserve ✓
+Utilisateur  décision requise ←
+```
+
+This is a projection of current state, not a new scheduler, queue or ownership engine.
+
+### What Pantheon changed
+
+When governance materially changes the deliverable, a compact before/after explanation may make Pantheon's contribution explicit.
+
+```text
+Avant contrôle
+« budget actuel ≈ 120 k€ »
+
+Après contrôle
+« 120 k€ = enveloppe haute d'un état antérieur ; coût actuel à recalculer depuis le DCE »
+```
+
+This comparison must be grounded in observable source/status changes. It must not exaggerate Pantheon's contribution or imply that Pantheon independently established truth.
+
+## Progressive disclosure
+
+Conversation surfaces should remain calm. Additional detail belongs behind progressive disclosure when the channel supports it.
+
+### Level 1 — conversation
+
+Show only meaningful milestones:
+
+- identity and semantic function;
+- concise observable description;
+- material blocker or decision request;
+- optional small status when it changes interpretation.
+
+### Level 2 — event detail
+
+An expanded event may show:
+
+- trigger;
+- objective or Task Contract reference;
+- source references and version/scope status;
+- evidence posture;
+- contradiction/tension;
+- Rite or governed Space if materially active;
+- approval posture;
+- next action;
+- produced candidate/artifact references.
+
+### Level 3 — Cockpit / audit
+
+The Cockpit may expose the broader trace, project graph, role/rite/space context, Evidence Pack Candidates, approvals, artifacts and bounded runtime trace references according to their existing owners.
+
+Progressive disclosure does not change authority:
+
+```text
+more visible detail != more authority
+projection != persistence
+expanded trace != Evidence
+```
+
+## Presentation and color
+
+The stable textual grammar is:
+
+```text
+[icon] [name] · [semantic function]
+[description]
+
+```
+
+Color may enrich interfaces that support it, but must never carry unique governance meaning.
+
+Recommended presentation hierarchy:
+
+- first line may receive an identity/family accent;
+- description remains normal body text;
+- risk/blocking/decision state may receive an accessible status accent;
+- Telegram or plain-text channels remain fully understandable without color.
+
+Do not assign a unique semantic meaning solely through hue. Icons, labels and text remain authoritative for presentation meaning.
+
 ## Minimal projection
 
 Do not create a parallel canonical event model merely for chat.
@@ -185,23 +370,7 @@ conversation_projection:
   conversation_visibility: visible
 ```
 
-For a Rite or Space, the same display shape may be derived without asserting a new persisted schema:
-
-```yaml
-visible_identity:
-  kind: rite
-  id: CONCORDANCE_DES_SOURCES
-  name: Concordance des Sources
-  semantic_label: Rite de vérification
-```
-
-```yaml
-visible_identity:
-  kind: governed_space
-  id: AGORA
-  name: Agora
-  semantic_label: Espace de délibération
-```
+For a Rite or Space, the same display shape may be derived without asserting a new persisted schema.
 
 These examples describe presentation projection only. No new persisted field is required until a concrete runtime producer demonstrates that existing trace/event and owner surfaces cannot provide the necessary identity safely.
 
@@ -217,9 +386,7 @@ meaningful step
 -> channel projection
 ```
 
-The projection should not wait for the final answer when the runtime can safely expose an intermediate milestone.
-
-It also must not publish every tool call, token, retry or retrieval attempt.
+The projection should not wait for the final answer when the runtime can safely expose an intermediate milestone. It also must not publish every tool call, token, retry or retrieval attempt.
 
 ### Publishable milestones
 
@@ -228,8 +395,9 @@ A chat surface may show a line when one of these materially changes:
 - responsibility or visible Role;
 - Rite invocation, material result or closure;
 - governed Space when it clarifies a deliberation or activity boundary;
-- source/evidence coverage;
+- source/evidence coverage or legitimacy state;
 - important finding or contradiction;
+- material alternative accepted/rejected;
 - bounded delegation or return from research;
 - approval or governance posture;
 - blocking uncertainty;
@@ -254,35 +422,30 @@ A burst of runtime operations may therefore produce one conversation line.
 
 ## Summary style
 
-Target one or two short sentences. The preferred content is:
-
-```text
-observation + consequence/next move
-```
+Target one or two short sentences: observation + consequence/next move.
 
 Good:
 
 ```text
-🦉 Athena · Analyse / structuration — Le C2 est antérieur au DCE actuel. Je vérifie les écarts de périmètre avant de retenir son estimation.
+🦉 Athena · Analyse / structuration
+Le C2 est antérieur au DCE actuel. Je vérifie les écarts de périmètre avant de retenir son estimation.
+
 ```
 
 Too thin:
 
 ```text
-🦉 Athena · Analyse / structuration — Analyse en cours.
+🦉 Athena · Analyse / structuration
+Analyse en cours.
 ```
 
-Too detailed:
-
-```text
-A transcript of internal model deliberation, intermediate scoring, hidden prompt state or scratchpad.
-```
+Too detailed: a transcript of internal model deliberation, intermediate scoring, hidden prompt state or scratchpad.
 
 ## Channel neutrality
 
 The same projection may be rendered by Telegram, WhatsApp, OpenWebUI, a Hermes WebUI or another admitted chat surface.
 
-The channel must not invent governance semantics. It receives or derives a display projection from an observable event and renders it.
+The channel must not invent governance semantics. Transport-specific formatting may differ; identity and semantic status must not.
 
 ```text
 same governed event
@@ -290,8 +453,6 @@ same governed event
 -> OpenWebUI line
 -> cockpit timeline entry
 ```
-
-Transport-specific formatting may differ; identity and semantic status must not.
 
 ## Relationship with Role Signals
 
@@ -311,7 +472,9 @@ conversation activity != Role Signal
 When useful, a compact activity line may summarize the latest meaningful runtime observation:
 
 ```text
-⚙ Hermes · Exécution — OCR : 18/42 pages traitées. La progression est mesurée par le runtime ; aucune conclusion documentaire n'est encore tirée.
+⚙ Hermes · Exécution
+OCR : 18/42 pages traitées. La progression est mesurée par le runtime ; aucune conclusion documentaire n'est encore tirée.
+
 ```
 
 Quantified progress remains runtime-reported progress, not Pantheon-measured truth.
@@ -329,13 +492,17 @@ If a new mechanism changes data exposure, effect ceiling, approval posture, sour
 When work cannot continue safely:
 
 ```text
-⛔ Athena · Analyse / structuration — Les pièces retrouvées se contredisent sur le montant. Je ne peux pas conclure sans une source plus récente.
+⛔ Athena · Analyse / structuration
+Les pièces retrouvées se contredisent sur le montant. Je ne peux pas conclure sans une source plus récente.
+
 ```
 
 When only the user can resolve the remaining ambiguity:
 
 ```text
-❓ Athena · Analyse / structuration — Les documents permettent deux lectures. Souhaites-tu conserver l'enveloppe C2 ou recalculer depuis le DCE actuel ?
+❓ Athena · Analyse / structuration
+Les documents permettent deux lectures. Souhaites-tu conserver l'enveloppe C2 ou recalculer depuis le DCE actuel ?
+
 ```
 
 A user question is a real workflow boundary, not a cosmetic progress message.
@@ -349,10 +516,10 @@ A controlled test should verify the following observable sequence without requir
 2. Pantheon classification is observable as consulted/qualified, not as blanket approval.
 3. Athena identifies the need for current financial sources.
 4. Hermes retrieves the exact C2 and current DCE/CCTP sources through the admitted IFJA retrieval path.
-5. Athena records the material date/scope difference.
-6. Concordance des Sources may be projected if a governed Rite is actually invoked and materially changes the review.
-7. Themis or the applicable governance review qualifies the professional/financial delivery boundary.
-8. Agora may be projected only if a real visible deliberation or unresolved human choice is opened there.
+5. Retrieval is visibly distinct from source qualification.
+6. Athena records the material date/scope difference.
+7. Concordance des Sources may be projected if a governed Rite is actually invoked and materially changes the review.
+8. Themis or the applicable governance review qualifies the professional/financial delivery boundary.
 9. If evidence is sufficient, a Result Candidate is prepared; otherwise a user/source gap is shown.
 10. The chat receives only meaningful compact activity lines plus the final candidate response.
 ```
@@ -360,24 +527,32 @@ A controlled test should verify the following observable sequence without requir
 Expected compact shape:
 
 ```text
-🦉 Athena · Analyse / structuration — Je vérifie d'abord quelles pièces financières sont actuellement applicables.
+🦉 Athena · Analyse / structuration
+Je vérifie d'abord quelles pièces financières sont actuellement applicables.
 
-⚙ Hermes · Exécution — C2 et DCE retrouvés. Le DCE est postérieur et décrit un périmètre plus précis.
+⚙ Hermes · Exécution
+C2 et DCE retrouvés. Le DCE est postérieur et décrit un périmètre plus précis.
 
-🔁 Concordance des Sources · Rite de vérification — Les périmètres diffèrent. Je conserve l'écart visible avant toute conclusion financière.
+🔁 Concordance des Sources · Rite de vérification
+Les périmètres diffèrent. Je conserve l'écart visible avant toute conclusion financière.
 
-⚖ Themis · Risque / conformité — Information financière destinée au client : la réponse reste candidate jusqu'à validation humaine.
+⚖ Themis · Risque / conformité
+Information financière destinée au client : la réponse reste candidate jusqu'à validation humaine.
+
 ```
+
+An expanded view should additionally be able to explain the trigger, source status, contradiction, approval posture, current holder and what Pantheon materially changed.
 
 ## Implementation order
 
 1. Keep `ROLE_DIALOGUE_TRACE` as the conceptual trace authority; do not create a competing canonical event family.
 2. Reuse canonical Role, Rite and governed Space identities and resolve short semantic labels at presentation time.
 3. Identify the smallest existing Hermes/runtime progress hook able to emit meaningful milestones.
-4. Map milestones to safe summaries without exposing hidden reasoning.
+4. Map milestones to safe summaries and observable state changes without exposing hidden reasoning.
 5. Add deduplication/throttling so repeated operations or unchanged identity metadata do not flood chat.
-6. Render the same projection through the active gateway/chat adapter.
-7. Add the Floquet controlled test covering Pantheon classification, IFJA retrieval, source comparison, optional Rite/Space projection, approval boundary and progressive delivery.
+6. Add progressive disclosure where the target UI supports expansion; preserve plain-text fallback.
+7. Render the same projection through the active gateway/chat adapter.
+8. Add the Floquet controlled test covering Pantheon classification, IFJA retrieval, source comparison, optional Rite/Space projection, approval boundary and progressive delivery.
 
 If Hermes exposes no suitable progress/event hook, return a Capability Gap and implement the smallest adapter at the Hermes boundary rather than adding execution logic to Pantheon.
 
@@ -386,12 +561,18 @@ If Hermes exposes no suitable progress/event hook, return a Capability Gap and i
 This feature is complete only when a controlled live run demonstrates that:
 
 - activity arrives progressively rather than only at final response;
+- identity header and description are separated by a line break, with a blank line between milestones;
 - a visible Pantheon identity shows both its governed name and a plain semantic label;
-- Rite and governed Space labels appear only when those objects are actually relevant;
+- color is optional and no governance meaning depends on it;
+- Rite and governed Space labels appear only when actually relevant;
 - Hermes remains visibly identified as runtime execution rather than a Pantheon Role;
+- the user can understand why a material step happened, what it relied on, what changed, what remains blocked and who acts next;
+- retrieval can visibly progress through qualification without being represented as truth;
+- material contradictions and tensions can remain visible rather than being silently flattened;
+- coverage indicators are observable and no synthetic confidence percentage is invented;
+- a material before/after may explain what governance changed;
 - summaries are concise and contain no hidden reasoning;
 - low-level tool noise is suppressed;
-- source retrieval is not represented as truth;
 - Rite completion is not represented as output approval;
 - Space projection is not represented as persistence or authority;
 - Hermes execution is not represented as approval;
