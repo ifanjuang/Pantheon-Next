@@ -157,6 +157,40 @@ Do not emit `prior_decision_reuse` merely because the user says the information
 should be reusable later. If the information is being stored now for future
 reuse, that describes promotion, not reuse of an already-retained decision.
 
+## External action direction
+
+Distinguish preparing content for an external audience from asking Hermes to
+cause an actual effect outside the current interaction.
+
+```text
+external_transmission
+= information is requested to be sent, submitted, published, or otherwise
+  transmitted outside the current interaction
+
+client_delivery
+= the requested external recipient is a client
+
+external_effect
+= the request asks Hermes to cause a real-world or external-system effect,
+  including sending, publishing, submitting, changing, creating, deleting,
+  booking, paying, approving, or otherwise acting outside the conversation
+```
+
+When the user asks to actually send or publish information, emit all materially
+required transmission conditions:
+
+```text
+external_transmission
+external_effect
+```
+
+Add `client_delivery` when the requested recipient is a client.
+
+A draft, rewrite, message preparation, or recipient-specific formatting request
+does not imply `external_effect` unless actual transmission or another external
+action is requested. `external_effect` describes the requested consequence; it
+does not authorize that consequence or imply that it occurred.
+
 Examples:
 
 ```text
@@ -176,6 +210,7 @@ Examples:
 "Envoie cette réponse au client"
 -> external_transmission
 -> client_delivery
+-> external_effect
 
 "Fais trois idées de logo"
 -> artifact_fabrication
