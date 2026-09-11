@@ -29,8 +29,6 @@ REFUSED_EFFECTS = {
     "execute": "executing a capability or tool",
 }
 
-# French and English action words mapped to the refused effects above, so a
-# request phrased in the maintainer's working language is refused identically.
 _REFUSAL_RE = {
     "send": r"send|envoyer|envoi|transmettre|transmission",
     "write": r"write|écrire|ecrire",
@@ -64,8 +62,8 @@ _K4_TRIGGERS = re.compile(
 )
 
 # Canonical GLOSSARY K0 explicitly includes orientation, formatting and harmless
-# drafts. These operation hints may therefore stay K0 when no higher-consequence
-# semantic or lexical trigger is present.
+# drafts. These operation hints may therefore stay K0 when no stronger semantic
+# or lexical trigger is present.
 _K0_TRANSFORMATIONS = {
     "rewrite",
     "wording",
@@ -74,6 +72,16 @@ _K0_TRANSFORMATIONS = {
     "formatting",
     "summarize",
     "summary",
+}
+
+# Conditions that may still describe harmless shaping work. Any other declared
+# governed condition prevents the K0 fast exit and falls back to normal
+# consequence classification.
+_K0_SAFE_CONDITIONS = {
+    "unclear_output",
+    "narrative_or_editorial_work",
+    "delivery_quality_required",
+    "recipient_specific_format",
 }
 
 _K_TO_V = {"K0": "V0", "K1": "V1", "K2": "V2", "K3": "V3", "K4": "V4"}
@@ -115,6 +123,22 @@ def _semantic_observations(request: dict) -> dict:
     return observations if isinstance(observations, dict) else {}
 
 
+def _declared_conditions(request: dict, observations: dict) -> set[str]:
+    """Collect declared condition names without treating them as truth."""
+    conditions: set[str] = set()
+    raw = request.get("conditions") or []
+    if isinstance(raw, str):
+        raw = [raw]
+    if isinstance(raw, list):
+        conditions.update(str(item) for item in raw if str(item))
+
+    # Semantic intake may also provide condition booleans in observations.
+    for key, value in observations.items():
+        if value is True and key in request_handling.ROLE_TRIGGER_MAP:
+            conditions.add(str(key))
+    return conditions
+
+
 def _semantic_bool(request: dict, observations: dict, name: str) -> bool:
     """Prefer an explicit caller observation, otherwise use the legacy field."""
     if name in observations:
@@ -123,24 +147,16 @@ def _semantic_bool(request: dict, observations: dict, name: str) -> bool:
 
 
 def classify_request(request: dict) -> dict:
-    """Classify a described request. Input fields (all optional):
+    """Classify a described request.
 
-    intent (str), external_effect (bool|"unknown"), writes_state (bool),
-    delegated_execution (bool), memory_promotion_requested (bool),
-    transmission_requested (bool), professional_position (bool),
-    financial_or_contractual_effect (bool), scope (dict with
-    scope_type/scope_id), perform (list of actions the caller asks THIS server
-    to do — these are refused, never done).
+    ``conditions`` is the preferred generic semantic intake vocabulary. It uses
+    existing governed Role Activation trigger names and remains candidate input,
+    not truth or authorization. Legacy semantic fields remain supported during
+    migration.
 
     ``requested_transformation`` may identify a harmless formatting/draft
     operation such as ``rewrite`` or ``formatting``. It stays K0 only while no
-    stronger semantic or lexical consequence trigger is present.
-
-    ``observations`` may carry caller-provided semantic candidates such as
-    ``professional_position``, ``financial_or_contractual_effect``,
-    ``source_required`` or ``contradiction_detected``. They are candidate
-    observations, not truth or authorization. Pantheon qualifies their
-    governance consequence and returns a bounded ``handling`` projection.
+    stronger lexical, semantic or governed condition is present.
 
     ``delegated_execution`` defaults to True. Only an operational PEP that knows
     an effect is a direct human action should send False; the policy HTTP API is
@@ -172,34 +188,53 @@ def classify_request(request: dict) -> dict:
     delegated_execution = raw_delegated
 
     observations = _semantic_observations(request)
+    conditions = _declared_conditions(request, observations)
     intent = str(request.get("intent", ""))
     requested_transformation = str(request.get("requested_transformation", "")).strip().lower()
-    external = observations.get("external_effect", request.get("external_effect", False))
-    transmission = _semantic_bool(request, observations, "transmission_requested") or _semantic_bool(
-        request, observations, "external_transmission"
+
+    condition_external = "external_effect" in conditions
+    condition_transmission = bool(
+        {"external_transmission", "client_delivery", "public_output"}.intersection(conditions)
     )
-    memory = _semantic_bool(request, observations, "memory_promotion_requested")
+    condition_memory = "memory_promotion" in conditions
+    condition_professional = bool(
+        {"legal_or_professional_risk", "liability_risk"}.intersection(conditions)
+    )
+
+    external = observations.get("external_effect", request.get("external_effect", False))
+    if condition_external:
+        external = True
+
+    transmission = (
+        _semantic_bool(request, observations, "transmission_requested")
+        or _semantic_bool(request, observations, "external_transmission")
+        or condition_transmission
+    )
+    memory = _semantic_bool(request, observations, "memory_promotion_requested") or condition_memory
     writes = _semantic_bool(request, observations, "writes_state")
-    professional_position = _semantic_bool(request, observations, "professional_position")
+    professional_position = (
+        _semantic_bool(request, observations, "professional_position")
+        or condition_professional
+    )
     financial_or_contractual = _semantic_bool(
         request, observations, "financial_or_contractual_effect"
     )
-    # Proposing Registre Probatoire material is evidence-class work (K3+),
-    # even though the candidate itself is never promoted here.
+
     register_material = bool(request.get("register_candidates"))
     scope = request.get("scope") or {}
     k4_intent_trigger = bool(_K4_TRIGGERS.search(intent))
     k3_intent_trigger = bool(_K3_TRIGGERS.search(intent))
+    k0_conditions_safe = not conditions.difference(_K0_SAFE_CONDITIONS)
 
     if external is True or transmission or memory or professional_position or financial_or_contractual:
         consequence = "K4"
     elif external == "unknown":
-        consequence = "K4"  # unknown external effect escalates, never relaxes
+        consequence = "K4"
     elif k4_intent_trigger:
         consequence = "K4"
     elif writes or register_material or k3_intent_trigger:
         consequence = "K3"
-    elif requested_transformation in _K0_TRANSFORMATIONS:
+    elif requested_transformation in _K0_TRANSFORMATIONS and k0_conditions_safe:
         consequence = "K0"
     elif intent.strip():
         consequence = "K2"
@@ -217,23 +252,10 @@ def classify_request(request: dict) -> dict:
     if transmission or memory or professional_position or financial_or_contractual:
         approval = "C4"
     elif consequence == "K4" and k4_intent_trigger:
-        # A high-consequence claim intent is C4 even when the semantic caller
-        # did not supply a more specific consequence flag.
         approval = "C4"
 
-    # A Task Contract governs delegated external-runtime work. A direct human
-    # Cockpit/CLI effect can still be K3/K4 and require a bound human decision,
-    # but inventing a Task Contract for that act would misstate its execution
-    # boundary. Omission remains conservative: callers default to delegated.
     task_contract_required = consequence in ("K2", "K3", "K4") and delegated_execution
 
-    # ``writes_state`` alone does not make the written content Evidence. Direct
-    # human local-state effects (review status, admitted binding, exact governed
-    # state transition) therefore do not fabricate an Evidence Pack merely to
-    # satisfy transport. Evidence remains mandatory for delegated consequential
-    # work, external/transmission/memory effects, professional/contractual
-    # positions, register material, and intents whose semantics themselves carry
-    # K3/K4 assertion risk.
     evidence_required = consequence in ("K3", "K4") and bool(
         delegated_execution
         or external is True
@@ -247,9 +269,6 @@ def classify_request(request: dict) -> dict:
         or k4_intent_trigger
     )
 
-    # K4 always stops at the User Decision Gate. Direct-human governed writes
-    # also require the human decision reference that makes them direct-human in
-    # the first place; ``delegated_execution=False`` is never an authorization.
     blocked_until_gate = consequence == "K4" or (not delegated_execution and writes)
 
     gates: list[str] = []
@@ -275,6 +294,7 @@ def classify_request(request: dict) -> dict:
         "required_gates": gates,
         "allowed_output": "candidate only (Result Candidate + Evidence Pack Candidate)",
         "scope_seen": scope or None,
+        "conditions_seen": sorted(conditions),
         "doctrine_refs": _DOCTRINE_REFS,
         "authority_note": _AUTHORITY_NOTE,
     }
