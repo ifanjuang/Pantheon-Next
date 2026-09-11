@@ -47,6 +47,17 @@ def test_request_intake_is_a_bounded_semantic_adapter_not_policy_authority() -> 
     assert "Do not emit a condition merely because a word appears in the request" in text
 
 
+def test_request_intake_distinguishes_memory_promotion_from_prior_reuse() -> None:
+    text = SKILL.read_text(encoding="utf-8")
+
+    assert "## Memory direction" in text
+    assert "retrieve or reuse information that is already retained" in text
+    assert "persistent, canonical, official" in text
+    assert "memory_candidate\nmemory_promotion\napproval_required" in text
+    assert "that describes promotion, not reuse of an already-retained decision" in text
+    assert "it is not an\napproval and does not authorize persistence" in text
+
+
 def test_skill_condition_examples_are_owned_by_role_activation_and_supported_by_policy() -> None:
     text = SKILL.read_text(encoding="utf-8")
     doctrine = _role_triggers()
