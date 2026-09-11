@@ -1,13 +1,8 @@
 """Progressive request-handling projection.
 
-This module turns caller-provided governed conditions plus the K/V/C
-classification into the smallest useful governance handling recommendation.
-It does not understand raw natural language, execute work, dispatch roles,
-run a workflow, authorize an effect, or approve an output.
-
-The preferred input is a small list of existing ROLE_ACTIVATION conditions plus
-optional non-persistent coordination relations. Topology is derived from those
-relations, not from domain-specific Role combinations.
+Consumes governed conditions plus optional coordination relations and projects
+the smallest useful governance handling. It does not parse raw language,
+execute work, dispatch Roles, authorize effects, or persist workflow state.
 """
 
 from __future__ import annotations
@@ -16,8 +11,6 @@ from typing import Any
 
 
 # Implemented subset of ROLE_ACTIVATION.md mandatory_role_triggers.
-# Tests bind every pair back to that doctrine so this module cannot silently
-# invent a parallel Role-trigger authority.
 ROLE_TRIGGER_MAP: dict[str, tuple[str, ...]] = {
     "complex_task": ("ATHENA",),
     "scope_split_required": ("ATHENA",),
@@ -50,9 +43,8 @@ ROLE_TRIGGER_MAP: dict[str, tuple[str, ...]] = {
     "recipient_specific_format": ("IRIS",),
 }
 
-# Compatibility aliases only. New callers should prefer `conditions` using the
-# governed vocabulary above.
-_LEGACY_FIELD_TO_CONDITION: dict[str, str] = {
+# Compatibility only. New callers should prefer governed `conditions`.
+_LEGACY_FIELD_TO_CONDITION = {
     "source_required": "source_required",
     "evidence_gap": "evidence_gap",
     "prior_state_required": "project_history_reuse",
@@ -85,7 +77,7 @@ _MATERIAL_RECONSULT_CONDITIONS = (
     "policy_conflict",
 )
 
-_SOURCE_CONDITIONS = {
+_SOURCE = {
     "factual_claim",
     "external_reference",
     "source_required",
@@ -93,14 +85,14 @@ _SOURCE_CONDITIONS = {
     "source_freshness_risk",
     "provenance_unclear",
 }
-_CONTINUITY_CONDITIONS = {
+_CONTINUITY = {
     "memory_recall_requested",
     "prior_decision_reuse",
     "project_history_reuse",
     "duplicate_or_supersession_risk",
     "memory_candidate",
 }
-_RISK_CONDITIONS = {
+_RISK = {
     "approval_required",
     "legal_or_professional_risk",
     "external_effect",
@@ -108,8 +100,8 @@ _RISK_CONDITIONS = {
     "liability_risk",
     "memory_promotion",
 }
-_STRUCTURE_CONDITIONS = {"complex_task", "scope_split_required", "multi_step_workflow"}
-_DELIVERY_CONDITIONS = {
+_STRUCTURE = {"complex_task", "scope_split_required", "multi_step_workflow"}
+_DELIVERY = {
     "external_transmission",
     "client_delivery",
     "public_output",
@@ -123,18 +115,19 @@ def _observations(request: dict[str, Any]) -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
 
 
-def _declared_conditions(request: dict[str, Any]) -> list[str]:
-    """Collect governed conditions without inferring them from prose."""
-    out: list[str] = []
+def _strings(value: Any) -> list[str]:
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, list):
+        return [str(item) for item in value if str(item)]
+    return []
 
-    raw = request.get("conditions") or []
-    if isinstance(raw, str):
-        raw = [raw]
-    if isinstance(raw, list):
-        for item in raw:
-            value = str(item)
-            if value in ROLE_TRIGGER_MAP and value not in out:
-                out.append(value)
+
+def _conditions(request: dict[str, Any]) -> list[str]:
+    out: list[str] = []
+    for value in _strings(request.get("conditions")):
+        if value in ROLE_TRIGGER_MAP and value not in out:
+            out.append(value)
 
     observations = _observations(request)
     for condition in ROLE_TRIGGER_MAP:
@@ -142,13 +135,11 @@ def _declared_conditions(request: dict[str, Any]) -> list[str]:
             out.append(condition)
 
     for field, condition in _LEGACY_FIELD_TO_CONDITION.items():
-        value = observations.get(field, request.get(field))
-        if value is True and condition not in out:
+        if observations.get(field, request.get(field)) is True and condition not in out:
             out.append(condition)
 
     if request.get("transmission_requested") is True and "external_transmission" not in out:
         out.append("external_transmission")
-
     return out
 
 
@@ -162,7 +153,6 @@ def _viewpoints(conditions: list[str]) -> list[str]:
 
 
 def _pairs(value: Any) -> list[list[str]]:
-    """Normalize a list of two-item relations; malformed candidates are ignored."""
     if not isinstance(value, list):
         return []
     out: list[list[str]] = []
@@ -175,7 +165,6 @@ def _pairs(value: Any) -> list[list[str]]:
 
 
 def _groups(value: Any) -> list[list[str]]:
-    """Normalize independent groups with at least two named members."""
     if not isinstance(value, list):
         return []
     out: list[list[str]] = []
@@ -187,123 +176,108 @@ def _groups(value: Any) -> list[list[str]]:
     return out
 
 
-def _strings(value: Any) -> list[str]:
-    if isinstance(value, str):
-        return [value]
-    if isinstance(value, list):
-        return [str(item) for item in value if str(item)]
-    return []
-
-
 def _coordination(request: dict[str, Any]) -> dict[str, Any]:
-    """Return bounded, non-persistent coordination relations supplied by caller."""
     raw = request.get("coordination")
     if not isinstance(raw, dict):
         return {}
 
-    coordination: dict[str, Any] = {}
+    result: dict[str, Any] = {}
     requires = _pairs(raw.get("requires"))
     independent = _groups(raw.get("independent"))
     branch_on = _strings(raw.get("branch_on"))
     repeat_until = _strings(raw.get("repeat_until"))
-    synthesize = bool(raw.get("synthesize", False))
 
     if requires:
-        coordination["requires"] = requires
+        result["requires"] = requires
     if independent:
-        coordination["independent"] = independent
-    if synthesize:
-        coordination["synthesize"] = True
+        result["independent"] = independent
+    if bool(raw.get("synthesize", False)):
+        result["synthesize"] = True
     if branch_on:
-        coordination["branch_on"] = branch_on
+        result["branch_on"] = branch_on
     if repeat_until:
-        coordination["repeat_until"] = repeat_until
-    return coordination
+        result["repeat_until"] = repeat_until
+    return result
 
 
-def _topology(coordination: dict[str, Any]) -> dict[str, Any] | None:
-    """Derive an existing Task Contract topology from generic relations only."""
+def _topology(coordination: dict[str, Any]) -> dict[str, str] | None:
+    """Derive existing topology from generic relations, never from Role names."""
     if coordination.get("requires"):
         return {
             "suggested": "sequential_handoff",
-            "reason": "an explicit dependency requires one state to precede another",
+            "reason": "explicit dependency requires one state to precede another",
         }
-
     if coordination.get("branch_on"):
         return {
             "suggested": "router",
-            "reason": "the next path depends on an explicit observed condition",
+            "reason": "next path depends on an explicit observed condition",
         }
-
     if coordination.get("independent") and coordination.get("synthesize"):
         return {
             "suggested": "fanout_extract_then_single_synthesis",
-            "reason": "independent work may proceed separately before a shared synthesis",
+            "reason": "independent work precedes one shared synthesis",
         }
-
     if coordination.get("independent"):
         return {
             "suggested": "parallel_independent_workers",
-            "reason": "explicitly independent work may proceed in parallel",
+            "reason": "declared work items are independent",
         }
-
-    # repeat_until is a control condition, not an existing Task Contract topology.
     return None
 
 
-def _derived_completion_requirements(conditions: list[str]) -> list[str]:
-    """Fallback requirements derived from governed conditions."""
-    required: list[str] = []
-    if _STRUCTURE_CONDITIONS.intersection(conditions):
-        required.append("scope_and_method_bounded")
-    if _SOURCE_CONDITIONS.intersection(conditions):
-        required.append("supporting_basis_qualified")
-    if _CONTINUITY_CONDITIONS.intersection(conditions):
-        required.append("current_state_qualified")
-    if _RISK_CONDITIONS.intersection(conditions):
-        required.append("consequence_boundary_reviewed")
-    if _DELIVERY_CONDITIONS.intersection(conditions):
-        required.append("delivery_boundary_qualified")
-    return required
+def _fallback_completion(conditions: list[str]) -> list[str]:
+    result: list[str] = []
+    if _STRUCTURE.intersection(conditions):
+        result.append("scope_and_method_bounded")
+    if _SOURCE.intersection(conditions):
+        result.append("supporting_basis_qualified")
+    if _CONTINUITY.intersection(conditions):
+        result.append("current_state_qualified")
+    if _RISK.intersection(conditions):
+        result.append("consequence_boundary_reviewed")
+    if _DELIVERY.intersection(conditions):
+        result.append("delivery_boundary_qualified")
+    return result
 
 
-def _completion_requirements(request: dict[str, Any], conditions: list[str]) -> list[str]:
-    """Prefer explicit acceptance conditions; otherwise use bounded fallbacks."""
+def _completion(request: dict[str, Any], conditions: list[str]) -> list[str]:
     explicit = _strings(request.get("completion_requirements"))
-    return explicit or _derived_completion_requirements(conditions)
+    return explicit or _fallback_completion(conditions)
 
 
 def _effect_requested(request: dict[str, Any], conditions: list[str]) -> bool:
     observations = _observations(request)
-    external = observations.get("external_effect", request.get("external_effect"))
     return bool(
-        external is True
+        "external_effect" in conditions
         or "external_transmission" in conditions
+        or "client_delivery" in conditions
+        or "public_output" in conditions
         or "memory_promotion" in conditions
+        or observations.get("external_effect", request.get("external_effect")) is True
         or request.get("writes_state") is True
         or observations.get("writes_state") is True
     )
 
 
 def recommend_handling(request: dict[str, Any], classification: dict[str, Any]) -> dict[str, Any]:
-    """Return the smallest progressive governance handling recommendation."""
-    conditions = _declared_conditions(request)
+    conditions = _conditions(request)
     viewpoints = _viewpoints(conditions)
     coordination = _coordination(request)
     topology = _topology(coordination)
-    completion_requirements = _completion_requirements(request, conditions)
+    completion = _completion(request, conditions)
     effect_requested = _effect_requested(request, conditions)
-    conflict_detected = bool(
+    observations = _observations(request)
+    conflict = bool(
         request.get("conflict_detected") is True
-        or _observations(request).get("conflict_detected") is True
-        or _observations(request).get("contradiction_detected") is True
+        or observations.get("conflict_detected") is True
+        or observations.get("contradiction_detected") is True
     )
 
     needs_consult = bool(
         viewpoints
-        or completion_requirements
+        or completion
         or coordination
-        or conflict_detected
+        or conflict
         or classification.get("blocked_until_gate")
     )
 
@@ -317,26 +291,24 @@ def recommend_handling(request: dict[str, Any], classification: dict[str, Any]) 
     constraints: list[str] = []
     if request.get("conditions") or request.get("observations") or coordination:
         constraints.append("declared_conditions_and_relations_are_candidates_not_truth")
-    if _RISK_CONDITIONS.intersection(conditions):
+    if _RISK.intersection(conditions):
         constraints.append("do_not_increase_claim_authority_without_support")
     if request.get("requested_transformation") in {"rewrite", "wording", "polish"}:
         constraints.append("preserve_claim_status_and_meaning")
     if classification.get("evidence_required"):
         constraints.append("retrieved_material_is_not_evidence_until_qualified")
 
-    reconsult_if = [
-        condition
-        for condition in _MATERIAL_RECONSULT_CONDITIONS
-        if condition not in conditions
-    ]
-
     handling: dict[str, Any] = {
         "disposition": disposition,
         "conditions": conditions,
         "role_viewpoints": viewpoints,
-        "completion_requirements": completion_requirements,
+        "completion_requirements": completion,
         "constraints": constraints,
-        "reconsult_if": reconsult_if,
+        "reconsult_if": [
+            condition
+            for condition in _MATERIAL_RECONSULT_CONDITIONS
+            if condition not in conditions
+        ],
         "authority_note": (
             "Handling is policy guidance only. Conditions and coordination relations "
             "are candidate inputs, a viewpoint is not an agent, topology is not "
@@ -346,13 +318,13 @@ def recommend_handling(request: dict[str, Any], classification: dict[str, Any]) 
 
     if coordination:
         handling["coordination"] = coordination
-    if topology is not None:
+    if topology:
         handling["topology"] = topology
     if request.get("current_state") is not None:
         handling["current_state"] = request.get("current_state")
     if request.get("target_state") is not None:
         handling["target_state"] = request.get("target_state")
-    if conflict_detected:
+    if conflict:
         handling["rite_candidate"] = "concordance_des_sources"
     if classification.get("blocked_until_gate"):
         handling["effect_gate"] = {
@@ -360,5 +332,4 @@ def recommend_handling(request: dict[str, Any], classification: dict[str, Any]) 
             "required_before_effect": True,
             "effect_requested_now": effect_requested,
         }
-
     return handling
