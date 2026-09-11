@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import re
 
+from . import request_handling
+
 # Effects the policy server must refuse to perform itself (Phase 7 posture).
 REFUSED_EFFECTS = {
     "send": "sending anything externally",
@@ -56,7 +58,7 @@ _K3_TRIGGERS = re.compile(
 
 _K4_TRIGGERS = re.compile(
     r"\b(non[- ]?conform|claim|réclamation|reclamation|liability|responsibility|"
-    r"responsabilité|validate|valider|confirm|confirmer|price reduction|diminution du prix|"
+    r"responsabilité|validate|valider|price reduction|diminution du prix|"
     r"vefa|carrez|notarial|acqu[eé]reur|purchaser)\b",
     re.IGNORECASE,
 )
@@ -70,6 +72,8 @@ _DOCTRINE_REFS = [
     "docs/governance/UNIFORM_CAPABILITY_GOVERNANCE.md",
     "docs/governance/USER_DECISION_GATE.md",
     "docs/governance/TASK_CONTRACTS.md",
+    "docs/governance/REQUEST_LIFECYCLE.md",
+    "docs/governance/ROLE_ACTIVATION.md",
 ]
 
 _AUTHORITY_NOTE = (
@@ -93,6 +97,18 @@ def _refusals_in(request: dict) -> list[str]:
     return sorted(set(hits))
 
 
+def _semantic_observations(request: dict) -> dict:
+    observations = request.get("observations")
+    return observations if isinstance(observations, dict) else {}
+
+
+def _semantic_bool(request: dict, observations: dict, name: str) -> bool:
+    """Prefer an explicit caller observation, otherwise use the legacy field."""
+    if name in observations:
+        return observations.get(name) is True
+    return bool(request.get(name, False))
+
+
 def classify_request(request: dict) -> dict:
     """Classify a described request. Input fields (all optional):
 
@@ -102,6 +118,12 @@ def classify_request(request: dict) -> dict:
     financial_or_contractual_effect (bool), scope (dict with
     scope_type/scope_id), perform (list of actions the caller asks THIS server
     to do — these are refused, never done).
+
+    ``observations`` may carry caller-provided semantic candidates such as
+    ``professional_position``, ``financial_or_contractual_effect``,
+    ``source_required`` or ``contradiction_detected``. They are candidate
+    observations, not truth or authorization. Pantheon qualifies their
+    governance consequence and returns a bounded ``handling`` projection.
 
     ``delegated_execution`` defaults to True. Only an operational PEP that knows
     an effect is a direct human action should send False; the policy HTTP API is
@@ -132,13 +154,18 @@ def classify_request(request: dict) -> dict:
         }
     delegated_execution = raw_delegated
 
+    observations = _semantic_observations(request)
     intent = str(request.get("intent", ""))
-    external = request.get("external_effect", False)
-    transmission = bool(request.get("transmission_requested", False))
-    memory = bool(request.get("memory_promotion_requested", False))
-    writes = bool(request.get("writes_state", False))
-    professional_position = bool(request.get("professional_position", False))
-    financial_or_contractual = bool(request.get("financial_or_contractual_effect", False))
+    external = observations.get("external_effect", request.get("external_effect", False))
+    transmission = _semantic_bool(request, observations, "transmission_requested") or _semantic_bool(
+        request, observations, "external_transmission"
+    )
+    memory = _semantic_bool(request, observations, "memory_promotion_requested")
+    writes = _semantic_bool(request, observations, "writes_state")
+    professional_position = _semantic_bool(request, observations, "professional_position")
+    financial_or_contractual = _semantic_bool(
+        request, observations, "financial_or_contractual_effect"
+    )
     # Proposing Registre Probatoire material is evidence-class work (K3+),
     # even though the candidate itself is never promoted here.
     register_material = bool(request.get("register_candidates"))
@@ -170,8 +197,8 @@ def classify_request(request: dict) -> dict:
     if transmission or memory or professional_position or financial_or_contractual:
         approval = "C4"
     elif consequence == "K4" and k4_intent_trigger:
-        # A professional-position / financial-claim intent is a C4-class
-        # effect even when no explicit flag was set.
+        # A high-consequence claim intent is C4 even when the semantic caller
+        # did not supply a more specific consequence flag.
         approval = "C4"
 
     # A Task Contract governs delegated external-runtime work. A direct human
@@ -216,7 +243,7 @@ def classify_request(request: dict) -> dict:
     if not scope:
         gates.append("scope missing: declare scope_type/scope_id before work starts")
 
-    return {
+    report = {
         "result": "classified",
         "consequence_level": consequence,
         "required_verification": verification,
@@ -231,6 +258,8 @@ def classify_request(request: dict) -> dict:
         "doctrine_refs": _DOCTRINE_REFS,
         "authority_note": _AUTHORITY_NOTE,
     }
+    report["handling"] = request_handling.recommend_handling(request, report)
+    return report
 
 
 def check_external_action(description: str) -> dict:
