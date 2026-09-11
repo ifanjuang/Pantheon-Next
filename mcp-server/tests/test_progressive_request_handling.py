@@ -10,10 +10,13 @@ import sys
 import unittest
 from pathlib import Path
 
+import yaml
+
 MODULE_DIR = Path(__file__).resolve().parents[1]
+REPO_ROOT = MODULE_DIR.parent
 sys.path.insert(0, str(MODULE_DIR))
 
-from pantheon_mcp import policy  # noqa: E402
+from pantheon_mcp import policy, request_handling  # noqa: E402
 
 
 SCOPE = {"scope_type": "task", "scope_id": "progressive-handling-test"}
@@ -67,6 +70,10 @@ class TestProgressiveRequestHandling(unittest.TestCase):
             "do_not_strengthen_unverified_professional_claim",
             report["handling"]["constraints"],
         )
+        self.assertIn(
+            "legal_or_professional_risk",
+            report["handling"]["governance_triggers"],
+        )
 
     def test_source_and_prior_state_use_fanout_then_synthesis(self):
         report = policy.classify_request(
@@ -90,6 +97,10 @@ class TestProgressiveRequestHandling(unittest.TestCase):
             report["handling"]["next_state"]["completion_requires"],
             ["applicable_source_basis_qualified", "current_or_superseded_state_qualified"],
         )
+        self.assertIn(
+            "project_history_reuse",
+            report["handling"]["governance_triggers"],
+        )
 
     def test_material_contradiction_proposes_existing_rite(self):
         report = policy.classify_request(
@@ -104,6 +115,7 @@ class TestProgressiveRequestHandling(unittest.TestCase):
 
         self.assertEqual(report["handling"]["disposition"], "CONSULT")
         self.assertIn("ARGOS", report["handling"]["role_viewpoints"])
+        self.assertIn("evidence_gap", report["handling"]["governance_triggers"])
         self.assertEqual(
             report["handling"]["rite_candidate"],
             "concordance_des_sources",
@@ -142,8 +154,31 @@ class TestProgressiveRequestHandling(unittest.TestCase):
         )
         self.assertIn(
             "source_required",
-            report["handling"]["triggers"],
+            report["handling"]["observed_conditions"],
         )
+        self.assertIn(
+            "source_required",
+            report["handling"]["governance_triggers"],
+        )
+
+    def test_role_trigger_projection_is_subset_of_role_activation_doctrine(self):
+        doctrine = (REPO_ROOT / "docs/governance/ROLE_ACTIVATION.md").read_text(
+            encoding="utf-8"
+        )
+        marker = "mandatory_role_triggers:"
+        start = doctrine.index(marker)
+        end = doctrine.index("```", start)
+        parsed = yaml.safe_load(doctrine[start:end])
+        canonical = parsed["mandatory_role_triggers"]
+
+        for trigger, roles in request_handling.ROLE_TRIGGER_MAP.items():
+            for role in roles:
+                self.assertIn(role, canonical, f"role missing from doctrine: {role}")
+                self.assertIn(
+                    trigger,
+                    canonical[role],
+                    f"{trigger} -> {role} is not owned by ROLE_ACTIVATION.md",
+                )
 
 
 if __name__ == "__main__":
