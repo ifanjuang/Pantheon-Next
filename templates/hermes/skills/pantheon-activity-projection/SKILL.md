@@ -1,6 +1,6 @@
 ---
 name: pantheon-activity-projection
-description: "Project meaningful observable progress from non-trivial Pantheon-governed Hermes work into chat: initial plan, action/reason/goal, cited sources, methods, skills/tools actually used, result, limits and explicit handoff. Presentation only; never exposes hidden reasoning or creates governance state."
+description: "Project meaningful observable progress from non-trivial Pantheon-governed Hermes work into chat: plan, action/reason/goal, real sources and metadata, methods, skills/tools actually used, result, limits and explicit responsibility handoff. Presentation only."
 metadata:
   owner_layer: hermes
   status: candidate_template_only
@@ -11,12 +11,7 @@ metadata:
 
 # Pantheon activity projection
 
-Lightweight presentation adapter for Hermes chat surfaces.
-
-Use it only when work is non-trivial enough that progressive visibility helps the
-user understand what is happening. It does not create a trace backend, workflow,
-Role activation, Rite invocation, scheduler, queue, approval, Evidence, memory or
-authorization.
+Lightweight presentation adapter for non-trivial governed chat work.
 
 ```text
 projection != persistence
@@ -27,35 +22,20 @@ runtime success != approval
 summary rationale != hidden chain-of-thought
 ```
 
-## Proportional use
+## When to use it
 
-Keep the surface quiet by default.
-
-```text
-simple direct request
--> no activity projection, or one compact line only when materially useful
-
-non-trivial bounded task
--> initial plan + 2-4 meaningful milestones + final traceability summary
-
-complex / professional task
--> initial plan + meaningful source/method/status changes + final summary
-```
+Keep simple requests quiet. For a bounded non-trivial task, normally show one
+initial plan, 2-4 meaningful milestones, then a compact final summary. Show more
+only when a new material finding, source, contradiction, blocker, responsibility,
+approval posture or result actually changes the user's understanding.
 
 Do not publish every tool call, retrieval attempt, retry, token, internal branch
-or unchanged status.
-
-A milestone is useful when at least one user-relevant fact changes: source
-coverage, applicable version, contradiction, material finding, method, visible
-responsibility, blocker, approval posture, external-effect posture, result or
-next action.
+or unchanged runtime state.
 
 ## Initial plan
 
-For a non-trivial task, publish one compact plan before substantial execution.
-Describe the intended path, not a guaranteed runtime transcript.
-
-Prefer:
+Before substantial execution, show the intended path without pretending it is a
+guaranteed runtime transcript.
 
 ```text
 [visible identity] · Plan
@@ -63,52 +43,38 @@ Objectif: ...
 Étapes: ...
 Sources attendues: ...        # only when already known
 Méthode prévue: ...           # only when already selected/required
-→ Premier relais: ...         # only when an actual next responsibility is known
+→ Premier relais: ...         # only when the next responsibility is established
 ```
 
-If the observed task state later invalidates the plan, publish one short plan
-adjustment rather than silently pretending the initial plan still applies.
+If new evidence materially invalidates the plan, show one short adjustment.
 
-## Milestone content
+## Milestone grammar
 
-A meaningful milestone should answer, as compactly as possible:
+Use the smallest useful subset of:
 
 ```text
-Action
-= what observable work is being performed or has just completed
-
-Reason
-= the observable condition that makes the action relevant now
-
-Goal
-= the concrete result sought by this action
-
-Result
-= the observable outcome, finding, blocker or changed status
+[visible identity] · [semantic function]
+Action: observable work performed or completed
+Raison: observable condition making it relevant now
+But: concrete result sought
+Sources: [S1], [S2] ...       # when material
+Méthode: ...                  # only when actually selected/applied
+Skill: ...                    # only when actually used
+Outil: ...                    # only when actually invoked/observed
+Résultat: finding, blocker or changed status
+Limite: ...                   # when material
+→ Relais: next responsibility — reason
 ```
 
-Add only the optional fields that materially help:
+`Raison` is a concise observable rationale, not private reasoning. Never output a
+scratchpad, hidden chain-of-thought, token-level alternatives or invented debate.
 
-```text
-Sources
-Method
-Skills
-Tools
-Limits / status
-Handoff + handoff reason
-```
+## Identity and handoff
 
-Do not generate a private reasoning transcript. `Reason` is a concise observable
-rationale such as "two document revisions exist" or "the amount is not supported
-by an identified source".
+Use only a visible identity already established by the governed task/context.
+Do not activate a Role or invent a Rite to make the display look structured.
 
-## Visible identity
-
-Use the identity already established by the governed task/context. This skill
-must never activate a Role or invent a Rite merely to make the conversation look
-structured.
-
-Recommended compact labels follow the current conversation projection doctrine:
+Current compact labels:
 
 ```text
 🦉 Athena · Analyse / structuration
@@ -122,26 +88,28 @@ Recommended compact labels follow the current conversation projection doctrine:
 ⚙ Hermes · Exécution
 ```
 
-Hermes is an execution runtime, not a Pantheon Role.
+Hermes is a runtime, not a Pantheon Role.
+
+A `→ Relais` line means the next responsibility, not a new agent or dispatch. If
+Hermes actually delegates runtime work, report that separately as an observed
+Hermes delegation.
 
 ## Source citation
 
-When a source materially supports or limits a milestone, assign stable references
-for the current task and reuse them consistently:
+When a source materially supports or limits a milestone, assign stable task-local
+references and reuse them consistently.
 
 ```text
-[S1] Document title
-     Index/revision: C2
-     Date: 2026-05-14
-     Origin: IFJA_AFFAIRES
+[S1] <observed title>
+     Indice/révision: <observed value or non identifié>
+     Date: <observed value or non identifiée>
+     Origine: <observed repository/vault/location>
+     Page/section: <observed locator when useful>
 ```
 
-Include source metadata only when observed in the source or returned by the
-qualified retrieval path. Useful metadata may include title, index/revision,
-date, author, origin/location and exact page/section when available.
-
-Never infer a missing date, index or version. Use `not identified` (localized to
-the user's language) when the missing metadata is material; otherwise omit it.
+Include metadata only when it is present in the source or returned by the
+qualified retrieval path. Never infer a missing title, date, index, revision,
+author or version from context.
 
 ```text
 source returned != source verified
@@ -149,57 +117,35 @@ source name guessed from context != source citation
 old source != current source
 ```
 
-## Methods, skills and tools
+## Method, skill and tool
 
-Keep these categories distinct:
-
-```text
-Method
-= governed or task method actually selected/applied, for example a material Rite
-  or an explicit comparison/verification method
-
-Skill
-= Hermes skill actually used for the current task
-
-Tool
-= concrete runtime tool/connector/capability actually invoked or observed
-```
-
-Name a Rite or governed method only when it is actually selected/applied and
-materially affects the work. Availability does not mean use.
-
-List a skill or tool only when its use is observed in the current task context.
-Do not claim Docling, Hindsight, MCP, Drive, a filesystem tool or another
-mechanism merely because it would have been reasonable to use it.
-
-Repeated low-level calls should be summarized rather than spammed, for example:
+Keep the categories distinct:
 
 ```text
-Hindsight · documentary search — 7 queries, 2 retained sources
+Méthode = governed/task method actually selected and applied
+Skill   = Hermes skill actually used in the current task
+Outil   = runtime tool, connector or capability actually invoked or observed
 ```
 
-when those counts are actually observable.
+Availability does not mean use. Do not claim Docling, Hindsight, MCP, Drive,
+filesystem access or another mechanism merely because it would have been useful.
+Repeated low-level calls may be collapsed into one factual summary only when the
+count/result is observable.
 
-## Handoff
+## Progressive delivery
 
-When visible responsibility materially changes, end the milestone with a compact
-handoff:
+When the active Hermes/channel surface supports safe interim assistant messages,
+publish meaningful milestones progressively. Otherwise preserve the same
+structure in a compact final response; do not introduce a second transport
+mechanism solely for progress display.
 
-```text
-→ Relais : Argos
-Motif : qualifier la provenance et la version des pièces retrouvées.
-```
+Transport-specific formatting may vary across Telegram, Discord, WhatsApp,
+WebUI or another admitted surface. Governance meaning must not depend on message
+editing, color or another channel-specific feature.
 
-A handoff line describes the next responsibility. It does not imply a new agent,
-subagent, message bus or dispatch action.
+## Final summary
 
-If Hermes actually delegates runtime work, describe that separately as an
-observable Hermes delegation; do not disguise runtime delegation as Pantheon
-Role activation.
-
-## Final traceability summary
-
-For non-trivial projected work, end with a compact summary when it adds value:
+When useful, close non-trivial work with only the categories actually present:
 
 ```text
 Plan / réalisation
@@ -210,70 +156,58 @@ Sources
 [S1] ...
 [S2] ...
 
-Methods
+Méthodes
 - ...
 
-Skills used
+Skills utilisés
 - ...
 
-Tools used
+Outils utilisés
 - ...
 
-Responsibility path
-Athena -> Argos -> Hermes -> Themis -> Apollo
+Parcours responsabilité / exécution
+Athena -> Argos -> Hermes -> Themis
 
-Result
+Résultat
 ...
 
-Open
+Ouvert
 ...
 ```
 
-Include only categories that were materially present. Do not manufacture a
-complete-looking path when some responsibilities were not involved.
+Do not manufacture a complete-looking path, source set, method or tool list.
 
-## Transport behavior
+## Floquet acceptance shape
 
-When the active Hermes/channel surface supports safe interim assistant messages,
-publish milestones progressively. When it does not, preserve the same structure
-in a compact final response rather than adding a new transport mechanism.
-
-Transport formatting may vary across Telegram, Discord, WhatsApp, WebUI or
-another admitted surface. Governance meaning must not depend on color, message
-editing or a platform-specific feature.
-
-## Floquet acceptance example
-
-A professional source-verification request such as verifying a Floquet budget
-should make the following observable distinctions if the actual task state
-supports them:
+For a real Floquet source-verification test, use only corpus facts actually
+retrieved during that run:
 
 ```text
 🦉 Athena · Plan
-Objectif: vérifier la justification du montant demandé.
+Objectif: vérifier l'affirmation demandée à partir des pièces applicables.
 → Premier relais: Argos
 
 🔎 Argos · Sources / traçabilité
-Action: identifier la pièce financière pertinente.
-Raison: le montant ne peut pas être retenu sans source identifiable.
-But: déterminer le document, son indice et sa date.
-Source: [S1] Budget estimatif C2 — indice C2 — date non identifiée
-Résultat: document retrouvé; justification détaillée encore absente.
-→ Relais: Hermes — poursuivre la recherche documentaire.
+Action: identifier la pièce pertinente.
+Raison: l'affirmation nécessite une source identifiable.
+But: déterminer le document applicable, son indice et sa date.
+Source: [S1] <document réel> — <indice observé> — <date observée/non identifiée>
+Résultat: <constat réellement supporté>.
+→ Relais: Hermes — <action d'exécution réellement nécessaire>.
 
 ⚙ Hermes · Exécution
-Skill: <only the skill actually used>
-Tool: <only the tool actually invoked>
-Résultat: <observed retrieval/runtime result>
+Skill: <skill réellement utilisé>
+Outil: <outil réellement invoqué>
+Résultat: <résultat runtime observé>
 ```
 
-The example is a presentation shape, not a claim about the real Floquet corpus.
+This is a presentation shape, not a claim about the real Floquet corpus.
 
 ## Final invariant
 
 ```text
 Show what changed, why it matters, what was sought and what was observed.
-Cite real sources with real metadata when available.
+Cite only real sources and observed metadata.
 Name only methods, skills and tools actually selected or used.
 Make responsibility changes explicit without inventing dispatch.
 Never expose hidden reasoning and never turn presentation into authority.
