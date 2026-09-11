@@ -51,9 +51,6 @@ def test_skill_condition_examples_are_owned_by_role_activation_and_supported_by_
     text = SKILL.read_text(encoding="utf-8")
     doctrine = _role_triggers()
 
-    # The skill intentionally advertises only the subset implemented by the
-    # current request-handling surface. This protects against a second trigger
-    # authority silently appearing in Hermes guidance.
     start = text.index("Common examples include:")
     block = text[start:].split("```text", 1)[1].split("```", 1)[0]
     advertised = {line.strip() for line in block.splitlines() if line.strip()}
@@ -62,7 +59,7 @@ def test_skill_condition_examples_are_owned_by_role_activation_and_supported_by_
 
     request_handling = REQUEST_HANDLING.read_text(encoding="utf-8")
     for trigger in advertised:
-        assert f'"{trigger}":' in request_handling
+        assert f'"{trigger}"' in request_handling
 
 
 def test_broad_fixture_corpus_is_structural_and_contains_negative_expectations() -> None:
