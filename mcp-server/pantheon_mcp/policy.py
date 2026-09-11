@@ -63,6 +63,19 @@ _K4_TRIGGERS = re.compile(
     re.IGNORECASE,
 )
 
+# Canonical GLOSSARY K0 explicitly includes orientation, formatting and harmless
+# drafts. These operation hints may therefore stay K0 when no higher-consequence
+# semantic or lexical trigger is present.
+_K0_TRANSFORMATIONS = {
+    "rewrite",
+    "wording",
+    "polish",
+    "format",
+    "formatting",
+    "summarize",
+    "summary",
+}
+
 _K_TO_V = {"K0": "V0", "K1": "V1", "K2": "V2", "K3": "V3", "K4": "V4"}
 
 _DOCTRINE_REFS = [
@@ -119,6 +132,10 @@ def classify_request(request: dict) -> dict:
     scope_type/scope_id), perform (list of actions the caller asks THIS server
     to do — these are refused, never done).
 
+    ``requested_transformation`` may identify a harmless formatting/draft
+    operation such as ``rewrite`` or ``formatting``. It stays K0 only while no
+    stronger semantic or lexical consequence trigger is present.
+
     ``observations`` may carry caller-provided semantic candidates such as
     ``professional_position``, ``financial_or_contractual_effect``,
     ``source_required`` or ``contradiction_detected``. They are candidate
@@ -156,6 +173,7 @@ def classify_request(request: dict) -> dict:
 
     observations = _semantic_observations(request)
     intent = str(request.get("intent", ""))
+    requested_transformation = str(request.get("requested_transformation", "")).strip().lower()
     external = observations.get("external_effect", request.get("external_effect", False))
     transmission = _semantic_bool(request, observations, "transmission_requested") or _semantic_bool(
         request, observations, "external_transmission"
@@ -181,6 +199,8 @@ def classify_request(request: dict) -> dict:
         consequence = "K4"
     elif writes or register_material or k3_intent_trigger:
         consequence = "K3"
+    elif requested_transformation in _K0_TRANSFORMATIONS:
+        consequence = "K0"
     elif intent.strip():
         consequence = "K2"
     else:
@@ -240,7 +260,7 @@ def classify_request(request: dict) -> dict:
             gates.append("User Decision Gate before any external effect or Registre write")
         else:
             gates.append("User Decision Gate before direct human governed-state effect")
-    if not scope:
+    if not scope and task_contract_required:
         gates.append("scope missing: declare scope_type/scope_id before work starts")
 
     report = {
