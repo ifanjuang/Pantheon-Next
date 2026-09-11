@@ -42,12 +42,40 @@ class TestProgressiveRequestHandling(unittest.TestCase):
             report["handling"]["constraints"],
         )
 
+    def test_material_condition_prevents_k0_fast_exit(self):
+        report = policy.classify_request(
+            {
+                "intent": "Reformuler ce texte après vérification de la source.",
+                "requested_transformation": "rewrite",
+                "scope": SCOPE,
+                "conditions": ["source_required"],
+            }
+        )
+
+        self.assertEqual(report["consequence_level"], "K2")
+        self.assertTrue(report["task_contract_required"])
+        self.assertEqual(report["handling"]["disposition"], "CONSULT")
+        self.assertIn("ARGOS", report["handling"]["role_viewpoints"])
+
+    def test_external_effect_condition_drives_k4_and_gate_without_legacy_flag(self):
+        report = policy.classify_request(
+            {
+                "intent": "Préparer l'effet demandé.",
+                "scope": SCOPE,
+                "conditions": ["external_effect"],
+            }
+        )
+
+        self.assertEqual(report["consequence_level"], "K4")
+        self.assertEqual(report["required_approval_ceiling"], "C3")
+        self.assertEqual(report["handling"]["disposition"], "GATE")
+        self.assertTrue(report["handling"]["effect_gate"]["effect_requested_now"])
+
     def test_explicit_dependency_derives_sequential_handoff(self):
         report = policy.classify_request(
             {
                 "intent": "Préparer une analyse engageante avec base sourcée.",
                 "scope": SCOPE,
-                "professional_position": True,
                 "conditions": ["source_required", "legal_or_professional_risk"],
                 "coordination": {
                     "requires": [["supporting_basis", "consequence_review"]],
@@ -199,7 +227,6 @@ class TestProgressiveRequestHandling(unittest.TestCase):
             {
                 "intent": "Envoyer la réponse préparée.",
                 "scope": SCOPE,
-                "transmission_requested": True,
                 "conditions": ["external_transmission"],
             }
         )
