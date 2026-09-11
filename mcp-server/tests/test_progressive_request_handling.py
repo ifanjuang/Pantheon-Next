@@ -23,16 +23,17 @@ SCOPE = {"scope_type": "task", "scope_id": "progressive-handling-test"}
 
 
 class TestProgressiveRequestHandling(unittest.TestCase):
-    def test_appointment_confirmation_is_not_professional_confirmation(self):
+    def test_appointment_confirmation_is_harmless_k0_and_needs_no_contract(self):
         report = policy.classify_request(
             {
                 "intent": "Améliore ce message : merci de confirmer le rendez-vous de mardi.",
                 "requested_transformation": "rewrite",
-                "scope": SCOPE,
             }
         )
 
-        self.assertEqual(report["consequence_level"], "K2")
+        self.assertEqual(report["consequence_level"], "K0")
+        self.assertFalse(report["task_contract_required"])
+        self.assertEqual(report["required_gates"], [])
         self.assertEqual(report["handling"]["disposition"], "PROCEED")
         self.assertEqual(report["handling"]["role_viewpoints"], [])
         self.assertIn(
