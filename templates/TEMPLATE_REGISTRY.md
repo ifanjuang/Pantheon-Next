@@ -20,6 +20,7 @@ Pantheon Cockpit     -> governed Cards/navigation/decision/status projections
 | Hermes template index | `templates/hermes/README.md` | Hermes | execution template index | non-executable |
 | Task Contract handoff | `templates/hermes/handoffs/task_contract_handoff.template.yaml` | Hermes | handoff candidate | non-executable |
 | Evidence Pack candidate return | `templates/hermes/returns/evidence_pack_candidate.template.yaml` | Hermes | return envelope candidate | non-executable |
+| Pantheon request intake skill candidate | `templates/hermes/skills/pantheon-request-intake/SKILL.md` | Hermes | semantic intake skill candidate | non-executable |
 | IFJA project context skill candidate | `templates/hermes/skills/ifja-project-context/SKILL.md` | Hermes | skill candidate | non-executable |
 | Source research skill candidate | `templates/hermes/skills/source-research/SKILL.md` | Hermes | skill candidate | non-executable |
 | Source research summary Workflow Manifest | `templates/source_research_summary_workflow_manifest.template.yaml` | Pantheon | workflow governance candidate | non-executable |
