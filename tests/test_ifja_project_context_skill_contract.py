@@ -33,6 +33,8 @@ def test_ifja_project_context_routes_existing_sources_without_new_authority():
     assert "reuse the existing `source-research` skill/capability" in text
     assert "prefer an abstracted query" in text
 
+    assert "generic `pantheon-request-intake` semantic adapter" in text
+    assert "Do not create an IFJA-specific K/V/C or trigger classifier here" in text
     assert "bounded HTTP policy service" in text
     assert "do not assume that the consultation-only MCP binding exposes classification" in text
     assert "return a Capability Gap" in text

@@ -62,9 +62,11 @@ workspace access != external disclosure authorization
 
 When the request may involve professional/contractual/financial consequence, Evidence or approval, governed status or protected mutation, external transmission/action, memory/Register promotion, or another consequential decision boundary, consult the currently selected Pantheon policy binding.
 
+Before classification, reuse the generic `pantheon-request-intake` semantic adapter to describe only the material request conditions, optional coordination relations and observable completion requirements. Do not create an IFJA-specific K/V/C or trigger classifier here.
+
 The current repository decision interface is the bounded HTTP policy service described by `mcp-server/docs/HTTP_API_CONTRACT.md`. Invoke `classify_request` through a binding that actually exposes that operation; do not assume that the consultation-only MCP binding exposes classification. If the selected deployed binding cannot provide the required decision operation, stop before the consequential effect and return a Capability Gap rather than inventing policy locally.
 
-Pass observable request facts and scope. Do not derive K/V/C, approval levels or gate rules in this skill. Follow the policy data returned by Pantheon. Do not call Pantheon mechanically for trivial consultation unless the current doctrine, Task Contract or binding requires it.
+Pass the semantic request candidate plus observable scope. Do not derive K/V/C, approval levels or gate rules in this skill. Follow the policy data returned by Pantheon. Do not call Pantheon mechanically for trivial consultation unless the current doctrine, Task Contract or binding requires it.
 
 ### 5. Execute without changing authority
 
