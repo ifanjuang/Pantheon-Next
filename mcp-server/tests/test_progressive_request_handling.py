@@ -23,7 +23,7 @@ SCOPE = {"scope_type": "task", "scope_id": "progressive-handling-test"}
 
 
 class TestProgressiveRequestHandling(unittest.TestCase):
-    def test_appointment_confirmation_is_harmless_k0_and_needs_no_contract(self):
+    def test_harmless_rewrite_exits_at_k0_without_contract(self):
         report = policy.classify_request(
             {
                 "intent": "Améliore ce message : merci de confirmer le rendez-vous de mardi.",
@@ -41,16 +41,14 @@ class TestProgressiveRequestHandling(unittest.TestCase):
             report["handling"]["constraints"],
         )
 
-    def test_professional_claim_consults_before_effect_gate(self):
+    def test_source_basis_precedes_consequential_judgement(self):
         report = policy.classify_request(
             {
-                "intent": "Reformuler la réponse au client.",
+                "intent": "Reformuler une réponse qui porte une position engageante.",
                 "requested_transformation": "rewrite",
                 "scope": SCOPE,
-                "observations": {
-                    "professional_position": True,
-                    "source_required": True,
-                },
+                "professional_position": True,
+                "conditions": ["source_required", "legal_or_professional_risk"],
             }
         )
 
@@ -63,28 +61,21 @@ class TestProgressiveRequestHandling(unittest.TestCase):
             "sequential_handoff",
         )
         self.assertEqual(
-            report["handling"]["next_state"]["purpose"],
-            "establish_factual_basis",
+            report["handling"]["completion_requirements"],
+            ["supporting_basis_qualified", "consequence_boundary_reviewed"],
         )
         self.assertFalse(report["handling"]["effect_gate"]["effect_requested_now"])
         self.assertIn(
-            "do_not_strengthen_unverified_professional_claim",
+            "do_not_increase_claim_authority_without_support",
             report["handling"]["constraints"],
         )
-        self.assertIn(
-            "legal_or_professional_risk",
-            report["handling"]["governance_triggers"],
-        )
 
-    def test_source_and_prior_state_use_fanout_then_synthesis(self):
+    def test_source_and_continuity_use_fanout_then_synthesis(self):
         report = policy.classify_request(
             {
-                "intent": "Comparer l'état actuel avec le dernier état connu.",
+                "intent": "Comparer l'état actuel avec un état antérieur.",
                 "scope": SCOPE,
-                "observations": {
-                    "source_required": True,
-                    "prior_state_required": True,
-                },
+                "conditions": ["source_required", "project_history_reuse"],
             }
         )
 
@@ -95,28 +86,22 @@ class TestProgressiveRequestHandling(unittest.TestCase):
             "fanout_extract_then_single_synthesis",
         )
         self.assertEqual(
-            report["handling"]["next_state"]["completion_requires"],
-            ["applicable_source_basis_qualified", "current_or_superseded_state_qualified"],
-        )
-        self.assertIn(
-            "project_history_reuse",
-            report["handling"]["governance_triggers"],
+            report["handling"]["completion_requirements"],
+            ["supporting_basis_qualified", "current_state_qualified"],
         )
 
-    def test_material_contradiction_proposes_existing_rite(self):
+    def test_conflict_proposes_existing_rite_without_new_conflict_schema(self):
         report = policy.classify_request(
             {
-                "intent": "Examiner les pièces disponibles.",
+                "intent": "Examiner des éléments contradictoires.",
                 "scope": SCOPE,
-                "observations": {
-                    "contradiction_detected": True,
-                },
+                "conditions": ["evidence_gap"],
+                "conflict_detected": True,
             }
         )
 
         self.assertEqual(report["handling"]["disposition"], "CONSULT")
         self.assertIn("ARGOS", report["handling"]["role_viewpoints"])
-        self.assertIn("evidence_gap", report["handling"]["governance_triggers"])
         self.assertEqual(
             report["handling"]["rite_candidate"],
             "concordance_des_sources",
@@ -128,6 +113,7 @@ class TestProgressiveRequestHandling(unittest.TestCase):
                 "intent": "Envoyer la réponse préparée.",
                 "scope": SCOPE,
                 "transmission_requested": True,
+                "conditions": ["external_transmission"],
             }
         )
 
@@ -140,27 +126,20 @@ class TestProgressiveRequestHandling(unittest.TestCase):
             "C4",
         )
 
-    def test_semantic_observations_remain_explicitly_candidate(self):
+    def test_declared_conditions_remain_candidate_inputs(self):
         report = policy.classify_request(
             {
                 "intent": "Examiner ce point.",
                 "scope": SCOPE,
-                "observations": {"source_required": True},
+                "conditions": ["source_required"],
             }
         )
 
         self.assertIn(
-            "semantic_observations_are_candidates_not_truth",
+            "declared_conditions_are_candidates_not_truth",
             report["handling"]["constraints"],
         )
-        self.assertIn(
-            "source_required",
-            report["handling"]["observed_conditions"],
-        )
-        self.assertIn(
-            "source_required",
-            report["handling"]["governance_triggers"],
-        )
+        self.assertEqual(report["handling"]["conditions"], ["source_required"])
 
     def test_role_trigger_projection_is_subset_of_role_activation_doctrine(self):
         doctrine = (REPO_ROOT / "docs/governance/ROLE_ACTIVATION.md").read_text(
