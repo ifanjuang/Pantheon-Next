@@ -58,6 +58,19 @@ def test_request_intake_distinguishes_memory_promotion_from_prior_reuse() -> Non
     assert "it is not an\napproval and does not authorize persistence" in text
 
 
+def test_request_intake_distinguishes_external_effect_from_message_preparation() -> None:
+    text = SKILL.read_text(encoding="utf-8")
+
+    assert "## External action direction" in text
+    assert "cause an actual effect outside the current interaction" in text
+    assert "external_transmission\nexternal_effect" in text
+    assert "Add `client_delivery` when the requested recipient is a client" in text
+    assert "does not imply `external_effect` unless actual transmission" in text
+    assert "it\ndoes not authorize that consequence or imply that it occurred" in text
+    assert '"Envoie cette réponse au client"' in text
+    assert "-> client_delivery\n-> external_effect" in text
+
+
 def test_skill_condition_examples_are_owned_by_role_activation_and_supported_by_policy() -> None:
     text = SKILL.read_text(encoding="utf-8")
     doctrine = _role_triggers()
