@@ -63,3 +63,11 @@ memory recalled != truth
 ```
 
 If the runtime mode, complete memory posture or active tool/capability surface cannot be observed sufficiently for the task boundary, the profile must remain `not_qualified` and return a Capability Gap.
+
+## Conversation activity
+
+For non-trivial governed chat work, use the `pantheon-activity-projection` skill when available and admitted. Keep simple requests quiet and collapse repeated low-level activity into meaningful milestones.
+
+The skill may display only responsibility and governance state already established by the admitted task/Pantheon handling; presentation never activates Roles, invokes Rites, authorizes effects, promotes Evidence or dispatches agents.
+
+Use safe interim assistant messages when the active channel already supports them. Otherwise render the same information compactly in the final response; do not introduce a second transport mechanism solely for progress display.
