@@ -25,32 +25,30 @@ def test_activity_projection_is_presentation_only_and_proportional() -> None:
     ):
         assert invariant in text
 
-    assert "simple direct request" in text
-    assert "no activity projection, or one compact line only when materially useful" in text
+    assert "Keep simple requests quiet" in text
+    assert "2-4 meaningful milestones" in text
     assert "Do not publish every tool call" in text
-    assert "Do not emit progress merely to display activity" in BASE_SOUL.read_text(encoding="utf-8")
 
 
 def test_activity_projection_explains_action_reason_goal_result_without_cot() -> None:
     text = SKILL.read_text(encoding="utf-8")
 
-    for label in ("Action", "Reason", "Goal", "Result"):
-        assert f"{label}\n=" in text
+    for field in ("Action:", "Raison:", "But:", "Résultat:"):
+        assert field in text
 
-    assert "concise observable\nrationale" in text
-    assert "two document revisions exist" in text
-    assert "Do not generate a private reasoning transcript" in text
+    assert "concise observable rationale" in text
+    assert "not private reasoning" in text
+    assert "Never output a\nscratchpad, hidden chain-of-thought" in text
 
 
 def test_activity_projection_requires_real_source_metadata_and_stable_refs() -> None:
     text = SKILL.read_text(encoding="utf-8")
 
-    assert "assign stable references" in text
-    assert "[S1] Document title" in text
-    assert "Index/revision: C2" in text
-    assert "Date: 2026-05-14" in text
-    assert "Never infer a missing date, index or version" in text
-    assert "not identified" in text
+    assert "assign stable task-local\nreferences" in text
+    assert "[S1] <observed title>" in text
+    assert "Indice/révision: <observed value or non identifié>" in text
+    assert "Date: <observed value or non identifiée>" in text
+    assert "Never infer a missing title, date, index, revision" in text
     assert "source returned != source verified" in text
     assert "source name guessed from context != source citation" in text
 
@@ -58,50 +56,54 @@ def test_activity_projection_requires_real_source_metadata_and_stable_refs() -> 
 def test_activity_projection_distinguishes_methods_skills_tools_and_real_use() -> None:
     text = SKILL.read_text(encoding="utf-8")
 
-    assert "## Methods, skills and tools" in text
-    assert "Method\n= governed or task method actually selected/applied" in text
-    assert "Skill\n= Hermes skill actually used" in text
-    assert "Tool\n= concrete runtime tool/connector/capability actually invoked or observed" in text
+    assert "## Method, skill and tool" in text
+    assert "Méthode = governed/task method actually selected and applied" in text
+    assert "Skill   = Hermes skill actually used in the current task" in text
+    assert "Outil   = runtime tool, connector or capability actually invoked or observed" in text
     assert "Availability does not mean use" in text
-    assert "List a skill or tool only when its use is observed" in text
     assert "Do not claim Docling, Hindsight, MCP, Drive" in text
 
 
 def test_activity_projection_handoff_is_responsibility_not_dispatch() -> None:
     text = SKILL.read_text(encoding="utf-8")
 
-    assert "## Handoff" in text
-    assert "→ Relais : Argos" in text
-    assert "does not imply a new agent,\nsubagent, message bus or dispatch action" in text
-    assert "If Hermes actually delegates runtime work" in text
+    assert "A `→ Relais` line means the next responsibility" in text
+    assert "not a new agent or dispatch" in text
+    assert "If\nHermes actually delegates runtime work" in text
 
 
-def test_activity_projection_supports_interim_delivery_without_transport_dependency() -> None:
+def test_activity_projection_supports_native_interim_or_compact_final_delivery() -> None:
     text = SKILL.read_text(encoding="utf-8")
+    base = BASE_SOUL.read_text(encoding="utf-8")
 
     assert "supports safe interim assistant messages" in text
-    assert "publish milestones progressively" in text
-    assert "preserve the same structure\nin a compact final response" in text
-    assert "do not introduce a second transport mechanism" in text
+    assert "publish meaningful milestones progressively" in text
+    assert "compact final response" in text
+    assert "do not introduce a second transport\nmechanism" in text
+    assert "do not introduce a second transport mechanism" in base
 
 
-def test_activity_projection_is_bound_once_without_polluting_semantic_intake() -> None:
+def test_activity_projection_binding_stays_small_and_does_not_pollute_intake() -> None:
     base = BASE_SOUL.read_text(encoding="utf-8")
     registry = REGISTRY.read_text(encoding="utf-8")
     intake = REQUEST_INTAKE.read_text(encoding="utf-8")
     path = "templates/hermes/skills/pantheon-activity-projection/SKILL.md"
 
-    assert "`pantheon-activity-projection` skill" in base
-    assert "initial plan, action, observable\nreason, goal, cited sources" in base
+    assert base.count("pantheon-activity-projection") == 1
+    assert "Keep simple requests quiet" in base
+    assert "presentation never activates Roles" in base
     assert registry.count(path) == 1
     assert "pantheon-activity-projection" not in intake
 
 
-def test_floquet_example_is_explicitly_non_authoritative() -> None:
+def test_floquet_example_is_shape_only_and_contains_no_invented_project_fact() -> None:
     text = SKILL.read_text(encoding="utf-8")
 
-    assert "## Floquet acceptance example" in text
-    assert "Source: [S1] Budget estimatif C2" in text
-    assert "Skill: <only the skill actually used>" in text
-    assert "Tool: <only the tool actually invoked>" in text
+    assert "## Floquet acceptance shape" in text
+    assert "<document réel>" in text
+    assert "<indice observé>" in text
+    assert "<skill réellement utilisé>" in text
+    assert "<outil réellement invoqué>" in text
     assert "not a claim about the real Floquet corpus" in text
+    assert "120 000" not in text
+    assert "Budget estimatif C2" not in text
