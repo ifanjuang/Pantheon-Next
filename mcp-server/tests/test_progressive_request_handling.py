@@ -23,7 +23,7 @@ SCOPE = {"scope_type": "task", "scope_id": "progressive-handling-test"}
 
 
 class TestProgressiveRequestHandling(unittest.TestCase):
-    def test_harmless_rewrite_exits_at_k0_without_contract(self):
+    def test_direct_harmless_rewrite_exits_at_k0_without_contract(self):
         report = policy.classify_request(
             {
                 "intent": "Améliore ce message : merci de confirmer le rendez-vous de mardi.",
@@ -36,24 +36,26 @@ class TestProgressiveRequestHandling(unittest.TestCase):
         self.assertEqual(report["required_gates"], [])
         self.assertEqual(report["handling"]["disposition"], "PROCEED")
         self.assertEqual(report["handling"]["role_viewpoints"], [])
+        self.assertNotIn("topology", report["handling"])
         self.assertIn(
             "preserve_claim_status_and_meaning",
             report["handling"]["constraints"],
         )
 
-    def test_source_basis_precedes_consequential_judgement(self):
+    def test_explicit_dependency_derives_sequential_handoff(self):
         report = policy.classify_request(
             {
-                "intent": "Reformuler une réponse qui porte une position engageante.",
-                "requested_transformation": "rewrite",
+                "intent": "Préparer une analyse engageante avec base sourcée.",
                 "scope": SCOPE,
                 "professional_position": True,
                 "conditions": ["source_required", "legal_or_professional_risk"],
+                "coordination": {
+                    "requires": [["supporting_basis", "consequence_review"]],
+                },
             }
         )
 
         self.assertEqual(report["consequence_level"], "K4")
-        self.assertTrue(report["blocked_until_gate"])
         self.assertEqual(report["handling"]["disposition"], "CONSULT")
         self.assertEqual(report["handling"]["role_viewpoints"], ["ARGOS", "THEMIS"])
         self.assertEqual(
@@ -61,21 +63,21 @@ class TestProgressiveRequestHandling(unittest.TestCase):
             "sequential_handoff",
         )
         self.assertEqual(
-            report["handling"]["completion_requirements"],
-            ["supporting_basis_qualified", "consequence_boundary_reviewed"],
+            report["handling"]["coordination"]["requires"],
+            [["supporting_basis", "consequence_review"]],
         )
         self.assertFalse(report["handling"]["effect_gate"]["effect_requested_now"])
-        self.assertIn(
-            "do_not_increase_claim_authority_without_support",
-            report["handling"]["constraints"],
-        )
 
-    def test_source_and_continuity_use_fanout_then_synthesis(self):
+    def test_independent_work_with_synthesis_derives_fanout(self):
         report = policy.classify_request(
             {
-                "intent": "Comparer l'état actuel avec un état antérieur.",
+                "intent": "Comparer plusieurs états indépendants puis synthétiser.",
                 "scope": SCOPE,
                 "conditions": ["source_required", "project_history_reuse"],
+                "coordination": {
+                    "independent": [["source_state", "prior_state"]],
+                    "synthesize": True,
+                },
             }
         )
 
@@ -85,10 +87,95 @@ class TestProgressiveRequestHandling(unittest.TestCase):
             report["handling"]["topology"]["suggested"],
             "fanout_extract_then_single_synthesis",
         )
+
+    def test_independent_work_without_synthesis_derives_parallel(self):
+        report = policy.classify_request(
+            {
+                "intent": "Effectuer deux vérifications indépendantes.",
+                "scope": SCOPE,
+                "conditions": ["source_required", "delivery_quality_required"],
+                "coordination": {
+                    "independent": [["source_check", "delivery_check"]],
+                },
+            }
+        )
+
+        self.assertEqual(
+            report["handling"]["topology"]["suggested"],
+            "parallel_independent_workers",
+        )
+
+    def test_branch_relation_derives_existing_router_topology(self):
+        report = policy.classify_request(
+            {
+                "intent": "Choisir la suite selon le résultat du contrôle.",
+                "scope": SCOPE,
+                "conditions": ["complex_task"],
+                "coordination": {
+                    "branch_on": ["verification_result"],
+                },
+            }
+        )
+
+        self.assertEqual(report["handling"]["disposition"], "CONSULT")
+        self.assertEqual(report["handling"]["topology"]["suggested"], "router")
+        self.assertEqual(
+            report["handling"]["coordination"]["branch_on"],
+            ["verification_result"],
+        )
+
+    def test_repeat_until_is_control_relation_not_new_topology(self):
+        report = policy.classify_request(
+            {
+                "intent": "Réviser le candidat jusqu'à satisfaction du critère.",
+                "scope": SCOPE,
+                "conditions": ["delivery_quality_required"],
+                "completion_requirements": ["acceptance_criteria_met"],
+                "coordination": {
+                    "repeat_until": ["acceptance_criteria_met"],
+                },
+            }
+        )
+
+        self.assertEqual(report["handling"]["disposition"], "CONSULT")
+        self.assertNotIn("topology", report["handling"])
+        self.assertEqual(
+            report["handling"]["coordination"]["repeat_until"],
+            ["acceptance_criteria_met"],
+        )
         self.assertEqual(
             report["handling"]["completion_requirements"],
-            ["supporting_basis_qualified", "current_state_qualified"],
+            ["acceptance_criteria_met"],
         )
+
+    def test_explicit_completion_requirements_override_generic_fallback(self):
+        report = policy.classify_request(
+            {
+                "intent": "Examiner une source selon un critère propre à la tâche.",
+                "scope": SCOPE,
+                "conditions": ["source_required"],
+                "completion_requirements": ["requested_fact_resolved"],
+            }
+        )
+
+        self.assertEqual(
+            report["handling"]["completion_requirements"],
+            ["requested_fact_resolved"],
+        )
+
+    def test_current_and_target_state_are_projection_only(self):
+        report = policy.classify_request(
+            {
+                "intent": "Faire progresser le candidat.",
+                "scope": SCOPE,
+                "conditions": ["complex_task"],
+                "current_state": "draft",
+                "target_state": "reviewable_candidate",
+            }
+        )
+
+        self.assertEqual(report["handling"]["current_state"], "draft")
+        self.assertEqual(report["handling"]["target_state"], "reviewable_candidate")
 
     def test_conflict_proposes_existing_rite_without_new_conflict_schema(self):
         report = policy.classify_request(
@@ -126,17 +213,18 @@ class TestProgressiveRequestHandling(unittest.TestCase):
             "C4",
         )
 
-    def test_declared_conditions_remain_candidate_inputs(self):
+    def test_declared_relations_remain_candidate_inputs(self):
         report = policy.classify_request(
             {
                 "intent": "Examiner ce point.",
                 "scope": SCOPE,
                 "conditions": ["source_required"],
+                "coordination": {"branch_on": ["source_status"]},
             }
         )
 
         self.assertIn(
-            "declared_conditions_are_candidates_not_truth",
+            "declared_conditions_and_relations_are_candidates_not_truth",
             report["handling"]["constraints"],
         )
         self.assertEqual(report["handling"]["conditions"], ["source_required"])
