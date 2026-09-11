@@ -63,6 +63,11 @@ qualified candidate != authorized capability
 
 Pantheon does not need to become the language-understanding runtime.
 
+The declarative Hermes candidate `templates/hermes/skills/pantheon-request-intake/SKILL.md`
+now owns the bounded runtime guidance for translating raw language into the
+smallest request candidate. It is not a second policy owner and it does not
+derive K/V/C.
+
 Hermes may describe the request with existing governed conditions owned by `ROLE_ACTIVATION.md`:
 
 ```yaml
@@ -74,11 +79,17 @@ conditions:
 Conditions are candidate observations.
 
 ```text
+semantic intake != policy classification
 condition supplied != truth
 condition supplied != consequence classification
 condition supplied != Role authority
 condition supplied != authorization
 ```
+
+The intake materiality rule is deliberately narrow: emit a condition only when
+omitting it could materially change meaning, reliability/source need,
+responsibility, authorization/external effect, continuity/retention, or the next
+legitimate transition. This is runtime guidance, not a new consequence scale.
 
 Legacy task-specific fields may remain compatibility aliases while callers migrate, but they are not the core ontology.
 
@@ -322,7 +333,7 @@ This makes an always-consulted Pantheon compatible with a light everyday experie
 
 ```text
 1. User sends a request through an admitted Hermes client.
-2. Hermes identifies candidate conditions and, only when useful, generic coordination relations.
+2. Hermes uses the bounded semantic intake guidance to identify only material candidate conditions and, when useful, coordination/completion relations.
 3. Hermes calls mcp.classify_request.
 4. Pantheon returns K/V/C plus the smallest handling projection.
 5. PROCEED -> Hermes continues inside the admitted boundary.
@@ -366,26 +377,23 @@ safe to execute
 
 ## Regression coverage
 
-`mcp-server/tests/test_progressive_request_handling.py` verifies at least:
+`mcp-server/tests/test_progressive_request_handling.py` verifies policy projection.
+`tests/test_pantheon_request_intake_skill_contract.py` binds the Hermes semantic
+adapter to existing `ROLE_ACTIVATION.md` trigger ownership.
+`tests/fixtures/hermes_request_intake_cases.yaml` plus
+`tests/test_hermes_request_intake_policy_corpus.py` exercise a broad request
+corpus across harmless transformations, factual questions, current comparison,
+software diagnosis, contradiction, creative work, professional review, memory,
+external transmission, branching and repeat-until behavior.
 
-```text
-direct harmless request -> K0 / PROCEED / no topology
-explicit dependency -> sequential_handoff
-independent + synthesis -> fanout_extract_then_single_synthesis
-independent without synthesis -> parallel_independent_workers
-branch condition -> router
-repeat-until condition -> preserved without inventing a topology
-explicit completion criteria override generic fallback
-conflict -> existing rite candidate
-external transmission -> gate
-Role-trigger mapping remains a subset of ROLE_ACTIVATION.md
-```
-
-These tests validate policy projection only. They do not execute Roles, workflows, rites or external effects.
+These tests validate declared semantic candidates and policy projection only.
+They do not prove that a live Hermes model will infer every candidate correctly.
+Live precision/recall remains a separate runtime qualification step.
 
 ## Final rule
 
 ```text
+Hermes describes material conditions; it does not decide their consequence.
 Pantheon governs the constraints of the path, not the path itself.
 Hermes may optimize execution inside those constraints.
 Roles carry bounded judgement responsibilities.
