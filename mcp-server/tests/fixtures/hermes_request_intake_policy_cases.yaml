@@ -9,9 +9,9 @@ cases:
       disposition: PROCEED
       topology: null
 
-  - id: format_contract_without_semantic_review
+  - id: harmless_formatting
     request:
-      intent: "Mets ce texte de contrat en forme sans changer un seul mot."
+      intent: "Mets ce passage en forme sans changer un seul mot."
       requested_transformation: formatting
       conditions: []
     expected:
