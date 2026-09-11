@@ -158,6 +158,18 @@ def _next_state(triggers: list[str]) -> dict[str, Any] | None:
     return None
 
 
+def _consequential_effect_requested(request: dict[str, Any], triggers: list[str]) -> bool:
+    """Separate candidate review from the effect that actually needs a gate."""
+    observations = _candidate_observations(request)
+    external = observations.get("external_effect", request.get("external_effect"))
+    return bool(
+        external is True
+        or "external_transmission" in triggers
+        or "memory_promotion_requested" in triggers
+        or "writes_state" in triggers
+    )
+
+
 def recommend_handling(request: dict[str, Any], classification: dict[str, Any]) -> dict[str, Any]:
     """Return the smallest progressive governance handling recommendation.
 
@@ -169,10 +181,13 @@ def recommend_handling(request: dict[str, Any], classification: dict[str, Any]) 
     viewpoints = _viewpoints(triggers)
     topology = _topology(triggers, viewpoints)
     next_state = _next_state(triggers)
+    effect_requested = _consequential_effect_requested(request, triggers)
 
-    if classification.get("blocked_until_gate"):
+    if classification.get("blocked_until_gate") and effect_requested:
         disposition = "GATE"
-    elif viewpoints or next_state or "contradiction_detected" in triggers:
+    elif viewpoints or next_state or classification.get("blocked_until_gate"):
+        # K4 candidate work may still need consultation before any effect is
+        # attempted. The gate constrains the effect, not the prior analysis.
         disposition = "CONSULT"
     else:
         disposition = "PROCEED"
@@ -215,10 +230,11 @@ def recommend_handling(request: dict[str, Any], classification: dict[str, Any]) 
         handling["next_state"] = next_state
     if "contradiction_detected" in triggers:
         handling["rite_candidate"] = "concordance_des_sources"
-    if disposition == "GATE":
-        handling["gate"] = {
+    if classification.get("blocked_until_gate"):
+        handling["effect_gate"] = {
             "required_approval_ceiling": classification.get("required_approval_ceiling"),
-            "blocked_until_gate": True,
+            "required_before_effect": True,
+            "effect_requested_now": effect_requested,
         }
 
     return handling
