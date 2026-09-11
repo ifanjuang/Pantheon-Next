@@ -4,11 +4,6 @@ Status: implementation candidate — integration contract for the bounded `mcp-s
 
 This contract describes how Hermes may call the Pantheon MCP Policy Server to frame work without Pantheon executing the work.
 
-This document names a concrete surface (the bounded `mcp-server/` module) rather
-than restating the generic separation, so it declares the boundary fields
-directly instead of a `Boundary profile` line (`BOUNDARY_PROFILES.md`'s
-"Inherited role separation" covers only the generic case):
-
 ```text
 exposed_by:  Hermes Web/dashboard, or another compatible client
 executed_by: Hermes Agent, outside Pantheon
@@ -26,13 +21,13 @@ The MCP Policy Server is read-only / validation / candidate-preparation only.
 
 It may:
 
-- list which consultation surfaces are implemented, partial or documented non-implemented;
-- explain allowlisted architecture placement and cite its governed sources;
-- qualify a caller-provided capability-status candidate without probing a runtime;
-- classify a request on the K/V/C axes;
-- project the smallest currently relevant governance handling from caller-provided semantic observations;
-- validate a capability passport;
-- prepare candidate skeletons for Task Contracts and Evidence Packs;
+- list implemented consultation surfaces;
+- explain allowlisted architecture placement from governed sources;
+- qualify caller-provided capability-status candidates;
+- classify requests on the K/V/C axes;
+- project the smallest currently relevant governance handling;
+- validate capability passports and governed references;
+- prepare Task Contract and Evidence Pack candidates;
 - run read-only doctor checks;
 - return policy decisions as data.
 
@@ -61,21 +56,7 @@ get_capability_status(status_yaml)
   -> qualify a status candidate already supplied by an external producer
 ```
 
-`get_capability_status` does not discover live status despite its client-facing
-name. The installable Hermes dashboard plugin, or another separately governed
-producer, gathers operational signals; the MCP only checks the provided vocabulary, keeps status axes
-separate and reports evidence/freshness/scope gaps.
-
-The shared observation envelope keeps these axes distinct:
-
-```text
-listed | detected | installed | configured | enabled | reachable | health
-governance_status | task_use_status
-```
-
-`update_status` and `rollback_status` are optional lifecycle extensions. A
-dashboard `policy.governance` placement label is not a Pantheon approval
-record and cannot establish `governance_status` by itself.
+`get_capability_status` does not discover live status. An external producer gathers operational signals; the MCP only qualifies the supplied candidate.
 
 ```text
 connected != consulted
@@ -84,104 +65,101 @@ reported status != runtime probe
 qualified candidate != authorized capability
 ```
 
-## Semantic intake candidate
+## Request intake: conditions, not a domain-specific ontology
 
 Pantheon does not need to become the language-understanding runtime.
 
-Hermes may describe what it observes in the request using explicit semantic
-candidate fields. Typical examples are:
+Hermes may describe the request using a small set of **governed conditions**. The preferred vocabulary is the existing trigger vocabulary owned by `ROLE_ACTIVATION.md`.
+
+Example:
 
 ```yaml
-intent: rewrite_email
+intent: prepare a bounded response
 requested_transformation: rewrite
-observations:
-  source_required: false
-  prior_state_required: false
-  professional_position: true
-  financial_or_contractual_effect: false
-  contradiction_detected: false
-  recipient_specific_output: true
+conditions:
+  - source_required
+  - legal_or_professional_risk
 ```
 
-These observations are inputs to policy qualification only.
+Another domain may use a different subset:
+
+```yaml
+conditions:
+  - project_history_reuse
+  - evidence_gap
+  - external_transmission
+```
+
+The handling core does not need to know whether the underlying subject is architecture, legal work, software, finance, administration or another domain. Domain packs may add context and source expectations outside this generic mechanism.
+
+Legacy fields such as `professional_position`, `financial_or_contractual_effect` or `prior_state_required` may be accepted as compatibility aliases while callers migrate, but they are not the core ontology.
 
 ```text
-Hermes observation != truth
-semantic candidate != consequence classification
-semantic candidate != Role authority
-semantic candidate != authorization
+condition supplied != truth
+condition supplied != consequence classification
+condition supplied != Role authority
+condition supplied != authorization
 ```
 
-Pantheon remains responsible for the governance consequence of the described
-request. Hermes remains responsible for interaction and external execution
-inside the admitted boundary.
-
-Raw intent matching remains a conservative compatibility fallback. Ambiguous
-ordinary language must not be treated as a professional commitment solely
-because it contains a generic verb such as `confirm` / `confirmer`; professional
-position should be represented explicitly by the semantic intake when known.
+Raw intent matching remains a conservative compatibility fallback. Generic wording such as `confirm` / `confirmer` must not by itself create a high-consequence professional position.
 
 ## Progressive handling projection
 
-`classify_request` still owns K/V/C classification. Its response may additionally
-contain a bounded `handling` projection produced from the request candidate and
-the classification.
+`classify_request` remains authoritative for K/V/C classification. Its response may additionally contain a bounded `handling` projection.
 
 The handling projection answers only:
 
 ```text
-What may happen next?
-Which governance viewpoints materially matter now?
-Is an existing reasoning topology useful?
-What state must be established before moving on?
-Which material changes require reconsulting Pantheon?
-Is a gate required before the requested effect?
+May work continue now?
+Which existing governance viewpoints materially matter?
+Does coordination need an existing topology?
+What observable conditions must be satisfied before relying on the result?
+Which material changes require reconsultation?
+Is a decision gate required before the requested effect?
 ```
 
-It does not answer how Hermes should internally execute the work.
+It does not prescribe Hermes internal execution mechanics.
 
 Three dispositions are sufficient:
 
 ```text
 PROCEED  -> no additional governance consultation is currently material
-CONSULT  -> establish the named state with the named viewpoints before relying on the result
+CONSULT  -> satisfy the current governance requirements before relying on the result
 GATE     -> the requested consequential effect cannot occur before the applicable decision gate
 ```
 
-A K4 request may still be `CONSULT` while preparing or reviewing a candidate.
-The gate constrains the consequential effect, not every preceding analytical
-step.
+A high-consequence candidate may still be `CONSULT` while being prepared or reviewed. The gate constrains the effect, not every prior analytical step.
 
-Example harmless wording request:
+### Minimal output
+
+For a harmless formatting or draft operation:
 
 ```yaml
 disposition: PROCEED
 role_viewpoints: []
+completion_requirements: []
 constraints:
   - preserve_claim_status_and_meaning
 ```
 
-Example consequential draft requiring a factual basis first:
+For a request that needs several governance concerns:
 
 ```yaml
 disposition: CONSULT
+conditions:
+  - source_required
+  - legal_or_professional_risk
 role_viewpoints:
   - ARGOS
   - THEMIS
 topology:
   suggested: sequential_handoff
-next_state:
-  purpose: establish_factual_basis
-  completion_requires:
-    - applicable_source_basis_qualified
-constraints:
-  - do_not_strengthen_unverified_professional_claim
-reconsult_if:
-  - contradiction_detected
-  - external_transmission
+completion_requirements:
+  - supporting_basis_qualified
+  - consequence_boundary_reviewed
 ```
 
-Example effect request:
+For an effect request:
 
 ```yaml
 disposition: GATE
@@ -191,117 +169,132 @@ effect_gate:
   effect_requested_now: true
 ```
 
-## Existing Role and topology vocabulary
+## Reuse existing Role and topology mechanisms
 
-The handling projection reuses existing owners rather than creating a second
-workflow model.
+Role participation follows `ROLE_ACTIVATION.md`. A viewpoint is governance attention, not an autonomous worker.
 
-Role participation follows `ROLE_ACTIVATION.md`. A viewpoint is governance
-attention, not an autonomous worker.
+The progressive handler consumes only an implemented subset of that document's existing trigger vocabulary. Tests bind the code mapping back to the doctrine so the MCP cannot silently create a second Role-trigger authority.
 
-Task topology reuses the existing Task Contract vocabulary. The V1 handling
-projection uses topology only when it changes the legitimate coordination path:
+Task topology reuses the existing Task Contract vocabulary. Emit topology only when it changes the legitimate coordination path:
 
 ```text
-single relevant viewpoint
-  -> no topology needs to be emitted
+one relevant viewpoint
+  -> no topology emitted
 
-source/evidence basis must precede professional judgement
+supporting basis must precede consequential judgement
   -> sequential_handoff
 
-source qualification and prior-state/currentness can proceed independently
+source state and continuity/currentness can be established independently
   -> fanout_extract_then_single_synthesis
 
-several independent viewpoints, with no proven dependency
+several viewpoints are relevant with no proven dependency
   -> parallel_independent_workers
 ```
 
-A topology recommendation is governance metadata only.
-
 ```text
 topology selected != workers dispatched
-parallel viewpoints != consultation
+parallel viewpoints != punctual consultation
 consultation != approval
-phase complete != authorized effect
+completion requirement satisfied != authorized effect
 ```
 
-A punctual consultation between role qualities remains distinct from runtime
-parallelism. A material contradiction may propose the existing
-`concordance_des_sources` rite; proposing the rite does not run it.
+A punctual consultation between Role qualities remains distinct from runtime parallelism.
 
-## Next state, not full plan
+## Generic completion requirements
 
-Pantheon should not precompute the whole execution tree. The handling projection
-names only the next governed state that must be established when such a state is
-material.
+Pantheon should not precompute a full task tree. It should expose only the smallest observable requirements needed for the next legitimate transition.
 
-Examples:
+The V1 projection deliberately uses broad, reusable requirements:
 
 ```text
-establish_factual_basis
-establish_current_state
-assess_professional_consequence
+scope_and_method_bounded
+supporting_basis_qualified
+current_state_qualified
+consequence_boundary_reviewed
+delivery_boundary_qualified
 ```
 
-Completion requirements are observable governance conditions, not hidden chain
-of thought and not a new milestone ontology.
+These are projection terms, not a new persistent milestone ontology. They summarize meanings already owned by Task Contracts, governed workflow phases, expected outputs and completion criteria.
 
-The projection deliberately reuses the meanings already owned by Task Contracts,
-Workflow governed phases, expected outputs and completion criteria. It does not
-add a `milestone`, `objective graph` or second workflow schema.
+Domain-specific work may refine what counts as satisfying a requirement, but should not replace the generic mechanism.
+
+## Conflict and rites
+
+Conflict is treated as a generic observed condition, not as a new workflow type.
+
+When a material conflict is reported and an Evidence/source concern is active, Pantheon may propose the existing `concordance_des_sources` rite.
+
+```text
+conflict detected != contradiction resolved
+rite proposed != rite executed
+rite completed != truth approved
+```
 
 ## Reconsultation on material change
 
 Hermes does not need to reconsult Pantheon after every internal step.
 
-Reconsult when a material governance condition becomes newly true, for example:
+Reconsult only when a materially relevant governed condition becomes newly true, for example:
 
 ```text
-contradiction_detected
 source_required
 evidence_gap
-professional_position
-financial_or_contractual_effect
+source_freshness_risk
+project_history_reuse
+duplicate_or_supersession_risk
+legal_or_professional_risk
 liability_risk
 external_effect
 external_transmission
-memory_promotion_requested
-writes_state
+memory_promotion
+approval_required
+policy_conflict
 ```
 
-The request is then classified again with the newly observed candidate facts.
-No separate hidden workflow state machine is required.
+The request is then classified again with the newly observed candidate conditions.
 
 ```text
-current state
-  -> smallest legitimate next state
+current governed state
+  -> smallest required transition conditions
   -> Hermes works externally
   -> material condition changes?
        no  -> continue
        yes -> reconsult classify_request
 ```
 
-A material change of cap, scope, responsibility or destination still follows the
-Task Contract revision rules owned by `REQUEST_LIFECYCLE.md` and
-`TASK_CONTRACT_REVISIONS.md`.
+A material change of cap, scope, responsibility or destination still follows the Task Contract revision rules owned by `REQUEST_LIFECYCLE.md` and `TASK_CONTRACT_REVISIONS.md`.
+
+## K0 fast exit
+
+The canonical Glossary defines K0 as including orientation, formatting, local display and harmless drafts.
+
+A declared harmless transformation such as `rewrite`, `wording`, `polish`, `formatting` or `summary` may therefore remain K0 when no stronger consequence signal is present.
+
+```text
+K0 harmless transformation
+  -> no Task Contract solely because text exists
+  -> no scope gate solely because text exists
+  -> PROCEED unless another material condition appears
+```
+
+This is what makes "Pantheon always consulted" compatible with a light everyday experience.
 
 ## Target sequence
 
 ```text
 1. The user sends a request through an admitted Hermes client.
-2. Hermes receives the request and may prepare bounded semantic observations.
+2. Hermes receives it and may describe applicable governed conditions.
 3. Hermes calls mcp.classify_request.
 4. Pantheon returns K/V/C plus the smallest current handling projection.
-5. If PROCEED, Hermes continues inside the admitted boundary.
-6. If CONSULT, Hermes establishes only the named next state using the relevant viewpoints/topology.
-7. If a material reconsult condition appears, Hermes calls mcp.classify_request again with the new observation candidate.
-8. If a Task Contract is required, Hermes prepares/reviews it through the existing candidate path.
-9. Hermes executes, outside Pantheon, only the admitted work.
-10. Evidence Pack Candidate preparation and result review follow existing owners when required.
-11. If GATE applies to the requested effect, the human accepts, refuses, revises or escalates.
+5. PROCEED -> Hermes continues inside the admitted boundary.
+6. CONSULT -> Hermes satisfies only the listed completion requirements using the relevant viewpoints/topology.
+7. A material condition changes -> Hermes reconsults classify_request.
+8. Task Contract / Evidence Pack candidates are prepared only when their existing rules require them.
+9. Hermes executes outside Pantheon.
+10. GATE -> the consequential effect waits for the applicable human decision.
 ```
 
-Execution remains outside Pantheon. The MCP Policy Server does not perform it.
+Execution remains outside Pantheon.
 
 ## Expected Hermes output envelope
 
@@ -334,33 +327,29 @@ authorized action
 safe to execute
 ```
 
-## Compliance fixtures and tests
+## Compliance tests
 
-`mcp-server/fixtures/sequence_conformance.yaml` keeps the existing candidate and
-refusal sequence coverage.
-
-`mcp-server/tests/test_progressive_request_handling.py` adds focused regression
-coverage for progressive handling, including:
+`mcp-server/tests/test_progressive_request_handling.py` verifies at least:
 
 ```text
-appointment confirmation != professional confirmation
-professional claim -> consult before effect gate
-source + prior state -> fanout then synthesis
-material contradiction -> Concordance des Sources rite candidate
+harmless rewrite -> K0 / PROCEED / no Task Contract
+source basis before consequential judgement -> sequential handoff
+source + continuity -> fanout then synthesis
+material conflict -> existing rite candidate
 external transmission -> gate
-semantic observations remain candidates, not truth
+conditions remain candidate inputs
+Role-trigger code mapping remains a subset of ROLE_ACTIVATION.md
 ```
 
-These tests validate policy projection only. They do not run roles, workflows,
-rites or external effects.
+The tests validate policy projection only. They do not run Roles, workflows, rites or external effects.
 
 ## Final rule
 
 ```text
-Hermes describes what it observes and performs admitted work outside Pantheon.
-Pantheon classifies consequence and names only the next legitimate governance state.
+Hermes describes material conditions and performs admitted work outside Pantheon.
+Pantheon classifies consequence and exposes only the smallest current governance requirements.
 Roles provide bounded viewpoints; topology expresses coordination only when needed.
-Material changes trigger reconsultation.
+Material condition changes trigger reconsultation.
 The gate constrains consequential effects.
 The human decides.
 ```
