@@ -5,8 +5,9 @@ classification into the smallest useful governance handling recommendation.
 It does not understand raw natural language, execute work, dispatch roles,
 run a workflow, authorize an effect, or approve an output.
 
-The preferred input is a small list of existing ROLE_ACTIVATION conditions.
-Legacy task-specific fields remain accepted only as compatibility aliases.
+The preferred input is a small list of existing ROLE_ACTIVATION conditions plus
+optional non-persistent coordination relations. Topology is derived from those
+relations, not from domain-specific Role combinations.
 """
 
 from __future__ import annotations
@@ -50,8 +51,7 @@ ROLE_TRIGGER_MAP: dict[str, tuple[str, ...]] = {
 }
 
 # Compatibility aliases only. New callers should prefer `conditions` using the
-# governed vocabulary above. This keeps domain-specific semantics out of the
-# handling core while preserving existing request fields during migration.
+# governed vocabulary above.
 _LEGACY_FIELD_TO_CONDITION: dict[str, str] = {
     "source_required": "source_required",
     "evidence_gap": "evidence_gap",
@@ -161,42 +161,98 @@ def _viewpoints(conditions: list[str]) -> list[str]:
     return roles
 
 
-def _topology(conditions: list[str], viewpoints: list[str]) -> dict[str, Any] | None:
-    """Recommend an existing topology only when a dependency is material."""
-    if len(viewpoints) <= 1:
-        return None
+def _pairs(value: Any) -> list[list[str]]:
+    """Normalize a list of two-item relations; malformed candidates are ignored."""
+    if not isinstance(value, list):
+        return []
+    out: list[list[str]] = []
+    for item in value:
+        if isinstance(item, (list, tuple)) and len(item) == 2:
+            pair = [str(item[0]), str(item[1])]
+            if pair not in out:
+                out.append(pair)
+    return out
 
-    source = bool(_SOURCE_CONDITIONS.intersection(conditions))
-    continuity = bool(_CONTINUITY_CONDITIONS.intersection(conditions))
-    risk = bool(_RISK_CONDITIONS.intersection(conditions))
 
-    if source and risk:
+def _groups(value: Any) -> list[list[str]]:
+    """Normalize independent groups with at least two named members."""
+    if not isinstance(value, list):
+        return []
+    out: list[list[str]] = []
+    for item in value:
+        if isinstance(item, (list, tuple)) and len(item) >= 2:
+            group = [str(member) for member in item]
+            if group not in out:
+                out.append(group)
+    return out
+
+
+def _strings(value: Any) -> list[str]:
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, list):
+        return [str(item) for item in value if str(item)]
+    return []
+
+
+def _coordination(request: dict[str, Any]) -> dict[str, Any]:
+    """Return bounded, non-persistent coordination relations supplied by caller."""
+    raw = request.get("coordination")
+    if not isinstance(raw, dict):
+        return {}
+
+    coordination: dict[str, Any] = {}
+    requires = _pairs(raw.get("requires"))
+    independent = _groups(raw.get("independent"))
+    branch_on = _strings(raw.get("branch_on"))
+    repeat_until = _strings(raw.get("repeat_until"))
+    synthesize = bool(raw.get("synthesize", False))
+
+    if requires:
+        coordination["requires"] = requires
+    if independent:
+        coordination["independent"] = independent
+    if synthesize:
+        coordination["synthesize"] = True
+    if branch_on:
+        coordination["branch_on"] = branch_on
+    if repeat_until:
+        coordination["repeat_until"] = repeat_until
+    return coordination
+
+
+def _topology(coordination: dict[str, Any]) -> dict[str, Any] | None:
+    """Derive an existing Task Contract topology from generic relations only."""
+    if coordination.get("requires"):
         return {
             "suggested": "sequential_handoff",
-            "reason": "qualify the supporting basis before relying on a consequential judgement",
-            "ordered_viewpoints": [
-                role for role in ("ARGOS", "MNEMOSYNE", "THEMIS") if role in viewpoints
-            ],
+            "reason": "an explicit dependency requires one state to precede another",
         }
 
-    if source and continuity:
+    if coordination.get("branch_on"):
+        return {
+            "suggested": "router",
+            "reason": "the next path depends on an explicit observed condition",
+        }
+
+    if coordination.get("independent") and coordination.get("synthesize"):
         return {
             "suggested": "fanout_extract_then_single_synthesis",
-            "reason": "source state and continuity/currentness can be qualified independently before synthesis",
-            "parallel_viewpoints": [
-                role for role in ("ARGOS", "MNEMOSYNE") if role in viewpoints
-            ],
+            "reason": "independent work may proceed separately before a shared synthesis",
         }
 
-    return {
-        "suggested": "parallel_independent_workers",
-        "reason": "several viewpoints are relevant without a proven ordering dependency",
-        "parallel_viewpoints": viewpoints,
-    }
+    if coordination.get("independent"):
+        return {
+            "suggested": "parallel_independent_workers",
+            "reason": "explicitly independent work may proceed in parallel",
+        }
+
+    # repeat_until is a control condition, not an existing Task Contract topology.
+    return None
 
 
-def _completion_requirements(conditions: list[str]) -> list[str]:
-    """Return generic observable conditions for the next legitimate transition."""
+def _derived_completion_requirements(conditions: list[str]) -> list[str]:
+    """Fallback requirements derived from governed conditions."""
     required: list[str] = []
     if _STRUCTURE_CONDITIONS.intersection(conditions):
         required.append("scope_and_method_bounded")
@@ -209,6 +265,12 @@ def _completion_requirements(conditions: list[str]) -> list[str]:
     if _DELIVERY_CONDITIONS.intersection(conditions):
         required.append("delivery_boundary_qualified")
     return required
+
+
+def _completion_requirements(request: dict[str, Any], conditions: list[str]) -> list[str]:
+    """Prefer explicit acceptance conditions; otherwise use bounded fallbacks."""
+    explicit = _strings(request.get("completion_requirements"))
+    return explicit or _derived_completion_requirements(conditions)
 
 
 def _effect_requested(request: dict[str, Any], conditions: list[str]) -> bool:
@@ -227,8 +289,9 @@ def recommend_handling(request: dict[str, Any], classification: dict[str, Any]) 
     """Return the smallest progressive governance handling recommendation."""
     conditions = _declared_conditions(request)
     viewpoints = _viewpoints(conditions)
-    topology = _topology(conditions, viewpoints)
-    completion_requirements = _completion_requirements(conditions)
+    coordination = _coordination(request)
+    topology = _topology(coordination)
+    completion_requirements = _completion_requirements(request, conditions)
     effect_requested = _effect_requested(request, conditions)
     conflict_detected = bool(
         request.get("conflict_detected") is True
@@ -236,16 +299,24 @@ def recommend_handling(request: dict[str, Any], classification: dict[str, Any]) 
         or _observations(request).get("contradiction_detected") is True
     )
 
+    needs_consult = bool(
+        viewpoints
+        or completion_requirements
+        or coordination
+        or conflict_detected
+        or classification.get("blocked_until_gate")
+    )
+
     if classification.get("blocked_until_gate") and effect_requested:
         disposition = "GATE"
-    elif viewpoints or completion_requirements or conflict_detected or classification.get("blocked_until_gate"):
+    elif needs_consult:
         disposition = "CONSULT"
     else:
         disposition = "PROCEED"
 
     constraints: list[str] = []
-    if request.get("conditions") or request.get("observations"):
-        constraints.append("declared_conditions_are_candidates_not_truth")
+    if request.get("conditions") or request.get("observations") or coordination:
+        constraints.append("declared_conditions_and_relations_are_candidates_not_truth")
     if _RISK_CONDITIONS.intersection(conditions):
         constraints.append("do_not_increase_claim_authority_without_support")
     if request.get("requested_transformation") in {"rewrite", "wording", "polish"}:
@@ -267,14 +338,20 @@ def recommend_handling(request: dict[str, Any], classification: dict[str, Any]) 
         "constraints": constraints,
         "reconsult_if": reconsult_if,
         "authority_note": (
-            "Handling is policy guidance only. A condition is candidate input, a "
-            "viewpoint is not an agent, topology is not dispatch, completion is not "
-            "approval, and Hermes remains the external executor."
+            "Handling is policy guidance only. Conditions and coordination relations "
+            "are candidate inputs, a viewpoint is not an agent, topology is not "
+            "dispatch, completion is not approval, and Hermes remains the external executor."
         ),
     }
 
+    if coordination:
+        handling["coordination"] = coordination
     if topology is not None:
         handling["topology"] = topology
+    if request.get("current_state") is not None:
+        handling["current_state"] = request.get("current_state")
+    if request.get("target_state") is not None:
+        handling["target_state"] = request.get("target_state")
     if conflict_detected:
         handling["rite_candidate"] = "concordance_des_sources"
     if classification.get("blocked_until_gate"):
