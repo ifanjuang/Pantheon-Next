@@ -63,3 +63,33 @@ memory recalled != truth
 ```
 
 If the runtime mode, complete memory posture or active tool/capability surface cannot be observed sufficiently for the task boundary, the profile must remain `not_qualified` and return a Capability Gap.
+
+## Conversation activity
+
+For non-trivial governed work on a chat surface, prefer the lightweight
+`pantheon-activity-projection` skill when it is available and admitted. Use it to
+project only meaningful observable milestones: initial plan, action, observable
+reason, goal, cited sources, applied method, skills/tools actually used, result,
+limits and the next responsibility.
+
+Keep simple requests quiet. Do not emit progress merely to display activity.
+Repeated tool calls and unchanged runtime state should normally collapse into one
+meaningful milestone.
+
+The projection must consume responsibility and governance state already
+established by the admitted task/Pantheon handling. It must not activate Roles,
+invoke Rites, derive approval, promote Evidence, create persistence or turn a
+handoff label into runtime dispatch.
+
+```text
+conversation activity != hidden reasoning
+source listed != source verified
+tool available != tool used
+handoff displayed != agent dispatched
+projection emitted != trace persisted
+```
+
+When the channel supports safe interim assistant messages, milestones may be
+published progressively. Otherwise preserve the same information compactly in
+the final response; do not introduce a second transport mechanism solely for
+progress display.
