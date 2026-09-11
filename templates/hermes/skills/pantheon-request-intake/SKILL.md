@@ -124,6 +124,39 @@ next legitimate transition
 
 Do not emit a condition merely because a word appears in the request.
 
+## Memory direction
+
+Distinguish retrieval or reuse of already-retained information from a request to
+make information persistent for future use.
+
+```text
+memory_recall_requested / prior_decision_reuse
+= retrieve or reuse information that is already retained
+
+memory_candidate
+= information is being proposed for possible retention
+
+memory_promotion
+= the user asks to make information persistent, canonical, official, or a
+  governed reference for future sessions or future reuse
+```
+
+When the user explicitly asks for governed persistence, emit all materially
+required conditions:
+
+```text
+memory_candidate
+memory_promotion
+approval_required
+```
+
+`approval_required` here describes the need for a governed gate; it is not an
+approval and does not authorize persistence.
+
+Do not emit `prior_decision_reuse` merely because the user says the information
+should be reusable later. If the information is being stored now for future
+reuse, that describes promotion, not reuse of an already-retained decision.
+
 Examples:
 
 ```text
