@@ -66,30 +66,8 @@ If the runtime mode, complete memory posture or active tool/capability surface c
 
 ## Conversation activity
 
-For non-trivial governed work on a chat surface, prefer the lightweight
-`pantheon-activity-projection` skill when it is available and admitted. Use it to
-project only meaningful observable milestones: initial plan, action, observable
-reason, goal, cited sources, applied method, skills/tools actually used, result,
-limits and the next responsibility.
+For non-trivial governed chat work, use the `pantheon-activity-projection` skill when available and admitted. Keep simple requests quiet and collapse repeated low-level activity into meaningful milestones.
 
-Keep simple requests quiet. Do not emit progress merely to display activity.
-Repeated tool calls and unchanged runtime state should normally collapse into one
-meaningful milestone.
+The skill may display only responsibility and governance state already established by the admitted task/Pantheon handling; presentation never activates Roles, invokes Rites, authorizes effects, promotes Evidence or dispatches agents.
 
-The projection must consume responsibility and governance state already
-established by the admitted task/Pantheon handling. It must not activate Roles,
-invoke Rites, derive approval, promote Evidence, create persistence or turn a
-handoff label into runtime dispatch.
-
-```text
-conversation activity != hidden reasoning
-source listed != source verified
-tool available != tool used
-handoff displayed != agent dispatched
-projection emitted != trace persisted
-```
-
-When the channel supports safe interim assistant messages, milestones may be
-published progressively. Otherwise preserve the same information compactly in
-the final response; do not introduce a second transport mechanism solely for
-progress display.
+Use safe interim assistant messages when the active channel already supports them. Otherwise render the same information compactly in the final response; do not introduce a second transport mechanism solely for progress display.
