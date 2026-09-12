@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import math
 import sys
 from pathlib import Path
 
@@ -38,6 +39,7 @@ def _observation(**overrides):
         "large_tool_result_chars": 250000,
         "source_recall_checks": 2,
         "source_recall_passes": 2,
+        "source_recall_check_ids": ["recall:S1:locator", "recall:S2:contradiction"],
         "required_quality_checks": {
             "source_locator_recoverable": True,
             "scope_unchanged": True,
@@ -138,6 +140,7 @@ def test_missing_candidate_quality_observation_is_inconclusive_not_cheaper_is_be
         input_tokens=1000,
         source_recall_checks=None,
         source_recall_passes=None,
+        source_recall_check_ids=None,
     )
 
     result = compare_observations(baseline, candidate)
@@ -145,6 +148,25 @@ def test_missing_candidate_quality_observation_is_inconclusive_not_cheaper_is_be
     assert result["quality_gate"] == "unknown"
     assert result["decision"] == "inconclusive"
     assert "candidate source recall is unobserved" in result["quality_unknowns"]
+
+
+def test_non_complete_baseline_or_candidate_cannot_win_on_lower_cost() -> None:
+    partial_candidate = compare_observations(
+        _observation(),
+        _observation(variant="candidate", input_tokens=1000, result_status="partial"),
+    )
+    blocked_baseline = compare_observations(
+        _observation(result_status="blocked"),
+        _observation(variant="candidate", input_tokens=1000),
+    )
+
+    assert partial_candidate["quality_gate"] == "unknown"
+    assert partial_candidate["decision"] == "inconclusive"
+    assert any("candidate result_status is partial" in item for item in partial_candidate["quality_unknowns"])
+
+    assert blocked_baseline["quality_gate"] == "unknown"
+    assert blocked_baseline["decision"] == "inconclusive"
+    assert any("baseline result_status is blocked" in item for item in blocked_baseline["quality_unknowns"])
 
 
 def test_different_runtime_or_known_model_profile_settings_block_causal_comparison() -> None:
@@ -238,12 +260,13 @@ def test_same_case_is_required_and_variant_names_must_differ() -> None:
         compare_observations(baseline, _observation())
 
 
-def test_source_recall_perimeter_mismatch_is_inconclusive() -> None:
-    baseline = _observation(source_recall_checks=2, source_recall_passes=2)
+def test_source_recall_perimeter_uses_stable_ids_not_only_count() -> None:
+    baseline = _observation()
     candidate = _observation(
         variant="candidate",
-        source_recall_checks=3,
-        source_recall_passes=3,
+        source_recall_checks=2,
+        source_recall_passes=2,
+        source_recall_check_ids=["recall:S1:locator", "recall:S3:different"],
         input_tokens=8000,
     )
 
@@ -252,6 +275,29 @@ def test_source_recall_perimeter_mismatch_is_inconclusive() -> None:
     assert result["quality_gate"] == "unknown"
     assert result["decision"] == "inconclusive"
     assert "source recall check perimeter differs between variants" in result["quality_unknowns"]
+
+
+def test_source_recall_check_ids_are_required_and_match_check_count() -> None:
+    with pytest.raises(
+        RuntimeEfficiencyQualificationError,
+        match="source_recall_check_ids are required",
+    ):
+        _observation(source_recall_check_ids=None)
+
+    with pytest.raises(
+        RuntimeEfficiencyQualificationError,
+        match="length must equal source_recall_checks",
+    ):
+        _observation(source_recall_check_ids=["only-one"])
+
+
+def test_non_finite_elapsed_seconds_are_rejected() -> None:
+    for value in (math.inf, -math.inf, math.nan):
+        with pytest.raises(
+            RuntimeEfficiencyQualificationError,
+            match="finite non-negative number",
+        ):
+            _observation(elapsed_seconds=value)
 
 
 def test_lab_has_no_product_or_runtime_integration_path() -> None:
