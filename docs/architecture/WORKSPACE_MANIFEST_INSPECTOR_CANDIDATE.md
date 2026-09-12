@@ -1,6 +1,14 @@
 # Workspace Manifest Inspector — candidate companion to file-native convergence
 
-Status: candidate architecture note — documentation only.
+Status: candidate architecture note — first read-only Linux projection implemented.
+
+Implementation note (2026-09-12): the bounded first slice lives under
+`implementation/workspace_cockpit/` with its operator installer at
+`deployment/ubuntu/configure-workspace-cockpit-local` and its recommended
+container definition at `deployment/ubuntu/compose.workspace-cockpit-local.yaml`.
+It reads only the local filesystem mirrors produced by LiveSync, exposes no
+file-content endpoint and performs no workspace write. PostgreSQL, pgvector and
+direct CouchDB access are outside this slice.
 
 Parent roadmap: `docs/roadmaps/FILE_NATIVE_CONTROL_CONVERGENCE.md` in PR #687.
 Parent workspace exploration: Pantheon-Next #684.
@@ -872,6 +880,12 @@ This is a repository-placement recommendation, not an implementation authorizati
 ## 22. First synthetic prototype
 
 Use a non-client/sandbox vault only.
+
+The implemented Linux slice covers the read-only subset: Card rendering,
+folder/file selection through the index, the five local health states,
+manifest/Markdown naming checks, resource counts, filters and workspace-health
+counters. Manifest editing, Hermes actions, outbox behavior and governed owner
+mapping remain unimplemented.
 
 Minimum proof:
 

@@ -93,6 +93,10 @@ def test_functional_profiles_inherit_one_governed_runtime_mode() -> None:
     assert "memory tool: off" in readme
     assert "X-Hermes-Session-Key: not sent" in readme
     assert "`assistant-personal` is a separate non-governed runtime mode" in readme
+    assert "`default` remains the sticky CLI/UI profile" in readme
+    assert "Hermes does not infer this switch from prompt content" in readme
+    assert "tool_search:" in readme
+    assert "An old session retains its frozen system prompt" in readme
     assert "hermes memory off != built-in memory injection off" in readme
     assert "memory tool absent != memory injection disabled" in readme
 

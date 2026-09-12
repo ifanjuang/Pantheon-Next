@@ -1,0 +1,32 @@
+services:
+  workspace-cockpit:
+    build:
+      context: ../../implementation/workspace_cockpit
+      args:
+        HERMES_IMAGE: ${RELEASE_HERMES_IMAGE:?load deployment/ubuntu/release.env}
+    image: pantheon/workspace-cockpit:local
+    container_name: pantheon-workspace-cockpit
+    restart: unless-stopped
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    ports:
+      - "${WORKSPACE_COCKPIT_BIND:-127.0.0.1}:${WORKSPACE_COCKPIT_PORT:-8189}:8189"
+    volumes:
+      - /srv/pantheon/obsidian:/vaults/ifja:ro
+      - /srv/pantheon/obsidian-affaires:/vaults/affaires:ro
+      - /srv/pantheon/obsidian-documentaires:/vaults/documentaires:ro
+    healthcheck:
+      test:
+        - CMD
+        - python3
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8189/api/health', timeout=2)
+      interval: 15s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
