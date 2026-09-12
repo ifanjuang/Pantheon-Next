@@ -81,9 +81,11 @@ def _observer(args: argparse.Namespace) -> HermesRunsApiObserver:
 
 def _observe_with_presentation(args: argparse.Namespace) -> dict[str, Any]:
     observed = _observer(args).observe()
-    presentation_receipt = _load_json_object(
-        args.presentation_config_receipt,
-        label="presentation configuration receipt",
+    presentation_path = getattr(args, "presentation_config_receipt", None)
+    presentation_receipt = (
+        _load_json_object(presentation_path, label="presentation configuration receipt")
+        if presentation_path is not None
+        else None
     )
     presentation = qualify_presentation_config_observation(
         presentation_receipt,
@@ -204,8 +206,10 @@ def build_parser() -> argparse.ArgumentParser:
     observe.add_argument(
         "--presentation-config-receipt",
         type=Path,
-        required=True,
-        help="sanitized JSON receipt produced by capture-presentation-config",
+        help=(
+            "sanitized JSON receipt produced by capture-presentation-config; "
+            "operational qualification requires it, legacy observation remains readable without it"
+        ),
     )
     observe.add_argument("--output", type=Path)
 
