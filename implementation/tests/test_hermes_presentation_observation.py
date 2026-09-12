@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from mvp_vertical import hermes_cli
-from mvp_vertical.hermes_presentation_observation import (
+from mvp_vertical.hermes_runs_observer import (
     capture_presentation_config,
     qualify_presentation_config_observation,
 )
