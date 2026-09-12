@@ -9,14 +9,21 @@ PILOT = ROOT / "tests/fixtures/hermes_request_intake_evaluation_pilot.json"
 CORPUS = ROOT / "tests/fixtures/hermes_request_intake_cases.yaml"
 SKILL = ROOT / "templates/hermes/skills/pantheon-request-intake/SKILL.md"
 RUNTIME_REVIEW = ROOT / "docs/governance/HERMES_RUNTIME_SURFACE_REVIEW.md"
+EXTERNAL_PINS = ROOT / "implementation/qualification/external-pins.json"
 
 
 def _pilot() -> dict:
     return json.loads(PILOT.read_text(encoding="utf-8"))
 
 
+def _hermes_pin() -> dict:
+    registry = json.loads(EXTERNAL_PINS.read_text(encoding="utf-8"))
+    return registry["pins"]["hermes-agent"]
+
+
 def test_runtime_pilot_reuses_exact_merged_skill_and_existing_corpus() -> None:
     pilot = _pilot()
+    hermes_pin = _hermes_pin()
 
     assert pilot["pilot_id"] == "hermes-request-intake-runtime-eval-001"
     assert pilot["capability"] == "pantheon_request_intake"
@@ -24,8 +31,8 @@ def test_runtime_pilot_reuses_exact_merged_skill_and_existing_corpus() -> None:
 
     target = pilot["runtime_target"]
     assert target["runtime_id"] == "nousresearch-hermes-agent"
-    assert target["version"] == "0.21.0"
-    assert target["release_commit"] == "29112bef099274229cadff79cdff7bf7b99c4b77"
+    assert target["version"] == hermes_pin["version"]
+    assert target["release_commit"] == hermes_pin["ref"]
     assert target["required_profile"] == "pantheon-governed"
     assert target["must_observe_exact_installed_artifact"] is True
 
@@ -42,7 +49,7 @@ def test_runtime_pilot_reuses_exact_merged_skill_and_existing_corpus() -> None:
     assert len({case["id"] for case in corpus}) == len(corpus)
 
     runtime_review = RUNTIME_REVIEW.read_text(encoding="utf-8")
-    assert "Current reviewed target: Hermes Agent 0.21.0" in runtime_review
+    assert f"Current reviewed target: Hermes Agent {hermes_pin['version']}" in runtime_review
     assert "real_instance_observation_required: true" in runtime_review
 
 
@@ -75,9 +82,10 @@ def test_runtime_pilot_measures_over_and_under_governance_separately() -> None:
 
 def test_runtime_pilot_does_not_fake_live_qualification() -> None:
     pilot = _pilot()
+    hermes_pin = _hermes_pin()
     blocker = pilot["execution_blocker"]
 
-    assert "exact observed Hermes 0.21.0 runtime/profile" in blocker["missing_prerequisite"]
+    assert f"exact observed Hermes {hermes_pin['version']} runtime/profile" in blocker["missing_prerequisite"]
     assert "cannot establish whether a live language model infers" in blocker["why_repo_tests_are_insufficient"]
     assert "green CI" in blocker["forbidden_shortcut"]
     assert "deterministic fake provider" in blocker["forbidden_shortcut"]
