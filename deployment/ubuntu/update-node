@@ -130,6 +130,14 @@ cp -a "$CONFIG_ROOT" "$checkpoint/etc-pantheon-node"
 cp -a "$APP_ROOT/compose.yaml" "$APP_ROOT/compose-env" "$checkpoint/"
 compose config > "$checkpoint/compose-rendered.yaml"
 readlink -f "$PANTHEON_ROOT/current" > "$checkpoint/pantheon-current.txt" 2>/dev/null || true
+if [[ -f "$STATE_ROOT/hermes/profiles/pantheon-governed/config.yaml" ]]; then
+  install -d -m 0700 "$checkpoint/hermes-pantheon-governed"
+  cp -a "$STATE_ROOT/hermes/profiles/pantheon-governed/config.yaml" \
+    "$checkpoint/hermes-pantheon-governed/config.yaml"
+fi
+if [[ -d "$STATE_ROOT/hermes-governed-skills" ]]; then
+  cp -a "$STATE_ROOT/hermes-governed-skills" "$checkpoint/hermes-governed-skills"
+fi
 
 update_containers() {
   if [[ "${COUCHDB_IMAGE:-}" != "$TARGET_COUCHDB_IMAGE" && "${STATEFUL_BACKUP_CONFIRMED:-0}" != "1" ]]; then
@@ -205,6 +213,7 @@ update_pantheon() {
   "$APP_ROOT/uv/bin/uv" pip install --python "$STATE_ROOT/policy-venv/bin/python" --force-reinstall "$target/mcp-server"
   "$STATE_ROOT/policy-venv/bin/pantheon-mcp-server" --help >/dev/null
   ln -sfn "$target" "$PANTHEON_ROOT/current"
+  bash "$SCRIPT_DIR/sync-hermes-governed-skills" "$target"
   set_version PANTHEON_COMMIT "$PANTHEON_COMMIT_OVERRIDE"
 }
 
