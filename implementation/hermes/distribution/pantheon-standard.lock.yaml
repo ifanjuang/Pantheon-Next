@@ -45,7 +45,7 @@ components:
     kind: runtime_observer
     path: implementation/mvp_vertical/hermes_runs_observer.py
     digest_mode: file
-    content_digest: sha256:004258e0df3cdbb8694be8f324d31d2cf9ddbcc79db31bf8437d20fc206ed95d
+    content_digest: sha256:e03d380935e89bed7ae92508473ed88c1902f47c110f1d15d51008628f9b6548
     required: true
     enabled_by_default: false
     capabilities:
@@ -54,7 +54,9 @@ components:
       - qualify-tool-surface
       - capture-memory-posture
       - qualify-memory-posture
-    notes: One-shot observation only; route, tool and fresh memory qualification do not activate the binding or authorize a task.
+      - capture-presentation-config
+      - qualify-presentation-config
+    notes: One-shot observation only; route, tool, memory and presentation configuration receipts do not activate the binding, authorize a task, prove user-visible reasoning behavior or create Evidence.
 required_checks:
   - check_id: distribution-schema-and-paths
     kind: static_structure
