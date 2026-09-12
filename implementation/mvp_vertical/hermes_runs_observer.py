@@ -12,10 +12,15 @@ Hermes 0.20.0 wraps the toolset list in an OpenAI-style list envelope:
 A historical bare list remains readable only as an explicitly labelled
 compatibility surface; malformed or differently scoped envelopes fail closed.
 
-The same locked observer component may capture one profile-local memory status
-receipt by invoking the official ``hermes -p <profile> memory status`` command
-without a shell. It never mutates configuration, reads arbitrary profile files,
-enables or disables tools, or retains raw command output.
+The same locked observer component may capture bounded profile-local receipts
+through official read-only Hermes CLI commands:
+
+- ``hermes -p <profile> memory status``
+- ``hermes -p <profile> config get <key> --json``
+
+It never mutates configuration, enables or disables tools, or retains raw model
+reasoning. Presentation configuration remains configuration evidence only; it
+does not prove what a user-facing surface rendered.
 
 A reachable API is not automatically safe for a Pantheon-admitted run. The
 profile route, tool surface and complete memory posture all fail closed unless
@@ -25,6 +30,7 @@ explicitly observed and qualified.
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 import subprocess
 from datetime import datetime, timezone
@@ -40,10 +46,18 @@ REQUIRED_RUN_FEATURES = (
 )
 MAX_MEMORY_STATUS_CHARS = 64_000
 MAX_MEMORY_OBSERVATION_AGE_SECONDS = 300.0
+MAX_PRESENTATION_OBSERVATION_AGE_SECONDS = 300.0
 MAX_FUTURE_CLOCK_SKEW_SECONDS = 30.0
 _PROFILE_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
+_PLATFORM_PATTERN = _PROFILE_PATTERN
 _DIGEST_PATTERN = re.compile(r"^sha256:[0-9a-f]{64}$")
 _ANSI_PATTERN = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+_PRESENTATION_GLOBAL_KEYS = {
+    "show_reasoning": "display.show_reasoning",
+    "show_commentary": "display.show_commentary",
+    "interim_assistant_messages": "display.interim_assistant_messages",
+    "stream_reasoning_deltas": "plugins.stream_reasoning_deltas",
+}
 
 
 class HermesRunsObservationError(ValueError):
@@ -51,6 +65,10 @@ class HermesRunsObservationError(ValueError):
 
 
 class HermesMemoryObservationError(HermesRunsObservationError):
+    pass
+
+
+class HermesPresentationObservationError(HermesRunsObservationError):
     pass
 
 
@@ -65,6 +83,15 @@ def normalize_profile_name(value: str) -> str:
             "Hermes profile must contain only letters, numbers, hyphens or underscores"
         )
     return profile
+
+
+def normalize_platform_name(value: str) -> str:
+    platform = str(value or "").strip()
+    if not platform or not _PLATFORM_PATTERN.fullmatch(platform):
+        raise HermesPresentationObservationError(
+            "Hermes platform must contain only letters, numbers, hyphens or underscores"
+        )
+    return platform
 
 
 def _memory_toggle(text: str, label: str) -> str:
@@ -334,6 +361,289 @@ def qualify_memory_observation(
         "age_seconds": round(age_seconds, 3) if age_seconds is not None else None,
         "stdout_digest": digest or None,
         "raw_output_retained": receipt.get("raw_output_retained") is True,
+    }
+
+
+def _presentation_capture_key(
+    *,
+    profile: str,
+    key: str,
+    hermes_command: str,
+    timeout: float,
+    runner: Callable[..., Any],
+) -> dict[str, Any]:
+    command = [hermes_command, "-p", profile, "config", "get", key, "--json"]
+    try:
+        completed = runner(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            check=False,
+            shell=False,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise HermesPresentationObservationError(
+            f"Hermes presentation configuration capture failed for {key}"
+        ) from exc
+
+    stdout = completed.stdout if isinstance(completed.stdout, str) else ""
+    record: dict[str, Any] = {
+        "key": key,
+        "value": "unknown",
+        "status": "unsupported_or_error",
+        "exit_code": int(completed.returncode),
+        "stdout_digest": "sha256:" + hashlib.sha256(stdout.encode("utf-8")).hexdigest(),
+    }
+    if completed.returncode != 0:
+        return record
+    try:
+        value = json.loads(stdout.strip())
+    except json.JSONDecodeError:
+        record["status"] = "invalid_json"
+        return record
+    if not isinstance(value, bool):
+        record["status"] = "unexpected_type"
+        return record
+    record.update(value=value, status="observed")
+    return record
+
+
+def capture_presentation_config(
+    *,
+    profile: str,
+    platforms: Iterable[str] | None = None,
+    hermes_command: str = "hermes",
+    timeout: float = 10.0,
+    runner: Callable[..., Any] | None = None,
+) -> dict[str, Any]:
+    """Capture resolved global and optional per-platform display configuration."""
+
+    profile = normalize_profile_name(profile)
+    command_name = str(hermes_command or "").strip()
+    if not command_name:
+        raise HermesPresentationObservationError("Hermes command is required")
+    if timeout <= 0:
+        raise HermesPresentationObservationError("Hermes presentation timeout must be positive")
+
+    platform_names = sorted({normalize_platform_name(value) for value in (platforms or [])})
+    run = runner or subprocess.run
+    settings = {
+        name: _presentation_capture_key(
+            profile=profile,
+            key=key,
+            hermes_command=command_name,
+            timeout=timeout,
+            runner=run,
+        )
+        for name, key in _PRESENTATION_GLOBAL_KEYS.items()
+    }
+    platform_settings = {
+        platform: {
+            "show_reasoning": _presentation_capture_key(
+                profile=profile,
+                key=f"platforms.{platform}.show_reasoning",
+                hermes_command=command_name,
+                timeout=timeout,
+                runner=run,
+            ),
+            "interim_assistant_messages": _presentation_capture_key(
+                profile=profile,
+                key=f"platforms.{platform}.interim_assistant_messages",
+                hermes_command=command_name,
+                timeout=timeout,
+                runner=run,
+            ),
+        }
+        for platform in platform_names
+    }
+
+    security_values = [
+        settings["show_reasoning"]["value"],
+        settings["stream_reasoning_deltas"]["value"],
+        *(values["show_reasoning"]["value"] for values in platform_settings.values()),
+    ]
+    alignment = (
+        "misaligned" if any(value is True for value in security_values)
+        else "incomplete" if any(value == "unknown" for value in security_values)
+        else "aligned"
+    )
+    return {
+        "kind": "hermes_profile_presentation_config_observation",
+        "observation_source": "hermes_config_get_json_cli",
+        "profile": profile,
+        "captured_at": _now(),
+        "settings": settings,
+        "platforms": platform_settings,
+        "platform_scope": platform_names,
+        "configuration_alignment": alignment,
+        "behavior_status": "not_evaluated",
+        "raw_output_retained": False,
+        "write_effect": False,
+        "activation_changed": False,
+        "authority_effect": "none",
+        "technical_receipt_is_evidence": False,
+        "non_equivalences": [
+            "configuration aligned != private reasoning proven hidden",
+            "global display setting != every channel behavior",
+            "commentary unavailable != governed task unsafe",
+            "presentation observation != task authorization",
+            "presentation observation != Evidence",
+        ],
+    }
+
+
+def _empty_presentation_qualification(expected_profile: str | None) -> dict[str, Any]:
+    return {
+        "receipt_status": "not_evaluated",
+        "configuration_alignment": "unknown",
+        "expected_profile": expected_profile,
+        "observed_profile": None,
+        "captured_at": None,
+        "age_seconds": None,
+        "platform_scope": [],
+        "settings": {},
+        "platforms": {},
+        "behavior_status": "not_evaluated",
+        "posture_status": "not_evaluated",
+        "reason": "no presentation configuration observation was supplied",
+        "configuration_only": True,
+        "technical_receipt_is_evidence": False,
+    }
+
+
+def _presentation_records(
+    settings: dict[str, Any],
+    platforms: dict[str, Any],
+    reasons: list[str],
+):
+    for name in _PRESENTATION_GLOBAL_KEYS:
+        record = settings.get(name)
+        if not isinstance(record, dict):
+            reasons.append(f"presentation observation is missing {name}")
+        else:
+            yield record
+    for platform, values in platforms.items():
+        normalize_platform_name(platform)
+        if not isinstance(values, dict):
+            reasons.append(f"presentation platform {platform} has invalid settings")
+            continue
+        for name in ("show_reasoning", "interim_assistant_messages"):
+            record = values.get(name)
+            if not isinstance(record, dict):
+                reasons.append(f"presentation platform {platform} is missing {name}")
+            else:
+                yield record
+
+
+def qualify_presentation_config_observation(
+    receipt: dict[str, Any] | None,
+    *,
+    expected_profile: str | None,
+    observed_at: datetime | None = None,
+    max_age_seconds: float = MAX_PRESENTATION_OBSERVATION_AGE_SECONDS,
+) -> dict[str, Any]:
+    """Validate config evidence without upgrading it to surface-behavior proof."""
+
+    expected = normalize_profile_name(expected_profile) if expected_profile else None
+    if receipt is None:
+        return _empty_presentation_qualification(expected)
+    if not isinstance(receipt, dict):
+        raise HermesPresentationObservationError(
+            "Hermes presentation configuration observation must be an object"
+        )
+    if receipt.get("kind") != "hermes_profile_presentation_config_observation":
+        raise HermesPresentationObservationError(
+            "Hermes presentation configuration observation has an unexpected kind"
+        )
+    if max_age_seconds <= 0:
+        raise HermesPresentationObservationError(
+            "Hermes presentation observation max age must be positive"
+        )
+
+    observed_profile = normalize_profile_name(str(receipt.get("profile") or ""))
+    reference_time = observed_at or datetime.now(timezone.utc)
+    if reference_time.tzinfo is None:
+        raise HermesPresentationObservationError(
+            "Hermes presentation observation reference time must be timezone-aware"
+        )
+    reference_time = reference_time.astimezone(timezone.utc)
+
+    reasons: list[str] = []
+    if expected is None:
+        reasons.append("no expected profile was supplied")
+    elif observed_profile != expected:
+        reasons.append("presentation observation profile differs from expected profile")
+    if receipt.get("observation_source") != "hermes_config_get_json_cli":
+        reasons.append("presentation observation has an unexpected source")
+
+    captured_at = _observation_time(receipt.get("captured_at"))
+    age_seconds: float | None = None
+    if captured_at is None:
+        reasons.append("presentation observation has no valid timezone-aware capture time")
+    else:
+        age_seconds = (reference_time - captured_at).total_seconds()
+        if age_seconds > max_age_seconds:
+            reasons.append("presentation observation is stale")
+        elif age_seconds < -MAX_FUTURE_CLOCK_SKEW_SECONDS:
+            reasons.append("presentation observation capture time is in the future")
+
+    settings = receipt.get("settings")
+    platforms = receipt.get("platforms")
+    if not isinstance(settings, dict) or not isinstance(platforms, dict):
+        raise HermesPresentationObservationError(
+            "Hermes presentation observation settings must be objects"
+        )
+    for record in _presentation_records(settings, platforms, reasons):
+        if not _DIGEST_PATTERN.fullmatch(str(record.get("stdout_digest") or "")):
+            reasons.append("presentation observation contains an invalid output digest")
+        if record.get("status") not in {
+            "observed", "unsupported_or_error", "invalid_json", "unexpected_type"
+        }:
+            reasons.append("presentation observation contains an invalid key status")
+
+    if receipt.get("raw_output_retained") is not False:
+        reasons.append("presentation observation retained raw command output")
+    if receipt.get("write_effect") is not False or receipt.get("activation_changed") is not False:
+        reasons.append("presentation observation reports a mutation effect")
+    if receipt.get("authority_effect") != "none":
+        reasons.append("presentation observation reports an authority effect")
+    if receipt.get("technical_receipt_is_evidence") is not False:
+        reasons.append("presentation observation is incorrectly classified as Evidence")
+
+    alignment = str(receipt.get("configuration_alignment") or "unknown")
+    if alignment not in {"aligned", "misaligned", "incomplete"}:
+        reasons.append("presentation observation has invalid configuration alignment")
+        alignment = "unknown"
+
+    receipt_status = "observed" if not reasons else "not_qualified"
+    if alignment == "misaligned":
+        posture_status = "not_qualified"
+        posture_reason = "presentation configuration exposes or streams private reasoning"
+    elif receipt_status != "observed" or alignment != "aligned":
+        posture_status = "not_evaluated"
+        posture_reason = "presentation configuration is incomplete or unqualified"
+    else:
+        posture_status = "not_evaluated"
+        posture_reason = (
+            "configuration is aligned but user-visible behavior still requires surface observation"
+        )
+
+    return {
+        "receipt_status": receipt_status,
+        "configuration_alignment": alignment,
+        "expected_profile": expected,
+        "observed_profile": observed_profile,
+        "captured_at": captured_at.isoformat() if captured_at is not None else None,
+        "age_seconds": round(age_seconds, 3) if age_seconds is not None else None,
+        "platform_scope": sorted(platforms),
+        "settings": settings,
+        "platforms": platforms,
+        "behavior_status": "not_evaluated",
+        "posture_status": posture_status,
+        "reason": "; ".join(reasons) if reasons else posture_reason,
+        "configuration_only": True,
+        "technical_receipt_is_evidence": False,
     }
 
 

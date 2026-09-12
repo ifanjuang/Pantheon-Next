@@ -18,9 +18,12 @@ from .hermes_run_binding import (
 )
 from .hermes_runs_observer import (
     HermesMemoryObservationError,
+    HermesPresentationObservationError,
     HermesRunsApiObserver,
     HermesRunsObservationError,
     capture_memory_status,
+    capture_presentation_config,
+    qualify_presentation_config_observation,
 )
 
 
@@ -72,6 +75,29 @@ def _observer(args: argparse.Namespace) -> HermesRunsApiObserver:
         required_tools=args.required_tools,
         timeout=args.timeout,
     )
+
+
+def _observe_with_presentation(args: argparse.Namespace) -> dict[str, Any]:
+    observed = _observer(args).observe()
+    presentation_path = getattr(args, "presentation_config_receipt", None)
+    presentation_receipt = (
+        _load_json_object(presentation_path, label="presentation configuration receipt")
+        if presentation_path is not None
+        else None
+    )
+    presentation = qualify_presentation_config_observation(
+        presentation_receipt,
+        expected_profile=args.expected_profile,
+    )
+    observed["presentation_config"] = presentation
+    observed["governed_surface_status"] = presentation["posture_status"]
+    observed["presentation_behavior_status"] = presentation["behavior_status"]
+    observed.setdefault("non_equivalences", []).extend([
+        "presentation config aligned != private reasoning proven hidden",
+        "runtime safety_status qualified != governed surface qualified",
+        "presentation observation != task authorization",
+    ])
+    return observed
 
 
 def _binding(args: argparse.Namespace) -> ExternalHermesRunBinding:
@@ -151,14 +177,37 @@ def build_parser() -> argparse.ArgumentParser:
     capture.add_argument("--timeout", type=float, default=10.0)
     capture.add_argument("--output", type=Path)
 
+    presentation = sub.add_parser(
+        "capture-presentation-config",
+        help="capture resolved read-only Hermes presentation configuration",
+    )
+    presentation.add_argument("--profile", required=True)
+    presentation.add_argument(
+        "--platform",
+        action="append",
+        dest="platforms",
+        help="gateway platform whose effective display override should be observed; repeatable",
+    )
+    presentation.add_argument("--hermes-command", default="hermes")
+    presentation.add_argument("--timeout", type=float, default=10.0)
+    presentation.add_argument("--output", type=Path)
+
     observe = sub.add_parser(
         "observe",
-        help="observe one named Hermes profile, its toolsets and memory posture once",
+        help="observe one named Hermes profile, toolsets, memory and presentation config once",
     )
     _add_runtime_args(
         observe,
         require_allowlist=True,
         require_governed_observation=True,
+    )
+    observe.add_argument(
+        "--presentation-config-receipt",
+        type=Path,
+        help=(
+            "sanitized JSON receipt produced by capture-presentation-config; "
+            "operational qualification requires it, legacy observation remains readable without it"
+        ),
     )
     observe.add_argument("--output", type=Path)
 
@@ -209,8 +258,16 @@ def execute(args: argparse.Namespace) -> dict[str, Any]:
             timeout=args.timeout,
         )
 
+    if args.command == "capture-presentation-config":
+        return capture_presentation_config(
+            profile=args.profile,
+            platforms=args.platforms,
+            hermes_command=args.hermes_command,
+            timeout=args.timeout,
+        )
+
     if args.command == "observe":
-        return _observer(args).observe()
+        return _observe_with_presentation(args)
 
     if args.command == "launch":
         admission_id = args.admission_id.strip()
@@ -239,6 +296,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         DistributionLockError,
         HermesCliError,
         HermesMemoryObservationError,
+        HermesPresentationObservationError,
         HermesRunBindingError,
         HermesRunsObservationError,
         ModuleNotFoundError,
