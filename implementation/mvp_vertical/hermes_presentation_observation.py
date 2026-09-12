@@ -1,9 +1,8 @@
-"""Read-only capture and qualification of Hermes presentation configuration.
+"""Read-only Hermes presentation configuration observation.
 
-This module observes only resolved configuration values exposed by the official
-``hermes config get <key> --json`` command. It does not inspect or retain model
-reasoning, does not prove what a user-facing surface rendered, and performs no
-configuration write.
+Only resolved values from ``hermes config get <key> --json`` are captured.
+Configuration observation never proves what a user-facing surface rendered and
+never retains private model reasoning.
 """
 
 from __future__ import annotations
@@ -18,10 +17,8 @@ from typing import Any, Callable, Iterable
 
 MAX_PRESENTATION_OBSERVATION_AGE_SECONDS = 300.0
 MAX_FUTURE_CLOCK_SKEW_SECONDS = 30.0
-_PROFILE_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
-_PLATFORM_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
+_NAME_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
 _DIGEST_PATTERN = re.compile(r"^sha256:[0-9a-f]{64}$")
-
 _GLOBAL_KEYS = {
     "show_reasoning": "display.show_reasoning",
     "show_commentary": "display.show_commentary",
@@ -38,9 +35,9 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _normalize_name(value: str, *, label: str, pattern: re.Pattern[str]) -> str:
+def _name(value: str, *, label: str) -> str:
     normalized = str(value or "").strip()
-    if not normalized or not pattern.fullmatch(normalized):
+    if not normalized or not _NAME_PATTERN.fullmatch(normalized):
         raise HermesPresentationObservationError(
             f"Hermes {label} must contain only letters, numbers, hyphens or underscores"
         )
@@ -48,23 +45,21 @@ def _normalize_name(value: str, *, label: str, pattern: re.Pattern[str]) -> str:
 
 
 def normalize_profile_name(value: str) -> str:
-    return _normalize_name(value, label="profile", pattern=_PROFILE_PATTERN)
+    return _name(value, label="profile")
 
 
 def normalize_platform_name(value: str) -> str:
-    return _normalize_name(value, label="platform", pattern=_PLATFORM_PATTERN)
+    return _name(value, label="platform")
 
 
-def _observation_time(value: Any) -> datetime | None:
+def _parse_time(value: Any) -> datetime | None:
     if not isinstance(value, str) or not value.strip():
         return None
     try:
         parsed = datetime.fromisoformat(value.strip())
     except ValueError:
         return None
-    if parsed.tzinfo is None:
-        return None
-    return parsed.astimezone(timezone.utc)
+    return parsed.astimezone(timezone.utc) if parsed.tzinfo is not None else None
 
 
 def _capture_key(
@@ -91,43 +86,25 @@ def _capture_key(
         ) from exc
 
     stdout = completed.stdout if isinstance(completed.stdout, str) else ""
-    digest = "sha256:" + hashlib.sha256(stdout.encode("utf-8")).hexdigest()
-    if int(completed.returncode) != 0:
-        return {
-            "key": key,
-            "value": "unknown",
-            "status": "unsupported_or_error",
-            "exit_code": int(completed.returncode),
-            "stdout_digest": digest,
-        }
-
+    record: dict[str, Any] = {
+        "key": key,
+        "value": "unknown",
+        "status": "unsupported_or_error",
+        "exit_code": int(completed.returncode),
+        "stdout_digest": "sha256:" + hashlib.sha256(stdout.encode("utf-8")).hexdigest(),
+    }
+    if completed.returncode != 0:
+        return record
     try:
         value = json.loads(stdout.strip())
     except json.JSONDecodeError:
-        return {
-            "key": key,
-            "value": "unknown",
-            "status": "invalid_json",
-            "exit_code": int(completed.returncode),
-            "stdout_digest": digest,
-        }
-
+        record["status"] = "invalid_json"
+        return record
     if not isinstance(value, bool):
-        return {
-            "key": key,
-            "value": "unknown",
-            "status": "unexpected_type",
-            "exit_code": int(completed.returncode),
-            "stdout_digest": digest,
-        }
-
-    return {
-        "key": key,
-        "value": value,
-        "status": "observed",
-        "exit_code": int(completed.returncode),
-        "stdout_digest": digest,
-    }
+        record["status"] = "unexpected_type"
+        return record
+    record.update(value=value, status="observed")
+    return record
 
 
 def capture_presentation_config(
@@ -138,7 +115,7 @@ def capture_presentation_config(
     timeout: float = 10.0,
     runner: Callable[..., Any] | None = None,
 ) -> dict[str, Any]:
-    """Capture resolved presentation settings without writing configuration."""
+    """Capture resolved global and optional per-platform display configuration."""
 
     profile = normalize_profile_name(profile)
     command_name = str(hermes_command or "").strip()
@@ -159,10 +136,8 @@ def capture_presentation_config(
         )
         for name, key in _GLOBAL_KEYS.items()
     }
-
-    platform_settings: dict[str, dict[str, Any]] = {}
-    for platform in platform_names:
-        platform_settings[platform] = {
+    platform_settings = {
+        platform: {
             "show_reasoning": _capture_key(
                 profile=profile,
                 key=f"platforms.{platform}.show_reasoning",
@@ -178,22 +153,19 @@ def capture_presentation_config(
                 runner=run,
             ),
         }
+        for platform in platform_names
+    }
 
     security_values = [
         settings["show_reasoning"]["value"],
         settings["stream_reasoning_deltas"]["value"],
-        *[
-            values["show_reasoning"]["value"]
-            for values in platform_settings.values()
-        ],
+        *(values["show_reasoning"]["value"] for values in platform_settings.values()),
     ]
-    if any(value is True for value in security_values):
-        alignment = "misaligned"
-    elif any(value == "unknown" for value in security_values):
-        alignment = "incomplete"
-    else:
-        alignment = "aligned"
-
+    alignment = (
+        "misaligned" if any(value is True for value in security_values)
+        else "incomplete" if any(value == "unknown" for value in security_values)
+        else "aligned"
+    )
     return {
         "kind": "hermes_profile_presentation_config_observation",
         "observation_source": "hermes_config_get_json_cli",
@@ -219,6 +191,45 @@ def capture_presentation_config(
     }
 
 
+def _empty(expected_profile: str | None) -> dict[str, Any]:
+    return {
+        "receipt_status": "not_evaluated",
+        "configuration_alignment": "unknown",
+        "expected_profile": expected_profile,
+        "observed_profile": None,
+        "captured_at": None,
+        "age_seconds": None,
+        "platform_scope": [],
+        "settings": {},
+        "platforms": {},
+        "behavior_status": "not_evaluated",
+        "posture_status": "not_evaluated",
+        "reason": "no presentation configuration observation was supplied",
+        "configuration_only": True,
+        "technical_receipt_is_evidence": False,
+    }
+
+
+def _records(settings: dict[str, Any], platforms: dict[str, Any], reasons: list[str]):
+    for name in _GLOBAL_KEYS:
+        record = settings.get(name)
+        if not isinstance(record, dict):
+            reasons.append(f"presentation observation is missing {name}")
+        else:
+            yield record
+    for platform, values in platforms.items():
+        normalize_platform_name(platform)
+        if not isinstance(values, dict):
+            reasons.append(f"presentation platform {platform} has invalid settings")
+            continue
+        for name in ("show_reasoning", "interim_assistant_messages"):
+            record = values.get(name)
+            if not isinstance(record, dict):
+                reasons.append(f"presentation platform {platform} is missing {name}")
+            else:
+                yield record
+
+
 def qualify_presentation_config_observation(
     receipt: dict[str, Any] | None,
     *,
@@ -226,21 +237,11 @@ def qualify_presentation_config_observation(
     observed_at: datetime | None = None,
     max_age_seconds: float = MAX_PRESENTATION_OBSERVATION_AGE_SECONDS,
 ) -> dict[str, Any]:
-    """Validate a bounded config receipt without upgrading it to behavioral proof."""
+    """Validate a config receipt without upgrading configuration to behavioral proof."""
 
     expected = normalize_profile_name(expected_profile) if expected_profile else None
     if receipt is None:
-        return {
-            "receipt_status": "not_evaluated",
-            "configuration_alignment": "unknown",
-            "expected_profile": expected,
-            "observed_profile": None,
-            "behavior_status": "not_evaluated",
-            "reason": "no presentation configuration observation was supplied",
-            "platform_scope": [],
-            "settings": {},
-            "platforms": {},
-        }
+        return _empty(expected)
     if not isinstance(receipt, dict):
         raise HermesPresentationObservationError(
             "Hermes presentation configuration observation must be an object"
@@ -248,6 +249,10 @@ def qualify_presentation_config_observation(
     if receipt.get("kind") != "hermes_profile_presentation_config_observation":
         raise HermesPresentationObservationError(
             "Hermes presentation configuration observation has an unexpected kind"
+        )
+    if max_age_seconds <= 0:
+        raise HermesPresentationObservationError(
+            "Hermes presentation observation max age must be positive"
         )
 
     observed_profile = normalize_profile_name(str(receipt.get("profile") or ""))
@@ -266,7 +271,7 @@ def qualify_presentation_config_observation(
     if receipt.get("observation_source") != "hermes_config_get_json_cli":
         reasons.append("presentation observation has an unexpected source")
 
-    captured_at = _observation_time(receipt.get("captured_at"))
+    captured_at = _parse_time(receipt.get("captured_at"))
     age_seconds: float | None = None
     if captured_at is None:
         reasons.append("presentation observation has no valid timezone-aware capture time")
@@ -283,29 +288,8 @@ def qualify_presentation_config_observation(
         raise HermesPresentationObservationError(
             "Hermes presentation observation settings must be objects"
         )
-
-    all_records: list[dict[str, Any]] = []
-    for name in _GLOBAL_KEYS:
-        record = settings.get(name)
-        if not isinstance(record, dict):
-            reasons.append(f"presentation observation is missing {name}")
-            continue
-        all_records.append(record)
-    for platform, values in platforms.items():
-        normalize_platform_name(platform)
-        if not isinstance(values, dict):
-            reasons.append(f"presentation platform {platform} has invalid settings")
-            continue
-        for name in ("show_reasoning", "interim_assistant_messages"):
-            record = values.get(name)
-            if not isinstance(record, dict):
-                reasons.append(f"presentation platform {platform} is missing {name}")
-                continue
-            all_records.append(record)
-
-    for record in all_records:
-        digest = str(record.get("stdout_digest") or "")
-        if not _DIGEST_PATTERN.fullmatch(digest):
+    for record in _records(settings, platforms, reasons):
+        if not _DIGEST_PATTERN.fullmatch(str(record.get("stdout_digest") or "")):
             reasons.append("presentation observation contains an invalid output digest")
         if record.get("status") not in {
             "observed", "unsupported_or_error", "invalid_json", "unexpected_type"
