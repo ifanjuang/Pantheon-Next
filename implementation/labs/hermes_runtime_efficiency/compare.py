@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
@@ -32,7 +33,6 @@ COST_METRICS = (
 )
 
 ALLOWED_RESULT_STATUS = {"complete", "partial", "blocked", "failed", "unknown"}
-SUCCESS_RESULT_STATUS = {"complete", "partial"}
 
 
 class RuntimeEfficiencyQualificationError(ValueError):
@@ -62,9 +62,12 @@ def _optional_int(value: Any, *, field: str) -> int | None:
 def _optional_number(value: Any, *, field: str) -> float | None:
     if value is None:
         return None
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or value < 0:
-        raise RuntimeEfficiencyQualificationError(f"{field} must be a non-negative number or null")
-    return float(value)
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise RuntimeEfficiencyQualificationError(f"{field} must be a finite non-negative number or null")
+    number = float(value)
+    if number < 0 or not math.isfinite(number):
+        raise RuntimeEfficiencyQualificationError(f"{field} must be a finite non-negative number or null")
+    return number
 
 
 def _refs(value: Any, *, field: str) -> tuple[str, ...] | None:
@@ -121,6 +124,7 @@ class RunObservation:
     large_tool_result_chars: int | None
     source_recall_checks: int | None
     source_recall_passes: int | None
+    source_recall_check_ids: tuple[str, ...] | None
     required_quality_checks: tuple[tuple[str, bool], ...]
     result_status: str
     retrieved_refs: tuple[str, ...] | None
@@ -135,12 +139,11 @@ class RunObservation:
 
         status = _require_text(raw.get("result_status", "unknown"), field="result_status")
         if status not in ALLOWED_RESULT_STATUS:
-            raise RuntimeEfficiencyQualificationError(
-                f"unsupported result_status: {status}"
-            )
+            raise RuntimeEfficiencyQualificationError(f"unsupported result_status: {status}")
 
         source_checks = _optional_int(raw.get("source_recall_checks"), field="source_recall_checks")
         source_passes = _optional_int(raw.get("source_recall_passes"), field="source_recall_passes")
+        source_check_ids = _refs(raw.get("source_recall_check_ids"), field="source_recall_check_ids")
         if (source_checks is None) != (source_passes is None):
             raise RuntimeEfficiencyQualificationError(
                 "source_recall_checks and source_recall_passes must both be known or both be null"
@@ -149,6 +152,19 @@ class RunObservation:
             raise RuntimeEfficiencyQualificationError(
                 "source_recall_passes cannot exceed source_recall_checks"
             )
+        if source_checks is None and source_check_ids is not None:
+            raise RuntimeEfficiencyQualificationError(
+                "source_recall_check_ids require source_recall_checks/source_recall_passes"
+            )
+        if source_checks is not None:
+            if source_check_ids is None:
+                raise RuntimeEfficiencyQualificationError(
+                    "source_recall_check_ids are required when source recall is observed"
+                )
+            if len(source_check_ids) != source_checks:
+                raise RuntimeEfficiencyQualificationError(
+                    "source_recall_check_ids length must equal source_recall_checks"
+                )
 
         retrieved = _refs(raw.get("retrieved_refs"), field="retrieved_refs")
         admitted = _refs(raw.get("admitted_refs"), field="admitted_refs")
@@ -192,6 +208,7 @@ class RunObservation:
             ),
             source_recall_checks=source_checks,
             source_recall_passes=source_passes,
+            source_recall_check_ids=source_check_ids,
             required_quality_checks=_required_quality_checks(raw.get("required_quality_checks")),
             result_status=status,
             retrieved_refs=retrieved,
@@ -206,7 +223,13 @@ class RunObservation:
     def as_jsonable(self) -> dict[str, Any]:
         result = asdict(self)
         result["required_quality_checks"] = self.quality_check_map()
-        for field in ("retrieved_refs", "admitted_refs", "used_refs", "notes"):
+        for field in (
+            "source_recall_check_ids",
+            "retrieved_refs",
+            "admitted_refs",
+            "used_refs",
+            "notes",
+        ):
             value = result[field]
             if value is not None:
                 result[field] = list(value)
@@ -219,13 +242,9 @@ def _identity_comparability(
     blockers: list[str] = []
     warnings: list[str] = []
     if baseline.case_id != candidate.case_id:
-        raise RuntimeEfficiencyQualificationError(
-            "A/B comparison requires the exact same case_id"
-        )
+        raise RuntimeEfficiencyQualificationError("A/B comparison requires the exact same case_id")
     if baseline.variant == candidate.variant:
-        raise RuntimeEfficiencyQualificationError(
-            "A/B comparison requires distinct variant names"
-        )
+        raise RuntimeEfficiencyQualificationError("A/B comparison requires distinct variant names")
     if baseline.runtime_identity != candidate.runtime_identity:
         blockers.append("runtime_identity differs")
 
@@ -245,10 +264,12 @@ def _candidate_quality(
     regressions: list[str] = []
     unknowns: list[str] = []
 
+    if baseline.result_status != "complete":
+        unknowns.append(f"baseline result_status is {baseline.result_status}; cost comparison requires complete")
     if candidate.result_status in {"blocked", "failed"}:
         regressions.append(f"candidate result_status is {candidate.result_status}")
-    elif candidate.result_status == "unknown":
-        unknowns.append("candidate result_status is unknown")
+    elif candidate.result_status != "complete":
+        unknowns.append(f"candidate result_status is {candidate.result_status}; cost comparison requires complete")
 
     if candidate.source_recall_checks is None:
         unknowns.append("candidate source recall is unobserved")
@@ -271,7 +292,7 @@ def _candidate_quality(
     if baseline.source_recall_checks is not None:
         if candidate.source_recall_checks is None:
             unknowns.append("candidate source recall cannot be compared with baseline")
-        elif baseline.source_recall_checks != candidate.source_recall_checks:
+        elif baseline.source_recall_check_ids != candidate.source_recall_check_ids:
             unknowns.append("source recall check perimeter differs between variants")
         elif (
             baseline.source_recall_passes is not None
@@ -287,7 +308,9 @@ def _candidate_quality(
     return "pass", [], []
 
 
-def _metric_delta(baseline: int | float | None, candidate: int | float | None) -> dict[str, Any]:
+def _metric_delta(
+    baseline: int | float | None, candidate: int | float | None
+) -> dict[str, Any]:
     if baseline is None or candidate is None:
         return {
             "baseline": baseline,
@@ -317,8 +340,16 @@ def compare_observations(
         metric: _metric_delta(getattr(baseline, metric), getattr(candidate, metric))
         for metric in COST_METRICS
     }
-    improved = [metric for metric, values in costs.items() if values["delta"] is not None and values["delta"] < 0]
-    worsened = [metric for metric, values in costs.items() if values["delta"] is not None and values["delta"] > 0]
+    improved = [
+        metric
+        for metric, values in costs.items()
+        if values["delta"] is not None and values["delta"] < 0
+    ]
+    worsened = [
+        metric
+        for metric, values in costs.items()
+        if values["delta"] is not None and values["delta"] > 0
+    ]
     unchanged = [metric for metric, values in costs.items() if values["delta"] == 0]
     unknown_costs = [metric for metric, values in costs.items() if values["delta"] is None]
 
@@ -369,9 +400,7 @@ def load_observation(path: Path) -> RunObservation:
     try:
         raw = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
-        raise RuntimeEfficiencyQualificationError(
-            f"cannot load observation: {path}"
-        ) from exc
+        raise RuntimeEfficiencyQualificationError(f"cannot load observation: {path}") from exc
     return RunObservation.from_mapping(raw)
 
 
@@ -387,7 +416,7 @@ def main() -> int:
         load_observation(args.baseline),
         load_observation(args.candidate),
     )
-    print(json.dumps(comparison, indent=2, sort_keys=True))
+    print(json.dumps(comparison, indent=2, sort_keys=True, allow_nan=False))
     return 0
 
 
