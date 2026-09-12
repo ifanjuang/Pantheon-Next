@@ -10,11 +10,6 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from .hermes_distribution import DistributionLockError, validate
-from .hermes_presentation_observation import (
-    HermesPresentationObservationError,
-    capture_presentation_config,
-    qualify_presentation_config_observation,
-)
 from .hermes_run_binding import (
     ExternalHermesRunBinding,
     HermesRunBindingError,
@@ -23,9 +18,12 @@ from .hermes_run_binding import (
 )
 from .hermes_runs_observer import (
     HermesMemoryObservationError,
+    HermesPresentationObservationError,
     HermesRunsApiObserver,
     HermesRunsObservationError,
     capture_memory_status,
+    capture_presentation_config,
+    qualify_presentation_config_observation,
 )
 
 
