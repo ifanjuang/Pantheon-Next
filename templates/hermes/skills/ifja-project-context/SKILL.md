@@ -5,6 +5,7 @@ metadata:
   owner_layer: hermes
   status: candidate_template_only
   governed_by: docs/governance/HERMES_INTEGRATION.md
+  related_skills: [pantheon-activity-projection, pantheon-request-intake, source-research]
   upstream: "agentskills.io SKILL.md standard; exact Hermes runtime compatibility must be qualified before admission"
 ---
 
@@ -17,6 +18,18 @@ Non-executable Hermes skill candidate. It routes IFJA professional work to exist
 Use when work involves an affaire/project, professional documents or correspondence, technical/regulatory/legal/contractual/responsibility analysis, or a professional action that needs source-aware context.
 
 Do not use merely for generic conversation when no professional workspace context or governed boundary is relevant.
+
+## Conversation projection
+
+For non-trivial IFJA work, when `pantheon-activity-projection` is available in the current Hermes profile, load and apply it before substantial execution. Use it only to present the plan, meaningful milestones, real sources, actual methods/tools and the result; it does not prescribe the runtime tool sequence and it does not create authority.
+
+If the projection skill is unavailable, continue only within the otherwise admitted boundary and treat the missing projection as a presentation capability gap rather than inventing an equivalent governance layer.
+
+```text
+projection skill available != task authorized
+projection plan != runtime dispatch plan
+visible milestone != MCP-prescribed tool sequence
+```
 
 ## Routing
 
