@@ -216,6 +216,40 @@ ZEUS arbitrates status.
 The human decides.
 ```
 
+## Distilled external methods
+
+Pantheon may distill narrow techniques from external method repositories without importing their runtime, naming, authority model or whole skill catalogue.
+
+Distillation is allowed only when the technique strengthens an existing owner and does not create a duplicate Role, Rite or governed Space.
+
+Current mapping for unknown-finding techniques:
+
+```text
+blindspot pass
+-> enriches PREMISSES_CACHEES before commitment
+-> enriches AUTOCRITIQUE_CONTRADICTOIRE after a convincing candidate exists
+
+test blindspots
+-> enriches AUTOCRITIQUE_CONTRADICTOIRE
+-> asks what passing checks do not establish
+
+assumption test
+-> reusable bounded Method / Skill
+-> may be requested from PREMISSES_CACHEES or AUTOCRITIQUE_CONTRADICTOIRE
+-> result must remain supported-within-scope, refuted or inconclusive
+
+reference hunt
+-> ARGOS-aligned research Method / Skill
+-> source found != Evidence admitted
+
+context audit
+-> convergence/maintenance Method for instruction surfaces
+-> not a new Role or Rite by default
+```
+
+These techniques do not self-trigger Rites and do not inherit Pantheon authority.
+A runtime skill implementing one of them remains a candidate external execution method under the existing Task Contract, capability and skill-admission owners.
+
 ## Initial rite catalogue
 
 - `RITE_INVOCATION_POLICY.md` - define invocation, budget, anti-chaining, closure and Rite Review Card policy.
@@ -317,77 +351,3 @@ When a rite affects output legitimacy, delivery posture, memory posture or user 
 A Rite Review Card is not a schema.
 
 It is a documentation format.
-
-Recommended format:
-
-```text
-rite_id:
-trigger_reason:
-proposed_by:
-authorized_by:
-role_viewpoints_involved:
-inputs_considered:
-outputs_retained:
-tensions_exposed:
-blocked_claims:
-ZEUS_status:
-User_Decision_Gate:
-Evidence_Pack_impact:
-memory_impact:
-next_allowed_action:
-```
-
-Forbidden content:
-
-- hidden chain-of-thought;
-- raw role debate;
-- private scratchpad;
-- autonomous agent transcript;
-- runtime worker trace;
-- executable workflow state;
-- automatic approval event;
-- automatic memory promotion event.
-
-## Runtime-client projection boundary
-
-Optional runtime clients may expose interaction around a rite but do not own rite status, authority or approval. Hermes WebUI is one optional/proposed client if separately selected and qualified.
-
-Pantheon Cockpit may project governed Rite Review Cards, tensions, status and linked User Decision Gates.
-
-```text
-Hermes WebUI available != Hermes WebUI selected
-client selected != authority transfer
-projection != persistence
-rite visible != rite authorized
-```
-
-## Forbidden drift
-
-Rites must never become:
-
-- autonomous workflows;
-- hidden role debates;
-- agent loops;
-- tool dispatch plans;
-- schedulers;
-- queues;
-- executable DAGs;
-- LangGraph runtime substitutes;
-- approval callbacks;
-- memory promotion pipelines;
-- client-specific governance plugins;
-- Hermes skill auto-installers.
-
-If a rite becomes executable by Pantheon itself, governance drift has occurred.
-
-## Final rule
-
-A rite is a governed method.
-
-It can organize role viewpoints.
-
-It cannot execute work.
-
-It cannot approve itself.
-
-It cannot make memory canonical.
