@@ -14,11 +14,12 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **928**.
+Total indexed entries: **929**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-09-12 | `2026/Q3/2026-09-12-hermes-runtime-efficiency-qualification.md` | AI log — Hermes runtime-efficiency qualification harness |
 | 2026-09-09 | `2026/Q3/2026-09-09-boundary-profile-migration-final-slice.md` | 2026-09-09 — Boundary profile migration: final slice (templates/, hermes/profiles/, docs/roadmaps/) |
 | 2026-09-09 | `2026/Q3/2026-09-09-athena-reasoning-hestia-context.md` | 2026-09-09 — Athena reasoning and Hestia situated-context convergence |
 | 2026-09-09 | `2026/Q3/2026-09-09-athena-live-referent-ambiguity-rebuild.md` | 2026-09-09 — Athena live referent ambiguity rebuild |
