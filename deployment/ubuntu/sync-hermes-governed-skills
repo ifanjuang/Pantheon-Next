@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+RELEASE_LOCK="$SCRIPT_DIR/release.env"
+if [[ ! -f "$RELEASE_LOCK" ]]; then
+  printf '[pantheon-skills] ERROR: reviewed deployment lock is missing: %s\n' "$RELEASE_LOCK" >&2
+  exit 1
+fi
+# shellcheck disable=SC1091
+source "$RELEASE_LOCK"
+
+STATE_ROOT="${STATE_ROOT:-/srv/pantheon}"
+APP_ROOT="${APP_ROOT:-/opt/pantheon-node}"
+PROFILE="pantheon-governed"
+HOST_SKILLS_ROOT="$STATE_ROOT/hermes-governed-skills"
+CONTAINER_SKILLS_ROOT="/opt/pantheon-skills"
+COMPOSE_FILE="$APP_ROOT/compose.yaml"
+COMPOSE_ENV="$APP_ROOT/compose-env"
+SKILLS="${RELEASE_HERMES_GOVERNED_SKILLS:?release.env missing RELEASE_HERMES_GOVERNED_SKILLS}"
+
+die() { printf '[pantheon-skills] ERROR: %s\n' "$*" >&2; exit 1; }
+warn() { printf '[pantheon-skills] WARNING: %s\n' "$*" >&2; }
+log() { printf '[pantheon-skills] %s\n' "$*"; }
+
+[[ $# -eq 1 ]] || die "usage: sync-hermes-governed-skills <reviewed-pantheon-checkout>"
+CHECKOUT="$(readlink -f "$1")"
+[[ -d "$CHECKOUT/.git" ]] || die "reviewed Pantheon checkout is missing: $CHECKOUT"
+[[ -f "$COMPOSE_FILE" && -f "$COMPOSE_ENV" ]] || die "Pantheon node compose files are missing under $APP_ROOT"
+
+compose() {
+  docker compose --env-file "$COMPOSE_ENV" -f "$COMPOSE_FILE" "$@"
+}
+
+stage="$(mktemp -d "$STATE_ROOT/.hermes-governed-skills.XXXXXX")"
+cleanup() { rm -rf "$stage"; }
+trap cleanup EXIT
+
+for skill in $SKILLS; do
+  [[ "$skill" =~ ^[A-Za-z0-9][A-Za-z0-9_-]*$ ]] || die "invalid governed skill name: $skill"
+  src="$CHECKOUT/templates/hermes/skills/$skill"
+  [[ -f "$src/SKILL.md" ]] || die "governed skill source is missing SKILL.md: $src"
+  if find "$src" -type l -print -quit | grep -q .; then
+    die "governed skill source contains a symlink: $skill"
+  fi
+  install -d -m 0755 "$stage/$skill"
+  rsync -a --delete "$src/" "$stage/$skill/"
+done
+
+# The runtime copy is a deployment projection of reviewed repository content.
+# Keep it read-only to Hermes; it is not a writable skill-authoring location.
+find "$stage" -type d -exec chmod 0555 {} +
+find "$stage" -type f -exec chmod 0444 {} +
+
+old="$HOST_SKILLS_ROOT.previous.$$"
+rm -rf "$old"
+if [[ -e "$HOST_SKILLS_ROOT" ]]; then mv "$HOST_SKILLS_ROOT" "$old"; fi
+mv "$stage" "$HOST_SKILLS_ROOT"
+trap - EXIT
+rm -rf "$old"
+
+mount_line='      - /srv/pantheon/hermes-governed-skills:/opt/pantheon-skills:ro'
+mount_added=0
+if ! grep -Fqx "$mount_line" "$COMPOSE_FILE"; then
+  sed -i '\|      - /srv/pantheon/hermes:/opt/data|a\      - /srv/pantheon/hermes-governed-skills:/opt/pantheon-skills:ro' "$COMPOSE_FILE"
+  grep -Fqx "$mount_line" "$COMPOSE_FILE" || die "failed to add governed skill read-only mount"
+  mount_added=1
+fi
+
+profile_dir="$STATE_ROOT/hermes/profiles/$PROFILE"
+if [[ -d "$profile_dir" ]]; then
+  raw="$(compose run --rm --no-deps hermes -p "$PROFILE" config get skills.external_dirs --json 2>/dev/null || printf '[]')"
+  merged="$(printf '%s' "$raw" | jq -c --arg path "$CONTAINER_SKILLS_ROOT" '
+    def as_array:
+      if type == "array" then .
+      elif type == "string" then (try fromjson catch [])
+      else [] end;
+    as_array
+    | map(select(type == "string"))
+    | if index($path) then . else . + [$path] end
+  ')" || die "cannot parse existing Hermes skills.external_dirs"
+  compose run --rm --no-deps hermes -p "$PROFILE" config set skills.external_dirs "$merged" >/dev/null
+  observed="$(compose run --rm --no-deps hermes -p "$PROFILE" config get skills.external_dirs --json)"
+  printf '%s' "$observed" | jq -e --arg path "$CONTAINER_SKILLS_ROOT" '
+    if type == "array" then index($path) != null
+    elif type == "string" then (try (fromjson | index($path) != null) catch false)
+    else false end
+  ' >/dev/null || die "Hermes did not retain the governed external skill directory"
+  log "bound curated external skills to profile $PROFILE"
+else
+  warn "profile $PROFILE is absent; skills are staged but not bound to a profile"
+fi
+
+if ((mount_added == 1)) && docker inspect -f '{{.State.Running}}' pantheon-hermes 2>/dev/null | grep -qx true; then
+  compose up -d --force-recreate hermes
+  log "recreated running Hermes container once to apply the new read-only skill mount"
+fi
+
+log "staged governed Hermes skills: $SKILLS"
+log "available skill != skill used; skill used != task authorization; projection != persistence"
