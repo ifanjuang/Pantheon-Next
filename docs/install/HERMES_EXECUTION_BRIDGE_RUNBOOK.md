@@ -21,6 +21,7 @@ component enabled != binding activated
 binding activated != task authorized
 profile route answered != governed profile qualified
 fresh memory observation != task authorized
+configured reasoning hidden != observed reasoning hidden
 runtime return != accepted result
 runtime output != Evidence
 ```
@@ -223,12 +224,15 @@ authority_effect = none
 
 If `memory_posture.status` is not `qualified`, capture a new receipt and investigate the profile configuration. Do not edit a receipt manually.
 
+The current observer does not inspect Hermes display configuration or prove what a user-facing channel renders. Do not infer private-reasoning safety from `safety_status = qualified` until the presentation check below has also been completed for the admitted surface.
+
 ```text
 reachable != healthy
 healthy != safe
 profile route answered != governed profile qualified
 tool surface qualified != production activated
 memory posture qualified != task authorized
+runtime safety_status qualified != presentation posture observed
 observation != Evidence
 ```
 
@@ -245,6 +249,71 @@ X-Hermes-Session-Key = absent
 ```
 
 Record the configuration source, observed route and observation time. A UI route label alone is not proof of the backend profile or memory posture.
+
+## 7A. Verify governed presentation posture
+
+Private model reasoning must not be projected onto a governed user-facing surface. Safe commentary and meaningful interim progress are preferred when the exact Hermes version and channel support them, but their absence is an UX degradation rather than an automatic safety failure.
+
+First record the exact profile configuration values. On Hermes versions that support these keys, the recommended baseline is:
+
+```bash
+hermes -p "${HERMES_GOVERNED_PROFILE}" config set display.show_reasoning false
+hermes -p "${HERMES_GOVERNED_PROFILE}" config set display.show_commentary true
+hermes -p "${HERMES_GOVERNED_PROFILE}" config set display.interim_assistant_messages true
+hermes -p "${HERMES_GOVERNED_PROFILE}" config set plugins.stream_reasoning_deltas false
+```
+
+Then read them back with the exact installed runtime rather than assuming that the write was accepted:
+
+```bash
+hermes -p "${HERMES_GOVERNED_PROFILE}" config get display.show_reasoning
+hermes -p "${HERMES_GOVERNED_PROFILE}" config get display.show_commentary
+hermes -p "${HERMES_GOVERNED_PROFILE}" config get display.interim_assistant_messages
+hermes -p "${HERMES_GOVERNED_PROFILE}" config get plugins.stream_reasoning_deltas
+```
+
+If a key is unsupported on the exact reviewed Hermes version, record it as unsupported and verify the effective behavior directly. Do not add a compatibility shim merely to satisfy this checklist.
+
+Expected baseline when supported:
+
+```text
+display.show_reasoning = false
+plugins.stream_reasoning_deltas = false
+display.show_commentary = true              # preferred, not a safety gate
+display.interim_assistant_messages = true   # preferred, not a safety gate
+```
+
+Configuration is not proof. Run one bounded read-only task on each user-facing surface that will be admitted for governed work and inspect the actual user-visible output.
+
+Required behavioral result:
+
+```text
+no private scratchpad shown
+no chain-of-thought / reasoning block shown
+no reasoning delta streamed to the user-visible surface
+no "💭 Reasoning" block or equivalent private-reasoning projection
+safe commentary/progress may appear
+final governed result remains available even if interim progress is unsupported
+```
+
+Qualification rule:
+
+```text
+observed private reasoning disclosure -> not_qualified
+reasoning visibility cannot be sufficiently observed -> not_qualified for that surface
+commentary unavailable -> presentation degraded, not automatically unsafe
+interim messages unavailable -> presentation degraded, not automatically unsafe
+```
+
+Preserve a bounded technical record containing the exact Hermes version/profile/surface, relevant configuration values or unsupported-key result, observation time and pass/fail outcome. Do not retain private reasoning content merely to prove that it leaked; a minimal redacted marker or digest is sufficient when incident evidence must be preserved.
+
+```text
+show_reasoning false != private reasoning proven hidden
+reasoning hidden in CLI != reasoning hidden in Telegram/WebUI/another surface
+private reasoning != Pantheon activity
+commentary != chain-of-thought
+presentation observation != task authorization
+```
 
 ## 8. Activate the binding separately
 
@@ -314,6 +383,8 @@ observation.tool_surface.status = qualified
 observation.memory_posture.status = qualified
 ```
 
+The launch receipt does not by itself prove the governed presentation posture. Keep the separate surface observation from step 7A with the operational qualification record.
+
 It performs no daemon loop, scheduler, queue, automatic retry, provider routing or model override.
 
 A replayed reservation or ambiguous network outcome requires manual reconciliation. Do not rerun the command with a new key merely to bypass uncertainty.
@@ -378,6 +449,10 @@ toolset response
 memory receipt profile, captured_at and stdout_digest
 memory posture qualification
 OpenWebUI enrichment observation
+governed presentation configuration values or unsupported-key result
+governed user-visible surface tested
+private-reasoning exposure pass/fail result
+commentary/interim capability when available
 launch reservation identity
 run identity
 absence of X-Hermes-Session-Key
@@ -417,6 +492,9 @@ reviewed tool surface qualified
 fresh complete memory posture qualified
 X-Hermes-Session-Key absent
 OpenWebUI hidden memory and automatic RAG disabled
+private reasoning absent from each admitted governed user-visible surface
+reasoning deltas not projected to each admitted governed user-visible surface
+commentary/interim capability recorded when available but not required for safety
 context bridge installed and bounded
 host task/session correlation verified
 one human-admitted read-only run completed
