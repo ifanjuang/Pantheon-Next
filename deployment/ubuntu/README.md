@@ -75,6 +75,22 @@ CouchDB
 
 Repeated one-shot `sync` + `mirror` is not used.
 
+## Governed Hermes skills
+
+`release.env` also carries a small reviewed deployment list of Pantheon-authored Hermes skills. The install/update path copies only those named skill packages from the exact target Pantheon checkout into `/srv/pantheon/hermes-governed-skills`, mounts that directory into Hermes as `/opt/pantheon-skills:ro`, and, when the existing `pantheon-governed` profile is present, adds that path to its existing `skills.external_dirs` list.
+
+The deployment does not expose the whole `templates/hermes/skills` tree, does not create `pantheon-governed`, and does not replace any pre-existing external skill directories. A missing governed profile is reported and left untouched so profile creation/activation remains a separate operator decision.
+
+```text
+skill selected for deployment != task authorized
+skill available != skill used
+skill used != result accepted
+projection != persistence
+external skill directory != writable skill-authoring area
+```
+
+The copied directory is a deployment projection of reviewed repository content; the authoritative candidate instructions remain in the exact Pantheon checkout. The runtime projection is made read-only to Hermes.
+
 ## Update
 
 Check only:
@@ -101,6 +117,8 @@ Pantheon never follows `main` implicitly. A Pantheon change requires a reviewed 
 sudo PANTHEON_COMMIT_OVERRIDE=<40-char-sha> deployment/ubuntu/update-node --apply --component pantheon
 ```
 
+A Pantheon component update also refreshes the governed external-skill projection from that same exact target checkout. The updater checkpoints the current `pantheon-governed` config and the existing governed skill projection before changing either one.
+
 A stateful CouchDB/Hindsight version change is refused unless the operator first establishes a verified backup/rollback point and explicitly sets `STATEFUL_BACKUP_CONFIRMED=1`.
 
 ## Version posture
@@ -126,7 +144,7 @@ Operational data stays outside Git checkouts:
 /opt/pantheon/          pinned code checkouts
 /opt/pantheon-node/     installer-managed application material
 /etc/pantheon-node/     root-owned configuration and generated secrets
-/srv/pantheon/          runtime state and workspace mirror
+/srv/pantheon/          runtime state, governed skill projection and workspace mirror
 /srv/ai/                models, caches and ComfyUI output
 ```
 
