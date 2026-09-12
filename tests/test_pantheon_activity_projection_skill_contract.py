@@ -6,6 +6,7 @@ SKILL = ROOT / "templates/hermes/skills/pantheon-activity-projection/SKILL.md"
 BASE_SOUL = ROOT / "hermes/profiles/_base/base-soul-rules.md"
 REGISTRY = ROOT / "templates/TEMPLATE_REGISTRY.md"
 REQUEST_INTAKE = ROOT / "templates/hermes/skills/pantheon-request-intake/SKILL.md"
+IFJA_CONTEXT = ROOT / "templates/hermes/skills/ifja-project-context/SKILL.md"
 
 
 def test_activity_projection_is_presentation_only_and_proportional() -> None:
@@ -101,6 +102,19 @@ def test_activity_projection_reconciles_quantitative_scope_before_conclusion() -
     assert "calculation correct != contractual perimeter established" in text
 
 
+def test_activity_projection_keeps_monetary_bases_and_prudent_envelope_coherent() -> None:
+    text = SKILL.read_text(encoding="utf-8")
+
+    assert "Label each component `HT`, `TVA`, `TTC` or\n`non identifié`" in text
+    assert "Never add an HT\namount directly to a TTC amount" in text
+    assert "show the percentage, its base and whether that base is HT or TTC" in text
+    assert "upper bound must\nnot be lower than a displayed high-case total" in text
+    assert "must be labelled as an assumption or derived\nestimate" in text
+    assert "HT amount + TTC amount != coherent total" in text
+    assert "reasonable allowance != sourced project fact" in text
+    assert "prudence label != reconciled high-case coverage" in text
+
+
 def test_activity_projection_handoff_is_responsibility_not_dispatch() -> None:
     text = SKILL.read_text(encoding="utf-8")
 
@@ -134,6 +148,18 @@ def test_activity_projection_binding_stays_small_and_does_not_pollute_intake() -
     assert "pantheon-activity-projection" not in intake
 
 
+def test_ifja_context_requests_projection_without_prescribing_runtime_sequence() -> None:
+    text = IFJA_CONTEXT.read_text(encoding="utf-8")
+
+    assert "related_skills: [pantheon-activity-projection, pantheon-request-intake, source-research]" in text
+    assert "For non-trivial IFJA work" in text
+    assert "load and apply it before substantial execution" in text
+    assert "does not prescribe the runtime tool sequence" in text
+    assert "projection plan != runtime dispatch plan" in text
+    assert "visible milestone != MCP-prescribed tool sequence" in text
+    assert "presentation capability gap" in text
+
+
 def test_floquet_example_is_shape_only_and_contains_no_invented_project_fact() -> None:
     text = SKILL.read_text(encoding="utf-8")
 
@@ -143,7 +169,9 @@ def test_floquet_example_is_shape_only_and_contains_no_invented_project_fact() -
     assert "<skill réellement utilisé>" in text
     assert "<outil réellement invoqué>" in text
     assert "Périmètre: <explicit>" in text
+    assert "Base monétaire: <HT/TTC/non identifié>" in text
     assert "Formule: <displayed source components>" in text
+    assert "Hypothèses: <none or explicitly labelled derived assumptions>" in text
     assert "not a claim about the real Floquet corpus" in text
     assert "120 000" not in text
     assert "Budget estimatif C2" not in text
