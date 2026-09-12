@@ -16,13 +16,17 @@ from typing import Any
 
 
 COMPILER = "pantheon_structured_extraction"
-COMPILER_VERSION = "2"
+COMPILER_VERSION = "3"
 MAX_RETRIEVAL_CHARS = 1200
+MAX_TABLE_SCHEMA_CHARS = 320
 MAX_TABLE_DIMENSION = 1000
 MAX_TABLE_CELLS = 50_000
 MAX_TABLE_OCCUPANCY = 2_000_000
 COMPILER_CONFIG = {
     "max_retrieval_chars": MAX_RETRIEVAL_CHARS,
+    "retrieval_boundary_policy": "section_then_unit_then_sentence",
+    "oversized_table_policy": "row_groups_with_repeated_header_schema",
+    "max_table_schema_chars": MAX_TABLE_SCHEMA_CHARS,
     "preserve_tables": True,
     "repeat_spanned_values": False,
     "synthetic_ditto": False,
@@ -576,6 +580,7 @@ def _docling_units(
 
 _HEADING = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
 _LIST_ITEM = re.compile(r"^\s*(?:[-*+] |\d+[.)] ).+")
+_SENTENCE_BOUNDARY = re.compile(r"(?<=[.!?…])(?:[ \t]+|\n+)")
 
 
 def _looks_like_table(lines: list[str]) -> bool:
@@ -698,6 +703,178 @@ def _with_section_context(text: str, section_path: tuple[str, ...]) -> str:
     return f"Section: {' > '.join(section_path)}\n\n{text}"
 
 
+def _content_budget(section_path: tuple[str, ...]) -> int:
+    prefix_length = len(_with_section_context("", section_path))
+    return max(1, MAX_RETRIEVAL_CHARS - prefix_length)
+
+
+def _hard_wrap_text(text: str, limit: int) -> list[str]:
+    remaining = text.strip()
+    if not remaining:
+        return []
+    if limit <= 0:
+        return [remaining]
+    parts: list[str] = []
+    while len(remaining) > limit:
+        cut = max(
+            remaining.rfind("\n", 0, limit + 1),
+            remaining.rfind(" ", 0, limit + 1),
+            remaining.rfind("\t", 0, limit + 1),
+        )
+        if cut < max(1, limit // 3):
+            cut = limit
+        part = remaining[:cut].strip()
+        if part:
+            parts.append(part)
+        remaining = remaining[cut:].strip()
+    if remaining:
+        parts.append(remaining)
+    return parts
+
+
+def _pack_segments(segments: list[str], limit: int, separator: str) -> list[str]:
+    expanded: list[str] = []
+    for segment in segments:
+        cleaned = segment.strip()
+        if not cleaned:
+            continue
+        if len(cleaned) <= limit:
+            expanded.append(cleaned)
+        else:
+            expanded.extend(_hard_wrap_text(cleaned, limit))
+
+    parts: list[str] = []
+    current: list[str] = []
+    for segment in expanded:
+        candidate = separator.join([*current, segment])
+        if current and len(candidate) > limit:
+            parts.append(separator.join(current))
+            current = [segment]
+        else:
+            current.append(segment)
+    if current:
+        parts.append(separator.join(current))
+    return parts
+
+
+def _split_text_unit(unit: StructuredUnit) -> list[str]:
+    limit = _content_budget(unit.section_path)
+    if len(unit.text) <= limit:
+        return [unit.text]
+    if unit.content_type == "list":
+        return _pack_segments(
+            [line for line in unit.text.splitlines() if line.strip()],
+            limit,
+            "\n",
+        )
+
+    sentences = [
+        value.strip() for value in _SENTENCE_BOUNDARY.split(unit.text) if value.strip()
+    ]
+    if len(sentences) <= 1 and "\n" in unit.text:
+        sentences = [line.strip() for line in unit.text.splitlines() if line.strip()]
+    if len(sentences) <= 1:
+        return _hard_wrap_text(unit.text, limit)
+    return _pack_segments(sentences, limit, " ")
+
+
+def _table_schema_text(unit: StructuredUnit) -> str:
+    if not isinstance(unit.table_data, dict):
+        return ""
+    header_paths = unit.table_data.get("header_paths")
+    if not isinstance(header_paths, list):
+        return ""
+    labels: list[str] = []
+    for path in header_paths:
+        if not isinstance(path, list):
+            continue
+        parts = [str(value).strip() for value in path if str(value).strip()]
+        if parts:
+            labels.append(" > ".join(parts))
+    if not labels:
+        return ""
+    schema = "Table schema: " + " | ".join(labels)
+    if len(schema) > MAX_TABLE_SCHEMA_CHARS:
+        return schema[: MAX_TABLE_SCHEMA_CHARS - 3].rstrip() + "..."
+    return schema
+
+
+def _table_projection_parts(
+    unit: StructuredUnit,
+) -> list[tuple[str, tuple[str, ...]]]:
+    full_text = _with_section_context(unit.text, unit.section_path)
+    if len(full_text) <= MAX_RETRIEVAL_CHARS:
+        return [(full_text, unit.quality_flags)]
+
+    lines = unit.text.splitlines()
+    if len(lines) < 2:
+        return [
+            (
+                full_text,
+                _unique([*unit.quality_flags, "retrieval_limit_exceeded"]),
+            )
+        ]
+
+    header, separator, *rows = lines
+    schema = _table_schema_text(unit)
+    repeated_prefix = [value for value in (schema, header, separator) if value]
+
+    def render(selected_rows: list[str]) -> str:
+        return _with_section_context(
+            "\n".join([*repeated_prefix, *selected_rows]), unit.section_path
+        )
+
+    if not rows:
+        rendered = render([])
+        flags = unit.quality_flags
+        if len(rendered) > MAX_RETRIEVAL_CHARS:
+            flags = _unique([*flags, "retrieval_limit_exceeded"])
+        return [(rendered, flags)]
+
+    parts: list[tuple[str, tuple[str, ...]]] = []
+    current_rows: list[str] = []
+    for row in rows:
+        candidate = render([*current_rows, row])
+        if current_rows and len(candidate) > MAX_RETRIEVAL_CHARS:
+            parts.append((render(current_rows), unit.quality_flags))
+            current_rows = [row]
+        else:
+            current_rows.append(row)
+
+        if current_rows and len(render(current_rows)) > MAX_RETRIEVAL_CHARS:
+            parts.append(
+                (
+                    render(current_rows),
+                    _unique([*unit.quality_flags, "retrieval_limit_exceeded"]),
+                )
+            )
+            current_rows = []
+
+    if current_rows:
+        parts.append((render(current_rows), unit.quality_flags))
+    return parts
+
+
+def _single_unit_projection(
+    unit: StructuredUnit,
+    ordinal: int,
+    *,
+    text: str,
+    quality_flags: tuple[str, ...] | None = None,
+) -> RetrievalProjection:
+    return RetrievalProjection(
+        text=text,
+        content_type=unit.content_type,
+        structural_locator=unit.structural_locator,
+        unit_ordinals=(ordinal,),
+        page_start=unit.page_start,
+        page_end=unit.page_end,
+        parent_heading=unit.parent_heading,
+        section_path=unit.section_path,
+        quality_flags=unit.quality_flags if quality_flags is None else quality_flags,
+    )
+
+
 def _build_projections(units: list[StructuredUnit]) -> list[RetrievalProjection]:
     projections: list[RetrievalProjection] = []
     pending_ordinals: list[int] = []
@@ -747,20 +924,35 @@ def _build_projections(units: list[StructuredUnit]) -> list[RetrievalProjection]
             continue
         if unit.content_type == "table":
             flush()
-            projections.append(
-                RetrievalProjection(
-                    text=_with_section_context(unit.text, unit.section_path),
-                    content_type="table",
-                    structural_locator=unit.structural_locator,
-                    unit_ordinals=(ordinal,),
-                    page_start=unit.page_start,
-                    page_end=unit.page_end,
-                    parent_heading=unit.parent_heading,
-                    section_path=unit.section_path,
-                    quality_flags=unit.quality_flags,
+            for text, flags in _table_projection_parts(unit):
+                projections.append(
+                    _single_unit_projection(
+                        unit,
+                        ordinal,
+                        text=text,
+                        quality_flags=flags,
+                    )
                 )
-            )
             continue
+
+        unit_projection = _with_section_context(unit.text, unit.section_path)
+        if len(unit_projection) > MAX_RETRIEVAL_CHARS:
+            flush()
+            for part in _split_text_unit(unit):
+                text = _with_section_context(part, unit.section_path)
+                flags = unit.quality_flags
+                if len(text) > MAX_RETRIEVAL_CHARS:
+                    flags = _unique([*flags, "retrieval_limit_exceeded"])
+                projections.append(
+                    _single_unit_projection(
+                        unit,
+                        ordinal,
+                        text=text,
+                        quality_flags=flags,
+                    )
+                )
+            continue
+
         candidate_length = len(
             _with_section_context(
                 "\n\n".join([*pending_text, unit.text]), unit.section_path
