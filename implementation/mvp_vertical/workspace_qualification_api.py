@@ -12,6 +12,7 @@ from . import (
     hermes_handoff_store,
     workspace_dialogue,
     workspace_human_note,
+    workspace_markdown_write,
     workspace_qualification,
 )
 
@@ -61,6 +62,21 @@ class WorkspaceHumanNoteReadBody(BaseModel):
 class WorkspaceHumanNoteWriteBody(WorkspaceHumanNoteReadBody):
     human_note: str = Field(max_length=20_000)
     expected_manifest_digest: str | None = Field(default=None, min_length=64, max_length=64)
+
+
+class WorkspaceMarkdownReadBody(BaseModel):
+    workspace_ref: str = Field(min_length=1, max_length=200)
+    relative_path: str = Field(min_length=1, max_length=4096)
+
+
+class WorkspaceMarkdownCreateBody(WorkspaceMarkdownReadBody):
+    content: str = Field(max_length=500_000)
+
+
+class WorkspaceMarkdownPatchBody(WorkspaceMarkdownReadBody):
+    expected_digest: str = Field(min_length=64, max_length=64)
+    old_text: str = Field(min_length=1, max_length=200_000)
+    new_text: str = Field(max_length=200_000)
 
 
 def install_workspace_qualification_routes(
@@ -310,5 +326,85 @@ def install_workspace_qualification_routes(
                 "human note persisted != Document admission",
                 "human note persisted != Evidence",
                 "sidecar present != governed identity",
+            ],
+        }
+
+    @app.post("/cockpit/workspace-markdown/read")
+    def read_workspace_markdown(
+        body: WorkspaceMarkdownReadBody,
+        _authorized: None = Depends(require_read_key),
+    ) -> dict:
+        try:
+            return workspace_markdown_write.read_workspace_markdown(
+                workspace_roots,
+                body.workspace_ref,
+                body.relative_path,
+            )
+        except workspace_markdown_write.WorkspaceMarkdownWriteConflict as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        except workspace_markdown_write.WorkspaceMarkdownWriteError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    @app.post("/cockpit/workspace-markdown/create", status_code=201)
+    def create_workspace_markdown(
+        body: WorkspaceMarkdownCreateBody,
+        _authorized: None = Depends(require_editor_key),
+        actor: str = Depends(require_human_actor),
+    ) -> dict:
+        try:
+            result = workspace_markdown_write.create_workspace_markdown(
+                workspace_roots,
+                body.workspace_ref,
+                body.relative_path,
+                content=body.content,
+            )
+        except workspace_markdown_write.WorkspaceMarkdownWriteConflict as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        except workspace_markdown_write.WorkspaceMarkdownWriteError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        return {
+            **result,
+            "written_by": actor,
+            "workspace_write": True,
+            "automatic_document_admission": False,
+            "is_evidence": False,
+            "non_equivalences": [
+                "workspace Markdown persisted != Document admission",
+                "workspace Markdown persisted != Evidence",
+                "workspace path != governed identity",
+                "workspace write != Hindsight write",
+            ],
+        }
+
+    @app.post("/cockpit/workspace-markdown/patch")
+    def patch_workspace_markdown(
+        body: WorkspaceMarkdownPatchBody,
+        _authorized: None = Depends(require_editor_key),
+        actor: str = Depends(require_human_actor),
+    ) -> dict:
+        try:
+            result = workspace_markdown_write.patch_workspace_markdown(
+                workspace_roots,
+                body.workspace_ref,
+                body.relative_path,
+                expected_digest=body.expected_digest,
+                old_text=body.old_text,
+                new_text=body.new_text,
+            )
+        except workspace_markdown_write.WorkspaceMarkdownWriteConflict as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        except workspace_markdown_write.WorkspaceMarkdownWriteError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        return {
+            **result,
+            "written_by": actor,
+            "workspace_write": True,
+            "automatic_document_admission": False,
+            "is_evidence": False,
+            "non_equivalences": [
+                "workspace Markdown persisted != Document admission",
+                "workspace Markdown persisted != Evidence",
+                "workspace path != governed identity",
+                "workspace write != Hindsight write",
             ],
         }
