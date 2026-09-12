@@ -83,17 +83,22 @@ large_tool_result_count
 large_tool_result_chars
 ```
 
+`elapsed_seconds` must be finite and non-negative. `NaN`, `Infinity` and overflow-to-infinity values are rejected rather than allowed to contaminate deltas or JSON output.
+
 Quality/provenance fields:
 
 ```text
 source_recall_checks
 source_recall_passes
+source_recall_check_ids: [stable opaque check identity, ...]
 required_quality_checks: {name: boolean}
 retrieved_refs
 admitted_refs
 used_refs
 notes
 ```
+
+When source recall is observed, stable `source_recall_check_ids` are mandatory and their count must equal `source_recall_checks`. The A/B perimeter is compared by those identities, not merely by the number of checks.
 
 Opaque task-local refs are preferred. Do not commit client content or sensitive document locators merely to populate a lab fixture.
 
@@ -117,16 +122,20 @@ unknown
 
 They do not create Pantheon result validity, Evidence status or approval.
 
+Operational-cost qualification requires both the baseline and candidate to be `complete`. A partial, blocked, failed or unknown run cannot appear cheaper merely because it terminated earlier. Candidate `blocked`/`failed` is a quality regression; any other non-complete pair is inconclusive.
+
 ## Quality-first rule
 
 The candidate cannot be preferred merely because it uses fewer tokens or fewer calls.
 
-The harness rejects a candidate when it:
+The harness rejects or makes inconclusive a candidate when it:
 
+- is not a completed equivalent execution;
 - fails required source-recall checks;
+- uses a different source-recall check perimeter;
 - fails an explicitly required quality/provenance check;
 - returns `blocked` or `failed`;
-- regresses a baseline source-recall perimeter that is directly comparable.
+- lacks a required quality observation.
 
 Unknown quality remains `unknown` and yields an inconclusive decision rather than a token-saving claim.
 
@@ -156,7 +165,7 @@ delta = candidate - baseline
 percent_change when baseline != 0
 ```
 
-Lower is treated as operationally cheaper for the listed cost metrics. There is deliberately no universal score or arbitrary token threshold.
+Lower is treated as operationally cheaper for the listed cost metrics only after the quality/provenance gate passes. There is deliberately no universal score or arbitrary token threshold.
 
 Possible lab decisions:
 
@@ -256,7 +265,10 @@ Implemented in this slice:
 - provider-neutral observation parser;
 - `used ⊆ admitted ⊆ retrieved` validation when lineage is observed;
 - identity/comparability checks;
+- complete-run equivalence gate before cost preference;
+- stable source-recall perimeter identities;
 - quality-before-cost comparison;
+- finite numeric validation and strict JSON emission;
 - unknown-metric preservation;
 - regression tests and isolated CI lane.
 
