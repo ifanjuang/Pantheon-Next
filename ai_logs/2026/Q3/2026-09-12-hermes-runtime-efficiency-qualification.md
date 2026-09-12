@@ -66,6 +66,28 @@ Lower token/tool cost cannot outrank a candidate with worse required source reca
   - no product/runtime integration guard.
 - isolated CI workflow for the lab tests.
 
+## Review hardening
+
+PR review identified three ways the initial harness could overstate a gain. They were treated as correctness defects in the existing lab, not as reasons to add architecture.
+
+The slice now also enforces:
+
+- both baseline and candidate must be `complete` before operational cost can qualify a candidate;
+- candidate `blocked` / `failed` remains a regression, while other non-complete comparisons are inconclusive;
+- observed source recall requires stable opaque `source_recall_check_ids` whose count exactly matches `source_recall_checks`;
+- A/B source-recall perimeter equality is based on those stable identities, not merely on the number of checks;
+- `elapsed_seconds` must be finite and non-negative;
+- report JSON is emitted with `allow_nan=False`;
+- targeted tests cover early termination, equal-count/different-perimeter recall, and `NaN` / infinity rejection.
+
+The strengthened non-equivalences are:
+
+```text
+partial execution != equivalent execution
+same check count != same source-recall perimeter
+lower cost != better result
+```
+
 ## Explicitly not implemented
 
 ```text
