@@ -116,6 +116,37 @@ not_observed != passed
 
 If observation is unavailable because of credentials, runtime, environment or scope, the limitation remains explicit.
 
+## Test-blindspot check
+
+A passing test or successful check establishes only what that check actually covered. When completion depends materially on tests, the rite should ask what the passing checks do not establish before accepting the completion claim.
+
+Review proportionally:
+
+```text
+claimed_property
+checks_that_support_it
+material_cases_not_covered
+environment_or_fixture_limits
+remaining_failure_modes
+```
+
+Useful questions include:
+
+- does the check exercise the real component or only a mock/fixture?
+- does it cover the relevant failure path, boundary condition or concurrency case?
+- does it verify the semantic consequence or only syntax/build success?
+- could the same defect survive in an unsearched equivalent location?
+- is the tested environment materially different from the target environment?
+
+Do not invent theoretical edge cases that cannot change the decision. Retain only blindspots material to the claimed completion, risk or consequence.
+
+```text
+tests_pass != claimed_property_proven
+coverage exists != relevant case covered
+mock success != provider behavior established
+check success != professional approval
+```
+
 ## Analogous occurrence check
 
 A defect discovered in one place may indicate a repeated construct.
@@ -190,6 +221,7 @@ If a defect is found:
 - contradiction report;
 - unsupported claims;
 - observation notes and unavailable checks;
+- test-blindspot findings when completion depends materially on tests;
 - analogous occurrence findings when applicable;
 - risk notes;
 - correction actions;
@@ -204,6 +236,7 @@ If this rite affects a deliverable, the Evidence Pack should record:
 - claim separation;
 - observations actually performed;
 - checks that could not be performed;
+- test coverage limits material to the completion claim;
 - unsupported statements;
 - contradiction notes;
 - analogous occurrence scope and findings when applicable;
@@ -240,6 +273,8 @@ The rite must not promote a Registre Probatoire entry.
 - style-only critique that misses substance;
 - reading code or prose and calling it verified without observation;
 - trusting the executor's completion report;
+- treating passing tests as proof of untested properties;
+- manufacturing irrelevant edge cases after the decision-relevant picture is stable;
 - repairing during an independent verdict;
 - searching analogues so broadly that the task scope silently expands;
 - excessive caution that blocks harmless drafts;
@@ -257,6 +292,7 @@ This rite must not become:
 - runtime validator owned by Pantheon;
 - hidden debate;
 - automatic test runner or scheduler;
+- exhaustive fuzzing mandate;
 - scope-expansion mechanism;
 - memory promotion pipeline;
 - replacement for human review.

@@ -46,12 +46,46 @@ Do not use this rite when:
 6. Rewrite the problem in a narrower form.
 7. Decide whether work can continue, continue with reserve, or require Task Contract revision.
 
+## Blindspot and assumption-test technique
+
+When several assumptions are visible, prioritize the one whose failure would most change the permitted approach, scope or consequence. Do not expand the rite into an exhaustive search for every conceivable unknown.
+
+For a consequential assumption that inspection alone cannot settle, the rite may propose a bounded assumption test under the existing Task Contract. Define the expected observation before testing:
+
+```text
+assumption
+observable_prediction
+would_support_within_scope
+would_refute
+would_remain_inconclusive
+```
+
+Use the smallest discriminating observation or experiment available inside the authorized scope. Preserve the relevant input, environment or source, actual observation and limitation needed for review.
+
+The retained verdict vocabulary is deliberately bounded:
+
+```text
+supported_within_scope
+refuted
+inconclusive
+```
+
+A successful observation must not be promoted into a universal claim. A missing tool, inaccessible environment or broken fixture means the test is unrun or inconclusive; it is not evidence that the assumption is false.
+
+```text
+plausible != established
+one successful trial != universal proof
+experiment authorized != broader effect authorized
+missing access != system verdict
+```
+
 ## Outputs
 
 - hidden assumptions;
 - clarified terms;
 - revised problem statement;
 - source or authority gaps;
+- scoped assumption-test note when applicable;
 - scope warning;
 - Task Contract revision note if needed;
 - ZEUS status.
@@ -66,6 +100,7 @@ If hidden assumptions affect the result, the Evidence Pack should record:
 - impact on evidence;
 - impact on approval;
 - impact on memory;
+- tested conditions and verdict when a bounded assumption test was actually run;
 - required follow-up.
 
 The Evidence Pack must distinguish assumption from fact.
@@ -88,8 +123,10 @@ The rite must not promote a Registre Probatoire entry.
 ## Failure modes
 
 - over-interrogating simple tasks;
+- searching for speculative unknowns that cannot change the permitted conclusion;
 - converting every missing preference into a blocker;
 - treating inferred assumptions as facts;
+- treating one successful bounded test as general proof;
 - hiding assumptions in polished prose;
 - broadening scope without explicit review.
 
@@ -101,6 +138,7 @@ This rite must not become:
 - hidden preference memory;
 - automatic scope expansion;
 - runtime intent classifier;
+- autonomous experiment loop;
 - approval bypass;
 - memory promotion pipeline.
 

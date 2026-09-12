@@ -216,6 +216,40 @@ ZEUS arbitrates status.
 The human decides.
 ```
 
+## Distilled external methods
+
+Pantheon may distill narrow techniques from external method repositories without importing their runtime, naming, authority model or whole skill catalogue.
+
+Distillation is allowed only when the technique strengthens an existing owner and does not create a duplicate Role, Rite or governed Space.
+
+Current mapping for unknown-finding techniques:
+
+```text
+blindspot pass
+-> enriches PREMISSES_CACHEES before commitment
+-> enriches AUTOCRITIQUE_CONTRADICTOIRE after a convincing candidate exists
+
+test blindspots
+-> enriches AUTOCRITIQUE_CONTRADICTOIRE
+-> asks what passing checks do not establish
+
+assumption test
+-> reusable bounded Method / Skill
+-> may be requested from PREMISSES_CACHEES or AUTOCRITIQUE_CONTRADICTOIRE
+-> result must remain supported-within-scope, refuted or inconclusive
+
+reference hunt
+-> ARGOS-aligned research Method / Skill
+-> source found != Evidence admitted
+
+context audit
+-> convergence/maintenance Method for instruction surfaces
+-> not a new Role or Rite by default
+```
+
+These techniques do not self-trigger Rites and do not inherit Pantheon authority.
+A runtime skill implementing one of them remains a candidate external execution method under the existing Task Contract, capability and skill-admission owners.
+
 ## Initial rite catalogue
 
 - `RITE_INVOCATION_POLICY.md` - define invocation, budget, anti-chaining, closure and Rite Review Card policy.
