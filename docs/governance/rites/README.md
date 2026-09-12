@@ -351,3 +351,77 @@ When a rite affects output legitimacy, delivery posture, memory posture or user 
 A Rite Review Card is not a schema.
 
 It is a documentation format.
+
+Recommended format:
+
+```text
+rite_id:
+trigger_reason:
+proposed_by:
+authorized_by:
+role_viewpoints_involved:
+inputs_considered:
+outputs_retained:
+tensions_exposed:
+blocked_claims:
+ZEUS_status:
+User_Decision_Gate:
+Evidence_Pack_impact:
+memory_impact:
+next_allowed_action:
+```
+
+Forbidden content:
+
+- hidden chain-of-thought;
+- raw role debate;
+- private scratchpad;
+- autonomous agent transcript;
+- runtime worker trace;
+- executable workflow state;
+- automatic approval event;
+- automatic memory promotion event.
+
+## Runtime-client projection boundary
+
+Optional runtime clients may expose interaction around a rite but do not own rite status, authority or approval. Hermes WebUI is one optional/proposed client if separately selected and qualified.
+
+Pantheon Cockpit may project governed Rite Review Cards, tensions, status and linked User Decision Gates.
+
+```text
+Hermes WebUI available != Hermes WebUI selected
+client selected != authority transfer
+projection != persistence
+rite visible != rite authorized
+```
+
+## Forbidden drift
+
+Rites must never become:
+
+- autonomous workflows;
+- hidden role debates;
+- agent loops;
+- tool dispatch plans;
+- schedulers;
+- queues;
+- executable DAGs;
+- LangGraph runtime substitutes;
+- approval callbacks;
+- memory promotion pipelines;
+- client-specific governance plugins;
+- Hermes skill auto-installers.
+
+If a rite becomes executable by Pantheon itself, governance drift has occurred.
+
+## Final rule
+
+A rite is a governed method.
+
+It can organize role viewpoints.
+
+It cannot execute work.
+
+It cannot approve itself.
+
+It cannot make memory canonical.
