@@ -489,6 +489,7 @@ write_operator_record() {
 installed_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 installer_version=$TOOL_VERSION
 pantheon_commit=$RESOLVED_PANTHEON_COMMIT
+governed_skills=$RELEASE_HERMES_GOVERNED_SKILLS
 node_bind_address=$NODE_BIND_ADDRESS
 comfyui_bind_address=$COMFYUI_BIND_ADDRESS
 livesync_installed=$ENABLE_LIVESYNC
@@ -538,6 +539,7 @@ write_compose
 install_ollama
 install_comfyui
 install_pantheon_checkout
+bash "$SCRIPT_DIR/sync-hermes-governed-skills" "$PANTHEON_ROOT/current"
 install_livesync
 start_containers
 write_operator_record

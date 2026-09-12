@@ -183,13 +183,32 @@ travaux + aléas + études
 Show the formula when inclusion/exclusion changes the answer. Keep source values
 separate from derived arithmetic and label rounded values as derived.
 
+Keep monetary bases coherent. Label each component `HT`, `TVA`, `TTC` or
+`non identifié` from the source or from an explicit derivation. Never add an HT
+amount directly to a TTC amount. When a percentage such as an aléa is applied,
+show the percentage, its base and whether that base is HT or TTC before naming
+the derived amount.
+
 If two reasonable perimeters produce different conclusions, do not choose one
 silently. Report both and identify the missing scope decision.
+
+Before recommending an envelope as `prudente`, `haute` or as covering identified
+uncertainties, reconcile the scenario it claims to cover. Its upper bound must
+not be lower than a displayed high-case total that is inside that stated
+perimeter. If the recommendation intentionally excludes a component, state that
+exclusion beside the recommendation.
+
+Any allowance, market range, contingency percentage or impact amount that is not
+present in an identified source must be labelled as an assumption or derived
+estimate. Do not present it at the same evidentiary level as a sourced amount.
 
 ```text
 component listed separately != component excluded from global budget
 rounded total != source-stated total
 calculation correct != contractual perimeter established
+HT amount + TTC amount != coherent total
+reasonable allowance != sourced project fact
+prudence label != reconciled high-case coverage
 ```
 
 ## Progressive delivery
@@ -261,8 +280,10 @@ Résultat: <constat réellement supporté>.
 
 Calcul dérivé, si nécessaire
 Périmètre: <explicit>
+Base monétaire: <HT/TTC/non identifié>
 Formule: <displayed source components>
 Résultat calculé: <derived result>
+Hypothèses: <none or explicitly labelled derived assumptions>
 ```
 
 If a governed Role/handoff has actually been established, project it around the
@@ -278,7 +299,7 @@ Show what changed, why it matters, what was sought and what was observed.
 Cite only real sources and observed metadata.
 Give every supporting document its own source reference.
 Name only methods, skills and tools actually selected or used.
-Reconcile quantitative components before drawing a quantitative conclusion.
+Reconcile quantitative components and monetary bases before drawing a quantitative conclusion.
 Make established responsibility changes explicit without inventing dispatch.
 Never expose hidden reasoning and never turn presentation into authority.
 ```

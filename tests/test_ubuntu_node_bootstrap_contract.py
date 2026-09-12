@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEPLOY = ROOT / "deployment" / "ubuntu"
 INSTALL = DEPLOY / "install-node"
 UPDATE = DEPLOY / "update-node"
+SKILL_SYNC = DEPLOY / "sync-hermes-governed-skills"
 RELEASE = DEPLOY / "release.env"
 README = DEPLOY / "README.md"
 EXTERNAL_PINS = ROOT / "implementation" / "qualification" / "external-pins.json"
@@ -25,7 +26,7 @@ def _pin(pin_id: str) -> dict:
 
 
 def test_bootstrap_scripts_are_shell_syntax_valid() -> None:
-    for script in (INSTALL, UPDATE):
+    for script in (INSTALL, UPDATE, SKILL_SYNC):
         assert script.exists()
         subprocess.run(["bash", "-n", str(script)], check=True)
 
@@ -84,6 +85,22 @@ def test_release_lock_has_no_floating_latest_and_preserves_qualified_livesync_re
     assert f"livesync-cli:{livesync_cli['version']}" in text
 
 
+def test_release_lock_curates_governed_hermes_skills_without_exposing_all_templates() -> None:
+    text = _text(RELEASE)
+    line = next(
+        line for line in text.splitlines()
+        if line.startswith("RELEASE_HERMES_GOVERNED_SKILLS=")
+    )
+    for name in (
+        "ifja-project-context",
+        "pantheon-activity-projection",
+        "pantheon-request-intake",
+        "source-research",
+    ):
+        assert name in line
+    assert "templates/hermes/skills" not in line
+
+
 def test_bootstrap_scripts_have_one_reviewed_target_owner() -> None:
     """Scripts must consume release.env, not carry a second pin set in fallbacks."""
     for script in (INSTALL, UPDATE):
@@ -109,6 +126,41 @@ def test_bootstrap_scripts_fail_closed_when_release_lock_is_missing(tmp_path: Pa
         )
         assert result.returncode != 0
         assert "reviewed deployment lock is missing" in result.stderr
+
+
+def test_governed_skill_sync_uses_target_checkout_and_read_only_external_dir() -> None:
+    text = _text(SKILL_SYNC)
+    assert 'RELEASE_LOCK="$CHECKOUT/deployment/ubuntu/release.env"' in text
+    assert 'RELEASE_HERMES_GOVERNED_SKILLS' in text
+    assert 'HOST_SKILLS_ROOT="$STATE_ROOT/hermes-governed-skills"' in text
+    assert 'CONTAINER_SKILLS_ROOT="/opt/pantheon-skills"' in text
+    assert '/srv/pantheon/hermes-governed-skills:/opt/pantheon-skills:ro' in text
+    assert 'config get skills.external_dirs --json' in text
+    assert 'config set skills.external_dirs "$merged"' in text
+    assert 'find "$src" -type l' in text
+    assert 'find "$stage" -type d -exec chmod 0555' in text
+    assert 'find "$stage" -type f -exec chmod 0444' in text
+    assert "hermes profile create" not in text
+    assert "available skill != skill used" in text
+    assert "projection != persistence" in text
+
+
+def test_install_and_pantheon_update_sync_governed_skills_without_creating_profile() -> None:
+    install = _text(INSTALL)
+    update = _text(UPDATE)
+    call = 'bash "$SCRIPT_DIR/sync-hermes-governed-skills"'
+    assert call in install
+    assert call in update
+    assert "hermes profile create" not in install
+    assert "hermes profile create" not in update
+
+
+def test_updater_checkpoints_governed_skill_projection_before_mutation() -> None:
+    text = _text(UPDATE)
+    assert '$STATE_ROOT/hermes/profiles/pantheon-governed/config.yaml' in text
+    assert '$checkpoint/hermes-pantheon-governed/config.yaml' in text
+    assert '$STATE_ROOT/hermes-governed-skills' in text
+    assert '$checkpoint/hermes-governed-skills' in text
 
 
 def test_updater_never_follows_main_or_silently_updates_stateful_services() -> None:
