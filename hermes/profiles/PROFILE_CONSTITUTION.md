@@ -76,12 +76,18 @@ automatic_runtime_recall: forbidden
 automatic_runtime_memory_write: forbidden
 OpenWebUI_memory_injection: forbidden
 OpenWebUI_automatic_RAG: forbidden
+private_reasoning_projection: forbidden
+reasoning_stream_to_user_surface: forbidden
+commentary_projection: preferred_when_supported
+interim_progress_projection: preferred_when_supported
 profile_route: explicit_when_required
 runtime_capability_surface: observable_and_qualified
 runtime_tool_selection: adaptive_within_admitted_boundary
 provider_and_model_override_in_run_payload: omitted_unless_separately_admitted
 output_status: candidate_only
 ```
+
+The presentation fields describe an expected governed posture, not proof that a deployed surface behaves that way. A local setting such as `display.show_reasoning: false` supports qualification only when the exact profile/surface is also observed not to expose private reasoning. Commentary and interim progress improve observability but are not safety gates when a channel cannot render them.
 
 The personal-assistant posture remains separate:
 
@@ -114,11 +120,13 @@ external provider absent from tool list != external memory proven off
 memory tool absent != memory injection disabled
 stored memory != admitted memory
 runtime mode configured != task authorized
+show_reasoning false != private reasoning proven hidden
+commentary unavailable != governed task unsafe
 provider selected != memory admitted
 memory recalled != truth
 ```
 
-If the exact runtime mode, material memory posture or active capability surface cannot be observed sufficiently for the task boundary, the profile remains `not_qualified` for governed execution and must return a Capability Gap.
+If the exact runtime mode, material memory posture, active capability surface or user-visible reasoning posture cannot be observed sufficiently for the task boundary, the profile remains `not_qualified` for governed execution and must return a Capability Gap. Lack of commentary/interim rendering alone is an observability degradation, not a qualification failure, when private reasoning remains hidden and the final governed result is preserved.
 
 ## Adaptive runtime selection
 
@@ -273,11 +281,14 @@ message received != task authorized
 profile mentioned != approval granted
 agent reply != external delivery unless it reaches a third party
 agent-to-agent discussion != governance review
+private reasoning != user-visible activity
 ```
 
 A governed client must not silently fall back to a personal/memory-enriched profile. `profile route fell back to default` is a Capability Gap when that fallback changes the admitted execution posture.
 
 The governed client must not send `X-Hermes-Session-Key` unless separately admitted; session continuity must not silently reintroduce runtime memory.
+
+For a governed user-facing surface, model scratchpad, chain-of-thought blocks and reasoning deltas must remain hidden. Safe commentary may be projected when the runtime and channel support it, but commentary is a concise observable rationale/progress surface rather than private reasoning.
 
 ## Failure behavior
 
@@ -293,6 +304,8 @@ ambiguous requested effect
 runtime mode not observed
 memory posture not sufficiently observed
 active capability surface not qualified
+private reasoning visible on governed user surface
+reasoning visibility posture not sufficiently observed
 profile route fell back to default
 candidate tool requires broader source or data exposure
 candidate tool requires stronger permission or higher effect ceiling
@@ -317,10 +330,22 @@ selected plugin/MCP bindings when used
 delegation/durable-work behavior when used
 idempotency and external-effect gates when applicable
 workspace/source isolation
+private reasoning absent from the governed user-visible surface
+reasoning deltas not projected to the governed user-visible surface
+commentary/interim progress capability recorded when available
 trace visibility
 no automatic memory promotion
 no automatic external action
 no protected-path mutation without gate
+```
+
+Configuration supports this verification but does not replace it:
+
+```text
+display.show_reasoning = false -> expected configuration signal, not behavioral proof
+plugins.stream_reasoning_deltas = false -> preferred baseline when supported, not proof of channel behavior
+show_commentary/interim messages unavailable -> UX degradation, not automatic safety failure
+observed reasoning disclosure -> not_qualified regardless of nominal config
 ```
 
 Qualification should observe capabilities, not freeze a historical list of concrete tools unless a narrow high-risk binding requires that exact restriction.
@@ -333,6 +358,8 @@ Profiles as execution identities.
 Functional profiles inheriting one governed runtime mode.
 Adaptive Hermes selection among qualified means inside an admitted Task Contract.
 Stored profile memory remaining inert by default.
+Private reasoning remaining hidden on governed user-visible surfaces.
+Safe commentary and interim progress as preferred observability when supported.
 Profile constitution as adapter note outside the kernel.
 Kanban and delegate_task as optional runtime mechanisms, not Pantheon requirements.
 
@@ -342,6 +369,9 @@ Parallel governed copies of every functional profile.
 Profile constitution as doctrine source.
 Runtime memory as Registre Probatoire.
 Tool availability as task authorization.
+Nominal `show_reasoning: false` treated as proof that reasoning is hidden.
+Private chain-of-thought or reasoning deltas projected as Pantheon activity.
+Commentary availability treated as a safety authority.
 A fixed global tool allowlist as the normal expression of Pantheon governance.
 A personal memory-enriched profile receiving a Pantheon Task Contract without separate admission.
 Kanban comments as Evidence Pack by themselves.
@@ -351,6 +381,7 @@ Self-organizing agent team as governance.
 To verify:
 Exact installed Hermes runtime/profile/capability behavior.
 Complete memory status observation.
+Governed user-visible reasoning posture on each admitted surface.
 Selected plugin/MCP/provider behavior when used.
 OpenWebUI hidden memory and RAG behavior.
 Loop guardrails and durable/delegation semantics when used.
@@ -367,6 +398,7 @@ Whether a shared context bus is admissible, and under which scope and memory rul
 The functional profile chooses the work shape.
 The admitted boundary constrains consequence, scope and exposure.
 Hermes chooses the qualified runtime means.
+Private reasoning stays private; safe observable commentary may be projected.
 Stored runtime memory remains inert unless separately admitted.
 None creates authority.
 Pantheon governs the consequence.
