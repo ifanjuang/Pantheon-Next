@@ -1,15 +1,6 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-RELEASE_LOCK="$SCRIPT_DIR/release.env"
-if [[ ! -f "$RELEASE_LOCK" ]]; then
-  printf '[pantheon-skills] ERROR: reviewed deployment lock is missing: %s\n' "$RELEASE_LOCK" >&2
-  exit 1
-fi
-# shellcheck disable=SC1091
-source "$RELEASE_LOCK"
-
 STATE_ROOT="${STATE_ROOT:-/srv/pantheon}"
 APP_ROOT="${APP_ROOT:-/opt/pantheon-node}"
 PROFILE="pantheon-governed"
@@ -17,7 +8,6 @@ HOST_SKILLS_ROOT="$STATE_ROOT/hermes-governed-skills"
 CONTAINER_SKILLS_ROOT="/opt/pantheon-skills"
 COMPOSE_FILE="$APP_ROOT/compose.yaml"
 COMPOSE_ENV="$APP_ROOT/compose-env"
-SKILLS="${RELEASE_HERMES_GOVERNED_SKILLS:?release.env missing RELEASE_HERMES_GOVERNED_SKILLS}"
 
 die() { printf '[pantheon-skills] ERROR: %s\n' "$*" >&2; exit 1; }
 warn() { printf '[pantheon-skills] WARNING: %s\n' "$*" >&2; }
@@ -26,6 +16,11 @@ log() { printf '[pantheon-skills] %s\n' "$*"; }
 [[ $# -eq 1 ]] || die "usage: sync-hermes-governed-skills <reviewed-pantheon-checkout>"
 CHECKOUT="$(readlink -f "$1")"
 [[ -d "$CHECKOUT/.git" ]] || die "reviewed Pantheon checkout is missing: $CHECKOUT"
+RELEASE_LOCK="$CHECKOUT/deployment/ubuntu/release.env"
+[[ -f "$RELEASE_LOCK" ]] || die "target checkout reviewed deployment lock is missing: $RELEASE_LOCK"
+# shellcheck disable=SC1090
+source "$RELEASE_LOCK"
+SKILLS="${RELEASE_HERMES_GOVERNED_SKILLS:?target release.env missing RELEASE_HERMES_GOVERNED_SKILLS}"
 [[ -f "$COMPOSE_FILE" && -f "$COMPOSE_ENV" ]] || die "Pantheon node compose files are missing under $APP_ROOT"
 
 compose() {
@@ -96,5 +91,5 @@ if ((mount_added == 1)) && docker inspect -f '{{.State.Running}}' pantheon-herme
   log "recreated running Hermes container once to apply the new read-only skill mount"
 fi
 
-log "staged governed Hermes skills: $SKILLS"
+log "staged governed Hermes skills from target checkout: $SKILLS"
 log "available skill != skill used; skill used != task authorization; projection != persistence"
