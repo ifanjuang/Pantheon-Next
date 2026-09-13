@@ -23,7 +23,8 @@ def test_mobile_swiper_motion_javascript_parses() -> None:
     if node is None:
         pytest.skip("Node.js is unavailable; JavaScript syntax check skipped")
     result = subprocess.run(
-        [node, "--check", str(MOTION)],
+        [node, "--input-type=module", "--check"],
+        input=_read(MOTION),
         check=False,
         capture_output=True,
         text=True,
