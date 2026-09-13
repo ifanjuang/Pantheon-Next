@@ -60,7 +60,7 @@ def test_linux_configurator_is_idempotent_and_keeps_a_backup() -> None:
     for skill in (
         "external-commitment-guard",
         "ifja-project-context",
-        "ifja-vault-search",
+ "ifja-vault-search",
         "pantheon-activity-projection",
         "pantheon-governed-method",
         "pantheon-request-intake",
@@ -104,8 +104,9 @@ def test_governed_local_mcp_binding_is_explicit_filtered_and_fail_closed() -> No
     text = CONFIGURE.read_text(encoding="utf-8")
     assert "--bind-local-mcp" in text
     assert "get_profile_optional_config_json default mcp_servers" in text
-    for server in ("Doclin", "hindsight-affaires", "hindsight-documentaires", "hindsight-memory", "pantheon-policy"):
+    for server in ("docling", "hindsight-affaires", "hindsight-documentaires", "hindsight-memory", "pantheon-policy"):
         assert server in text
+    assert "Doclin" not in text
     assert '"tools": {"include": ["recall"]}' in text
     assert 'endswith("/mcp/hermes/")' in text
     assert "required local Hindsight bindings are absent; refusing partial inheritance" in text
@@ -144,6 +145,23 @@ def test_curated_default_capabilities_remain_bounded_and_searchable() -> None:
         "grounded-citations",
     ):
         assert skill in text
+    assert 'HERMES_IMAGE_SKILLS_ROOT="${HERMES_IMAGE_SKILLS_ROOT:-/opt/hermes/skills}"' in text
+    assert 'docker cp "$CONTAINER:$source/." "$target/"' in text
+    assert 'source="$CURATED_STAGE_ROOT/$name"' in text
+    assert 'source="$HERMES_ROOT/skills/$path"' not in text
     assert "tools.tool_search.enabled auto" in text
     assert ".no-bundled-skills" in text
     assert "whole default skill catalogue" in text
+
+
+def test_optional_runtime_dependencies_are_preflighted_before_profile_mutation() -> None:
+    text = CONFIGURE.read_text(encoding="utf-8")
+    preflight = text.index("preflight_optional_dependencies")
+    backup = text.index('stamp="$(date -u +%Y%m%dT%H%M%SZ)"')
+    first_profile_install = text.index('install -d -m 0755 "$PROFILE_ROOT/skills"')
+    assert preflight < backup < first_profile_install
+    assert "prepare_local_mcp_selection" in text
+    assert "stage_curated_default_skills" in text
+    assert "preflight_whatsapp_runtime" in text
+    assert '[[ -n "$LOCAL_MCP_SELECTED" ]] || die "local MCP bindings were not preflighted"' in text
+    assert '[[ -n "$CURATED_STAGE_ROOT" ]] || die "curated skills were not staged"' in text
