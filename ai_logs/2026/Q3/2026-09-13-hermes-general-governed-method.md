@@ -78,3 +78,24 @@ disabled. That result is an observed platform boundary, not evidence that the
 profile MCP or messaging gateway is unavailable. The API surface must therefore
 not be used as a tool-routing acceptance fixture until its tool policy is
 explicitly configured and reviewed.
+
+## Post-acceptance optimization
+
+The exported CLI trace showed six tool calls, 44,460 input tokens and an initial
+rejected attempt to batch three deferred local MCP tools. The model recovered by
+calling them serially, but the full `list_sources` result injected all governed
+source descriptions into the context.
+
+The method now requires one local MCP function per Hermes `tool_call` and gives
+that observed runtime constraint precedence over generic parallel-read advice.
+Pantheon Policy adds `find_relevant_sources`, a read-only, condition-driven and
+explainable shortlist returning at most eight compact records and normally used
+with a limit of three. It does not read source bodies or infer business-domain
+workflows. `list_sources` remains available for explicit catalog inspection and
+recovery only.
+
+Readiness guidance now names the exact requested result under assessment and
+distinguishes an available method explanation from a professional result that
+cannot be produced without user input. The source receipt also carries optional
+observed session/run and tool-call references so model-declared consultation can
+remain distinct from runtime-observed consultation.

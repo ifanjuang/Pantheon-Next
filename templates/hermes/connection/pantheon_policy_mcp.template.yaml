@@ -25,6 +25,7 @@ mcp_servers:
     # MCP does not probe Hermes or infer approval from dashboard labels.
     tools:
       include:
+        - find_relevant_sources
         - list_sources
         - read_doctrine
         - explain_governance_structure
@@ -44,7 +45,7 @@ mcp_servers:
     sampling:
       enabled: false
 
-    # Conservative common-baseline default. All twelve tools are read-only, but
+    # Conservative common-baseline default. All thirteen tools are read-only, but
     # serialized calls simplify trace review and avoid claiming concurrency need.
     supports_parallel_tool_calls: false
 

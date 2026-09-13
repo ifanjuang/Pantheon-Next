@@ -150,6 +150,31 @@ STRUCTURE_SECTIONS: tuple[dict, ...] = (
     },
 )
 
+# Condition-driven policy routing. These mappings point only to governance
+# doctrine; they do not select business records or infer a domain workflow.
+CONDITION_SOURCE_KEYS: dict[str, tuple[str, ...]] = {
+    "complex_task": ("task-contracts", "preflight"),
+    "multi_step_workflow": ("task-contracts", "preflight"),
+    "source_required": ("source-ingestion-retrieval", "answer-verification-gate", "evidence-pack"),
+    "factual_claim": ("answer-verification-gate", "evidence-pack"),
+    "evidence_gap": ("evidence-pack", "answer-verification-gate"),
+    "source_freshness_risk": ("source-ingestion-retrieval", "answer-verification-gate"),
+    "memory_recall_requested": ("memory", "knowledge-ingestion-memory"),
+    "prior_decision_reuse": ("memory", "registre-probatoire"),
+    "project_history_reuse": ("memory", "registre-probatoire"),
+    "legal_or_professional_risk": ("approvals", "user-decision-gate", "evidence-pack"),
+    "liability_risk": ("approvals", "user-decision-gate"),
+    "external_transmission": ("approvals", "user-decision-gate", "task-contracts"),
+    "external_effect": ("approvals", "user-decision-gate", "task-contracts"),
+    "delivery_quality_required": ("answer-verification-gate", "evidence-pack"),
+    "artifact_fabrication": ("task-contracts", "evidence-pack"),
+    "capability_change": ("capability-registry", "uniform-capability-governance", "capability-placement"),
+}
+
+_SOURCE_SEARCH_STOPWORDS = {
+    "and", "avec", "dans", "des", "for", "from", "les", "pour", "sur", "the", "une",
+}
+
 
 def load_authority_index(root: Path | None = None) -> dict[str, dict[str, str]]:
     """Compatibility view of exact rows across the effective authority map."""
@@ -257,6 +282,81 @@ def list_sources(root: Path | None = None) -> list[dict]:
     root = root or find_repo_root()
     catalog = load_authority_catalog(root)
     return [describe_source(k, root, catalog=catalog) for k in sorted(SOURCES)]
+
+
+def find_relevant_sources(request: dict, root: Path | None = None) -> dict:
+    """Return a small, explainable doctrine shortlist from material conditions.
+
+    The result is deliberately compact. A candidate only becomes an opened
+    source after a separate ``read_doctrine`` call.
+    """
+    root = root or find_repo_root()
+    conditions = request.get("conditions", [])
+    if not isinstance(conditions, list):
+        conditions = []
+    conditions = [str(item).strip() for item in conditions if str(item).strip()]
+
+    raw_terms = request.get("terms", request.get("query", ""))
+    if isinstance(raw_terms, list):
+        raw_terms = " ".join(str(item) for item in raw_terms)
+    tokens = {
+        token
+        for token in re.findall(r"[a-z0-9]+", str(raw_terms).lower())
+        if len(token) > 2 and token not in _SOURCE_SEARCH_STOPWORDS
+    }
+
+    try:
+        limit = int(request.get("limit", 3))
+    except (TypeError, ValueError):
+        limit = 3
+    limit = max(1, min(limit, 8))
+
+    scores: dict[str, int] = {}
+    reasons: dict[str, list[str]] = {}
+    for condition in conditions:
+        for position, key in enumerate(CONDITION_SOURCE_KEYS.get(condition, ())):
+            scores[key] = scores.get(key, 0) + max(1, 6 - position)
+            reasons.setdefault(key, []).append(f"condition:{condition}")
+
+    for key, (source_file, title) in SOURCES.items():
+        haystack = f"{key} {source_file} {title}".lower()
+        matched = sorted(token for token in tokens if token in haystack)
+        if matched:
+            scores[key] = scores.get(key, 0) + 2 * len(matched)
+            reasons.setdefault(key, []).extend(f"term:{token}" for token in matched)
+
+    ranked = sorted(scores, key=lambda key: (-scores[key], key))[:limit]
+    catalog = load_authority_catalog(root)
+    candidates = []
+    for key in ranked:
+        info = describe_source(key, root, catalog=catalog)
+        candidates.append(
+            {
+                "key": key,
+                "uri": info["uri"],
+                "title": info["title"],
+                "source_file": info["source_file"],
+                "exists": info["exists"],
+                "authority": info["authority"],
+                "status": info["status"],
+                "score": scores[key],
+                "matched_on": reasons[key],
+            }
+        )
+
+    return {
+        "result": "shortlisted" if candidates else "no_match",
+        "conditions": conditions,
+        "terms": sorted(tokens),
+        "limit": limit,
+        "candidates": candidates,
+        "next_action": (
+            "read_doctrine for only the candidate keys needed by the request"
+            if candidates
+            else "clarify the material condition or use list_sources for explicit catalog inspection"
+        ),
+        "boundary": "shortlisted candidate != exact source opened",
+    }
 
 
 def explain_structure(key: str = "", root: Path | None = None) -> dict:

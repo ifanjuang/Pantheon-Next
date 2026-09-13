@@ -2,7 +2,7 @@
 # it is not a source validator, Evidence Pack, approval or professional truth.
 
 template_id: source_preflight_receipt
-template_version: 1
+template_version: 2
 owner_layer: hermes
 status: candidate_template_only
 
@@ -24,6 +24,11 @@ source_preflight_receipt:
         version_or_index: null
       supported_claim_refs: []
       limitations: []
+      runtime_trace:
+        observed: false
+        session_or_run_ref: null
+        tool_call_ref: null
+        tool_result_ref: null
   memory_leads:
     used: false
     refs: []
@@ -35,6 +40,7 @@ source_preflight_receipt:
     result: not_run
     context_pack_ref: null
   completion:
+    assessed_result: REQUIRED
     consulted_required_families: false
     exact_required_sources_opened: false
     contradictions_preserved: true

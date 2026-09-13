@@ -26,6 +26,7 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     ):
         assert movement in text
     for tool in (
+        "find_relevant_sources",
         "classify_request",
         "evaluate_preflight",
         "prepare_task_contract_skeleton",
@@ -46,6 +47,9 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "one primary method" in text
     assert "one guardrail method" in text
     assert "one verification method" in text
+    assert "one such MCP function per `tool_call`" in text
+    assert "Do not call `list_sources` on the normal answer path" in text
+    assert "Judge the result the user requested" in text
     for business_object in ("budget", "mail", "cctp", "compte rendu"):
         assert business_object not in text.lower()
 
@@ -62,6 +66,8 @@ def test_source_preflight_receipt_requires_exact_sources_and_keeps_boundaries() 
     assert receipt["memory_leads"]["label_when_unconfirmed"] == "indice mémoire — non confirmé"
     assert receipt["context_pack_validation"]["tool"] == "validate_context_pack"
     assert receipt["completion"]["readiness"] == "needs_revision"
+    assert receipt["completion"]["assessed_result"] == "REQUIRED"
+    assert consultation["runtime_trace"]["observed"] is False
     assert receipt["boundaries"] == {
         "receipt_is_evidence": False,
         "receipt_is_source_validation": False,

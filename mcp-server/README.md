@@ -35,6 +35,7 @@ Any request asking the server to perform such an effect is refused with a report
 | Tool | Returns |
 |---|---|
 | `list_sources` | the source map with authority/status per file |
+| `find_relevant_sources(request_yaml)` | compact condition-driven shortlist, normally limited to three; does not open a source |
 | `read_doctrine(key)` | one source, full body, labeled |
 | `explain_governance_structure(source_key="")` | read-only wiki view of the governance sections, why they exist and their traced sources; optional focus by source key |
 | `get_consultation_catalog()` | honest availability map: implemented read-only, partial and documented-non-implemented consultation surfaces |
@@ -120,6 +121,7 @@ mcp_servers:
     supports_parallel_tool_calls: true
     tools:
       include:
+        - find_relevant_sources
         - list_sources
         - read_doctrine
         - explain_governance_structure

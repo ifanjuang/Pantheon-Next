@@ -80,8 +80,26 @@ validate_context_pack
 Call only the subset justified by the returned handling. Candidate preparation
 does not execute work, and validation does not authorize an effect.
 
+Hermes currently represents deferred MCP functions as local tools. Invoke only
+one such MCP function per `tool_call`; do not batch several local MCP calls in a
+single call envelope. Sequence dependent policy calls. This runtime constraint
+overrides the general preference to batch independent reads.
+
 When professional factual claims require workspace sources, complete the
 source-preflight receipt described below before presenting them as supported.
+
+For Pantheon doctrine, prefer the compact progressive route:
+
+```text
+find_relevant_sources(conditions + optional terms, limit <= 3)
+-> read_doctrine(exact selected key)
+-> source-preflight receipt
+```
+
+Do not call `list_sources` on the normal answer path. Reserve the full catalog
+for explicit catalog inspection, administration or recovery from a genuinely
+empty shortlist. A shortlist is not a source consultation: only
+`read_doctrine` opens the selected doctrine source.
 
 ### 4. Compose
 
@@ -125,8 +143,8 @@ after every routine tool call.
 
 ### 7. Status
 
-Close each materially shown responsibility with one of the existing readiness
-decisions:
+First name the bounded result whose readiness is being judged. Close each
+materially shown responsibility with one of the existing readiness decisions:
 
 ```text
 ready
@@ -136,10 +154,23 @@ needs_user_input
 blocked
 ```
 
+Apply the decisions consistently:
+
+| Decision | Meaning for the requested result |
+|---|---|
+| `ready` | produced and observably checked for its declared internal use |
+| `ready_with_limits` | produced and usable for that use with bounded explicit limits |
+| `needs_revision` | produced but an observed defect prevents declared use |
+| `needs_user_input` | cannot be produced without a decision or datum unavailable to tools |
+| `blocked` | cannot be produced because a required technical, access or authority dependency is unavailable |
+
 Attach the smallest useful result, evidence/source references, limitations and
-next safe action. This is a readiness statement for the bounded candidate, not
-whole-task approval. A draft may be `ready` for internal review while remaining
-blocked for external transmission.
+next safe action. Judge the result the user requested, not whether the method
+itself ran successfully. A method explanation may be `ready_with_limits` while
+the absent professional result is `needs_user_input`; name which one is being
+reported. This is readiness for the bounded candidate, not whole-task approval.
+A draft may be `ready` for internal review while remaining blocked for external
+transmission.
 
 ## Source-preflight receipt
 
@@ -155,6 +186,7 @@ The receipt must identify:
 - whether memory supplied only an unconfirmed lead;
 - the Context Pack validation result when a Context Pack was required;
 - the completion result for each required source family.
+- an observed runtime trace reference when the active surface exposes one.
 
 A required family is not complete when only search snippets, conversation
 memory, model recall or a guessed filename were observed. If the exact source
@@ -166,6 +198,7 @@ memory lead != source consultation
 search hit != exact source opened
 receipt complete != source true
 Context Pack valid != Evidence or approval
+model-declared tool use != observed runtime trace
 ```
 
 ## Presentation

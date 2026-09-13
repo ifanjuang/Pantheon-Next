@@ -296,7 +296,12 @@ def consultation_catalog() -> dict[str, Any]:
                 {
                     "id": "governance_sources",
                     "status": "implemented_read_only",
-                    "interface": ["MCP resources", "list_sources", "read_doctrine"],
+                    "interface": [
+                        "MCP resources",
+                        "find_relevant_sources",
+                        "list_sources",
+                        "read_doctrine",
+                    ],
                 },
                 {
                     "id": "architecture_explanations",

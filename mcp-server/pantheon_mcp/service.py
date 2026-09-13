@@ -208,6 +208,14 @@ class PantheonPolicyService:
             source_mode="governed_repository_sources",
         )
 
+    def find_relevant_sources(self, request: dict[str, Any]) -> dict[str, Any]:
+        return self._project(
+            "sources.find_relevant",
+            source_map.find_relevant_sources(request, self.root),
+            source_mode="provided_conditions_and_governed_repository_sources",
+            input_value=request,
+        )
+
     def read_doctrine(self, key: str) -> dict[str, Any]:
         return self._project(
             "sources.read",

@@ -109,6 +109,14 @@ Current compact labels:
 
 Hermes is a runtime, not a Pantheon Role.
 
+Select labels from observed responsibility, never from the output's object
+name. Typical condition-driven jurisdiction is compact: structure or material
+ambiguity may justify Athena; source support Argos; prior-state continuity
+Mnemosyne; consequential risk Themis; production Hephaistos; delivery quality
+Apollo; recipient/channel adaptation Iris; and actual conflict or final
+procedural status Zeus. Hermes may label an execution milestone. This mapping
+does not require displaying any Role whose contribution is absent.
+
 A `→ Relais` line means the next responsibility, not a new agent or dispatch. If
 Hermes actually delegates runtime work, report that separately as an observed
 Hermes delegation.
@@ -120,6 +128,11 @@ observable readiness outcome: `ready`, `ready_with_limits`, `needs_revision`,
 `needs_user_input` or `blocked`, plus the smallest useful result, source/evidence
 reference, limitation or next safe action. Do not activate extra Roles merely to populate
 a checklist, and do not confuse a Role outcome with final task approval.
+
+Use natural, result-bearing labels. Avoid vague phrases such as `candidate
+seulement`, `classification requeste` or `exécution déléguée` unless an actual
+delegation was observed. Prefer `périmètre à préciser`, `source ouverte`,
+`résultat non produit` and the exact missing datum or dependency.
 
 For a drafted communication, typical outcomes are: objective and recipient
 grounded (Athena), material facts checked (Argos), commitments/confidentiality
