@@ -109,6 +109,19 @@ _DELIVERY = {
     "recipient_specific_format",
 }
 
+# First deterministic front edge from RITE_TRIGGER_CATALOGUE.md.
+# The signal may surface attention only. It does not activate or authorize a Rite.
+RITE_ATTENTION_SIGNALS: dict[str, dict[str, str]] = {
+    "tests_pass_completion": {
+        "signal_source": "completion_requirements:tests_pass",
+        "question": "What would passing these tests still not establish?",
+        "attention_failure": "tests_pass_treated_as_claim_proven",
+        "related_rite": "autocritique_contradictoire",
+        "default_mode": "mode_light",
+        "effect": "attention_only",
+    },
+}
+
 
 def _observations(request: dict[str, Any]) -> dict[str, Any]:
     value = request.get("observations")
@@ -245,6 +258,19 @@ def _completion(request: dict[str, Any], conditions: list[str]) -> list[str]:
     return explicit or _fallback_completion(conditions)
 
 
+def _metathoughts(completion: list[str]) -> list[dict[str, str]]:
+    """Surface deterministic attention questions without selecting or running a Rite."""
+    out: list[dict[str, str]] = []
+    if "tests_pass" in completion:
+        out.append(
+            {
+                "signal_id": "tests_pass_completion",
+                **RITE_ATTENTION_SIGNALS["tests_pass_completion"],
+            }
+        )
+    return out
+
+
 def _effect_requested(request: dict[str, Any], conditions: list[str]) -> bool:
     observations = _observations(request)
     return bool(
@@ -265,6 +291,7 @@ def recommend_handling(request: dict[str, Any], classification: dict[str, Any]) 
     coordination = _coordination(request)
     topology = _topology(coordination)
     completion = _completion(request, conditions)
+    metathoughts = _metathoughts(completion)
     effect_requested = _effect_requested(request, conditions)
     observations = _observations(request)
     conflict = bool(
@@ -297,6 +324,8 @@ def recommend_handling(request: dict[str, Any], classification: dict[str, Any]) 
         constraints.append("preserve_claim_status_and_meaning")
     if classification.get("evidence_required"):
         constraints.append("retrieved_material_is_not_evidence_until_qualified")
+    if metathoughts:
+        constraints.append("metathought_question_does_not_activate_rite")
 
     handling: dict[str, Any] = {
         "disposition": disposition,
@@ -312,7 +341,8 @@ def recommend_handling(request: dict[str, Any], classification: dict[str, Any]) 
         "authority_note": (
             "Handling is policy guidance only. Conditions and coordination relations "
             "are candidate inputs, a viewpoint is not an agent, topology is not "
-            "dispatch, completion is not approval, and Hermes remains the external executor."
+            "dispatch, completion is not approval, a metathought is a question not "
+            "a verdict or Rite activation, and Hermes remains the external executor."
         ),
     }
 
@@ -320,6 +350,8 @@ def recommend_handling(request: dict[str, Any], classification: dict[str, Any]) 
         handling["coordination"] = coordination
     if topology:
         handling["topology"] = topology
+    if metathoughts:
+        handling["metathoughts"] = metathoughts
     if request.get("current_state") is not None:
         handling["current_state"] = request.get("current_state")
     if request.get("target_state") is not None:
