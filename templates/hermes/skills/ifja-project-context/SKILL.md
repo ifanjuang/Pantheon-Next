@@ -39,10 +39,37 @@ Ground the active affaire/project from the request and available context. When p
 
 Once an affaire/project is sufficiently grounded, keep it as the conversation-local working referent for elliptical follow-ups until the user selects another one or material evidence makes the referent uncertain. For detailed resolution and alias handling, use [references/project-resolution.md](references/project-resolution.md).
 
-Use Hindsight when associative recall materially helps with prior context, actors, chronology, earlier positions or dossier resolution.
+For every material professional factual answer, complete a source preflight
+before the final answer. This is a completion requirement, not a generic
+governance classifier:
+
+```text
+dossier/client/address/budget/date/status/planning -> AFFAIRES required
+technical/standard/regulatory/legal/method question -> DOCUMENTAIRES required
+dossier fact tested against a transversal rule -> AFFAIRES + DOCUMENTAIRES required
+ambiguous dossier or conversational continuity -> conversation memory lead, then the applicable source above
+```
+
+The preflight is not required for casual conversation, pure transformation of
+content supplied in the current request, or a question whose answer does not
+depend on professional workspace facts.
+
+When dossier identity is ambiguous or continuity materially helps, consult the
+admitted conversation-memory binding first. Treat it only as a fast location or
+context lead. If interim assistant messages are supported, publish one compact
+`Mnemosyne` milestone as soon as that lead changes the user's understanding,
+label it `indice mémoire — non confirmé`, and continue immediately with exact
+source discovery. Do not wait for the final synthesis to disclose a useful lead,
+but do not present it as the answer.
+
+Before returning a material budget, date, status, obligation or recommendation,
+resolve and open the exact applicable workspace source. If the required binding
+is unavailable or returns no support, state the Capability Gap or unconfirmed
+scope instead of answering from model recall.
 
 ```text
 Hindsight recall != source authority
+fast memory lead != confirmed answer
 memory recalled != Evidence
 bounded referent candidate set != merged identity
 conversation continuity != governed persistence
@@ -57,6 +84,11 @@ Use admitted workspace bindings; do not hard-code filesystem paths, Hindsight ba
 - `AFFAIRES` + `DOCUMENTAIRES` -> consult both in parallel when a dossier-specific question must be tested against a transversal professional rule.
 
 Keep the two source families distinguishable in the synthesis.
+
+Start the required source lookup as soon as the route is selected. Independent
+AFFAIRES and DOCUMENTAIRES lookups may run in parallel. Progressive chat output
+may report a bounded lead while retrieval continues; it must not imply that a
+background task exists when execution is actually sequential.
 
 For claims about plans, PDFs or other professional documents, keep `mentioned != exact source present != relevant content inspected`. When content inspection matters, use [references/document-inspection.md](references/document-inspection.md).
 
@@ -86,6 +118,35 @@ Pass the semantic request candidate plus observable scope. Do not derive K/V/C, 
 Hermes may search, read, compare, analyze, calculate, draft and delegate within the admitted boundary. Parallelize independent retrieval when useful, especially `AFFAIRES` + `DOCUMENTAIRES` and already-justified currentness checks.
 
 Preserve provenance and surface missing information, contradiction, freshness limits and uncertainty.
+
+### 6. Select an artifact destination explicitly
+
+When a requested artifact could be created in more than one admitted system,
+resolve its destination before the first write:
+
+1. use the canonical destination named by the current dossier manifest or Task Contract;
+2. otherwise use the destination explicitly named in the current request;
+3. otherwise, when the choice changes collaboration, permissions, external
+   exposure or the source of truth, ask one short clarification presenting only
+   the materially different destinations;
+4. when useful, offer a local Markdown draft followed by a separately approved
+   publication step.
+
+Do not create parallel copies in multiple systems silently. Derive the candidate
+destinations from the admitted capability catalogue and dossier manifest.
+A local workspace such as Obsidian Markdown is a normal candidate for durable,
+dossier-linked knowledge; a collaborative system such as Google Docs is a
+normal candidate for review or sharing, but requires an admitted connection and
+any applicable external-write authorization. A confirmed durable
+preference may be recorded in the dossier manifest through the governed update
+path; do not infer or persist it from one incidental choice.
+
+```text
+available destination != selected destination
+local draft != external publication
+Google connection available != external write authorized
+one chosen destination != permanent dossier preference
+```
 
 ## Final invariants
 

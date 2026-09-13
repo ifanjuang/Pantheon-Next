@@ -40,6 +40,10 @@ change the answer, permitted action or consequence.
 
 ## Search order
 
+0. For an ambiguous or continuity-dependent request, make one fast recall
+   against the configured conversation-memory binding. Emit at most one interim
+   `indice mémoire — non confirmé` when it materially helps locate the dossier,
+   then continue to the applicable professional source.
 1. For an exact name, alias, path or inventory question, use the configured
    document-listing capability before semantic recall.
 2. Resolve the project page or exact source identity. A high-ranked semantic
@@ -53,10 +57,18 @@ change the answer, permitted action or consequence.
    binding. Attribute memory-only information to recent conversation and mark it
    unconfirmed until an admitted business source supports it.
 
+For a material professional factual answer, the applicable source lookup is
+mandatory before final synthesis: `AFFAIRES` for dossier facts,
+`DOCUMENTAIRES` for transversal professional facts, and both for a mixed
+question. A memory lead never satisfies this requirement. If the required
+binding is unavailable, return the limitation rather than substituting model
+recall.
+
 ```text
 subject match != selected project
 recall snippet != exact document
 conversation memory != business source
+fast memory lead != confirmed answer
 document opened != Evidence admitted
 ```
 

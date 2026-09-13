@@ -104,7 +104,12 @@ progressive Role milestones, use its observed Hermes `chat_id`:
 deployment/ubuntu/configure-hermes-activity-projection --check \
   --route-whatsapp --whatsapp-chat-id '<chat-id>'
 sudo deployment/ubuntu/configure-hermes-activity-projection --apply --restart \
-  --route-whatsapp --whatsapp-chat-id '<chat-id>'
+  --route-whatsapp --whatsapp-chat-id '<chat-id>' \
+  --with-curated-default-skills
+
+# Optional IFJA organization adapter and its already configured local bindings:
+sudo deployment/ubuntu/configure-hermes-activity-projection --apply --restart \
+  --with-ifja-adapter --bind-local-mcp
 ```
 
 Use `--all-authorized-whatsapp` instead of `--whatsapp-chat-id` only when every
@@ -114,6 +119,33 @@ merges existing profile routes and profile allowlist entries, disables raw
 reasoning display on WhatsApp, enables safe interim assistant messages, and
 keeps a backup of the Hermes configuration. These are supported Hermes settings;
 the provider source and image are not patched.
+
+The governed profile remains generalist: its stable repository-owned core is
+`pantheon-activity-projection`, `pantheon-request-intake` and `source-research`.
+Capabilities and organization adapters are available modules selected from the
+request, manifest and admitted runtime bindings; they do not redefine the
+profile identity.
+
+`--with-ifja-adapter` adds `ifja-project-context` and `ifja-vault-search` as
+contextual modules. With that explicit adapter, `--bind-local-mcp` copies no secrets and no arbitrary server. It merges only the
+already configured local `Doclin`, `hindsight-affaires`,
+`hindsight-documentaires` and `pantheon-policy` entries from the default profile
+into the governed profile. It derives a recall-only `hindsight-memory` binding
+from the already configured local Hindsight endpoint and refuses a partial result
+when either required professional Hindsight binding is absent.
+
+`--with-curated-default-skills` retains the profile's `.no-bundled-skills`
+boundary and copies only architecture diagrams, Excalidraw, Obsidian, PDF,
+OCR/documents, DOCX, XLSX, PowerPoint, Google Workspace and grounded citations from the skills
+already pinned by the installed Hermes image. It also sets dynamic tool search
+to `auto`; the Web, browser, vision and generation toolsets remain governed
+runtime capabilities and are discovered only when relevant.
+
+For material professional questions, that skill set imposes a source preflight:
+AFFAIRES for dossier facts, DOCUMENTAIRES for transversal professional facts,
+and both for mixed questions. When continuity or dossier resolution is needed,
+the recall-only memory binding may produce one fast, explicitly unconfirmed
+`Mnemosyne` milestone while the exact professional source lookup continues.
 
 Hermes routing is based on trusted platform/chat/thread metadata, not on a
 semantic guess about each question. Once a chat reaches `pantheon-governed`, the

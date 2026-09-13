@@ -20,6 +20,13 @@ def test_ifja_project_context_routes_existing_sources_without_new_authority():
     assert "governed_by: docs/governance/HERMES_INTEGRATION.md" in text
 
     assert "Hindsight recall != source authority" in text
+    assert "For every material professional factual answer, complete a source preflight" in text
+    assert "dossier/client/address/budget/date/status/planning -> AFFAIRES required" in text
+    assert "technical/standard/regulatory/legal/method question -> DOCUMENTAIRES required" in text
+    assert "AFFAIRES + DOCUMENTAIRES required" in text
+    assert "indice mémoire — non confirmé" in text
+    assert "fast memory lead != confirmed answer" in text
+    assert "resolve and open the exact applicable workspace source" in text
     assert "bounded candidate set" in text
     assert "do not silently merge or select an identity" in text
     assert "conversation-local working referent" in text
@@ -46,6 +53,14 @@ def test_ifja_project_context_routes_existing_sources_without_new_authority():
     assert "Hindsight != Evidence" in text
     assert "runtime success != authorization" in text
     assert "projection != persistence" in text
+    assert "### 6. Select an artifact destination explicitly" in text
+    assert "canonical destination named by the current dossier manifest" in text
+    assert "ask one short clarification" in text
+    assert "Do not create parallel copies in multiple systems silently" in text
+    assert "admitted capability catalogue and dossier manifest" in text
+    assert "local Markdown draft followed by a separately approved" in text
+    assert "publication step" in text
+    assert "Google connection available != external write authorized" in text
 
     registry = REGISTRY.read_text(encoding="utf-8")
     skill_path = "templates/hermes/skills/ifja-project-context/SKILL.md"
