@@ -37,6 +37,7 @@ Executable Pantheon adapter code remains outside this template directory under `
 - Agent adapter: `templates/hermes/AGENTS.md`.
 - Skill collection contract: `templates/hermes/SKILLS.md`.
 - Individual skill behavior: `templates/hermes/skills/*/SKILL.md`.
+- Managed profile supplements: `templates/hermes/profiles/*/SOUL.append.md`.
 - Handoff and return shapes: `templates/hermes/handoffs/` and `templates/hermes/returns/`.
 - Connection candidates: `templates/hermes/connection/`.
 - Reproducible external composition contract: `templates/hermes/distribution/`.

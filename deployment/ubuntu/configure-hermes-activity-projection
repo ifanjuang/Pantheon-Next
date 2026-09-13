@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+STATE_ROOT="${PANTHEON_STATE_ROOT:-/srv/pantheon}"
+HERMES_ROOT="$STATE_ROOT/hermes"
+PROFILE="pantheon-governed"
+APPLY=0
+RESTART=0
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd -- "$SCRIPT_DIR/../.." && pwd)"
+SKILL_SOURCE="$REPO_ROOT/templates/hermes/skills/pantheon-activity-projection/SKILL.md"
+SOUL_APPEND_SOURCE="$REPO_ROOT/templates/hermes/profiles/pantheon-governed/SOUL.append.md"
+BEGIN_MARKER="<!-- BEGIN PANTHEON ACTIVITY PROJECTION -->"
+END_MARKER="<!-- END PANTHEON ACTIVITY PROJECTION -->"
+
+log() { printf '[pantheon-hermes-activity] %s\n' "$*"; }
+die() { printf '[pantheon-hermes-activity] ERROR: %s\n' "$*" >&2; exit 1; }
+
+usage() {
+  cat <<'USAGE'
+Usage:
+  deployment/ubuntu/configure-hermes-activity-projection --check
+  sudo deployment/ubuntu/configure-hermes-activity-projection --apply [--restart]
+
+Installs the versioned presentation skill and managed SOUL supplement into the
+existing pantheon-governed Hermes profile. It does not expose chain-of-thought,
+create agents, persist Role Signals or change task authorization.
+USAGE
+}
+
+while (($#)); do
+  case "$1" in
+    --check) APPLY=0 ;;
+    --apply) APPLY=1 ;;
+    --restart) RESTART=1 ;;
+    -h|--help) usage; exit 0 ;;
+    *) die "unknown argument: $1" ;;
+  esac
+  shift
+done
+
+PROFILE_ROOT="$HERMES_ROOT/profiles/$PROFILE"
+SKILL_TARGET="$PROFILE_ROOT/skills/pantheon-activity-projection/SKILL.md"
+SOUL_TARGET="$PROFILE_ROOT/SOUL.md"
+
+[[ -f "$SKILL_SOURCE" ]] || die "skill source missing: $SKILL_SOURCE"
+[[ -f "$SOUL_APPEND_SOURCE" ]] || die "SOUL supplement missing: $SOUL_APPEND_SOURCE"
+
+if ((APPLY == 0)); then
+  [[ -d "$PROFILE_ROOT" ]] || die "Hermes profile missing: $PROFILE_ROOT"
+  if [[ -f "$SKILL_TARGET" ]] && cmp -s "$SKILL_SOURCE" "$SKILL_TARGET"; then
+    log "skill is current"
+  else
+    log "skill requires installation or update"
+  fi
+  if [[ -f "$SOUL_TARGET" ]] && grep -Fq "$BEGIN_MARKER" "$SOUL_TARGET" && grep -Fq "$END_MARKER" "$SOUL_TARGET"; then
+    log "managed SOUL block is present"
+  else
+    log "managed SOUL block requires installation"
+  fi
+  log "check only; no runtime state changed"
+  exit 0
+fi
+
+[[ ${EUID:-$(id -u)} -eq 0 ]] || die "--apply requires root"
+[[ -d "$PROFILE_ROOT" ]] || die "Hermes profile missing: $PROFILE_ROOT"
+[[ -f "$SOUL_TARGET" ]] || die "Hermes profile SOUL missing: $SOUL_TARGET"
+
+stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+backup_root="$STATE_ROOT/backups/hermes-activity-$stamp"
+install -d -m 0700 "$backup_root"
+cp -a "$SOUL_TARGET" "$backup_root/SOUL.md"
+if [[ -f "$SKILL_TARGET" ]]; then cp -a "$SKILL_TARGET" "$backup_root/SKILL.md"; fi
+
+install -d -m 0755 "$(dirname -- "$SKILL_TARGET")"
+install -m 0644 "$SKILL_SOURCE" "$SKILL_TARGET"
+
+clean_soul="$(mktemp)"
+trap 'rm -f "$clean_soul"' EXIT
+awk -v begin="$BEGIN_MARKER" -v end="$END_MARKER" '
+  $0 == begin {managed=1; next}
+  $0 == end {managed=0; next}
+  !managed {print}
+' "$SOUL_TARGET" > "$clean_soul"
+{
+  sed -e '${/^$/d;}' "$clean_soul"
+  printf '\n%s\n' "$BEGIN_MARKER"
+  cat "$SOUL_APPEND_SOURCE"
+  printf '%s\n' "$END_MARKER"
+} > "$SOUL_TARGET"
+
+profile_uid="$(stat -c '%u' "$PROFILE_ROOT")"
+profile_gid="$(stat -c '%g' "$PROFILE_ROOT")"
+chown "$profile_uid:$profile_gid" "$SOUL_TARGET" "$SKILL_TARGET"
+chmod 0600 "$SOUL_TARGET"
+
+log "installed skill and managed SOUL block for $PROFILE"
+log "backup: $backup_root"
+
+if ((RESTART == 1)); then
+  docker restart pantheon-hermes >/dev/null
+  log "restarted pantheon-hermes"
+else
+  log "restart not requested; new sessions may require a Hermes restart"
+fi
+
+log "projection != persistence; visible role != autonomous agent"

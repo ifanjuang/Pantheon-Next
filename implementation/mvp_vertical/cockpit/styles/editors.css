@@ -221,6 +221,63 @@
   .v2-context-panel { display: grid; gap: .5rem; }
   .v2-context-selected, .v2-context-results { display: grid; gap: .4rem; }
 
+  .v2-role-dialogue {
+    display: grid;
+    gap: .55rem;
+    padding-top: .75rem;
+    border-top: 1px solid var(--cockpit-line);
+  }
+  .v2-role-dialogue-head { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; }
+  .v2-role-dialogue-state {
+    color: var(--cockpit-muted);
+    font-size: .78rem;
+    text-align: right;
+  }
+  .v2-role-dialogue-boundary {
+    margin: 0;
+    color: var(--cockpit-muted);
+    font-size: .76rem;
+  }
+  .v2-role-dialogue-events {
+    display: grid;
+    gap: .5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .v2-role-stage {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    gap: .2rem .55rem;
+    padding: .6rem;
+    border: 1px solid var(--cockpit-line);
+    border-radius: 14px;
+    background: #f8f9fa;
+  }
+  .v2-role-stage.is-running { border-color: color-mix(in srgb, var(--pantheon-cyan) 60%, var(--cockpit-line)); }
+  .v2-role-stage-icon { grid-row: 1 / span 2; font-size: 1.15rem; }
+  .v2-role-stage-title { min-width: 0; font-size: .86rem; }
+  .v2-role-stage-status,
+  .v2-role-stage-origin {
+    border-radius: 999px;
+    padding: .1rem .4rem;
+    background: #e8ebed;
+    color: var(--cockpit-muted);
+    font-size: .67rem;
+    white-space: nowrap;
+  }
+  .v2-role-stage-summary { grid-column: 2 / -1; margin: 0; color: var(--cockpit-muted); font-size: .8rem; }
+  .v2-role-stage details { grid-column: 2 / -1; font-size: .76rem; }
+  .v2-role-stage details dl { display: grid; grid-template-columns: auto 1fr; gap: .2rem .5rem; margin: .35rem 0 0; }
+  .v2-role-stage details dt { color: var(--cockpit-muted); }
+  .v2-role-stage details dd { margin: 0; overflow-wrap: anywhere; }
+
+  @media (max-width: 420px) {
+    .v2-role-stage { grid-template-columns: auto minmax(0, 1fr) auto; }
+    .v2-role-stage-origin { grid-column: 2; justify-self: start; }
+    .v2-role-stage-summary { grid-column: 2 / -1; }
+  }
+
   :where(button, input, textarea, select):focus-visible {
     outline: 3px solid var(--pantheon-cyan);
     outline-offset: 2px;

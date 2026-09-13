@@ -13,6 +13,15 @@ UPDATE = DEPLOY / "update-node"
 SKILL_SYNC = DEPLOY / "sync-hermes-governed-skills"
 RELEASE = DEPLOY / "release.env"
 README = DEPLOY / "README.md"
+HERMES_LOCAL_COMPOSE = DEPLOY / "compose.hermes-local.yaml"
+WORKSPACE_COCKPIT_COMPOSE = DEPLOY / "compose.workspace-cockpit-local.yaml"
+WORKSPACE_COCKPIT_TAILSCALE = DEPLOY / "compose.workspace-cockpit-tailscale.yaml"
+CONFIGURE_LIVESYNC = DEPLOY / "configure-livesync-local"
+CONFIGURE_MARKER = DEPLOY / "configure-marker-local"
+MARKER_IDLE_WRAPPER = DEPLOY / "marker_idle_vram.py"
+CONFIGURE_DOCLING = DEPLOY / "configure-docling-local"
+CONFIGURE_WORKSPACE_COCKPIT = DEPLOY / "configure-workspace-cockpit-local"
+CONFIGURE_HERMES_ACTIVITY = DEPLOY / "configure-hermes-activity-projection"
 EXTERNAL_PINS = ROOT / "implementation" / "qualification" / "external-pins.json"
 
 
@@ -26,9 +35,43 @@ def _pin(pin_id: str) -> dict:
 
 
 def test_bootstrap_scripts_are_shell_syntax_valid() -> None:
-    for script in (INSTALL, UPDATE, SKILL_SYNC):
+    scripts = (
+        INSTALL,
+        UPDATE,
+        SKILL_SYNC,
+        CONFIGURE_MARKER,
+        CONFIGURE_DOCLING,
+        CONFIGURE_WORKSPACE_COCKPIT,
+        CONFIGURE_HERMES_ACTIVITY,
+    )
+    for script in scripts:
         assert script.exists()
         subprocess.run(["bash", "-n", str(script)], check=True)
+
+
+def test_workspace_cockpit_compose_is_read_only_and_loopback_only() -> None:
+    text = _text(WORKSPACE_COCKPIT_COMPOSE)
+    assert 'WORKSPACE_COCKPIT_BIND:-127.0.0.1' in text
+    assert "read_only: true" in text
+    assert "no-new-privileges:true" in text
+    assert "cap_drop:" in text and "- ALL" in text
+    assert text.count(":ro") == 3
+    assert '127.0.0.1:${ROLE_TRACE_ATTACH_PORT:-8190}:8190' in text
+    assert "HERMES_ROLE_TRACE_API_KEY" in text
+    assert "ROLE_TRACE_ATTACH_KEY" in text
+    assert "ROLE_TRACE_READ_KEY" in text
+
+
+def test_workspace_cockpit_remote_access_uses_pinned_userspace_tailscale() -> None:
+    release = _text(RELEASE)
+    compose = _text(WORKSPACE_COCKPIT_TAILSCALE)
+    assert "RELEASE_TAILSCALE_IMAGE=tailscale/tailscale:v" in release
+    assert "${RELEASE_TAILSCALE_IMAGE:" in compose
+    assert 'TS_USERSPACE: "true"' in compose
+    assert "/dev/net/tun" not in compose
+    assert "network_mode: host" not in compose
+    assert "TS_AUTHKEY" not in compose
+    assert "pantheon-cockpit-tailscale-state" in compose
 
 
 def test_install_defaults_fail_private_and_keep_optional_services_inactive() -> None:
@@ -37,7 +80,7 @@ def test_install_defaults_fail_private_and_keep_optional_services_inactive() -> 
     assert 'COMFYUI_BIND_ADDRESS="127.0.0.1"' in text
     assert "ENABLE_HINDSIGHT=0" in text
     assert "systemctl disable livesync-headless.service" in text
-    assert "ConditionPathExists=$STATE_ROOT/livesync/db/settings.json" in text
+    assert "ConditionPathExists=$STATE_ROOT/livesync/db/.livesync/settings.json" in text
     assert "daemon --interval 30" in text
     assert "installed != activated" in text
     assert "activated != task-authorized" in text

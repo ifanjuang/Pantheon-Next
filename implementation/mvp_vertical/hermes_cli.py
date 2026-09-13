@@ -15,6 +15,7 @@ from .hermes_run_binding import (
     HermesRunBindingError,
     HermesRunsHttpClient,
     PantheonRunBridgeClient,
+    RoleTraceAttachmentClient,
 )
 from .hermes_runs_observer import (
     HermesMemoryObservationError,
@@ -113,7 +114,20 @@ def _binding(args: argparse.Namespace) -> ExternalHermesRunBinding:
         _required_env("HERMES_API_KEY"),
         timeout=args.timeout,
     )
-    return ExternalHermesRunBinding(observer=observer, pantheon=pantheon, hermes=hermes)
+    trace_base = os.environ.get("PANTHEON_ROLE_TRACE_API_BASE", "").strip()
+    trace_key = os.environ.get("PANTHEON_ROLE_TRACE_API_KEY", "").strip()
+    if bool(trace_base) != bool(trace_key):
+        raise HermesCliError(
+            "PANTHEON_ROLE_TRACE_API_BASE and PANTHEON_ROLE_TRACE_API_KEY "
+            "must be configured together"
+        )
+    role_trace = RoleTraceAttachmentClient(trace_base, trace_key, timeout=args.timeout) if trace_base else None
+    return ExternalHermesRunBinding(
+        observer=observer,
+        pantheon=pantheon,
+        hermes=hermes,
+        role_trace=role_trace,
+    )
 
 
 def _add_runtime_args(

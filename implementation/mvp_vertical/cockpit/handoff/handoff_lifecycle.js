@@ -103,6 +103,12 @@
     host.append(s);
   }
 
+  function publishAdmission(payload) {
+    document.dispatchEvent(new CustomEvent("pantheon:hermes-admission", {
+      detail: { admission: payload || null },
+    }));
+  }
+
   async function post(url, body, humanActor = false) {
     const headers = { Authorization: `Bearer ${token()}`, "Content-Type": "application/json" };
     if (humanActor) headers["X-Pantheon-Human-Actor"] = actor();
@@ -123,6 +129,7 @@
       if (!response.ok) throw new Error(payload.detail || response.statusText);
       lastAdmission = payload;
       if (render) renderAdmission(payload, "Dernière admission", true);
+      publishAdmission(payload);
       buttons();
     } catch (e) {
       $("v2-handoff-message").textContent = `Admission mémorisée non relue : ${e.message}`;
@@ -173,6 +180,7 @@
       lastAdmission = payload;
       sessionStorage.setItem(ACTIVE_ADMISSION_KEY, payload.admission_id);
       renderAdmission(payload);
+      publishAdmission(payload);
       $("v2-handoff-message").textContent = "Admission bornée créée. Pantheon n’a pas lancé Hermes.";
     } catch (e) { $("v2-handoff-message").textContent = `Admission refusée : ${e.message}`; }
     buttons();
@@ -187,6 +195,7 @@
       lastAdmission = payload;
       if (admitted?.admission_id === payload.admission_id) admitted = payload;
       renderAdmission(payload, "Admission révoquée", true);
+      publishAdmission(payload);
       $("v2-handoff-message").textContent = "Admission révoquée avant consommation.";
     } catch (e) { $("v2-handoff-message").textContent = `Révocation refusée : ${e.message}`; }
     buttons();
@@ -214,6 +223,7 @@
   $("v2-handoff-descendants")?.addEventListener("change", () => invalidate("Scope modifié : préparez à nouveau."));
   ["v2-handoff-actor", "v2-handoff-ttl", "v2-handoff-revoke-reason"].forEach(id => $(id)?.addEventListener("input", buttons));
   $("v2-token")?.addEventListener("change", () => void refreshLastAdmission());
+  document.addEventListener("pantheon:hermes-dock-open", () => void refreshLastAdmission({ render: false }));
 
   const remembered = sessionStorage.getItem("pantheon-human-actor");
   if (remembered && $("v2-handoff-actor")) $("v2-handoff-actor").value = remembered;

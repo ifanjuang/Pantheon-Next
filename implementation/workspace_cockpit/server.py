@@ -11,9 +11,12 @@ import json
 import mimetypes
 import os
 from pathlib import Path
+import re
 import sys
 from typing import Any, Iterable
+from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
+from urllib.request import Request, urlopen
 
 import yaml
 
@@ -256,6 +259,8 @@ def scan_workspaces(roots: list[tuple[str, Path]], max_depth: int = 2) -> dict[s
 class CockpitHandler(BaseHTTPRequestHandler):
     roots: list[tuple[str, Path]] = []
     max_depth = 2
+    role_trace_url = ""
+    role_trace_key = ""
 
     def _headers(self, status: HTTPStatus, content_type: str) -> None:
         self.send_response(status)
@@ -276,13 +281,54 @@ class CockpitHandler(BaseHTTPRequestHandler):
         self._headers(status, "application/json; charset=utf-8")
         self.wfile.write(body)
 
+    def _proxy_role_trace(self, upstream_path: str, *, stream: bool = False) -> None:
+        if not self.role_trace_url or not self.role_trace_key:
+            self._json({"error": "role_trace_not_configured"}, HTTPStatus.NOT_FOUND)
+            return
+        headers = {"Authorization": f"Bearer {self.role_trace_key}"}
+        last_event_id = self.headers.get("Last-Event-ID", "").strip()
+        if last_event_id:
+            headers["Last-Event-ID"] = last_event_id
+        request = Request(f"{self.role_trace_url}{upstream_path}", headers=headers)
+        try:
+            response = urlopen(request, timeout=190 if stream else 5)
+        except HTTPError as exc:
+            body = exc.read(16_384)
+            self._headers(HTTPStatus(exc.code), exc.headers.get_content_type() or "application/json")
+            self.wfile.write(body)
+            return
+        except (OSError, URLError):
+            self._json({"error": "role_trace_unavailable"}, HTTPStatus.BAD_GATEWAY)
+            return
+        with response:
+            content_type = response.headers.get("Content-Type", "application/json")
+            self._headers(HTTPStatus.OK, content_type)
+            while True:
+                chunk = response.read(8192)
+                if not chunk:
+                    break
+                self.wfile.write(chunk)
+                if stream:
+                    self.wfile.flush()
+
     def do_GET(self) -> None:  # noqa: N802 - stdlib handler API
         path = urlparse(self.path).path
         if path == "/api/health":
-            self._json({"status": "ok", "read_only": True})
+            self._json({"status": "ok", "read_only": True, "role_trace": bool(self.role_trace_url)})
             return
         if path == "/api/workspaces":
             self._json(scan_workspaces(self.roots, self.max_depth))
+            return
+        if path == "/api/role-traces/latest":
+            self._proxy_role_trace("/internal/role-traces/latest")
+            return
+        role_match = re.fullmatch(r"/api/role-traces/(run_[A-Za-z0-9]{8,128})(/events)?", path)
+        if role_match:
+            run_id, suffix = role_match.groups()
+            self._proxy_role_trace(
+                f"/internal/role-traces/{run_id}{suffix or ''}",
+                stream=suffix == "/events",
+            )
             return
         asset = {"/": "index.html", "/app.js": "app.js", "/styles.css": "styles.css"}.get(path)
         if not asset:
@@ -332,6 +378,14 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if all(workspace["available"] for workspace in result["workspaces"]) else 1
     CockpitHandler.roots = args.root
     CockpitHandler.max_depth = args.max_depth
+    role_trace_url = os.getenv("WORKSPACE_ROLE_TRACE_URL", "").strip().rstrip("/")
+    role_trace_key = os.getenv("WORKSPACE_ROLE_TRACE_KEY", "").strip()
+    if bool(role_trace_url) != bool(role_trace_key):
+        raise SystemExit("WORKSPACE_ROLE_TRACE_URL and WORKSPACE_ROLE_TRACE_KEY must be configured together")
+    if role_trace_url and not role_trace_url.startswith(("http://", "https://")):
+        raise SystemExit("WORKSPACE_ROLE_TRACE_URL must be HTTP(S)")
+    CockpitHandler.role_trace_url = role_trace_url
+    CockpitHandler.role_trace_key = role_trace_key
     server = ThreadingHTTPServer((args.host, args.port), CockpitHandler)
     print(f"workspace-cockpit listening on http://{args.host}:{args.port}", flush=True)
     try:

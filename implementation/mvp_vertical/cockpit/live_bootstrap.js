@@ -50,6 +50,7 @@
       "context/context_selection.js",
       "handoff/handoff_lifecycle.js",
       "handoff/handoff_send.js",
+      "handoff/role_dialogue.js",
       "actions/card_actions.js",
       "actions/decision_request_actions.js",
       "actions/change_candidate_actions.js",

@@ -38,6 +38,8 @@ def test_composed_cockpit_api_routes_precede_static_mount_and_assets_still_serve
         _route_index(app, "/cockpit/workspace-collections/{workspace_ref}")
         < static_index
     )
+    assert _route_index(app, "/cockpit/role-traces/{run_id}") < static_index
+    assert _route_index(app, "/cockpit/role-traces/{run_id}/events") < static_index
 
     client = TestClient(app)
 

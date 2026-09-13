@@ -114,3 +114,93 @@ elements["status-filters"].addEventListener("click", (event) => {
 });
 
 load();
+
+const ROLE_ICONS = Object.freeze({ Athena: "🦉", Argos: "🔎", Themis: "⚖", Apollo: "☀", Hephaistos: "🛠", Iris: "📨", Zeus: "⚡", Mnemosyne: "🧠", Hermes: "⚙" });
+const roleView = {
+  runId: "", cursor: 0, controller: null, stages: new Map(),
+  state: document.getElementById("role-dialogue-state"),
+  events: document.getElementById("role-dialogue-events"),
+};
+
+function roleState(value) { roleView.state.textContent = value; }
+
+function renderRoleStage(event) {
+  if (!event?.stage_id || !event?.visible_role) return;
+  let item = roleView.stages.get(event.stage_id);
+  if (!item) {
+    item = document.createElement("li");
+    item.className = "role-stage";
+    roleView.stages.set(event.stage_id, item);
+    roleView.events.append(item);
+  }
+  item.dataset.phase = event.phase || "updated";
+  item.replaceChildren();
+  const icon = document.createElement("span"); icon.className = "role-stage-icon"; icon.setAttribute("aria-hidden", "true"); icon.textContent = ROLE_ICONS[event.visible_role] || "•";
+  const title = document.createElement("strong"); title.className = "role-stage-title"; title.textContent = `${event.visible_role} — ${event.semantic_function || event.role_family || "Jalon"}`;
+  const status = document.createElement("span"); status.className = "role-stage-status"; status.textContent = event.phase === "completed" ? "terminé" : "en cours";
+  const summary = document.createElement("p"); summary.className = "role-stage-summary"; summary.textContent = event.summary || "Jalon public observé.";
+  const origin = document.createElement("span"); origin.className = "role-stage-origin"; origin.textContent = event.projection === "derived_transient" ? "Dérivé du flux public" : "Événement natif";
+  item.append(icon, title, status, summary, origin);
+}
+
+function consumeRoleBlock(block) {
+  let kind = "message";
+  let id = 0;
+  const data = [];
+  for (const line of block.split("\n")) {
+    if (line.startsWith("event:")) kind = line.slice(6).trim();
+    else if (line.startsWith("id:")) id = Number(line.slice(3).trim());
+    else if (line.startsWith("data:")) data.push(line.slice(5).trimStart());
+  }
+  if (!data.length) return;
+  const event = JSON.parse(data.join("\n"));
+  if (Number.isSafeInteger(id) && id > roleView.cursor) roleView.cursor = id;
+  if (kind === "role.stage") renderRoleStage(event);
+  else if (kind === "role.trace.error") roleState("Rejeu incomplet");
+}
+
+async function followRoleTrace(runId) {
+  if (!runId) return;
+  if (runId !== roleView.runId) {
+    roleView.controller?.abort();
+    roleView.runId = runId; roleView.cursor = 0; roleView.stages.clear(); roleView.events.replaceChildren();
+  }
+  roleView.controller = new AbortController();
+  const headers = roleView.cursor ? { "Last-Event-ID": String(roleView.cursor) } : {};
+  try {
+    roleState("En direct");
+    const response = await fetch(`/api/role-traces/${encodeURIComponent(runId)}/events`, { headers, cache: "no-store", signal: roleView.controller.signal });
+    if (!response.ok || !response.body) throw new Error(`HTTP ${response.status}`);
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    while (true) {
+      const { value, done } = await reader.read();
+      buffer += decoder.decode(value || new Uint8Array(), { stream: !done }).replaceAll("\r\n", "\n");
+      let end;
+      while ((end = buffer.indexOf("\n\n")) >= 0) {
+        const block = buffer.slice(0, end); buffer = buffer.slice(end + 2);
+        if (block.trim()) consumeRoleBlock(block);
+      }
+      if (done) break;
+    }
+    roleState("Terminé");
+  } catch (error) {
+    if (error?.name !== "AbortError") roleState("Trace indisponible");
+  }
+}
+
+async function discoverLatestRoleTrace() {
+  try {
+    const response = await fetch("/api/role-traces/latest", { cache: "no-store" });
+    if (response.status === 404) { roleState("Aucune trace"); return; }
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const trace = await response.json();
+    if (trace.run_id && trace.run_id !== roleView.runId) void followRoleTrace(trace.run_id);
+  } catch (_error) {
+    roleState("Relais indisponible");
+  }
+}
+
+void discoverLatestRoleTrace();
+window.setInterval(discoverLatestRoleTrace, 5000);

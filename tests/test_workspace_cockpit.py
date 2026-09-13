@@ -108,3 +108,12 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     assert "read_only: true" in compose
     assert compose.count(":ro") == 3
     assert "127.0.0.1" in compose
+    assert "role-trace:" in compose
+    assert "ROLE_TRACE_ATTACH_KEY" in compose
+    assert "ROLE_TRACE_READ_KEY" in compose
+    assert "HERMES_ROLE_TRACE_API_KEY" in compose
+    html = (ROOT / "implementation" / "workspace_cockpit" / "static" / "index.html").read_text(encoding="utf-8")
+    javascript = (ROOT / "implementation" / "workspace_cockpit" / "static" / "app.js").read_text(encoding="utf-8")
+    assert 'id="role-dialogue-events"' in html
+    assert "/api/role-traces/latest" in javascript
+    assert "Last-Event-ID" in javascript

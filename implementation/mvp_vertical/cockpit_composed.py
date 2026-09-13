@@ -50,6 +50,11 @@ from .document_structure_api import install_document_structure_routes
 from .entity_relation_api import install_entity_relation_routes
 from .execution_result_api import install_execution_result_routes
 from .human_access_api import install_human_access_routes
+from .hermes_role_trace_relay import (
+    HermesRoleTraceRelay,
+    HermesRunsRoleEventSource,
+    install_role_trace_routes,
+)
 from .knowledge_edit_variant_api import install_knowledge_edit_variant_routes
 from .project_anatomy_api import install_project_anatomy_routes
 from .project_change_variant_api import install_project_change_variant_routes
@@ -113,6 +118,21 @@ def _bearer_token(authorization: str | None) -> str:
     return authorization.removeprefix("Bearer ").strip()
 
 
+def _role_trace_source_from_env() -> HermesRunsRoleEventSource | None:
+    """Build the optional display-only Hermes reader from an explicit pair."""
+
+    base_url = os.getenv("MVP_HERMES_ROLE_TRACE_BASE_URL", "").strip()
+    api_key = os.getenv("MVP_HERMES_ROLE_TRACE_API_KEY", "").strip()
+    if not base_url and not api_key:
+        return None
+    if not base_url or not api_key:
+        raise ValueError(
+            "MVP_HERMES_ROLE_TRACE_BASE_URL and MVP_HERMES_ROLE_TRACE_API_KEY "
+            "must be configured together"
+        )
+    return HermesRunsRoleEventSource(base_url, api_key)
+
+
 def _place_cockpit_static_mount_last(app) -> None:
     """Keep the static `/cockpit` mount behind all composed API extensions."""
     static_mount = next(
@@ -137,7 +157,20 @@ def create_composed_cockpit_app(**kwargs):
     revision_upload_config = kwargs.pop("revision_upload_config", None)
     revision_upload_docling = kwargs.pop("revision_upload_docling", None)
     workspace_roots = kwargs.pop("workspace_roots", None)
+    role_trace_relay = kwargs.pop("role_trace_relay", None) or HermesRoleTraceRelay()
+    role_trace_source = kwargs.pop("role_trace_source", None)
+    if role_trace_source is None:
+        role_trace_source = _role_trace_source_from_env()
     app = create_cockpit_app(initialize_fn=initialize_fn, **kwargs)
+    app.state.role_trace_relay = role_trace_relay
+    app.state.role_trace_source_configured = role_trace_source is not None
+    if role_trace_source is not None:
+        async def attach_registered_run(run_id: str) -> None:
+            await role_trace_relay.start_hermes_source(run_id, role_trace_source)
+
+        # The execution callback resolves this observer dynamically only after
+        # Pantheon has recorded the exact external run as started.
+        app.state.hermes_runtime_start_observer = attach_registered_run
 
     def with_connection(operation):
         conn = app.state.connect_fn()
@@ -217,6 +250,11 @@ def create_composed_cockpit_app(**kwargs):
         require_read_key=require_read_key,
         require_editor_key=require_editor_key,
         require_human_actor=require_human_actor,
+    )
+    install_role_trace_routes(
+        app,
+        relay=role_trace_relay,
+        require_read_key=require_read_key,
     )
     install_contradictory_review_routes(
         app,

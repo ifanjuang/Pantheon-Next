@@ -1,8 +1,12 @@
 # Template Registry
 
-Status: candidate support note — non-executable template registry — documented non-implemented.
+Status: candidate support note — mixed external installation status.
 
-This registry lists the current declarative templates under `templates/`. It does not install, execute, deploy or authorize any runtime, client, skill, flow, MCP service, policy gateway, trace backend or prompt runtime.
+This registry lists the current declarative templates under `templates/`. Their
+presence does not install, execute, deploy or authorize any runtime, client,
+skill, flow, MCP service, policy gateway, trace backend or prompt runtime. The
+Pantheon activity projection has a separate explicit Ubuntu configurator; that
+external installation exception is identified on its own row.
 
 ```text
 Hermes Web/dashboard -> selected external chat/session/runtime interaction baseline
@@ -27,6 +31,7 @@ Pantheon Cockpit     -> governed Cards/navigation/decision/status projections
 | IFJA project context skill candidate | `templates/hermes/skills/ifja-project-context/SKILL.md` | Hermes | skill candidate | non-executable |
 | Source research summary Workflow Manifest | `templates/source_research_summary_workflow_manifest.template.yaml` | Pantheon | workflow governance candidate | non-executable |
 | Visual focus skill candidate | `templates/hermes/skills/visual-focus/SKILL.md` | Hermes | skill candidate | non-executable |
+| Pantheon activity projection skill | `templates/hermes/skills/pantheon-activity-projection/SKILL.md` | Hermes | presentation skill candidate | externally installable; no persistence |
 | Checkpoint manifest | `templates/hermes/run_manifests/checkpoint_manifest.template.yaml` | Hermes | run manifest candidate | non-executable |
 | Devis reprise run manifest | `templates/hermes/run_manifests/devis_reprise_run_manifest.template.yaml` | Hermes | run manifest candidate | non-executable |
 | Context Pack preparation flow | `templates/langflow/flows/context_pack_preparation_flow.template.yaml` | Langflow | deterministic flow candidate | non-executable |
@@ -49,7 +54,7 @@ The former `templates/openwebui/` namespace is retired. Generic execution handof
 Template does not mean implementation.
 Trace does not mean Evidence Pack.
 Manifest does not mean scheduler.
-Skill candidate does not mean installed skill.
+Skill candidate does not mean installed skill unless an explicit external configurator is applied.
 Flow candidate does not mean deployment.
 MCP passport does not mean tool authorization.
 Provenance link does not mean proof.

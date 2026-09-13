@@ -1,10 +1,15 @@
 # Hermes Templates
 
-Status: external Hermes integration templates — inactive in Pantheon Next.
+Status: external Hermes integration templates — inactive by presence; selected artifacts externally installable.
 
 This directory contains candidate templates for future Hermes execution handoffs, returns and skill candidates.
 
-They are not installed Hermes profiles, skills, tools or toolsets. The pre-built browser bundle under `dashboard-plugins/pantheon-modules/` is an installable Hermes dashboard-only plugin template; it executes only after an external operator installs and enables it in Hermes.
+They are not installed Hermes profiles, skills, tools or toolsets merely by
+repository presence. The activity-projection template has an explicit Ubuntu
+configurator, and the pre-built browser bundle under
+`dashboard-plugins/pantheon-modules/` is an installable Hermes dashboard-only
+plugin template. Either executes only after an external operator applies its
+separate installation or enablement step.
 
 Nothing in this directory executes inside Pantheon Next by its presence here.
 
@@ -20,6 +25,10 @@ DESIGN.md   architecture, ownership and monorepo evolution index
 ```
 
 Individual skill candidates remain under `skills/<skill-name>/SKILL.md`.
+
+`profiles/pantheon-governed/SOUL.append.md` is a bounded managed supplement for
+the external governed profile. It is installed only by the explicit Ubuntu
+configurator and does not replace the runtime-owned base `SOUL.md`.
 
 These four files are adapters and indexes. They do not replace their canonical governance owners, install anything or grant authority.
 

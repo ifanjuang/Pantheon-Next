@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json
 from typing import Any
+from urllib.parse import quote
 
 from .hermes_runs_observer import HermesRunsApiObserver
 
@@ -358,6 +359,36 @@ class HermesRunsHttpClient:
         return self._request("GET", f"/v1/runs/{run_id}")
 
 
+class RoleTraceAttachmentClient:
+    """Notify one transient display relay; never controls the Hermes run."""
+
+    def __init__(self, base_url: str, api_key: str, *, timeout: float = 5.0, client: Any | None = None) -> None:
+        self._base_url = str(base_url or "").strip().rstrip("/")
+        self._api_key = str(api_key or "").strip()
+        self._timeout = timeout
+        self._client = client
+        if not self._base_url.startswith(("http://", "https://")) or not self._api_key:
+            raise HermesRunBindingError("Role trace base_url and api_key are required")
+
+    def attach(self, run_id: str) -> dict[str, Any]:
+        client = self._client
+        owns = client is None
+        if owns:
+            import httpx
+            client = httpx.Client(timeout=self._timeout)
+        try:
+            response = client.request(
+                "POST",
+                f"{self._base_url}/internal/role-traces/{quote(run_id, safe='')}/attach",
+                headers={"Authorization": f"Bearer {self._api_key}"},
+                timeout=self._timeout,
+            )
+            return _json_response(response, surface="Role trace attachment")
+        finally:
+            if owns:
+                client.close()
+
+
 class ExternalHermesRunBinding:
     """One-shot junction between a governed admission and the external Hermes run."""
 
@@ -367,10 +398,12 @@ class ExternalHermesRunBinding:
         observer: HermesRunsApiObserver,
         pantheon: PantheonRunBridgeClient,
         hermes: HermesRunsHttpClient,
+        role_trace: RoleTraceAttachmentClient | None = None,
     ) -> None:
         self._observer = observer
         self._pantheon = pantheon
         self._hermes = hermes
+        self._role_trace = role_trace
 
     def launch(self, *, admission_id: str, idempotency_key: str) -> dict[str, Any]:
         observation = self._observer.observe()
@@ -446,6 +479,15 @@ class ExternalHermesRunBinding:
             ) from exc
 
         work_issue = started.get("work_issue") or {}
+        role_trace_notification = "unconfigured"
+        if self._role_trace is not None:
+            try:
+                self._role_trace.attach(run_id)
+                role_trace_notification = "attached"
+            except Exception:
+                # The run is already registered. A presentation-only failure
+                # must remain diagnostic and must never trigger a second run.
+                role_trace_notification = "failed"
         return {
             "kind": "external_hermes_run_launch_receipt",
             "admission_id": admission_id,
@@ -455,6 +497,7 @@ class ExternalHermesRunBinding:
             "run_id": run_id,
             "hermes_submission_status": submitted.get("status"),
             "runtime_start_recorded": started.get("runtime_start_recorded") is True,
+            "role_trace_notification": role_trace_notification,
             "return_expected_issue_version": work_issue.get("version"),
             "session_id": admission_id,
             "session_memory_header_sent": False,
