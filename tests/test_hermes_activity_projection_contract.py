@@ -46,3 +46,30 @@ def test_linux_configurator_is_idempotent_and_keeps_a_backup() -> None:
     assert "cmp -s" in text
     assert "docker restart pantheon-hermes" in text
     assert "projection != persistence" in text
+
+
+def test_whatsapp_governed_routing_is_explicit_scoped_and_non_destructive() -> None:
+    text = CONFIGURE.read_text(encoding="utf-8")
+    assert "--route-whatsapp" in text
+    assert "--whatsapp-chat-id" in text
+    assert "--all-authorized-whatsapp" in text
+    assert '--route-whatsapp requires --whatsapp-chat-id or --all-authorized-whatsapp' in text
+    assert '[$route] + map(select(.name != "pantheon-governed-whatsapp"))' in text
+    assert 'map(select(.name != "pantheon-governed-whatsapp")) + [$route]' in text
+    assert 'if index($profile) then . else . + [$profile] end' in text
+    assert 'if ((update_allowlist == 1))' in text
+    assert '. == null or . == "null"' in text
+    assert 'refusing to replace it' in text
+    assert 'Config key not set: $key' in text
+    assert 'cp -a "$CONFIG_TARGET" "$backup_root/config.yaml"' in text
+
+
+def test_whatsapp_projection_uses_supported_config_not_a_provider_patch() -> None:
+    text = CONFIGURE.read_text(encoding="utf-8")
+    assert "config set gateway.multiplex_profiles true" in text
+    assert 'config set gateway.profile_routes "$merged_routes"' in text
+    assert "config set display.platforms.whatsapp.show_reasoning false" in text
+    assert "config set display.platforms.whatsapp.interim_assistant_messages true" in text
+    assert "config set display.platforms.whatsapp.tool_progress new" in text
+    assert 'config set plugins.stream_reasoning_deltas false' in text
+    assert "no provider patch" in text
