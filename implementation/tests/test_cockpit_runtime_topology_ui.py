@@ -19,18 +19,30 @@ def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def test_runtime_topology_javascript_parses() -> None:
+def _node() -> str:
     node = shutil.which("node")
     if node is None:
         pytest.skip("Node.js is unavailable; JavaScript syntax check skipped")
-    for path in (RUNTIME_TOPOLOGY, D3_LOADER):
-        result = subprocess.run(
-            [node, "--check", str(path)],
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-        assert result.returncode == 0, result.stderr
+    return node
+
+
+def test_runtime_topology_javascript_parses() -> None:
+    result = subprocess.run(
+        [_node(), "--check", str(RUNTIME_TOPOLOGY)],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, result.stderr
+
+    module_result = subprocess.run(
+        [_node(), "--input-type=module", "--check"],
+        input=_read(D3_LOADER),
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert module_result.returncode == 0, module_result.stderr
 
 
 def test_runtime_topology_is_a_separate_read_only_surface() -> None:
