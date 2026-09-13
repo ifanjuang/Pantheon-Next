@@ -69,6 +69,8 @@ def test_handoff_separates_conversation_governance_and_runtime() -> None:
     assert '.v2-role-stage' in css
     assert '.v2-role-graph-lane' in role_graph_css
     assert '.v2-role-graph-node[data-projection="derived_transient"]' in role_graph_css
+    assert '.v2-role-dialogue-events[hidden]' in role_graph_css
+    assert '.v2-role-graph[hidden]' in role_graph_css
     assert 'Last-Event-ID' in role_dialogue
     assert 'Authorization' in role_dialogue
     assert 'stageEvents.set(event.stage_id, { ...event });' in role_dialogue
