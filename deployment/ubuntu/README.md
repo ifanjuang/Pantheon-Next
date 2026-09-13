@@ -97,6 +97,31 @@ presentation for new governed sessions only. It does not expose hidden
 chain-of-thought, create agents, persist Role Signals or implement the Cockpit
 dialogue view.
 
+To route one WhatsApp conversation to the governed profile and enable safe
+progressive Role milestones, use its observed Hermes `chat_id`:
+
+```bash
+deployment/ubuntu/configure-hermes-activity-projection --check \
+  --route-whatsapp --whatsapp-chat-id '<chat-id>'
+sudo deployment/ubuntu/configure-hermes-activity-projection --apply --restart \
+  --route-whatsapp --whatsapp-chat-id '<chat-id>'
+```
+
+Use `--all-authorized-whatsapp` instead of `--whatsapp-chat-id` only when every
+conversation already admitted by the WhatsApp adapter should use
+`pantheon-governed`. The configurator does not widen that adapter allowlist. It
+merges existing profile routes and profile allowlist entries, disables raw
+reasoning display on WhatsApp, enables safe interim assistant messages, and
+keeps a backup of the Hermes configuration. These are supported Hermes settings;
+the provider source and image are not patched.
+
+Hermes routing is based on trusted platform/chat/thread metadata, not on a
+semantic guess about each question. Once a chat reaches `pantheon-governed`, the
+activity-projection skill applies the content-sensitive part: simple requests
+remain quiet, while non-trivial governed work gets compact Role milestones. A
+Hindsight retrieval is observable tool use; it does not by itself activate the
+Mnemosyne responsibility.
+
 Pantheon's live-acceptance collector also contains a transient, read-only
 `role.stage` projector for public Hermes Runs events. It can show canonical Role
 headers as they arrive and real Hermes tool lifecycle stages. It deliberately

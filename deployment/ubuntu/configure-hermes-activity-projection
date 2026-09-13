@@ -6,6 +6,10 @@ HERMES_ROOT="$STATE_ROOT/hermes"
 PROFILE="pantheon-governed"
 APPLY=0
 RESTART=0
+ROUTE_WHATSAPP=0
+WHATSAPP_CHAT_ID=""
+ALL_AUTHORIZED_WHATSAPP=0
+CONTAINER="${HERMES_CONTAINER:-pantheon-hermes}"
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "$SCRIPT_DIR/../.." && pwd)"
 SKILL_SOURCE="$REPO_ROOT/templates/hermes/skills/pantheon-activity-projection/SKILL.md"
@@ -21,10 +25,17 @@ usage() {
 Usage:
   deployment/ubuntu/configure-hermes-activity-projection --check
   sudo deployment/ubuntu/configure-hermes-activity-projection --apply [--restart]
+  deployment/ubuntu/configure-hermes-activity-projection --check --route-whatsapp --whatsapp-chat-id <id>
+  sudo deployment/ubuntu/configure-hermes-activity-projection --apply --route-whatsapp --whatsapp-chat-id <id> [--restart]
+  sudo deployment/ubuntu/configure-hermes-activity-projection --apply --route-whatsapp --all-authorized-whatsapp [--restart]
 
 Installs the versioned presentation skill and managed SOUL supplement into the
 existing pantheon-governed Hermes profile. It does not expose chain-of-thought,
 create agents, persist Role Signals or change task authorization.
+
+WhatsApp routing is opt-in. Prefer --whatsapp-chat-id. The broader
+--all-authorized-whatsapp form affects every chat already admitted by the
+WhatsApp adapter allowlist; it never widens that adapter allowlist.
 USAGE
 }
 
@@ -33,15 +44,178 @@ while (($#)); do
     --check) APPLY=0 ;;
     --apply) APPLY=1 ;;
     --restart) RESTART=1 ;;
+    --route-whatsapp) ROUTE_WHATSAPP=1 ;;
+    --whatsapp-chat-id)
+      shift
+      (($#)) || die "--whatsapp-chat-id requires a value"
+      WHATSAPP_CHAT_ID="$1"
+      ;;
+    --all-authorized-whatsapp) ALL_AUTHORIZED_WHATSAPP=1 ;;
     -h|--help) usage; exit 0 ;;
     *) die "unknown argument: $1" ;;
   esac
   shift
 done
 
+if [[ -n "$WHATSAPP_CHAT_ID" ]] && ((ALL_AUTHORIZED_WHATSAPP == 1)); then
+  die "choose either --whatsapp-chat-id or --all-authorized-whatsapp"
+fi
+if ((ROUTE_WHATSAPP == 1)) && [[ -z "$WHATSAPP_CHAT_ID" ]] && ((ALL_AUTHORIZED_WHATSAPP == 0)); then
+  die "--route-whatsapp requires --whatsapp-chat-id or --all-authorized-whatsapp"
+fi
+if ((ROUTE_WHATSAPP == 0)) && { [[ -n "$WHATSAPP_CHAT_ID" ]] || ((ALL_AUTHORIZED_WHATSAPP == 1)); }; then
+  die "WhatsApp scope requires --route-whatsapp"
+fi
+
 PROFILE_ROOT="$HERMES_ROOT/profiles/$PROFILE"
 SKILL_TARGET="$PROFILE_ROOT/skills/pantheon-activity-projection/SKILL.md"
 SOUL_TARGET="$PROFILE_ROOT/SOUL.md"
+CONFIG_TARGET="$HERMES_ROOT/config.yaml"
+
+hermes_config() {
+  docker exec "$CONTAINER" hermes "$@"
+}
+
+get_optional_config_json() {
+  local key="$1" output status
+  set +e
+  output="$(hermes_config config get "$key" --json 2>&1)"
+  status=$?
+  set -e
+  if ((status == 0)); then
+    printf '%s' "$output"
+  elif [[ "$output" == *"Config key not set: $key"* ]]; then
+    printf 'null'
+  else
+    printf '%s\n' "$output" >&2
+    return "$status"
+  fi
+}
+
+normalize_json_array() {
+  jq -ce '
+    if type == "array" then .
+    elif type == "string" then (fromjson | if type == "array" then . else error("decoded value is not an array") end)
+    elif . == null then []
+    else error("value is not an array")
+    end
+  '
+}
+
+check_whatsapp_runtime() {
+  command -v docker >/dev/null || die "docker is required for WhatsApp routing"
+  command -v jq >/dev/null || die "jq is required for WhatsApp routing"
+  docker inspect -f '{{.State.Running}}' "$CONTAINER" 2>/dev/null | grep -qx true \
+    || die "Hermes container is not running: $CONTAINER"
+
+  routes_raw="$(get_optional_config_json gateway.profile_routes)" \
+    || die "cannot read Hermes gateway.profile_routes"
+  routes="$(printf '%s' "$routes_raw" | normalize_json_array)" \
+    || die "cannot parse Hermes gateway.profile_routes"
+  multiplex="$(hermes_config config get gateway.multiplex_profiles --json 2>/dev/null || true)"
+  [[ "$multiplex" == "true" ]] && log "multi-profile gateway routing is enabled" \
+    || log "multi-profile gateway routing requires enabling"
+
+  if [[ -n "$WHATSAPP_CHAT_ID" ]]; then
+    printf '%s' "$routes" | jq -e --arg profile "$PROFILE" --arg chat "$WHATSAPP_CHAT_ID" '
+      any(.[]; .name == "pantheon-governed-whatsapp" and .enabled != false
+        and .platform == "whatsapp" and .profile == $profile and .chat_id == $chat)
+    ' >/dev/null && log "scoped WhatsApp route is current" \
+      || log "scoped WhatsApp route requires installation or update"
+  else
+    printf '%s' "$routes" | jq -e --arg profile "$PROFILE" '
+      any(.[]; .name == "pantheon-governed-whatsapp" and .enabled != false
+        and .platform == "whatsapp" and .profile == $profile and (has("chat_id") | not))
+    ' >/dev/null && log "authorized-WhatsApp route is current" \
+      || log "authorized-WhatsApp route requires installation or update"
+  fi
+
+  reasoning="$(hermes_config config get display.platforms.whatsapp.show_reasoning --json 2>/dev/null || true)"
+  interim="$(hermes_config config get display.platforms.whatsapp.interim_assistant_messages --json 2>/dev/null || true)"
+  [[ "$reasoning" == "false" ]] && log "WhatsApp private-reasoning display is disabled" \
+    || log "WhatsApp private-reasoning display requires disabling"
+  [[ "$interim" == "true" ]] && log "WhatsApp interim assistant messages are enabled" \
+    || log "WhatsApp interim assistant messages require enabling"
+}
+
+apply_whatsapp_runtime() {
+  command -v docker >/dev/null || die "docker is required for WhatsApp routing"
+  command -v jq >/dev/null || die "jq is required for WhatsApp routing"
+  docker inspect -f '{{.State.Running}}' "$CONTAINER" 2>/dev/null | grep -qx true \
+    || die "Hermes container is not running: $CONTAINER"
+
+  routes_raw="$(get_optional_config_json gateway.profile_routes)" \
+    || die "cannot read Hermes gateway.profile_routes; refusing to replace it"
+  routes="$(printf '%s' "$routes_raw" | normalize_json_array)" \
+    || die "cannot parse Hermes gateway.profile_routes; refusing to replace it"
+
+  if [[ -n "$WHATSAPP_CHAT_ID" ]]; then
+    route="$(jq -cn --arg profile "$PROFILE" --arg chat "$WHATSAPP_CHAT_ID" '{
+      name: "pantheon-governed-whatsapp", platform: "whatsapp", chat_id: $chat,
+      profile: $profile, enabled: true
+    }')"
+  else
+    route="$(jq -cn --arg profile "$PROFILE" '{
+      name: "pantheon-governed-whatsapp", platform: "whatsapp",
+      profile: $profile, enabled: true
+    }')"
+  fi
+  if [[ -n "$WHATSAPP_CHAT_ID" ]]; then
+    # A scoped route must precede any existing platform-wide WhatsApp route.
+    merged_routes="$(printf '%s' "$routes" | jq -ce --argjson route "$route" '
+      [$route] + map(select(.name != "pantheon-governed-whatsapp"))
+    ')" || die "cannot merge Hermes gateway.profile_routes"
+  else
+    # Keep existing scoped routes ahead of this explicitly requested broad route.
+    merged_routes="$(printf '%s' "$routes" | jq -ce --argjson route "$route" '
+      map(select(.name != "pantheon-governed-whatsapp")) + [$route]
+    ')" || die "cannot merge Hermes gateway.profile_routes"
+  fi
+
+  allowlist_raw="$(get_optional_config_json gateway.multiplex_profile_allowlist)" \
+    || die "cannot read Hermes gateway.multiplex_profile_allowlist; refusing to alter routing"
+  update_allowlist=0
+  if ! printf '%s' "$allowlist_raw" | jq -e '. == null or . == "null"' >/dev/null; then
+    allowlist="$(printf '%s' "$allowlist_raw" | normalize_json_array)" \
+      || die "cannot parse Hermes gateway.multiplex_profile_allowlist"
+    merged_allowlist="$(printf '%s' "$allowlist" | jq -ce --arg profile "$PROFILE" '
+      map(select(type == "string")) | if index($profile) then . else . + [$profile] end
+    ')" || die "cannot merge Hermes gateway.multiplex_profile_allowlist"
+    update_allowlist=1
+  fi
+
+  hermes_config config set gateway.multiplex_profiles true >/dev/null
+  if ((update_allowlist == 1)); then
+    hermes_config config set gateway.multiplex_profile_allowlist "$merged_allowlist" >/dev/null
+  fi
+  hermes_config config set gateway.profile_routes "$merged_routes" >/dev/null
+  hermes_config config set display.platforms.whatsapp.show_reasoning false >/dev/null
+  hermes_config config set display.platforms.whatsapp.interim_assistant_messages true >/dev/null
+  hermes_config config set display.platforms.whatsapp.tool_progress new >/dev/null
+  hermes_config -p "$PROFILE" config set display.show_reasoning false >/dev/null
+  hermes_config -p "$PROFILE" config set display.show_commentary true >/dev/null
+  hermes_config -p "$PROFILE" config set display.interim_assistant_messages true >/dev/null
+  hermes_config -p "$PROFILE" config set plugins.stream_reasoning_deltas false >/dev/null
+
+  observed_routes="$(hermes_config config get gateway.profile_routes --json)"
+  if [[ -n "$WHATSAPP_CHAT_ID" ]]; then
+    printf '%s' "$observed_routes" | normalize_json_array | jq -e \
+      --arg profile "$PROFILE" --arg chat "$WHATSAPP_CHAT_ID" '
+        any(.[]; .name == "pantheon-governed-whatsapp" and .enabled != false
+          and .platform == "whatsapp" and .profile == $profile and .chat_id == $chat)
+      ' >/dev/null || die "Hermes did not retain the scoped governed WhatsApp route"
+  else
+    printf '%s' "$observed_routes" | normalize_json_array | jq -e --arg profile "$PROFILE" '
+      any(.[]; .name == "pantheon-governed-whatsapp" and .enabled != false
+        and .platform == "whatsapp" and .profile == $profile and (has("chat_id") | not))
+    ' >/dev/null || die "Hermes did not retain the authorized-WhatsApp governed route"
+  fi
+  [[ "$(hermes_config config get display.platforms.whatsapp.show_reasoning --json)" == "false" ]] \
+    || die "Hermes did not retain WhatsApp show_reasoning=false"
+  [[ "$(hermes_config config get display.platforms.whatsapp.interim_assistant_messages --json)" == "true" ]] \
+    || die "Hermes did not retain WhatsApp interim_assistant_messages=true"
+  log "configured supported Hermes routing/display settings (no provider patch)"
+}
 
 [[ -f "$SKILL_SOURCE" ]] || die "skill source missing: $SKILL_SOURCE"
 [[ -f "$SOUL_APPEND_SOURCE" ]] || die "SOUL supplement missing: $SOUL_APPEND_SOURCE"
@@ -58,6 +232,7 @@ if ((APPLY == 0)); then
   else
     log "managed SOUL block requires installation"
   fi
+  if ((ROUTE_WHATSAPP == 1)); then check_whatsapp_runtime; fi
   log "check only; no runtime state changed"
   exit 0
 fi
@@ -71,6 +246,7 @@ backup_root="$STATE_ROOT/backups/hermes-activity-$stamp"
 install -d -m 0700 "$backup_root"
 cp -a "$SOUL_TARGET" "$backup_root/SOUL.md"
 if [[ -f "$SKILL_TARGET" ]]; then cp -a "$SKILL_TARGET" "$backup_root/SKILL.md"; fi
+if ((ROUTE_WHATSAPP == 1)) && [[ -f "$CONFIG_TARGET" ]]; then cp -a "$CONFIG_TARGET" "$backup_root/config.yaml"; fi
 
 install -d -m 0755 "$(dirname -- "$SKILL_TARGET")"
 install -m 0644 "$SKILL_SOURCE" "$SKILL_TARGET"
@@ -96,6 +272,10 @@ chmod 0600 "$SOUL_TARGET"
 
 log "installed skill and managed SOUL block for $PROFILE"
 log "backup: $backup_root"
+
+if ((ROUTE_WHATSAPP == 1)); then
+  apply_whatsapp_runtime
+fi
 
 if ((RESTART == 1)); then
   docker restart pantheon-hermes >/dev/null
