@@ -1,0 +1,55 @@
+name: Temporary Hermes 0.21.2 tool-search fixture adaptation
+
+on:
+  push:
+    branches:
+      - codex/governed-runtime-capabilities
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: codex/governed-runtime-capabilities
+          fetch-depth: 0
+      - name: Adapt deterministic fixtures to per-query tool search
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          old = '{"queries": ["pantheon context manifest entity"], "limit": 5},'
+          new = '{"queries": ["pantheon context manifest", "pantheon context entity"], "limit": 5},'
+          for raw_path in (
+              "implementation/tools/hermes_runtime_lab_fixture.py",
+              "implementation/tools/hermes_project_variant_lab_fixture.py",
+          ):
+              path = Path(raw_path)
+              text = path.read_text(encoding="utf-8")
+              if text.count(old) != 1:
+                  raise SystemExit(f"expected one legacy query in {raw_path}, found {text.count(old)}")
+              path.write_text(text.replace(old, new), encoding="utf-8")
+
+          test_path = Path("implementation/tests/test_hermes_runtime_lab_acceptance_contract.py")
+          text = test_path.read_text(encoding="utf-8")
+          needle = '    assert \'"name": "pantheon_context_entity"\' in raw\n'
+          assertion = '    assert \'"queries": ["pantheon context manifest", "pantheon context entity"]\' in raw\n'
+          if assertion not in text:
+              if text.count(needle) != 1:
+                  raise SystemExit(f"expected one fixture assertion insertion point, found {text.count(needle)}")
+              text = text.replace(needle, needle + assertion)
+              test_path.write_text(text, encoding="utf-8")
+          PY
+      - name: Commit bounded fixture adaptation
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add implementation/tools/hermes_runtime_lab_fixture.py implementation/tools/hermes_project_variant_lab_fixture.py implementation/tests/test_hermes_runtime_lab_acceptance_contract.py
+          git diff --cached --quiet && exit 0
+          git commit -m "test(hermes): align tool search fixture with 0.21.2"
+          git push origin HEAD:codex/governed-runtime-capabilities
