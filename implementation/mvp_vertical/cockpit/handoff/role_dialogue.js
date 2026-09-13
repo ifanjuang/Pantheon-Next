@@ -62,6 +62,7 @@
     observedOrder.clear();
     $("v2-role-dialogue-events")?.replaceChildren();
     resetGraph();
+    window.PantheonRuntimeTopology?.reset?.(runId);
   }
 
   function stageDetails(host, values) {
@@ -259,6 +260,7 @@
     const payload = JSON.parse(data.join("\n"));
     if (Number.isSafeInteger(id) && id > lastCursor) lastCursor = id;
     if (kind === "role.stage") renderStage(payload);
+    else if (kind === "runtime.subagent") window.PantheonRuntimeTopology?.consume?.(payload);
     else if (kind === "role.trace.error") setState("Rejeu incomplet");
   }
 
