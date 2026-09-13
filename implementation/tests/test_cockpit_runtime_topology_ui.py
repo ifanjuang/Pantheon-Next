@@ -52,7 +52,7 @@ def test_runtime_topology_is_a_separate_read_only_surface() -> None:
 
     assert 'kind === "runtime.subagent"' in dialogue
     assert "PantheonRuntimeTopology?.consume" in dialogue
-    assert dialogue.count("/events`") == 1
+    assert dialogue.count("role-traces/${encodeURIComponent(runId)}/events") == 1
     assert "reasoning.available" not in dialogue
 
     assert "event.governed_identity !== false" in runtime
@@ -91,4 +91,4 @@ def test_runtime_topology_styles_do_not_add_a_fifth_local_stylesheet() -> None:
     assert len(local_styles) == 4
     assert "pantheon-runtime-topology-styles" in runtime
     assert ".v2-runtime-topology-link--run" in runtime
-    assert ".v2-runtime-topology-node circle[data-selected=\"true\"]" in runtime
+    assert '.v2-runtime-topology-node circle[data-selected="true"]' in runtime
