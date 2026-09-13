@@ -31,6 +31,9 @@
       }
     }
 
+    const { ensureD3, d3Version } = await import("./visualization/d3_loader.js");
+    window.PantheonD3Loader = Object.freeze({ ensureD3, d3Version });
+
     const { loadClassicScriptsInOrder } = await import("./boot/classic_script_loader.js");
     const scripts = [
       "shell_controls.js",
@@ -50,6 +53,7 @@
       "context/context_selection.js",
       "handoff/handoff_lifecycle.js",
       "handoff/handoff_send.js",
+      "handoff/runtime_topology.js",
       "handoff/role_dialogue.js",
       "actions/card_actions.js",
       "actions/decision_request_actions.js",
