@@ -14,11 +14,12 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **934**.
+Total indexed entries: **935**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-09-13 | `2026/Q3/2026-09-13-hermes-general-governed-method.md` | AI log — Hermes general governed method |
 | 2026-09-12 | `2026/Q3/2026-09-12-hermes-visible-role-projection-v1.md` | AI log — Hermes visible Role projection v1 |
 | 2026-09-12 | `2026/Q3/2026-09-12-hermes-runtime-efficiency-qualification.md` | AI log — Hermes runtime-efficiency qualification harness |
 | 2026-09-12 | `2026/Q3/2026-09-12-hermes-role-trace-relay-v3.md` | AI log — Hermes Role trace relay v3 |
