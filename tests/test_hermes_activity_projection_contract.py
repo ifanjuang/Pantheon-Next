@@ -21,6 +21,10 @@ def test_activity_projection_skill_has_bounded_visible_contract() -> None:
     assert "only meaningful milestones" in text
     assert "do not invent one merely" in text
     assert "Hermes is a runtime, not a Pantheon Role" in text
+    assert "## Observable Role outcomes" in text
+    assert "`OK`, `réserve` or `blocage`" in text
+    assert "draft complete != transmission authorized" in text
+    assert "Do not activate extra Roles merely to populate" in text
     for role in (
         "Athena", "Argos", "Themis", "Apollo", "Hephaistos", "Iris", "Zeus", "Mnemosyne"
     ):

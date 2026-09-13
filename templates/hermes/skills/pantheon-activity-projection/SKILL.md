@@ -113,6 +113,24 @@ A `→ Relais` line means the next responsibility, not a new agent or dispatch. 
 Hermes actually delegates runtime work, report that separately as an observed
 Hermes delegation.
 
+## Observable Role outcomes
+
+Every Role that is materially shown must close its contribution with one
+observable outcome: `OK`, `réserve` or `blocage`, plus the smallest useful
+result or acceptance criterion. Do not activate extra Roles merely to populate
+a checklist, and do not confuse a Role outcome with final task approval.
+
+For a drafted communication, typical outcomes are: objective and recipient
+grounded (Athena), material facts checked (Argos), commitments/confidentiality
+reviewed (Themis), wording made clear (Apollo), tone/channel adapted (Iris), and
+final readiness stated (Zeus). Use only those that materially contribute.
+
+```text
+draft complete != transmission authorized
+Role result OK != whole task approved
+unused Role != missing validation
+```
+
 ## Source citation and provenance
 
 When a source materially supports or limits a milestone, assign stable task-local
