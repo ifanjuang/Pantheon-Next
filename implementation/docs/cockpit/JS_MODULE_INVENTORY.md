@@ -8,13 +8,14 @@ This inventory describes the browser-side Cockpit code loaded from `mvp_vertical
 
 `index.html` loads `cockpit_bootstrap.js`.
 
-Live mode then loads `live_bootstrap.js`, which first loads the module boundaries for registries, projection definitions, Swiper and ordered classic scripts:
+Live mode then loads `live_bootstrap.js`, which first loads the module boundaries for registries, projection definitions, Swiper, the lazy D3 loader and ordered classic scripts:
 
 - `rendering/tag_icons.js`;
 - `projection/navigation_registry_loader.js`;
 - `projection/card_projection_definition_loader.js`;
 - `navigation/swiper_loader.js`;
 - `live_collection_adapter.js` when Swiper is available;
+- `visualization/d3_loader.js`, which exposes lazy D3 acquisition but does not load D3 until Runtime Topology needs it;
 - `boot/classic_script_loader.js`.
 
 The ordered classic chain is:
@@ -35,24 +36,25 @@ The ordered classic chain is:
 14. `information_view_adapter.js`;
 15. `context/context_selection.js`;
 16. `handoff/handoff_lifecycle.js`;
-17. `handoff/role_dialogue.js`;
-18. `handoff/handoff_send.js`;
-19. `actions/card_actions.js`;
-20. `actions/decision_request_actions.js`;
-21. `actions/change_candidate_actions.js`;
-22. `actions/change_candidate_review.js`;
-23. `schema_editor.js`;
-24. `contacts_editor.js`;
-25. `information_create.js`;
-26. `interactions/card_interactions.js`;
-27. `map/map_graph_model.js`;
-28. `map/map_layouts.js`;
-29. `map/map_tokens.js`;
-30. `map/map_corroboration.js`;
-31. `map/map_bundle.js`;
-32. `map/map_view.js`;
-33. `map/map_mount.js`;
-34. `map_binding.js`.
+17. `handoff/handoff_send.js`;
+18. `handoff/runtime_topology.js`;
+19. `handoff/role_dialogue.js`;
+20. `actions/card_actions.js`;
+21. `actions/decision_request_actions.js`;
+22. `actions/change_candidate_actions.js`;
+23. `actions/change_candidate_review.js`;
+24. `schema_editor.js`;
+25. `contacts_editor.js`;
+26. `information_create.js`;
+27. `interactions/card_interactions.js`;
+28. `map/map_graph_model.js`;
+29. `map/map_layouts.js`;
+30. `map/map_tokens.js`;
+31. `map/map_corroboration.js`;
+32. `map/map_bundle.js`;
+33. `map/map_view.js`;
+34. `map/map_mount.js`;
+35. `map_binding.js`.
 
 The read-only knowledge-map lens (`map/`) binds to the projection snapshot
 (`window.PantheonCockpitGraph`) exposed by `projection/cockpit_projection.js`.
@@ -64,6 +66,14 @@ fetches or mutates governed state (`map view != data model`, `projection != auth
 
 `live_collection_adapter.js` imports `rendering/card_renderer.js` directly. The live collection receives canonical card structure before mount.
 
+Runtime Topology is a separate read-only presentation path. `role_dialogue.js`
+keeps the single authenticated Role Trace SSE connection and routes only
+`runtime.subagent` projections to `handoff/runtime_topology.js`.
+`runtime_topology.js` does not fetch independently. It renders explicit Hermes
+runtime identifiers only and may ask `visualization/d3_loader.js` to obtain the
+pinned D3 runtime lazily. The D3 layout is presentation only and never becomes
+runtime state, a scheduler, a causal model or governance authority.
+
 Demo mode uses the same chain. `live_bootstrap.js` reads `?mode=demo`, loads
 `demo_bootstrap.js` to substitute the fixture layer, and then continues through the
 identical renderer, provider and classic-script sequence. There is no second demo
@@ -74,16 +84,17 @@ application and no second provider.
 ### Entrypoints and boot
 
 - `cockpit_bootstrap.js`: canonical browser entrypoint and visible boot failure. It selects no mode.
-- `live_bootstrap.js`: mode detection and state, ordered application startup and visible failure projection. It records whether Swiper navigation is available; when it is not, it exposes the existing previous/next controls so the supported fallback remains navigable.
+- `live_bootstrap.js`: mode detection and state, ordered application startup and visible failure projection. It records whether Swiper navigation is available; when it is not, it exposes the existing previous/next controls so the supported fallback remains navigable. It exposes the lazy D3 loader without eagerly loading D3.
 - `boot/classic_script_loader.js`: ordered loading of explicitly listed classic scripts; it owns no domain state.
 - `navigation/swiper_loader.js`: optional Swiper acquisition, version pinning and readiness metadata.
+- `visualization/d3_loader.js`: optional D3 acquisition, fixed version, SRI and readiness metadata. Loading D3 does not create graph state or authority.
 - `demo_bootstrap.js`: live renderer demo data bootstrap.
 
 ### Collection and navigation
 
 - `live_collection_adapter.js`: collection integration boundary and canonical renderer consumer.
-- `collection/collection_controller.js`: collection lifecycle.
-- `collection/motion_adapter.js`: sole Swiper instance/API boundary.
+- `collection/collection_controller.js`: collection lifecycle and the single caller of responsive collection motion.
+- `collection/motion_adapter.js`: sole Swiper instance/API boundary. Compact mobile collections expose the same Swiper navigation with a fraction position indicator; this does not create a second navigation model.
 - `collection/navigation_state.js`: navigation state.
 - `providers/live_provider.js`: live collection snapshots.
 - `spatial_navigation.js`: spatial sibling, descend, ascend and root navigation state.
@@ -93,7 +104,7 @@ application and no second provider.
 
 Registry source names are projection inputs only: they are neither endpoint declarations nor authority grants.
 
-Swiper must remain isolated behind `collection/motion_adapter.js` for instance construction and navigation APIs. Compact cross-axis vertical gestures are translated by the collection adapter into the existing spatial ascend/descend controls; they do not create a second navigation state. When Swiper is unavailable, the existing button controls remain the compatibility path rather than a second navigation model.
+Swiper must remain isolated behind `collection/motion_adapter.js` for instance construction and navigation APIs. Compact cross-axis vertical gestures are translated by the collection adapter into the existing spatial ascend/descend controls; they do not create a second navigation state. Mobile fraction pagination is presentation-only. When Swiper is unavailable, the existing button controls remain the compatibility path rather than a second navigation model.
 
 ### Rendering and projection
 
@@ -103,6 +114,7 @@ Swiper must remain isolated behind `collection/motion_adapter.js` for instance c
 - `projection/cockpit_projection.js`: card-model normalization, direct optional I7 Capability-governance presentation, Cockpit state, navigation orchestration and bounded non-Swiper fallback. Root card identities are derived from the Navigation Registry and metadata remain owned by `card_projection_definitions.json`. It delegates all parent-child assembly to `child_collection_assembler.js`.
 - `projection/decision_request_projection.js`: projects one Decision Request identity as an attention card. It does not create a Decision, classify a Project, transition Work or authorize execution.
 - `projection/project_anatomy_projection.js`: presentation-only adapter for the server-calculated Project Anatomy read model. It projects one secondary `Anatomie du projet` card, stable-object cards and explicitly unmapped source-representation cards. It does not infer hierarchy, absence, authorization, Evidence or canonical state and exposes no actions.
+- `handoff/runtime_topology.js`: read-only rendering of explicit `runtime.subagent` nodes and explicit `parent_id` links. Its synthetic run root is display containment only; missing parents are not inferred and D3 is only a replaceable layout layer.
 - `structured_interface.js`: structured interface projection.
 - `project_claim_view_adapter.js`: ProjectClaim projection adapter.
 - `information_view_adapter.js`: Information projection adapter.
@@ -118,8 +130,8 @@ The exact Capability fields remain projection-only. Their presence in a Tool Car
 - `actions/change_candidate_actions.js`: human apply/reject actions for ChangeCandidates.
 - `actions/change_candidate_review.js`: human-only structured revision request, review annotations and append-only history projection. It creates no Hermes run and does not mutate the Project.
 - `handoff/handoff_lifecycle.js`: handoff preview, submission, bounded admission and revocation lifecycle.
-- `handoff/role_dialogue.js`: read-only progressive Role trace projection for one already-admitted Hermes run; it exposes no run-control or approval action.
 - `handoff/handoff_send.js`: convenience adapter that prepares then submits a handoff; it does not admit or dispatch execution.
+- `handoff/role_dialogue.js`: read-only progressive Role trace projection for one already-admitted Hermes run and the sole browser consumer of the Role Trace SSE. It multiplexes display events to Role Trace or Runtime Topology and exposes no run-control or approval action.
 
 ### Context, bindings and data
 
@@ -147,6 +159,7 @@ The exact Capability fields remain projection-only. Their presence in a Tool Car
 3. `live_bootstrap.js` still combines mode state, ordered script loading and failure projection.
 4. Classic scripts communicate through globals, so imports alone are insufficient to prove a file dead.
 5. Swiper instance construction and navigation APIs remain isolated behind `collection/motion_adapter.js`.
+6. D3 is an optional runtime-topology layout dependency only; topology data ownership remains outside D3.
 
 ## Dead-code proof
 

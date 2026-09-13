@@ -12,6 +12,7 @@ const EXPANDED_MIN_CARD_WIDTH = 230;
 const EXPANDED_GAP = 16;
 const EXPANDED_HORIZONTAL_PADDING = 36;
 const EXPANDED_MAX_ITEMS = 6;
+const MOBILE_QUERY = "(max-width: 620px)";
 const INTERACTIVE_SELECTOR = "button,input,select,textarea,a,[contenteditable='true']";
 
 export function canExpandCollection({ width, count }) {
@@ -43,6 +44,28 @@ function createShell(mount, className, label) {
   return shell;
 }
 
+function createMobilePagination(shell) {
+  const pagination = document.createElement("div");
+  pagination.className = "swiper-pagination swiper-pagination-fraction v3-mobile-card-pagination";
+  pagination.setAttribute("aria-label", "Position dans la collection");
+  pagination.style.position = "absolute";
+  pagination.style.left = "50%";
+  pagination.style.bottom = "max(8px, env(safe-area-inset-bottom))";
+  pagination.style.width = "auto";
+  pagination.style.transform = "translateX(-50%)";
+  pagination.style.zIndex = "5";
+  pagination.style.padding = ".22rem .55rem";
+  pagination.style.borderRadius = "999px";
+  pagination.style.background = "rgb(13 14 17 / 72%)";
+  pagination.style.color = "#fff";
+  pagination.style.fontSize = ".74rem";
+  pagination.style.fontWeight = "800";
+  pagination.style.pointerEvents = "none";
+  pagination.hidden = true;
+  shell.append(pagination);
+  return pagination;
+}
+
 export function createWindowedMotion({
   mount,
   renderAt,
@@ -55,10 +78,23 @@ export function createWindowedMotion({
   if (typeof renderAt !== "function") throw new Error("MotionAdapter requires renderAt");
 
   const shell = createShell(mount, "swiper v3-swiper v3-collection-swiper", label);
+  const pagination = createMobilePagination(shell);
+  const mobile = window.matchMedia(MOBILE_QUERY);
   let count = 0;
+
+  function syncPaginationVisibility() {
+    pagination.hidden = !mobile.matches || count < 2;
+  }
 
   const swiper = new window.Swiper(shell, {
     ...BASE_OPTIONS,
+    threshold: 6,
+    resistanceRatio: .62,
+    watchOverflow: true,
+    pagination: {
+      el: pagination,
+      type: "fraction",
+    },
     virtual: {
       enabled: true,
       cache: false,
@@ -82,11 +118,18 @@ export function createWindowedMotion({
     },
   });
 
+  function refreshPagination() {
+    swiper.pagination?.render?.();
+    swiper.pagination?.update?.();
+    syncPaginationVisibility();
+  }
+
   function mountCount(nextCount, index = 0) {
     count = Math.max(0, Number(nextCount) || 0);
     swiper.virtual.slides = new Array(count).fill(null).map((_, position) => position);
     swiper.virtual.update(true);
     goTo(index, { animate: false });
+    refreshPagination();
   }
 
   function extendTo(nextCount) {
@@ -95,12 +138,14 @@ export function createWindowedMotion({
       swiper.virtual.appendSlide(position);
     }
     count = nextCount;
+    refreshPagination();
   }
 
   function goTo(index, { animate = true } = {}) {
     if (!count) return;
     const target = Math.max(0, Math.min(count - 1, Number(index) || 0));
     swiper.slideTo(target, animate ? undefined : 0, false);
+    refreshPagination();
   }
 
   function move(delta) {
@@ -110,11 +155,16 @@ export function createWindowedMotion({
 
   function refresh() {
     swiper.virtual.update(true);
+    refreshPagination();
   }
 
   function activeElement() {
     return swiper.slides?.[swiper.activeIndex] || null;
   }
+
+  const onMobileChange = () => syncPaginationVisibility();
+  mobile.addEventListener?.("change", onMobileChange);
+  syncPaginationVisibility();
 
   return Object.freeze({
     element: shell,
@@ -126,7 +176,11 @@ export function createWindowedMotion({
     activeElement,
     lock() { swiper.allowTouchMove = false; },
     unlock() { swiper.allowTouchMove = true; },
-    dispose() { swiper.destroy(true, true); shell.remove(); },
+    dispose() {
+      mobile.removeEventListener?.("change", onMobileChange);
+      swiper.destroy(true, true);
+      shell.remove();
+    },
     get index() { return swiper.activeIndex; },
     get count() { return count; },
     get presentation() { return "compact"; },
@@ -386,6 +440,8 @@ export function createDeckMotion({
     ...BASE_OPTIONS,
     direction: "vertical",
     initialSlide: initial,
+    threshold: 6,
+    resistanceRatio: .62,
     on: {
       touchStart() { onMoveState(true); },
       sliderMove() { onMoveState(true); },
