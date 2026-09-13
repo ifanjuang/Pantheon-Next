@@ -64,7 +64,7 @@ def test_mobile_swiper_preserves_windowing_vertical_navigation_and_fail_closed_f
 
 
 def test_workspace_inventory_is_not_reinterpreted_as_the_governed_card_carousel() -> None:
-    workspace = ROOT.parent / "workspace_cockpit" / "static"
+    workspace = ROOT / "workspace_cockpit" / "static"
     index = (workspace / "index.html").read_text(encoding="utf-8")
     app = (workspace / "app.js").read_text(encoding="utf-8")
 
