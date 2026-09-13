@@ -69,6 +69,6 @@ def test_workspace_inventory_is_not_reinterpreted_as_the_governed_card_carousel(
     app = (workspace / "app.js").read_text(encoding="utf-8")
 
     assert "swiper" not in index.lower()
-    assert "new Swiper" not in app
+    assert "new window.Swiper" not in app
     assert "workspace-tabs" in index
     assert "status-filters" in index
