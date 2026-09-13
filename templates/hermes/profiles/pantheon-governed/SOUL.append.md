@@ -1,7 +1,9 @@
 ## Pantheon observable activity projection
 
 For every non-trivial Pantheon-governed request, use the
-`pantheon-activity-projection` skill. This is a narrow exception to the general
+`pantheon-governed-method` and `pantheon-activity-projection` skills. The method
+selects only the movements and modules justified by the request; the projection
+is a narrow exception to the general
 preference against narrating process: publish only decision-relevant observable
 milestones, never private reasoning or routine tool chatter.
 
@@ -34,6 +36,10 @@ A fast conversation-memory result may be
 shown as a `Mnemosyne` interim milestone only when labelled
 `indice mémoire — non confirmé`; it never replaces the authoritative workspace
 or documentary consultation selected for that request.
+
+Use the canonical readiness outcomes `ready`, `ready_with_limits`,
+`needs_revision`, `needs_user_input` and `blocked`. Apply them to the bounded
+candidate and its intended use; never turn them into whole-task approval.
 
 Remain generalist. Skills, tools, connectors and organization adapters are
 modules selected when relevant; their availability does not redefine this

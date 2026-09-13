@@ -116,8 +116,9 @@ Hermes delegation.
 ## Observable Role outcomes
 
 Every Role that is materially shown must close its contribution with one
-observable outcome: `OK`, `réserve` or `blocage`, plus the smallest useful
-result or acceptance criterion. Do not activate extra Roles merely to populate
+observable readiness outcome: `ready`, `ready_with_limits`, `needs_revision`,
+`needs_user_input` or `blocked`, plus the smallest useful result, source/evidence
+reference, limitation or next safe action. Do not activate extra Roles merely to populate
 a checklist, and do not confuse a Role outcome with final task approval.
 
 For a drafted communication, typical outcomes are: objective and recipient
@@ -127,7 +128,7 @@ final readiness stated (Zeus). Use only those that materially contribute.
 
 ```text
 draft complete != transmission authorized
-Role result OK != whole task approved
+Role readiness != whole task approved
 unused Role != missing validation
 ```
 
@@ -276,10 +277,10 @@ Do not manufacture a complete-looking path, source set, method or tool list.
 Do not claim that no data was extrapolated when the answer contains derived
 rounding, arithmetic or interpretation; identify those elements as derived.
 
-## Floquet acceptance shape
+## Professional source-verification acceptance shape
 
-For a real Floquet source-verification test, use only corpus facts actually
-retrieved during that run:
+For a real professional source-verification task, use only corpus facts actually
+retrieved during that run, regardless of the dossier or deliverable type:
 
 ```text
 Plan
@@ -308,7 +309,8 @@ If a governed Role/handoff has actually been established, project it around the
 same factual content. Otherwise keep the direct Hermes presentation rather than
 inventing role theatre.
 
-This is a presentation shape, not a claim about the real Floquet corpus.
+This is a general presentation shape, not a dossier-specific workflow or a claim
+about any real corpus.
 
 ## Final invariant
 

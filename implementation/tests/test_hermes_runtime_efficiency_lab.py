@@ -24,7 +24,7 @@ def _observation(**overrides):
     raw = {
         "case_id": "large-tool-output-01",
         "variant": "native",
-        "runtime_identity": "nousresearch/hermes-agent:v2026.8.31",
+        "runtime_identity": "nousresearch/hermes-agent:v2026.9.11",
         "model_identity": "qualification-model",
         "profile_identity": "pantheon-governed",
         "settings_digest": "sha256:settings-1",

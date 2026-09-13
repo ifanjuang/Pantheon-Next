@@ -42,8 +42,9 @@ def test_ifja_project_context_routes_existing_sources_without_new_authority():
 
     assert "generic `pantheon-request-intake` semantic adapter" in text
     assert "Do not create an IFJA-specific K/V/C or trigger classifier here" in text
-    assert "bounded HTTP policy service" in text
-    assert "do not assume that the consultation-only MCP binding exposes classification" in text
+    assert "same bounded read-only policy meaning" in text
+    assert "reviewed governed MCP binding exposes" in text
+    assert "`classify_request`, `evaluate_preflight`" in text
     assert "return a Capability Gap" in text
     assert "Do not derive K/V/C" in text
     assert "Do not call Pantheon mechanically for trivial consultation" in text
@@ -54,10 +55,12 @@ def test_ifja_project_context_routes_existing_sources_without_new_authority():
     assert "runtime success != authorization" in text
     assert "projection != persistence" in text
     assert "### 6. Select an artifact destination explicitly" in text
-    assert "canonical destination named by the current dossier manifest" in text
+    assert "exact destination already admitted by the current Task Contract" in text
+    assert "only when its admitted contract" in text
     assert "ask one short clarification" in text
     assert "Do not create parallel copies in multiple systems silently" in text
-    assert "admitted capability catalogue and dossier manifest" in text
+    assert "admitted capability catalogue and available governed" in text
+    assert "do not assume that every dossier manifest defines a destination" in text
     assert "local Markdown draft followed by a separately approved" in text
     assert "publication step" in text
     assert "Google connection available != external write authorized" in text

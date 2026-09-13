@@ -30,7 +30,7 @@ from . import context_admission
 # hermes_runtime` fails when the distribution lock moves off this version, which
 # forces the marker to be re-verified against the new runtime instead of silently
 # ceasing to match.
-QUALIFIED_HERMES_VERSION = "0.21.0"
+QUALIFIED_HERMES_VERSION = "0.21.2"
 
 # `[^\n]+` rather than `[^\]\n]+`: an attachment named `report [final].pdf`
 # produces `[Content of report [final].pdf]:`, which a bracket-excluding class

@@ -13,15 +13,20 @@ BIND_LOCAL_MCP=0
 CURATED_DEFAULT_SKILLS=0
 IFJA_ADAPTER=0
 CONTAINER="${HERMES_CONTAINER:-pantheon-hermes}"
+PANTHEON_POLICY_TOOLS_JSON='["list_sources","read_doctrine","explain_governance_structure","get_consultation_catalog","explain_architecture","get_capability_status","classify_request","evaluate_preflight","prepare_task_contract_skeleton","prepare_evidence_pack_skeleton","plan_context_pack","validate_context_pack"]'
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "$SCRIPT_DIR/../.." && pwd)"
 SKILL_NAMES=(
+  external-commitment-guard
   pantheon-activity-projection
+  pantheon-governed-method
   pantheon-request-intake
   source-research
 )
 SKILL_SOURCES=(
+  "$REPO_ROOT/templates/hermes/skills/external-commitment-guard"
   "$REPO_ROOT/templates/hermes/skills/pantheon-activity-projection"
+  "$REPO_ROOT/templates/hermes/skills/pantheon-governed-method"
   "$REPO_ROOT/templates/hermes/skills/pantheon-request-intake"
   "$REPO_ROOT/templates/hermes/skills/source-research"
 )
@@ -54,7 +59,8 @@ Usage:
   sudo deployment/ubuntu/configure-hermes-activity-projection --apply --with-ifja-adapter --bind-local-mcp [--restart]
   sudo deployment/ubuntu/configure-hermes-activity-projection --apply --route-whatsapp --all-authorized-whatsapp [--restart]
 
-Installs the minimal versioned governed skill set and managed SOUL supplement
+Installs the minimal generalist governed method, external-effect guard,
+versioned support skills and managed SOUL supplement
 into the existing pantheon-governed Hermes profile. It does not expose
 chain-of-thought, create agents, persist Role Signals or change task authorization.
 
@@ -64,7 +70,9 @@ WhatsApp adapter allowlist; it never widens that adapter allowlist.
 
 --bind-local-mcp merges only the existing Doclin, Hindsight AFFAIRES,
 Hindsight DOCUMENTAIRES and Pantheon Policy bindings from the local default
-profile. Missing Hindsight bindings fail closed; unrelated MCPs are not copied.
+profile. It restricts Pantheon Policy to the reviewed read-only consultation
+and governed-work tools. Missing required bindings fail closed; unrelated MCPs
+are not copied.
 
 --with-curated-default-skills copies a bounded document/research/diagram set
 from the bundled skills already pinned by the installed Hermes image. It keeps
@@ -186,11 +194,15 @@ check_local_mcp_bindings() {
     || die "cannot read governed mcp_servers"
   current="$(printf '%s' "$current_raw" | normalize_json_object)" \
     || die "cannot parse governed mcp_servers"
-  if printf '%s' "$current" | jq -e '
+  if printf '%s' "$current" | jq -e --argjson policy_tools "$PANTHEON_POLICY_TOOLS_JSON" '
     has("hindsight-affaires") and has("hindsight-documentaires") and has("hindsight-memory")
     and has("pantheon-policy")
+    and (."pantheon-policy".tools.include == $policy_tools)
+    and (."pantheon-policy".tools.prompts == false)
+    and (."pantheon-policy".tools.resources == false)
+    and (."pantheon-policy".sampling.enabled == false)
   ' >/dev/null; then
-    log "governed local MCP bindings are present"
+    log "governed local MCP bindings and policy tool boundary are current"
   else
     log "governed local MCP bindings require installation or update"
   fi
@@ -242,18 +254,33 @@ apply_local_mcp_bindings() {
     || die "cannot read local default-profile mcp_servers"
   source_mcp="$(printf '%s' "$source_raw" | normalize_json_object)" \
     || die "cannot parse local default-profile mcp_servers"
-  selected="$(printf '%s' "$source_mcp" | jq -ce 'with_entries(select(
+  selected="$(printf '%s' "$source_mcp" | jq -ce --argjson policy_tools "$PANTHEON_POLICY_TOOLS_JSON" 'with_entries(select(
     .key == "Doclin" or .key == "hindsight-affaires"
     or .key == "hindsight-documentaires" or .key == "pantheon-policy"
   ))
+  | if has("pantheon-policy") then . else error("pantheon-policy binding is absent") end
+  | ."pantheon-policy".tools = (
+      (if (."pantheon-policy".tools | type) == "object" then ."pantheon-policy".tools else {} end)
+      + {"include": $policy_tools, "prompts": false, "resources": false}
+    )
+  | ."pantheon-policy".sampling = (
+      (if (."pantheon-policy".sampling | type) == "object" then ."pantheon-policy".sampling else {} end)
+      + {"enabled": false}
+    )
+  | ."pantheon-policy".supports_parallel_tool_calls = false
   | . + {"hindsight-memory": {
       "url": (."hindsight-affaires".url | sub("IFJA_AFFAIRES/?$"; "hermes/")),
       "tools": {"include": ["recall"]},
       "enabled": true
     }}')" || die "cannot select governed local MCP bindings"
-  printf '%s' "$selected" | jq -e '
+  printf '%s' "$selected" | jq -e --argjson policy_tools "$PANTHEON_POLICY_TOOLS_JSON" '
     has("hindsight-affaires") and has("hindsight-documentaires")
+    and has("pantheon-policy")
     and (."hindsight-memory".url | endswith("/mcp/hermes/"))
+    and (."pantheon-policy".tools.include == $policy_tools)
+    and (."pantheon-policy".tools.prompts == false)
+    and (."pantheon-policy".tools.resources == false)
+    and (."pantheon-policy".sampling.enabled == false)
   ' >/dev/null || die "required local Hindsight bindings are absent; refusing partial inheritance"
 
   current_raw="$(get_profile_optional_config_json "$PROFILE" mcp_servers)" \
@@ -265,11 +292,15 @@ apply_local_mcp_bindings() {
   hermes_config -p "$PROFILE" config set --force mcp_servers "$merged" >/dev/null
 
   observed="$(get_profile_optional_config_json "$PROFILE" mcp_servers)"
-  printf '%s' "$observed" | normalize_json_object | jq -e '
+  printf '%s' "$observed" | normalize_json_object | jq -e --argjson policy_tools "$PANTHEON_POLICY_TOOLS_JSON" '
     has("hindsight-affaires") and has("hindsight-documentaires") and has("hindsight-memory")
     and has("pantheon-policy")
+    and (."pantheon-policy".tools.include == $policy_tools)
+    and (."pantheon-policy".tools.prompts == false)
+    and (."pantheon-policy".tools.resources == false)
+    and (."pantheon-policy".sampling.enabled == false)
   ' >/dev/null || die "Hermes did not retain the governed local MCP bindings"
-  log "merged reviewed local MCP bindings into $PROFILE"
+  log "merged reviewed local MCP bindings and bounded Pantheon Policy tools into $PROFILE"
 }
 
 check_whatsapp_runtime() {

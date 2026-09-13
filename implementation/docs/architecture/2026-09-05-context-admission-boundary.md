@@ -36,10 +36,11 @@ fd39f1d377d57eb2dc03060c0f93b21763b745b7
 No open Pantheon PR or issue was found implementing a Context Admission or
 prompt-injection boundary in parallel.
 
-The active Pantheon distribution remains pinned to Hermes Agent `0.21.0`.
+The active Pantheon candidate distribution is pinned to Hermes Agent `0.21.2`.
 
-Upstream Hermes was checked both at the qualified `v2026.8.31` release and at
-current `main`. The qualified release already provides:
+Upstream Hermes was initially checked at `v2026.8.31`; the same exact attachment
+marker and protection seams were rechecked at the selected `v2026.9.11` release.
+The selected release provides:
 
 - `tools.threat_patterns.scan_for_threats(..., scope="context")`;
 - context-file scanning before system-prompt inclusion;
@@ -104,7 +105,7 @@ pantheon_context_entity
 Their outputs may contain source-derived Markdown, Information text, Knowledge
 text, names, descriptions, notes or other model-readable strings.
 
-Hermes `0.21.0` automatically applies its untrusted-result transport to:
+Hermes `0.21.2` automatically applies its untrusted-result transport to:
 
 ```text
 web_search
@@ -190,7 +191,7 @@ own trailing line; every ambiguous case demotes the whole message to data.
 
 ## Why the registered-handler boundary
 
-Hermes `0.21.0` exposes `transform_tool_result`, but that transform surface uses a
+Hermes `0.21.2` exposes `transform_tool_result`, but that transform surface uses a
 first-valid-replacement rule. A security invariant should not depend on plugin
 registration order or on whether another transform already returned a string.
 

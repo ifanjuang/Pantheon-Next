@@ -256,6 +256,89 @@ class TestProgressiveRequestHandling(unittest.TestCase):
         )
         self.assertEqual(report["handling"]["conditions"], ["source_required"])
 
+    def test_general_professional_objects_share_condition_driven_handling(self):
+        cases = (
+            (
+                {
+                    "intent": "Déterminer le budget à annoncer pour un dossier client.",
+                    "scope": {"scope_type": "dossier", "scope_id": "budget-fixture"},
+                    "conditions": [
+                        "factual_claim",
+                        "source_required",
+                        "legal_or_professional_risk",
+                        "delivery_quality_required",
+                    ],
+                    "coordination": {
+                        "requires": [
+                            ["supporting_basis", "consequence_review"],
+                            ["consequence_review", "readiness_review"],
+                        ]
+                    },
+                    "completion_requirements": [
+                        "exact_source_opened",
+                        "monetary_perimeter_reconciled",
+                        "readiness_stated",
+                    ],
+                },
+                ["ARGOS", "THEMIS", "APOLLO"],
+                "sequential_handoff",
+            ),
+            (
+                {
+                    "intent": "Rédiger un message externe à partir de faits du dossier.",
+                    "scope": {"scope_type": "task", "scope_id": "message-fixture"},
+                    "conditions": [
+                        "narrative_or_editorial_work",
+                        "source_required",
+                        "external_transmission",
+                        "client_delivery",
+                    ],
+                    "completion_requirements": [
+                        "sources_qualified",
+                        "commitments_reviewed",
+                        "draft_ready_for_human_gate",
+                    ],
+                },
+                ["APOLLO", "ARGOS", "IRIS"],
+                None,
+            ),
+            (
+                {
+                    "intent": "Produire une section technique de cahier des charges.",
+                    "scope": {"scope_type": "task", "scope_id": "specification-fixture"},
+                    "conditions": [
+                        "artifact_fabrication",
+                        "factual_claim",
+                        "source_required",
+                        "legal_or_professional_risk",
+                        "delivery_quality_required",
+                    ],
+                    "completion_requirements": [
+                        "technical_basis_qualified",
+                        "section_complete",
+                        "readiness_stated",
+                    ],
+                },
+                ["HEPHAISTOS", "ARGOS", "THEMIS", "APOLLO"],
+                None,
+            ),
+        )
+
+        for request, expected_roles, expected_topology in cases:
+            with self.subTest(intent=request["intent"]):
+                report = policy.classify_request(request)
+                handling = report["handling"]
+                self.assertEqual(handling["role_viewpoints"], expected_roles)
+                self.assertEqual(
+                    handling.get("topology", {}).get("suggested"),
+                    expected_topology,
+                )
+                self.assertEqual(
+                    handling["completion_requirements"],
+                    request["completion_requirements"],
+                )
+                self.assertIn(handling["disposition"], {"CONSULT", "GATE"})
+
     def test_role_trigger_projection_is_subset_of_role_activation_doctrine(self):
         doctrine = (REPO_ROOT / "docs/governance/ROLE_ACTIVATION.md").read_text(
             encoding="utf-8"

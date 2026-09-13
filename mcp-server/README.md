@@ -42,6 +42,11 @@ Any request asking the server to perform such an effect is refused with a report
 | `get_capability_status(status_yaml)` | qualifies a *provided* observation on the Hermes dashboard axes (`listed`, `detected`, `installed`, `configured`, `enabled`, `reachable`, `health`) plus separate governance, task-use, update and rollback axes; performs no live inventory or runtime probe and grants no authorization |
 | `validate_passport(passport_yaml)` | shape report + governance gaps (validation ≠ authorization) |
 | `classify_request(request_yaml)` | consequence K0–K4, required verification V0–V4, approval ceiling C0–C5, required gates |
+| `evaluate_preflight(preflight_yaml)` | candidate-work eligibility and missing gates from caller-provided state; authorizes no effect |
+| `prepare_task_contract_skeleton(request_yaml)` | non-executable Task Contract candidate skeleton |
+| `prepare_evidence_pack_skeleton(request_yaml)` | Evidence Pack candidate skeleton without truth validation |
+| `plan_context_pack(request_yaml)` | bounded plan for caller-assembled scoped context |
+| `validate_context_pack(context_pack_yaml)` | schema validation of caller-provided context; retrieves nothing and grants no authority |
 | `check_external_action(description)` | blocked-by-default report with the legitimization path |
 | `validate_decision(decision_yaml)` | validates a *provided* human decision reference against a requirement (scope, approval ceiling, expiry, object identity, digest), refuses a non-human signer and — when an issuer key registry is configured (`PANTHEON_DECISION_ISSUER_KEYS_PATH`) — authenticates the human issuer by verifying an HMAC signature over the signed fields (`issuer_authenticated: true/false`); returns `verdict: valid / invalid` with per-check detail. Read-only: it fetches nothing, persists nothing and approves nothing — a valid verdict is not an authorization |
 | `run_doctor_checks()` | fail-closed read-only repo checks with explicit `pass`, `fail`, `not_run` or `capability_gap` outcomes, per-check counts and an aggregate result |
@@ -121,6 +126,12 @@ mcp_servers:
         - get_consultation_catalog
         - explain_architecture
         - get_capability_status
+        - classify_request
+        - evaluate_preflight
+        - prepare_task_contract_skeleton
+        - prepare_evidence_pack_skeleton
+        - plan_context_pack
+        - validate_context_pack
       prompts: false
       resources: false
     sampling:

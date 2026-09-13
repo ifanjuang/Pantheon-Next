@@ -121,7 +121,8 @@ keeps a backup of the Hermes configuration. These are supported Hermes settings;
 the provider source and image are not patched.
 
 The governed profile remains generalist: its stable repository-owned core is
-`pantheon-activity-projection`, `pantheon-request-intake` and `source-research`.
+`pantheon-governed-method`, `pantheon-activity-projection`,
+`pantheon-request-intake`, `external-commitment-guard` and `source-research`.
 Capabilities and organization adapters are available modules selected from the
 request, manifest and admitted runtime bindings; they do not redefine the
 profile identity.
@@ -130,7 +131,9 @@ profile identity.
 contextual modules. With that explicit adapter, `--bind-local-mcp` copies no secrets and no arbitrary server. It merges only the
 already configured local `Doclin`, `hindsight-affaires`,
 `hindsight-documentaires` and `pantheon-policy` entries from the default profile
-into the governed profile. It derives a recall-only `hindsight-memory` binding
+into the governed profile. The copied Pantheon Policy entry is narrowed to the
+reviewed read-only consultation, request classification/preflight, candidate
+skeleton and Context Pack tools. It derives a recall-only `hindsight-memory` binding
 from the already configured local Hindsight endpoint and refuses a partial result
 when either required professional Hindsight binding is absent.
 
@@ -141,9 +144,11 @@ already pinned by the installed Hermes image. It also sets dynamic tool search
 to `auto`; the Web, browser, vision and generation toolsets remain governed
 runtime capabilities and are discovered only when relevant.
 
-For material professional questions, that skill set imposes a source preflight:
+For material professional questions, that skill set imposes a generic source preflight:
 AFFAIRES for dossier facts, DOCUMENTAIRES for transversal professional facts,
-and both for mixed questions. When continuity or dossier resolution is needed,
+and both for mixed questions. The task-local receipt records the actual binding,
+exact source opened, inspected locator and limitations; it is a trace, not
+Evidence or source validation. When continuity or dossier resolution is needed,
 the recall-only memory binding may produce one fast, explicitly unconfirmed
 `Mnemosyne` milestone while the exact professional source lookup continues.
 

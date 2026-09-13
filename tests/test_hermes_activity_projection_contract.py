@@ -22,7 +22,14 @@ def test_activity_projection_skill_has_bounded_visible_contract() -> None:
     assert "do not invent one merely" in text
     assert "Hermes is a runtime, not a Pantheon Role" in text
     assert "## Observable Role outcomes" in text
-    assert "`OK`, `réserve` or `blocage`" in text
+    for readiness in (
+        "ready",
+        "ready_with_limits",
+        "needs_revision",
+        "needs_user_input",
+        "blocked",
+    ):
+        assert readiness in text
     assert "draft complete != transmission authorized" in text
     assert "Do not activate extra Roles merely to populate" in text
     for role in (
@@ -51,9 +58,11 @@ def test_linux_configurator_is_idempotent_and_keeps_a_backup() -> None:
     assert "docker restart pantheon-hermes" in text
     assert "projection != persistence" in text
     for skill in (
+        "external-commitment-guard",
         "ifja-project-context",
         "ifja-vault-search",
         "pantheon-activity-projection",
+        "pantheon-governed-method",
         "pantheon-request-intake",
         "source-research",
     ):
@@ -103,6 +112,19 @@ def test_governed_local_mcp_binding_is_explicit_filtered_and_fail_closed() -> No
     assert "'$current + $selected'" in text
     assert 'config set --force mcp_servers "$merged"' in text
     assert 'cp -a "$PROFILE_CONFIG_TARGET" "$backup_root/profile-config.yaml"' in text
+    for tool in (
+        "classify_request",
+        "evaluate_preflight",
+        "prepare_task_contract_skeleton",
+        "prepare_evidence_pack_skeleton",
+        "plan_context_pack",
+        "validate_context_pack",
+    ):
+        assert tool in text
+    assert '"prompts": false' in text
+    assert '"resources": false' in text
+    assert '"enabled": false' in text
+    assert 'supports_parallel_tool_calls = false' in text
 
 
 def test_curated_default_capabilities_remain_bounded_and_searchable() -> None:
