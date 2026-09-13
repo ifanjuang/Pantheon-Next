@@ -109,3 +109,24 @@ def test_only_external_hermes_can_report_runtime_start(monkeypatch) -> None:
     assert started.status_code == 201
     assert observed["run_id"] == "hermes-runtime-123"
     assert observed["actor"] == "hermes-adapter"
+
+
+def test_recorded_runtime_start_notifies_optional_display_observer(monkeypatch) -> None:
+    monkeypatch.setattr(hermes_execution, "record_external_runtime_start", lambda _conn, **values: {
+        "admission_id": values["admission_id"], "run_id": values["run_id"],
+        "runtime_start_recorded": True, "replayed": False, "work_issue": {"status": "in_progress"},
+    })
+    client = _client()
+    observed = []
+
+    async def observer(run_id):
+        observed.append(run_id)
+
+    client.app.state.hermes_runtime_start_observer = observer
+    response = client.post(
+        "/hermes/execution-admissions/admission-1/runs/start",
+        headers={"Authorization": "Bearer hermes-key", "X-Pantheon-Hermes-Actor": "hermes-adapter"},
+        json={"run_id": "run_12345678", "expected_issue_version": 1, "idempotency_key": "runtime-start-123"},
+    )
+    assert response.status_code == 201
+    assert observed == ["run_12345678"]

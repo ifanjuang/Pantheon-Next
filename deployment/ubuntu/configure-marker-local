@@ -1,0 +1,236 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+RELEASE_LOCK="$SCRIPT_DIR/release.env"
+[[ -f "$RELEASE_LOCK" ]] || { printf '[pantheon-marker] ERROR: missing %s\n' "$RELEASE_LOCK" >&2; exit 1; }
+# shellcheck disable=SC1091
+source "$RELEASE_LOCK"
+
+MARKER_VERSION="${RELEASE_MARKER_PDF_VERSION:?release.env missing RELEASE_MARKER_PDF_VERSION}"
+MARKER_PYTHON="${RELEASE_MARKER_PYTHON:?release.env missing RELEASE_MARKER_PYTHON}"
+OBSIDIAN_MARKER_VERSION="${RELEASE_OBSIDIAN_MARKER_VERSION:?release.env missing RELEASE_OBSIDIAN_MARKER_VERSION}"
+NVIDIA_TOOLKIT_VERSION="${RELEASE_NVIDIA_CONTAINER_TOOLKIT_VERSION:?release.env missing RELEASE_NVIDIA_CONTAINER_TOOLKIT_VERSION}"
+APP_ROOT="/opt/pantheon-node"
+UV_PYTHON_INSTALL_DIR="$APP_ROOT/python"
+export UV_PYTHON_INSTALL_DIR
+STATE_ROOT="/srv/pantheon"
+AI_ROOT="/srv/ai"
+CONFIG_ROOT="/etc/pantheon-node"
+VAULT_ROOT="$STATE_ROOT/obsidian"
+MARKER_ROOT="$APP_ROOT/marker"
+MARKER_STATE="$STATE_ROOT/marker"
+MARKER_CACHE="$AI_ROOT/cache/marker"
+MARKER_USER="pantheon-marker"
+MARKER_IDLE_WRAPPER="$MARKER_ROOT/pantheon_marker_idle_vram.py"
+PLUGIN_ROOT="$VAULT_ROOT/.obsidian/plugins/marker-api"
+UV="$APP_ROOT/uv/bin/uv"
+API_BIND="127.0.0.1"
+API_PORT="8001"
+ENABLE=0
+VLLM_GPU_TYPE="auto"
+
+log() { printf '[pantheon-marker] %s\n' "$*"; }
+die() { printf '[pantheon-marker] ERROR: %s\n' "$*" >&2; exit 1; }
+
+usage() {
+  cat <<'USAGE'
+Usage: sudo ./configure-marker-local [--enable] [--bind ADDRESS] [--gpu-type TYPE]
+
+Installs Marker 2, its local Python upload API, and obsidian-marker in the
+LiveSync vault mirror. The default API bind is 127.0.0.1. Use a private address
+only when the Obsidian client is on another trusted host.
+USAGE
+}
+
+while (($#)); do
+  case "$1" in
+    --enable) ENABLE=1 ;;
+    --bind) shift; API_BIND="${1:?missing address}" ;;
+    --gpu-type) shift; VLLM_GPU_TYPE="${1:?missing GPU type}" ;;
+    -h|--help) usage; exit 0 ;;
+    *) die "unknown argument: $1" ;;
+  esac
+  shift
+done
+
+[[ ${EUID:-$(id -u)} -eq 0 ]] || die "run this command as root (sudo)"
+[[ -x "$UV" ]] || die "managed uv is missing: $UV"
+[[ -d "$VAULT_ROOT" ]] || die "LiveSync vault mirror is missing: $VAULT_ROOT"
+command -v docker >/dev/null 2>&1 || die "Docker is required"
+command -v nvidia-smi >/dev/null 2>&1 || die "the NVIDIA driver is required"
+nvidia-smi -L >/dev/null 2>&1 || die "the NVIDIA driver is not ready"
+
+if [[ "$VLLM_GPU_TYPE" == auto ]]; then
+  gpu_name="$(nvidia-smi --query-gpu=name --format=csv,noheader | head -1 | tr '[:upper:]' '[:lower:]')"
+  case "$gpu_name" in
+    *5090*) VLLM_GPU_TYPE=5090 ;;
+    *4090*) VLLM_GPU_TYPE=4090 ;;
+    *4080*) VLLM_GPU_TYPE=t4 ;;
+    *4070*|*4060*) VLLM_GPU_TYPE=t4 ;;
+    *3090*) VLLM_GPU_TYPE=3090 ;;
+    *l40s*) VLLM_GPU_TYPE=l40s ;;
+    *a10*) VLLM_GPU_TYPE=a10 ;;
+    *l4*) VLLM_GPU_TYPE=l4 ;;
+    *t4*) VLLM_GPU_TYPE=t4 ;;
+    *) die "unsupported automatic GPU mapping for '$gpu_name'; pass --gpu-type 5090|4090|3090|l40s|a10|l4|t4" ;;
+  esac
+fi
+case "$VLLM_GPU_TYPE" in 5090|4090|3090|l40s|a10|l4|t4) ;; *) die "unsupported vLLM GPU type: $VLLM_GPU_TYPE" ;; esac
+
+install_nvidia_toolkit() {
+  if docker info --format '{{json .Runtimes.nvidia}}' 2>/dev/null | grep -q nvidia-container-runtime; then
+    return
+  fi
+  log "installing NVIDIA Container Toolkit $NVIDIA_TOOLKIT_VERSION"
+  install -m 0755 -d /usr/share/keyrings
+  curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey \
+    | gpg --dearmor --yes -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+  curl -fsSL https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list \
+    | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' \
+    > /etc/apt/sources.list.d/nvidia-container-toolkit.list
+  apt-get update
+  apt-get install -y \
+    "nvidia-container-toolkit=$NVIDIA_TOOLKIT_VERSION" \
+    "nvidia-container-toolkit-base=$NVIDIA_TOOLKIT_VERSION" \
+    "libnvidia-container-tools=$NVIDIA_TOOLKIT_VERSION" \
+    "libnvidia-container1=$NVIDIA_TOOLKIT_VERSION"
+  nvidia-ctk runtime configure --runtime=docker
+  log "restarting Docker once to activate its NVIDIA runtime"
+  systemctl restart docker
+}
+
+install_nvidia_toolkit
+docker info --format '{{json .Runtimes.nvidia}}' | grep -q nvidia-container-runtime \
+  || die "Docker's NVIDIA runtime is not available"
+
+log "installing marker-pdf $MARKER_VERSION with Python $MARKER_PYTHON"
+id -u "$MARKER_USER" >/dev/null 2>&1 \
+  || useradd --system --home-dir "$MARKER_STATE" --shell /usr/sbin/nologin "$MARKER_USER"
+usermod -a -G docker "$MARKER_USER"
+install -d -m 0755 "$MARKER_ROOT"
+install -d -o "$MARKER_USER" -g "$MARKER_USER" -m 0750 "$MARKER_STATE" "$MARKER_CACHE"
+"$UV" python install --force "$MARKER_PYTHON"
+managed_python="$("$UV" python find --managed-python "$MARKER_PYTHON")"
+[[ "$managed_python" == "$APP_ROOT/python/"* ]] \
+  || die "uv resolved Marker Python outside $APP_ROOT/python: $managed_python"
+chmod -R a+rX "$APP_ROOT/python"
+"$UV" venv --clear --python "$managed_python" "$MARKER_ROOT/.venv"
+"$UV" pip install --python "$MARKER_ROOT/.venv/bin/python" \
+  "marker-pdf==$MARKER_VERSION" uvicorn fastapi python-multipart
+install -m 0644 "$SCRIPT_DIR/marker_idle_vram.py" "$MARKER_IDLE_WRAPPER"
+chmod -R a+rX "$MARKER_ROOT"
+"$MARKER_ROOT/.venv/bin/marker_server" --help >/dev/null
+
+# Surya 0.22.1 publishes its auto-spawned vLLM port on every interface. Keep
+# the inference endpoint loopback-only until the upstream correction lands.
+vllm_backend="$("$MARKER_ROOT/.venv/bin/python" - <<'PY'
+import inspect
+import surya.inference.backends.vllm
+print(inspect.getsourcefile(surya.inference.backends.vllm))
+PY
+)"
+if grep -Fq 'f"{port}:8000"' "$vllm_backend"; then
+  sed -i 's/f"{port}:8000"/f"{settings.SURYA_INFERENCE_HOST}:{port}:8000"/' "$vllm_backend"
+fi
+grep -Fq 'f"{settings.SURYA_INFERENCE_HOST}:{port}:8000"' "$vllm_backend" \
+  || die "could not verify the loopback-only Surya vLLM port patch"
+
+cat > "$CONFIG_ROOT/marker.env" <<EOF_ENV
+HOME=$MARKER_STATE
+TORCH_DEVICE=cuda
+HF_HOME=$MARKER_CACHE/huggingface
+TORCH_HOME=$MARKER_CACHE/torch
+XDG_CACHE_HOME=$MARKER_CACHE
+DOCKER_HF_CACHE_PATH=$MARKER_CACHE/huggingface
+SURYA_INFERENCE_BACKEND=vllm
+SURYA_INFERENCE_HOST=127.0.0.1
+SURYA_INFERENCE_KEEP_ALIVE=0
+VLLM_GPUS=0
+VLLM_GPU_TYPE=$VLLM_GPU_TYPE
+VLLM_GPU_MEMORY_UTILIZATION=0.70
+VLLM_DOCKER_IMAGE=vllm/vllm-openai:v0.20.1
+MARKER_GPU_IDLE_SECONDS=600
+MARKER_RELEASE_OLLAMA=1
+OLLAMA_BASE_URL=http://127.0.0.1:11434
+EOF_ENV
+chmod 0640 "$CONFIG_ROOT/marker.env"
+
+cat > /etc/systemd/system/pantheon-marker-api.service <<EOF_SERVICE
+[Unit]
+Description=Marker 2 local upload API for obsidian-marker
+After=docker.service network-online.target
+Requires=docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=$MARKER_USER
+Group=$MARKER_USER
+SupplementaryGroups=docker
+EnvironmentFile=$CONFIG_ROOT/marker.env
+WorkingDirectory=$MARKER_STATE
+ExecStart=$MARKER_ROOT/.venv/bin/uvicorn pantheon_marker_idle_vram:app --app-dir $MARKER_ROOT --host $API_BIND --port $API_PORT
+Restart=on-failure
+RestartSec=5
+PrivateTmp=true
+ProtectHome=read-only
+ProtectSystem=strict
+ReadWritePaths=$MARKER_STATE $MARKER_CACHE $MARKER_ROOT/.venv/lib/python3.12/site-packages/static
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
+EOF_SERVICE
+
+log "installing obsidian-marker $OBSIDIAN_MARKER_VERSION into the LiveSync vault"
+install -d -m 0750 "$PLUGIN_ROOT"
+for asset in main.js manifest.json styles.css; do
+  curl -fsSL \
+    "https://github.com/L3-N0X/obsidian-marker/releases/download/$OBSIDIAN_MARKER_VERSION/$asset" \
+    -o "$PLUGIN_ROOT/$asset"
+done
+grep -Fq '"id": "marker-api"' "$PLUGIN_ROOT/manifest.json" \
+  || die "downloaded obsidian-marker manifest has an unexpected plugin id"
+
+cat > "$PLUGIN_ROOT/data.json" <<EOF_PLUGIN
+{
+  "markerEndpoint": "localhost:8000",
+  "pythonEndpoint": "$API_BIND:$API_PORT",
+  "createFolder": true,
+  "deleteOriginal": false,
+  "extractContent": "all",
+  "writeMetadata": true,
+  "movePDFtoFolder": false,
+  "createAssetSubfolder": true,
+  "apiEndpoint": "python-cloud-api",
+  "langs": "fr,en",
+  "forceOCR": false,
+  "paginate": false
+}
+EOF_PLUGIN
+
+community_plugins="$VAULT_ROOT/.obsidian/community-plugins.json"
+if [[ -f "$community_plugins" ]]; then
+  plugins_tmp="$(mktemp)"
+  jq 'if index("marker-api") then . else . + ["marker-api"] end' \
+    "$community_plugins" > "$plugins_tmp"
+  install -m 0640 "$plugins_tmp" "$community_plugins"
+  rm -f "$plugins_tmp"
+else
+  printf '["marker-api"]\n' > "$community_plugins"
+  chmod 0640 "$community_plugins"
+fi
+
+systemctl daemon-reload
+if ((ENABLE == 1)); then
+  docker pull vllm/vllm-openai:v0.20.1
+  systemctl enable --now pantheon-marker-api.service
+  log "Marker API enabled; initial model loading can take several minutes"
+else
+  systemctl disable pantheon-marker-api.service >/dev/null 2>&1 || true
+  log "installed but inactive; rerun with --enable to activate"
+fi
+
+log "Obsidian plugin: $PLUGIN_ROOT"
+log "Python Cloud API endpoint: $API_BIND:$API_PORT"

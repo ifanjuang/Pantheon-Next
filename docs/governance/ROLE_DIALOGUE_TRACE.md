@@ -1,11 +1,27 @@
 # Role Dialogue Trace
 
-Status: candidate orientation — observable workflow trace, role dialogue and cockpit log.
-Boundary profile: candidate_support_note.
+Status: candidate support specification — presentation foundation, transient
+derived-event projector, bounded Cockpit SSE relay, admitted-run attachment hook,
+composed-Cockpit dialogue UI and optional Ubuntu Workspace-Cockpit sidecar
+implemented; native runtime events and persistence non-implemented.
 
-This document is a candidate orientation, not an implementation.
+The first presentation slice is implemented as an external Hermes template and
+an Ubuntu profile configurator. It produces bounded role-labelled milestones in
+supported Hermes response streams.
 
-It does not create a workflow runtime, agent loop, queue, scheduler, hidden chain-of-thought recorder, approval engine, memory engine, skill runtime, file watcher, registry writer, connector gateway, LangGraph runtime, Langflow runtime or Hermes command surface.
+It does not make Hermes emit native `role.stage` events or persist Role Signals.
+The implemented dialogue view is available in the composed Cockpit candidate
+and through an optional transient sidecar in the filesystem Workspace Cockpit.
+Neither path creates a workflow runtime, agent loop, queue, scheduler, hidden
+chain-of-thought recorder, approval engine, memory engine, file watcher,
+registry writer, connector gateway, LangGraph runtime or Langflow runtime.
+
+```text
+Hermes Web/dashboard exposes runtime interaction.
+Hermes Agent executes.
+Pantheon Cockpit may project governed trace state.
+Pantheon Next governs.
+```
 
 ## Purpose
 
@@ -42,7 +58,7 @@ Athena checked source coverage.
 Hermes retrieved document X.
 Hephaistos prepared file patch Y.
 Zeus marked decision as to arbitrate.
-Cerberus blocked memory promotion.
+Themis blocked memory promotion because approval was missing.
 ```
 
 Forbidden:
@@ -211,7 +227,7 @@ not promoted
 
 Zeus status is procedural unless backed by the required human decision.
 
-### Cerberus / boundary role
+### Themis / risk and boundary role
 
 May show:
 
@@ -223,7 +239,7 @@ approval missing
 source insufficient
 ```
 
-### Charon / transfer role
+### Iris / transmission role
 
 May show:
 
@@ -382,8 +398,11 @@ Athena     -> analysis / review
 Hermes     -> runtime execution
 Hephaistos -> fabrication / patch / artifact shaping
 Zeus       -> status arbitration
-Cerberus   -> boundary guard
-Charon     -> transfer / handoff
+Themis     -> risk / compliance / boundary
+Iris       -> transmission / adaptation
+Argos      -> sources / traceability
+Apollo     -> quality / readiness
+Mnemosyne  -> continuity / memory framing
 ```
 
 The metaphor is a display layer only.
@@ -415,13 +434,158 @@ It may contain:
 - approval state;
 - next action.
 
-## Governance boundary
+## Implemented presentation slice
 
-This orientation does not implement tracing.
+The following repository artifacts implement a bounded first slice:
 
-It defines what a future cockpit trace may safely display.
+```text
+templates/hermes/skills/pantheon-activity-projection/SKILL.md
+templates/hermes/profiles/pantheon-governed/SOUL.append.md
+deployment/ubuntu/configure-hermes-activity-projection
+```
 
-Pantheon governs the status vocabulary and boundary conditions.
+The skill defines role selection and visible milestone grammar. The SOUL
+supplement makes that projection expected for non-trivial governed requests.
+The Ubuntu configurator installs both into an existing `pantheon-governed`
+profile with a recoverable backup.
+
+This slice can expose ordered labels in a streamed answer and can request
+interim assistant messages when the Hermes transport supports them. It does not
+claim a separate durable event for every label.
+
+```text
+ordered streamed label != structured trace event
+structured trace event != persisted Role Signal
+persisted Role Signal != Evidence or approval
+```
+
+## Implemented transient event projection
+
+`implementation/mvp_vertical/hermes_role_stage_projection.py` implements a
+bounded incremental projector over the public Hermes Runs stream. It consumes:
+
+```text
+message.delta
+tool.started
+tool.completed
+run.completed | run.failed | run.cancelled | run.interrupted
+```
+
+It emits transient display events shaped as:
+
+```yaml
+event: role.stage
+phase: started | updated | completed
+stage_id:
+run_id:
+sequence:
+timestamp:
+visible_role:
+role_family:
+semantic_function:
+summary:
+details: {}
+tool:
+source_event:
+projection: derived_transient
+authority_effect: none
+private_reasoning_included: false
+```
+
+The projector recognizes only canonical visible Role headers. Tool lifecycle
+events become observable `Hermes · Exécution` stages because they report real
+runtime activity. `reasoning.available` is ignored by construction. Arbitrary
+labels do not create Roles, and unterminated public lines or excessive stage
+counts fail closed.
+
+The existing live-acceptance SSE collector now returns these projections beside
+the unmodified upstream events. This is an adapter seam and test surface, not a
+public service, durable trace store or Cockpit view.
+
+## Implemented bounded relay
+
+`implementation/mvp_vertical/hermes_role_trace_relay.py` provides one
+in-memory transport seam per already-admitted Hermes run:
+
+```text
+one upstream event consumer
+-> one incremental Role projector
+-> bounded replay window
+-> multiple identical read-only subscribers
+```
+
+It refuses a second upstream consumer, retains at most 500 projected events per
+run and at most 32 traces per process, evicts only a terminal trace when full,
+and fails closed on invalid run identifiers or replay gaps. It cannot create,
+stop, approve or retry a Hermes run.
+
+The same component includes a fixed-URL, server-side-key Runs reader. It accepts
+only an existing `run_id`, consumes no more than 1,000 public SSE events, checks
+that every event remains within that run and requires a terminal event. It has
+no submission or control method.
+
+The composed Cockpit exposes authenticated read routes:
+
+```text
+GET /cockpit/role-traces/{run_id}
+GET /cockpit/role-traces/{run_id}/events
+```
+
+The second route is a finite/replayable SSE view with `Last-Event-ID` support.
+The relay is transient process memory, not a message bus, database, Evidence
+store or Role Signal registry.
+
+## Implemented admitted-run attachment and browser dialogue
+
+After the external Hermes callback has successfully recorded the exact
+`run_id`, `hermes_execution_api.py` notifies an optional display observer. The
+composed Cockpit configures that observer only when both of these deployment
+values are present:
+
+```text
+MVP_HERMES_ROLE_TRACE_BASE_URL
+MVP_HERMES_ROLE_TRACE_API_KEY
+```
+
+The pair is fail-closed: one missing value refuses startup, and no values mean
+no outbound Role source. A replayed runtime-start callback does not attach a
+second upstream reader. A projection failure cannot reinterpret or roll back
+the already-recorded runtime start.
+
+The composed Cockpit Hermes dock now contains a compact progressive timeline.
+It follows the authenticated SSE stream through `fetch`, resumes from
+`Last-Event-ID`, replaces repeated updates for the same `stage_id`, keeps detail
+fields collapsed and labels every item `dérivé` or `natif`. It also states that
+the surface contains public observable milestones and no private reasoning.
+
+```text
+visible Role label != autonomous agent
+derived event != proof that an independent review ran
+timeline completion != approval
+```
+
+## Implemented filesystem Cockpit adapter
+
+The Ubuntu Workspace Cockpit now includes an optional credentialed sidecar and
+a same-origin read-only browser proxy. The sidecar attaches only an exact
+already-admitted `run_id`, keeps the bounded relay in transient memory and
+reads the configured governed Hermes Runs stream. Its attach listener is
+published on host loopback only. Separate attach and read keys remain outside
+Git, and the browser receives neither those keys nor the Hermes API key.
+
+This adapter does not introduce PostgreSQL, pgvector, durable trace admission,
+run control or approval authority. Attachment failure is reported as display
+diagnostic state and cannot reinterpret the canonical run start.
+
+## Remaining implementation boundary
+
+Native Hermes `role.stage` emission, durable trace admission and Role Signal
+persistence remain non-implemented. The live Ubuntu deployment still requires
+operator-provided secrets and activation. A model that emits all public Role
+text only at final-answer time cannot be represented as having exposed those
+Roles during private reasoning.
+
+Pantheon governs their future status vocabulary and boundary conditions.
 
 Runtime logs, connector logs, skill logs and workflow checkpoints remain outside Pantheon unless imported as candidate trace records.
 

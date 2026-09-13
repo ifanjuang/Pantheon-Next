@@ -88,12 +88,25 @@ class _Hermes:
         return self.status
 
 
-def _binding(*, observer=None, pantheon=None, hermes=None):
+def _binding(*, observer=None, pantheon=None, hermes=None, role_trace=None):
     return ExternalHermesRunBinding(
         observer=observer or _Observer(),
         pantheon=pantheon or _Pantheon(),
         hermes=hermes or _Hermes(),
+        role_trace=role_trace,
     )
+
+
+class _RoleTrace:
+    def __init__(self, *, fails=False):
+        self.fails = fails
+        self.calls = []
+
+    def attach(self, run_id):
+        self.calls.append(run_id)
+        if self.fails:
+            raise RuntimeError("display unavailable")
+        return {"run_id": run_id, "attached": True}
 
 
 def test_launch_requires_qualified_surface_before_reservation_or_submission() -> None:
@@ -134,6 +147,25 @@ def test_launch_reserves_then_submits_once_and_records_exact_run() -> None:
     assert receipt["runtime_submission_performed"] is True
     assert receipt["automatic_retry_performed"] is False
     assert receipt["provider_routing_performed"] is False
+    assert receipt["role_trace_notification"] == "unconfigured"
+
+
+def test_launch_notifies_role_trace_only_after_start_and_isolates_display_failure() -> None:
+    role_trace = _RoleTrace()
+    receipt = _binding(role_trace=role_trace).launch(
+        admission_id="admission-1", idempotency_key="launch-key-1"
+    )
+    assert role_trace.calls == ["run-hermes-1"]
+    assert receipt["runtime_start_recorded"] is True
+    assert receipt["role_trace_notification"] == "attached"
+
+    failing = _RoleTrace(fails=True)
+    failed_receipt = _binding(role_trace=failing).launch(
+        admission_id="admission-1", idempotency_key="launch-key-2"
+    )
+    assert failing.calls == ["run-hermes-1"]
+    assert failed_receipt["runtime_start_recorded"] is True
+    assert failed_receipt["role_trace_notification"] == "failed"
 
 
 def test_replayed_reservation_never_resubmits_hermes() -> None:

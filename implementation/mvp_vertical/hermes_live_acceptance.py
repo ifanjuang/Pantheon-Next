@@ -11,7 +11,7 @@ changes production activation.
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Iterable
 from urllib.parse import quote
 
@@ -21,6 +21,7 @@ from .hermes_run_binding import (
     HermesRunRegistrationUnknown,
     HermesRunSubmissionUnknown,
 )
+from .hermes_role_stage_projection import HermesRoleStageProjector
 from .hermes_runs_observer import HermesRunsApiObserver
 
 SYNTHETIC_MARKER = "PANTHEON_HERMES_LIVE_ACCEPTANCE_V1"
@@ -41,6 +42,7 @@ class EventCollection:
     events: list[dict[str, Any]]
     stream_complete: bool
     diagnostic: str | None = None
+    role_stages: list[dict[str, Any]] = field(default_factory=list)
 
 
 class PantheonLiveAcceptanceInspector:
@@ -204,6 +206,8 @@ class HermesRunEventInspector:
 
             client = httpx.Client(timeout=self._timeout)
         events: list[dict[str, Any]] = []
+        role_stages: list[dict[str, Any]] = []
+        projector = HermesRoleStageProjector(run_id)
         try:
             with client.stream(
                 "GET",
@@ -227,6 +231,7 @@ class HermesRunEventInspector:
                             "Hermes run event stream contained a non-object event"
                         )
                     events.append(event)
+                    role_stages.extend(projector.feed(event))
                     if len(events) > MAX_EVENT_COUNT:
                         raise HermesLiveAcceptanceError(
                             f"Hermes run event stream exceeds {MAX_EVENT_COUNT} events"
@@ -245,8 +250,13 @@ class HermesRunEventInspector:
                                 if event.get("event") == "approval.request"
                                 else None
                             ),
+                            role_stages=role_stages,
                         )
-            return EventCollection(events=events, stream_complete=True)
+            return EventCollection(
+                events=events,
+                stream_complete=True,
+                role_stages=role_stages,
+            )
         except HermesLiveAcceptanceError:
             raise
         except Exception as exc:
@@ -254,6 +264,7 @@ class HermesRunEventInspector:
                 events=events,
                 stream_complete=False,
                 diagnostic=f"event stream incomplete: {type(exc).__name__}",
+                role_stages=role_stages,
             )
         finally:
             if owns:

@@ -55,6 +55,16 @@ functional profile
 
 `pantheon-governed` is a runtime mode, not a Pantheon Role and not automatically an additional functional profile folder.
 
+`default` remains the sticky CLI/UI profile. Governed work must explicitly use
+the `pantheon-governed` runtime mode; selecting a functional profile does not
+silently change that sticky profile or authorize governed execution.
+
+Hermes does not infer this switch from prompt content. The operator selects the
+runtime profile before starting a new session. `tool_search:` may discover an
+available capability inside the selected profile, but it is not a profile
+router. An old session retains its frozen system prompt; changing the active
+profile affects only a newly created session.
+
 Inside an admitted Task Contract, Hermes may choose among the qualified runtime mechanisms that satisfy the same objective and constraints. Pantheon does not pin a concrete tool merely because one implementation happened to be used previously.
 
 ```text

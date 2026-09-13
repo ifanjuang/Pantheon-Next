@@ -11,9 +11,10 @@ Agency Data access or provider routing exists here.
 from __future__ import annotations
 
 import hmac
+import inspect
 from typing import Any, Callable, Literal
 
-from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi import BackgroundTasks, Depends, FastAPI, Header, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 
 from . import (
@@ -118,6 +119,21 @@ def install_hermes_execution_routes(
                 detail="X-Pantheon-Hermes-Actor is required for a Hermes runtime request",
             )
         return x_pantheon_hermes_actor.strip()
+
+    async def notify_runtime_start(run_id: str) -> None:
+        """Notify an optional display observer after canonical start recording."""
+
+        observer = getattr(app.state, "hermes_runtime_start_observer", None)
+        if observer is None:
+            return
+        try:
+            outcome = observer(run_id)
+            if inspect.isawaitable(outcome):
+                await outcome
+        except Exception as exc:
+            # Presentation failure must never roll back or reinterpret the
+            # already-recorded external runtime start.
+            app.state.hermes_runtime_start_observer_error = type(exc).__name__
 
     connect_fn = getattr(app.state, "connect_fn", None)
     if (
@@ -240,11 +256,12 @@ def install_hermes_execution_routes(
     def record_hermes_runtime_start(
         admission_id: str,
         body: HermesRuntimeStartBody,
+        background_tasks: BackgroundTasks,
         _authorized: None = Depends(require_hermes_key),
         actor: str = Depends(require_hermes_actor),
     ) -> dict:
         try:
-            return use_connection(
+            started = use_connection(
                 lambda conn: hermes_execution.record_external_runtime_start(
                     conn,
                     admission_id=admission_id,
@@ -255,6 +272,9 @@ def install_hermes_execution_routes(
                     launch_reservation_id=body.launch_reservation_id,
                 )
             )
+            if started.get("runtime_start_recorded") is True:
+                background_tasks.add_task(notify_runtime_start, body.run_id)
+            return started
         except hermes_execution.AdmissionNotFound as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
         except (

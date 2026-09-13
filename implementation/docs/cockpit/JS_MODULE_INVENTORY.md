@@ -35,23 +35,24 @@ The ordered classic chain is:
 14. `information_view_adapter.js`;
 15. `context/context_selection.js`;
 16. `handoff/handoff_lifecycle.js`;
-17. `handoff/handoff_send.js`;
-18. `actions/card_actions.js`;
-19. `actions/decision_request_actions.js`;
-20. `actions/change_candidate_actions.js`;
-21. `actions/change_candidate_review.js`;
-22. `schema_editor.js`;
-23. `contacts_editor.js`;
-24. `information_create.js`;
-25. `interactions/card_interactions.js`;
-26. `map/map_graph_model.js`;
-27. `map/map_layouts.js`;
-28. `map/map_tokens.js`;
-29. `map/map_corroboration.js`;
-30. `map/map_bundle.js`;
-31. `map/map_view.js`;
-32. `map/map_mount.js`;
-33. `map_binding.js`.
+17. `handoff/role_dialogue.js`;
+18. `handoff/handoff_send.js`;
+19. `actions/card_actions.js`;
+20. `actions/decision_request_actions.js`;
+21. `actions/change_candidate_actions.js`;
+22. `actions/change_candidate_review.js`;
+23. `schema_editor.js`;
+24. `contacts_editor.js`;
+25. `information_create.js`;
+26. `interactions/card_interactions.js`;
+27. `map/map_graph_model.js`;
+28. `map/map_layouts.js`;
+29. `map/map_tokens.js`;
+30. `map/map_corroboration.js`;
+31. `map/map_bundle.js`;
+32. `map/map_view.js`;
+33. `map/map_mount.js`;
+34. `map_binding.js`.
 
 The read-only knowledge-map lens (`map/`) binds to the projection snapshot
 (`window.PantheonCockpitGraph`) exposed by `projection/cockpit_projection.js`.
@@ -117,6 +118,7 @@ The exact Capability fields remain projection-only. Their presence in a Tool Car
 - `actions/change_candidate_actions.js`: human apply/reject actions for ChangeCandidates.
 - `actions/change_candidate_review.js`: human-only structured revision request, review annotations and append-only history projection. It creates no Hermes run and does not mutate the Project.
 - `handoff/handoff_lifecycle.js`: handoff preview, submission, bounded admission and revocation lifecycle.
+- `handoff/role_dialogue.js`: read-only progressive Role trace projection for one already-admitted Hermes run; it exposes no run-control or approval action.
 - `handoff/handoff_send.js`: convenience adapter that prepares then submits a handoff; it does not admit or dispatch execution.
 
 ### Context, bindings and data

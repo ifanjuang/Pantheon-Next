@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <meta name="description" content="Vue locale en lecture seule des dossiers documentaires Pantheon.">
+    <title>Pantheon — Dossiers</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Pantheon · Workspace</p>
+          <h1>Dossiers</h1>
+        </div>
+        <div class="sync-state" aria-label="État de la source">
+          <span class="sync-dot" aria-hidden="true"></span>
+          <span>Lecture seule · miroirs locaux</span>
+        </div>
+      </header>
+
+      <section class="summary" aria-label="Résumé de l’espace de travail">
+        <div class="summary-lead">
+          <span id="package-count" class="summary-number">—</span>
+          <span class="summary-label">dossiers observés</span>
+        </div>
+        <div id="status-counts" class="status-counts"></div>
+      </section>
+
+      <section class="role-dialogue" aria-labelledby="role-dialogue-title">
+        <div class="role-dialogue-head">
+          <div>
+            <p class="eyebrow">Exécution gouvernée</p>
+            <h2 id="role-dialogue-title">Dialogue des rôles</h2>
+          </div>
+          <span id="role-dialogue-state" class="role-dialogue-state" aria-live="polite">Aucune trace</span>
+        </div>
+        <p class="role-dialogue-boundary">Jalons publics observables · aucun raisonnement privé · aucune approbation implicite.</p>
+        <ol id="role-dialogue-events" class="role-dialogue-events" aria-live="polite"></ol>
+      </section>
+
+      <section class="controls" aria-label="Filtres">
+        <label class="search-field">
+          <span class="visually-hidden">Rechercher un dossier</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.1-5.4a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"/></svg>
+          <input id="search" type="search" placeholder="Rechercher un dossier…" autocomplete="off">
+        </label>
+        <button id="refresh" class="refresh" type="button">Actualiser</button>
+      </section>
+
+      <nav id="workspace-tabs" class="tabs" aria-label="Espaces documentaires"></nav>
+      <div id="status-filters" class="filters" aria-label="Filtrer par état"></div>
+
+      <section aria-live="polite">
+        <div id="loading" class="message">Lecture des dossiers…</div>
+        <div id="error" class="message error" hidden></div>
+        <div id="cards" class="cards" hidden></div>
+        <div id="empty" class="message" hidden>Aucun dossier ne correspond à ces filtres.</div>
+      </section>
+    </main>
+  </body>
+</html>

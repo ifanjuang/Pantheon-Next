@@ -18,7 +18,7 @@ components:
     kind: run_binding
     path: implementation/mvp_vertical/hermes_run_binding.py
     digest_mode: file
-    content_digest: sha256:f53f2b11c040b04539c147ab82ca0b0920341bdfd3c597b27e7ae29db4e72186
+    content_digest: sha256:65407df53d49ab4c0f8b6af1ac7369e5fe2d769185fb620ccfbbb38ad9b6fd03
     required: true
     enabled_by_default: false
     capabilities:
@@ -27,7 +27,8 @@ components:
       - record-runtime-start
       - record-runtime-return
       - record-typed-project-variant-return
-    notes: Stateless one-shot external binding; a structured Project variant return remains unselected candidate material and adds no queue, scheduler, retry worker, memory header or provider router.
+      - notify-role-trace-attachment
+    notes: Stateless one-shot external binding; the optional Role trace notification is display-only, and a structured Project variant return remains unselected candidate material. Neither adds a queue, scheduler, retry worker, memory header, provider router, run control or approval authority.
   - component_id: context-bridge
     kind: context_bridge
     path: implementation/hermes/plugins/pantheon-context-bridge

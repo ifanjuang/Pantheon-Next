@@ -183,6 +183,8 @@ def test_composed_app_mounts_candidate_review_routes_without_startup_effects():
     assert "GET" in methods_by_path["/apu-write-commands/{command_id}/authorizations"]
     assert "POST" in methods_by_path["/apu-write-commands/{command_id}/apply"]
     assert "GET" in methods_by_path["/agency/projects/{project_id}/project-anatomy"]
+    assert "GET" in methods_by_path["/cockpit/role-traces/{run_id}"]
+    assert "GET" in methods_by_path["/cockpit/role-traces/{run_id}/events"]
 
 
 def test_composed_initializer_replays_owner_and_review_migrations_in_dependency_order(monkeypatch):

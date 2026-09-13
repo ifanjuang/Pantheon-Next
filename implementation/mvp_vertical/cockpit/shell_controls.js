@@ -38,8 +38,12 @@
     document.body.classList.toggle("v2-hermes-open", open);
     if (open) {
       setMenuOpen(false);
+      document.dispatchEvent(new CustomEvent("pantheon:hermes-dock-open"));
       requestAnimationFrame(() => document.getElementById("v2-handoff-question")?.focus());
-    } else if (hermesDock.contains(document.activeElement)) {
+    } else {
+      document.dispatchEvent(new CustomEvent("pantheon:hermes-dock-close"));
+    }
+    if (!open && hermesDock.contains(document.activeElement)) {
       hermesToggle.focus();
     }
   }

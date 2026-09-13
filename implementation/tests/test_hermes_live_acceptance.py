@@ -2,16 +2,80 @@
 
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from mvp_vertical.hermes_live_acceptance import (
     EventCollection,
     HermesLiveAcceptanceRefused,
     HermesLiveBindingAcceptance,
+    HermesRunEventInspector,
     SYNTHETIC_MARKER,
     _tool_event_assessment,
     _validate_synthetic_envelope,
 )
+
+
+class _SseResponse:
+    def __init__(self, events):
+        self._events = events
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_args):
+        return False
+
+    def raise_for_status(self):
+        return None
+
+    def iter_lines(self):
+        for event in self._events:
+            yield "data: " + json.dumps(event)
+
+
+class _SseClient:
+    def __init__(self, events):
+        self._events = events
+
+    def stream(self, *_args, **_kwargs):
+        return _SseResponse(self._events)
+
+
+def test_event_inspector_projects_public_role_stages_beside_raw_events() -> None:
+    events = [
+        {"event": "reasoning.available", "text": "private", "timestamp": 1},
+        {
+            "event": "message.delta",
+            "delta": "🦉 Athena · Plan\nAction: vérifier\n",
+            "timestamp": 2,
+        },
+        {"event": "tool.started", "tool": "inventory", "timestamp": 3},
+        {
+            "event": "tool.completed",
+            "tool": "inventory",
+            "error": False,
+            "timestamp": 4,
+        },
+        {"event": "run.completed", "timestamp": 5},
+    ]
+    result = HermesRunEventInspector(
+        "http://hermes.invalid",
+        "api-key",
+        client=_SseClient(events),
+    ).collect_events("run-role-1")
+
+    assert result.events == events
+    assert result.stream_complete is True
+    assert [stage["visible_role"] for stage in result.role_stages] == [
+        "Athena",
+        "Athena",
+        "Hermes",
+        "Hermes",
+        "Athena",
+    ]
+    assert all(stage["private_reasoning_included"] is False for stage in result.role_stages)
 
 
 class _Observer:

@@ -14,12 +14,17 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **929**.
+Total indexed entries: **934**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-09-12 | `2026/Q3/2026-09-12-hermes-visible-role-projection-v1.md` | AI log — Hermes visible Role projection v1 |
 | 2026-09-12 | `2026/Q3/2026-09-12-hermes-runtime-efficiency-qualification.md` | AI log — Hermes runtime-efficiency qualification harness |
+| 2026-09-12 | `2026/Q3/2026-09-12-hermes-role-trace-relay-v3.md` | AI log — Hermes Role trace relay v3 |
+| 2026-09-12 | `2026/Q3/2026-09-12-hermes-role-stage-projector-v2.md` | AI log — Hermes Role stage projector v2 |
+| 2026-09-12 | `2026/Q3/2026-09-12-hermes-role-dialogue-v4.md` | Hermes Role dialogue V4 — admitted-run attachment and Cockpit view |
+| 2026-09-12 | `2026/Q3/2026-09-12-hermes-0.21.2-update.md` | AI log — Hermes Agent 0.21.2 update |
 | 2026-09-09 | `2026/Q3/2026-09-09-boundary-profile-migration-final-slice.md` | 2026-09-09 — Boundary profile migration: final slice (templates/, hermes/profiles/, docs/roadmaps/) |
 | 2026-09-09 | `2026/Q3/2026-09-09-athena-reasoning-hestia-context.md` | 2026-09-09 — Athena reasoning and Hestia situated-context convergence |
 | 2026-09-09 | `2026/Q3/2026-09-09-athena-live-referent-ambiguity-rebuild.md` | 2026-09-09 — Athena live referent ambiguity rebuild |

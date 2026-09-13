@@ -1,0 +1,25 @@
+# Local Ollama binding for Linux hosts.
+# Hermes uses host networking to reach Ollama on 127.0.0.1 while its own
+# HTTP surfaces remain bound to the explicitly selected node address.
+services:
+  hermes:
+    network_mode: host
+    ports: !reset []
+    extra_hosts: !reset []
+    environment:
+      API_SERVER_HOST: ${NODE_BIND_ADDRESS}
+      HERMES_DASHBOARD_HOST: ${NODE_BIND_ADDRESS}
+
+  hindsight:
+    network_mode: host
+    stop_grace_period: 40s
+    ports: !reset []
+    extra_hosts: !reset []
+    environment:
+      HINDSIGHT_API_HOST: ${NODE_BIND_ADDRESS}
+      # Hindsight Control Plane (Next.js) loops on 127.0.0.1 due to
+      # locale middleware URL normalization; bind to all interfaces.
+      HINDSIGHT_CP_HOSTNAME: 0.0.0.0
+      HINDSIGHT_API_LLM_PROVIDER: ollama
+      HINDSIGHT_API_LLM_BASE_URL: http://127.0.0.1:11434/v1
+      HINDSIGHT_API_LLM_MODEL: qwen3.5:9b
