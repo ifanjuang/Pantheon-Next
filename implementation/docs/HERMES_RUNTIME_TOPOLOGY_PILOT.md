@@ -1,7 +1,8 @@
 # Hermes Runtime Topology Pilot
 
-Status: implementation candidate — projection and contradictory-review binding
-contract implemented; live `pantheon-governed` Runs delegation not yet qualified.
+Status: implementation candidate — projection, read-only Cockpit topology view
+and contradictory-review binding contract implemented; live `pantheon-governed`
+Runs delegation not yet qualified.
 
 ## Objective
 
@@ -36,6 +37,36 @@ runtime.subagent -> explicit Hermes worker topology
 The SSE event name preserves that distinction. No relation is synthesized from
 time, ordering, Role labels or handoff prose. A runtime worker is explicitly
 marked `governed_identity: false`.
+
+## Cockpit presentation
+
+The composed Cockpit keeps the existing Role Trace Graph as DOM/CSS semantic
+lanes and renders Runtime Hermes separately. The runtime view uses a lazily
+loaded, integrity-pinned D3 tree layout only after a `runtime.subagent` event is
+observed.
+
+```text
+Role Trace Graph
+-> semantic responsibility lanes
+-> no worker identity
+
+Runtime Hermes
+-> D3 hierarchy/tree presentation
+-> explicit parent_id -> subagent_id relations only
+-> synthetic run root is display containment only
+```
+
+D3 is not a state store, scheduler, causal model or authority source. A missing
+parent event creates no inferred parent edge. Cycles are cut for display and
+reported rather than repaired. If D3 cannot load, the Cockpit falls back to a
+plain bounded list of observed worker identifiers and parent identifiers.
+
+The main Cockpit continues to use the existing Swiper-owned collection motion.
+On mobile, compact card collections expose an explicit fraction position while
+preserving horizontal sibling swipe, vertical parent/child swipe and the
+existing previous/next fallback when Swiper is unavailable. The Workspace
+Cockpit remains a filtered dossier inventory and is not reinterpreted as the
+same governed card carousel.
 
 ## `AUTOCRITIQUE_CONTRADICTOIRE` pilot
 
