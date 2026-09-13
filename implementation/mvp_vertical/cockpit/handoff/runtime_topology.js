@@ -1,11 +1,120 @@
 (() => {
   "use strict";
 
+  const STYLE_ID = "pantheon-runtime-topology-styles";
   const $ = id => document.getElementById(id);
   const nodes = new Map();
   let currentRun = "";
   let selectedId = "";
   let d3Promise = null;
+
+  function ensureStyles() {
+    if (document.getElementById(STYLE_ID)) return;
+    const style = document.createElement("style");
+    style.id = STYLE_ID;
+    style.textContent = `
+      .v2-runtime-topology {
+        display: grid;
+        gap: .55rem;
+        padding-top: .75rem;
+        border-top: 1px solid var(--cockpit-line);
+      }
+      .v2-runtime-topology-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: .75rem;
+      }
+      .v2-runtime-topology-state,
+      .v2-runtime-topology-boundary,
+      .v2-runtime-topology-detail-summary {
+        margin: 0;
+        color: var(--cockpit-muted);
+        font-size: .74rem;
+        line-height: 1.4;
+      }
+      .v2-runtime-topology-state { text-align: right; }
+      .v2-runtime-topology-tree {
+        min-height: 7.5rem;
+        max-width: 100%;
+        overflow-x: auto;
+        border: 1px solid var(--cockpit-line);
+        border-radius: 12px;
+        background: #f8f9fa;
+        scrollbar-width: thin;
+      }
+      .v2-runtime-topology-svg {
+        display: block;
+        width: max(100%, 20rem);
+        min-height: 7.5rem;
+        color: var(--cockpit-ink);
+      }
+      .v2-runtime-topology-link {
+        fill: none;
+        stroke: var(--cockpit-line);
+        stroke-width: 1.4;
+      }
+      .v2-runtime-topology-link--run { stroke-dasharray: 4 4; }
+      .v2-runtime-topology-node { cursor: pointer; }
+      .v2-runtime-topology-node--root { cursor: default; }
+      .v2-runtime-topology-node circle {
+        fill: #fff;
+        stroke: var(--cockpit-ink);
+        stroke-width: 1.4;
+      }
+      .v2-runtime-topology-node--root circle { fill: var(--cockpit-ink); }
+      .v2-runtime-topology-node circle[data-phase="started"] { stroke-dasharray: 3 2; }
+      .v2-runtime-topology-node circle[data-selected="true"] { stroke-width: 3; }
+      .v2-runtime-topology-node text {
+        fill: currentColor;
+        font-size: 11px;
+        font-weight: 700;
+        pointer-events: none;
+      }
+      .v2-runtime-topology-node:focus-visible circle {
+        stroke-width: 3;
+      }
+      .v2-runtime-topology-detail {
+        display: grid;
+        gap: .38rem;
+        padding: .65rem;
+        border: 1px solid var(--cockpit-line);
+        border-radius: 12px;
+        background: #f8f9fa;
+      }
+      .v2-runtime-topology-detail:empty { display: none; }
+      .v2-runtime-topology-detail-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: .75rem;
+        font-size: .78rem;
+      }
+      .v2-runtime-topology-detail-head span {
+        color: var(--cockpit-muted);
+        font-size: .68rem;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+      .v2-runtime-topology-detail dl {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: .2rem .5rem;
+        margin: 0;
+        font-size: .72rem;
+      }
+      .v2-runtime-topology-detail dt { color: var(--cockpit-muted); }
+      .v2-runtime-topology-detail dd { margin: 0; overflow-wrap: anywhere; }
+      .v2-runtime-topology-fallback {
+        display: grid;
+        gap: .35rem;
+        margin: 0;
+        padding: .7rem 1.4rem;
+        font-size: .74rem;
+      }
+    `;
+    document.head.append(style);
+  }
 
   function setState(message) {
     const node = $("v2-runtime-topology-state");
@@ -53,11 +162,13 @@
     }
 
     let cycleDetected = false;
+    const covered = new Set();
     const materialize = (event, path = new Set()) => {
       if (path.has(event.subagent_id)) {
         cycleDetected = true;
         return { event, children: [], cycleCut: true };
       }
+      covered.add(event.subagent_id);
       const nextPath = new Set(path);
       nextPath.add(event.subagent_id);
       return {
@@ -66,6 +177,13 @@
       };
     };
 
+    const children = roots.map(event => materialize(event));
+    for (const event of nodes.values()) {
+      if (covered.has(event.subagent_id)) continue;
+      cycleDetected = true;
+      children.push(materialize(event));
+    }
+
     return {
       data: {
         event: {
@@ -73,7 +191,7 @@
           synthetic_root: true,
           status: "run",
         },
-        children: roots.map(event => materialize(event)),
+        children,
       },
       cycleDetected,
     };
@@ -168,7 +286,7 @@
       .append("svg")
       .attr("class", "v2-runtime-topology-svg")
       .attr("viewBox", `0 0 ${width} ${height}`)
-      .attr("role", "tree")
+      .attr("role", "group")
       .attr("aria-label", "Topologie des workers Hermes observés");
     const graph = svg.append("g").attr("transform", `translate(28 ${offsetX})`);
 
@@ -224,6 +342,7 @@
     if (cycleDetected) setState(`${nodes.size} workers · relation cyclique coupée`);
   }
 
+  ensureStyles();
   window.PantheonRuntimeTopology = Object.freeze({ reset, consume: mergeEvent });
   reset("");
 })();
