@@ -10,6 +10,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 MOTION = COCKPIT / "collection" / "motion_adapter.js"
+CONTROLLER = COCKPIT / "collection" / "collection_controller.js"
 BOOTSTRAP = COCKPIT / "live_bootstrap.js"
 ADAPTER = COCKPIT / "live_collection_adapter.js"
 
@@ -34,6 +35,7 @@ def test_mobile_swiper_motion_javascript_parses() -> None:
 
 def test_compact_mobile_cards_use_existing_swiper_owner_with_fraction_position() -> None:
     motion = _read(MOTION)
+    controller = _read(CONTROLLER)
     adapter = _read(ADAPTER)
 
     assert 'const MOBILE_QUERY = "(max-width: 620px)";' in motion
@@ -46,7 +48,9 @@ def test_compact_mobile_cards_use_existing_swiper_owner_with_fraction_position()
     assert "mobile.addEventListener?.(\"change\", onMobileChange)" in motion
     assert "mobile.removeEventListener?.(\"change\", onMobileChange)" in motion
 
-    assert "createResponsiveMotion({" in adapter
+    assert 'import { createResponsiveMotion } from "./motion_adapter.js"' in controller
+    assert "const motion = createResponsiveMotion({" in controller
+    assert "new window.Swiper" not in controller
     assert "new window.Swiper" not in adapter
     assert "swiper-pagination" not in adapter
 
