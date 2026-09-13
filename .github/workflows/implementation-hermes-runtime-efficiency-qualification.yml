@@ -6,6 +6,7 @@ on:
       - ".github/workflows/implementation-hermes-runtime-efficiency-qualification.yml"
       - "implementation/labs/hermes_runtime_efficiency/**"
       - "implementation/tests/test_hermes_runtime_efficiency_lab.py"
+      - "implementation/tests/test_hermes_kv_cache_qualification.py"
   workflow_dispatch:
 
 permissions:
@@ -28,4 +29,7 @@ jobs:
 
       - name: Run Hermes runtime-efficiency lab tests
         working-directory: implementation
-        run: pytest -q tests/test_hermes_runtime_efficiency_lab.py
+        run: >-
+          pytest -q
+          tests/test_hermes_runtime_efficiency_lab.py
+          tests/test_hermes_kv_cache_qualification.py
