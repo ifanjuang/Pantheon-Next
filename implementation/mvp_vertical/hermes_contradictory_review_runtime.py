@@ -1,11 +1,11 @@
 """Bounded Hermes delegation contract for ``AUTOCRITIQUE_CONTRADICTOIRE``.
 
-The model-facing child produces findings only.  Governed identity, Task Contract
+The model-facing child produces findings only. Governed identity, Task Contract
 references, candidate digests, binding identity and closure semantics are added
 by the trusted caller before the existing deterministic contradictory-review
 compiler is invoked.
 
-This module prepares/compiles data only.  It does not dispatch a subagent,
+This module prepares/compiles data only. It does not dispatch a subagent,
 execute a tool, persist a review, admit Evidence, approve output or close a Rite.
 """
 
@@ -44,8 +44,16 @@ REVIEW_FINDINGS_SCHEMA: dict[str, Any] = {
                     "fresh_observation",
                 ],
                 "properties": {
-                    "observation_id": {"type": "string", "minLength": 1, "maxLength": 200},
-                    "claim_id": {"type": "string", "minLength": 1, "maxLength": 200},
+                    "observation_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200,
+                    },
+                    "claim_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200,
+                    },
                     "support_status": {
                         "type": "string",
                         "enum": [
@@ -60,12 +68,24 @@ REVIEW_FINDINGS_SCHEMA: dict[str, Any] = {
                         "type": "string",
                         "enum": ["notice", "warning", "blocking"],
                     },
-                    "method": {"type": "string", "minLength": 1, "maxLength": 2_000},
-                    "detail": {"type": "string", "minLength": 1, "maxLength": 8_000},
+                    "method": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2_000,
+                    },
+                    "detail": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 8_000,
+                    },
                     "artifact_refs": {
                         "type": "array",
                         "maxItems": 64,
-                        "items": {"type": "string", "minLength": 1, "maxLength": 1_000},
+                        "items": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 1_000,
+                        },
                     },
                     "fresh_observation": {"type": "boolean"},
                 },
@@ -77,23 +97,49 @@ REVIEW_FINDINGS_SCHEMA: dict[str, Any] = {
             "items": {
                 "type": "object",
                 "additionalProperties": False,
-                "required": ["occurrence_id", "pattern", "location", "status", "detail"],
+                "required": [
+                    "occurrence_id",
+                    "pattern",
+                    "location",
+                    "status",
+                    "detail",
+                ],
                 "properties": {
-                    "occurrence_id": {"type": "string", "minLength": 1, "maxLength": 200},
-                    "pattern": {"type": "string", "minLength": 1, "maxLength": 2_000},
-                    "location": {"type": "string", "minLength": 1, "maxLength": 2_000},
+                    "occurrence_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200,
+                    },
+                    "pattern": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2_000,
+                    },
+                    "location": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2_000,
+                    },
                     "status": {
                         "type": "string",
                         "enum": ["candidate", "confirmed", "not_found"],
                     },
-                    "detail": {"type": "string", "minLength": 1, "maxLength": 8_000},
+                    "detail": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 8_000,
+                    },
                 },
             },
         },
         "limits": {
             "type": "array",
             "maxItems": 100,
-            "items": {"type": "string", "minLength": 1, "maxLength": 4_000},
+            "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4_000,
+            },
         },
     },
 }
@@ -114,7 +160,9 @@ def _claims(values: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
         for value in values
     ]
     if not claims:
-        raise HermesContradictoryReviewRuntimeError("at least one governed claim is required")
+        raise HermesContradictoryReviewRuntimeError(
+            "at least one governed claim is required"
+        )
     ids = [claim["claim_id"] for claim in claims]
     if len(ids) != len(set(ids)):
         raise HermesContradictoryReviewRuntimeError("claim ids must be unique")
@@ -131,7 +179,7 @@ def build_delegate_task(
     """Build the one-task Hermes ``delegate_task`` payload for independent review.
 
     The advertised Hermes 0.21.2 spawn shape is ``tasks[]`` with per-task
-    ``output_schema``.  No Pantheon Role name is used as a runtime identity.
+    ``output_schema``. No Pantheon Role name is used as a runtime identity.
     """
 
     normalized_claims = _claims(claims)
@@ -142,7 +190,10 @@ def build_delegate_task(
             "candidate_id and candidate_digest are required"
         )
     context_payload = {
-        "candidate": {"candidate_id": candidate_id, "digest": candidate_digest},
+        "candidate": {
+            "candidate_id": candidate_id,
+            "digest": candidate_digest,
+        },
         "claims": normalized_claims,
         "review_context": str(review_context or "").strip() or None,
         "constraints": [
@@ -163,8 +214,9 @@ def build_delegate_task(
             {
                 "goal": (
                     "Independently challenge the supplied governed claims. "
-                    "Record only fresh review observations, analogous occurrences and explicit limits. "
-                    "Do not repair the candidate, decide approval or claim Pantheon Role authority."
+                    "Record only fresh review observations, analogous occurrences "
+                    "and explicit limits. Do not repair the candidate, decide "
+                    "approval or claim Pantheon Role authority."
                 ),
                 "context": context,
                 "output_schema": deepcopy(REVIEW_FINDINGS_SCHEMA),
@@ -185,7 +237,7 @@ def _json_object_from_summary(value: Any) -> dict[str, Any]:
             f"Hermes delegate summary exceeds {MAX_DELEGATE_SUMMARY_CHARS} characters"
         )
     text = value.strip()
-    if text.startswith("```",):
+    if text.startswith("```"):
         first_newline = text.find("\n")
         if first_newline >= 0:
             text = text[first_newline + 1 :]
@@ -237,7 +289,11 @@ def compile_delegate_result(
             "Hermes contradictory-review child output did not satisfy output_schema"
         )
     findings = _json_object_from_summary(delegate_entry.get("summary"))
-    unknown = set(findings) - {"observations", "analogous_occurrences", "limits"}
+    unknown = set(findings) - {
+        "observations",
+        "analogous_occurrences",
+        "limits",
+    }
     if unknown:
         raise HermesContradictoryReviewRuntimeError(
             "Hermes contradictory-review findings contain unsupported fields: "
@@ -263,13 +319,4 @@ def compile_delegate_result(
         "repair_applied": False,
         "scope_expanded": False,
     }
-    report = report_from_payload(payload).as_dict()
-    report["runtime_binding"] = {
-        "runtime": "Hermes",
-        "mechanism": "delegate_task",
-        "structured_output": True,
-        "worker_is_pantheon_role": False,
-        "schema_validated_by_runtime": True,
-        "authority_effect": "none",
-    }
-    return report
+    return report_from_payload(payload).as_dict()
