@@ -26,6 +26,11 @@
     color: #fff;
   }
 
+  .v2-role-dialogue-events[hidden],
+  .v2-role-graph[hidden] {
+    display: none !important;
+  }
+
   .v2-role-graph {
     display: grid;
     gap: .55rem;
