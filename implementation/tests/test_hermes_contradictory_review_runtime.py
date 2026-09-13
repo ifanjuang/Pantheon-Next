@@ -106,14 +106,7 @@ def test_schema_valid_child_result_compiles_through_existing_rite_contract() -> 
         "is_task_authorization": False,
         "requires_zeus_closure": True,
     }
-    assert report["runtime_binding"] == {
-        "runtime": "Hermes",
-        "mechanism": "delegate_task",
-        "structured_output": True,
-        "worker_is_pantheon_role": False,
-        "schema_validated_by_runtime": True,
-        "authority_effect": "none",
-    }
+    assert "runtime_binding" not in report
 
 
 def test_child_cannot_inject_governed_fields_or_bypass_schema_failure() -> None:
@@ -139,7 +132,11 @@ def test_child_cannot_inject_governed_fields_or_bypass_schema_failure() -> None:
 
     with pytest.raises(HermesContradictoryReviewRuntimeError, match="output_schema"):
         compile_delegate_result(
-            delegate_entry={"status": "completed", "schema_valid": False, "summary": "{}"},
+            delegate_entry={
+                "status": "completed",
+                "schema_valid": False,
+                "summary": "{}",
+            },
             claims=CLAIMS,
             task_contract_ref="task-contract:42",
             trigger_reason="material completion claim",
