@@ -33,7 +33,7 @@ components:
     kind: context_bridge
     path: implementation/hermes/plugins/pantheon-context-bridge
     digest_mode: tree
-    content_digest: sha256:7b3cb946eb774525c9e4fd3a19b45e4595262c3c373cff38a40fa53b6340bba2
+    content_digest: sha256:e65d6844d499afbf7831917a7af08097bd4d24a1dac99eb36c15026a62a16ad6
     required: true
     enabled_by_default: false
     capabilities:
