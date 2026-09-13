@@ -6,6 +6,9 @@
     Athena: "🦉", Argos: "🔎", Themis: "⚖", Apollo: "☀",
     Hephaistos: "🛠", Iris: "📨", Zeus: "⚡", Mnemosyne: "🧠", Hermes: "⚙",
   });
+  const ROLE_ORDER = Object.freeze([
+    "Athena", "Argos", "Hermes", "Hephaistos", "Themis", "Apollo", "Zeus", "Iris", "Mnemosyne",
+  ]);
   const DETAIL_LABELS = Object.freeze({
     action: "Action", raison: "Raison", but: "But", sources: "Sources",
     method: "Méthode", skill: "Skill", outil: "Outil", result: "Résultat",
@@ -21,7 +24,12 @@
   let admissionTimer = null;
   let reconnectTimer = null;
   let reconnects = 0;
+  let observationCounter = 0;
+  let activeView = "dialogue";
+  let selectedStageId = "";
   const stages = new Map();
+  const stageEvents = new Map();
+  const observedOrder = new Map();
 
   function setState(message) {
     const node = $("v2-role-dialogue-state");
@@ -36,14 +44,24 @@
     admissionTimer = reconnectTimer = null;
   }
 
+  function resetGraph() {
+    $("v2-role-graph-lanes")?.replaceChildren();
+    $("v2-role-graph-detail")?.replaceChildren();
+  }
+
   function resetForRun(runId) {
     if (runId === currentRun) return;
     stop();
     currentRun = runId;
     lastCursor = 0;
     reconnects = 0;
+    observationCounter = 0;
+    selectedStageId = "";
     stages.clear();
+    stageEvents.clear();
+    observedOrder.clear();
     $("v2-role-dialogue-events")?.replaceChildren();
+    resetGraph();
   }
 
   function stageDetails(host, values) {
@@ -64,8 +82,135 @@
     host.append(details);
   }
 
+  function stageSort(left, right) {
+    const leftSequence = Number(left?.sequence);
+    const rightSequence = Number(right?.sequence);
+    const leftHasSequence = Number.isSafeInteger(leftSequence);
+    const rightHasSequence = Number.isSafeInteger(rightSequence);
+    if (leftHasSequence && rightHasSequence && leftSequence !== rightSequence) return leftSequence - rightSequence;
+    return (observedOrder.get(left.stage_id) ?? 0) - (observedOrder.get(right.stage_id) ?? 0);
+  }
+
+  function orderedStages() {
+    return [...stageEvents.values()].sort(stageSort);
+  }
+
+  function roleOrder(events) {
+    const present = new Set(events.map(event => event.visible_role));
+    const canonical = ROLE_ORDER.filter(role => present.has(role));
+    const extras = [...present].filter(role => !ROLE_ORDER.includes(role));
+    return [...canonical, ...extras];
+  }
+
+  function renderGraphDetail(event) {
+    const host = $("v2-role-graph-detail");
+    if (!host) return;
+    host.replaceChildren();
+    if (!event) {
+      const empty = document.createElement("p");
+      empty.className = "v2-role-graph-detail-empty";
+      empty.textContent = "Sélectionnez un jalon pour afficher ses détails observables.";
+      host.append(empty);
+      return;
+    }
+
+    const head = document.createElement("div");
+    head.className = "v2-role-graph-detail-head";
+    const title = document.createElement("strong");
+    title.textContent = `${event.visible_role} — ${event.semantic_function || event.role_family || "Jalon"}`;
+    const status = document.createElement("span");
+    status.textContent = event.phase === "completed" ? "terminé" : "en cours";
+    head.append(title, status);
+
+    const summary = document.createElement("p");
+    summary.className = "v2-role-graph-detail-summary";
+    summary.textContent = event.summary || "Jalon public observé.";
+    const origin = document.createElement("p");
+    origin.className = "v2-role-graph-detail-origin";
+    origin.textContent = event.projection === "derived_transient"
+      ? "Projection transitoire dérivée du flux public Hermes."
+      : "Événement structuré émis par le runtime.";
+    host.append(head, summary, origin);
+    stageDetails(host, event.details);
+  }
+
+  function renderGraph() {
+    const host = $("v2-role-graph-lanes");
+    if (!host) return;
+    const events = orderedStages();
+    host.replaceChildren();
+    if (!events.length) {
+      const empty = document.createElement("p");
+      empty.className = "v2-role-graph-empty";
+      empty.textContent = "Aucun jalon observable pour cette exécution.";
+      host.append(empty);
+      renderGraphDetail(null);
+      return;
+    }
+
+    const stageColumns = new Map(events.map((event, index) => [event.stage_id, index + 1]));
+    for (const role of roleOrder(events)) {
+      const lane = document.createElement("div");
+      lane.className = "v2-role-graph-lane";
+      const label = document.createElement("div");
+      label.className = "v2-role-graph-label";
+      const icon = document.createElement("span");
+      icon.setAttribute("aria-hidden", "true");
+      icon.textContent = ROLE_ICONS[role] || "•";
+      const name = document.createElement("strong");
+      name.textContent = role;
+      label.append(icon, name);
+
+      const rail = document.createElement("div");
+      rail.className = "v2-role-graph-rail";
+      rail.style.gridTemplateColumns = `repeat(${events.length}, 3.1rem)`;
+      for (const event of events.filter(candidate => candidate.visible_role === role)) {
+        const node = document.createElement("button");
+        node.type = "button";
+        node.className = "v2-role-graph-node";
+        node.style.gridColumn = String(stageColumns.get(event.stage_id));
+        node.dataset.phase = event.phase || "updated";
+        node.dataset.projection = event.projection || "native";
+        node.classList.toggle("is-selected", event.stage_id === selectedStageId);
+        node.textContent = ROLE_ICONS[role] || "•";
+        node.title = event.summary || `${role} — jalon observable`;
+        node.setAttribute(
+          "aria-label",
+          `${role}, ${event.semantic_function || event.role_family || "jalon"}, ${event.summary || "jalon public observé"}`,
+        );
+        node.addEventListener("click", () => {
+          selectedStageId = event.stage_id;
+          renderGraph();
+        });
+        rail.append(node);
+      }
+      lane.append(label, rail);
+      host.append(lane);
+    }
+
+    if (selectedStageId && !stageEvents.has(selectedStageId)) selectedStageId = "";
+    renderGraphDetail(selectedStageId ? stageEvents.get(selectedStageId) : null);
+  }
+
+  function setView(view) {
+    activeView = view === "graph" ? "graph" : "dialogue";
+    const dialogue = $("v2-role-dialogue-events");
+    const graph = $("v2-role-graph");
+    if (dialogue) dialogue.hidden = activeView !== "dialogue";
+    if (graph) graph.hidden = activeView !== "graph";
+    for (const button of document.querySelectorAll("[data-role-trace-view]")) {
+      const selected = button.dataset.roleTraceView === activeView;
+      button.setAttribute("aria-selected", String(selected));
+      button.tabIndex = selected ? 0 : -1;
+    }
+    if (activeView === "graph") renderGraph();
+  }
+
   function renderStage(event) {
     if (!event?.stage_id || !event?.visible_role) return;
+    if (!observedOrder.has(event.stage_id)) observedOrder.set(event.stage_id, observationCounter++);
+    stageEvents.set(event.stage_id, { ...event });
+
     let item = stages.get(event.stage_id);
     if (!item) {
       item = document.createElement("li");
@@ -98,6 +243,7 @@
       : "Événement structuré émis par le runtime";
     item.append(icon, title, status, origin, summary);
     stageDetails(item, event.details);
+    if (activeView === "graph") renderGraph();
   }
 
   function consumeBlock(block) {
@@ -219,4 +365,8 @@
     resetForRun("");
     if (dockOpen()) void readActiveAdmission();
   });
+  for (const button of document.querySelectorAll("[data-role-trace-view]")) {
+    button.addEventListener("click", () => setView(button.dataset.roleTraceView));
+  }
+  setView("dialogue");
 })();
