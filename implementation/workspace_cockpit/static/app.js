@@ -116,16 +116,143 @@ elements["status-filters"].addEventListener("click", (event) => {
 load();
 
 const ROLE_ICONS = Object.freeze({ Athena: "🦉", Argos: "🔎", Themis: "⚖", Apollo: "☀", Hephaistos: "🛠", Iris: "📨", Zeus: "⚡", Mnemosyne: "🧠", Hermes: "⚙" });
+const ROLE_ORDER = Object.freeze(["Athena", "Argos", "Hermes", "Hephaistos", "Themis", "Apollo", "Zeus", "Iris", "Mnemosyne"]);
 const roleView = {
-  runId: "", cursor: 0, controller: null, stages: new Map(),
+  runId: "", cursor: 0, controller: null, stages: new Map(), stageEvents: new Map(), observedOrder: new Map(),
+  observationCounter: 0, activeView: "dialogue", selectedStageId: "",
   state: document.getElementById("role-dialogue-state"),
   events: document.getElementById("role-dialogue-events"),
+  graph: document.getElementById("role-graph"),
+  graphLanes: document.getElementById("role-graph-lanes"),
+  graphDetail: document.getElementById("role-graph-detail"),
 };
 
 function roleState(value) { roleView.state.textContent = value; }
 
+function roleStageSort(left, right) {
+  const leftSequence = Number(left?.sequence);
+  const rightSequence = Number(right?.sequence);
+  const leftHasSequence = Number.isSafeInteger(leftSequence);
+  const rightHasSequence = Number.isSafeInteger(rightSequence);
+  if (leftHasSequence && rightHasSequence && leftSequence !== rightSequence) return leftSequence - rightSequence;
+  return (roleView.observedOrder.get(left.stage_id) ?? 0) - (roleView.observedOrder.get(right.stage_id) ?? 0);
+}
+
+function orderedRoleStages() { return [...roleView.stageEvents.values()].sort(roleStageSort); }
+
+function visibleRoleOrder(events) {
+  const present = new Set(events.map((event) => event.visible_role));
+  return [...ROLE_ORDER.filter(role => present.has(role)), ...[...present].filter(role => !ROLE_ORDER.includes(role))];
+}
+
+function renderRoleGraphDetail(event) {
+  roleView.graphDetail.replaceChildren();
+  if (!event) {
+    const empty = document.createElement("p");
+    empty.className = "role-graph-detail-empty";
+    empty.textContent = "Sélectionnez un jalon pour afficher ses détails observables.";
+    roleView.graphDetail.append(empty);
+    return;
+  }
+  const head = document.createElement("div");
+  head.className = "role-graph-detail-head";
+  const title = document.createElement("strong");
+  title.textContent = `${event.visible_role} — ${event.semantic_function || event.role_family || "Jalon"}`;
+  const status = document.createElement("span");
+  status.textContent = event.phase === "completed" ? "terminé" : "en cours";
+  head.append(title, status);
+  const summary = document.createElement("p");
+  summary.className = "role-graph-detail-summary";
+  summary.textContent = event.summary || "Jalon public observé.";
+  const origin = document.createElement("p");
+  origin.className = "role-graph-detail-origin";
+  origin.textContent = event.projection === "derived_transient"
+    ? "Projection transitoire dérivée du flux public Hermes."
+    : "Événement structuré émis par le runtime.";
+  roleView.graphDetail.append(head, summary, origin);
+  const entries = Object.entries(event.details || {}).filter(([, value]) => value != null && value !== "");
+  if (entries.length) {
+    const list = document.createElement("dl");
+    for (const [key, value] of entries) {
+      const dt = document.createElement("dt");
+      const dd = document.createElement("dd");
+      dt.textContent = key.replaceAll("_", " ");
+      dd.textContent = String(value);
+      list.append(dt, dd);
+    }
+    roleView.graphDetail.append(list);
+  }
+}
+
+function renderRoleGraph() {
+  const events = orderedRoleStages();
+  roleView.graphLanes.replaceChildren();
+  if (!events.length) {
+    const empty = document.createElement("p");
+    empty.className = "role-graph-empty";
+    empty.textContent = "Aucun jalon observable pour cette exécution.";
+    roleView.graphLanes.append(empty);
+    renderRoleGraphDetail(null);
+    return;
+  }
+
+  const stageColumns = new Map(events.map((event, index) => [event.stage_id, index + 1]));
+  for (const role of visibleRoleOrder(events)) {
+    const lane = document.createElement("div");
+    lane.className = "role-graph-lane";
+    const label = document.createElement("div");
+    label.className = "role-graph-label";
+    const icon = document.createElement("span");
+    icon.setAttribute("aria-hidden", "true");
+    icon.textContent = ROLE_ICONS[role] || "•";
+    const name = document.createElement("strong");
+    name.textContent = role;
+    label.append(icon, name);
+
+    const rail = document.createElement("div");
+    rail.className = "role-graph-rail";
+    rail.style.gridTemplateColumns = `repeat(${events.length}, 3.1rem)`;
+    for (const event of events.filter(candidate => candidate.visible_role === role)) {
+      const node = document.createElement("button");
+      node.type = "button";
+      node.className = "role-graph-node";
+      node.style.gridColumn = String(stageColumns.get(event.stage_id));
+      node.dataset.phase = event.phase || "updated";
+      node.dataset.projection = event.projection || "native";
+      node.classList.toggle("is-selected", event.stage_id === roleView.selectedStageId);
+      node.textContent = ROLE_ICONS[role] || "•";
+      node.title = event.summary || `${role} — jalon observable`;
+      node.setAttribute("aria-label", `${role}, ${event.semantic_function || event.role_family || "jalon"}, ${event.summary || "jalon public observé"}`);
+      node.addEventListener("click", () => {
+        roleView.selectedStageId = event.stage_id;
+        renderRoleGraph();
+      });
+      rail.append(node);
+    }
+    lane.append(label, rail);
+    roleView.graphLanes.append(lane);
+  }
+
+  if (roleView.selectedStageId && !roleView.stageEvents.has(roleView.selectedStageId)) roleView.selectedStageId = "";
+  renderRoleGraphDetail(roleView.selectedStageId ? roleView.stageEvents.get(roleView.selectedStageId) : null);
+}
+
+function setRoleTraceView(view) {
+  roleView.activeView = view === "graph" ? "graph" : "dialogue";
+  roleView.events.hidden = roleView.activeView !== "dialogue";
+  roleView.graph.hidden = roleView.activeView !== "graph";
+  for (const button of document.querySelectorAll("[data-role-trace-view]")) {
+    const selected = button.dataset.roleTraceView === roleView.activeView;
+    button.setAttribute("aria-selected", String(selected));
+    button.tabIndex = selected ? 0 : -1;
+  }
+  if (roleView.activeView === "graph") renderRoleGraph();
+}
+
 function renderRoleStage(event) {
   if (!event?.stage_id || !event?.visible_role) return;
+  if (!roleView.observedOrder.has(event.stage_id)) roleView.observedOrder.set(event.stage_id, roleView.observationCounter++);
+  roleView.stageEvents.set(event.stage_id, { ...event });
   let item = roleView.stages.get(event.stage_id);
   if (!item) {
     item = document.createElement("li");
@@ -141,6 +268,7 @@ function renderRoleStage(event) {
   const summary = document.createElement("p"); summary.className = "role-stage-summary"; summary.textContent = event.summary || "Jalon public observé.";
   const origin = document.createElement("span"); origin.className = "role-stage-origin"; origin.textContent = event.projection === "derived_transient" ? "Dérivé du flux public" : "Événement natif";
   item.append(icon, title, status, summary, origin);
+  if (roleView.activeView === "graph") renderRoleGraph();
 }
 
 function consumeRoleBlock(block) {
@@ -163,7 +291,16 @@ async function followRoleTrace(runId) {
   if (!runId) return;
   if (runId !== roleView.runId) {
     roleView.controller?.abort();
-    roleView.runId = runId; roleView.cursor = 0; roleView.stages.clear(); roleView.events.replaceChildren();
+    roleView.runId = runId;
+    roleView.cursor = 0;
+    roleView.observationCounter = 0;
+    roleView.selectedStageId = "";
+    roleView.stages.clear();
+    roleView.stageEvents.clear();
+    roleView.observedOrder.clear();
+    roleView.events.replaceChildren();
+    roleView.graphLanes.replaceChildren();
+    roleView.graphDetail.replaceChildren();
   }
   roleView.controller = new AbortController();
   const headers = roleView.cursor ? { "Last-Event-ID": String(roleView.cursor) } : {};
@@ -202,5 +339,9 @@ async function discoverLatestRoleTrace() {
   }
 }
 
+for (const button of document.querySelectorAll("[data-role-trace-view]")) {
+  button.addEventListener("click", () => setRoleTraceView(button.dataset.roleTraceView));
+}
+setRoleTraceView("dialogue");
 void discoverLatestRoleTrace();
 window.setInterval(discoverLatestRoleTrace, 5000);

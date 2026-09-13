@@ -308,3 +308,178 @@
     .v2-document-chunk-item dl { grid-template-columns: 1fr; }
   }
 }
+
+@layer editors {
+  .v2-role-trace-tabs {
+    display: inline-flex;
+    width: max-content;
+    padding: .18rem;
+    border: 1px solid var(--cockpit-line);
+    border-radius: 999px;
+    background: #f2f3f4;
+  }
+
+  .v2-role-trace-tab {
+    min-height: 1.9rem;
+    padding: .28rem .7rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--cockpit-muted);
+    font: inherit;
+    font-size: .74rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .v2-role-trace-tab[aria-selected="true"] {
+    background: var(--cockpit-ink);
+    color: #fff;
+  }
+
+  .v2-role-dialogue-events[hidden],
+  .v2-role-graph[hidden] {
+    display: none !important;
+  }
+
+  .v2-role-graph {
+    display: grid;
+    gap: .55rem;
+  }
+
+  .v2-role-graph-boundary,
+  .v2-role-graph-empty,
+  .v2-role-graph-detail-empty,
+  .v2-role-graph-detail-summary,
+  .v2-role-graph-detail-origin {
+    margin: 0;
+    color: var(--cockpit-muted);
+    font-size: .74rem;
+    line-height: 1.4;
+  }
+
+  .v2-role-graph-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    padding: .25rem 0 .35rem;
+    scrollbar-width: thin;
+  }
+
+  .v2-role-graph-lanes {
+    display: grid;
+    gap: .42rem;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .v2-role-graph-lane {
+    display: grid;
+    grid-template-columns: 7.2rem auto;
+    align-items: center;
+    gap: .45rem;
+    min-height: 2.5rem;
+  }
+
+  .v2-role-graph-label {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    min-height: 2.2rem;
+    padding: .28rem .45rem;
+    border-right: 1px solid var(--cockpit-line);
+    background: #fff;
+    font-size: .75rem;
+  }
+
+  .v2-role-graph-label span { font-size: 1rem; }
+
+  .v2-role-graph-rail {
+    position: relative;
+    display: grid;
+    align-items: center;
+    min-height: 2.2rem;
+    padding: .1rem .45rem;
+  }
+
+  .v2-role-graph-rail::before {
+    content: "";
+    position: absolute;
+    inset: 50% .45rem auto;
+    height: 1px;
+    background: color-mix(in srgb, var(--cockpit-line) 82%, transparent);
+    transform: translateY(-50%);
+  }
+
+  .v2-role-graph-node {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    justify-self: center;
+    padding: 0;
+    border: 1px solid var(--cockpit-line);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--cockpit-ink);
+    font-size: .9rem;
+    cursor: pointer;
+  }
+
+  .v2-role-graph-node[data-phase="started"],
+  .v2-role-graph-node[data-phase="updated"] {
+    border-color: color-mix(in srgb, var(--pantheon-cyan) 60%, var(--cockpit-line));
+  }
+
+  .v2-role-graph-node[data-projection="derived_transient"] { border-style: dashed; }
+
+  .v2-role-graph-node.is-selected {
+    outline: 2px solid var(--cockpit-ink);
+    outline-offset: 2px;
+  }
+
+  .v2-role-graph-detail {
+    display: grid;
+    gap: .38rem;
+    padding: .65rem;
+    border: 1px solid var(--cockpit-line);
+    border-radius: 12px;
+    background: #f8f9fa;
+  }
+
+  .v2-role-graph-detail:empty { display: none; }
+
+  .v2-role-graph-detail-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: .75rem;
+    font-size: .78rem;
+  }
+
+  .v2-role-graph-detail-head span {
+    color: var(--cockpit-muted);
+    font-size: .68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .v2-role-graph-detail details { font-size: .74rem; }
+  .v2-role-graph-detail details dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: .2rem .5rem;
+    margin: .35rem 0 0;
+  }
+  .v2-role-graph-detail details dt { color: var(--cockpit-muted); }
+  .v2-role-graph-detail details dd { margin: 0; overflow-wrap: anywhere; }
+
+  @media (max-width: 420px) {
+    .v2-role-graph-lane { grid-template-columns: 5.6rem auto; }
+    .v2-role-graph-label { font-size: .7rem; }
+  }
+}
