@@ -3,28 +3,33 @@
 
 The repository creates candidates far more readily than it resolves them. The
 promotion rule (`AUTHORITY_INDEX.md`, B-5) is deliberate about *how* a candidate
-leaves that state, and it is explicit that age alone promotes nothing. What is
-missing is not a promotion shortcut but a way to tell two situations apart:
+leaves that state, and it is explicit that age alone promotes nothing. This
+check separates a candidate deliberately kept as one from a candidate nobody
+has revisited.
 
-    a candidate deliberately kept as a candidate
-    a candidate nobody has looked at since it was written
+It reports; it does not fail on age. A candidate leaves the report by promotion
+with a referent, by archival, or by a dated human review cited in the document
+header.
 
-Today those are indistinguishable. This check makes the second one visible.
-
-It reports; it does not fail on age. A candidate leaves the report in one of
-three ways, all of them decisions:
-
-    promotion   with a referent, per the promotion rule
-    archival    per CHARON
-    a dated review recorded in ai_logs/ and cited in the document header
-
-The last one is what the optional header line records:
+Historical review markers may cite a repository record under `ai_logs/`:
 
     Candidacy reviewed: 2026-08-31 (ai_logs/2026/Q3/2026-08-31-some-review.md)
 
-placed in the same header block as `Status:`. It restarts the clock. A
-malformed line, a future date, or a record that does not exist *is* a failure:
-an aging reset that cites nothing is worse than no reset at all.
+New markers may instead cite an explicit GitHub decision referent in this
+repository:
+
+    Candidacy reviewed: 2026-08-31 (PR #123)
+    Candidacy reviewed: 2026-08-31 (issue #456)
+
+A PR or issue reference is only a durable referent. Its existence, merge state,
+CI status or automation output is not a human decision. Governance still
+requires the cited discussion to contain an explicit human review/decision.
+This checker deliberately validates the bounded reference syntax without
+turning GitHub availability or CI success into authorization.
+
+The marker is placed in the same header block as `Status:` and restarts the
+clock. A malformed line, future date, invalid referent, or missing legacy
+`ai_logs/` record is a failure.
 
 Where the start date comes from
 -------------------------------
@@ -33,11 +38,9 @@ silently; the commit history is a fact. For each candidate the check walks its
 commits backwards and finds when the document last entered the candidate state.
 
 This repository's history begins at its own import commit, and the predecessor
-repository is retired and is not a source dependency. So for a document that
-arrived with that import, the true candidacy start is simply not observable
-here. Those rows are reported as `imported` rather than given a fabricated age:
-the observable clock starts at the import, and the check says so instead of
-pretending otherwise.
+repository is retired and is not a source dependency. For a document that
+arrived with that import, the true candidacy start is not observable here. Such
+rows are reported as `imported` rather than given a fabricated age.
 """
 
 from __future__ import annotations
@@ -52,12 +55,8 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
-
 _HEADERS_PATH = Path(__file__).resolve().parent / "check_status_headers.py"
 
-# The authority class is the head of the Status line, before the first em dash.
-# A descriptive tail may mention candidates without being one: "active support
-# doctrine — workflow candidate forging" is active doctrine, not a candidate.
 _CANDIDATE_HEAD = re.compile(r"^(candidate\b|to[\s/]+verify\b)", re.IGNORECASE)
 _TO_VERIFY_HEAD = re.compile(r"\bto[\s/]+verify\b", re.IGNORECASE)
 
@@ -66,6 +65,7 @@ REVIEW_MARKER = re.compile(
     re.IGNORECASE,
 )
 REVIEW_PREFIX = re.compile(r"^\s*Candidacy\s+reviewed\s*:", re.IGNORECASE)
+GITHUB_DECISION_REF = re.compile(r"^(?:PR|issue)\s+#[1-9]\d*$", re.IGNORECASE)
 
 HEADER_LINES = 10
 DEFAULT_THRESHOLD_DAYS = 180
@@ -82,17 +82,8 @@ def _load_status_headers():
 HEADERS = _load_status_headers()
 
 
-# ---------------------------------------------------------------------------
-# Pure classification and parsing
-# ---------------------------------------------------------------------------
-
-
 def status_head(status: str) -> str:
-    """The authority-class part of a Status value, before any descriptive tail.
-
-    The corpus separates class from description with an em dash, and a handful
-    of documents use a spaced hyphen instead.
-    """
+    """Return the authority-class part of a Status value."""
     head = status.split("—")[0].split(" - ")[0]
     return head.strip().rstrip(".").strip()
 
@@ -105,10 +96,38 @@ def is_candidate(status: str | None) -> bool:
     return bool(_CANDIDATE_HEAD.match(head) or _TO_VERIFY_HEAD.search(head))
 
 
+def _validate_review_referent(record: str) -> str | None:
+    """Validate a bounded candidacy-review referent.
+
+    Legacy `ai_logs/` paths are resolved locally and must exist. New GitHub
+    referents are deliberately limited to a PR or issue number in this same
+    repository. The checker does not infer a human decision from GitHub state;
+    that semantic requirement remains governance-owned and reviewable.
+    """
+    if GITHUB_DECISION_REF.fullmatch(record):
+        return None
+
+    try:
+        resolved = (ROOT / record).resolve()
+        ai_logs_root = (ROOT / "ai_logs").resolve()
+        inside = resolved.is_relative_to(ai_logs_root)
+    except (OSError, ValueError):
+        return f"'Candidacy reviewed:' referent is not usable: {record!r}"
+
+    if not inside:
+        return (
+            "'Candidacy reviewed:' referent must be a legacy ai_logs/ record, "
+            f"'PR #<n>' or 'issue #<n>'; got {record!r}"
+        )
+    if not resolved.is_file():
+        return f"'Candidacy reviewed:' legacy record does not exist: {record}"
+    return None
+
+
 def parse_review_marker(
     lines: list[str], today: dt.date
 ) -> tuple[dt.date | None, str | None, str | None]:
-    """Return (reviewed_date, record_path, error) for the optional header line."""
+    """Return (reviewed_date, decision_referent, error) for the optional header."""
     for raw in lines[:HEADER_LINES]:
         if not REVIEW_PREFIX.match(raw):
             continue
@@ -116,41 +135,29 @@ def parse_review_marker(
         if not match:
             return None, None, (
                 "malformed 'Candidacy reviewed:' line; expected "
-                "'Candidacy reviewed: YYYY-MM-DD (ai_logs/<year>/Q<n>/<file>.md)'"
+                "'Candidacy reviewed: YYYY-MM-DD (<decision referent>)'"
             )
         try:
             reviewed = dt.date.fromisoformat(match.group("date"))
         except ValueError:
-            return None, None, f"'Candidacy reviewed:' date is not ISO 8601: {match.group('date')!r}"
-        record = match.group("record").strip()
-        if reviewed > today:
-            return None, None, f"'Candidacy reviewed:' date is in the future: {reviewed.isoformat()}"
-        # Containment, not a prefix test. `ai_logs/../docs/governance/STATUS.md`
-        # starts with the right string and resolves to a real file that is not a
-        # record at all, so a candidate could reset its own clock by citing a
-        # governance document.
-        try:
-            resolved = (ROOT / record).resolve()
-            inside = resolved.is_relative_to((ROOT / "ai_logs").resolve())
-        except (OSError, ValueError):
-            return None, None, f"'Candidacy reviewed:' record is not a usable path: {record!r}"
-        if not inside:
             return None, None, (
-                f"'Candidacy reviewed:' record must resolve inside ai_logs/, got {record!r}"
+                f"'Candidacy reviewed:' date is not ISO 8601: {match.group('date')!r}"
             )
-        if not resolved.is_file():
-            return None, None, f"'Candidacy reviewed:' record does not exist: {record}"
+        if reviewed > today:
+            return None, None, (
+                f"'Candidacy reviewed:' date is in the future: {reviewed.isoformat()}"
+            )
+
+        record = match.group("record").strip()
+        error = _validate_review_referent(record)
+        if error:
+            return None, None, error
         return reviewed, record, None
     return None, None, None
 
 
 def age_days(since: dt.date, today: dt.date) -> int:
     return (today - since).days
-
-
-# ---------------------------------------------------------------------------
-# Git-derived candidacy start
-# ---------------------------------------------------------------------------
 
 
 class _Blobs:
@@ -184,7 +191,9 @@ class _Blobs:
 
 
 def _git(args: list[str]) -> str:
-    return subprocess.check_output(["git", *args], cwd=ROOT, text=True, stderr=subprocess.DEVNULL)
+    return subprocess.check_output(
+        ["git", *args], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+    )
 
 
 def _root_commits() -> set[str]:
@@ -195,15 +204,11 @@ def _root_commits() -> set[str]:
 
 
 def _file_commits(rel: str) -> list[tuple[str, dt.date, str]]:
-    """Commits touching `rel`, newest first, as (sha, author date, path then).
-
-    History is followed across renames. Without that, renaming a candidate
-    resets its clock to the rename commit, and a document unresolved for a year
-    reads as new. The path is carried per commit because the blob lookup needs
-    the name the file had at that commit, not the name it has now.
-    """
+    """Commits touching `rel`, newest first, as (sha, author date, path then)."""
     try:
-        raw = _git(["log", "--follow", "--name-status", "--format=%x00%H%x09%aI", "--", rel])
+        raw = _git(
+            ["log", "--follow", "--name-status", "--format=%x00%H%x09%aI", "--", rel]
+        )
     except subprocess.CalledProcessError:
         return []
 
@@ -219,7 +224,6 @@ def _file_commits(rel: str) -> list[tuple[str, dt.date, str]]:
             continue
         sha, stamp = header.split("\t", 1)
         rows.append((sha, dt.datetime.fromisoformat(stamp).date(), current))
-        # A rename tells us what the file was called before this commit.
         for entry in lines[1:]:
             parts = entry.split("\t")
             if parts and parts[0].startswith("R") and len(parts) >= 3:
@@ -228,29 +232,23 @@ def _file_commits(rel: str) -> list[tuple[str, dt.date, str]]:
     return rows
 
 
-def candidacy_start(rel: str, blobs: _Blobs, roots: set[str]) -> tuple[dt.date | None, str]:
-    """When `rel` last entered the candidate state, and how well we know it.
-
-    Provenance is `observed` when the transition is visible in this repository's
-    history, `imported` when the document was already a candidate at the import
-    commit, and `unknown` when history is unavailable (a shallow clone).
-    """
+def candidacy_start(
+    rel: str, blobs: _Blobs, roots: set[str]
+) -> tuple[dt.date | None, str]:
+    """When `rel` last entered candidate state, and how well we know it."""
     commits = _file_commits(rel)
     if not commits:
         return None, "unknown"
     start_sha, start_date, _ = commits[0]
     for sha, when, path_then in commits:
-        _, status = HEADERS.detect_status((blobs.read(f"{sha}:{path_then}") or "").splitlines())
+        _, status = HEADERS.detect_status(
+            (blobs.read(f"{sha}:{path_then}") or "").splitlines()
+        )
         if not is_candidate(status):
             break
         start_sha, start_date = sha, when
     provenance = "imported" if start_sha in roots else "observed"
     return start_date, provenance
-
-
-# ---------------------------------------------------------------------------
-# Report
-# ---------------------------------------------------------------------------
 
 
 def collect(today: dt.date) -> tuple[list[dict], list[str], dict[str, int]]:
@@ -302,8 +300,13 @@ def render(
     today: dt.date,
     list_imported: bool = False,
 ) -> str:
-    aged = [row for row in rows if row["age"] is not None and row["age"] >= threshold]
-    observed = [row for row in rows if row["provenance"] in {"observed", "reviewed"}]
+    aged = [
+        row for row in rows
+        if row["age"] is not None and row["age"] >= threshold
+    ]
+    observed = [
+        row for row in rows if row["provenance"] in {"observed", "reviewed"}
+    ]
     imported = [row for row in rows if row["provenance"] == "imported"]
 
     out = [
@@ -317,8 +320,8 @@ def render(
         f"- candidacy start not observable (present at import): {len(imported)}",
         "",
         "Age does not promote anything. A row leaves this report by promotion "
-        "with a referent, by archival, or by a dated review recorded in "
-        "`ai_logs/` and cited in the document header.",
+        "with a referent, by archival, or by a dated human review with an "
+        "explicit decision referent in the document header.",
         "",
     ]
 
@@ -336,7 +339,10 @@ def render(
             )
         out.append("")
     else:
-        out += [f"No candidate has been unresolved for {threshold} days or more.", ""]
+        out += [
+            f"No candidate has been unresolved for {threshold} days or more.",
+            "",
+        ]
 
     if imported:
         out += [
@@ -358,7 +364,9 @@ def render(
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--aging-threshold-days", type=int, default=DEFAULT_THRESHOLD_DAYS)
+    parser.add_argument(
+        "--aging-threshold-days", type=int, default=DEFAULT_THRESHOLD_DAYS
+    )
     parser.add_argument(
         "--strict",
         action="store_true",
@@ -375,7 +383,11 @@ def main() -> int:
     today = dt.date.fromisoformat(args.today) if args.today else dt.date.today()
     rows, errors, classes = collect(today)
     report = render(
-        rows, classes, args.aging_threshold_days, today, list_imported=args.list_imported
+        rows,
+        classes,
+        args.aging_threshold_days,
+        today,
+        list_imported=args.list_imported,
     )
     print(report)
 
@@ -391,7 +403,10 @@ def main() -> int:
         return 1
 
     if args.strict:
-        aged = [row for row in rows if row["age"] is not None and row["age"] >= args.aging_threshold_days]
+        aged = [
+            row for row in rows
+            if row["age"] is not None and row["age"] >= args.aging_threshold_days
+        ]
         if aged:
             print(
                 f"\n--strict: {len(aged)} candidate(s) unresolved past "
