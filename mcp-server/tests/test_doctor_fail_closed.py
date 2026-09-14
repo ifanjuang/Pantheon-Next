@@ -38,6 +38,20 @@ class TestDoctorFailClosed(unittest.TestCase):
                 {"expected", "evaluated", "passed", "failed", "not_run"},
             )
 
+    def test_ai_logs_are_not_part_of_mandatory_file_health(self) -> None:
+        self.assertNotIn("ai_logs/README.md", doctor.MANDATORY_FILES)
+        for relative in doctor.MANDATORY_FILES:
+            source = self.repo / relative
+            target = self.tmp / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, target)
+
+        self.assertFalse((self.tmp / "ai_logs").exists())
+        result = doctor.check_mandatory_files(self.tmp)
+        self.assertTrue(result["ok"], result)
+        self.assertEqual(result["status"], "pass")
+        self.assertEqual(result["missing"], [])
+
     def test_missing_required_instance_directory_is_not_run(self) -> None:
         result = doctor.check_vertical_slice(self.tmp)
         self.assertFalse(result["ok"])
