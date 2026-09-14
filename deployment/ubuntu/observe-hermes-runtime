@@ -132,7 +132,10 @@ if [[ "$running" == "true" ]]; then
 
   if (( external_rc == 0 )) && [[ -n "$external_raw" ]]; then
     if printf '%s' "$external_raw" | jq -e . >/dev/null 2>&1; then
-      external_dirs="$(printf '%s' "$external_raw" | jq -c 'if type == "string" then (try fromjson catch .) else . end')"
+      external_dirs="$(printf '%s' "$external_raw" | jq -c '
+        (if type == "object" and has("value") then .value else . end)
+        | if type == "string" then (try fromjson catch .) else . end
+      ')"
       external_dirs_status="observed"
     else
       external_dirs_status="invalid_json"
@@ -231,7 +234,7 @@ jq -n \
       projected:$skills
     },
     runtime_version:{status:$version_status, value:$runtime_version},
-    observation_process_started:($running == true),
+    read_only_exec_attempted:($running == true),
     write_effect:false,
     activation_changed:false,
     authority_effect:"none",
