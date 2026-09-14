@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   merge-main:
-    if: github.actor != 'github-actions[bot]'
+    if: ${{ github.actor != 'github-actions[bot]' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -31,80 +31,79 @@ jobs:
           set -e
 
           if [ "$merge_status" -ne 0 ]; then
-            mapfile -t conflicts < <(git diff --name-only --diff-filter=U | sort)
-            expected=(
-              "ai_logs/INDEX.md"
-              "implementation/hermes/distribution/pantheon-standard.lock.yaml"
-              "templates/hermes/profiles/pantheon-governed/SOUL.append.md"
-            )
-            if [ "${conflicts[*]}" != "${expected[*]}" ]; then
-              printf 'Unexpected conflicts:\n%s\n' "${conflicts[*]}"
-              exit 1
-            fi
-
-            # INDEX is generated: start from current main, then regenerate over the merged tree.
-            git checkout --theirs -- ai_logs/INDEX.md
-
-            # Distribution lock: #1057 owns Hermes 0.21.2 + context-bridge digest;
-            # current main owns the independently changed runtime-observer digest.
-            runtime_observer_digest="$({ git show :3:implementation/hermes/distribution/pantheon-standard.lock.yaml; } | python3 -c '
-import re, sys
-text=sys.stdin.read()
-m=re.search(r"component_id: runtime-observer.*?content_digest: (sha256:[0-9a-f]+)", text, re.S)
-assert m, "runtime-observer digest not found in main stage"
-print(m.group(1))
-')"
-            git checkout --ours -- implementation/hermes/distribution/pantheon-standard.lock.yaml
-            RUNTIME_OBSERVER_DIGEST="$runtime_observer_digest" python3 - <<'PY'
+            python3 - <<'PY'
           import os
           import re
-          from pathlib import Path
-          path = Path("implementation/hermes/distribution/pantheon-standard.lock.yaml")
-          text = path.read_text(encoding="utf-8")
-          pattern = r"(component_id: runtime-observer.*?content_digest: )sha256:[0-9a-f]+"
-          new, count = re.subn(pattern, rf"\g<1>{os.environ['RUNTIME_OBSERVER_DIGEST']}", text, count=1, flags=re.S)
-          if count != 1:
-              raise SystemExit(f"expected one runtime-observer digest, replaced {count}")
-          if 'version: "0.21.2"' not in new:
-              raise SystemExit("Hermes 0.21.2 pin was not preserved")
-          path.write_text(new, encoding="utf-8")
-          PY
-
-            # SOUL: keep #1057's governed-method/source-preflight profile and insert
-            # main's metathought presentation block without duplicating either authority path.
-            python3 - <<'PY'
           import subprocess
           from pathlib import Path
-          path = "templates/hermes/profiles/pantheon-governed/SOUL.append.md"
-          ours = subprocess.check_output(["git", "show", f":2:{path}"], text=True)
-          theirs = subprocess.check_output(["git", "show", f":3:{path}"], text=True)
+
+          expected = [
+              "ai_logs/INDEX.md",
+              "implementation/hermes/distribution/pantheon-standard.lock.yaml",
+              "templates/hermes/profiles/pantheon-governed/SOUL.append.md",
+          ]
+          conflicts = sorted(
+              line for line in subprocess.check_output(
+                  ["git", "diff", "--name-only", "--diff-filter=U"], text=True
+              ).splitlines() if line
+          )
+          if conflicts != expected:
+              raise SystemExit(f"unexpected conflicts: {conflicts}")
+
+          # Generated index: current main is a valid starting point; regenerate later.
+          subprocess.run(["git", "checkout", "--theirs", "--", "ai_logs/INDEX.md"], check=True)
+
+          lock_path = "implementation/hermes/distribution/pantheon-standard.lock.yaml"
+          ours_lock = subprocess.check_output(["git", "show", f":2:{lock_path}"], text=True)
+          theirs_lock = subprocess.check_output(["git", "show", f":3:{lock_path}"], text=True)
+          digest_match = re.search(
+              r"component_id: runtime-observer.*?content_digest: (sha256:[0-9a-f]+)",
+              theirs_lock,
+              re.S,
+          )
+          if not digest_match:
+              raise SystemExit("runtime-observer digest not found in current main")
+          merged_lock, count = re.subn(
+              r"(component_id: runtime-observer.*?content_digest: )sha256:[0-9a-f]+",
+              rf"\g<1>{digest_match.group(1)}",
+              ours_lock,
+              count=1,
+              flags=re.S,
+          )
+          if count != 1:
+              raise SystemExit(f"expected one runtime-observer digest, replaced {count}")
+          if 'version: "0.21.2"' not in merged_lock:
+              raise SystemExit("Hermes 0.21.2 pin was not preserved")
+          Path(lock_path).write_text(merged_lock, encoding="utf-8")
+
+          soul_path = "templates/hermes/profiles/pantheon-governed/SOUL.append.md"
+          ours_soul = subprocess.check_output(["git", "show", f":2:{soul_path}"], text=True)
+          theirs_soul = subprocess.check_output(["git", "show", f":3:{soul_path}"], text=True)
           start = "When an observed Pantheon `classify_request` result contains\n"
           end = "report that later transition separately.\n\n"
-          if start not in theirs or end not in theirs:
-              raise SystemExit("main metathought block not found")
-          block = theirs[theirs.index(start):theirs.index(end) + len(end)]
+          if start not in theirs_soul or end not in theirs_soul:
+              raise SystemExit("current-main metathought block not found")
+          block = theirs_soul[theirs_soul.index(start):theirs_soul.index(end) + len(end)]
           needle = "An explicit request for the skill must visibly include at least:\n"
-          if needle not in ours:
+          if needle not in ours_soul:
               raise SystemExit("#1057 SOUL insertion point not found")
-          if start in ours:
+          if start in ours_soul:
               raise SystemExit("metathought block unexpectedly already present in #1057 side")
-          merged = ours.replace(needle, block + needle, 1)
+          merged_soul = ours_soul.replace(needle, block + needle, 1)
           required = (
               "`pantheon-governed-method` and `pantheon-activity-projection` skills",
               "handling.metathoughts",
               "source preflight",
               "ready_with_limits",
           )
-          missing = [item for item in required if item not in merged]
+          missing = [item for item in required if item not in merged_soul]
           if missing:
               raise SystemExit(f"merged SOUL missing required content: {missing}")
-          Path(path).write_text(merged, encoding="utf-8")
+          Path(soul_path).write_text(merged_soul, encoding="utf-8")
           PY
-
             git add ai_logs/INDEX.md implementation/hermes/distribution/pantheon-standard.lock.yaml templates/hermes/profiles/pantheon-governed/SOUL.append.md
           fi
 
-          # Canonical regeneration over the actual merged log set.
           python3 .github/scripts/generate_ai_logs_index.py
           git add ai_logs/INDEX.md
 
