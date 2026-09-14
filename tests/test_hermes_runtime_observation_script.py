@@ -28,7 +28,9 @@ def test_runtime_observer_reads_actual_container_identity_and_skill_projection()
     assert 'org.opencontainers.image.version' in text
     assert 'org.opencontainers.image.revision' in text
     assert 'config get skills.external_dirs --json' in text
+    assert 'has("value")' in text
     assert 'hermes --version' in text
+    assert 'read_only_exec_attempted' in text
     assert 'skill_md_digest' in text
     assert 'read_only_mount_observed' in text
     assert 'release_target_image' in text
