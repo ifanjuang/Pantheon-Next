@@ -184,8 +184,10 @@ schema
 test
 end-to-end example
 read-only verification surface
-explicit dated human decision in ai_logs/
+explicit dated human decision with a durable referent
 ```
+
+For the human-decision form, use a bounded repository referent such as `PR #<n>` or `issue #<n>`. Existing historical records under `ai_logs/` remain valid referents. A PR, issue, merge, green CI result or automation output does not become a human decision merely by existing; the cited referent must contain the explicit human decision.
 
 Without a referent, keep the material candidate, support, validation-only or reference.
 
