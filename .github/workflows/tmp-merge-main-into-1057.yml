@@ -17,13 +17,15 @@ jobs:
         with:
           ref: codex/governed-runtime-capabilities
           fetch-depth: 0
-      - name: Merge current main with bounded conflict resolution
+      - name: Merge verified main with explicit bounded resolution
         shell: bash
         run: |
           set -euo pipefail
+          readonly EXPECTED_MAIN="d4d28a4455c3f20cdddb8b6eab9744ed609086ed"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git fetch origin main
+          test "$(git rev-parse origin/main)" = "$EXPECTED_MAIN"
 
           set +e
           git merge --no-commit --no-ff origin/main
@@ -31,88 +33,208 @@ jobs:
           set -e
 
           if [ "$merge_status" -ne 0 ]; then
-            python3 - <<'PY'
-          import os
-          import re
-          import subprocess
-          from pathlib import Path
+            actual="$(git diff --name-only --diff-filter=U | sort | tr '\n' ' ')"
+            expected="ai_logs/INDEX.md implementation/hermes/distribution/pantheon-standard.lock.yaml templates/hermes/profiles/pantheon-governed/SOUL.append.md "
+            test "$actual" = "$expected"
 
-          expected = [
-              "ai_logs/INDEX.md",
-              "implementation/hermes/distribution/pantheon-standard.lock.yaml",
-              "templates/hermes/profiles/pantheon-governed/SOUL.append.md",
-          ]
-          conflicts = sorted(
-              line for line in subprocess.check_output(
-                  ["git", "diff", "--name-only", "--diff-filter=U"], text=True
-              ).splitlines() if line
-          )
-          if conflicts != expected:
-              raise SystemExit(f"unexpected conflicts: {conflicts}")
+            git checkout --theirs -- ai_logs/INDEX.md
 
-          # Generated index: current main is a valid starting point; regenerate later.
-          subprocess.run(["git", "checkout", "--theirs", "--", "ai_logs/INDEX.md"], check=True)
+            cat > implementation/hermes/distribution/pantheon-standard.lock.yaml <<'EOF'
+          schema_id: pantheon.hermes_distribution_lock
+          revision: 3
+          distribution_id: pantheon-hermes-standard
+          status: candidate
+          source_pins:
+            pantheon_repository:
+              repository: ifanjuang/Pantheon-Next
+              ref: "fea7d9e5be87adfb8d222deac856fb767b25af0f"
+            # Materialized candidate snapshot of qualification pin `hermes-agent`.
+            # test_external_qualification_pins.py rejects drift from the canonical registry.
+            hermes_runtime:
+              runtime_id: nousresearch-hermes-agent
+              version: "0.21.2"
+              artifact_digest: null
+              observation_ref: docs/governance/HERMES_RUNTIME_SURFACE_REVIEW.md
+          components:
+            - component_id: run-binding
+              kind: run_binding
+              path: implementation/mvp_vertical/hermes_run_binding.py
+              digest_mode: file
+              content_digest: sha256:65407df53d49ab4c0f8b6af1ac7369e5fe2d769185fb620ccfbbb38ad9b6fd03
+              required: true
+              enabled_by_default: false
+              capabilities:
+                - reserve-admitted-launch
+                - submit-one-external-run
+                - record-runtime-start
+                - record-runtime-return
+                - record-typed-project-variant-return
+                - notify-role-trace-attachment
+              notes: Stateless one-shot external binding; the optional Role trace notification is display-only, and a structured Project variant return remains unselected candidate material. Neither adds a queue, scheduler, retry worker, memory header, provider router, run control or approval authority.
+            - component_id: context-bridge
+              kind: context_bridge
+              path: implementation/hermes/plugins/pantheon-context-bridge
+              digest_mode: tree
+              content_digest: sha256:e65d6844d499afbf7831917a7af08097bd4d24a1dac99eb36c15026a62a16ad6
+              required: true
+              enabled_by_default: false
+              capabilities:
+                - read-admitted-context
+                - read-admitted-entity
+                - protect-model-bound-context
+                - protect-gateway-attachments
+              notes: Reads only the exact active Context Pack identified by the Hermes host session; model-bound Pantheon context and adapter-inlined gateway document attachments are deterministically framed as data with no instruction authority.
+            - component_id: runtime-observer
+              kind: runtime_observer
+              path: implementation/mvp_vertical/hermes_runs_observer.py
+              digest_mode: file
+              content_digest: sha256:d8e22444cd647a8b943beacffad9e60d28d9fd41a49d97ad2396ad79525d93cb
+              required: true
+              enabled_by_default: false
+              capabilities:
+                - observe-runs-api
+                - qualify-profile-route
+                - qualify-tool-surface
+                - capture-memory-posture
+                - qualify-memory-posture
+                - capture-presentation-config
+                - qualify-presentation-config
+              notes: One-shot observation only; route, tool, memory and presentation configuration receipts do not activate the binding, authorize a task, prove user-visible reasoning behavior or create Evidence.
+          required_checks:
+            - check_id: distribution-schema-and-paths
+              kind: static_structure
+              required: true
+              command: pantheon-hermes verify-distribution
+              expected: The lock validates and every component resolves inside the canonical Pantheon monorepo root.
+            - check_id: component-content-digests
+              kind: artifact_integrity
+              required: true
+              command: pantheon-hermes verify-distribution
+              expected: Every required file and tree digest matches the deterministic distribution contract.
+            - check_id: bounded-route-contract
+              kind: route_contract
+              required: true
+              expected: Internal Pantheon routes are stable and the external Hermes Runs API keeps its upstream versioned protocol.
+            - check_id: context-plugin-contract
+              kind: plugin_contract
+              required: true
+              expected: The context bridge derives admission identity from host context, exposes only bounded reads and binds deterministic data-only Context Admission to registered model-bound context handlers and gateway document attachments.
+            - check_id: composed-read-only-run
+              kind: end_to_end
+              required: true
+              command: pytest -q tests/test_hermes_distribution_acceptance.py
+              expected: One admitted read-only run can launch, read exact context and return a candidate without automatic mutation or Evidence admission.
+            - check_id: no-authority-collapse
+              kind: no_authority
+              required: true
+              expected: Composition, installation observation and acceptance cannot activate a binding or authorize a task.
+          state:
+            installation_state: not_observed
+            activation_state: not_activated
+            task_authorization_state: not_authorized
+            acceptance_state: not_run
+            observation_refs: []
+          authority:
+            installs_components: false
+            activates_binding: false
+            authorizes_tasks: false
+            dispatches_runs: false
+            accepts_results: false
+            admits_evidence: false
+          governance_refs:
+            - templates/hermes/DESIGN.md
+            - templates/hermes/distribution/README.md
+            - docs/governance/HERMES_RUNTIME_SURFACE_REVIEW.md
+            - docs/install/HERMES_EXECUTION_BRIDGE_RUNBOOK.md
+            - docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md
+            - docs/governance/HERMES_INTEGRATION.md
+            - docs/governance/TASK_CONTRACTS.md
+            - docs/governance/CONTEXT_PACKS.md
+            - docs/governance/APPROVALS.md
+            - implementation/docs/architecture/2026-09-05-context-admission-boundary.md
+          EOF
 
-          lock_path = "implementation/hermes/distribution/pantheon-standard.lock.yaml"
-          ours_lock = subprocess.check_output(["git", "show", f":2:{lock_path}"], text=True)
-          theirs_lock = subprocess.check_output(["git", "show", f":3:{lock_path}"], text=True)
-          digest_match = re.search(
-              r"component_id: runtime-observer.*?content_digest: (sha256:[0-9a-f]+)",
-              theirs_lock,
-              re.S,
-          )
-          if not digest_match:
-              raise SystemExit("runtime-observer digest not found in current main")
-          merged_lock, count = re.subn(
-              r"(component_id: runtime-observer.*?content_digest: )sha256:[0-9a-f]+",
-              rf"\g<1>{digest_match.group(1)}",
-              ours_lock,
-              count=1,
-              flags=re.S,
-          )
-          if count != 1:
-              raise SystemExit(f"expected one runtime-observer digest, replaced {count}")
-          if 'version: "0.21.2"' not in merged_lock:
-              raise SystemExit("Hermes 0.21.2 pin was not preserved")
-          Path(lock_path).write_text(merged_lock, encoding="utf-8")
+            cat > templates/hermes/profiles/pantheon-governed/SOUL.append.md <<'EOF'
+          ## Pantheon observable activity projection
 
-          soul_path = "templates/hermes/profiles/pantheon-governed/SOUL.append.md"
-          ours_soul = subprocess.check_output(["git", "show", f":2:{soul_path}"], text=True)
-          theirs_soul = subprocess.check_output(["git", "show", f":3:{soul_path}"], text=True)
-          start = "When an observed Pantheon `classify_request` result contains\n"
-          end = "report that later transition separately.\n\n"
-          if start not in theirs_soul or end not in theirs_soul:
-              raise SystemExit("current-main metathought block not found")
-          block = theirs_soul[theirs_soul.index(start):theirs_soul.index(end) + len(end)]
-          needle = "An explicit request for the skill must visibly include at least:\n"
-          if needle not in ours_soul:
-              raise SystemExit("#1057 SOUL insertion point not found")
-          if start in ours_soul:
-              raise SystemExit("metathought block unexpectedly already present in #1057 side")
-          merged_soul = ours_soul.replace(needle, block + needle, 1)
-          required = (
-              "`pantheon-governed-method` and `pantheon-activity-projection` skills",
-              "handling.metathoughts",
-              "source preflight",
-              "ready_with_limits",
-          )
-          missing = [item for item in required if item not in merged_soul]
-          if missing:
-              raise SystemExit(f"merged SOUL missing required content: {missing}")
-          Path(soul_path).write_text(merged_soul, encoding="utf-8")
-          PY
+          For every non-trivial Pantheon-governed request, use the
+          `pantheon-governed-method` and `pantheon-activity-projection` skills. The method
+          selects only the movements and modules justified by the request; the projection
+          is a narrow exception to the general
+          preference against narrating process: publish only decision-relevant observable
+          milestones, never private reasoning or routine tool chatter.
+
+          When interim assistant messages are supported, publish the plan before the first
+          material tool call and later milestones only when a source, result, risk,
+          blocker, artifact, status or responsibility changes. Otherwise preserve the same
+          ordered role labels in the streamed final response and do not imply that separate
+          events were emitted.
+
+          When an observed Pantheon `classify_request` result contains
+          `handling.metathoughts`, surface each returned question unchanged as governed
+          attention. This is presentation of an observed policy result, not a new Role
+          consultation or Rite activation.
+
+          Use this compact public shape:
+
+          ```text
+          ⚙ Hermes · Attention gouvernée
+          <question exactly as returned by handling.metathoughts[].question>
+          Limite: attention_only — question ≠ symptôme confirmé ≠ Rite activé
+          ```
+
+          For the currently implemented `tests_pass_completion` signal, the returned
+          question is:
+
+          ```text
+          What would passing these tests still not establish?
+          ```
+
+          Do not answer the metathought as though Pantheon had already supplied a verdict.
+          Do not convert `related_rite` into an activated Rite, do not invent a Role handoff,
+          and do not call `delegate_task` solely because a metathought is present. If later
+          observable work independently confirms the symptom and the existing governance
+          path authorizes a Rite, report that later transition separately.
+
+          An explicit request for the skill must visibly include at least:
+
+          ```text
+          🦉 Athena · Plan / structuration
+          ...
+
+          <one materially relevant Role or ⚙ Hermes milestone>
+          ...
+
+          ⚡ Zeus · Statut
+          ...
+          ```
+
+          Do not display every canonical Role. Do not invent consultation, delegation,
+          sources, tools or approval. Hermes is a runtime, not a Pantheon Role. A visible
+          role label identifies a governance responsibility, not an autonomous agent.
+
+          For material professional factual questions, use the admitted contextual
+          source-routing module and complete its source preflight before the final answer.
+          A fast conversation-memory result may be
+          shown as a `Mnemosyne` interim milestone only when labelled
+          `indice mémoire — non confirmé`; it never replaces the authoritative workspace
+          or documentary consultation selected for that request.
+
+          Use the canonical readiness outcomes `ready`, `ready_with_limits`,
+          `needs_revision`, `needs_user_input` and `blocked`. Apply them to the bounded
+          candidate and its intended use; never turn them into whole-task approval.
+
+          Remain generalist. Skills, tools, connectors and organization adapters are
+          modules selected when relevant; their availability does not redefine this
+          profile's identity or authorize their use.
+          EOF
+
             git add ai_logs/INDEX.md implementation/hermes/distribution/pantheon-standard.lock.yaml templates/hermes/profiles/pantheon-governed/SOUL.append.md
           fi
 
           python3 .github/scripts/generate_ai_logs_index.py
           git add ai_logs/INDEX.md
-
-          if git diff --name-only --diff-filter=U | grep -q .; then
-            echo "Unresolved merge conflicts remain"
-            git diff --name-only --diff-filter=U
-            exit 1
-          fi
+          test -z "$(git diff --name-only --diff-filter=U)"
           git diff --check
-
           git commit -m "merge(main): reconcile governed runtime capabilities"
           git push origin HEAD:codex/governed-runtime-capabilities
