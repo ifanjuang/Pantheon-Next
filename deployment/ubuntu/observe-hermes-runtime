@@ -1,0 +1,225 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+RELEASE_LOCK="$SCRIPT_DIR/release.env"
+[[ -f "$RELEASE_LOCK" ]] || { printf '[pantheon-hermes-observe] ERROR: reviewed deployment lock is missing: %s\n' "$RELEASE_LOCK" >&2; exit 1; }
+# shellcheck disable=SC1091
+source "$RELEASE_LOCK"
+
+CONFIG_ROOT="${CONFIG_ROOT:-/etc/pantheon-node}"
+STATE_ROOT="${STATE_ROOT:-/srv/pantheon}"
+CONTAINER_NAME="${HERMES_CONTAINER_NAME:-pantheon-hermes}"
+PROFILE="${HERMES_PROFILE:-pantheon-governed}"
+SKILLS_ROOT="${HERMES_GOVERNED_SKILLS_ROOT:-$STATE_ROOT/hermes-governed-skills}"
+CONTAINER_SKILLS_ROOT="/opt/pantheon-skills"
+TARGET_IMAGE="${RELEASE_HERMES_IMAGE:?release.env missing RELEASE_HERMES_IMAGE}"
+OUTPUT=""
+
+usage() {
+  cat <<'USAGE'
+Usage:
+  deployment/ubuntu/observe-hermes-runtime [--output PATH]
+
+Read-only observation of the Hermes container actually present on the Ubuntu node.
+It reports the running container image/id, immutable image identity, version labels,
+profile configuration digest, governed-skill mount, projected skill digests and the
+profile's resolved skills.external_dirs when the running Hermes CLI can read it.
+
+The command never changes configuration, starts/restarts a container, installs a
+skill, launches a run, approves an effect or promotes the receipt to Evidence.
+USAGE
+}
+
+die() { printf '[pantheon-hermes-observe] ERROR: %s\n' "$*" >&2; exit 1; }
+have() { command -v "$1" >/dev/null 2>&1; }
+
+while (($#)); do
+  case "$1" in
+    --output) shift; OUTPUT="${1:?missing output path}" ;;
+    -h|--help) usage; exit 0 ;;
+    *) die "unknown argument: $1" ;;
+  esac
+  shift
+done
+
+[[ "$CONTAINER_NAME" =~ ^[A-Za-z0-9][A-Za-z0-9_.-]*$ ]] || die "invalid Hermes container name"
+[[ "$PROFILE" =~ ^[A-Za-z0-9][A-Za-z0-9_-]*$ ]] || die "invalid Hermes profile name"
+have docker || die "docker is required"
+have jq || die "jq is required"
+have sha256sum || die "sha256sum is required"
+
+observed_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+container_json="$(docker inspect "$CONTAINER_NAME" 2>/dev/null)" || die "Hermes container is not observable: $CONTAINER_NAME"
+container_count="$(printf '%s' "$container_json" | jq 'length')"
+[[ "$container_count" == "1" ]] || die "expected exactly one Hermes container observation"
+
+running="$(printf '%s' "$container_json" | jq -r '.[0].State.Running // false')"
+container_id="$(printf '%s' "$container_json" | jq -r '.[0].Id // ""')"
+configured_image="$(printf '%s' "$container_json" | jq -r '.[0].Config.Image // ""')"
+image_id="$(printf '%s' "$container_json" | jq -r '.[0].Image // ""')"
+started_at="$(printf '%s' "$container_json" | jq -r '.[0].State.StartedAt // ""')"
+
+repo_digests='[]'
+image_labels='{}'
+image_created=null
+if [[ -n "$image_id" ]]; then
+  image_json="$(docker image inspect "$image_id" 2>/dev/null || true)"
+  if [[ -n "$image_json" ]] && [[ "$(printf '%s' "$image_json" | jq 'length')" == "1" ]]; then
+    repo_digests="$(printf '%s' "$image_json" | jq -c '.[0].RepoDigests // []')"
+    image_labels="$(printf '%s' "$image_json" | jq -c '.[0].Config.Labels // {}')"
+    image_created="$(printf '%s' "$image_json" | jq -c '.[0].Created // null')"
+  fi
+fi
+
+expected_mount_observed="$(printf '%s' "$container_json" | jq -r --arg src "$SKILLS_ROOT" --arg dst "$CONTAINER_SKILLS_ROOT" '
+  any(.[0].Mounts[]?; .Source == $src and .Destination == $dst and .RW == false)
+')"
+
+profile_config="$STATE_ROOT/hermes/profiles/$PROFILE/config.yaml"
+profile_config_present=false
+profile_config_digest=null
+if [[ -f "$profile_config" ]]; then
+  profile_config_present=true
+  profile_config_digest="\"sha256:$(sha256sum "$profile_config" | awk '{print $1}')\""
+fi
+
+skills='[]'
+if [[ -d "$SKILLS_ROOT" ]]; then
+  while IFS= read -r skill_dir; do
+    [[ -n "$skill_dir" ]] || continue
+    name="$(basename "$skill_dir")"
+    [[ "$name" =~ ^[A-Za-z0-9][A-Za-z0-9_-]*$ ]] || continue
+    skill_file="$skill_dir/SKILL.md"
+    [[ -f "$skill_file" ]] || continue
+    digest="sha256:$(sha256sum "$skill_file" | awk '{print $1}')"
+    skills="$(printf '%s' "$skills" | jq -c --arg name "$name" --arg digest "$digest" '. + [{name:$name, skill_md_digest:$digest}]')"
+  done < <(find "$SKILLS_ROOT" -mindepth 1 -maxdepth 1 -type d -print | sort)
+fi
+
+external_dirs_status="not_observed"
+external_dirs='null'
+version_status="not_observed"
+runtime_version='null'
+if [[ "$running" == "true" ]]; then
+  set +e
+  external_raw="$(docker exec "$CONTAINER_NAME" hermes -p "$PROFILE" config get skills.external_dirs --json 2>/dev/null)"
+  external_rc=$?
+  version_raw="$(docker exec "$CONTAINER_NAME" hermes --version 2>/dev/null)"
+  version_rc=$?
+  set -e
+
+  if (( external_rc == 0 )) && [[ -n "$external_raw" ]]; then
+    if printf '%s' "$external_raw" | jq -e . >/dev/null 2>&1; then
+      external_dirs="$(printf '%s' "$external_raw" | jq -c 'if type == "string" then (try fromjson catch .) else . end')"
+      external_dirs_status="observed"
+    else
+      external_dirs_status="invalid_json"
+    fi
+  else
+    external_dirs_status="unsupported_or_error"
+  fi
+
+  if (( version_rc == 0 )) && [[ -n "${version_raw//[[:space:]]/}" ]]; then
+    runtime_version="$(printf '%s' "$version_raw" | tr '\r\n' ' ' | sed 's/[[:space:]]\+/ /g; s/^ //; s/ $//' | jq -Rs '.')"
+    version_status="observed"
+  else
+    version_status="unsupported_or_error"
+  fi
+fi
+
+external_dir_bound=false
+if [[ "$external_dirs_status" == "observed" ]]; then
+  external_dir_bound="$(printf '%s' "$external_dirs" | jq -r --arg path "$CONTAINER_SKILLS_ROOT" '
+    if type == "array" then index($path) != null
+    elif type == "string" then . == $path
+    else false end
+  ')"
+fi
+
+recorded_image=null
+if [[ -r "$CONFIG_ROOT/versions.env" ]]; then
+  recorded="$(awk -F= '$1=="HERMES_IMAGE" {sub(/^[^=]*=/, ""); print; exit}' "$CONFIG_ROOT/versions.env")"
+  if [[ -n "$recorded" ]]; then recorded_image="$(printf '%s' "$recorded" | jq -Rs '.')"; fi
+fi
+
+receipt="$(jq -n \
+  --arg observed_at "$observed_at" \
+  --arg container "$CONTAINER_NAME" \
+  --arg container_id "$container_id" \
+  --arg configured_image "$configured_image" \
+  --arg target_image "$TARGET_IMAGE" \
+  --arg image_id "$image_id" \
+  --arg started_at "$started_at" \
+  --arg profile "$PROFILE" \
+  --arg external_dirs_status "$external_dirs_status" \
+  --arg version_status "$version_status" \
+  --argjson running "$running" \
+  --argjson repo_digests "$repo_digests" \
+  --argjson image_labels "$image_labels" \
+  --argjson image_created "$image_created" \
+  --argjson profile_config_present "$profile_config_present" \
+  --argjson profile_config_digest "$profile_config_digest" \
+  --argjson expected_mount_observed "$expected_mount_observed" \
+  --argjson skills "$skills" \
+  --argjson external_dirs "$external_dirs" \
+  --argjson external_dir_bound "$external_dir_bound" \
+  --argjson runtime_version "$runtime_version" \
+  --argjson recorded_image "$recorded_image" \
+  '{
+    kind:"hermes_ubuntu_runtime_observation",
+    observation_source:"docker_inspect_and_read_only_hermes_cli",
+    observed_at:$observed_at,
+    container:{
+      name:$container,
+      id:$container_id,
+      running:$running,
+      started_at:$started_at,
+      configured_image:$configured_image,
+      image_id:$image_id,
+      repo_digests:$repo_digests,
+      image_created:$image_created,
+      image_labels:$image_labels
+    },
+    deployment:{
+      release_target_image:$target_image,
+      recorded_image:$recorded_image,
+      target_matches_container_config:($configured_image == $target_image),
+      recorded_matches_container_config:(if $recorded_image == null then null else $configured_image == $recorded_image end)
+    },
+    profile:{
+      name:$profile,
+      config_present:$profile_config_present,
+      config_digest:$profile_config_digest,
+      external_dirs_status:$external_dirs_status,
+      external_dirs:$external_dirs
+    },
+    governed_skills:{
+      host_projection_root_present:($skills | length > 0),
+      read_only_mount_observed:$expected_mount_observed,
+      external_dir_bound:$external_dir_bound,
+      projected:$skills
+    },
+    runtime_version:{status:$version_status, value:$runtime_version},
+    write_effect:false,
+    activation_changed:false,
+    authority_effect:"none",
+    technical_receipt_is_evidence:false,
+    non_equivalences:[
+      "release target image != running container image",
+      "recorded deployment image != running container image",
+      "image tag != immutable image digest",
+      "skill projected != skill used",
+      "profile config present != profile route active",
+      "runtime reachable != task authorized",
+      "runtime observation != Evidence"
+    ]
+  }')"
+
+if [[ -n "$OUTPUT" ]]; then
+  umask 077
+  mkdir -p "$(dirname "$OUTPUT")"
+  printf '%s\n' "$receipt" > "$OUTPUT"
+else
+  printf '%s\n' "$receipt"
+fi
