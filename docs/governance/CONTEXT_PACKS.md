@@ -252,8 +252,7 @@ A Context Pack may include constraints such as:
 
 ```text
 only modify docs/governance files
-avoid protected directories
-read ai_logs before significant work
+read current owner documents and relevant recent commits, PRs and issues before significant repository work
 ask before schemas changes
 no runtime architecture
 no provider routing
@@ -294,7 +293,7 @@ cite source files
 record assumptions
 record risks
 list files changed
-add ai_log after significant intervention
+preserve consequential rationale in owner documents, tests/contracts, Git or PR discussion; use an exceptional ai_log only when that context would otherwise be lost
 verify actual diff after important commit
 ```
 
@@ -417,7 +416,7 @@ They must be adapted to Pantheon doctrine, not copied blindly.
 
 A root-level `MEMORY.md` or `ERRORS.md` pattern must not become parallel a Registre Probatoire entry unless explicitly governed.
 
-For Pantheon repository work, significant decisions should be traced through `ai_logs/`, `STATUS.md`, `CHANGELOG.md`, Register Candidates or other governed artifacts as appropriate.
+For Pantheon repository work, significant decisions should be traced through the relevant owner documents, `STATUS.md`, `CHANGELOG.md`, Git history, pull-request rationale, Register Candidates or other governed artifacts as appropriate. `ai_logs/` remains optional historical/exceptional support only.
 
 ## ChatGPT adapter
 
