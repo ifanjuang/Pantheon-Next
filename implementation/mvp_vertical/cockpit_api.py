@@ -113,6 +113,12 @@ def create_app(
     app.state.hermes_api_key = (
         hermes_api_key if hermes_api_key is not None else os.getenv("MVP_HERMES_API_KEY", "")
     )
+    if (
+        app.state.editor_api_key
+        and app.state.hermes_api_key
+        and hmac.compare_digest(app.state.editor_api_key, app.state.hermes_api_key)
+    ):
+        raise ValueError("MVP_EDITOR_API_KEY and MVP_HERMES_API_KEY must be distinct")
     app.state.public_url = (
         public_url if public_url is not None else os.getenv("MVP_COCKPIT_PUBLIC_URL", "")
     ).rstrip("/")
