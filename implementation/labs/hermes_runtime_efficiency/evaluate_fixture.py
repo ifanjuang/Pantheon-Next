@@ -99,15 +99,16 @@ def _evaluate_c3(workspace: Path, _answer_path: Path) -> dict[str, Any]:
         check=False,
     )
     return {
-        "source_recall_checks": None,
-        "source_recall_passes": None,
-        "source_recall_check_ids": None,
+        "source_recall_checks": 0,
+        "source_recall_passes": 0,
+        "source_recall_check_ids": [],
         "required_quality_checks": {
             "tests_pass": completed.returncode == 0,
             "immutable_fixture_files_unchanged": immutable_ok,
         },
         "notes": [
             f"Post-run pytest exit code: {completed.returncode}",
+            "Source recall is not applicable to C3; zero checks are recorded explicitly.",
             "Fixture integrity checks cover test_task.py and prompt.txt; task.py is intentionally mutable.",
         ],
     }
