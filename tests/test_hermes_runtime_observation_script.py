@@ -42,6 +42,9 @@ def test_runtime_observer_targets_post_1057_profile_surface() -> None:
     assert 'CONTAINER_PROFILE_ROOT="/opt/data/profiles/$PROFILE"' in text
     assert '.Destination == "/opt/data"' in text
     assert 'profile_data_mount_observed' in text
+    assert 'profile_host_observation="not_observable"' in text
+    assert 'profile_root_present=null' in text
+    assert 'host_observation:$profile_host_observation' in text
     assert 'docker exec "$CONTAINER_NAME" test -d "$CONTAINER_PROFILE_ROOT"' in text
     assert 'config_digest' in text
     assert 'soul_digest' in text
@@ -170,6 +173,7 @@ fi
     assert receipt["deployment"]["target_matches_container_config"] is True
     assert receipt["deployment"]["recorded_matches_container_config"] is True
     assert receipt["profile"]["host_root_present"] is True
+    assert receipt["profile"]["host_observation"] == "observed_present"
     assert receipt["profile"]["visible_in_container"] is True
     assert receipt["profile"]["snapshot_digest"].startswith("sha256:")
     assert receipt["profile"]["no_bundled_skills_marker"] is True

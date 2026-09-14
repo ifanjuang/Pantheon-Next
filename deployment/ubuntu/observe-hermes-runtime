@@ -81,12 +81,14 @@ if [[ -n "$image_id" ]]; then
   fi
 fi
 
-profile_root_present=false
+profile_host_observation="not_observable"
+profile_root_present=null
 config_digest=""
 soul_digest=""
 no_bundled_skills_marker=false
 profile_skills='[]'
 if [[ -d "$PROFILE_ROOT" ]]; then
+  profile_host_observation="observed_present"
   profile_root_present=true
   [[ -f "$PROFILE_ROOT/config.yaml" ]] && config_digest="sha256:$(sha256sum "$PROFILE_ROOT/config.yaml" | awk '{print $1}')"
   [[ -f "$PROFILE_ROOT/SOUL.md" ]] && soul_digest="sha256:$(sha256sum "$PROFILE_ROOT/SOUL.md" | awk '{print $1}')"
@@ -102,6 +104,15 @@ if [[ -d "$PROFILE_ROOT" ]]; then
       profile_skills="$(printf '%s' "$profile_skills" | jq -c --arg name "$name" --arg digest "$digest" '. + [{name:$name, skill_md_digest:$digest}] | sort_by(.name)')"
     done < <(find "$PROFILE_ROOT/skills" -mindepth 1 -maxdepth 1 -type d -print | sort)
   fi
+elif [[ -e "$PROFILE_ROOT" ]]; then
+  profile_host_observation="observed_non_directory"
+  profile_root_present=false
+elif [[ -x "$(dirname "$PROFILE_ROOT")" ]]; then
+  profile_host_observation="observed_absent"
+  profile_root_present=false
+elif [[ ! -e "$STATE_ROOT" ]] && [[ -x "$(dirname "$STATE_ROOT")" ]]; then
+  profile_host_observation="observed_absent"
+  profile_root_present=false
 fi
 
 profile_snapshot_digest=""
@@ -149,6 +160,7 @@ jq -n \
   --arg image_id "$image_id" \
   --arg started_at "$started_at" \
   --arg profile "$PROFILE" \
+  --arg profile_host_observation "$profile_host_observation" \
   --arg config_digest "$config_digest" \
   --arg soul_digest "$soul_digest" \
   --arg profile_snapshot_digest "$profile_snapshot_digest" \
@@ -187,6 +199,7 @@ jq -n \
     },
     profile:{
       name:$profile,
+      host_observation:$profile_host_observation,
       host_root_present:$profile_root_present,
       visible_in_container:$profile_visible_in_container,
       config_digest:(if $config_digest == "" then null else $config_digest end),
