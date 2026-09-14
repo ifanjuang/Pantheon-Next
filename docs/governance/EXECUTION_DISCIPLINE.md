@@ -124,7 +124,7 @@ When editing the repository:
 - avoid unrelated formatting churn;
 - avoid mixing documentation, schema, tests, operations, platform and Docker changes;
 - avoid rewriting large docs when a focused migration or additive patch is enough;
-- add an ai_log after significant work;
+- preserve durable rationale in owner documents, tests/contracts, Git history and pull-request discussion; add an exceptional `ai_log` only when consequential context would otherwise be lost or materially ambiguous;
 - verify the real diff after important commits.
 
 Documentation-only changes must not claim implementation.
@@ -154,7 +154,7 @@ Examples:
 The file moves from stub to migrated doctrine.
 The migrated document does not introduce runtime behavior.
 The status, roadmap, governance index and migration mapping are reconciled.
-The ai_log records the intervention.
+The durable repository record explains the intervention; an exceptional ai_log is added only if otherwise necessary.
 No private data enters the repository.
 No schema, test, operation or platform file is modified.
 ```
@@ -351,7 +351,7 @@ It must:
 - avoid unrelated refactors;
 - avoid inventing implementation details not requested;
 - preserve the optional-client / Hermes Agent / Pantheon Cockpit / Pantheon Next boundary;
-- log significant interventions in `ai_logs/`;
+- use owner documents, tests/contracts, Git history and pull-request rationale as the default durable trace; add an exceptional `ai_log` only when needed to preserve otherwise-lost consequential context;
 - state when tests were not run;
 - avoid modifying protected areas without confirmation.
 
@@ -370,7 +370,7 @@ Does it avoid private or identifiable data?
 Does it mark candidate status where appropriate?
 Does it specify evidence and approvals where consequential?
 Does it avoid unnecessary workflow creation?
-Does it update STATUS / ROADMAP / index / ai_log when needed?
+Does it update STATUS / ROADMAP / governed indexes when needed without requiring an ai_log by default?
 Does it leave a clear next safe action?
 ```
 
