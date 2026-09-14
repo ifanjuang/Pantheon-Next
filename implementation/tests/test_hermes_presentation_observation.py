@@ -52,9 +52,9 @@ def _aligned_receipt(*, captured_at: str | None = None) -> dict:
         },
         "platforms": {
             "telegram": {
-                "show_reasoning": record("platforms.telegram.show_reasoning", False),
+                "show_reasoning": record("display.platforms.telegram.show_reasoning", False),
                 "interim_assistant_messages": record(
-                    "platforms.telegram.interim_assistant_messages", True
+                    "display.platforms.telegram.interim_assistant_messages", True
                 ),
             }
         },
@@ -76,8 +76,8 @@ def test_capture_reads_resolved_global_and_platform_values_without_shell() -> No
         "display.show_commentary": True,
         "display.interim_assistant_messages": True,
         "plugins.stream_reasoning_deltas": False,
-        "platforms.telegram.show_reasoning": False,
-        "platforms.telegram.interim_assistant_messages": True,
+        "display.platforms.telegram.show_reasoning": False,
+        "display.platforms.telegram.interim_assistant_messages": True,
     }
 
     receipt = capture_presentation_config(
@@ -108,8 +108,8 @@ def test_reasoning_enabled_globally_or_on_platform_is_misaligned() -> None:
         "display.show_commentary": True,
         "display.interim_assistant_messages": True,
         "plugins.stream_reasoning_deltas": False,
-        "platforms.telegram.show_reasoning": True,
-        "platforms.telegram.interim_assistant_messages": True,
+        "display.platforms.telegram.show_reasoning": True,
+        "display.platforms.telegram.interim_assistant_messages": True,
     }
     receipt = capture_presentation_config(
         profile=PROFILE,
@@ -261,3 +261,36 @@ def test_cli_observe_adds_config_without_claiming_surface_qualification(
     assert payload["governed_surface_status"] == "not_evaluated"
     assert payload["presentation_behavior_status"] == "not_evaluated"
     assert "runtime safety_status qualified != governed surface qualified" in payload["non_equivalences"]
+
+
+def test_observed_keys_match_the_namespace_the_deployment_script_writes() -> None:
+    """Bind the observer's key namespace to the script that sets those values.
+
+    The observer queried `platforms.<p>.show_reasoning` while
+    `deployment/ubuntu/configure-hermes-activity-projection` sets
+    `display.platforms.<p>.show_reasoning`. Hermes answered "no such key" for
+    every platform, so `configuration_alignment` could never reach
+    `misaligned` -- a channel projecting private reasoning stayed invisible to
+    the one check meant to catch it. Reading the namespace off the script keeps
+    the two from drifting apart again in silence.
+    """
+    script = (
+        Path(__file__).resolve().parents[2]
+        / "deployment"
+        / "ubuntu"
+        / "configure-hermes-activity-projection"
+    ).read_text(encoding="utf-8")
+
+    calls: list[tuple[list[str], dict]] = []
+    capture_presentation_config(
+        profile=PROFILE,
+        platforms=["whatsapp"],
+        runner=_runner({}, calls),
+    )
+    queried = {command[-2] for command, _ in calls}
+
+    for key in sorted(queried):
+        assert key in script, f"{key} is queried but never written by the deployment script"
+
+    assert "display.platforms.whatsapp.show_reasoning" in queried
+    assert "display.platforms.whatsapp.interim_assistant_messages" in queried

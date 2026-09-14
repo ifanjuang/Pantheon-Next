@@ -442,14 +442,14 @@ def capture_presentation_config(
         platform: {
             "show_reasoning": _presentation_capture_key(
                 profile=profile,
-                key=f"platforms.{platform}.show_reasoning",
+                key=f"display.platforms.{platform}.show_reasoning",
                 hermes_command=command_name,
                 timeout=timeout,
                 runner=run,
             ),
             "interim_assistant_messages": _presentation_capture_key(
                 profile=profile,
-                key=f"platforms.{platform}.interim_assistant_messages",
+                key=f"display.platforms.{platform}.interim_assistant_messages",
                 hermes_command=command_name,
                 timeout=timeout,
                 runner=run,
