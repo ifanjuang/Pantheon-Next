@@ -32,7 +32,6 @@ jobs:
             "LICENSE"
             "VERSION"
             "CHANGELOG.md"
-            "ai_logs/README.md"
             "docs/governance/README.md"
             "docs/governance/STATUS.md"
             "docs/governance/ROADMAP.md"
@@ -65,25 +64,15 @@ jobs:
           fi
           echo "OK: all mandatory governance files are present."
 
-      - name: ai_logs directory exists and has README
+      - name: Optional ai_logs index is current when present
         shell: bash
         run: |
           set -euo pipefail
-          if [ ! -d "ai_logs" ]; then
-            echo "FAIL: ai_logs/ directory missing"
-            exit 1
+          if [ -d "ai_logs" ]; then
+            python3 .github/scripts/check_ai_logs_index_current.py
+          else
+            echo "OK: optional ai_logs/ corpus is absent."
           fi
-          if [ ! -f "ai_logs/README.md" ]; then
-            echo "FAIL: ai_logs/README.md missing"
-            exit 1
-          fi
-          echo "OK: ai_logs/ and ai_logs/README.md present."
-
-      - name: ai_logs/INDEX.md is current
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 .github/scripts/check_ai_logs_index_current.py
 
       - name: Governance files do not suggest Pantheon executes
         shell: bash
@@ -105,7 +94,7 @@ jobs:
           python3 .github/scripts/check_no_truncation.py
           python3 .github/scripts/check_no_net_truncation.py
           python3 .github/scripts/check_no_predecessor_dependency.py
-          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ] && [ -d "ai_logs" ]; then
             python3 .github/scripts/check_new_ai_log_paths.py --base "$GOVERNANCE_BASE_REF"
           fi
 

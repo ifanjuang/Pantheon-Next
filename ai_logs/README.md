@@ -1,18 +1,34 @@
 # AI Logs
 
-Status: active support note — AI log policy and navigation — implemented as documentation.
+Status: optional support note — historical and exceptional AI-assisted repository trace.
 Boundary profile: validation_only_trace.
 
-This directory stores validation-only traces for material AI-assisted repository interventions.
+This directory stores validation-only traces for material AI-assisted repository interventions when the durable context would otherwise be difficult to reconstruct from the authoritative repository record.
 
-AI logs support review. They are not doctrine, approval, runtime evidence by default or a substitute for Git history and pull-request discussion.
+AI logs are optional support material. They are not doctrine, approval, runtime evidence by default, workflow state, Hermes memory or a substitute for Git history, pull-request discussion, tests, schemas or owner documents.
+
+## Default trace path
+
+Prefer the existing authoritative record first:
+
+```text
+owner documents
++ schemas / contracts / tests
++ Git commit history
++ pull-request rationale
+-> sufficient by default
+```
+
+Create a separate AI log only when a consequential boundary, external-runtime observation, consolidation/removal mapping or architectural rationale would otherwise be lost or materially ambiguous.
+
+Target state: no skill, workflow, Hermes runtime, governance baseline or Doctor health check depends on an AI log being present. The CI baseline treats this corpus as optional; legacy Doctor coupling is tracked separately until removed and tested.
 
 ## Purpose
 
-AI logs may preserve:
+An AI log may preserve:
 
-- a consequential governance change and its rationale;
-- a protected-path intervention and its explicit boundary;
+- a consequential governance change whose rationale is not already clear in the owner documents and pull request;
+- a protected-path intervention and its explicit boundary when that boundary is not otherwise durable;
 - an architecture decision that is not otherwise visible in the changed owner documents;
 - a validation or external-runtime observation that must remain distinct from adoption;
 - a consolidation or removal mapping needed to understand current placement.
@@ -23,27 +39,13 @@ Default:
 
 ```text
 one coherent pull request
--> at most one AI log
+-> zero AI logs normally
+-> at most one when exceptional trace value remains
 ```
 
-A separate log is expected when the pull request materially changes one or more of:
+A separate log is normally unnecessary when the commit, pull request, tests, schemas and owner documents already preserve the consequential understanding.
 
-- doctrine or authority;
-- runtime-status claims;
-- protected paths;
-- schemas, tests or CI;
-- installation, activation, update or rollback posture;
-- memory or Evidence behavior;
-- an external action or external-runtime observation;
-- removal or consolidation whose mapping would otherwise be lost.
-
-A separate log is normally unnecessary for:
-
-- spelling or formatting corrections;
-- link repairs with no status effect;
-- generated-index refreshes;
-- small wording alignment already explained by the pull-request body;
-- a mechanical edit that changes no doctrine, authority, runtime status or protected path.
+Do not create a log merely because a pull request changes doctrine, CI, tests, schemas or protected paths. Create one only when the additional trace carries durable information that those authoritative surfaces do not already preserve.
 
 Do not split one coherent intervention into multiple logs merely because it used several commits.
 
@@ -54,7 +56,7 @@ When a log is created, use `LOG_FORMAT.md` unless the intervention requires a lo
 The log should state:
 
 - what changed;
-- why it changed;
+- why the additional trace is needed beyond Git/PR/owner documents;
 - the authority or repository-state effect;
 - runtime and protected-path effects;
 - risks and limitations;
@@ -71,6 +73,7 @@ AI logs must not:
 - claim implementation from documentation, a schema, a prototype or a test alone;
 - expose secrets or private project data;
 - contain hidden chain-of-thought;
+- store workflow/session state required for Hermes execution or recovery;
 - duplicate the full pull-request body without adding durable trace value;
 - rewrite old logs merely to make historical language look current.
 
@@ -78,7 +81,7 @@ Historical logs remain facts about their date. Current status comes from `docs/g
 
 ## Placement and naming convention
 
-New logs use the calendar year and quarter of the date in their filename:
+When an exceptional new log is justified, use the calendar year and quarter of the date in its filename:
 
 ```text
 ai_logs/YYYY/Qn/YYYY-MM-DD-short-description.md
@@ -99,11 +102,11 @@ Q3 -> July to September
 Q4 -> October to December
 ```
 
-The existing flat files remain valid historical paths. They are not moved in bulk and must not be rewritten merely to satisfy the new placement rule.
+The existing flat files remain valid historical paths. They are not moved in bulk and must not be rewritten merely to satisfy the newer placement rule.
 
 ## Index and retention
 
-`INDEX.md` is generated and provides newest-first navigation across both the historical flat corpus and quarterly subdirectories. After adding, moving or removing a log, run:
+While `ai_logs/` remains in the working tree, `INDEX.md` provides newest-first navigation across both the historical flat corpus and quarterly subdirectories. After adding, moving or removing a log, run:
 
 ```bash
 python3 .github/scripts/generate_ai_logs_index.py
@@ -111,10 +114,11 @@ python3 .github/scripts/generate_ai_logs_index.py
 
 The generator is navigation-only. It does not move, delete, compact, classify or sign traces.
 
-Removal of a log from the working tree requires a separately reviewed change that verifies active references first. Git history remains the archive. There is no automatic deletion, scheduled compaction, monthly digest or retroactive mass migration.
+Removal of a historical log from the working tree requires a separately reviewed change that verifies active references first. Git history remains the archive. There is no automatic deletion, scheduled compaction, monthly digest or retroactive mass migration.
 
 ```text
-quarterly placement for new logs != migration of old logs
+AI log present != runtime dependency
+AI log absent != missing workflow state
 removed from working tree != removed from Git history
 index generation != trace approval
 ```
@@ -122,6 +126,6 @@ index generation != trace approval
 ## Final rule
 
 ```text
-Trace what changes consequential understanding.
-Do not create trace merely to record that a file was touched.
+Prefer authoritative owner docs, contracts, tests, Git and PR history.
+Add an AI log only when consequential understanding would otherwise be lost.
 ```
