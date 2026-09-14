@@ -6,6 +6,7 @@ on:
       - ".github/workflows/implementation-hermes-runtime-efficiency-qualification.yml"
       - "implementation/labs/hermes_runtime_efficiency/**"
       - "implementation/tests/test_hermes_runtime_efficiency_lab.py"
+      - "implementation/tests/test_hermes_runtime_efficiency_native_baseline.py"
       - "implementation/tests/test_hermes_kv_cache_qualification.py"
   workflow_dispatch:
 
@@ -32,4 +33,5 @@ jobs:
         run: >-
           pytest -q
           tests/test_hermes_runtime_efficiency_lab.py
+          tests/test_hermes_runtime_efficiency_native_baseline.py
           tests/test_hermes_kv_cache_qualification.py
