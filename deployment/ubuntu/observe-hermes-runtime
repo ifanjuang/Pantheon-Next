@@ -1,0 +1,213 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+RELEASE_LOCK="$SCRIPT_DIR/release.env"
+[[ -f "$RELEASE_LOCK" ]] || { printf '[pantheon-hermes-observe] ERROR: reviewed deployment lock is missing: %s\n' "$RELEASE_LOCK" >&2; exit 1; }
+# shellcheck disable=SC1091
+source "$RELEASE_LOCK"
+
+CONFIG_ROOT="${CONFIG_ROOT:-/etc/pantheon-node}"
+STATE_ROOT="${STATE_ROOT:-/srv/pantheon}"
+CONTAINER_NAME="${HERMES_CONTAINER_NAME:-pantheon-hermes}"
+PROFILE="${HERMES_PROFILE:-pantheon-governed}"
+PROFILE_ROOT="$STATE_ROOT/hermes/profiles/$PROFILE"
+CONTAINER_PROFILE_ROOT="/opt/data/profiles/$PROFILE"
+TARGET_IMAGE="${RELEASE_HERMES_IMAGE:?release.env missing RELEASE_HERMES_IMAGE}"
+
+usage() {
+  cat <<'USAGE'
+Usage:
+  deployment/ubuntu/observe-hermes-runtime
+
+Emit one read-only JSON observation of the Hermes container actually present on
+this Ubuntu node: running image identity, immutable digest information, bounded
+OCI identity labels, the mounted profile surface, profile snapshot digest and
+profile-local skill digests.
+
+The command changes nothing. It never starts/restarts a container, changes
+Hermes configuration, installs a skill, launches a run, approves an effect or
+promotes the receipt to Evidence.
+USAGE
+}
+
+die() { printf '[pantheon-hermes-observe] ERROR: %s\n' "$*" >&2; exit 1; }
+have() { command -v "$1" >/dev/null 2>&1; }
+
+while (($#)); do
+  case "$1" in
+    -h|--help) usage; exit 0 ;;
+    *) die "unknown argument: $1" ;;
+  esac
+  shift
+done
+
+[[ "$CONTAINER_NAME" =~ ^[A-Za-z0-9][A-Za-z0-9_.-]*$ ]] || die "invalid Hermes container name"
+[[ "$PROFILE" =~ ^[A-Za-z0-9][A-Za-z0-9_-]*$ ]] || die "invalid Hermes profile name"
+have docker || die "docker is required"
+have jq || die "jq is required"
+have sha256sum || die "sha256sum is required"
+
+observed_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+container_json="$(docker inspect "$CONTAINER_NAME" 2>/dev/null)" || die "Hermes container is not observable: $CONTAINER_NAME"
+[[ "$(printf '%s' "$container_json" | jq 'length')" == "1" ]] || die "expected exactly one Hermes container observation"
+
+running="$(printf '%s' "$container_json" | jq -r '.[0].State.Running // false')"
+container_id="$(printf '%s' "$container_json" | jq -r '.[0].Id // ""')"
+configured_image="$(printf '%s' "$container_json" | jq -r '.[0].Config.Image // ""')"
+image_id="$(printf '%s' "$container_json" | jq -r '.[0].Image // ""')"
+started_at="$(printf '%s' "$container_json" | jq -r '.[0].State.StartedAt // ""')"
+profile_data_mount_observed="$(printf '%s' "$container_json" | jq -r --arg src "$STATE_ROOT/hermes" '
+  any(.[0].Mounts[]?; .Source == $src and .Destination == "/opt/data")
+')"
+
+repo_digests='[]'
+identity_labels='{}'
+image_created=null
+if [[ -n "$image_id" ]]; then
+  image_json="$(docker image inspect "$image_id" 2>/dev/null || true)"
+  if [[ -n "$image_json" ]] && [[ "$(printf '%s' "$image_json" | jq 'length')" == "1" ]]; then
+    repo_digests="$(printf '%s' "$image_json" | jq -c '.[0].RepoDigests // []')"
+    identity_labels="$(printf '%s' "$image_json" | jq -c '
+      (.[0].Config.Labels // {}) as $labels
+      | {
+          version: ($labels["org.opencontainers.image.version"] // null),
+          revision: ($labels["org.opencontainers.image.revision"] // null),
+          source: ($labels["org.opencontainers.image.source"] // null),
+          title: ($labels["org.opencontainers.image.title"] // null)
+        }
+    ')"
+    image_created="$(printf '%s' "$image_json" | jq -c '.[0].Created // null')"
+  fi
+fi
+
+profile_root_present=false
+config_digest=""
+soul_digest=""
+no_bundled_skills_marker=false
+profile_skills='[]'
+if [[ -d "$PROFILE_ROOT" ]]; then
+  profile_root_present=true
+  [[ -f "$PROFILE_ROOT/config.yaml" ]] && config_digest="sha256:$(sha256sum "$PROFILE_ROOT/config.yaml" | awk '{print $1}')"
+  [[ -f "$PROFILE_ROOT/SOUL.md" ]] && soul_digest="sha256:$(sha256sum "$PROFILE_ROOT/SOUL.md" | awk '{print $1}')"
+  [[ -e "$PROFILE_ROOT/skills/.no-bundled-skills" ]] && no_bundled_skills_marker=true
+  if [[ -d "$PROFILE_ROOT/skills" ]]; then
+    while IFS= read -r skill_dir; do
+      [[ -n "$skill_dir" ]] || continue
+      name="$(basename "$skill_dir")"
+      [[ "$name" =~ ^[A-Za-z0-9][A-Za-z0-9_-]*$ ]] || continue
+      skill_file="$skill_dir/SKILL.md"
+      [[ -f "$skill_file" ]] || continue
+      digest="sha256:$(sha256sum "$skill_file" | awk '{print $1}')"
+      profile_skills="$(printf '%s' "$profile_skills" | jq -c --arg name "$name" --arg digest "$digest" '. + [{name:$name, skill_md_digest:$digest}] | sort_by(.name)')"
+    done < <(find "$PROFILE_ROOT/skills" -mindepth 1 -maxdepth 1 -type d -print | sort)
+  fi
+fi
+
+profile_snapshot_digest=""
+if [[ "$profile_root_present" == "true" ]]; then
+  profile_snapshot="$(jq -nc \
+    --arg config_digest "$config_digest" \
+    --arg soul_digest "$soul_digest" \
+    --argjson no_bundled "$no_bundled_skills_marker" \
+    --argjson skills "$profile_skills" \
+    '{config_digest:(if $config_digest == "" then null else $config_digest end), soul_digest:(if $soul_digest == "" then null else $soul_digest end), no_bundled_skills_marker:$no_bundled, skills:$skills}')"
+  profile_snapshot_digest="sha256:$(printf '%s' "$profile_snapshot" | sha256sum | awk '{print $1}')"
+fi
+
+profile_visible_in_container=false
+runtime_version_status="not_observed"
+runtime_version=""
+if [[ "$running" == "true" ]]; then
+  if docker exec "$CONTAINER_NAME" test -d "$CONTAINER_PROFILE_ROOT" 2>/dev/null; then
+    profile_visible_in_container=true
+  fi
+  set +e
+  version_raw="$(docker exec "$CONTAINER_NAME" hermes --version 2>/dev/null)"
+  version_rc=$?
+  set -e
+  if ((version_rc == 0)) && [[ -n "${version_raw//[[:space:]]/}" ]]; then
+    runtime_version="$(printf '%s' "$version_raw" | tr '\r\n' ' ' | sed 's/[[:space:]]\+/ /g; s/^ //; s/ $//')"
+    runtime_version_status="observed"
+  else
+    runtime_version_status="unsupported_or_error"
+  fi
+fi
+
+recorded_image=""
+if [[ -r "$CONFIG_ROOT/versions.env" ]]; then
+  recorded_image="$(awk -F= '$1=="HERMES_IMAGE" {sub(/^[^=]*=/, ""); print; exit}' "$CONFIG_ROOT/versions.env")"
+fi
+
+jq -n \
+  --arg observed_at "$observed_at" \
+  --arg container "$CONTAINER_NAME" \
+  --arg container_id "$container_id" \
+  --arg configured_image "$configured_image" \
+  --arg target_image "$TARGET_IMAGE" \
+  --arg recorded_image "$recorded_image" \
+  --arg image_id "$image_id" \
+  --arg started_at "$started_at" \
+  --arg profile "$PROFILE" \
+  --arg config_digest "$config_digest" \
+  --arg soul_digest "$soul_digest" \
+  --arg profile_snapshot_digest "$profile_snapshot_digest" \
+  --arg runtime_version_status "$runtime_version_status" \
+  --arg runtime_version "$runtime_version" \
+  --argjson running "$running" \
+  --argjson profile_data_mount_observed "$profile_data_mount_observed" \
+  --argjson repo_digests "$repo_digests" \
+  --argjson identity_labels "$identity_labels" \
+  --argjson image_created "$image_created" \
+  --argjson profile_root_present "$profile_root_present" \
+  --argjson profile_visible_in_container "$profile_visible_in_container" \
+  --argjson no_bundled_skills_marker "$no_bundled_skills_marker" \
+  --argjson profile_skills "$profile_skills" \
+  '{
+    kind:"hermes_ubuntu_runtime_observation",
+    observation_source:"docker_inspect_and_profile_snapshot",
+    observed_at:$observed_at,
+    container:{
+      name:$container,
+      id:$container_id,
+      running:$running,
+      started_at:$started_at,
+      configured_image:$configured_image,
+      image_id:$image_id,
+      repo_digests:$repo_digests,
+      image_created:$image_created,
+      identity_labels:$identity_labels,
+      profile_data_mount_observed:$profile_data_mount_observed
+    },
+    deployment:{
+      release_target_image:$target_image,
+      recorded_image:(if $recorded_image == "" then null else $recorded_image end),
+      target_matches_container_config:($configured_image == $target_image),
+      recorded_matches_container_config:(if $recorded_image == "" then null else $configured_image == $recorded_image end)
+    },
+    profile:{
+      name:$profile,
+      host_root_present:$profile_root_present,
+      visible_in_container:$profile_visible_in_container,
+      config_digest:(if $config_digest == "" then null else $config_digest end),
+      soul_digest:(if $soul_digest == "" then null else $soul_digest end),
+      snapshot_digest:(if $profile_snapshot_digest == "" then null else $profile_snapshot_digest end),
+      no_bundled_skills_marker:$no_bundled_skills_marker,
+      local_skills:$profile_skills
+    },
+    runtime_version:{status:$runtime_version_status, value:(if $runtime_version == "" then null else $runtime_version end)},
+    write_effect:false,
+    activation_changed:false,
+    authority_effect:"none",
+    technical_receipt_is_evidence:false,
+    non_equivalences:[
+      "release target image != running container image",
+      "recorded deployment image != running container image",
+      "image tag != immutable image digest",
+      "profile snapshot != profile route active for a run",
+      "profile-local skill != skill used",
+      "runtime version observed != effective model/provider settings observed",
+      "runtime reachable != task authorized",
+      "runtime observation != Evidence"
+    ]
+  }'
