@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pytest
 from fastapi.testclient import TestClient
 
 from mvp_vertical import agency_data, agency_directory
@@ -252,23 +253,12 @@ def test_agency_write_requires_actor_and_writer_key() -> None:
 
 
 def test_same_editor_and_hermes_key_is_refused_as_ambiguous() -> None:
-    client = TestClient(
+    with pytest.raises(
+        ValueError,
+        match="MVP_EDITOR_API_KEY and MVP_HERMES_API_KEY must be distinct",
+    ):
         create_cockpit_app(
             connect_fn=_Connection,
             editor_api_key="shared-key",
             hermes_api_key="shared-key",
         )
-    )
-    response = client.patch(
-        "/agency/projects/project-lieurey",
-        headers={
-            "Authorization": "Bearer shared-key",
-            "X-Pantheon-Actor": "ambiguous-actor",
-        },
-        json={
-            "expected_revision": 1,
-            "idempotency_key": "idem-ambiguous-key",
-            "description": "Description bornée",
-        },
-    )
-    assert response.status_code == 503

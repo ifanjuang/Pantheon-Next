@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pytest
 from fastapi.testclient import TestClient
 
 from mvp_vertical import agency_classification
@@ -146,20 +147,11 @@ def test_ambiguous_editor_and_hermes_key_is_refused(monkeypatch) -> None:
         raise AssertionError("ambiguous writer key must fail closed")
 
     monkeypatch.setattr(agency_classification, "create_category", create_category)
-    client = _client(editor_api_key="shared-key", hermes_api_key="shared-key")
-    response = client.post(
-        "/agency/categories",
-        headers={
-            "Authorization": "Bearer shared-key",
-            "X-Pantheon-Human-Actor": "ambiguous",
-        },
-        json={
-            "category_id": "urbanisme",
-            "title": "Urbanisme",
-            "applies_to": ["document"],
-        },
-    )
-    assert response.status_code == 503
+    with pytest.raises(
+        ValueError,
+        match="MVP_EDITOR_API_KEY and MVP_HERMES_API_KEY must be distinct",
+    ):
+        _client(editor_api_key="shared-key", hermes_api_key="shared-key")
     assert called is False
 
 
