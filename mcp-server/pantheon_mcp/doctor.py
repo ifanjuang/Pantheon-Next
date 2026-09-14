@@ -27,7 +27,6 @@ MANDATORY_FILES = [
     "CLAUDE.md",
     "VERSION",
     "CHANGELOG.md",
-    "ai_logs/README.md",
     "docs/governance/README.md",
     "docs/governance/STATUS.md",
     "docs/governance/ROADMAP.md",

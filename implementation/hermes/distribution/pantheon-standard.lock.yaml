@@ -46,7 +46,7 @@ components:
     kind: runtime_observer
     path: implementation/mvp_vertical/hermes_runs_observer.py
     digest_mode: file
-    content_digest: sha256:e03d380935e89bed7ae92508473ed88c1902f47c110f1d15d51008628f9b6548
+    content_digest: sha256:d8e22444cd647a8b943beacffad9e60d28d9fd41a49d97ad2396ad79525d93cb
     required: true
     enabled_by_default: false
     capabilities:

@@ -1,6 +1,0 @@
-stage=merge
-exit=1
-main=73b5c7d9fc5285035b6bb3cb14e2dbf7cec2da0a
-main_lock=c6f937f3428c4f8a2f9d784ad4f8a312234b1409
-main_soul=379533680bffb6d1f6065c603b229425f2c9164e
-conflicts=ai_logs/INDEX.md 

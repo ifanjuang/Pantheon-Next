@@ -1,8 +1,9 @@
-"""Bounded in-memory fan-out for already-admitted Hermes Role stages.
+"""Bounded in-memory fan-out for one already-admitted Hermes public run stream.
 
 One upstream consumer owns each run. Any number of bounded local readers may
-observe the same derived events without competing for Hermes' source queue.
-The relay cannot create, stop, approve or retry a run and persists nothing.
+observe the same derived Role-stage and explicit runtime-topology events without
+competing for Hermes' source queue. The relay cannot create, stop, approve or
+retry a run and persists nothing.
 """
 
 from __future__ import annotations
@@ -16,6 +17,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from .hermes_role_stage_projection import HermesRoleStageProjector
+from .hermes_runtime_topology_projection import HermesRuntimeTopologyProjector
 
 
 MAX_TRACES = 32
@@ -23,6 +25,7 @@ MAX_REPLAY_EVENTS = 500
 MAX_UPSTREAM_EVENTS = 1_000
 _RUN_ID = re.compile(r"^run_[A-Za-z0-9]{8,128}$")
 _TERMINAL = {"run.completed", "run.failed", "run.cancelled", "run.interrupted"}
+_PROJECTED_EVENT_NAMES = {"role.stage", "runtime.subagent"}
 
 
 class HermesRoleTraceRelayError(RuntimeError):
@@ -116,6 +119,7 @@ class HermesRunsRoleEventSource:
 class _Trace:
     run_id: str
     projector: HermesRoleStageProjector
+    runtime_projector: HermesRuntimeTopologyProjector
     condition: asyncio.Condition = field(default_factory=asyncio.Condition)
     events: deque[dict[str, Any]] = field(
         default_factory=lambda: deque(maxlen=MAX_REPLAY_EVENTS)
@@ -127,7 +131,7 @@ class _Trace:
 
 
 class HermesRoleTraceRelay:
-    """One-source, bounded-replay, multi-reader Role trace relay."""
+    """One-source, bounded-replay, multi-reader observable Hermes trace relay."""
 
     def __init__(self, *, max_traces: int = MAX_TRACES) -> None:
         if max_traces < 1 or max_traces > MAX_TRACES:
@@ -142,8 +146,6 @@ class HermesRoleTraceRelay:
     def _finish_source_task(self, task: asyncio.Task[None]) -> None:
         self._source_tasks.discard(task)
         if not task.cancelled():
-            # Retrieve the exception so a display-only upstream failure is kept
-            # in the trace diagnostic without becoming an unhandled task error.
             task.exception()
 
     @staticmethod
@@ -171,6 +173,7 @@ class HermesRoleTraceRelay:
             self._traces[run_id] = _Trace(
                 run_id=run_id,
                 projector=HermesRoleStageProjector(run_id),
+                runtime_projector=HermesRuntimeTopologyProjector(run_id),
             )
         return self.snapshot(run_id)
 
@@ -193,16 +196,23 @@ class HermesRoleTraceRelay:
             "retained_events": len(trace.events),
             "first_cursor": first_cursor,
             "last_cursor": last_cursor,
+            "projected_event_kinds": sorted(_PROJECTED_EVENT_NAMES),
+            "runtime_relations": "explicit_ids_only",
             "persistence": "none",
             "authority_effect": "none",
         }
 
-    async def _publish(self, trace: _Trace, stages: list[dict[str, Any]]) -> None:
-        if not stages:
+    async def _publish(self, trace: _Trace, projected: list[dict[str, Any]]) -> None:
+        if not projected:
             return
         async with trace.condition:
-            for stage in stages:
-                trace.events.append({"cursor": trace.next_cursor, **stage})
+            for event in projected:
+                event_name = str(event.get("event") or "")
+                if event_name not in _PROJECTED_EVENT_NAMES:
+                    raise HermesRoleTraceRelayError(
+                        f"unsupported projected Hermes trace event: {event_name or '<empty>'}"
+                    )
+                trace.events.append({"cursor": trace.next_cursor, **event})
                 trace.next_cursor += 1
             trace.condition.notify_all()
 
@@ -232,8 +242,9 @@ class HermesRoleTraceRelay:
 
         try:
             async for raw_event in source:
-                stages = trace.projector.feed(raw_event)
-                await self._publish(trace, stages)
+                projected = trace.projector.feed(raw_event)
+                projected.extend(trace.runtime_projector.feed(raw_event))
+                await self._publish(trace, projected)
                 if str(raw_event.get("event") or "") in _TERMINAL:
                     trace.terminal = True
                     break
@@ -252,12 +263,7 @@ class HermesRoleTraceRelay:
         run_id: str,
         source: HermesRunsRoleEventSource,
     ) -> bool:
-        """Attach one source in the background after governed start registration.
-
-        Replayed start callbacks are intentionally idempotent.  ``True`` means
-        this call claimed and started the source; ``False`` means the run was
-        already attached.
-        """
+        """Attach one source in the background after governed start registration."""
 
         await self.register(run_id)
         trace = self._trace(run_id)
@@ -290,7 +296,7 @@ class HermesRoleTraceRelay:
         *,
         after_cursor: int = 0,
     ) -> AsyncIterator[dict[str, Any]]:
-        """Replay retained stages then follow the trace until terminal."""
+        """Replay retained projections then follow the trace until terminal."""
 
         if after_cursor < 0:
             raise HermesRoleTraceRelayError("after_cursor cannot be negative")
@@ -360,7 +366,8 @@ def install_role_trace_routes(
             try:
                 async for event in relay.subscribe(run_id, after_cursor=after):
                     payload = json.dumps(event, ensure_ascii=False, separators=(",", ":"))
-                    yield f"id: {event['cursor']}\nevent: role.stage\ndata: {payload}\n\n"
+                    event_name = str(event.get("event") or "")
+                    yield f"id: {event['cursor']}\nevent: {event_name}\ndata: {payload}\n\n"
             except HermesRoleTraceReplayGap as exc:
                 payload = json.dumps(
                     {"event": "role.trace.error", "detail": str(exc)},

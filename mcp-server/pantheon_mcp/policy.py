@@ -140,10 +140,16 @@ def _declared_conditions(request: dict, observations: dict) -> set[str]:
 
 
 def _semantic_bool(request: dict, observations: dict, name: str) -> bool:
-    """Prefer an explicit caller observation, otherwise use the legacy field."""
-    if name in observations:
-        return observations.get(name) is True
-    return bool(request.get(name, False))
+    """Compose a caller observation with the legacy field.
+
+    Intake vocabularies raise consequence; they never lower it. A caller that
+    omits an observation says nothing about it, and a caller that sends ``False``
+    is reporting its own reading, not overruling a signal the request already
+    carries. Letting the observation win would allow a described request to talk
+    its way under the gate -- which ``conditions`` already refuses to allow (see
+    ``condition_external`` in ``classify_request``).
+    """
+    return observations.get(name) is True or bool(request.get(name, False))
 
 
 def classify_request(request: dict) -> dict:
@@ -201,7 +207,13 @@ def classify_request(request: dict) -> dict:
         {"legal_or_professional_risk", "liability_risk"}.intersection(conditions)
     )
 
-    external = observations.get("external_effect", request.get("external_effect", False))
+    # ``external_effect`` is tri-state: False, True, or "unknown" -- and
+    # "unknown" is itself an escalation to K4. Like every other intake signal it
+    # composes upward only.
+    external = request.get("external_effect", False)
+    observed_external = observations.get("external_effect")
+    if observed_external is True or observed_external == "unknown":
+        external = observed_external
     if condition_external:
         external = True
 

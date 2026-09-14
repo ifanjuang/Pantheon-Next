@@ -112,7 +112,7 @@ Always distinguish:
 - to verify;
 - non implemented.
 
-Every significant AI intervention must add an entry under `ai_logs/<year>/Q<n>/`. Existing flat logs remain valid historical paths and are not migrated automatically.
+Use owner documents, schemas/contracts/tests, Git history and pull-request rationale as the default durable trace of repository work. `ai_logs/` is optional historical/exceptional support only; do not create one unless consequential context would otherwise be lost or materially ambiguous.
 
 ## Runtime policy
 

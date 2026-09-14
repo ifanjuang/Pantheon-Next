@@ -7,6 +7,7 @@
     <meta name="description" content="Vue locale en lecture seule des dossiers documentaires Pantheon.">
     <title>Pantheon — Dossiers</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="role_trace_graph.css">
     <script src="app.js" defer></script>
   </head>
   <body>
@@ -34,12 +35,23 @@
         <div class="role-dialogue-head">
           <div>
             <p class="eyebrow">Exécution gouvernée</p>
-            <h2 id="role-dialogue-title">Dialogue des rôles</h2>
+            <h2 id="role-dialogue-title">Trace des rôles</h2>
           </div>
           <span id="role-dialogue-state" class="role-dialogue-state" aria-live="polite">Aucune trace</span>
         </div>
+        <div class="role-trace-tabs" role="tablist" aria-label="Vue de la trace des rôles">
+          <button id="role-view-dialogue" class="role-trace-tab" type="button" role="tab" data-role-trace-view="dialogue" aria-selected="true" aria-controls="role-dialogue-events">Dialogue</button>
+          <button id="role-view-graph" class="role-trace-tab" type="button" role="tab" data-role-trace-view="graph" aria-selected="false" aria-controls="role-graph" tabindex="-1">Graphe</button>
+        </div>
         <p class="role-dialogue-boundary">Jalons publics observables · aucun raisonnement privé · aucune approbation implicite.</p>
-        <ol id="role-dialogue-events" class="role-dialogue-events" aria-live="polite"></ol>
+        <ol id="role-dialogue-events" class="role-dialogue-events" role="tabpanel" aria-labelledby="role-view-dialogue" aria-live="polite"></ol>
+        <section id="role-graph" class="role-graph" role="tabpanel" aria-labelledby="role-view-graph" hidden>
+          <p class="role-graph-boundary">Ordre observable · aucun lien causal n’est déduit.</p>
+          <div class="role-graph-scroll" tabindex="0" aria-label="Graphe chronologique des rôles observés">
+            <div id="role-graph-lanes" class="role-graph-lanes"></div>
+          </div>
+          <div id="role-graph-detail" class="role-graph-detail" aria-live="polite"></div>
+        </section>
       </section>
 
       <section class="controls" aria-label="Filtres">

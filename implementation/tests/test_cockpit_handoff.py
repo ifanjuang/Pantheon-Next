@@ -45,6 +45,10 @@ def test_handoff_separates_conversation_governance_and_runtime() -> None:
     assert 'href="styles/editors.css"' in html
     assert 'id="v2-role-dialogue"' in html
     assert 'id="v2-role-dialogue-events"' in html
+    assert 'id="v2-role-view-graph"' in html
+    assert 'id="v2-role-graph"' in html
+    assert 'id="v2-role-graph-lanes"' in html
+    assert "Ordre observable" in html
     assert '../cockpit/hermes-handoffs/preview' in javascript
     assert '../cockpit/hermes-handoffs/submit' in javascript
     assert '../v1/cockpit/hermes-handoffs/preview' not in javascript
@@ -60,7 +64,15 @@ def test_handoff_separates_conversation_governance_and_runtime() -> None:
     assert '.v2-handoff-shell' in css
     assert '.v2-handoff-question' in css
     assert '.v2-role-stage' in css
+    assert '.v2-role-graph-lane' in css
+    assert '.v2-role-graph-node[data-projection="derived_transient"]' in css
+    assert '.v2-role-dialogue-events[hidden]' in css
+    assert '.v2-role-graph[hidden]' in css
     assert 'Last-Event-ID' in role_dialogue
     assert 'Authorization' in role_dialogue
+    assert 'stageEvents.set(event.stage_id, { ...event });' in role_dialogue
+    assert 'button.dataset.roleTraceView === activeView' in role_dialogue
     assert 'event.projection === "derived_transient" ? "dérivé" : "natif"' in role_dialogue
     assert 'reasoning.available' not in role_dialogue
+    assert 'parent_stage_id' not in role_dialogue
+    assert 'caused_by' not in role_dialogue

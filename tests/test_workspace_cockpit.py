@@ -114,6 +114,18 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     assert "HERMES_ROLE_TRACE_API_KEY" in compose
     html = (ROOT / "implementation" / "workspace_cockpit" / "static" / "index.html").read_text(encoding="utf-8")
     javascript = (ROOT / "implementation" / "workspace_cockpit" / "static" / "app.js").read_text(encoding="utf-8")
+    graph_css = (ROOT / "implementation" / "workspace_cockpit" / "static" / "role_trace_graph.css").read_text(encoding="utf-8")
+    assert 'href="role_trace_graph.css"' in html
     assert 'id="role-dialogue-events"' in html
+    assert 'id="role-view-graph"' in html
+    assert 'id="role-graph"' in html
+    assert 'id="role-graph-lanes"' in html
+    assert "Ordre observable" in html
     assert "/api/role-traces/latest" in javascript
     assert "Last-Event-ID" in javascript
+    assert 'roleView.stageEvents.set(event.stage_id, { ...event });' in javascript
+    assert 'button.dataset.roleTraceView === roleView.activeView' in javascript
+    assert 'parent_stage_id' not in javascript
+    assert 'caused_by' not in javascript
+    assert '.role-graph-lane' in graph_css
+    assert '.role-graph-node[data-projection="derived_transient"]' in graph_css
