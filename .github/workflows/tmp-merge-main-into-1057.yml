@@ -21,7 +21,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          readonly EXPECTED_MAIN="ab12dad2a4caa9fb7c82e8216e52bc84fc36e7e1"
+          readonly EXPECTED_MAIN="3d1721a4605de36363a5af53adb3258660058ffa"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git fetch origin main
