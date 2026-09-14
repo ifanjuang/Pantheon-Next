@@ -17,23 +17,27 @@ jobs:
         with:
           ref: codex/governed-runtime-capabilities
           fetch-depth: 0
-      - name: Merge verified main with bounded semantic resolution
+      - name: Merge current main with bounded semantic resolution
         shell: bash
         run: |
           set -euo pipefail
-          readonly EXPECTED_MAIN="3d1721a4605de36363a5af53adb3258660058ffa"
           readonly BRANCH_HEAD="$(git rev-parse HEAD)"
+          readonly EXPECTED_MAIN_LOCK_BLOB="c6f937f3428c4f8a2f9d784ad4f8a312234b1409"
+          readonly EXPECTED_MAIN_SOUL_BLOB="379533680bffb6d1f6065c603b229425f2c9164e"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git fetch origin main
-          test "$(git rev-parse origin/main)" = "$EXPECTED_MAIN"
+          readonly MAIN_HEAD="$(git rev-parse origin/main)"
+
+          test "$(git rev-parse "${MAIN_HEAD}:implementation/hermes/distribution/pantheon-standard.lock.yaml")" = "$EXPECTED_MAIN_LOCK_BLOB"
+          test "$(git rev-parse "${MAIN_HEAD}:templates/hermes/profiles/pantheon-governed/SOUL.append.md")" = "$EXPECTED_MAIN_SOUL_BLOB"
 
           set +e
-          git merge --no-commit --no-ff origin/main
+          git merge --no-commit --no-ff "$MAIN_HEAD"
           merge_status=$?
           set -e
 
-          BRANCH_HEAD="$BRANCH_HEAD" EXPECTED_MAIN="$EXPECTED_MAIN" python3 - <<'PY'
+          BRANCH_HEAD="$BRANCH_HEAD" MAIN_HEAD="$MAIN_HEAD" python3 - <<'PY'
           import os
           import re
           import subprocess
@@ -54,7 +58,7 @@ jobs:
               raise SystemExit(f"unexpected merge conflicts: {sorted(unexpected)}")
 
           branch_head = os.environ["BRANCH_HEAD"]
-          main_head = os.environ["EXPECTED_MAIN"]
+          main_head = os.environ["MAIN_HEAD"]
 
           lock_path = "implementation/hermes/distribution/pantheon-standard.lock.yaml"
           ours_lock = subprocess.check_output(["git", "show", f"{branch_head}:{lock_path}"], text=True)
@@ -88,10 +92,7 @@ jobs:
           needle = "An explicit request for the skill must visibly include at least:\n"
           if needle not in ours_soul:
               raise SystemExit("#1057 SOUL insertion point not found")
-          if start in ours_soul:
-              merged_soul = ours_soul
-          else:
-              merged_soul = ours_soul.replace(needle, block + needle, 1)
+          merged_soul = ours_soul if start in ours_soul else ours_soul.replace(needle, block + needle, 1)
           for required in (
               "`pantheon-governed-method` and `pantheon-activity-projection` skills",
               "handling.metathoughts",
