@@ -74,6 +74,36 @@ def test_tool_lifecycle_is_projected_as_observed_hermes_execution() -> None:
     assert completed[0]["error"] is False
 
 
+def test_governed_attention_is_visible_without_implying_rite_activation() -> None:
+    projector = HermesRoleStageProjector("run-role-1")
+
+    started = projector.feed(
+        _event("message.delta", delta="⚙ Hermes · Attention gouvernée\n")
+    )
+    question = projector.feed(
+        _event(
+            "message.delta",
+            delta="What would passing these tests still not establish?\n",
+        )
+    )
+    limit = projector.feed(
+        _event(
+            "message.delta",
+            delta="Limite: attention_only — question ≠ symptôme confirmé ≠ Rite activé\n",
+        )
+    )
+
+    assert started[0]["visible_role"] == "Hermes"
+    assert started[0]["role_family"] == "runtime"
+    assert started[0]["semantic_function"] == "Attention gouvernée"
+    assert started[0]["authority_effect"] == "none"
+    assert question[0]["summary"] == "What would passing these tests still not establish?"
+    assert limit[0]["summary"] == question[0]["summary"]
+    assert limit[0]["details"]["limite"] == (
+        "attention_only — question ≠ symptôme confirmé ≠ Rite activé"
+    )
+
+
 def test_terminal_event_flushes_the_last_public_stage() -> None:
     projector = HermesRoleStageProjector("run-role-1")
     projector.feed(_event("message.delta", delta="⚡ Zeus · Statut\nRésultat: prêt"))
