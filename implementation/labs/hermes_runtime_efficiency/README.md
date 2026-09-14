@@ -28,7 +28,7 @@ Opened from:
 
 ```text
 Pantheon-Next main: 836219b7e9c271d64a4850bd2484d3767c56a38f
-Pantheon deployment target: nousresearch/hermes-agent:v2026.8.31
+Pantheon deployment target: nousresearch/hermes-agent:v2026.9.11
 reference project: NVlabs/SoL-Pi
 issue: #1047
 ```

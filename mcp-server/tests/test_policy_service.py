@@ -41,6 +41,45 @@ class TestPantheonPolicyService(unittest.TestCase):
         self.assertGreater(len(report), 10)
         self.assertIn("source_file", report[0])
 
+    def test_relevant_source_shortlist_is_compact_condition_driven_and_bounded(self):
+        report = self.service.find_relevant_sources(
+            {
+                "conditions": ["source_required", "external_effect"],
+                "terms": ["verification"],
+                "limit": 3,
+            }
+        )
+
+        self.assertEqual(report["result"], "shortlisted")
+        self.assertLessEqual(len(report["candidates"]), 3)
+        self.assertEqual(report["operation"], "sources.find_relevant")
+        self.assertFalse(report["write_effect"])
+        self.assertIn("answer-verification-gate", {item["key"] for item in report["candidates"]})
+        for item in report["candidates"]:
+            self.assertNotIn("body", item)
+            self.assertNotIn("summary", item)
+            self.assertNotIn("authority_diagnostics", item)
+            self.assertTrue(item["matched_on"])
+
+    def test_relevant_source_shortlist_does_not_guess_without_signals(self):
+        report = self.service.find_relevant_sources({"limit": 99})
+
+        self.assertEqual(report["result"], "no_match")
+        self.assertEqual(report["limit"], 8)
+        self.assertEqual(report["candidates"], [])
+        self.assertIn("clarify", report["next_action"])
+
+    def test_mcp_relevant_source_tool_uses_yaml_contract(self):
+        report = json.loads(
+            server.find_relevant_sources(
+                "conditions:\n  - project_history_reuse\nlimit: 2\n"
+            )
+        )
+
+        self.assertEqual(report["result"], "shortlisted")
+        self.assertLessEqual(len(report["candidates"]), 2)
+        self.assertIn("memory", {item["key"] for item in report["candidates"]})
+
     def test_unknown_source_key_never_becomes_a_path(self):
         report = self.service.read_doctrine("../../etc/passwd")
         self.assertEqual(report["error"], "unknown source key")

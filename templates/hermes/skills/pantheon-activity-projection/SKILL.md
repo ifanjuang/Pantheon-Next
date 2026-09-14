@@ -109,9 +109,41 @@ Current compact labels:
 
 Hermes is a runtime, not a Pantheon Role.
 
+Select labels from observed responsibility, never from the output's object
+name. Typical condition-driven jurisdiction is compact: structure or material
+ambiguity may justify Athena; source support Argos; prior-state continuity
+Mnemosyne; consequential risk Themis; production Hephaistos; delivery quality
+Apollo; recipient/channel adaptation Iris; and actual conflict or final
+procedural status Zeus. Hermes may label an execution milestone. This mapping
+does not require displaying any Role whose contribution is absent.
+
 A `→ Relais` line means the next responsibility, not a new agent or dispatch. If
 Hermes actually delegates runtime work, report that separately as an observed
 Hermes delegation.
+
+## Observable Role outcomes
+
+Every Role that is materially shown must close its contribution with one
+observable readiness outcome: `ready`, `ready_with_limits`, `needs_revision`,
+`needs_user_input` or `blocked`, plus the smallest useful result, source/evidence
+reference, limitation or next safe action. Do not activate extra Roles merely to populate
+a checklist, and do not confuse a Role outcome with final task approval.
+
+Use natural, result-bearing labels. Avoid vague phrases such as `candidate
+seulement`, `classification requeste` or `exécution déléguée` unless an actual
+delegation was observed. Prefer `périmètre à préciser`, `source ouverte`,
+`résultat non produit` and the exact missing datum or dependency.
+
+For a drafted communication, typical outcomes are: objective and recipient
+grounded (Athena), material facts checked (Argos), commitments/confidentiality
+reviewed (Themis), wording made clear (Apollo), tone/channel adapted (Iris), and
+final readiness stated (Zeus). Use only those that materially contribute.
+
+```text
+draft complete != transmission authorized
+Role readiness != whole task approved
+unused Role != missing validation
+```
 
 ## Source citation and provenance
 
@@ -258,10 +290,10 @@ Do not manufacture a complete-looking path, source set, method or tool list.
 Do not claim that no data was extrapolated when the answer contains derived
 rounding, arithmetic or interpretation; identify those elements as derived.
 
-## Floquet acceptance shape
+## Professional source-verification acceptance shape
 
-For a real Floquet source-verification test, use only corpus facts actually
-retrieved during that run:
+For a real professional source-verification task, use only corpus facts actually
+retrieved during that run, regardless of the dossier or deliverable type:
 
 ```text
 Plan
@@ -290,7 +322,8 @@ If a governed Role/handoff has actually been established, project it around the
 same factual content. Otherwise keep the direct Hermes presentation rather than
 inventing role theatre.
 
-This is a presentation shape, not a claim about the real Floquet corpus.
+This is a general presentation shape, not a dossier-specific workflow or a claim
+about any real corpus.
 
 ## Final invariant
 

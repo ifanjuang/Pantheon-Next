@@ -20,6 +20,13 @@ def test_ifja_project_context_routes_existing_sources_without_new_authority():
     assert "governed_by: docs/governance/HERMES_INTEGRATION.md" in text
 
     assert "Hindsight recall != source authority" in text
+    assert "For every material professional factual answer, complete a source preflight" in text
+    assert "dossier/client/address/budget/date/status/planning -> AFFAIRES required" in text
+    assert "technical/standard/regulatory/legal/method question -> DOCUMENTAIRES required" in text
+    assert "AFFAIRES + DOCUMENTAIRES required" in text
+    assert "indice mémoire — non confirmé" in text
+    assert "fast memory lead != confirmed answer" in text
+    assert "resolve and open the exact applicable workspace source" in text
     assert "bounded candidate set" in text
     assert "do not silently merge or select an identity" in text
     assert "conversation-local working referent" in text
@@ -35,8 +42,9 @@ def test_ifja_project_context_routes_existing_sources_without_new_authority():
 
     assert "generic `pantheon-request-intake` semantic adapter" in text
     assert "Do not create an IFJA-specific K/V/C or trigger classifier here" in text
-    assert "bounded HTTP policy service" in text
-    assert "do not assume that the consultation-only MCP binding exposes classification" in text
+    assert "same bounded read-only policy meaning" in text
+    assert "reviewed governed MCP binding exposes" in text
+    assert "`classify_request`, `evaluate_preflight`" in text
     assert "return a Capability Gap" in text
     assert "Do not derive K/V/C" in text
     assert "Do not call Pantheon mechanically for trivial consultation" in text
@@ -46,6 +54,16 @@ def test_ifja_project_context_routes_existing_sources_without_new_authority():
     assert "Hindsight != Evidence" in text
     assert "runtime success != authorization" in text
     assert "projection != persistence" in text
+    assert "### 6. Select an artifact destination explicitly" in text
+    assert "exact destination already admitted by the current Task Contract" in text
+    assert "only when its admitted contract" in text
+    assert "ask one short clarification" in text
+    assert "Do not create parallel copies in multiple systems silently" in text
+    assert "admitted capability catalogue and available governed" in text
+    assert "do not assume that every dossier manifest defines a destination" in text
+    assert "local Markdown draft followed by a separately approved" in text
+    assert "publication step" in text
+    assert "Google connection available != external write authorized" in text
 
     registry = REGISTRY.read_text(encoding="utf-8")
     skill_path = "templates/hermes/skills/ifja-project-context/SKILL.md"

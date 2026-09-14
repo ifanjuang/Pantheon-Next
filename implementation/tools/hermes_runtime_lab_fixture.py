@@ -459,7 +459,7 @@ class Handler(BaseHTTPRequestHandler):
             response = _tool_call_message(
                 step,
                 "tool_search",
-                {"queries": ["pantheon context manifest entity"], "limit": 5},
+                {"queries": ["pantheon context manifest", "pantheon context entity"], "limit": 5},
             )
         elif step == 1:
             response = _tool_call_message(

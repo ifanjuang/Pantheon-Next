@@ -311,7 +311,7 @@ class Handler(base.Handler):
             response = base._tool_call_message(
                 step,
                 "tool_search",
-                {"queries": ["pantheon context manifest entity"], "limit": 5},
+                {"queries": ["pantheon context manifest", "pantheon context entity"], "limit": 5},
             )
         elif step == 1:
             response = base._tool_call_message(

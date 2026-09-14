@@ -187,6 +187,7 @@ def test_fixture_uses_native_progressive_tool_disclosure() -> None:
     assert 'BRIDGE_TOOLS = {"tool_search", "tool_describe", "tool_call"}' in raw
     assert '"name": "pantheon_context_manifest"' in raw
     assert '"name": "pantheon_context_entity"' in raw
+    assert '"queries": ["pantheon context manifest", "pantheon context entity"]' in raw
     assert raw.count('"tool_call"') >= 4
     assert "progressive tool checks failed" in raw
     assert "LAB_ACCEPTANCE_COMPLETED: progressive discovery" in raw

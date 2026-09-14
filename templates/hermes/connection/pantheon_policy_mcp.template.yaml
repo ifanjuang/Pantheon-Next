@@ -17,17 +17,27 @@ mcp_servers:
       # Mount the audited Pantheon checkout read-only at this path.
       PANTHEON_REPO_PATH: "/opt/pantheon-next-<COMMIT_SHORT>"
 
-    # These tools only read governed sources or qualify caller-provided status.
+    # This exact surface combines the bounded governance wiki with the
+    # read-only request-handling helpers required by the governed Hermes flow.
+    # Candidate skeleton preparation and validation never execute work, mutate
+    # Pantheon, authorize an effect or turn retrieved material into Evidence.
     # The Hermes dashboard plugin remains the live observation producer; this
     # MCP does not probe Hermes or infer approval from dashboard labels.
     tools:
       include:
+        - find_relevant_sources
         - list_sources
         - read_doctrine
         - explain_governance_structure
         - get_consultation_catalog
         - explain_architecture
         - get_capability_status
+        - classify_request
+        - evaluate_preflight
+        - prepare_task_contract_skeleton
+        - prepare_evidence_pack_skeleton
+        - plan_context_pack
+        - validate_context_pack
       prompts: false
       resources: false
 
@@ -35,7 +45,7 @@ mcp_servers:
     sampling:
       enabled: false
 
-    # Conservative common-baseline default. The six tools are read-only, but
+    # Conservative common-baseline default. All thirteen tools are read-only, but
     # serialized calls simplify trace review and avoid claiming concurrency need.
     supports_parallel_tool_calls: false
 

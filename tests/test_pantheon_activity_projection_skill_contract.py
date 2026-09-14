@@ -151,7 +151,7 @@ def test_activity_projection_binding_stays_small_and_does_not_pollute_intake() -
 def test_ifja_context_requests_projection_without_prescribing_runtime_sequence() -> None:
     text = IFJA_CONTEXT.read_text(encoding="utf-8")
 
-    assert "related_skills: [pantheon-activity-projection, pantheon-request-intake, source-research]" in text
+    assert "related_skills: [pantheon-governed-method, pantheon-activity-projection, pantheon-request-intake, source-research]" in text
     assert "For non-trivial IFJA work" in text
     assert "load and apply it before substantial execution" in text
     assert "does not prescribe the runtime tool sequence" in text
@@ -160,10 +160,10 @@ def test_ifja_context_requests_projection_without_prescribing_runtime_sequence()
     assert "presentation capability gap" in text
 
 
-def test_floquet_example_is_shape_only_and_contains_no_invented_project_fact() -> None:
+def test_professional_example_is_generic_shape_only() -> None:
     text = SKILL.read_text(encoding="utf-8")
 
-    assert "## Floquet acceptance shape" in text
+    assert "## Professional source-verification acceptance shape" in text
     assert "<document réel>" in text
     assert "<indice observé>" in text
     assert "<skill réellement utilisé>" in text
@@ -172,6 +172,7 @@ def test_floquet_example_is_shape_only_and_contains_no_invented_project_fact() -
     assert "Base monétaire: <HT/TTC/non identifié>" in text
     assert "Formule: <displayed source components>" in text
     assert "Hypothèses: <none or explicitly labelled derived assumptions>" in text
-    assert "not a claim about the real Floquet corpus" in text
+    assert "not a dossier-specific workflow" in text
+    assert "Floquet" not in text
     assert "120 000" not in text
     assert "Budget estimatif C2" not in text

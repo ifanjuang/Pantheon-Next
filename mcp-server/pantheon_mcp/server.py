@@ -120,6 +120,12 @@ def list_sources() -> str:
 
 
 @_read_only_tool()
+def find_relevant_sources(request_yaml: str) -> str:
+    """Shortlist up to eight governance sources from conditions and search terms."""
+    return _call_yaml(request_yaml, "find_relevant_sources")
+
+
+@_read_only_tool()
 def read_doctrine(key: str) -> str:
     """Read one allowlisted governed source; arbitrary paths are not accepted."""
     return _call("read_doctrine", key)
