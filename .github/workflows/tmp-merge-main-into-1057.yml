@@ -17,54 +17,99 @@ jobs:
         with:
           ref: codex/governed-runtime-capabilities
           fetch-depth: 0
-      - name: Diagnose bounded main reconciliation
+      - name: Merge current main with bounded semantic resolution
         shell: bash
         run: |
-          set -Eeuo pipefail
-          stage=init
-          readonly DIAG=.github/tmp-merge-diagnostic.txt
-          diagnose() {
-            code=$?
-            conflicts="$(git diff --name-only --diff-filter=U 2>/dev/null | sort | tr '\n' ' ' || true)"
-            main_head="$(git rev-parse origin/main 2>/dev/null || true)"
-            main_lock="$(git rev-parse "${main_head}:implementation/hermes/distribution/pantheon-standard.lock.yaml" 2>/dev/null || true)"
-            main_soul="$(git rev-parse "${main_head}:templates/hermes/profiles/pantheon-governed/SOUL.append.md" 2>/dev/null || true)"
-            git merge --abort >/dev/null 2>&1 || true
-            printf 'stage=%s\nexit=%s\nmain=%s\nmain_lock=%s\nmain_soul=%s\nconflicts=%s\n' "$stage" "$code" "$main_head" "$main_lock" "$main_soul" "$conflicts" > "$DIAG"
-            git add "$DIAG"
-            git commit -m "chore(ci): capture #1057 reconciliation diagnostic" || true
-            git push origin HEAD:codex/governed-runtime-capabilities || true
-            exit "$code"
-          }
-          trap diagnose ERR
-
+          set -euo pipefail
+          readonly BRANCH_HEAD="$(git rev-parse HEAD)"
+          readonly EXPECTED_MAIN_LOCK_BLOB="c6f937f3428c4f8a2f9d784ad4f8a312234b1409"
+          readonly EXPECTED_MAIN_SOUL_BLOB="379533680bffb6d1f6065c603b229425f2c9164e"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          stage=fetch
           git fetch origin main
           readonly MAIN_HEAD="$(git rev-parse origin/main)"
-          stage=blob-check
-          test "$(git rev-parse "${MAIN_HEAD}:implementation/hermes/distribution/pantheon-standard.lock.yaml")" = "c6f937f3428c4f8a2f9d784ad4f8a312234b1409"
-          test "$(git rev-parse "${MAIN_HEAD}:templates/hermes/profiles/pantheon-governed/SOUL.append.md")" = "379533680bffb6d1f6065c603b229425f2c9164e"
 
-          stage=merge
-          set +e
-          git merge --no-commit --no-ff "$MAIN_HEAD"
-          merge_status=$?
-          set -e
-          stage=conflict-set
-          conflicts="$(git diff --name-only --diff-filter=U | sort | tr '\n' ' ')"
-          python3 - "$conflicts" <<'PY'
-          import sys
+          test "$(git rev-parse "${MAIN_HEAD}:implementation/hermes/distribution/pantheon-standard.lock.yaml")" = "$EXPECTED_MAIN_LOCK_BLOB"
+          test "$(git rev-parse "${MAIN_HEAD}:templates/hermes/profiles/pantheon-governed/SOUL.append.md")" = "$EXPECTED_MAIN_SOUL_BLOB"
+
+          merge_status=0
+          git merge --no-commit --no-ff "$MAIN_HEAD" || merge_status=$?
+          test "$merge_status" -eq 0 -o "$merge_status" -eq 1
+
+          BRANCH_HEAD="$BRANCH_HEAD" MAIN_HEAD="$MAIN_HEAD" python3 - <<'PY'
+          import os
+          import re
+          import subprocess
+          from pathlib import Path
+
           allowed = {
               "ai_logs/INDEX.md",
               "implementation/hermes/distribution/pantheon-standard.lock.yaml",
               "templates/hermes/profiles/pantheon-governed/SOUL.append.md",
           }
-          actual = {p for p in sys.argv[1].split() if p}
-          unexpected = actual - allowed
+          conflicts = {
+              line for line in subprocess.check_output(
+                  ["git", "diff", "--name-only", "--diff-filter=U"], text=True
+              ).splitlines() if line
+          }
+          unexpected = conflicts - allowed
           if unexpected:
-              raise SystemExit(f"unexpected conflicts: {sorted(unexpected)}")
+              raise SystemExit(f"unexpected merge conflicts: {sorted(unexpected)}")
+
+          branch_head = os.environ["BRANCH_HEAD"]
+          main_head = os.environ["MAIN_HEAD"]
+
+          lock_path = "implementation/hermes/distribution/pantheon-standard.lock.yaml"
+          ours_lock = subprocess.check_output(["git", "show", f"{branch_head}:{lock_path}"], text=True)
+          main_lock = subprocess.check_output(["git", "show", f"{main_head}:{lock_path}"], text=True)
+          digest_match = re.search(
+              r"component_id: runtime-observer.*?content_digest: (sha256:[0-9a-f]+)",
+              main_lock,
+              re.S,
+          )
+          if not digest_match:
+              raise SystemExit("runtime-observer digest not found in current main")
+          merged_lock, count = re.subn(
+              r"(component_id: runtime-observer.*?content_digest: )sha256:[0-9a-f]+",
+              rf"\g<1>{digest_match.group(1)}",
+              ours_lock,
+              count=1,
+              flags=re.S,
+          )
+          if count != 1 or 'version: "0.21.2"' not in merged_lock:
+              raise SystemExit("distribution lock composition failed")
+          Path(lock_path).write_text(merged_lock, encoding="utf-8")
+
+          soul_path = "templates/hermes/profiles/pantheon-governed/SOUL.append.md"
+          ours_soul = subprocess.check_output(["git", "show", f"{branch_head}:{soul_path}"], text=True)
+          main_soul = subprocess.check_output(["git", "show", f"{main_head}:{soul_path}"], text=True)
+          start = "When an observed Pantheon `classify_request` result contains\n"
+          end = "report that later transition separately.\n\n"
+          if start not in main_soul or end not in main_soul:
+              raise SystemExit("main metathought block not found")
+          block = main_soul[main_soul.index(start):main_soul.index(end) + len(end)]
+          needle = "An explicit request for the skill must visibly include at least:\n"
+          if needle not in ours_soul:
+              raise SystemExit("#1057 SOUL insertion point not found")
+          merged_soul = ours_soul if start in ours_soul else ours_soul.replace(needle, block + needle, 1)
+          for required in (
+              "`pantheon-governed-method` and `pantheon-activity-projection` skills",
+              "handling.metathoughts",
+              "source preflight",
+              "ready_with_limits",
+          ):
+              if required not in merged_soul:
+                  raise SystemExit(f"merged SOUL missing: {required}")
+          Path(soul_path).write_text(merged_soul, encoding="utf-8")
+
+          if "ai_logs/INDEX.md" in conflicts:
+              subprocess.run(["git", "checkout", "--theirs", "--", "ai_logs/INDEX.md"], check=True)
           PY
-          stage=intentional-stop
-          false
+
+          git add implementation/hermes/distribution/pantheon-standard.lock.yaml templates/hermes/profiles/pantheon-governed/SOUL.append.md ai_logs/INDEX.md
+          python3 .github/scripts/generate_ai_logs_index.py
+          git add ai_logs/INDEX.md
+          test -z "$(git diff --name-only --diff-filter=U)"
+          git diff --check
+          git commit -m "merge(main): reconcile governed runtime capabilities"
+          git push origin HEAD:codex/governed-runtime-capabilities
