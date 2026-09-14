@@ -21,7 +21,7 @@ owner documents
 
 Create a separate AI log only when a consequential boundary, external-runtime observation, consolidation/removal mapping or architectural rationale would otherwise be lost or materially ambiguous.
 
-No skill, workflow, Hermes runtime, governance baseline or Doctor health check should depend on an AI log being present.
+Target state: no skill, workflow, Hermes runtime, governance baseline or Doctor health check depends on an AI log being present. The CI baseline treats this corpus as optional; legacy Doctor coupling is tracked separately until removed and tested.
 
 ## Purpose
 
