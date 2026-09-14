@@ -14,6 +14,7 @@ PROFILE="${HERMES_PROFILE:-pantheon-governed}"
 SKILLS_ROOT="${HERMES_GOVERNED_SKILLS_ROOT:-$STATE_ROOT/hermes-governed-skills}"
 CONTAINER_SKILLS_ROOT="/opt/pantheon-skills"
 TARGET_IMAGE="${RELEASE_HERMES_IMAGE:?release.env missing RELEASE_HERMES_IMAGE}"
+TARGET_SKILLS="${RELEASE_HERMES_GOVERNED_SKILLS:?release.env missing RELEASE_HERMES_GOVERNED_SKILLS}"
 
 usage() {
   cat <<'USAGE'
@@ -107,6 +108,16 @@ if [[ -d "$SKILLS_ROOT" ]]; then
   done < <(find "$SKILLS_ROOT" -mindepth 1 -maxdepth 1 -type d -print | sort)
 fi
 
+target_skill_names='[]'
+for name in $TARGET_SKILLS; do
+  [[ "$name" =~ ^[A-Za-z0-9][A-Za-z0-9_-]*$ ]] || die "invalid governed skill name in release.env: $name"
+  target_skill_names="$(printf '%s' "$target_skill_names" | jq -c --arg name "$name" '. + [$name] | unique | sort')"
+done
+projected_skill_names="$(printf '%s' "$skills" | jq -c '[.[].name] | unique | sort')"
+missing_target_skills="$(jq -nc --argjson target "$target_skill_names" --argjson observed "$projected_skill_names" '$target - $observed')"
+unexpected_projected_skills="$(jq -nc --argjson target "$target_skill_names" --argjson observed "$projected_skill_names" '$observed - $target')"
+skills_match_target="$(jq -nr --argjson target "$target_skill_names" --argjson observed "$projected_skill_names" '$target == $observed')"
+
 external_dirs_status="not_observed"
 external_dirs='null'
 version_status="not_observed"
@@ -173,6 +184,10 @@ jq -n \
   --argjson skills_root_present "$skills_root_present" \
   --argjson expected_mount_observed "$expected_mount_observed" \
   --argjson skills "$skills" \
+  --argjson target_skill_names "$target_skill_names" \
+  --argjson skills_match_target "$skills_match_target" \
+  --argjson missing_target_skills "$missing_target_skills" \
+  --argjson unexpected_projected_skills "$unexpected_projected_skills" \
   --argjson external_dirs "$external_dirs" \
   --argjson external_dir_bound "$external_dir_bound" \
   --argjson runtime_version "$runtime_version" \
@@ -206,9 +221,13 @@ jq -n \
       external_dirs:$external_dirs
     },
     governed_skills:{
+      release_target:$target_skill_names,
       host_projection_root_present:$skills_root_present,
       read_only_mount_observed:$expected_mount_observed,
       external_dir_bound:$external_dir_bound,
+      matches_release_target:$skills_match_target,
+      missing_release_target:$missing_target_skills,
+      unexpected_projected:$unexpected_projected_skills,
       projected:$skills
     },
     runtime_version:{status:$version_status, value:$runtime_version},
@@ -222,6 +241,7 @@ jq -n \
       "recorded deployment image != running container image",
       "image tag != immutable image digest",
       "skill projected != skill used",
+      "skill set matches release target != skill used",
       "profile config present != profile route active",
       "read-only observation process != authorization",
       "runtime reachable != task authorized",
