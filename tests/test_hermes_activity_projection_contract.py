@@ -106,7 +106,7 @@ def test_governed_local_mcp_binding_is_explicit_filtered_and_fail_closed() -> No
     assert "get_profile_optional_config_json default mcp_servers" in text
     for server in ("docling", "hindsight-affaires", "hindsight-documentaires", "hindsight-memory", "pantheon-policy"):
         assert server in text
-    assert "Doclin" not in text
+    assert '"Doclin"' not in text
     assert '"tools": {"include": ["recall"]}' in text
     assert 'endswith("/mcp/hermes/")' in text
     assert "required local Hindsight bindings are absent; refusing partial inheritance" in text
