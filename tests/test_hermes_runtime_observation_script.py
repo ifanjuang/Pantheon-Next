@@ -35,6 +35,17 @@ def test_runtime_observer_reads_actual_container_identity_and_skill_projection()
     assert 'recorded_image' in text
 
 
+def test_runtime_observer_compares_projected_skills_with_release_owner() -> None:
+    text = _text()
+
+    assert 'RELEASE_HERMES_GOVERNED_SKILLS' in text
+    assert 'release_target:$target_skill_names' in text
+    assert 'matches_release_target:$skills_match_target' in text
+    assert 'missing_release_target:$missing_target_skills' in text
+    assert 'unexpected_projected:$unexpected_projected_skills' in text
+    assert '"skill set matches release target != skill used"' in text
+
+
 def test_runtime_observer_remains_observation_only() -> None:
     text = _text()
 
