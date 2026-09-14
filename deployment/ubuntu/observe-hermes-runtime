@@ -14,20 +14,21 @@ PROFILE="${HERMES_PROFILE:-pantheon-governed}"
 SKILLS_ROOT="${HERMES_GOVERNED_SKILLS_ROOT:-$STATE_ROOT/hermes-governed-skills}"
 CONTAINER_SKILLS_ROOT="/opt/pantheon-skills"
 TARGET_IMAGE="${RELEASE_HERMES_IMAGE:?release.env missing RELEASE_HERMES_IMAGE}"
-OUTPUT=""
 
 usage() {
   cat <<'USAGE'
 Usage:
-  deployment/ubuntu/observe-hermes-runtime [--output PATH]
+  bash deployment/ubuntu/observe-hermes-runtime
 
 Read-only observation of the Hermes container actually present on the Ubuntu node.
-It reports the running container image/id, immutable image identity, version labels,
-profile configuration digest, governed-skill mount, projected skill digests and the
-profile's resolved skills.external_dirs when the running Hermes CLI can read it.
+It reports the running container image/id, immutable image identity, bounded OCI
+identity labels, profile configuration digest, governed-skill mount, projected
+skill digests and the profile's resolved skills.external_dirs when the running
+Hermes CLI can read it.
 
-The command never changes configuration, starts/restarts a container, installs a
-skill, launches a run, approves an effect or promotes the receipt to Evidence.
+The command writes nothing. It never changes configuration, starts/restarts a
+container, installs a skill, launches a run, approves an effect or promotes the
+receipt to Evidence. Redirect stdout explicitly if an operator wants to retain it.
 USAGE
 }
 
@@ -36,7 +37,6 @@ have() { command -v "$1" >/dev/null 2>&1; }
 
 while (($#)); do
   case "$1" in
-    --output) shift; OUTPUT="${1:?missing output path}" ;;
     -h|--help) usage; exit 0 ;;
     *) die "unknown argument: $1" ;;
   esac
@@ -61,13 +61,21 @@ image_id="$(printf '%s' "$container_json" | jq -r '.[0].Image // ""')"
 started_at="$(printf '%s' "$container_json" | jq -r '.[0].State.StartedAt // ""')"
 
 repo_digests='[]'
-image_labels='{}'
+identity_labels='{}'
 image_created=null
 if [[ -n "$image_id" ]]; then
   image_json="$(docker image inspect "$image_id" 2>/dev/null || true)"
   if [[ -n "$image_json" ]] && [[ "$(printf '%s' "$image_json" | jq 'length')" == "1" ]]; then
     repo_digests="$(printf '%s' "$image_json" | jq -c '.[0].RepoDigests // []')"
-    image_labels="$(printf '%s' "$image_json" | jq -c '.[0].Config.Labels // {}')"
+    identity_labels="$(printf '%s' "$image_json" | jq -c '
+      (.[0].Config.Labels // {}) as $labels
+      | {
+          version: ($labels["org.opencontainers.image.version"] // null),
+          revision: ($labels["org.opencontainers.image.revision"] // null),
+          source: ($labels["org.opencontainers.image.source"] // null),
+          title: ($labels["org.opencontainers.image.title"] // null)
+        }
+    ')"
     image_created="$(printf '%s' "$image_json" | jq -c '.[0].Created // null')"
   fi
 fi
@@ -84,8 +92,10 @@ if [[ -f "$profile_config" ]]; then
   profile_config_digest="\"sha256:$(sha256sum "$profile_config" | awk '{print $1}')\""
 fi
 
+skills_root_present=false
 skills='[]'
 if [[ -d "$SKILLS_ROOT" ]]; then
+  skills_root_present=true
   while IFS= read -r skill_dir; do
     [[ -n "$skill_dir" ]] || continue
     name="$(basename "$skill_dir")"
@@ -143,7 +153,7 @@ if [[ -r "$CONFIG_ROOT/versions.env" ]]; then
   if [[ -n "$recorded" ]]; then recorded_image="$(printf '%s' "$recorded" | jq -Rs '.')"; fi
 fi
 
-receipt="$(jq -n \
+jq -n \
   --arg observed_at "$observed_at" \
   --arg container "$CONTAINER_NAME" \
   --arg container_id "$container_id" \
@@ -156,10 +166,11 @@ receipt="$(jq -n \
   --arg version_status "$version_status" \
   --argjson running "$running" \
   --argjson repo_digests "$repo_digests" \
-  --argjson image_labels "$image_labels" \
+  --argjson identity_labels "$identity_labels" \
   --argjson image_created "$image_created" \
   --argjson profile_config_present "$profile_config_present" \
   --argjson profile_config_digest "$profile_config_digest" \
+  --argjson skills_root_present "$skills_root_present" \
   --argjson expected_mount_observed "$expected_mount_observed" \
   --argjson skills "$skills" \
   --argjson external_dirs "$external_dirs" \
@@ -179,7 +190,7 @@ receipt="$(jq -n \
       image_id:$image_id,
       repo_digests:$repo_digests,
       image_created:$image_created,
-      image_labels:$image_labels
+      identity_labels:$identity_labels
     },
     deployment:{
       release_target_image:$target_image,
@@ -195,12 +206,13 @@ receipt="$(jq -n \
       external_dirs:$external_dirs
     },
     governed_skills:{
-      host_projection_root_present:($skills | length > 0),
+      host_projection_root_present:$skills_root_present,
       read_only_mount_observed:$expected_mount_observed,
       external_dir_bound:$external_dir_bound,
       projected:$skills
     },
     runtime_version:{status:$version_status, value:$runtime_version},
+    observation_process_started:($running == true),
     write_effect:false,
     activation_changed:false,
     authority_effect:"none",
@@ -211,15 +223,8 @@ receipt="$(jq -n \
       "image tag != immutable image digest",
       "skill projected != skill used",
       "profile config present != profile route active",
+      "read-only observation process != authorization",
       "runtime reachable != task authorized",
       "runtime observation != Evidence"
     ]
-  }')"
-
-if [[ -n "$OUTPUT" ]]; then
-  umask 077
-  mkdir -p "$(dirname "$OUTPUT")"
-  printf '%s\n' "$receipt" > "$OUTPUT"
-else
-  printf '%s\n' "$receipt"
-fi
+  }'
