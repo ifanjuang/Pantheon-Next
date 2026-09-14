@@ -22,10 +22,12 @@ Use the same live Hermes runtime, model/provider, governed profile and effective
 At preparation time repository `main` was revalidated at:
 
 ```text
-73b5c7d9fc5285035b6bb3cb14e2dbf7cec2da0a
+da74cc056bbb3038a9313e41d37e879234aa0538
 ```
 
-The reviewed deployment target is currently `nousresearch/hermes-agent:v2026.9.11`, but repository configuration is not proof of the runtime installed on the Linux node.
+This includes merged PR #1057, which changed the governed Hermes profile/capability composition. The native baseline must therefore record the exact post-#1057 profile/configuration actually used by each run; never treat the name `pantheon-governed` as a sufficient identity by itself.
+
+The reviewed deployment target remains `nousresearch/hermes-agent:v2026.9.11`, but repository configuration is not proof of the runtime installed on the Linux node.
 
 Before running, observe the live runtime identity:
 
@@ -34,8 +36,6 @@ hermes --version
 ```
 
 If Hermes is containerized, also record the exact running image/digest from the container engine. Do not substitute the desired tag for the observed running identity.
-
-PR #1057 changes the governed Hermes profile/capability composition in parallel. This runbook does not depend on that PR. Record the exact profile/configuration actually used by each run; never assume the profile named `pantheon-governed` has a historical content snapshot.
 
 ## Safety boundary
 
