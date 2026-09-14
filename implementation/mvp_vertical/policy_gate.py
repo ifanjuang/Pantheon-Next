@@ -9,6 +9,7 @@ Rules:
 
 - fail closed on transport, malformed payload or non-eligible preflight;
 - bind human-decision validation to PEP-derived effect facts when supplied;
+- require independently authenticated issuers for the closed direct-human effect class;
 - never let a validated decision override explicit PDP effect-denial flags;
 - consume one-shot decisions at the operational PEP when the PDP explicitly
   requires replay protection for a bounded external-effect qualification;
@@ -25,7 +26,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Callable, Protocol
 
-from .policy_request import bind_decision_payload, build_preflight_payload
+from .policy_request import (
+    PolicyRequestError,
+    bind_decision_payload,
+    build_preflight_payload,
+    requires_authenticated_human_decision,
+)
 
 _ELIGIBLE_DISPOSITIONS = frozenset(
     {
@@ -78,6 +84,16 @@ def enforce_consequential(
     try:
         bound_decision = bind_decision_payload(candidate, decision_payload)
         preflight_payload = build_preflight_payload(candidate, bound_decision)
+    except PolicyRequestError as exc:
+        return GateVerdict(
+            False,
+            "blocked_invalid_decision_envelope",
+            [str(exc)],
+        )
+    except Exception as exc:
+        return GateVerdict(False, "policy_unavailable", [f"policy request binding failed: {exc}"])
+
+    try:
         preflight = client.preflight(preflight_payload)
     except Exception as exc:
         return GateVerdict(False, "policy_unavailable", [f"preflight call failed: {exc}"])
@@ -134,6 +150,16 @@ def enforce_consequential(
         reasons = [f"decision verdict: {validation.get('verdict', 'unknown')}"]
         reasons += list(validation.get("findings", []))
         return GateVerdict(False, disposition, reasons)
+
+    if (
+        requires_authenticated_human_decision(candidate)
+        and validation.get("issuer_authenticated") is not True
+    ):
+        reasons = [
+            "direct human consequential effect requires an independently authenticated issuer"
+        ]
+        reasons += list(validation.get("findings", []))
+        return GateVerdict(False, "blocked_unauthenticated_human_decision", reasons)
 
     decision = bound_decision.get("decision") or {}
     decision_id = str(decision.get("decision_id") or "").strip() or None
@@ -229,8 +255,11 @@ class StandInPolicyClient:
     The stand-in is deliberately policy-version-neutral. Its external-effect
     flag defaults to ``True`` for backward-compatible seam tests. Tests that
     model a fail-closed Pantheon response pass ``external_effect_allowed=False``
-    explicitly. Live behavior always comes from ``HttpPolicyClient`` responses,
-    never from these defaults.
+    explicitly. ``issuer_authenticated`` defaults to true only so a test that
+    supplies a complete direct-human decision can model a successful PDP
+    round-trip; callers can set it false to exercise the authentication refusal.
+    Live behavior always comes from ``HttpPolicyClient`` responses, never from
+    these defaults.
     """
 
     _SYSTEM_PREFIXES = ("system", "service", "runtime", "hermes", "bot", "agent")
@@ -243,12 +272,14 @@ class StandInPolicyClient:
         canonical_effect_allowed: bool = False,
         gate_signal_validation_performed: bool = False,
         replay_guard_required: bool = False,
+        issuer_authenticated: bool = True,
     ):
         self._disposition = disposition
         self._external_effect_allowed = external_effect_allowed
         self._canonical_effect_allowed = canonical_effect_allowed
         self._gate_signal_validation_performed = gate_signal_validation_performed
         self._replay_guard_required = replay_guard_required
+        self._issuer_authenticated = issuer_authenticated
         self.last_preflight: dict[str, Any] | None = None
         self.last_decision: dict[str, Any] | None = None
 
@@ -284,7 +315,11 @@ class StandInPolicyClient:
         if expected_digest is not None and decision.get("content_digest") != expected_digest:
             findings.append("decision content_digest does not match effect digest")
         verdict = "valid" if not findings else "invalid"
-        return {"verdict": verdict, "findings": findings}
+        return {
+            "verdict": verdict,
+            "findings": findings,
+            "issuer_authenticated": self._issuer_authenticated if verdict == "valid" else False,
+        }
 
 
 class HttpPolicyClient:
