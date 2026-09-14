@@ -101,7 +101,13 @@ A candidate does not become active doctrine by age or repetition. Promoting a
 - a test that exercises it;
 - an end-to-end example that runs it;
 - a read-only verification surface (`mcp-server/`) that checks it;
-- an explicit, dated human decision recorded in `ai_logs/`.
+- an explicit, dated human decision with a durable repository referent.
+
+For the human-decision form, a bounded referent such as `PR #<n>` or `issue #<n>`
+may be used. Existing historical decisions recorded under `ai_logs/` remain valid
+referents. The referent identifies where the human decision is recorded; a PR,
+issue, merge, green CI result or automation output does not become a human
+decision merely by existing.
 
 Without a referent, the material stays a note or a candidate; it is not promoted.
 This keeps the doctrine growing only where it anchors to something executable or
@@ -120,17 +126,28 @@ derives each candidate's start from the commit history rather than a written
 date, and reports a candidate whose start predates this repository as
 `imported` instead of giving it a fabricated age.
 
-A document may restart its own clock by recording a dated review, in the same
-header block as `Status:`:
+A document may restart its own clock by recording a dated human review, in the
+same header block as `Status:`. Historical markers remain valid:
 
 ```text
 Candidacy reviewed: <ISO date> (ai_logs/<year>/Q<n>/<record>.md)
 ```
 
-The cited record must exist under `ai_logs/`; the check fails on a marker that
-cites nothing real, because an aging reset backed by a missing record is worse
-than no reset. The line is optional and adds no authority — it records that a
-human looked, and when.
+New reviews may use a bounded decision referent in this repository:
+
+```text
+Candidacy reviewed: <ISO date> (PR #<n>)
+Candidacy reviewed: <ISO date> (issue #<n>)
+```
+
+For a legacy `ai_logs/` marker, the cited record must still exist under
+`ai_logs/`. For a PR or issue marker, the checker validates the bounded reference
+syntax but does not infer human authority from GitHub state. The cited discussion
+must contain the explicit human review. Existence, merge, CI success or automation
+output alone is not review and does not authorize promotion.
+
+The line is optional and adds no authority by itself — it records that a human
+looked, when, and where that decision is recorded.
 
 ## Current authority map
 
