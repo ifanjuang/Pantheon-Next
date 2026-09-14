@@ -134,20 +134,23 @@ def test_c1_and_c2_exact_answers_pass(tmp_path: Path) -> None:
 def test_c3_quality_uses_tests_and_immutable_fixture_hashes(tmp_path: Path) -> None:
     FIXTURES.build_all(tmp_path)
     c3 = tmp_path / "C3-edit-validate"
-    (c3 / "task.py").write_text(
-        """def normalize_name(value: str) -> str:\n"
-        "    return ' '.join(value.split()).lower()\n\n"
-        "def compute_penalty(days: int) -> int:\n"
-        "    first = min(days, 15) * 70\n"
-        "    second = min(max(days - 15, 0), 15) * 84\n"
-        "    third = max(days - 30, 0) * 105\n"
-        "    return first + second + third\n\n"
-        "def classify_status(done: bool, blocked: bool) -> str:\n"
-        "    if blocked:\n"
-        "        return 'blocked'\n"
-        "    return 'done' if done else 'open'\n",
-        encoding="utf-8",
-    )
+    fixed_task = """def normalize_name(value: str) -> str:
+    return ' '.join(value.split()).lower()
+
+
+def compute_penalty(days: int) -> int:
+    first = min(days, 15) * 70
+    second = min(max(days - 15, 0), 15) * 84
+    third = max(days - 30, 0) * 105
+    return first + second + third
+
+
+def classify_status(done: bool, blocked: bool) -> str:
+    if blocked:
+        return 'blocked'
+    return 'done' if done else 'open'
+"""
+    (c3 / "task.py").write_text(fixed_task, encoding="utf-8")
     answer = tmp_path / "c3-answer.txt"
     answer.write_text("complete\n", encoding="utf-8")
 
