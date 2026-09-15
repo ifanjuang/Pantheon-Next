@@ -272,7 +272,7 @@ check_local_mcp_bindings() {
 }
 
 stage_curated_default_skills() {
-  local path name source target
+  local path name source target flat_name
   command -v rsync >/dev/null || die "rsync is required for curated Hermes skills"
   require_running_container
   [[ -z "$CURATED_STAGE_ROOT" ]] || return 0
@@ -281,6 +281,16 @@ stage_curated_default_skills() {
   for path in "${CURATED_SKILL_PATHS[@]}"; do
     name="${path##*/}"
     source="$HERMES_IMAGE_SKILLS_ROOT/$path"
+    # Hermes releases have used both category-prefixed and flat skill
+    # directories. Prefer the pinned category path, then accept the exact
+    # flat skill directory exposed by the same image. Never synthesize a
+    # missing skill or copy from an unrelated host location.
+    if ! docker exec "$CONTAINER" test -f "$source/SKILL.md"; then
+      flat_name="$HERMES_IMAGE_SKILLS_ROOT/$name"
+      if docker exec "$CONTAINER" test -f "$flat_name/SKILL.md"; then
+        source="$flat_name"
+      fi
+    fi
     target="$CURATED_STAGE_ROOT/$name"
     docker exec "$CONTAINER" test -f "$source/SKILL.md" \
       || die "bundled skill missing from pinned Hermes image: $path"

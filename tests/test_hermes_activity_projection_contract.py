@@ -159,6 +159,8 @@ def test_curated_default_capabilities_remain_bounded_and_searchable() -> None:
         assert skill in text
     assert 'HERMES_IMAGE_SKILLS_ROOT="${HERMES_IMAGE_SKILLS_ROOT:-/opt/hermes/skills}"' in text
     assert 'docker cp "$CONTAINER:$source/." "$target/"' in text
+    assert 'flat_name="$HERMES_IMAGE_SKILLS_ROOT/$name"' in text
+    assert 'source="$flat_name"' in text
     assert 'source="$CURATED_STAGE_ROOT/$name"' in text
     assert 'source="$HERMES_ROOT/skills/$path"' not in text
     assert "tools.tool_search.enabled auto" in text
