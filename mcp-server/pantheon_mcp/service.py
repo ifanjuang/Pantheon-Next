@@ -256,6 +256,61 @@ class PantheonPolicyService:
             input_value=request,
         )
 
+    def route_governed_request(self, request: dict[str, Any]) -> dict[str, Any]:
+        """Classify once and derive a compact doctrine shortlist.
+
+        This is the normal Hermes entry point.  Keeping classification and
+        source selection in one read-only operation avoids asking a deferred
+        MCP client to batch dependent local calls.  The returned shortlist
+        still requires an explicit ``read_doctrine`` call before a source has
+        been consulted.
+        """
+        classification = policy.classify_request(request)
+        handling = classification.get("handling")
+        handling = handling if isinstance(handling, dict) else {}
+        raw_conditions = handling.get("conditions")
+        route_conditions = (
+            [str(item) for item in raw_conditions]
+            if isinstance(raw_conditions, list)
+            else []
+        )
+
+        # Derived routing signals select doctrine only. They do not alter the
+        # classification, consequence, approval or authorization result.
+        if classification.get("task_contract_required"):
+            route_conditions.append("complex_task")
+        if classification.get("evidence_required"):
+            route_conditions.append("source_required")
+        route_conditions = list(dict.fromkeys(route_conditions))
+
+        terms = request.get("terms", request.get("query", request.get("intent", "")))
+        source_request = {
+            "conditions": route_conditions,
+            "terms": terms,
+            "limit": request.get("source_limit", request.get("limit", 3)),
+        }
+        shortlist = source_map.find_relevant_sources(source_request, self.root)
+
+        return self._project(
+            "policy.request.route",
+            {
+                "result": "routed",
+                "classification": classification,
+                "source_route": shortlist,
+                "next_action": (
+                    "read_doctrine for only the shortlisted keys needed by the request"
+                    if shortlist.get("candidates")
+                    else "revise the request candidate with canonical material conditions"
+                ),
+                "boundary": (
+                    "classification + shortlist != doctrine consulted != Evidence "
+                    "!= approval != execution"
+                ),
+            },
+            source_mode="provided_request_candidate_and_governed_repository_sources",
+            input_value=request,
+        )
+
     def evaluate_preflight(self, candidate: dict[str, Any]) -> dict[str, Any]:
         """Return candidate-work eligibility and missing gates.
 
