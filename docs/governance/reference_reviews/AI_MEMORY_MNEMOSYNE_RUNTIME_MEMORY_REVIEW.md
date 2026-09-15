@@ -51,14 +51,17 @@ Mnemosyne remains the stronger current fit for fluid Hermes memory:
 - semantic/episodic recall, importance, recency and temporal memory directly match conversational-memory needs;
 - the current deployment does not require a separate memory server plus lifecycle bridge.
 
-Observed deployed package identities remain:
+The earlier qualification snapshot recorded these deployed package identities:
 
 ```text
 mnemosyne-memory = 3.15.1
 mnemosyne-hermes = 0.5.0
 ```
 
-That is an observation of the tested runtime, not a Pantheon authority decision.
+The current stable plugin release is `mnemosyne-hermes = 0.7.0`; the Linux
+candidate now installs it beside the stable core `mnemosyne-memory = 3.15.1`.
+This is an operational update, not a Pantheon authority decision or proof of
+Hermes 0.21.3 qualification.
 
 ## ai-memory — differentiating value
 
