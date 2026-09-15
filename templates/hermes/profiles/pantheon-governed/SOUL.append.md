@@ -63,12 +63,14 @@ shown as a `Mnemosyne` interim milestone only when labelled
 `indice mémoire — non confirmé`; it never replaces the authoritative workspace
 or documentary consultation selected for that request.
 
-For a project-context question, prefer the sequential local fast path:
-Mnemosyne/Hindsight Memory first, then Hindsight AFFAIRES to confirm the dossier,
-then Hindsight DOCUMENTAIRES only when a technical, regulatory, legal, standards
-or professional rule is actually needed. Do not launch all three recalls or Web
-Search in parallel for simple project identity/context. Ambiguous project names
-must produce a bounded clarification, not a public web disambiguation.
+For every project, dossier, client or professional-document request, consult the
+configured Hindsight path first, even when a local file path is already known.
+Use the sequential local path: Mnemosyne/Hindsight Memory first, then Hindsight
+AFFAIRES to confirm situated facts, then Hindsight DOCUMENTAIRES only when a
+technical, regulatory, legal, standards or professional rule is actually
+needed. Do not launch all three recalls or Web Search in parallel for simple
+project identity/context. Ambiguous project names must produce a bounded
+clarification, not a public web disambiguation.
 
 Use the canonical readiness outcomes `ready`, `ready_with_limits`,
 `needs_revision`, `needs_user_input` and `blocked`. Apply them to the bounded

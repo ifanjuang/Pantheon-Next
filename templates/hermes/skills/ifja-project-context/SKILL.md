@@ -33,6 +33,13 @@ visible milestone != MCP-prescribed tool sequence
 
 ## Routing
 
+For every request tied to a project, dossier, client, professional document or
+workspace context, start with the configured Hindsight binding before opening a
+local file, calling Docling or using external search. This remains true when a
+filesystem path is already known: Hindsight is the first continuity/location
+check, not the final source authority. The only exception is a pure
+transformation of content fully supplied in the current request.
+
 ### 1. Resolve context only when useful
 
 Ground the active affaire/project from the request and available context. When project identity or the target referent is ambiguous, preserve the unresolved possibilities as a bounded candidate set; do not silently merge or select an identity merely to make reasoning easier. If the distinction would materially change the answer, permitted action or consequence, request targeted clarification or return a safe non-conclusion. If it would not, continue only from supported shared facts while carrying the uncertainty explicitly.
@@ -92,6 +99,10 @@ we know about Floquet?”), use this bounded sequence:
 3. Hindsight DOCUMENTAIRES — only when a technical, regulatory, legal,
    standards or professional rule is actually required
 ```
+
+For a known document, perform the same Hindsight-first check with its exact
+name, path or identifier, then open the corresponding source. Do not skip the
+Hindsight step merely because a local path was supplied.
 
 Do not call the three Hindsight bindings in parallel for a simple project-context
 question. Do not use Web Search before this local path has returned no usable
@@ -153,13 +164,22 @@ workspace access != external disclosure authorization
 
 When the request may involve professional/contractual/financial consequence, Evidence or approval, governed status or protected mutation, external transmission/action, memory/Register promotion, or another consequential decision boundary, consult the currently selected Pantheon policy binding.
 
+After the Hindsight-first context check, use Pantheon as the routing authority
+for a material professional request: `classify_request` identifies the governed
+conditions, `find_relevant_sources` can shortlist the necessary source families,
+and `route_governed_request` returns the bounded handling path. These calls
+propose routing and readiness; they do not replace Hindsight, open documents or
+activate autonomous Roles. Do not call them mechanically for trivial casual
+conversation.
+
 Before classification, reuse the generic `pantheon-request-intake` semantic adapter to describe only the material request conditions, optional coordination relations and observable completion requirements. Do not create an IFJA-specific K/V/C or trigger classifier here.
 
 The current repository exposes the same bounded read-only policy meaning through
 MCP and the authenticated HTTP service described by
 `mcp-server/docs/HTTP_API_CONTRACT.md`. The reviewed governed MCP binding exposes
-`classify_request`, `evaluate_preflight`, the Task Contract and Evidence Pack
-skeleton preparers, and Context Pack planning/validation. If the selected
+`classify_request`, `evaluate_preflight`, `find_relevant_sources`,
+`route_governed_request`, the Task Contract and Evidence Pack skeleton
+preparers, and Context Pack planning/validation. If the selected
 deployed binding cannot provide a required decision operation, stop before the
 consequential effect and return a Capability Gap rather than inventing policy
 locally.

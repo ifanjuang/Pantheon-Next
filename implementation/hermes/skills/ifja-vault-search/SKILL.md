@@ -40,12 +40,15 @@ change the answer, permitted action or consequence.
 
 ## Search order
 
-0. For an ambiguous or continuity-dependent request, make one fast recall
-   against the configured conversation-memory binding. Emit at most one interim
-   `indice mémoire — non confirmé` when it materially helps locate the dossier,
-   then continue to the applicable professional source.
-1. For an exact name, alias, path or inventory question, use the configured
-   document-listing capability before semantic recall.
+0. For every project, dossier, client, document or professional-workspace
+   request, start with one fast Hindsight/Mnemosyne lookup. Emit at most one
+   interim `indice mémoire — non confirmé` when it materially helps locate the
+   dossier, then continue to the applicable Hindsight source. A known local
+   path does not bypass this first check.
+1. Use the applicable Hindsight source (AFFAIRES for situated work,
+   DOCUMENTAIRES for transversal professional material) to resolve the exact
+   project or document identity. For an exact name, alias, path or inventory
+   question, its listing/get operation is the Hindsight-first lookup.
 2. Resolve the project page or exact source identity. A high-ranked semantic
    result does not select a project.
 3. Open the exact project page or requested document before returning a material
