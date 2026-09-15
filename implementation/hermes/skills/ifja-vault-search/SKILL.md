@@ -66,8 +66,11 @@ change the answer, permitted action or consequence.
    For a document-family query, normalize the project/document terms and include
    the relevant filename tokens and professional aliases in the bounded search
    (for example, a CCTP may also be labelled CCAP, DCE or cahier des charges).
-   Preserve candidates separately; a permit, estimate or plan is not a CCTP
-   merely because it shares the project name.
+   Rank candidates by exact document-family match first, then project-name
+   match, then revision/path evidence. Preserve candidates separately; a permit,
+   estimate or plan is not a CCTP merely because it shares the project name.
+   Never promote a lower-ranked document when an exact family match is absent;
+   report the candidate set and the missing type instead.
 3. Open the exact project page or requested document before returning a material
    identifier, date, status or contractual fact.
    If Hindsight returns no exact candidate but an admitted Workspace/vault path
@@ -199,12 +202,19 @@ invented path.
 ## Limits and return
 
 - At most two recall calls across all bindings for one question.
+- For a single professional lookup, use at most one Mnemosyne recall, one
+  AFFAIRES semantic recall, one targeted `search_knowledge_base` query and one
+  bounded listing fallback. Repeating an identical query is not a search
+  strategy.
 - Open at most five candidate documents unless the user requests an exhaustive
   inventory.
 - Stop widening retrieval when remaining unknowns cannot change the permitted
   conclusion.
 - Cite the exact path or document ID for each material project fact.
 - Expose contradictions, freshness limits and missing source confirmation.
+- For every proposed omission or compliance gap, cite the exact project-document
+  locator and the exact DOCUMENTAIRES reference when available. Otherwise label
+  it `à vérifier` and state which reference is missing.
 - End a material review with two to four optional, bounded follow-up paths when
   useful (for example: inspect a specific lot, verify a named standard, compare
   a revision or prepare a checklist). Label these as proposals; do not execute

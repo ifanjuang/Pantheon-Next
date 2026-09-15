@@ -155,6 +155,9 @@ For a document-family request, normalize the project label and include filename
 tokens and professional aliases in the bounded query (`CCTP`, `CCAP`, `DCE`,
 `cahier des charges`, etc.). Keep similarly named permits, estimates and plans
 as separate candidates; a shared project name does not establish document type.
+Prefer an exact document-family match over a generic project-name match and
+retain the candidate set when no exact match exists. Never call a permit,
+estimate or plan a CCTP solely because it contains the same project label.
 If an exact Workspace/vault path or filename is already known but Hindsight has
 no exact candidate, classify the result as an indexing gap and open that source
 through the admitted local binding (Docling when extraction is required) rather
