@@ -22,6 +22,7 @@ CONTRACT_PATHS: dict[str, str] = {
     "document_currentness_projection": "schemas/architecture-proof-register/document_currentness_projection.schema.yaml",
     "document_knowledge_slice": "schemas/document_knowledge_slice.schema.yaml",
     "document_version_event": "schemas/architecture-proof-register/version_event.schema.yaml",
+    "human_response": "schemas/human_response.schema.yaml",
     "information_card_projection": "schemas/information_card_projection.schema.yaml",
     "knowledge_edit_variant_candidate": "schemas/knowledge_edit_variant_candidate.schema.yaml",
     "mvp_governed_loop_objects": "schemas/mvp_governed_loop_objects.schema.yaml",
