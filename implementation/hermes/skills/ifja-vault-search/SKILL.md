@@ -49,6 +49,10 @@ change the answer, permitted action or consequence.
    DOCUMENTAIRES for transversal professional material) to resolve the exact
    project or document identity. For an exact name, alias, path or inventory
    question, its listing/get operation is the Hindsight-first lookup.
+   When the configured MCP binding and function schema are already present in
+   the active profile, invoke that function directly. Do not repeat Tool Search
+   or Tool Describe calls for every step; use at most one schema inspection when
+   the required argument shape is genuinely unknown.
 2. Resolve the project page or exact source identity. A high-ranked semantic
    result does not select a project.
 3. Open the exact project page or requested document before returning a material
@@ -66,6 +70,11 @@ mandatory before final synthesis: `AFFAIRES` for dossier facts,
 question. A memory lead never satisfies this requirement. If the required
 binding is unavailable, return the limitation rather than substituting model
 recall.
+
+Do not turn a generic remembered checklist into a regulatory conclusion. Each
+technical, legal, contractual or standards requirement must be tied to an exact
+document or section returned by the admitted source path, or be labelled
+`à vérifier` with the missing reference stated.
 
 ```text
 subject match != selected project
