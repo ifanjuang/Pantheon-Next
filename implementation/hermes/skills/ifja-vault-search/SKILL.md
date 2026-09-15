@@ -47,22 +47,29 @@ change the answer, permitted action or consequence.
    path does not bypass this first check.
 1. Use the applicable Hindsight source (AFFAIRES for situated work,
    DOCUMENTAIRES for transversal professional material) to resolve the exact
-   project or document identity. For an exact name, alias, path or inventory
-   question, its listing/get operation is the Hindsight-first lookup.
+   project or document identity. For a semantic project/document question,
+   issue one targeted `recall` against AFFAIRES first; use `list_documents`
+   only for an explicit inventory/path request. If recall returns no usable
+   candidate, use one targeted `search_knowledge_base` keyword query before the
+   bounded `list_documents` fallback. For an exact name, alias, path or
+   inventory question, listing/get is sufficient.
    When the configured MCP binding and function schema are already present in
    the active profile, invoke that function directly. Do not repeat Tool Search
    or Tool Describe calls for every step; use at most one schema inspection when
    the required argument shape is genuinely unknown.
 2. Resolve the project page or exact source identity. A high-ranked semantic
-   result does not select a project.
+   result does not select a project, and a failed first recall does not establish
+   that the source is absent until the targeted keyword search and bounded
+   AFFAIRES inventory fallback have also been attempted.
 3. Open the exact project page or requested document before returning a material
    identifier, date, status or contractual fact.
 4. Use one targeted recall when the request is conceptual, associative or the
    exact source remains unknown.
 5. For a recent project or information possibly awaiting synchronization, use
    the second and final recall against the configured conversation-memory
-   binding. Attribute memory-only information to recent conversation and mark it
-   unconfirmed until an admitted business source supports it.
+   binding only after the applicable AFFAIRES lookup (and its bounded fallback)
+   has been attempted. Attribute memory-only information to recent conversation
+   and mark it unconfirmed until an admitted business source supports it.
 
 For a material professional factual answer, the applicable source lookup is
 mandatory before final synthesis: `AFFAIRES` for dossier facts,
@@ -92,6 +99,10 @@ document opened != Evidence admitted
   and professional references.
 - Use both when a project-specific fact must be tested against a transversal
   rule. Keep their contributions distinguishable.
+- For a mixed document/compliance question, open the exact AFFAIRES document
+  first, then issue one targeted DOCUMENTAIRES recall for the rule families
+  needed to test the observed content. Do not list the entire DOCUMENTAIRES
+  bank before the project source is identified.
 - Use the live source only when the user requests current state or indicates a
   change may not yet be indexed. Do not silently merge live and indexed state.
 

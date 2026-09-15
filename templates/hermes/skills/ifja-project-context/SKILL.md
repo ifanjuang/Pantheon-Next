@@ -95,9 +95,12 @@ we know about Floquet?”), use this bounded sequence:
 
 ```text
 1. Hindsight Memory — one fast Mnemosyne lead
-2. Hindsight AFFAIRES — confirm dossier-specific facts and identity
-3. Hindsight DOCUMENTAIRES — only when a technical, regulatory, legal,
-   standards or professional rule is actually required
+2. Hindsight AFFAIRES — one targeted semantic recall to find the dossier or
+   document, followed by one targeted keyword search and then one bounded
+   listing fallback only when recall has no usable candidate
+3. Hindsight DOCUMENTAIRES — only after the exact AFFAIRES source is opened and
+   a technical, regulatory, legal, standards or professional rule is actually
+   required
 ```
 
 For a known document, perform the same Hindsight-first check with its exact

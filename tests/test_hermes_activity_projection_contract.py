@@ -141,6 +141,14 @@ def test_docling_mcp_introspection_tools_are_hidden_from_governed_profile() -> N
     assert '.docling.tools.resources == false' in text
 
 
+def test_hindsight_bindings_are_bounded_to_read_only_search_tools() -> None:
+    text = CONFIGURE.read_text(encoding="utf-8")
+    assert 'HINDSIGHT_AFFAIRES_TOOLS_JSON=' in text
+    assert '"search_knowledge_base"' in text
+    assert '."hindsight-affaires".tools.include == $affaires_tools' in text
+    assert '."hindsight-documentaires".tools.include == $documentaires_tools' in text
+
+
 def test_curated_default_capabilities_remain_bounded_and_searchable() -> None:
     text = CONFIGURE.read_text(encoding="utf-8")
     assert "--with-curated-default-skills" in text

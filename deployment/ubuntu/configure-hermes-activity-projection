@@ -17,6 +17,8 @@ HERMES_IMAGE_SKILLS_ROOT="${HERMES_IMAGE_SKILLS_ROOT:-/opt/hermes/skills}"
 CURATED_STAGE_ROOT=""
 LOCAL_MCP_SELECTED=""
 PANTHEON_POLICY_TOOLS_JSON='["classify_request","find_relevant_sources","route_governed_request","read_doctrine","explain_governance_structure","get_consultation_catalog","explain_architecture","get_capability_status","evaluate_preflight","prepare_task_contract_skeleton","prepare_evidence_pack_skeleton","plan_context_pack","validate_context_pack"]'
+HINDSIGHT_AFFAIRES_TOOLS_JSON='["recall","search_knowledge_base","get_knowledge_page","list_documents","get_document","list_tags"]'
+HINDSIGHT_DOCUMENTAIRES_TOOLS_JSON='["recall","search_knowledge_base","get_knowledge_page","list_documents","get_document","list_tags"]'
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "$SCRIPT_DIR/../.." && pwd)"
 SKILL_NAMES=(
@@ -211,7 +213,7 @@ prepare_local_mcp_selection() {
     || die "cannot read local default-profile mcp_servers"
   source_mcp="$(printf '%s' "$source_raw" | normalize_json_object)" \
     || die "cannot parse local default-profile mcp_servers"
-  selected="$(printf '%s' "$source_mcp" | jq -ce --argjson policy_tools "$PANTHEON_POLICY_TOOLS_JSON" 'with_entries(select(
+  selected="$(printf '%s' "$source_mcp" | jq -ce --argjson policy_tools "$PANTHEON_POLICY_TOOLS_JSON" --argjson affaires_tools "$HINDSIGHT_AFFAIRES_TOOLS_JSON" --argjson documentaires_tools "$HINDSIGHT_DOCUMENTAIRES_TOOLS_JSON" 'with_entries(select(
     .key == "docling" or .key == "hindsight-affaires"
     or .key == "hindsight-documentaires" or .key == "pantheon-policy"
   ))
@@ -229,16 +231,20 @@ prepare_local_mcp_selection() {
       + {"enabled": false}
     )
   | ."pantheon-policy".supports_parallel_tool_calls = false
+  | ."hindsight-affaires".tools = {"include": $affaires_tools}
+  | ."hindsight-documentaires".tools = {"include": $documentaires_tools}
   | . + {"hindsight-memory": {
       "url": (."hindsight-affaires".url | sub("IFJA_AFFAIRES/?$"; "hermes/")),
       "tools": {"include": ["recall"]},
       "enabled": true
     }}')" || die "cannot select governed local MCP bindings"
-  printf '%s' "$selected" | jq -e --argjson policy_tools "$PANTHEON_POLICY_TOOLS_JSON" '
+  printf '%s' "$selected" | jq -e --argjson policy_tools "$PANTHEON_POLICY_TOOLS_JSON" --argjson affaires_tools "$HINDSIGHT_AFFAIRES_TOOLS_JSON" --argjson documentaires_tools "$HINDSIGHT_DOCUMENTAIRES_TOOLS_JSON" '
     has("docling") and has("hindsight-affaires") and has("hindsight-documentaires")
     and has("pantheon-policy")
     and (.docling.tools.prompts == false)
     and (.docling.tools.resources == false)
+    and (."hindsight-affaires".tools.include == $affaires_tools)
+    and (."hindsight-documentaires".tools.include == $documentaires_tools)
     and (."hindsight-memory".url | endswith("/mcp/hermes/"))
     and (."pantheon-policy".tools.include == $policy_tools)
     and (."pantheon-policy".tools.prompts == false)
