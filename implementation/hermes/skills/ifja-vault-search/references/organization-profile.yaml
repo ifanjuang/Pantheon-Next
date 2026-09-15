@@ -39,7 +39,7 @@ retrieval:
   recent_project_second_recall: HERMES_MEMORY
 
 documents:
-  textual_analysis_binding: Doclin
+  textual_analysis_binding: docling
   visual_analysis_binding: marker
   physical_affaires_root: /srv/pantheon/obsidian-affaires
 

@@ -33,6 +33,13 @@ visible milestone != MCP-prescribed tool sequence
 
 ## Routing
 
+For every request tied to a project, dossier, client, professional document or
+workspace context, start with the configured Hindsight binding before opening a
+local file, calling Docling or using external search. This remains true when a
+filesystem path is already known: Hindsight is the first continuity/location
+check, not the final source authority. The only exception is a pure
+transformation of content fully supplied in the current request.
+
 ### 1. Resolve context only when useful
 
 Ground the active affaire/project from the request and available context. When project identity or the target referent is ambiguous, preserve the unresolved possibilities as a bounded candidate set; do not silently merge or select an identity merely to make reasoning easier. If the distinction would materially change the answer, permitted action or consequence, request targeted clarification or return a safe non-conclusion. If it would not, continue only from supported shared facts while carrying the uncertainty explicitly.
@@ -84,14 +91,31 @@ conversation continuity != governed persistence
 ### Fast context path for project questions
 
 For a context-only question about an affaire or project (for example “what do
-we know about Floquet?”), use this bounded sequence:
+we know about this project?”), use this bounded sequence:
 
 ```text
 1. Hindsight Memory — one fast Mnemosyne lead
-2. Hindsight AFFAIRES — confirm dossier-specific facts and identity
-3. Hindsight DOCUMENTAIRES — only when a technical, regulatory, legal,
-   standards or professional rule is actually required
+2. Hindsight AFFAIRES — confirm dossier-specific facts and identity with one
+   targeted semantic recall to find the dossier or document, followed by one
+   targeted keyword search and then one bounded listing fallback only when
+   recall has no usable candidate
+3. Hindsight DOCUMENTAIRES — only after the exact AFFAIRES source is opened and
+   a technical, regulatory, legal, standards or professional rule is actually
+   required
 ```
+
+For a known document, perform the same Hindsight-first check with its exact
+name, path or identifier, then open the corresponding source. Do not skip the
+Hindsight step merely because a local path was supplied.
+
+If the exact source is a local file without an inspected Markdown derivative, or
+an attachment supplied in the current conversation, use the configured Docling
+binding after that fast location check (immediately for an attachment when no
+Hindsight identity exists). Docling is the extraction and page/table/layout
+inspection mechanism, not a source authority or memory store. Resolve the
+attachment to a Docling-visible shared Workspace/vault path; never guess a
+private upload path. If no shared path is available, report
+`source_not_visible_to_docling` and ask for one.
 
 Do not call the three Hindsight bindings in parallel for a simple project-context
 question. Do not use Web Search before this local path has returned no usable
@@ -99,6 +123,46 @@ support or a current public fact is explicitly required. If the project name is
 ambiguous, preserve the candidates and ask one targeted clarification rather
 than widening the web query. Label the first memory result `indice mémoire —
 non confirmé`; do not present it as a dossier fact until AFFAIRES confirms it.
+
+### Memory sufficiency gate
+
+Do not escalate every project question to a full dossier consultation. A fluid
+memory answer is sufficient for broad orientation when the user does not ask for
+an exact fact, current status, document existence, calculation, recommendation,
+professional rule or external action. Label it `orientation mémoire — non
+confirmée` and preserve the uncertainty.
+
+Escalate only when the requested precision requires it:
+
+```text
+orientation générale                         -> Mnemosyne only
+exact dossier fact / date / budget / status   -> AFFAIRES
+technical / legal / regulatory / standard     -> DOCUMENTAIRES
+decision / recommendation / delivery / action -> source preflight + Pantheon
+```
+
+If Mnemosyne has no useful lead or returns materially ambiguous candidates, ask a
+targeted clarification or continue to AFFAIRES; do not silently invent a fact.
+
+Once the exact project document is open, use DOCUMENTAIRES to find only the
+standards, regulations, contractual clauses or professional references needed
+to test observed gaps. Cite those references separately from the project source.
+At the end of a material review, Hermes may offer two to four bounded optional
+follow-up paths (specific lot, named rule, revision comparison or checklist
+draft); proposals are not additional execution or approval.
+
+For a document-family request, normalize the project label and include filename
+tokens and professional aliases in the bounded query (`CCTP`, `CCAP`, `DCE`,
+`cahier des charges`, etc.). Keep similarly named permits, estimates and plans
+as separate candidates; a shared project name does not establish document type.
+Prefer an exact document-family match over a generic project-name match and
+retain the candidate set when no exact match exists. Never call a permit,
+estimate or plan a CCTP solely because it contains the same project label.
+If an exact Workspace/vault path or filename is already known but Hindsight has
+no exact candidate, classify the result as an indexing gap and open that source
+through the admitted local binding (Docling when extraction is required) rather
+than asking the user to upload it. Do not call the binding unavailable merely
+because its search returned no match.
 
 ### 2. Workspace first
 
@@ -133,13 +197,22 @@ workspace access != external disclosure authorization
 
 When the request may involve professional/contractual/financial consequence, Evidence or approval, governed status or protected mutation, external transmission/action, memory/Register promotion, or another consequential decision boundary, consult the currently selected Pantheon policy binding.
 
+After the Hindsight-first context check, use Pantheon as the routing authority
+for a material professional request: `classify_request` identifies the governed
+conditions, `find_relevant_sources` can shortlist the necessary source families,
+and `route_governed_request` returns the bounded handling path. These calls
+propose routing and readiness; they do not replace Hindsight, open documents or
+activate autonomous Roles. Do not call them mechanically for trivial casual
+conversation.
+
 Before classification, reuse the generic `pantheon-request-intake` semantic adapter to describe only the material request conditions, optional coordination relations and observable completion requirements. Do not create an IFJA-specific K/V/C or trigger classifier here.
 
 The current repository exposes the same bounded read-only policy meaning through
 MCP and the authenticated HTTP service described by
 `mcp-server/docs/HTTP_API_CONTRACT.md`. The reviewed governed MCP binding exposes
-`classify_request`, `evaluate_preflight`, the Task Contract and Evidence Pack
-skeleton preparers, and Context Pack planning/validation. If the selected
+`classify_request`, `evaluate_preflight`, `find_relevant_sources`,
+`route_governed_request`, the Task Contract and Evidence Pack skeleton
+preparers, and Context Pack planning/validation. If the selected
 deployed binding cannot provide a required decision operation, stop before the
 consequential effect and return a Capability Gap rather than inventing policy
 locally.

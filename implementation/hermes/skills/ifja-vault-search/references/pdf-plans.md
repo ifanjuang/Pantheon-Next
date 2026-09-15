@@ -32,11 +32,18 @@ Ne pas lancer une recherche non bornée sur tout le système. Le chemin passé �
 Le serveur MCP `Doclin` est la route locale prévue pour les PDF :
 
 1. vérifier le cache avec `is_document_in_local_cache` ;
-2. convertir si nécessaire avec `convert_document_into_docling_document` ;
+2. convertir si nécessaire avec `convert_document_into_docling_document` en
+   transmettant `source: <chemin partagé ou URL>` ;
 3. obtenir la structure avec `get_overview_of_document_anchors` ;
 4. cibler les termes utiles avec `search_for_text_in_document_anchors` ;
 5. lire seulement les ancres pertinentes avec
    `get_text_of_document_item_at_anchor`.
+
+Ne pas appeler `get_prompt`, `list_prompts`, `read_resource` ou `list_resources`
+pour ouvrir un PDF. Ces opérations décrivent le serveur ou ses ressources et
+ne remplacent pas la conversion. Le chemin doit exister dans l'espace de
+fichiers du service Docling ; un chemin d'attachement WebUI non monté n'est pas
+valide.
 
 Pour une question nécessitant la lecture graphique d'un plan, utiliser
 `page_thumbnail` et une capacité visuelle si elles sont disponibles. Sinon,

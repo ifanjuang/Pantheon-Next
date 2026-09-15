@@ -10,7 +10,7 @@ source_pins:
   # test_external_qualification_pins.py rejects drift from the canonical registry.
   hermes_runtime:
     runtime_id: nousresearch-hermes-agent
-    version: "0.21.2"
+    version: "0.21.3"
     artifact_digest: null
     observation_ref: docs/governance/HERMES_RUNTIME_SURFACE_REVIEW.md
 components:
@@ -33,7 +33,7 @@ components:
     kind: context_bridge
     path: implementation/hermes/plugins/pantheon-context-bridge
     digest_mode: tree
-    content_digest: sha256:e65d6844d499afbf7831917a7af08097bd4d24a1dac99eb36c15026a62a16ad6
+    content_digest: sha256:2746224ff0df5139053bdcc25eba0dd8e77a2d1d6e5453b9836bf560e9ed7f0a
     required: true
     enabled_by_default: false
     capabilities:
