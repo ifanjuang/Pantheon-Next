@@ -139,6 +139,21 @@ grounded (Athena), material facts checked (Argos), commitments/confidentiality
 reviewed (Themis), wording made clear (Apollo), tone/channel adapted (Iris), and
 final readiness stated (Zeus). Use only those that materially contribute.
 
+For a document-gap or compliance review (such as identifying omissions in a
+CCTP), the usual minimal composition is Athena for scope and checklist
+structure, Argos when the exact document and locators are retrieved, Themis when
+technical, regulatory or contractual requirements are compared, Apollo for the
+clear consolidated findings, and Zeus for the final bounded readiness status.
+Hephaistos appears only when a revised document or checklist is actually
+produced. These labels remain conditional: omit any responsibility whose source,
+comparison or deliverable was not genuinely performed.
+
+When the governed method selects a complex task flow, the public projection may
+show a compact board summary (for example, `3 prêts · 1 en vérification · 1
+bloqué`) and only the cards whose status changed. The board is a view over the
+Task Contract, not a new authority. Do not show a Kanban surface for a simple
+question or expose every internal substep.
+
 ```text
 draft complete != transmission authorized
 Role readiness != whole task approved
