@@ -57,6 +57,11 @@ def test_linux_configurator_is_idempotent_and_keeps_a_backup() -> None:
     assert "diff -qr" in text
     assert "docker restart pantheon-hermes" in text
     assert "projection != persistence" in text
+    assert "check_profile_display" in text
+    assert "apply_profile_display" in text
+    assert 'config set display.interim_assistant_messages true' in text
+    assert 'config set display.show_reasoning false' in text
+    assert 'config set plugins.stream_reasoning_deltas false' in text
     for skill in (
         "external-commitment-guard",
         "ifja-project-context",

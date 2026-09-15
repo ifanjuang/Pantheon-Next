@@ -402,6 +402,33 @@ check_whatsapp_runtime() {
     || log "WhatsApp interim assistant messages require enabling"
 }
 
+check_profile_display() {
+  local reasoning commentary interim deltas
+  require_running_container
+  reasoning="$(hermes_config -p "$PROFILE" config get display.show_reasoning --json 2>/dev/null || true)"
+  commentary="$(hermes_config -p "$PROFILE" config get display.show_commentary --json 2>/dev/null || true)"
+  interim="$(hermes_config -p "$PROFILE" config get display.interim_assistant_messages --json 2>/dev/null || true)"
+  deltas="$(hermes_config -p "$PROFILE" config get plugins.stream_reasoning_deltas --json 2>/dev/null || true)"
+  [[ "$reasoning" == "false" ]] && log "governed private-reasoning display is disabled" \
+    || log "governed private-reasoning display requires disabling"
+  [[ "$commentary" == "true" ]] && log "governed public commentary is enabled" \
+    || log "governed public commentary requires enabling"
+  [[ "$interim" == "true" ]] && log "governed interim assistant messages are enabled" \
+    || log "governed interim assistant messages require enabling"
+  [[ "$deltas" == "false" ]] && log "governed reasoning deltas are disabled" \
+    || log "governed reasoning deltas require disabling"
+}
+
+apply_profile_display() {
+  require_running_container
+  hermes_config -p "$PROFILE" config set display.show_reasoning false >/dev/null
+  hermes_config -p "$PROFILE" config set display.show_commentary true >/dev/null
+  hermes_config -p "$PROFILE" config set display.interim_assistant_messages true >/dev/null
+  hermes_config -p "$PROFILE" config set plugins.stream_reasoning_deltas false >/dev/null
+  check_profile_display
+  log "configured governed public milestone display (no private reasoning)"
+}
+
 apply_whatsapp_runtime() {
   local routes_raw routes route merged_routes allowlist_raw allowlist merged_allowlist update_allowlist observed_routes
   command -v jq >/dev/null || die "jq is required for WhatsApp routing"
@@ -453,11 +480,6 @@ apply_whatsapp_runtime() {
   hermes_config config set display.platforms.whatsapp.show_reasoning false >/dev/null
   hermes_config config set display.platforms.whatsapp.interim_assistant_messages true >/dev/null
   hermes_config config set display.platforms.whatsapp.tool_progress new >/dev/null
-  hermes_config -p "$PROFILE" config set display.show_reasoning false >/dev/null
-  hermes_config -p "$PROFILE" config set display.show_commentary true >/dev/null
-  hermes_config -p "$PROFILE" config set display.interim_assistant_messages true >/dev/null
-  hermes_config -p "$PROFILE" config set plugins.stream_reasoning_deltas false >/dev/null
-
   observed_routes="$(hermes_config config get gateway.profile_routes --json)"
   if [[ -n "$WHATSAPP_CHAT_ID" ]]; then
     printf '%s' "$observed_routes" | normalize_json_array | jq -e \
@@ -500,6 +522,7 @@ if ((APPLY == 0)); then
   else
     log "managed SOUL block requires installation"
   fi
+  check_profile_display
   if ((ROUTE_WHATSAPP == 1)); then check_whatsapp_runtime; fi
   if ((BIND_LOCAL_MCP == 1)); then prepare_local_mcp_selection; check_local_mcp_bindings; fi
   if ((CURATED_DEFAULT_SKILLS == 1)); then stage_curated_default_skills; check_curated_default_skills; fi
@@ -555,6 +578,8 @@ chmod 0600 "$SOUL_TARGET"
 
 log "installed minimal governed skill set and managed SOUL block for $PROFILE"
 log "backup: $backup_root"
+
+apply_profile_display
 
 if ((ROUTE_WHATSAPP == 1)); then
   apply_whatsapp_runtime
