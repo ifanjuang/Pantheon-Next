@@ -121,6 +121,24 @@ A `→ Relais` line means the next responsibility, not a new agent or dispatch. 
 Hermes actually delegates runtime work, report that separately as an observed
 Hermes delegation.
 
+## Conditional relays and Zeus checkpoints
+
+A responsibility may propose a relay only after its own observable result is
+available. The relay names the next responsibility, the condition that justifies
+it and the expected contribution:
+
+```text
+→ Relais : Themis — source gap concerns regulatory applicability; verify the
+  named rule before closing the finding
+```
+
+The receiving responsibility is shown only when the governed context admits that
+scope. A proposed Rite or destination is a candidate, never an activation. Zeus
+may add a checkpoint whenever a result, dependency, contradiction or readiness
+status changes: it confirms what remains open, moves unresolved work to
+`to_verify`/`blocked`, or closes the bounded result. Zeus does not watch other
+runs in the background and does not infer approval from a successful stage.
+
 ## Observable Role outcomes
 
 Every Role that is materially shown must close its contribution with one
