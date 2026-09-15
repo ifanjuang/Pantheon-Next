@@ -216,6 +216,10 @@ prepare_local_mcp_selection() {
     or .key == "hindsight-documentaires" or .key == "pantheon-policy"
   ))
   | if has("pantheon-policy") then . else error("pantheon-policy binding is absent") end
+  | .docling.tools = (
+      (if (.docling.tools | type) == "object" then .docling.tools else {} end)
+      + {"prompts": false, "resources": false}
+    )
   | ."pantheon-policy".tools = (
       (if (."pantheon-policy".tools | type) == "object" then ."pantheon-policy".tools else {} end)
       + {"include": $policy_tools, "prompts": false, "resources": false}
@@ -233,6 +237,8 @@ prepare_local_mcp_selection() {
   printf '%s' "$selected" | jq -e --argjson policy_tools "$PANTHEON_POLICY_TOOLS_JSON" '
     has("docling") and has("hindsight-affaires") and has("hindsight-documentaires")
     and has("pantheon-policy")
+    and (.docling.tools.prompts == false)
+    and (.docling.tools.resources == false)
     and (."hindsight-memory".url | endswith("/mcp/hermes/"))
     and (."pantheon-policy".tools.include == $policy_tools)
     and (."pantheon-policy".tools.prompts == false)
@@ -252,6 +258,8 @@ check_local_mcp_bindings() {
   if printf '%s' "$current" | jq -e --argjson policy_tools "$PANTHEON_POLICY_TOOLS_JSON" '
     has("docling") and has("hindsight-affaires") and has("hindsight-documentaires") and has("hindsight-memory")
     and has("pantheon-policy")
+    and (.docling.tools.prompts == false)
+    and (.docling.tools.resources == false)
     and (."pantheon-policy".tools.include == $policy_tools)
     and (."pantheon-policy".tools.prompts == false)
     and (."pantheon-policy".tools.resources == false)

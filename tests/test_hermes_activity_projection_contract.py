@@ -134,6 +134,13 @@ def test_governed_local_mcp_binding_is_explicit_filtered_and_fail_closed() -> No
     assert 'supports_parallel_tool_calls = false' in text
 
 
+def test_docling_mcp_introspection_tools_are_hidden_from_governed_profile() -> None:
+    text = CONFIGURE.read_text(encoding="utf-8")
+    assert '.docling.tools = (' in text
+    assert '.docling.tools.prompts == false' in text
+    assert '.docling.tools.resources == false' in text
+
+
 def test_curated_default_capabilities_remain_bounded_and_searchable() -> None:
     text = CONFIGURE.read_text(encoding="utf-8")
     assert "--with-curated-default-skills" in text
