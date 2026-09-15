@@ -104,6 +104,15 @@ For a known document, perform the same Hindsight-first check with its exact
 name, path or identifier, then open the corresponding source. Do not skip the
 Hindsight step merely because a local path was supplied.
 
+If the exact source is a local file without an inspected Markdown derivative, or
+an attachment supplied in the current conversation, use the configured Docling
+binding after that fast location check (immediately for an attachment when no
+Hindsight identity exists). Docling is the extraction and page/table/layout
+inspection mechanism, not a source authority or memory store. Resolve the
+attachment to a Docling-visible shared Workspace/vault path; never guess a
+private upload path. If no shared path is available, report
+`source_not_visible_to_docling` and ask for one.
+
 Do not call the three Hindsight bindings in parallel for a simple project-context
 question. Do not use Web Search before this local path has returned no usable
 support or a current public fact is explicitly required. If the project name is

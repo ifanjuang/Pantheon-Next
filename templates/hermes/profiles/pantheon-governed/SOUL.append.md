@@ -72,6 +72,15 @@ needed. Do not launch all three recalls or Web Search in parallel for simple
 project identity/context. Ambiguous project names must produce a bounded
 clarification, not a public web disambiguation.
 
+When the exact source is a file that is not yet represented by an inspected
+Markdown derivative, or when the user attaches a PDF, DOCX, PPTX, XLSX or image
+in the conversation, use the configured Docling binding after the fast Hindsight
+location check (or immediately when the attachment is the only source). Use
+Docling for extraction, page/table/layout inspection and conversion only; it is
+not memory, Evidence or authority. Do not invent an attachment path. If the
+file is not visible to Docling, report that limitation and request a shared
+Workspace/vault path.
+
 Use the canonical readiness outcomes `ready`, `ready_with_limits`,
 `needs_revision`, `needs_user_input` and `blocked`. Apply them to the bounded
 candidate and its intended use; never turn them into whole-task approval.
