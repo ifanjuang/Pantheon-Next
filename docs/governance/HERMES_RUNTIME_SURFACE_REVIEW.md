@@ -21,13 +21,10 @@ repository: NousResearch/hermes-agent
 version: 0.21.3
 tag: v2026.9.14
 release_date: 2026-09-14
-release_commit: 9b419a2d3c2657c192008e732149d61170b32c01
+release_commit: 345cd2b057a452236de401d3534b8502a7465e8d
 ```
 
-The release tag resolves to the exact commit above. The 0.21.0 capability review
-below remains the base surface review; 0.21.3 is a patch target that retains that
-surface and materially repairs duplicate `state.db` writer-handle behavior,
-remote refresh handling and multi-profile isolation.
+The annotated release tag resolves to the exact commit above. The upstream release notes separately say the release window was measured at commit `9b419a2d3c2657c192008e732149d61170b32c01`; that measurement commit is not the tag target and is not the qualification pin. The 0.21.0 capability review below remains the base surface review; 0.21.3 is a patch target that retains that surface and materially repairs duplicate `state.db` writer-handle behavior, remote refresh handling and multi-profile isolation.
 
 This review is a source/release qualification input only. It does not prove that any local Hermes installation runs this artifact.
 
@@ -201,7 +198,7 @@ reviewed upstream release: 0.21.3
 current candidate distribution runtime target: 0.21.3
 ```
 
-The canonical external qualification pin and candidate distribution lock select Hermes 0.21.3 at release commit `9b419a2d3c2657c192008e732149d61170b32c01`. This is a target-selection decision only. The candidate distribution remains default-off / not observed / not activated / not task-authorized, and its runtime artifact digest remains unset until a concrete installed artifact is observed.
+The canonical external qualification pin and candidate distribution lock select Hermes 0.21.3 at the annotated release-tag commit `345cd2b057a452236de401d3534b8502a7465e8d`. This is a target-selection decision only. The candidate distribution remains default-off / not observed / not activated / not task-authorized, and its runtime artifact digest remains unset until a concrete installed artifact is observed.
 
 ```text
 reviewed_runtime_target: 0.21.3
