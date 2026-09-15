@@ -32,6 +32,10 @@ def test_ifja_project_context_routes_existing_sources_without_new_authority():
     assert "Do not call the three Hindsight bindings in parallel" in text
     assert "Do not use Web Search before this local path" in text
     assert "ask one targeted clarification" in text
+    assert "### Memory sufficiency gate" in text
+    assert "orientation générale                         -> Mnemosyne only" in text
+    assert "exact dossier fact / date / budget / status   -> AFFAIRES" in text
+    assert "Do not escalate every project question" in text
     assert "resolve and open the exact applicable workspace source" in text
     assert "bounded candidate set" in text
     assert "do not silently merge or select an identity" in text

@@ -121,6 +121,24 @@ A `→ Relais` line means the next responsibility, not a new agent or dispatch. 
 Hermes actually delegates runtime work, report that separately as an observed
 Hermes delegation.
 
+## Conditional relays and Zeus checkpoints
+
+A responsibility may propose a relay only after its own observable result is
+available. The relay names the next responsibility, the condition that justifies
+it and the expected contribution:
+
+```text
+→ Relais : Themis — source gap concerns regulatory applicability; verify the
+  named rule before closing the finding
+```
+
+The receiving responsibility is shown only when the governed context admits that
+scope. A proposed Rite or destination is a candidate, never an activation. Zeus
+may add a checkpoint whenever a result, dependency, contradiction or readiness
+status changes: it confirms what remains open, moves unresolved work to
+`to_verify`/`blocked`, or closes the bounded result. Zeus does not watch other
+runs in the background and does not infer approval from a successful stage.
+
 ## Observable Role outcomes
 
 Every Role that is materially shown must close its contribution with one
@@ -138,6 +156,21 @@ For a drafted communication, typical outcomes are: objective and recipient
 grounded (Athena), material facts checked (Argos), commitments/confidentiality
 reviewed (Themis), wording made clear (Apollo), tone/channel adapted (Iris), and
 final readiness stated (Zeus). Use only those that materially contribute.
+
+For a document-gap or compliance review (such as identifying omissions in a
+CCTP), the usual minimal composition is Athena for scope and checklist
+structure, Argos when the exact document and locators are retrieved, Themis when
+technical, regulatory or contractual requirements are compared, Apollo for the
+clear consolidated findings, and Zeus for the final bounded readiness status.
+Hephaistos appears only when a revised document or checklist is actually
+produced. These labels remain conditional: omit any responsibility whose source,
+comparison or deliverable was not genuinely performed.
+
+When the governed method selects a complex task flow, the public projection may
+show a compact board summary (for example, `3 prêts · 1 en vérification · 1
+bloqué`) and only the cards whose status changed. The board is a view over the
+Task Contract, not a new authority. Do not show a Kanban surface for a simple
+question or expose every internal substep.
 
 ```text
 draft complete != transmission authorized

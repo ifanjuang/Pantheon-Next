@@ -120,7 +120,7 @@ def test_runtime_observer_builds_bounded_receipt_from_observed_profile(tmp_path:
 set -eu
 if [[ "$1" == "inspect" ]]; then
   cat <<JSON
-[{"State":{"Running":true,"StartedAt":"2026-09-14T06:00:00Z"},"Id":"container-123","Config":{"Image":"nousresearch/hermes-agent:v2026.9.11"},"Image":"sha256:image-456","Mounts":[{"Source":"$STATE_ROOT/hermes","Destination":"/opt/data","RW":true}]}]
+[{"State":{"Running":true,"StartedAt":"2026-09-14T06:00:00Z"},"Id":"container-123","Config":{"Image":"nousresearch/hermes-agent:v2026.9.14"},"Image":"sha256:image-456","Mounts":[{"Source":"$STATE_ROOT/hermes","Destination":"/opt/data","RW":true}]}]
 JSON
 elif [[ "$1" == "image" && "$2" == "inspect" ]]; then
   cat <<'JSON'
@@ -142,7 +142,7 @@ fi
     config_root = tmp_path / "etc-pantheon"
     config_root.mkdir()
     (config_root / "versions.env").write_text(
-        "HERMES_IMAGE=nousresearch/hermes-agent:v2026.9.11\n", encoding="utf-8"
+        "HERMES_IMAGE=nousresearch/hermes-agent:v2026.9.14\n", encoding="utf-8"
     )
 
     state_root = tmp_path / "state"
@@ -173,7 +173,7 @@ fi
     receipt = json.loads(completed.stdout)
 
     assert receipt["container"]["running"] is True
-    assert receipt["container"]["configured_image"] == "nousresearch/hermes-agent:v2026.9.11"
+    assert receipt["container"]["configured_image"] == "nousresearch/hermes-agent:v2026.9.14"
     assert receipt["container"]["image_id"] == "sha256:image-456"
     assert receipt["container"]["repo_digests"] == ["nousresearch/hermes-agent@sha256:repo-789"]
     assert receipt["container"]["identity_labels"]["version"] == "0.0.0-fixture"

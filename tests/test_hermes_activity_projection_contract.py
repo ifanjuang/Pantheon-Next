@@ -57,6 +57,11 @@ def test_linux_configurator_is_idempotent_and_keeps_a_backup() -> None:
     assert "diff -qr" in text
     assert "docker restart pantheon-hermes" in text
     assert "projection != persistence" in text
+    assert "check_profile_display" in text
+    assert "apply_profile_display" in text
+    assert 'config set display.interim_assistant_messages true' in text
+    assert 'config set display.show_reasoning false' in text
+    assert 'config set plugins.stream_reasoning_deltas false' in text
     for skill in (
         "external-commitment-guard",
         "ifja-project-context",
@@ -129,6 +134,21 @@ def test_governed_local_mcp_binding_is_explicit_filtered_and_fail_closed() -> No
     assert 'supports_parallel_tool_calls = false' in text
 
 
+def test_docling_mcp_introspection_tools_are_hidden_from_governed_profile() -> None:
+    text = CONFIGURE.read_text(encoding="utf-8")
+    assert '.docling.tools = (' in text
+    assert '.docling.tools.prompts == false' in text
+    assert '.docling.tools.resources == false' in text
+
+
+def test_hindsight_bindings_are_bounded_to_read_only_search_tools() -> None:
+    text = CONFIGURE.read_text(encoding="utf-8")
+    assert 'HINDSIGHT_AFFAIRES_TOOLS_JSON=' in text
+    assert '"search_knowledge_base"' in text
+    assert '."hindsight-affaires".tools.include == $affaires_tools' in text
+    assert '."hindsight-documentaires".tools.include == $documentaires_tools' in text
+
+
 def test_curated_default_capabilities_remain_bounded_and_searchable() -> None:
     text = CONFIGURE.read_text(encoding="utf-8")
     assert "--with-curated-default-skills" in text
@@ -147,6 +167,8 @@ def test_curated_default_capabilities_remain_bounded_and_searchable() -> None:
         assert skill in text
     assert 'HERMES_IMAGE_SKILLS_ROOT="${HERMES_IMAGE_SKILLS_ROOT:-/opt/hermes/skills}"' in text
     assert 'docker cp "$CONTAINER:$source/." "$target/"' in text
+    assert 'flat_name="$HERMES_IMAGE_SKILLS_ROOT/$name"' in text
+    assert 'source="$flat_name"' in text
     assert 'source="$CURATED_STAGE_ROOT/$name"' in text
     assert 'source="$HERMES_ROOT/skills/$path"' not in text
     assert "tools.tool_search.enabled auto" in text

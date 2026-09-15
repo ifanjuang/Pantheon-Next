@@ -2,7 +2,7 @@
 
 Status: candidate external-runtime review and selected qualification target — not installed, observed, activated or task-authorized.
 Boundary profile: external_reference_review.
-Current reviewed target: Hermes Agent 0.21.2 (`v2026.9.11`).
+Current reviewed target: Hermes Agent 0.21.3 (`v2026.9.14`).
 
 ## Responsibility
 
@@ -14,20 +14,17 @@ Do not duplicate those owners here. A new Hermes surface belongs here only when 
 
 ## Reviewed upstream artifact
 
-Official upstream release and tagged source reviewed on 2026-09-13:
+Official upstream release and tagged source reviewed on 2026-09-15:
 
 ```text
 repository: NousResearch/hermes-agent
-version: 0.21.2
-tag: v2026.9.11
-release_date: 2026-09-11
-release_commit: 939e45c91d751fadd94dcd1b873ac3cb44846213
+version: 0.21.3
+tag: v2026.9.14
+release_date: 2026-09-14
+release_commit: 345cd2b057a452236de401d3534b8502a7465e8d
 ```
 
-The release tag resolves to the exact commit above. The 0.21.0 capability review
-below remains the base surface review; 0.21.2 is a patch target that retains that
-surface and materially repairs `state.db` connection/lock behavior plus
-multi-profile isolation.
+The annotated release tag resolves to the exact commit above. The upstream release notes separately say the release window was measured at commit `9b419a2d3c2657c192008e732149d61170b32c01`; that measurement commit is not the tag target and is not the qualification pin. The 0.21.0 capability review below remains the base surface review; 0.21.3 is a patch target that retains that surface and materially repairs duplicate `state.db` writer-handle behavior, remote refresh handling and multi-profile isolation.
 
 This review is a source/release qualification input only. It does not prove that any local Hermes installation runs this artifact.
 
@@ -61,16 +58,16 @@ Wire compatibility still requires observation against the exact installed artifa
 
 Only deltas that change trust, state, tool, execution-host or administration boundaries are retained here.
 
-### 0.21.2 state and profile isolation patch
+### 0.21.3 state and remote-session patch
 
-Upstream 0.21.2 removes several extra writer paths to `state.db`, makes read-only
+Upstream 0.21.3 removes duplicate long-lived writer handles to `state.db`, makes read-only
 opens avoid unnecessary write locks, degrades damaged FTS independently from
 the transcript store and hardens profile-specific database and credential
 isolation. These changes directly address the warning and fragility class seen
 with multiple live `SessionDB` handles; they do not justify patching the
 provider or bypassing live acceptance.
 
-Qualification consequence: select the tagged 0.21.2 artifact, keep one shared
+Qualification consequence: select the tagged 0.21.3 artifact, keep one shared
 long-lived handle per state path where the runtime supports it, verify the exact
 multi-profile/database behavior on the installed artifact and retain the same
 Pantheon memory, tool and authorization boundaries.
@@ -173,7 +170,7 @@ terminal_environment_backend: exact observed backend required
 consequential_effects: existing Pantheon policy / human gates apply
 ```
 
-The existing runtime observer already records route/tool/memory posture in the candidate distribution composition. 0.21.2 does not justify a second observer, a Pantheon multi-agent runtime, a second scheduler, a second memory owner or a parallel runtime inventory path. Any missing live observation should extend an existing seam only after a concrete target proves the gap.
+The existing runtime observer already records route/tool/memory posture in the candidate distribution composition. 0.21.3 does not justify a second observer, a Pantheon multi-agent runtime, a second scheduler, a second memory owner or a parallel runtime inventory path. Any missing live observation should extend an existing seam only after a concrete target proves the gap.
 
 The earlier 0.20.6 review of Hermes automatic memory/skill background review remains a useful historical finding, but 0.21.0 changes the wider memory/continuity surface enough that its exact trigger mechanics must be re-observed before any governed profile enables `memory`, `skill_manage` or runtime learning. The current profile admits none of them, so no authority expansion is required for this target selection.
 
@@ -194,18 +191,18 @@ A mobile, browser, desktop, Bot, peer, cron or messaging client may therefore ev
 
 ## Current repository decision
 
-The reviewed release and candidate distribution target are aligned on 0.21.2:
+The reviewed release and candidate distribution target are aligned on 0.21.3:
 
 ```text
-reviewed upstream release: 0.21.2
-current candidate distribution runtime target: 0.21.2
+reviewed upstream release: 0.21.3
+current candidate distribution runtime target: 0.21.3
 ```
 
-The canonical external qualification pin and candidate distribution lock select Hermes 0.21.2 at release commit `939e45c91d751fadd94dcd1b873ac3cb44846213`. This is a target-selection decision only. The candidate distribution remains default-off / not observed / not activated / not task-authorized, and its runtime artifact digest remains unset until a concrete installed artifact is observed.
+The canonical external qualification pin and candidate distribution lock select Hermes 0.21.3 at the annotated release-tag commit `345cd2b057a452236de401d3534b8502a7465e8d`. This is a target-selection decision only. The candidate distribution remains default-off / not observed / not activated / not task-authorized, and its runtime artifact digest remains unset until a concrete installed artifact is observed.
 
 ```text
-reviewed_runtime_target: 0.21.2
-candidate_distribution_runtime_target: 0.21.2
+reviewed_runtime_target: 0.21.3
+candidate_distribution_runtime_target: 0.21.3
 kernel_change_required: false
 run_binding_change_required: false
 new_runtime_owner_required: false
@@ -222,9 +219,9 @@ activation_effect: none
 task_authorization_effect: none
 ```
 
-Selecting 0.21.2 as the candidate target does not qualify it. Qualification requires the exact observed 0.21.2 artifact and the checks below.
+Selecting 0.21.3 as the candidate target does not qualify it. Qualification requires the exact observed 0.21.3 artifact and the checks below.
 
-## Required live checks before qualifying 0.21.2 for the governed distribution
+## Required live checks before qualifying 0.21.3 for the governed distribution
 
 1. record the exact installed Hermes package/image identity and immutable digest;
 2. observe the named profile route and `/v1/capabilities` / `/v1/toolsets` from that exact runtime;
@@ -236,14 +233,14 @@ Selecting 0.21.2 as the candidate target does not qualify it. Qualification requ
 8. confirm real-browser-profile, browser-extension-control and Desktop-browser-control paths are disabled, or run a separate explicit qualification before allowing any of them;
 9. confirm remote Desktop/fleet/SSH update administration is not part of the admitted run path and cannot silently mutate the qualified runtime during acceptance;
 10. execute one admitted read-only run through the existing launch/reconciliation path and exercise the existing real-runtime ambiguity/failure case;
-11. observe 0.21.2 run idempotency/replay behavior and confirm a replayed runtime run is not treated as fresh Pantheon authorization;
+11. observe 0.21.3 run idempotency/replay behavior and confirm a replayed runtime run is not treated as fresh Pantheon authorization;
 12. if subagent lifecycle events are emitted, retain them as technical observations only and confirm they create no Evidence, decision or governed child identity by implication;
 13. verify the runtime approval API and protected-file write approvals produce no Pantheon approval/write authorization state by implication;
 14. if Bot/peer surfaces are enabled in the runtime installation, prove they remain outside the admitted governed tool envelope unless separately qualified;
 15. if gateway/messaging/cron/continuity is selected in the deployment, exercise restart, persistence, code-skew and recovery behavior separately and retain outcomes as runtime observations only;
 16. if Verify is exercised, retain detected recipes/manifests/results as technical execution material until separately admitted through Pantheon Evidence rules.
 
-No new schema, observer or runtime owner is required by this target selection. A new protected-path invariant is justified only if live 0.21.2 acceptance exposes something the existing observer, binding or tests cannot represent.
+No new schema, observer or runtime owner is required by this target selection. A new protected-path invariant is justified only if live 0.21.3 acceptance exposes something the existing observer, binding or tests cannot represent.
 
 ## Local non-equivalences
 

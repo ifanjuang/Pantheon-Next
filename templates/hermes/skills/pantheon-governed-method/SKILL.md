@@ -51,6 +51,44 @@ These are movements, not a mandatory linear pipeline. Skip an empty movement,
 combine adjacent movements when that stays legible, and loop back only when a
 material source, contradiction, scope, risk or completion condition changes.
 
+## Adaptive task flow
+
+Select the lightest coordination surface that can represent the request:
+
+```text
+simple question or single transformation
+  -> direct response; no task board and no synthetic milestones
+material bounded request
+  -> compact Hermes milestones and one final readiness status
+complex request (multiple subgoals, dependencies, artifacts or sessions)
+  -> Task Contract plus an optional Kanban projection over its task items
+```
+
+Treat a request as complex when at least two material signals are observed:
+multiple independently checkable subgoals, a dependency between steps, more
+than one deliverable, work expected across sessions, a human decision gate, or
+an external-effect boundary. One long prompt is not by itself a complexity
+signal. For a complex request, prepare a Task Contract skeleton through the
+admitted Pantheon policy binding before creating cards; the contract names the
+scope, roles, constraints, expected evidence and stop conditions.
+
+The optional Kanban view is not a second source of truth. It projects the
+structured task contract using the candidate statuses `backlog`, `todo`,
+`in_progress`, `to_verify`, `blocked`, `done`, `cancelled` and `superseded`.
+Move a card only when an observable result, dependency, source, decision or
+blocker changes. Independent items may proceed in parallel; dependent items
+remain waiting until their prerequisite is ready. A loop returns to the
+smallest affected movement rather than restarting the whole task.
+
+Do not create a board merely because the request contains several sentences.
+Do not close a professional task, transmit an artifact or infer approval from a
+Kanban `done` status. Pantheon readiness and external-action gates remain
+independent of the projected board.
+
+When a complex task is resumed, reconstruct the board from the current Task
+Contract and observed receipts rather than trusting an old visual snapshot.
+Unknown or contradictory card state is `to_verify`, not `done`.
+
 ### 1. Frame
 
 Preserve the requested effect, audience, scope and output. Use

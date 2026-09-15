@@ -1,4 +1,4 @@
-ARG HERMES_IMAGE=nousresearch/hermes-agent:v2026.9.11
+ARG HERMES_IMAGE=nousresearch/hermes-agent:v2026.9.14
 FROM ${HERMES_IMAGE}
 
 WORKDIR /app
@@ -7,6 +7,7 @@ COPY workspace_cockpit/role_server.py /app/role_server.py
 COPY workspace_cockpit/static /app/static
 COPY mvp_vertical/__init__.py /app/mvp_vertical/__init__.py
 COPY mvp_vertical/hermes_role_stage_projection.py /app/mvp_vertical/hermes_role_stage_projection.py
+COPY mvp_vertical/hermes_runtime_topology_projection.py /app/mvp_vertical/hermes_runtime_topology_projection.py
 COPY mvp_vertical/hermes_role_trace_relay.py /app/mvp_vertical/hermes_role_trace_relay.py
 
 ENTRYPOINT ["/opt/hermes/.venv/bin/python", "/app/server.py"]
