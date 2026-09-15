@@ -8,8 +8,8 @@
       "kind": "git",
       "env_prefix": "HERMES",
       "repository": "NousResearch/hermes-agent",
-      "version": "0.21.2",
-      "ref": "939e45c91d751fadd94dcd1b873ac3cb44846213",
+      "version": "0.21.3",
+      "ref": "9b419a2d3c2657c192008e732149d61170b32c01",
       "aliases": {
         "ref": ["HERMES_RELEASE_COMMIT", "HERMES_COMMIT"]
       }
@@ -107,7 +107,7 @@
       "kind": "package",
       "env_prefix": "MNEMOSYNE_HERMES",
       "package": "mnemosyne-hermes",
-      "version": "0.5.0"
+      "version": "0.7.0"
     },
     "haystack": {
       "kind": "package",

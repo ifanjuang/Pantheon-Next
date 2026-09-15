@@ -16,10 +16,10 @@
     "hermes-agent": {
       "source": "github_releases_latest",
       "locator": "NousResearch/hermes-agent",
-      "latest_seen": "v2026.9.11",
-      "observed_on": "2026-09-13",
+      "latest_seen": "v2026.9.14",
+      "observed_on": "2026-09-15",
       "delta": "none",
-      "note": "Observed from the stable GitHub release v2026.9.11 (Hermes Agent 0.21.2), published 2026-09-11 at commit 939e45c91d751fadd94dcd1b873ac3cb44846213. Pantheon's separate candidate qualification pin now selects that artifact. The release materially fixes state.db writer/lock failure modes and multi-profile isolation; selecting it does not by itself prove installation, activation, runtime health, task authorization or full qualification."
+      "note": "Observed from the stable GitHub release v2026.9.14 (Hermes Agent 0.21.3), published 2026-09-14 at commit 9b419a2d3c2657c192008e732149d61170b32c01. Pantheon's separate candidate qualification pin now selects that artifact. The release addresses remote dashboard refresh handling and duplicate state.db writer handles; selecting it does not by itself prove installation, activation, runtime health, task authorization or full qualification."
     },
     "personal-ai-router": {
       "source": "github_releases_latest",
@@ -117,15 +117,17 @@
       "source": "pypi_latest",
       "locator": "mnemosyne-memory",
       "latest_seen": "3.15.1",
-      "observed_on": "2026-08-31",
-      "delta": "none"
+      "observed_on": "2026-09-15",
+      "delta": "acknowledged",
+      "note": "3.15.1 remains the latest stable release. PyPI also lists 4.0.0b2 (2026-09-10) as a pre-release; the candidate stays on the stable line until the Hermes integration is requalified."
     },
     "mnemosyne-hermes": {
       "source": "pypi_latest",
       "locator": "mnemosyne-hermes",
-      "latest_seen": "0.5.0",
-      "observed_on": "2026-08-31",
-      "delta": "none"
+      "latest_seen": "0.7.0",
+      "observed_on": "2026-09-15",
+      "delta": "none",
+      "note": "PyPI stable release 0.7.0 was published 2026-09-09. It requires the mnemosyne-memory embeddings extra; installation and Hermes 0.21.3 compatibility still require a node-side qualification run."
     },
     "haystack": {
       "source": "github_releases_latest",

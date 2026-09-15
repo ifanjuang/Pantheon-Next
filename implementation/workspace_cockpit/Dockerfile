@@ -1,4 +1,4 @@
-ARG HERMES_IMAGE=nousresearch/hermes-agent:v2026.9.11
+ARG HERMES_IMAGE=nousresearch/hermes-agent:v2026.9.14
 FROM ${HERMES_IMAGE}
 
 WORKDIR /app
