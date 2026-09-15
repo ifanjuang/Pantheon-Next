@@ -1,17 +1,32 @@
 name: Pantheon implementation CI
 
+# The suite this workflow runs is not confined to `implementation/`.
+# `implementation/tests/test_external_qualification_pins.py` reads four roots —
+# `.github/workflows/`, `implementation/tools/`, `implementation/tests/` and the
+# repository-root `tests/` — so a change under any of them can break it. The
+# filter below must therefore stay a superset of those roots.
+#
+# It was not: #1073 touched only `deployment/ubuntu/` and root `tests/`, this
+# workflow never ran, and the pin guard stayed red on main across five
+# subsequent merges. A guard with repository-wide reach behind a narrow trigger
+# is a control that cannot fire.
+#
+# `deployment/**` is deliberately absent: the guard does not read it, and the
+# whole implementation suite is the wrong cost for a deployment-only change.
 on:
   push:
     branches: [main]
     paths:
       - "implementation/**"
       - "schemas/**"
-      - ".github/workflows/implementation-ci.yml"
+      - "tests/**"
+      - ".github/workflows/**"
   pull_request:
     paths:
       - "implementation/**"
       - "schemas/**"
-      - ".github/workflows/implementation-ci.yml"
+      - "tests/**"
+      - ".github/workflows/**"
 
 permissions:
   contents: read
