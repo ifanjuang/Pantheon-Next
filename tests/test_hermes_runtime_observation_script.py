@@ -103,6 +103,15 @@ def test_runtime_observer_does_not_dump_secrets_or_arbitrary_image_labels() -> N
 
 
 def test_runtime_observer_builds_bounded_receipt_from_observed_profile(tmp_path: Path) -> None:
+    """Drive the observer against a fake docker and check what it surfaces.
+
+    The fake container deliberately reports `0.0.0-fixture` rather than the
+    registry's current `hermes-agent` version. Two reasons: the observer must
+    report what it *observed*, so a fixture equal to the configured pin would
+    let the assertion pass for the wrong reason; and restating a canonical pin
+    literal in an active qualification source is what
+    `implementation/tests/test_external_qualification_pins.py` exists to refuse.
+    """
     fake_bin = tmp_path / "bin"
     fake_bin.mkdir()
     fake_docker = fake_bin / "docker"
@@ -115,12 +124,12 @@ if [[ "$1" == "inspect" ]]; then
 JSON
 elif [[ "$1" == "image" && "$2" == "inspect" ]]; then
   cat <<'JSON'
-[{"RepoDigests":["nousresearch/hermes-agent@sha256:repo-789"],"Created":"2026-09-11T00:00:00Z","Config":{"Labels":{"org.opencontainers.image.version":"0.21.2","org.opencontainers.image.revision":"rev-abc","org.opencontainers.image.source":"https://github.com/NousResearch/hermes-agent","org.opencontainers.image.title":"Hermes Agent","secret.label":"must-not-surface"}}}]
+[{"RepoDigests":["nousresearch/hermes-agent@sha256:repo-789"],"Created":"2026-09-11T00:00:00Z","Config":{"Labels":{"org.opencontainers.image.version":"0.0.0-fixture","org.opencontainers.image.revision":"rev-abc","org.opencontainers.image.source":"https://github.com/NousResearch/hermes-agent","org.opencontainers.image.title":"Hermes Agent","secret.label":"must-not-surface"}}}]
 JSON
 elif [[ "$1" == "exec" && "$3" == "test" && "$4" == "-d" ]]; then
   exit 0
 elif [[ "$1" == "exec" && "$3" == "hermes" && "$4" == "--version" ]]; then
-  printf 'Hermes Agent 0.21.2\n'
+  printf 'Hermes Agent 0.0.0-fixture\n'
 else
   printf 'unexpected fake docker call: %s\n' "$*" >&2
   exit 64
@@ -167,7 +176,7 @@ fi
     assert receipt["container"]["configured_image"] == "nousresearch/hermes-agent:v2026.9.11"
     assert receipt["container"]["image_id"] == "sha256:image-456"
     assert receipt["container"]["repo_digests"] == ["nousresearch/hermes-agent@sha256:repo-789"]
-    assert receipt["container"]["identity_labels"]["version"] == "0.21.2"
+    assert receipt["container"]["identity_labels"]["version"] == "0.0.0-fixture"
     assert "secret.label" not in receipt["container"]["identity_labels"]
     assert receipt["container"]["profile_data_mount_observed"] is True
     assert receipt["deployment"]["target_matches_container_config"] is True
@@ -180,7 +189,7 @@ fi
     assert [item["name"] for item in receipt["profile"]["local_skills"]] == [
         "pantheon-governed-method"
     ]
-    assert receipt["runtime_version"] == {"status": "observed", "value": "Hermes Agent 0.21.2"}
+    assert receipt["runtime_version"] == {"status": "observed", "value": "Hermes Agent 0.0.0-fixture"}
     assert receipt["write_effect"] is False
     assert receipt["activation_changed"] is False
     assert receipt["authority_effect"] == "none"
