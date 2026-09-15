@@ -16,6 +16,7 @@ BEGIN
           FROM agency_decision_requests
          WHERE status = 'resolved'
            AND decision_type = 'question'
+           AND resolved_decision_id IS NOT NULL
     ) THEN
         RAISE EXCEPTION
             'resolved legacy question Decision Requests require explicit human reclassification before HumanResponse migration';
