@@ -80,6 +80,43 @@ class TestPantheonPolicyService(unittest.TestCase):
         self.assertLessEqual(len(report["candidates"]), 2)
         self.assertIn("memory", {item["key"] for item in report["candidates"]})
 
+    def test_governed_request_route_combines_classification_and_shortlist(self):
+        report = self.service.route_governed_request(
+            {
+                "intent": "Prepare a source-dependent professional result",
+                "conditions": ["source_required", "external_transmission"],
+                "scope": {"scope_type": "project", "scope_id": "fixture"},
+                "source_limit": 3,
+            }
+        )
+
+        self.assertEqual(report["result"], "routed")
+        self.assertEqual(report["operation"], "policy.request.route")
+        self.assertEqual(report["classification"]["consequence_level"], "K4")
+        self.assertLessEqual(len(report["source_route"]["candidates"]), 3)
+        self.assertIn(
+            "source-ingestion-retrieval",
+            {item["key"] for item in report["source_route"]["candidates"]},
+        )
+        self.assertFalse(report["write_effect"])
+        self.assertFalse(report["execution_effect"])
+        self.assertIn("read_doctrine", report["next_action"])
+
+    def test_mcp_governed_request_route_uses_one_yaml_contract(self):
+        report = json.loads(
+            server.route_governed_request(
+                "intent: Reuse project history\n"
+                "conditions:\n  - project_history_reuse\n"
+                "source_limit: 2\n"
+            )
+        )
+
+        self.assertEqual(report["result"], "routed")
+        self.assertLessEqual(len(report["source_route"]["candidates"]), 2)
+        self.assertIn(
+            "memory", {item["key"] for item in report["source_route"]["candidates"]}
+        )
+
     def test_unknown_source_key_never_becomes_a_path(self):
         report = self.service.read_doctrine("../../etc/passwd")
         self.assertEqual(report["error"], "unknown source key")

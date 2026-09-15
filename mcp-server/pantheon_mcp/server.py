@@ -168,6 +168,12 @@ def classify_request(request_yaml: str) -> str:
 
 
 @_read_only_tool()
+def route_governed_request(request_yaml: str) -> str:
+    """Classify a request and return its compact doctrine shortlist in one read-only call."""
+    return _call_yaml(request_yaml, "route_governed_request")
+
+
+@_read_only_tool()
 def evaluate_preflight(preflight_yaml: str) -> str:
     """Return candidate-work eligibility and missing gates without authorizing effects."""
     return _call_yaml(preflight_yaml, "evaluate_preflight")

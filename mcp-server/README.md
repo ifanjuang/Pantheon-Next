@@ -36,6 +36,7 @@ Any request asking the server to perform such an effect is refused with a report
 |---|---|
 | `list_sources` | the source map with authority/status per file |
 | `find_relevant_sources(request_yaml)` | compact condition-driven shortlist, normally limited to three; does not open a source |
+| `route_governed_request(request_yaml)` | normal Hermes entry point: classification plus compact doctrine shortlist in one read-only call |
 | `read_doctrine(key)` | one source, full body, labeled |
 | `explain_governance_structure(source_key="")` | read-only wiki view of the governance sections, why they exist and their traced sources; optional focus by source key |
 | `get_consultation_catalog()` | honest availability map: implemented read-only, partial and documented-non-implemented consultation surfaces |
@@ -121,14 +122,12 @@ mcp_servers:
     supports_parallel_tool_calls: true
     tools:
       include:
-        - find_relevant_sources
-        - list_sources
+        - route_governed_request
         - read_doctrine
         - explain_governance_structure
         - get_consultation_catalog
         - explain_architecture
         - get_capability_status
-        - classify_request
         - evaluate_preflight
         - prepare_task_contract_skeleton
         - prepare_evidence_pack_skeleton

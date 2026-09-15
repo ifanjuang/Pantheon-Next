@@ -26,8 +26,7 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     ):
         assert movement in text
     for tool in (
-        "find_relevant_sources",
-        "classify_request",
+        "route_governed_request",
         "evaluate_preflight",
         "prepare_task_contract_skeleton",
         "prepare_evidence_pack_skeleton",
@@ -48,7 +47,8 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "one guardrail method" in text
     assert "one verification method" in text
     assert "one such MCP function per `tool_call`" in text
-    assert "Do not call `list_sources` on the normal answer path" in text
+    assert "Do not call" in text
+    assert "`classify_request`, `find_relevant_sources` or `list_sources`" in text
     assert "Judge the result the user requested" in text
     for business_object in ("budget", "mail", "cctp", "compte rendu"):
         assert business_object not in text.lower()

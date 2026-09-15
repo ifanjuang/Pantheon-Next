@@ -114,8 +114,7 @@ def test_governed_local_mcp_binding_is_explicit_filtered_and_fail_closed() -> No
     assert 'config set --force mcp_servers "$merged"' in text
     assert 'cp -a "$PROFILE_CONFIG_TARGET" "$backup_root/profile-config.yaml"' in text
     for tool in (
-        "find_relevant_sources",
-        "classify_request",
+        "route_governed_request",
         "evaluate_preflight",
         "prepare_task_contract_skeleton",
         "prepare_evidence_pack_skeleton",
@@ -123,6 +122,7 @@ def test_governed_local_mcp_binding_is_explicit_filtered_and_fail_closed() -> No
         "validate_context_pack",
     ):
         assert tool in text
+    assert '"list_sources"' not in text
     assert '"prompts": false' in text
     assert '"resources": false' in text
     assert '"enabled": false' in text

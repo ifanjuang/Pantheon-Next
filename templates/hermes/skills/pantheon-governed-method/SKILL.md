@@ -91,15 +91,18 @@ source-preflight receipt described below before presenting them as supported.
 For Pantheon doctrine, prefer the compact progressive route:
 
 ```text
-find_relevant_sources(conditions + optional terms, limit <= 3)
+route_governed_request(minimal request candidate, source_limit <= 3)
 -> read_doctrine(exact selected key)
 -> source-preflight receipt
 ```
 
-Do not call `list_sources` on the normal answer path. Reserve the full catalog
-for explicit catalog inspection, administration or recovery from a genuinely
-empty shortlist. A shortlist is not a source consultation: only
-`read_doctrine` opens the selected doctrine source.
+The route operation combines request classification and doctrine shortlisting
+so Hermes does not batch dependent deferred MCP functions. Do not call
+`classify_request`, `find_relevant_sources` or `list_sources` on the normal
+answer path. Those lower-level and catalog primitives are reserved for explicit
+administration, compatibility or diagnosis outside the governed runtime
+profile. A shortlist is not a source consultation: only `read_doctrine` opens
+the selected doctrine source.
 
 ### 4. Compose
 

@@ -119,15 +119,21 @@ The default method is one independent-advice pass and, only when needed, one cha
 
 `connection/pantheon_policy_mcp.template.yaml` is a native Hermes Agent `~/.hermes/config.yaml` fragment aligned with the common installation baseline.
 
-It deliberately exposes only the six read-only navigation and consultation tools needed for the on-demand governance wiki:
+The governed runtime surface deliberately exposes one compact routing entry
+point plus the read-only consultation and candidate helpers it may need:
 
 ```text
-list_sources
+route_governed_request
 read_doctrine
 explain_governance_structure
 get_consultation_catalog
 explain_architecture
 get_capability_status
+evaluate_preflight
+prepare_task_contract_skeleton
+prepare_evidence_pack_skeleton
+plan_context_pack
+validate_context_pack
 ```
 
 The fragment is not installed, activated or approved by its presence here. An external operator must install the `mcp-server/` distribution into a versioned side-by-side environment, mount a pinned Pantheon checkout read-only, adapt the absolute executable path, merge the fragment into the real Hermes config and verify discovery.

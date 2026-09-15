@@ -269,20 +269,25 @@ class TestHermesCandidateConfiguration(unittest.TestCase):
         self.assertEqual(
             set(server["tools"]["include"]),
             {
-                "find_relevant_sources",
-                "list_sources",
+                "route_governed_request",
                 "read_doctrine",
                 "explain_governance_structure",
                 "get_consultation_catalog",
                 "explain_architecture",
                 "get_capability_status",
-                "classify_request",
                 "evaluate_preflight",
                 "prepare_task_contract_skeleton",
                 "prepare_evidence_pack_skeleton",
                 "plan_context_pack",
                 "validate_context_pack",
             },
+        )
+        self.assertTrue(
+            {
+                "classify_request",
+                "find_relevant_sources",
+                "list_sources",
+            }.isdisjoint(server["tools"]["include"])
         )
         self.assertFalse(server["tools"]["resources"])
         self.assertFalse(server["sampling"]["enabled"])
