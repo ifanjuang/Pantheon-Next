@@ -135,13 +135,20 @@ def _duplicated_pin_literals(data: dict, text: str) -> list[tuple[str, str]]:
     return duplicates
 
 
+# The repository-relative roots this guard reads. Exposed as a module constant
+# rather than hidden inside the function below because the reach is the point:
+# `test_pin_guard_ci_coverage.py` reads it to prove the workflow that runs this
+# suite is actually triggered by changes to every one of them.
+QUALIFICATION_SOURCE_ROOTS = (
+    ".github/workflows",
+    "implementation/tools",
+    "implementation/tests",
+    "tests",
+)
+
+
 def _active_qualification_sources() -> list[Path]:
-    roots = [
-        ROOT / ".github" / "workflows",
-        ROOT / "implementation" / "tools",
-        ROOT / "implementation" / "tests",
-        ROOT / "tests",
-    ]
+    roots = [ROOT / Path(root) for root in QUALIFICATION_SOURCE_ROOTS]
     suffixes = {".yml", ".yaml", ".py", ".sh", ".ts"}
     paths: list[Path] = []
     for root in roots:
