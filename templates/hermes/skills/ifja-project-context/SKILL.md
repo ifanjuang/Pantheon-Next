@@ -100,6 +100,26 @@ ambiguous, preserve the candidates and ask one targeted clarification rather
 than widening the web query. Label the first memory result `indice mémoire —
 non confirmé`; do not present it as a dossier fact until AFFAIRES confirms it.
 
+### Memory sufficiency gate
+
+Do not escalate every project question to a full dossier consultation. A fluid
+memory answer is sufficient for broad orientation when the user does not ask for
+an exact fact, current status, document existence, calculation, recommendation,
+professional rule or external action. Label it `orientation mémoire — non
+confirmée` and preserve the uncertainty.
+
+Escalate only when the requested precision requires it:
+
+```text
+orientation générale                         -> Mnemosyne only
+exact dossier fact / date / budget / status   -> AFFAIRES
+technical / legal / regulatory / standard     -> DOCUMENTAIRES
+decision / recommendation / delivery / action -> source preflight + Pantheon
+```
+
+If Mnemosyne has no useful lead or returns materially ambiguous candidates, ask a
+targeted clarification or continue to AFFAIRES; do not silently invent a fact.
+
 ### 2. Workspace first
 
 Use admitted workspace bindings; do not hard-code filesystem paths, Hindsight bank IDs or provider-specific names.
