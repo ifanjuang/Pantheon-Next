@@ -44,7 +44,9 @@ change the answer, permitted action or consequence.
    request, start with one fast Hindsight/Mnemosyne lookup. Emit at most one
    interim `indice mémoire — non confirmé` when it materially helps locate the
    dossier, then continue to the applicable Hindsight source. A known local
-   path does not bypass this first check.
+   path does not bypass this first check. Do not repeat an identical Mnemosyne
+   query; a second recall is reserved for an observed freshness/synchronization
+   concern and must use a distinct bounded query.
 1. Use the applicable Hindsight source (AFFAIRES for situated work,
    DOCUMENTAIRES for transversal professional material) to resolve the exact
    project or document identity. For a semantic project/document question,
@@ -61,8 +63,18 @@ change the answer, permitted action or consequence.
    result does not select a project, and a failed first recall does not establish
    that the source is absent until the targeted keyword search and bounded
    AFFAIRES inventory fallback have also been attempted.
+   For a document-family query, normalize the project/document terms and include
+   the relevant filename tokens and professional aliases in the bounded search
+   (for example, a CCTP may also be labelled CCAP, DCE or cahier des charges).
+   Preserve candidates separately; a permit, estimate or plan is not a CCTP
+   merely because it shares the project name.
 3. Open the exact project page or requested document before returning a material
    identifier, date, status or contractual fact.
+   If Hindsight returns no exact candidate but an admitted Workspace/vault path
+   or filename is already known, treat this as an indexing gap: validate and
+   open that exact local source (Docling for a file needing extraction) rather
+   than asking for an upload or declaring the document absent. Distinguish
+   `binding_unavailable`, `no_match` and `indexing_gap` in the limitation.
 4. Use one targeted recall when the request is conceptual, associative or the
    exact source remains unknown.
 5. For a recent project or information possibly awaiting synchronization, use
@@ -77,6 +89,11 @@ mandatory before final synthesis: `AFFAIRES` for dossier facts,
 question. A memory lead never satisfies this requirement. If the required
 binding is unavailable, return the limitation rather than substituting model
 recall.
+
+Never report that Hindsight is unavailable solely because a recall or search
+returned no match. Availability is established by the active MCP catalogue and
+connectivity test; an empty result is a search outcome and may indicate an
+indexing gap or an overly narrow query.
 
 Do not turn a generic remembered checklist into a regulatory conclusion. Each
 technical, legal, contractual or standards requirement must be tied to an exact
@@ -103,6 +120,11 @@ document opened != Evidence admitted
   first, then issue one targeted DOCUMENTAIRES recall for the rule families
   needed to test the observed content. Do not list the entire DOCUMENTAIRES
   bank before the project source is identified.
+- After the exact document is open, search DOCUMENTAIRES for only the
+  standards, regulations, contractual clauses or professional references that
+  correspond to observed gaps. Open the relevant knowledge pages and cite them
+  separately from the project document; do not present a generic catalogue as a
+  finding.
 - Use the live source only when the user requests current state or indicates a
   change may not yet be indexed. Do not silently merge live and indexed state.
 
@@ -183,6 +205,10 @@ invented path.
   conclusion.
 - Cite the exact path or document ID for each material project fact.
 - Expose contradictions, freshness limits and missing source confirmation.
+- End a material review with two to four optional, bounded follow-up paths when
+  useful (for example: inspect a specific lot, verify a named standard, compare
+  a revision or prepare a checklist). Label these as proposals; do not execute
+  them or imply that they are required unless the user chooses one.
 - Do not return unrelated personal contact data.
 - Consult Pantheon only at the consequential boundaries defined by the generic
   skill; do not call it mechanically for ordinary lookup.

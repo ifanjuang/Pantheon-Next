@@ -95,9 +95,10 @@ we know about Floquet?”), use this bounded sequence:
 
 ```text
 1. Hindsight Memory — one fast Mnemosyne lead
-2. Hindsight AFFAIRES — one targeted semantic recall to find the dossier or
-   document, followed by one targeted keyword search and then one bounded
-   listing fallback only when recall has no usable candidate
+2. Hindsight AFFAIRES — confirm dossier-specific facts and identity with one
+   targeted semantic recall to find the dossier or document, followed by one
+   targeted keyword search and then one bounded listing fallback only when
+   recall has no usable candidate
 3. Hindsight DOCUMENTAIRES — only after the exact AFFAIRES source is opened and
    a technical, regulatory, legal, standards or professional rule is actually
    required
@@ -142,6 +143,23 @@ decision / recommendation / delivery / action -> source preflight + Pantheon
 
 If Mnemosyne has no useful lead or returns materially ambiguous candidates, ask a
 targeted clarification or continue to AFFAIRES; do not silently invent a fact.
+
+Once the exact project document is open, use DOCUMENTAIRES to find only the
+standards, regulations, contractual clauses or professional references needed
+to test observed gaps. Cite those references separately from the project source.
+At the end of a material review, Hermes may offer two to four bounded optional
+follow-up paths (specific lot, named rule, revision comparison or checklist
+draft); proposals are not additional execution or approval.
+
+For a document-family request, normalize the project label and include filename
+tokens and professional aliases in the bounded query (`CCTP`, `CCAP`, `DCE`,
+`cahier des charges`, etc.). Keep similarly named permits, estimates and plans
+as separate candidates; a shared project name does not establish document type.
+If an exact Workspace/vault path or filename is already known but Hindsight has
+no exact candidate, classify the result as an indexing gap and open that source
+through the admitted local binding (Docling when extraction is required) rather
+than asking the user to upload it. Do not call the binding unavailable merely
+because its search returned no match.
 
 ### 2. Workspace first
 
