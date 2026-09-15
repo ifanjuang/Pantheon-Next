@@ -81,18 +81,38 @@ bounded referent candidate set != merged identity
 conversation continuity != governed persistence
 ```
 
+### Fast context path for project questions
+
+For a context-only question about an affaire or project (for example “what do
+we know about Floquet?”), use this bounded sequence:
+
+```text
+1. Hindsight Memory — one fast Mnemosyne lead
+2. Hindsight AFFAIRES — confirm dossier-specific facts and identity
+3. Hindsight DOCUMENTAIRES — only when a technical, regulatory, legal,
+   standards or professional rule is actually required
+```
+
+Do not call the three Hindsight bindings in parallel for a simple project-context
+question. Do not use Web Search before this local path has returned no usable
+support or a current public fact is explicitly required. If the project name is
+ambiguous, preserve the candidates and ask one targeted clarification rather
+than widening the web query. Label the first memory result `indice mémoire —
+non confirmé`; do not present it as a dossier fact until AFFAIRES confirms it.
+
 ### 2. Workspace first
 
 Use admitted workspace bindings; do not hard-code filesystem paths, Hindsight bank IDs or provider-specific names.
 
 - `AFFAIRES` -> dossier-specific facts, history, correspondence, contracts, CCTP, estimates, schedules, plans and project records.
 - `DOCUMENTAIRES` -> transversal technical, standards/DTU, regulatory, legal, contractual, responsibility, jurisprudence and professional reference material.
-- `AFFAIRES` + `DOCUMENTAIRES` -> consult both in parallel when a dossier-specific question must be tested against a transversal professional rule.
+- `AFFAIRES` + `DOCUMENTAIRES` -> consult both only when a dossier-specific question must be tested against a transversal professional rule.
 
 Keep the two source families distinguishable in the synthesis.
 
 Start the required source lookup as soon as the route is selected. Independent
-AFFAIRES and DOCUMENTAIRES lookups may run in parallel. Progressive chat output
+AFFAIRES and DOCUMENTAIRES lookups may run in parallel only when both source
+families are materially required by the same question. Progressive chat output
 may report a bounded lead while retrieval continues; it must not imply that a
 background task exists when execution is actually sequential.
 

@@ -26,6 +26,12 @@ def test_ifja_project_context_routes_existing_sources_without_new_authority():
     assert "AFFAIRES + DOCUMENTAIRES required" in text
     assert "indice mémoire — non confirmé" in text
     assert "fast memory lead != confirmed answer" in text
+    assert "### Fast context path for project questions" in text
+    assert "Hindsight Memory — one fast Mnemosyne lead" in text
+    assert "Hindsight AFFAIRES — confirm dossier-specific facts" in text
+    assert "Do not call the three Hindsight bindings in parallel" in text
+    assert "Do not use Web Search before this local path" in text
+    assert "ask one targeted clarification" in text
     assert "resolve and open the exact applicable workspace source" in text
     assert "bounded candidate set" in text
     assert "do not silently merge or select an identity" in text
@@ -33,7 +39,7 @@ def test_ifja_project_context_routes_existing_sources_without_new_authority():
     assert "references/project-resolution.md" in text
     assert "`AFFAIRES` -> dossier-specific" in text
     assert "`DOCUMENTAIRES` -> transversal" in text
-    assert "consult both in parallel" in text
+    assert "consult both only when" in text
     assert "### 2. Workspace first" in text
     assert "mentioned != exact source present != relevant content inspected" in text
     assert "references/document-inspection.md" in text
