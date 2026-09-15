@@ -26,6 +26,13 @@ Use this compact public shape:
 Limite: attention_only — question ≠ symptôme confirmé ≠ Rite activé
 ```
 
+For the currently implemented `tests_pass_completion` signal, the returned
+question is:
+
+```text
+What would passing these tests still not establish?
+```
+
 Do not answer the metathought as though Pantheon had already supplied a verdict.
 Do not convert `related_rite` into an activated Rite, do not invent a Role handoff,
 and do not call `delegate_task` solely because a metathought is present. If later
