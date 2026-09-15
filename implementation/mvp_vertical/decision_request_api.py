@@ -1,8 +1,10 @@
-"""Human attention and Decision record API.
+"""Human attention, HumanResponse and Decision record API.
 
 Decision Request creation and resolution require the editor key and a human
-actor. Hermes may later project a typed Execution Result through a separately
-reviewed adapter; it cannot call these canonical write routes directly.
+actor. Questions record governed information as HumanResponse; validation,
+approval and arbitration record Decisions. Hermes may later project a typed
+Execution Result through a separately reviewed adapter; it cannot call these
+canonical write routes directly.
 """
 
 from __future__ import annotations
@@ -81,6 +83,8 @@ class DecisionRequestCreateBody(BaseModel):
             raise ValueError("blocking Decision Request requires work_issue_ref")
         if self.scope_refs and not self.project_ref:
             raise ValueError("APU-scoped Decision Request requires project_ref")
+        if self.decision_type == "question" and self.response_mode == "decision_value":
+            raise ValueError("question Decision Requests cannot use decision_value response mode")
         scope_keys = {(scope.entity_type, scope.entity_id) for scope in self.scope_refs}
         if len(scope_keys) != len(self.scope_refs):
             raise ValueError("Decision Request scope_refs must be unique")
@@ -100,8 +104,15 @@ class DecisionRequestCreateBody(BaseModel):
 
 
 class ResolveDecisionRequestBody(BaseModel):
-    decision_id: str = Field(pattern=r"^[a-z0-9][a-z0-9._-]*$")
-    decision: DecisionValue
+    decision_id: str | None = Field(
+        default=None,
+        pattern=r"^[a-z0-9][a-z0-9._-]*$",
+    )
+    response_id: str | None = Field(
+        default=None,
+        pattern=r"^[a-z0-9][a-z0-9._-]*$",
+    )
+    decision: DecisionValue | None = None
     # This editor-key route has no authenticated-principal source. Keep the
     # persisted assurance honest until a real identity provider is composed.
     identity_assurance: IdentityAssurance = "declared"
@@ -133,6 +144,7 @@ def install_decision_request_routes(
         except (
             decision_requests.DecisionRequestNotFound,
             decision_requests.DecisionRecordNotFound,
+            decision_requests.HumanResponseNotFound,
         ) as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
         except (
@@ -285,8 +297,12 @@ def install_decision_request_routes(
             return apu_cross_family.enrich_request_projection(conn, projection)
 
         projection = execute(resolve_with_scope)
+        response_recorded = projection.get("human_response") is not None
+        decision_recorded = projection.get("decision_record") is not None
         return {
-            "effect": "decision_recorded",
+            "effect": "human_response_recorded" if response_recorded else "decision_recorded",
+            "human_response_recorded": response_recorded,
+            "decision_recorded": decision_recorded,
             "work_issue_transitioned": False,
             "runtime_continuation_authorized": False,
             "action_executed": False,
@@ -312,10 +328,18 @@ def install_decision_request_routes(
         projection = execute(cancel_with_scope)
         return {
             "effect": "decision_request_cancelled",
+            "human_response_recorded": False,
             "decision_recorded": False,
             "runtime_continuation_authorized": False,
             **projection,
         }
+
+    @app.get("/human-responses/{response_id}")
+    def get_human_response(
+        response_id: str,
+        _authorized: None = Depends(require_read_key),
+    ) -> dict[str, Any]:
+        return execute(lambda conn: decision_requests.get_response(conn, response_id))
 
     @app.get("/decisions/{decision_id}")
     def get_decision_record(
