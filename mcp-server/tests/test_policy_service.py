@@ -122,6 +122,11 @@ class TestPantheonPolicyService(unittest.TestCase):
         self.assertEqual(report["error"], "unknown source key")
         self.assertNotIn("body", report)
 
+    def test_mcp_read_doctrine_accepts_deferred_runtime_input_key_alias(self):
+        report = json.loads(server.read_doctrine(input_key="answer-verification-gate"))
+        self.assertEqual(report["uri"], "pantheon://answer-verification-gate")
+        self.assertIn("body", report)
+
     def test_preflight_rejects_insufficient_human_decision_level(self):
         report = self.service.evaluate_preflight(
             {

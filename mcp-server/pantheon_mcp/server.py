@@ -126,9 +126,13 @@ def find_relevant_sources(request_yaml: str) -> str:
 
 
 @_read_only_tool()
-def read_doctrine(key: str) -> str:
+def read_doctrine(key: str = "", input_key: str = "") -> str:
     """Read one allowlisted governed source; arbitrary paths are not accepted."""
-    return _call("read_doctrine", key)
+    # Hermes deferred-tool envelopes have used both names across supported
+    # runtime versions. Accepting the compatibility alias keeps a valid call
+    # single-shot without broadening the allowlisted source-key boundary.
+    selected_key = (key or input_key).strip()
+    return _call("read_doctrine", selected_key)
 
 
 @_read_only_tool()
