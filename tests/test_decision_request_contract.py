@@ -25,6 +25,22 @@ def _validator() -> jsonschema.Draft202012Validator:
     )
 
 
+def _resolved_question() -> dict:
+    payload = _load(EXAMPLE_PATH)
+    payload.update(
+        status="resolved",
+        decision_type="question",
+        response_mode="free_text",
+        options=[],
+        recommendation_candidate=None,
+        resolved_decision_ref=None,
+        resolved_response_ref="human-response-001",
+        resolved_at="2026-08-06T11:00:00Z",
+        revision=2,
+    )
+    return payload
+
+
 def test_decision_request_example_validates() -> None:
     _validator().validate(_load(EXAMPLE_PATH))
 
@@ -43,19 +59,52 @@ def test_option_response_requires_reviewable_options() -> None:
         _validator().validate(invalid)
 
 
-def test_pending_request_cannot_claim_a_resolution() -> None:
+@pytest.mark.parametrize("resolution_field", ["resolved_decision_ref", "resolved_response_ref"])
+def test_pending_request_cannot_claim_a_resolution(resolution_field: str) -> None:
     invalid = _load(EXAMPLE_PATH)
-    invalid["resolved_decision_ref"] = "decision-001"
+    invalid[resolution_field] = "resolution-001"
     invalid["resolved_at"] = "2026-08-06T11:00:00Z"
     with pytest.raises(jsonschema.ValidationError):
         _validator().validate(invalid)
 
 
-def test_resolved_request_requires_a_separate_decision_record_reference() -> None:
+def test_resolved_decision_request_requires_decision_record_reference() -> None:
+    valid = _load(EXAMPLE_PATH)
+    valid["status"] = "resolved"
+    valid["revision"] = 2
+    valid["resolved_decision_ref"] = "decision-001"
+    valid["resolved_at"] = "2026-08-06T11:00:00Z"
+    _validator().validate(valid)
+
+    missing = dict(valid)
+    missing["resolved_decision_ref"] = None
+    with pytest.raises(jsonschema.ValidationError):
+        _validator().validate(missing)
+
+
+def test_resolved_question_requires_human_response_not_decision() -> None:
+    valid = _resolved_question()
+    _validator().validate(valid)
+
+    missing = dict(valid)
+    missing["resolved_response_ref"] = None
+    with pytest.raises(jsonschema.ValidationError):
+        _validator().validate(missing)
+
+    wrong_authority = dict(valid)
+    wrong_authority["resolved_response_ref"] = None
+    wrong_authority["resolved_decision_ref"] = "decision-001"
+    with pytest.raises(jsonschema.ValidationError):
+        _validator().validate(wrong_authority)
+
+
+def test_resolved_decision_cannot_claim_human_response_reference() -> None:
     invalid = _load(EXAMPLE_PATH)
     invalid["status"] = "resolved"
+    invalid["revision"] = 2
     invalid["resolved_decision_ref"] = None
-    invalid["resolved_at"] = None
+    invalid["resolved_response_ref"] = "human-response-001"
+    invalid["resolved_at"] = "2026-08-06T11:00:00Z"
     with pytest.raises(jsonschema.ValidationError):
         _validator().validate(invalid)
 
@@ -98,15 +147,20 @@ def test_global_decisions_are_only_unclassified_requests() -> None:
     assert rules["project_view_requires_matching_project_ref"] is True
     assert rules["apu_scope_requires_project_classification"] is True
     assert rules["scope_refs_remain_request_owned"] is True
+    assert rules["question_resolution_creates_human_response"] is True
+    assert rules["decision_resolution_creates_separate_decision_record"] is True
+    assert rules["resolution_reference_is_type_driven"] is True
     assert schema["x-boundary"]["agency_decision_owner"] is False
 
 
-def test_request_is_not_decision_or_runtime_authority() -> None:
+def test_request_and_human_response_are_not_runtime_authority() -> None:
     schema = _load(SCHEMA_PATH)
     boundary = schema["x-boundary"]
     assert boundary["request_is_decision"] is False
     assert boundary["request_is_approval"] is False
     assert boundary["agency_decision_owner"] is False
+    assert boundary["human_response_is_decision"] is False
+    assert boundary["human_response_is_authorization"] is False
     assert boundary["scope_ref_is_semantic_relation"] is False
     assert boundary["scope_ref_is_task_authorization"] is False
     assert boundary["scope_ref_mutates_apu"] is False
