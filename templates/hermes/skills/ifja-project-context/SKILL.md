@@ -91,7 +91,7 @@ conversation continuity != governed persistence
 ### Fast context path for project questions
 
 For a context-only question about an affaire or project (for example “what do
-we know about Floquet?”), use this bounded sequence:
+we know about this project?”), use this bounded sequence:
 
 ```text
 1. Hindsight Memory — one fast Mnemosyne lead
