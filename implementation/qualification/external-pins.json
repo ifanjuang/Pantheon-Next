@@ -9,7 +9,7 @@
       "env_prefix": "HERMES",
       "repository": "NousResearch/hermes-agent",
       "version": "0.21.3",
-      "ref": "9b419a2d3c2657c192008e732149d61170b32c01",
+      "ref": "345cd2b057a452236de401d3534b8502a7465e8d",
       "aliases": {
         "ref": ["HERMES_RELEASE_COMMIT", "HERMES_COMMIT"]
       }
