@@ -117,10 +117,32 @@ class TestPantheonPolicyService(unittest.TestCase):
             "memory", {item["key"] for item in report["source_route"]["candidates"]}
         )
 
+    def test_mcp_governed_request_route_accepts_plain_text_alias(self):
+        report = json.loads(
+            server.route_governed_request(
+                request_text="Reuse project history for a bounded professional answer"
+            )
+        )
+
+        self.assertEqual(report["result"], "routed")
+        self.assertIn("policy.request.route", report["operation"])
+        self.assertTrue(report["classification"]["task_contract_required"])
+        self.assertLessEqual(len(report["source_route"]["candidates"]), 3)
+
+    def test_mcp_governed_request_route_rejects_empty_input_without_calling_policy(self):
+        report = json.loads(server.route_governed_request())
+        self.assertEqual(report["result"], "error")
+        self.assertIn("required", report["problems"][0])
+
     def test_unknown_source_key_never_becomes_a_path(self):
         report = self.service.read_doctrine("../../etc/passwd")
         self.assertEqual(report["error"], "unknown source key")
         self.assertNotIn("body", report)
+
+    def test_mcp_read_doctrine_accepts_deferred_runtime_input_key_alias(self):
+        report = json.loads(server.read_doctrine(input_key="answer-verification-gate"))
+        self.assertEqual(report["uri"], "pantheon://answer-verification-gate")
+        self.assertIn("body", report)
 
     def test_preflight_rejects_insufficient_human_decision_level(self):
         report = self.service.evaluate_preflight(

@@ -126,9 +126,13 @@ def find_relevant_sources(request_yaml: str) -> str:
 
 
 @_read_only_tool()
-def read_doctrine(key: str) -> str:
+def read_doctrine(key: str = "", input_key: str = "") -> str:
     """Read one allowlisted governed source; arbitrary paths are not accepted."""
-    return _call("read_doctrine", key)
+    # Hermes deferred-tool envelopes have used both names across supported
+    # runtime versions. Accepting the compatibility alias keeps a valid call
+    # single-shot without broadening the allowlisted source-key boundary.
+    selected_key = (key or input_key).strip()
+    return _call("read_doctrine", selected_key)
 
 
 @_read_only_tool()
@@ -168,9 +172,17 @@ def classify_request(request_yaml: str) -> str:
 
 
 @_read_only_tool()
-def route_governed_request(request_yaml: str) -> str:
-    """Classify a request and return its compact doctrine shortlist in one read-only call."""
-    return _call_yaml(request_yaml, "route_governed_request")
+def route_governed_request(request_yaml: str = "", request_text: str = "") -> str:
+    """Route YAML or plain request text; Hermes should not ask the user to build YAML."""
+    raw = (request_yaml or request_text).strip()
+    if not raw:
+        return _dump(
+            {
+                "result": "error",
+                "problems": ["request_yaml or request_text is required"],
+            }
+        )
+    return _call_yaml(raw, "route_governed_request")
 
 
 @_read_only_tool()

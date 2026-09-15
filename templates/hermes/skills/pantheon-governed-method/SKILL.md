@@ -91,7 +91,7 @@ source-preflight receipt described below before presenting them as supported.
 For Pantheon doctrine, prefer the compact progressive route:
 
 ```text
-route_governed_request(minimal request candidate, source_limit <= 3)
+route_governed_request(request YAML or plain request text, source_limit <= 3)
 -> read_doctrine(exact selected key)
 -> source-preflight receipt
 ```
@@ -103,6 +103,10 @@ answer path. Those lower-level and catalog primitives are reserved for explicit
 administration, compatibility or diagnosis outside the governed runtime
 profile. A shortlist is not a source consultation: only `read_doctrine` opens
 the selected doctrine source.
+
+Hermes may pass the user's request as `request_text` when a structured candidate
+has not already been prepared. Do not ask the user to write YAML solely to use
+this tool; the MCP adapter converts plain text into a bounded candidate.
 
 ### 4. Compose
 

@@ -36,7 +36,7 @@ Any request asking the server to perform such an effect is refused with a report
 |---|---|
 | `list_sources` | the source map with authority/status per file |
 | `find_relevant_sources(request_yaml)` | compact condition-driven shortlist, normally limited to three; does not open a source |
-| `route_governed_request(request_yaml)` | normal Hermes entry point: classification plus compact doctrine shortlist in one read-only call |
+| `route_governed_request(request_yaml\|request_text)` | normal Hermes entry point: classification plus compact doctrine shortlist in one read-only call; accepts plain text |
 | `read_doctrine(key)` | one source, full body, labeled |
 | `explain_governance_structure(source_key="")` | read-only wiki view of the governance sections, why they exist and their traced sources; optional focus by source key |
 | `get_consultation_catalog()` | honest availability map: implemented read-only, partial and documented-non-implemented consultation surfaces |
