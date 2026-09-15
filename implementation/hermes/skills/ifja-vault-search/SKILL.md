@@ -82,9 +82,11 @@ change the answer, permitted action or consequence.
    exact source remains unknown.
 5. For a recent project or information possibly awaiting synchronization, use
    the second and final recall against the configured conversation-memory
-   binding only after the applicable AFFAIRES lookup (and its bounded fallback)
-   has been attempted. Attribute memory-only information to recent conversation
-   and mark it unconfirmed until an admitted business source supports it.
+   binding only when a freshness/synchronization concern is explicitly observed
+   and the distinct query can change the result. Never repeat Mnemosyne after an
+   exact AFFAIRES document has already been opened merely to enrich the answer.
+   Attribute memory-only information to recent conversation and mark it
+   unconfirmed until an admitted business source supports it.
 
 For a material professional factual answer, the applicable source lookup is
 mandatory before final synthesis: `AFFAIRES` for dossier facts,
@@ -123,6 +125,10 @@ document opened != Evidence admitted
   first, then issue one targeted DOCUMENTAIRES recall for the rule families
   needed to test the observed content. Do not list the entire DOCUMENTAIRES
   bank before the project source is identified.
+- Once a technical or regulatory comparison is requested, a targeted
+  DOCUMENTAIRES recall and the relevant page/document must be opened before
+  presenting normative gaps. If no applicable reference is found, label the
+  item `à vérifier` rather than implying that the standard was consulted.
 - After the exact document is open, search DOCUMENTAIRES for only the
   standards, regulations, contractual clauses or professional references that
   correspond to observed gaps. Open the relevant knowledge pages and cite them
@@ -164,6 +170,11 @@ introspection/resource operations and do not open an arbitrary local PDF. Do
 not invent `filepath` or `file_path` for the Hermes conversion wrapper; if the
 selected binding exposes a different schema, inspect that schema before calling
 it rather than guessing.
+
+The same rule applies to Hindsight resource/introspection calls: use
+`get_document` for an identified document and `get_knowledge_page` for an
+identified knowledge page. A `read_resource` result is not a document
+consultation and must not be cited as one.
 
 The `source` path is resolved by the Docling service, not by the model. Use a
 path shared with that service, such as the reviewed `/srv/pantheon/obsidian`,

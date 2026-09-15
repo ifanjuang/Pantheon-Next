@@ -91,6 +91,8 @@ responsibilities are actually present; do not stop after a memory lookup without
 publishing the corresponding governed activity. A material answer must end with
 Zeus (or another established final responsibility) and one readiness outcome;
 ask a clarification only when the missing datum genuinely prevents that status.
+Emit the initial plan only once. Later role messages must represent a changed
+source, result, risk, blocker or status rather than repeating the same plan.
 
 When the exact source is a file that is not yet represented by an inspected
 Markdown derivative, or when the user attaches a PDF, DOCX, PPTX, XLSX or image
