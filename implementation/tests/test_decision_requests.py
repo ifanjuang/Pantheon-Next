@@ -1,4 +1,4 @@
-"""PostgreSQL acceptance tests for Decision Requests and immutable records."""
+"""PostgreSQL acceptance tests for typed Decision Request resolutions."""
 
 from __future__ import annotations
 
@@ -27,15 +27,17 @@ def conn():
         agency_data.MIGRATION,
         work_issue_scopes.MIGRATION,
         decision_requests.MIGRATION,
+        decision_requests.HUMAN_RESPONSE_MIGRATION,
     ):
         connection.execute(migration.read_text(encoding="utf-8"))
     connection.execute(
         """
-        TRUNCATE agency_decision_events, agency_decision_records,
-                 agency_decision_options, agency_decision_requests,
-                 work_issue_scope_events, work_issue_scope_links,
-                 issue_events, hermes_runs, issue_comments, work_card_metadata,
-                 work_issues, agency_information_cards, agency_people,
+        TRUNCATE agency_decision_events, agency_human_responses,
+                 agency_decision_records, agency_decision_options,
+                 agency_decision_requests, work_issue_scope_events,
+                 work_issue_scope_links, issue_events, hermes_runs,
+                 issue_comments, work_card_metadata, work_issues,
+                 agency_information_cards, agency_people,
                  agency_organizations, agency_projects
         RESTART IDENTITY CASCADE
         """
@@ -126,7 +128,23 @@ def _request_kwargs(
     }
 
 
-def test_pending_request_is_attention_not_a_decision(conn) -> None:
+def _question_kwargs(*, request_id: str | None = None, blocking: bool = False) -> dict:
+    values = _request_kwargs(
+        request_id=request_id,
+        work_issue_ref="issue-envelope" if blocking else None,
+        blocking=blocking,
+    )
+    values.update(
+        decision_type="question",
+        question="Quelle finition existante doit être conservée ?",
+        response_mode="free_text",
+        options=[],
+        recommendation_candidate=None,
+    )
+    return values
+
+
+def test_pending_request_is_attention_not_a_resolution(conn) -> None:
     project_id = _project(conn)
     _scoped_issue(conn, project_id)
     projection = decision_requests.create_request(conn, **_request_kwargs())
@@ -134,9 +152,14 @@ def test_pending_request_is_attention_not_a_decision(conn) -> None:
     request = projection["decision_request"]
     assert request["status"] == "pending"
     assert request["blocking"] is True
+    assert request["resolved_decision_ref"] is None
+    assert request["resolved_response_ref"] is None
+    assert projection["human_response"] is None
     assert projection["decision_record"] is None
     assert projection["attention_required"] is True
     assert projection["request_is_not_decision"] is True
+    assert projection["human_response_is_not_decision"] is True
+    assert projection["resolution_is_not_authorization"] is True
     assert projection["decision_is_not_execution"] is True
 
 
@@ -144,10 +167,7 @@ def test_global_and_project_views_preserve_one_request_identity(conn) -> None:
     project_id = _project(conn)
     _scoped_issue(conn, project_id)
     request_id = "decision-request-shared"
-    decision_requests.create_request(
-        conn,
-        **_request_kwargs(request_id=request_id),
-    )
+    decision_requests.create_request(conn, **_request_kwargs(request_id=request_id))
 
     global_view = decision_requests.list_requests(conn, status="pending")
     project_view = decision_requests.list_requests(
@@ -165,17 +185,11 @@ def test_only_one_pending_blocking_request_targets_a_work_issue(conn) -> None:
     decision_requests.create_request(conn, **_request_kwargs(request_id="request-one"))
 
     with pytest.raises(decision_requests.DecisionRequestConflict):
-        decision_requests.create_request(
-            conn,
-            **_request_kwargs(request_id="request-two"),
-        )
+        decision_requests.create_request(conn, **_request_kwargs(request_id="request-two"))
 
     preference = decision_requests.create_request(
         conn,
-        **_request_kwargs(
-            request_id="request-preference",
-            blocking=False,
-        ),
+        **_request_kwargs(request_id="request-preference", blocking=False),
     )
     assert preference["decision_request"]["blocking"] is False
 
@@ -192,11 +206,10 @@ def test_project_and_work_issue_links_must_share_an_explicit_scope(conn) -> None
         )
 
 
-def test_human_resolution_creates_separate_record_without_changing_work_issue(conn) -> None:
+def test_arbitration_resolution_creates_decision_without_changing_work_issue(conn) -> None:
     project_id = _project(conn)
     issue_projection = _scoped_issue(conn, project_id)
-    request_projection = decision_requests.create_request(conn, **_request_kwargs())
-    request = request_projection["decision_request"]
+    request = decision_requests.create_request(conn, **_request_kwargs())["decision_request"]
     issue_before = work_issues.get_issue(conn, "issue-envelope")["work_issue"]
 
     resolved = decision_requests.resolve_request(
@@ -212,7 +225,11 @@ def test_human_resolution_creates_separate_record_without_changing_work_issue(co
         rationale="Le zinc est retenu pour poursuivre les études.",
     )
 
-    assert resolved["decision_request"]["status"] == "resolved"
+    resolved_request = resolved["decision_request"]
+    assert resolved_request["status"] == "resolved"
+    assert resolved_request["resolved_decision_ref"] == "decision-envelope-zinc"
+    assert resolved_request["resolved_response_ref"] is None
+    assert resolved["human_response"] is None
     assert resolved["attention_required"] is False
     record = resolved["decision_record"]
     assert record["object_type"] == "decision_record"
@@ -231,7 +248,114 @@ def test_human_resolution_creates_separate_record_without_changing_work_issue(co
     assert issue_projection["work_issue"]["issue_id"] == issue_after["issue_id"]
 
 
-def test_resolution_replay_is_idempotent(conn) -> None:
+def test_free_text_question_creates_human_response_not_decision(conn) -> None:
+    _project(conn)
+    request = decision_requests.create_request(conn, **_question_kwargs())["decision_request"]
+
+    resolved = decision_requests.resolve_request(
+        conn,
+        request_id=request["request_id"],
+        response_id="human-response-finish",
+        decided_by="architect-human",
+        identity_assurance="declared",
+        expected_revision=request["revision"],
+        idempotency_key=_id("respond"),
+        response_text="Conserver l’enduit existant côté jardin.",
+    )
+
+    resolved_request = resolved["decision_request"]
+    assert resolved_request["status"] == "resolved"
+    assert resolved_request["resolved_response_ref"] == "human-response-finish"
+    assert resolved_request["resolved_decision_ref"] is None
+    assert resolved["decision_record"] is None
+    response = resolved["human_response"]
+    assert response["response_id"] == "human-response-finish"
+    assert response["request_id"] == request["request_id"]
+    assert response["responded_by"] == "architect-human"
+    assert response["response_text"] == "Conserver l’enduit existant côté jardin."
+    assert response["candidate_digest"] == request["candidate_digest"]
+    assert resolved["resolution_is_not_authorization"] is True
+    assert resolved["events"][-1]["response_ref"] == "human-response-finish"
+    assert resolved["events"][-1]["decision_ref"] is None
+
+    fetched = decision_requests.get_response(conn, "human-response-finish")
+    assert fetched["human_response"] == response
+    assert fetched["response_is_not_authorization"] is True
+    assert fetched["response_is_not_evidence"] is True
+
+
+def test_option_question_creates_human_response_without_authority(conn) -> None:
+    _project(conn)
+    values = _request_kwargs(blocking=False, work_issue_ref=None)
+    values["decision_type"] = "question"
+    values["question"] = "Quel matériau est actuellement posé ?"
+    request = decision_requests.create_request(conn, **values)["decision_request"]
+
+    resolved = decision_requests.resolve_request(
+        conn,
+        request_id=request["request_id"],
+        response_id="human-response-material",
+        decided_by="architect-human",
+        identity_assurance="declared",
+        expected_revision=1,
+        idempotency_key=_id("respond"),
+        selected_option_ids=["option-zinc"],
+    )
+
+    assert resolved["human_response"]["selected_option_ids"] == ["option-zinc"]
+    assert resolved["human_response"]["response_text"] is None
+    assert resolved["decision_record"] is None
+    assert resolved["resolution_is_not_authorization"] is True
+
+
+def test_question_cannot_be_resolved_as_decision(conn) -> None:
+    _project(conn)
+    request = decision_requests.create_request(conn, **_question_kwargs())["decision_request"]
+
+    with pytest.raises(decision_requests.DecisionRequestError, match="cannot carry Decision"):
+        decision_requests.resolve_request(
+            conn,
+            request_id=request["request_id"],
+            response_id="human-response-wrong",
+            decision_id="decision-wrong",
+            decision="approve",
+            decided_by="architect-human",
+            identity_assurance="declared",
+            expected_revision=1,
+            idempotency_key=_id("wrong"),
+            response_text="Information seulement.",
+        )
+
+
+def test_decision_request_cannot_be_resolved_as_human_response(conn) -> None:
+    project_id = _project(conn)
+    _scoped_issue(conn, project_id)
+    request = decision_requests.create_request(conn, **_request_kwargs())["decision_request"]
+
+    with pytest.raises(decision_requests.DecisionRequestError, match="cannot carry response_id"):
+        decision_requests.resolve_request(
+            conn,
+            request_id=request["request_id"],
+            response_id="human-response-wrong",
+            decision_id="decision-right",
+            decision="approve",
+            decided_by="architect-human",
+            identity_assurance="declared",
+            expected_revision=1,
+            idempotency_key=_id("wrong"),
+            selected_option_ids=["option-zinc"],
+        )
+
+
+def test_question_decision_value_mode_is_refused_for_new_requests(conn) -> None:
+    _project(conn)
+    values = _question_kwargs()
+    values["response_mode"] = "decision_value"
+    with pytest.raises(decision_requests.DecisionRequestError, match="cannot use decision_value"):
+        decision_requests.create_request(conn, **values)
+
+
+def test_decision_resolution_replay_is_idempotent(conn) -> None:
     project_id = _project(conn)
     _scoped_issue(conn, project_id)
     request = decision_requests.create_request(conn, **_request_kwargs())["decision_request"]
@@ -259,6 +383,25 @@ def test_resolution_replay_is_idempotent(conn) -> None:
         selected_option_ids=["option-zinc"],
     )
     assert replay["decision_record"]["decision_id"] == first["decision_record"]["decision_id"]
+    assert len(replay["events"]) == len(first["events"])
+
+
+def test_human_response_replay_is_idempotent(conn) -> None:
+    _project(conn)
+    request = decision_requests.create_request(conn, **_question_kwargs())["decision_request"]
+    key = _id("respond")
+    kwargs = dict(
+        request_id=request["request_id"],
+        response_id="human-response-one",
+        decided_by="architect-human",
+        identity_assurance="declared",
+        expected_revision=1,
+        idempotency_key=key,
+        response_text="Conserver l’existant.",
+    )
+    first = decision_requests.resolve_request(conn, **kwargs)
+    replay = decision_requests.resolve_request(conn, **kwargs)
+    assert replay["human_response"]["response_id"] == first["human_response"]["response_id"]
     assert len(replay["events"]) == len(first["events"])
 
 
@@ -294,7 +437,7 @@ def test_response_mode_and_revision_are_enforced(conn) -> None:
         )
 
 
-def test_cancellation_removes_attention_without_recording_a_decision(conn) -> None:
+def test_cancellation_removes_attention_without_recording_resolution(conn) -> None:
     project_id = _project(conn)
     _scoped_issue(conn, project_id)
     request = decision_requests.create_request(conn, **_request_kwargs())["decision_request"]
@@ -307,6 +450,7 @@ def test_cancellation_removes_attention_without_recording_a_decision(conn) -> No
         rationale="La question est devenue sans objet.",
     )
     assert cancelled["decision_request"]["status"] == "cancelled"
+    assert cancelled["human_response"] is None
     assert cancelled["decision_record"] is None
     assert cancelled["attention_required"] is False
 
@@ -335,8 +479,50 @@ def test_decision_material_and_events_are_immutable(conn) -> None:
     conn.rollback()
     event_id = resolved["events"][-1]["event_id"]
     with pytest.raises(psycopg.errors.RaiseException, match="immutable"):
+        conn.execute("DELETE FROM agency_decision_events WHERE event_id = %s", (event_id,))
+    conn.rollback()
+
+
+def test_human_response_is_immutable(conn) -> None:
+    _project(conn)
+    request = decision_requests.create_request(conn, **_question_kwargs())["decision_request"]
+    decision_requests.resolve_request(
+        conn,
+        request_id=request["request_id"],
+        response_id="human-response-immutable",
+        decided_by="architect-human",
+        identity_assurance="declared",
+        expected_revision=1,
+        idempotency_key=_id("respond"),
+        response_text="Conserver l’existant.",
+    )
+
+    with pytest.raises(psycopg.errors.RaiseException, match="immutable"):
         conn.execute(
-            "DELETE FROM agency_decision_events WHERE event_id = %s",
-            (event_id,),
+            "UPDATE agency_human_responses SET response_text = 'rewritten' "
+            "WHERE response_id = 'human-response-immutable'"
+        )
+    conn.rollback()
+
+
+def test_database_rejects_decision_record_for_question(conn) -> None:
+    _project(conn)
+    request = decision_requests.create_request(conn, **_question_kwargs())["decision_request"]
+
+    with pytest.raises(psycopg.errors.RaiseException, match="resolve to HumanResponse"):
+        conn.execute(
+            """
+            INSERT INTO agency_decision_records (
+                decision_id, request_id, applies_to, decision, decided_by,
+                identity_assurance, candidate_digest, decision_surface
+            ) VALUES (%s, %s, %s, 'approve', 'architect-human', 'declared', %s, %s)
+            """,
+            (
+                "decision-illegal",
+                request["request_id"],
+                request["request_id"],
+                request["candidate_digest"]["value"],
+                request["decision_surface"],
+            ),
         )
     conn.rollback()

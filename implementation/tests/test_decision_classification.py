@@ -26,6 +26,7 @@ def conn():
             agency_data.MIGRATION,
             work_issue_scopes.MIGRATION,
             decision_requests.MIGRATION,
+            decision_requests.HUMAN_RESPONSE_MIGRATION,
         ):
             connection.execute(migration.read_text(encoding="utf-8"))
         connection.commit()
@@ -39,13 +40,18 @@ def _id(prefix: str) -> str:
     return f"{prefix}-{uuid.uuid4().hex}"
 
 
-def _request_kwargs(*, request_id: str, project_ref: str | None) -> dict:
+def _request_kwargs(
+    *,
+    request_id: str,
+    project_ref: str | None,
+    decision_type: str = "question",
+) -> dict:
     return {
         "request_id": request_id,
-        "decision_type": "question",
+        "decision_type": decision_type,
         "question": "Cette demande doit-elle être classée ?",
         "priority": "normal",
-        "response_mode": "decision_value",
+        "response_mode": "free_text" if decision_type == "question" else "decision_value",
         "blocking": False,
         "candidate_ref": _id("candidate"),
         "candidate_digest": "a" * 64,
@@ -111,7 +117,11 @@ def test_decision_scope_resolves_a_decision_record_not_agency_decision(conn) -> 
 
     request = decision_requests.create_request(
         conn,
-        **_request_kwargs(request_id=request_id, project_ref=project_id),
+        **_request_kwargs(
+            request_id=request_id,
+            project_ref=project_id,
+            decision_type="validation",
+        ),
     )["decision_request"]
     decision_requests.resolve_request(
         conn,
