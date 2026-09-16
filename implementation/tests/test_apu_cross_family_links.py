@@ -33,6 +33,7 @@ def conn():
         agency_data.MIGRATION,
         apu_owner.MIGRATION,
         decision_requests.MIGRATION,
+        decision_requests.HUMAN_RESPONSE_MIGRATION,
         execution_results.MIGRATION,
         agency_claims.MIGRATION,
         apu_cross_family.MIGRATION,
@@ -41,7 +42,8 @@ def conn():
     connection.execute(
         """
         TRUNCATE agency_decision_request_scope_refs,
-                 agency_decision_events, agency_decision_records,
+                 agency_decision_events, agency_human_responses,
+                 agency_decision_records,
                  agency_decision_options, agency_decision_requests,
                  agency_project_claims,
                  execution_result_review_dispositions,
