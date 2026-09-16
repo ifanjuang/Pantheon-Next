@@ -12,6 +12,10 @@ from __future__ import annotations
 from typing import Any
 
 
+class PolicyRequestError(ValueError):
+    """A policy request cannot preserve the required governance boundary."""
+
+
 _REQUEST_FIELDS = frozenset(
     {
         "intent",
@@ -68,12 +72,63 @@ _DIRECT_HUMAN_EFFECT_INTENTS = frozenset(
     }
 )
 
+# A direct-human consequential effect consumes an independently authored signed
+# decision. The effect owner may derive the expectation it must satisfy, but it
+# may not manufacture any of these decision fields on the human's behalf.
+_DIRECT_HUMAN_DECISION_FIELDS = frozenset(
+    {
+        "decision_id",
+        "decided_by",
+        "approval_level",
+        "scope",
+        "object_identity",
+        "content_digest",
+        "expires_at",
+        "signature",
+    }
+)
+
 # Issue #664 qualification fixture. Only this synthetic intent carries the
 # already-bound human decision into preflight so Pantheon can compose signed
 # gate validation before emitting the one bounded external-effect permission.
 # Real adapters remain on their existing transport contract until separately
 # qualified.
 _QUALIFICATION_EXTERNAL_EFFECT_INTENT = "qualification_external_effect"
+
+
+def _candidate_intent(candidate: dict[str, Any]) -> str:
+    request = candidate.get("request")
+    if isinstance(request, dict) and request.get("intent") not in (None, ""):
+        return str(request["intent"]).strip()
+    return str(
+        candidate.get("intent")
+        or candidate.get("effect_kind")
+        or candidate.get("action")
+        or ""
+    ).strip()
+
+
+def requires_authenticated_human_decision(candidate: dict[str, Any]) -> bool:
+    """Whether this closed direct-human effect class requires issuer proof."""
+    return _candidate_intent(candidate) in _DIRECT_HUMAN_EFFECT_INTENTS
+
+
+def _require_independent_direct_human_decision(
+    candidate: dict[str, Any],
+    decision: dict[str, Any],
+) -> None:
+    if not requires_authenticated_human_decision(candidate):
+        return
+    missing = sorted(
+        field
+        for field in _DIRECT_HUMAN_DECISION_FIELDS
+        if decision.get(field) in (None, "")
+    )
+    if missing:
+        raise PolicyRequestError(
+            "direct human consequential effect requires a complete independently "
+            "authored signed decision; missing: " + ", ".join(missing)
+        )
 
 
 def _scope_from_decision(decision_payload: dict[str, Any]) -> dict[str, Any] | None:
@@ -113,13 +168,15 @@ def bind_decision_payload(
     candidate: dict[str, Any],
     decision_payload: dict[str, Any],
 ) -> dict[str, Any]:
-    """Bind decision validation to PEP-owned effect facts when provided.
+    """Bind an independent human decision to PEP-owned effect facts.
 
     ``decision`` remains caller-provided because it represents the human choice
-    reference. ``expectation`` is different: it states what the effect actually
-    requires. When an adapter supplies ``decision_expectation`` those fields are
-    authoritative for this execution attempt and caller-supplied expectation
-    values cannot override them.
+    itself. For the closed direct-human consequential class it must already be
+    complete and signed before the effect owner sees it. ``expectation`` is
+    different: it states what the effect actually requires. When an adapter
+    supplies ``decision_expectation`` those fields are authoritative for this
+    execution attempt and caller-supplied expectation values cannot override
+    them.
 
     Backward compatibility is deliberately narrow: adapters that have not yet
     supplied ``decision_expectation`` retain their existing caller expectation.
@@ -128,15 +185,17 @@ def bind_decision_payload(
     """
 
     if not isinstance(decision_payload, dict):
-        raise ValueError("decision_payload must be a mapping")
+        raise PolicyRequestError("decision_payload must be a mapping")
     decision = decision_payload.get("decision")
     if not isinstance(decision, dict):
-        raise ValueError("decision_payload.decision must be a mapping")
+        raise PolicyRequestError("decision_payload.decision must be a mapping")
+
+    _require_independent_direct_human_decision(candidate, decision)
 
     explicit = candidate.get("decision_expectation")
     if explicit is not None:
         if not isinstance(explicit, dict):
-            raise ValueError("candidate.decision_expectation must be a mapping")
+            raise PolicyRequestError("candidate.decision_expectation must be a mapping")
         expectation = {
             key: explicit[key]
             for key in _EXPECTATION_FIELDS
@@ -144,13 +203,13 @@ def bind_decision_payload(
         }
         missing = sorted(_EXPECTATION_FIELDS - set(expectation))
         if missing:
-            raise ValueError(
+            raise PolicyRequestError(
                 "candidate.decision_expectation is incomplete: " + ", ".join(missing)
             )
     else:
         caller_expectation = decision_payload.get("expectation")
         if not isinstance(caller_expectation, dict):
-            raise ValueError("decision_payload.expectation must be a mapping")
+            raise PolicyRequestError("decision_payload.expectation must be a mapping")
         expectation = dict(caller_expectation)
 
     return {
@@ -187,7 +246,7 @@ def build_preflight_payload(
 
     explicit_request = candidate.get("request")
     if explicit_request is not None and not isinstance(explicit_request, dict):
-        raise ValueError("candidate.request must be a mapping")
+        raise PolicyRequestError("candidate.request must be a mapping")
 
     source_request = explicit_request or {}
     request: dict[str, Any] = {
@@ -246,7 +305,7 @@ def build_preflight_payload(
 
     explicit_signals = candidate.get("gate_signals")
     if explicit_signals is not None and not isinstance(explicit_signals, dict):
-        raise ValueError("candidate.gate_signals must be a mapping")
+        raise PolicyRequestError("candidate.gate_signals must be a mapping")
 
     source_signals = explicit_signals or {}
     gate_signals: dict[str, Any] = {
@@ -273,7 +332,7 @@ def build_preflight_payload(
         decision = decision_payload.get("decision")
         expectation = decision_payload.get("expectation")
         if not isinstance(decision, dict) or not isinstance(expectation, dict):
-            raise ValueError(
+            raise PolicyRequestError(
                 "qualification_external_effect requires a bound decision validation payload"
             )
         payload["decision_validation"] = {
