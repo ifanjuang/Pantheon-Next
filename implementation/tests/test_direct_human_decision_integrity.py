@@ -47,7 +47,7 @@ def test_bare_decision_reference_cannot_be_upgraded_by_the_effect_owner() -> Non
 
     assert verdict.allowed is False
     assert verdict.disposition == "blocked_invalid_decision_envelope"
-    assert "complete independently authored signed decision" in verdict.reasons[0]
+    assert "complete substantive decision envelope" in verdict.reasons[0]
     assert client.last_preflight is None
     assert client.last_decision is None
 
