@@ -316,6 +316,7 @@ def test_question_cannot_be_resolved_as_decision(conn) -> None:
         decision_requests.resolve_request(
             conn,
             request_id=request["request_id"],
+            response_id="human-response-wrong",
             decision_id="decision-wrong",
             decision="approve",
             decided_by="architect-human",
