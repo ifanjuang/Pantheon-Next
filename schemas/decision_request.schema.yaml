@@ -2,10 +2,11 @@ $schema: "https://json-schema.org/draft/2020-12/schema"
 title: Pantheon Decision Request
 description: >-
   Human-attention Gate describing a question, validation, approval or arbitration
-  that requires a human determination. Resolving the Gate creates a separate
-  decision_record. The request is not itself a Decision and cannot authorize or
-  resume execution. Optional scope_refs let the same request concern reviewed APU
-  object identities without creating an APU relation or transferring authority.
+  that requires human input. Resolving a question creates a separate HumanResponse;
+  resolving a validation, approval or arbitration creates a separate decision_record.
+  The request is not itself a Decision and cannot authorize or resume execution.
+  Optional scope_refs let the same request concern reviewed APU object identities
+  without creating an APU relation or transferring authority.
 type: object
 required:
   - request_id
@@ -139,6 +140,9 @@ properties:
   resolved_decision_ref:
     type: [string, "null"]
     pattern: "^[a-z0-9][a-z0-9._-]*$"
+  resolved_response_ref:
+    type: [string, "null"]
+    pattern: "^[a-z0-9][a-z0-9._-]*$"
   resolved_at:
     type: [string, "null"]
     format: date-time
@@ -206,8 +210,36 @@ allOf:
       properties:
         status:
           const: resolved
+        decision_type:
+          const: question
       required:
         - status
+        - decision_type
+    then:
+      required:
+        - resolved_response_ref
+        - resolved_at
+      properties:
+        resolved_response_ref:
+          type: string
+          pattern: "^[a-z0-9][a-z0-9._-]*$"
+        resolved_decision_ref:
+          type: "null"
+        resolved_at:
+          type: string
+          format: date-time
+  - if:
+      properties:
+        status:
+          const: resolved
+        decision_type:
+          enum:
+            - validation
+            - approval
+            - arbitration
+      required:
+        - status
+        - decision_type
     then:
       required:
         - resolved_decision_ref
@@ -216,12 +248,24 @@ allOf:
         resolved_decision_ref:
           type: string
           pattern: "^[a-z0-9][a-z0-9._-]*$"
+        resolved_response_ref:
+          type: "null"
         resolved_at:
           type: string
           format: date-time
-    else:
+  - if:
+      properties:
+        status:
+          enum:
+            - pending
+            - cancelled
+      required:
+        - status
+    then:
       properties:
         resolved_decision_ref:
+          type: "null"
+        resolved_response_ref:
           type: "null"
         resolved_at:
           type: "null"
@@ -310,7 +354,9 @@ $defs:
     additionalProperties: false
 x-decision-request-rules:
   one_active_blocking_request_per_work_issue: true
-  resolution_creates_separate_decision_record: true
+  question_resolution_creates_human_response: true
+  decision_resolution_creates_separate_decision_record: true
+  resolution_reference_is_type_driven: true
   pending_requests_are_attention_items: true
   global_and_project_views_preserve_request_identity: true
   global_decisions_view_contains_only_unclassified_requests: true
@@ -324,6 +370,8 @@ x-boundary:
   request_is_decision: false
   request_is_approval: false
   agency_decision_owner: false
+  human_response_is_decision: false
+  human_response_is_authorization: false
   decision_record_is_execution: false
   decision_record_is_result_validation: false
   scope_ref_is_semantic_relation: false

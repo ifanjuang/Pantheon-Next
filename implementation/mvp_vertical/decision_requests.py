@@ -1,8 +1,9 @@
-"""Human-attention Decision Requests and immutable Decision records.
+"""Human-attention Decision Requests with typed immutable resolutions.
 
-A Decision Request is an unresolved Gate. A Decision record is a separate human
-determination. Neither object transitions a WorkIssue, resumes Hermes, admits
-Evidence or proves an external effect.
+A Decision Request is an unresolved Gate. Questions resolve to HumanResponse;
+validation, approval and arbitration resolve to Decision records. None of these
+objects transitions a WorkIssue, resumes Hermes, admits Evidence or proves an
+external effect merely because it was recorded.
 """
 
 from __future__ import annotations
@@ -23,7 +24,11 @@ from . import pantheon_contracts
 
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "018_decision_requests.sql"
+HUMAN_RESPONSE_MIGRATION = (
+    Path(__file__).resolve().parent / "sql" / "038_human_response_resolution.sql"
+)
 REQUEST_SCHEMA = pantheon_contracts.schema_path("decision_request")
+RESPONSE_SCHEMA = pantheon_contracts.schema_path("human_response")
 DECISION_SCHEMA = pantheon_contracts.schema_path("mvp_governed_loop_objects")
 
 DECISION_VALUES = frozenset({"approve", "refuse", "request_revision", "request_more_evidence"})
@@ -41,6 +46,10 @@ class DecisionRequestNotFound(DecisionRequestError):
 
 
 class DecisionRecordNotFound(DecisionRequestError):
+    pass
+
+
+class HumanResponseNotFound(DecisionRequestError):
     pass
 
 
@@ -78,6 +87,14 @@ def _load_schema(path: Path) -> dict[str, Any]:
 def _request_validator() -> jsonschema.Draft202012Validator:
     return jsonschema.Draft202012Validator(
         _load_schema(REQUEST_SCHEMA),
+        format_checker=jsonschema.FormatChecker(),
+    )
+
+
+@lru_cache(maxsize=1)
+def _response_validator() -> jsonschema.Draft202012Validator:
+    return jsonschema.Draft202012Validator(
+        _load_schema(RESPONSE_SCHEMA),
         format_checker=jsonschema.FormatChecker(),
     )
 
@@ -171,6 +188,15 @@ def _decision_row(conn: psycopg.Connection, decision_id: str) -> dict[str, Any]:
     return dict(row)
 
 
+def _response_row(conn: psycopg.Connection, response_id: str) -> dict[str, Any]:
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute("SELECT * FROM agency_human_responses WHERE response_id = %s", (response_id,))
+        row = cur.fetchone()
+    if row is None:
+        raise HumanResponseNotFound(f"unknown HumanResponse: {response_id}")
+    return dict(row)
+
+
 def _options(conn: psycopg.Connection, request_id: str) -> list[dict[str, Any]]:
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
@@ -190,7 +216,8 @@ def _events(conn: psycopg.Connection, request_id: str) -> list[dict[str, Any]]:
         cur.execute(
             """
             SELECT event_id, request_id AS request_ref, decision_id AS decision_ref,
-                   event_type, actor, expected_revision, resulting_revision,
+                   response_id AS response_ref, event_type, actor,
+                   expected_revision, resulting_revision,
                    idempotency_key, payload, occurred_at
               FROM agency_decision_events
              WHERE request_id = %s
@@ -238,6 +265,7 @@ def _request_projection(row: dict[str, Any], options: list[dict[str, Any]]) -> d
         "created_at": request["created_at"],
         "revision": request["revision"],
         "resolved_decision_ref": request.get("resolved_decision_id"),
+        "resolved_response_ref": request.get("resolved_response_id"),
         "resolved_at": request.get("resolved_at"),
         "cancelled_by": request.get("cancelled_by"),
         "cancelled_at": request.get("cancelled_at"),
@@ -246,6 +274,26 @@ def _request_projection(row: dict[str, Any], options: list[dict[str, Any]]) -> d
         _request_validator().validate(projection)
     except jsonschema.ValidationError as exc:
         raise DecisionRequestError(f"stored Decision Request violates its governed contract: {exc}") from exc
+    return projection
+
+
+def _human_response_projection(row: dict[str, Any]) -> dict[str, Any]:
+    response = _clean(row)
+    projection = {
+        "response_id": response["response_id"],
+        "request_id": response["request_id"],
+        "responded_by": response["responded_by"],
+        "identity_assurance": response["identity_assurance"],
+        "authenticated_principal": response.get("authenticated_principal"),
+        "selected_option_ids": response.get("selected_option_ids") or [],
+        "response_text": response.get("response_text"),
+        "candidate_digest": _digest(response["candidate_digest"]),
+        "recorded_at": response["recorded_at"],
+    }
+    try:
+        _response_validator().validate(projection)
+    except jsonschema.ValidationError as exc:
+        raise DecisionRequestError(f"stored HumanResponse violates its governed contract: {exc}") from exc
     return projection
 
 
@@ -285,6 +333,11 @@ def _decision_projection(row: dict[str, Any]) -> dict[str, Any]:
 def get_request(conn: psycopg.Connection, request_id: str) -> dict[str, Any]:
     row = _request_row(conn, request_id)
     request = _request_projection(row, _options(conn, request_id))
+    response = (
+        _human_response_projection(_response_row(conn, row["resolved_response_id"]))
+        if row.get("resolved_response_id")
+        else None
+    )
     decision = (
         _decision_projection(_decision_row(conn, row["resolved_decision_id"]))
         if row.get("resolved_decision_id")
@@ -292,11 +345,23 @@ def get_request(conn: psycopg.Connection, request_id: str) -> dict[str, Any]:
     )
     return {
         "decision_request": request,
+        "human_response": response,
         "decision_record": decision,
         "events": _events(conn, request_id),
         "attention_required": request["status"] == "pending",
         "request_is_not_decision": True,
+        "human_response_is_not_decision": True,
+        "resolution_is_not_authorization": True,
         "decision_is_not_execution": True,
+    }
+
+
+def get_response(conn: psycopg.Connection, response_id: str) -> dict[str, Any]:
+    return {
+        "human_response": _human_response_projection(_response_row(conn, response_id)),
+        "human_response_is_not_decision": True,
+        "response_is_not_authorization": True,
+        "response_is_not_evidence": True,
     }
 
 
@@ -339,16 +404,17 @@ def _insert_event(
     idempotency_key: str,
     payload: dict[str, Any],
     decision_id: str | None = None,
+    response_id: str | None = None,
 ) -> None:
     conn.execute(
         """
         INSERT INTO agency_decision_events (
-            event_id, request_id, decision_id, event_type, actor,
+            event_id, request_id, decision_id, response_id, event_type, actor,
             expected_revision, resulting_revision, idempotency_key, payload
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb)
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb)
         """,
         (
-            _event_id(), request_id, decision_id, event_type, actor,
+            _event_id(), request_id, decision_id, response_id, event_type, actor,
             expected_revision, expected_revision + 1, idempotency_key,
             json.dumps(payload, sort_keys=True, separators=(",", ":")),
         ),
@@ -388,6 +454,8 @@ def create_request(
         raise DecisionRequestError(f"unsupported priority: {priority!r}")
     if response_mode not in RESPONSE_MODES:
         raise DecisionRequestError(f"unsupported response_mode: {response_mode!r}")
+    if decision_type == "question" and response_mode == "decision_value":
+        raise DecisionRequestError("question Decision Requests cannot use decision_value response mode")
     question = str(question).strip()
     if not question:
         raise DecisionRequestError("Decision Request question is required")
@@ -499,7 +567,47 @@ def create_request(
         return get_request(conn, request_id)
 
 
-def _validate_response(
+def _selected_and_response(
+    *,
+    request: dict[str, Any],
+    selected_option_ids: Iterable[str] | None,
+    response_text: str | None,
+) -> tuple[list[str], str | None]:
+    selected = _string_list(selected_option_ids, field="selected_option_ids")
+    response = str(response_text).strip() if response_text else None
+    option_ids = {option["option_id"] for option in request.get("options") or []}
+    unknown = [option_id for option_id in selected if option_id not in option_ids]
+    if unknown:
+        raise DecisionRequestError(f"unknown selected Decision option: {unknown[0]}")
+    return selected, response
+
+
+def _validate_human_response(
+    *,
+    request: dict[str, Any],
+    selected_option_ids: Iterable[str] | None,
+    response_text: str | None,
+) -> tuple[list[str], str | None]:
+    selected, response = _selected_and_response(
+        request=request,
+        selected_option_ids=selected_option_ids,
+        response_text=response_text,
+    )
+    mode = request["response_mode"]
+    if mode == "decision_value":
+        raise DecisionRequestError("question Decision Requests cannot resolve with decision_value")
+    if mode == "single_option" and len(selected) != 1:
+        raise DecisionRequestError("single-option question requires exactly one option")
+    if mode == "multiple_options" and not selected:
+        raise DecisionRequestError("multiple-option question requires at least one option")
+    if mode == "free_text" and not response:
+        raise DecisionRequestError("free-text question requires a response")
+    if mode in {"single_option", "multiple_options"} and response:
+        raise DecisionRequestError("option question cannot also carry a free-text response")
+    return selected, response
+
+
+def _validate_decision_response(
     *,
     request: dict[str, Any],
     decision: str,
@@ -508,12 +616,11 @@ def _validate_response(
 ) -> tuple[list[str], str | None]:
     if decision not in DECISION_VALUES:
         raise DecisionRequestError(f"unsupported decision value: {decision!r}")
-    selected = _string_list(selected_option_ids, field="selected_option_ids")
-    response = str(response_text).strip() if response_text else None
-    option_ids = {option["option_id"] for option in request.get("options") or []}
-    unknown = [option_id for option_id in selected if option_id not in option_ids]
-    if unknown:
-        raise DecisionRequestError(f"unknown selected Decision option: {unknown[0]}")
+    selected, response = _selected_and_response(
+        request=request,
+        selected_option_ids=selected_option_ids,
+        response_text=response_text,
+    )
     if decision == "approve":
         mode = request["response_mode"]
         if mode == "single_option" and len(selected) != 1:
@@ -529,21 +636,10 @@ def _validate_response(
     return selected, response
 
 
-def resolve_request(
-    conn: psycopg.Connection,
-    *,
-    request_id: str,
-    decision_id: str,
-    decision: str,
-    decided_by: str,
+def _validate_identity(
     identity_assurance: str,
-    expected_revision: int,
-    idempotency_key: str,
-    selected_option_ids: Iterable[str] | None = None,
-    response_text: str | None = None,
-    authenticated_principal: dict[str, Any] | None = None,
-    rationale: str | None = None,
-) -> dict[str, Any]:
+    authenticated_principal: dict[str, Any] | None,
+) -> None:
     if identity_assurance not in {"declared", "authenticated"}:
         raise DecisionRequestError("identity_assurance must be declared or authenticated")
     if identity_assurance == "authenticated":
@@ -554,19 +650,133 @@ def resolve_request(
     elif authenticated_principal is not None:
         raise DecisionRequestError("declared identity assurance cannot carry authenticated_principal")
 
+
+def _check_pending_revision(row: dict[str, Any], expected_revision: int) -> None:
+    if row["status"] != "pending":
+        raise DecisionRequestConflict("Decision Request is no longer pending")
+    if row["revision"] != expected_revision:
+        raise StaleDecisionRequest(
+            f"stale Decision Request revision: expected {expected_revision}, current {row['revision']}"
+        )
+
+
+def resolve_request(
+    conn: psycopg.Connection,
+    *,
+    request_id: str,
+    decided_by: str,
+    identity_assurance: str,
+    expected_revision: int,
+    idempotency_key: str,
+    decision_id: str | None = None,
+    response_id: str | None = None,
+    decision: str | None = None,
+    selected_option_ids: Iterable[str] | None = None,
+    response_text: str | None = None,
+    authenticated_principal: dict[str, Any] | None = None,
+    rationale: str | None = None,
+) -> dict[str, Any]:
+    _validate_identity(identity_assurance, authenticated_principal)
+    actor = str(decided_by).strip()
+    if not actor:
+        raise DecisionRequestError("human actor is required")
+
     with conn.transaction():
         row = _request_row(conn, request_id, lock=True)
         request = _request_projection(row, _options(conn, request_id))
-        selected, response = _validate_response(
+
+        if request["decision_type"] == "question":
+            response_identity = str(response_id or "").strip()
+            if not response_identity:
+                raise DecisionRequestError("question resolution requires response_id")
+            if decision_id is not None or decision is not None:
+                raise DecisionRequestError("question resolution cannot carry Decision identity or value")
+            if rationale is not None and str(rationale).strip():
+                raise DecisionRequestError("question resolution cannot carry Decision rationale")
+            selected, response = _validate_human_response(
+                request=request,
+                selected_option_ids=selected_option_ids,
+                response_text=response_text,
+            )
+            payload = {
+                "response_id": response_identity,
+                "responded_by": actor,
+                "selected_option_ids": selected,
+                "response_text": response,
+                "identity_assurance": identity_assurance,
+                "authenticated_principal": authenticated_principal,
+                "candidate_digest": request["candidate_digest"],
+            }
+            if _event_replayed(
+                conn,
+                request_id=request_id,
+                event_type="request_resolved",
+                idempotency_key=idempotency_key,
+                payload=payload,
+            ):
+                return get_request(conn, request_id)
+            _check_pending_revision(row, expected_revision)
+            try:
+                conn.execute(
+                    """
+                    INSERT INTO agency_human_responses (
+                        response_id, request_id, responded_by, identity_assurance,
+                        authenticated_principal, selected_option_ids, response_text,
+                        candidate_digest
+                    ) VALUES (%s, %s, %s, %s, %s::jsonb, %s::jsonb, %s, %s)
+                    """,
+                    (
+                        response_identity,
+                        request_id,
+                        actor,
+                        identity_assurance,
+                        json.dumps(authenticated_principal) if authenticated_principal else None,
+                        json.dumps(selected),
+                        response,
+                        request["candidate_digest"]["value"],
+                    ),
+                )
+                conn.execute(
+                    """
+                    UPDATE agency_decision_requests
+                       SET status = 'resolved', resolved_response_id = %s,
+                           resolved_at = clock_timestamp(), revision = revision + 1,
+                           updated_at = clock_timestamp()
+                     WHERE request_id = %s AND status = 'pending' AND revision = %s
+                    """,
+                    (response_identity, request_id, expected_revision),
+                )
+            except psycopg.errors.UniqueViolation as exc:
+                raise DecisionRequestConflict("HumanResponse identity exists or request is already resolved") from exc
+            _insert_event(
+                conn,
+                request_id=request_id,
+                response_id=response_identity,
+                event_type="request_resolved",
+                actor=actor,
+                expected_revision=expected_revision,
+                idempotency_key=idempotency_key,
+                payload=payload,
+            )
+            return get_request(conn, request_id)
+
+        if response_id is not None:
+            raise DecisionRequestError("decision resolution cannot carry response_id")
+        decision_identity = str(decision_id or "").strip()
+        if not decision_identity:
+            raise DecisionRequestError("decision resolution requires decision_id")
+        if decision is None:
+            raise DecisionRequestError("decision resolution requires decision value")
+        selected, response = _validate_decision_response(
             request=request,
             decision=decision,
             selected_option_ids=selected_option_ids,
             response_text=response_text,
         )
         payload = {
-            "decision_id": decision_id,
+            "decision_id": decision_identity,
             "decision": decision,
-            "decided_by": decided_by,
+            "decided_by": actor,
             "selected_option_ids": selected,
             "response_text": response,
             "identity_assurance": identity_assurance,
@@ -582,12 +792,7 @@ def resolve_request(
             payload=payload,
         ):
             return get_request(conn, request_id)
-        if row["status"] != "pending":
-            raise DecisionRequestConflict("Decision Request is no longer pending")
-        if row["revision"] != expected_revision:
-            raise StaleDecisionRequest(
-                f"stale Decision Request revision: expected {expected_revision}, current {row['revision']}"
-            )
+        _check_pending_revision(row, expected_revision)
         consequences = {
             "request_id": request_id,
             "decision_type": request["decision_type"],
@@ -614,8 +819,8 @@ def resolve_request(
                 )
                 """,
                 (
-                    decision_id, request_id, request_id, request.get("evidence_pack_ref"),
-                    decision, decided_by, identity_assurance,
+                    decision_identity, request_id, request_id, request.get("evidence_pack_ref"),
+                    decision, actor, identity_assurance,
                     json.dumps(authenticated_principal) if authenticated_principal else None,
                     request["candidate_digest"]["value"],
                     request["evidence_pack_digest"]["value"] if request.get("evidence_pack_digest") else None,
@@ -631,16 +836,16 @@ def resolve_request(
                        updated_at = clock_timestamp()
                  WHERE request_id = %s AND status = 'pending' AND revision = %s
                 """,
-                (decision_id, request_id, expected_revision),
+                (decision_identity, request_id, expected_revision),
             )
         except psycopg.errors.UniqueViolation as exc:
             raise DecisionRequestConflict("Decision identity exists or request is already resolved") from exc
         _insert_event(
             conn,
             request_id=request_id,
-            decision_id=decision_id,
+            decision_id=decision_identity,
             event_type="request_resolved",
-            actor=decided_by,
+            actor=actor,
             expected_revision=expected_revision,
             idempotency_key=idempotency_key,
             payload=payload,
@@ -671,12 +876,7 @@ def cancel_request(
         ):
             return get_request(conn, request_id)
         row = _request_row(conn, request_id, lock=True)
-        if row["status"] != "pending":
-            raise DecisionRequestConflict("Decision Request is no longer pending")
-        if row["revision"] != expected_revision:
-            raise StaleDecisionRequest(
-                f"stale Decision Request revision: expected {expected_revision}, current {row['revision']}"
-            )
+        _check_pending_revision(row, expected_revision)
         conn.execute(
             """
             UPDATE agency_decision_requests

@@ -90,6 +90,7 @@ def initialize_composed_schema() -> None:
         conn.execute(information_projection.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(work_issue_scopes.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(decision_requests.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(decision_requests.HUMAN_RESPONSE_MIGRATION.read_text(encoding="utf-8"))
         conn.execute(entity_relations.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(agency_change_candidate_review.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(contradictory_review_store.MIGRATION.read_text(encoding="utf-8"))
