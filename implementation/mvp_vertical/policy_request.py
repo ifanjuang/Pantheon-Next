@@ -72,9 +72,11 @@ _DIRECT_HUMAN_EFFECT_INTENTS = frozenset(
     }
 )
 
-# A direct-human consequential effect consumes an independently authored signed
-# decision. The effect owner may derive the expectation it must satisfy, but it
-# may not manufacture any of these decision fields on the human's behalf.
+# These are the substantive fields the PEP needs in order to compare the human
+# decision with the effect expectation it derives. Cryptographic issuer proof
+# (signature, expiry and key verification) belongs to the PDP and is consumed
+# through ``issuer_authenticated``; duplicating that authentication schema here
+# would create a second authority for decision-signature validity.
 _DIRECT_HUMAN_DECISION_FIELDS = frozenset(
     {
         "decision_id",
@@ -83,8 +85,6 @@ _DIRECT_HUMAN_DECISION_FIELDS = frozenset(
         "scope",
         "object_identity",
         "content_digest",
-        "expires_at",
-        "signature",
     }
 )
 
@@ -113,7 +113,7 @@ def requires_authenticated_human_decision(candidate: dict[str, Any]) -> bool:
     return _candidate_intent(candidate) in _DIRECT_HUMAN_EFFECT_INTENTS
 
 
-def _require_independent_direct_human_decision(
+def _require_direct_human_decision_content(
     candidate: dict[str, Any],
     decision: dict[str, Any],
 ) -> None:
@@ -126,8 +126,8 @@ def _require_independent_direct_human_decision(
     )
     if missing:
         raise PolicyRequestError(
-            "direct human consequential effect requires a complete independently "
-            "authored signed decision; missing: " + ", ".join(missing)
+            "direct human consequential effect requires a complete substantive "
+            "decision envelope before PDP authentication; missing: " + ", ".join(missing)
         )
 
 
@@ -168,15 +168,18 @@ def bind_decision_payload(
     candidate: dict[str, Any],
     decision_payload: dict[str, Any],
 ) -> dict[str, Any]:
-    """Bind an independent human decision to PEP-owned effect facts.
+    """Bind a human decision to PEP-owned effect facts.
 
-    ``decision`` remains caller-provided because it represents the human choice
-    itself. For the closed direct-human consequential class it must already be
-    complete and signed before the effect owner sees it. ``expectation`` is
-    different: it states what the effect actually requires. When an adapter
-    supplies ``decision_expectation`` those fields are authoritative for this
-    execution attempt and caller-supplied expectation values cannot override
-    them.
+    ``decision`` carries the human decision content. The closed direct-human
+    consequential class must expose all substantive comparison fields before the
+    PDP is consulted. The PDP remains the single owner of cryptographic issuer
+    authentication; a structurally matching decision is insufficient unless it
+    later returns ``issuer_authenticated=true``.
+
+    ``expectation`` is different: it states what the effect actually requires.
+    When an adapter supplies ``decision_expectation`` those fields are
+    authoritative for this execution attempt and caller-supplied expectation
+    values cannot override them.
 
     Backward compatibility is deliberately narrow: adapters that have not yet
     supplied ``decision_expectation`` retain their existing caller expectation.
@@ -190,7 +193,7 @@ def bind_decision_payload(
     if not isinstance(decision, dict):
         raise PolicyRequestError("decision_payload.decision must be a mapping")
 
-    _require_independent_direct_human_decision(candidate, decision)
+    _require_direct_human_decision_content(candidate, decision)
 
     explicit = candidate.get("decision_expectation")
     if explicit is not None:
