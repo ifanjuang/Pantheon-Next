@@ -81,26 +81,28 @@ def test_runtime_review_keeps_current_runtime_state_non_authoritative() -> None:
     assert "runtime success != authorization" in review
 
 
-def test_functional_profiles_inherit_one_governed_runtime_mode() -> None:
+def test_governed_runtime_is_default_and_profiles_require_real_boundary() -> None:
     readme = _text(PROFILE_README)
     constitution = _text(PROFILE_CONSTITUTION)
     base_rules = _text(BASE_SOUL_RULES)
 
-    assert "functional profiles and runtime modes" in readme.lower()
-    assert "must inherit the `pantheon-governed` runtime mode" in readme
+    assert "## Profile cardinality rule" in readme
+    assert "Role coverage != profile cardinality" in readme
+    assert "The normal governed runtime path is the `pantheon-governed` envelope" in readme
     assert "built-in MEMORY.md injection: off" in readme
     assert "built-in USER.md profile injection: off" in readme
     assert "memory tool: off" in readme
     assert "X-Hermes-Session-Key: not sent" in readme
-    assert "`assistant-personal` is a separate non-governed runtime mode" in readme
-    assert "`default` remains the sticky CLI/UI profile" in readme
-    assert "Hermes does not infer this switch from prompt content" in readme
+    assert "`assistant-personal` is a separate non-governed runtime posture" in readme
+    assert "`default` may remain the sticky CLI/UI profile" in readme
+    assert "prompt content alone does not prove or switch runtime profile state" in readme
     assert "tool_search:" in readme
     assert "An old session retains its frozen system prompt" in readme
     assert "hermes memory off != built-in memory injection off" in readme
     assert "memory tool absent != memory injection disabled" in readme
+    assert "Their presence is compatibility debt, not the target topology" in readme
 
-    assert "## Runtime profile modes" in constitution
+    assert "## Profile admission rule" in constitution
     assert "runtime_mode: pantheon-governed" in constitution
     assert "task_contract_use: required" in constitution
     assert "built_in_memory_injection: off" in constitution
@@ -109,20 +111,23 @@ def test_functional_profiles_inherit_one_governed_runtime_mode() -> None:
     assert "session_memory_key: forbidden" in constitution
     assert "runtime_mode: assistant-personal" in constitution
     assert "task_contract_use: forbidden" in constitution
-    assert "They must not be duplicated into parallel `*-governed` profile families" in constitution
+    assert "One profile per Pantheon Role" in constitution
+    assert "Profiles created only to represent cognitive functions" in constitution
     assert "profile route reachable != profile safe" in constitution
     assert "hermes memory off != built-in memory injection off" in constitution
     assert "memory tool absent != memory injection disabled" in constitution
     assert "runtime_mode: pantheon-governed" in constitution.split("## Kanban handoff convention", 1)[1]
-    assert "A `pantheon-governed` task must not delegate into `assistant-personal`" in constitution
+    assert "must not silently fall back or delegate into this" in constitution
     assert "profile route fell back to default" in constitution
 
-    assert "Any functional profile that receives a Pantheon Task Contract" in base_rules
+    assert "Any Hermes runtime route that receives a Pantheon Task Contract" in base_rules
+    assert "Pantheon Role != Hermes Profile" in base_rules
+    assert "posture changed != profile changed" in base_rules
     assert "built-in `MEMORY.md` prompt injection off" in base_rules
     assert "built-in `USER.md` profile injection off" in base_rules
     assert "memory tool off" in base_rules
     assert "`X-Hermes-Session-Key` absent" in base_rules
-    assert "must remain `not_qualified`" in base_rules
+    assert "route must remain `not_qualified`" in base_rules
 
 
 def test_runtime_card_exposes_each_memory_posture_axis() -> None:
