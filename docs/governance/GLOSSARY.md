@@ -143,7 +143,7 @@ Use `HEPHAISTOS` for the Pantheon Role.
 
 Do not use `HEPHAESTUS` as the canonical Role spelling.
 
-There is no canonical `hephaistos-agent` Hermes profile or `hermes/profiles/hephaistos/` runtime identity. A future profile, if any, must be named for and justified by its actual runtime boundary rather than by the Role name.
+There is no canonical Hermes profile named for HEPHAISTOS. A future profile, if any, must be named for and justified by its actual runtime boundary rather than by the Role name.
 
 ## Bilingual terms (EN ↔ FR)
 
