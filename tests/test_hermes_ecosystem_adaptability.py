@@ -16,6 +16,15 @@ PROFILE_README = PROFILES / "README.md"
 PROFILE_CONSTITUTION = PROFILES / "PROFILE_CONSTITUTION.md"
 BASE_SOUL_RULES = PROFILES / "_base" / "base-soul-rules.md"
 EXTERNAL_PINS = ROOT / "implementation" / "qualification" / "external-pins.json"
+ROLE_ALIGNED_PROFILE_DIRS = (
+    "apollo",
+    "argos",
+    "athena",
+    "hephaistos",
+    "iris",
+    "themis",
+    "zeus",
+)
 
 
 def _text(path: Path) -> str:
@@ -100,7 +109,11 @@ def test_governed_runtime_is_default_and_profiles_require_real_boundary() -> Non
     assert "An old session retains its frozen system prompt" in readme
     assert "hermes memory off != built-in memory injection off" in readme
     assert "memory tool absent != memory injection disabled" in readme
-    assert "Their presence is compatibility debt, not the target topology" in readme
+    assert "## Role-aligned profile retirement" in readme
+    assert "No replacement profile family is created" in readme
+
+    for profile_dir in ROLE_ALIGNED_PROFILE_DIRS:
+        assert not (PROFILES / profile_dir).exists()
 
     assert "## Profile admission rule" in constitution
     assert "runtime_mode: pantheon-governed" in constitution
