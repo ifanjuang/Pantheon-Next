@@ -27,7 +27,9 @@ def test_canonical_role_registry_uses_same_current_boundary() -> None:
     assert "Hermes clients handle runtime interaction" in text
     assert "Hermes Agent executes externally" in text
     assert "Pantheon Cockpit exposes governed projections" in text
-    assert "A selected client or displayed projection does not gain governance authority" in text
+    assert "Pantheon Role != Hermes Profile" in text
+    assert "A selected client, profile, posture, subagent or displayed projection does not gain" in text
+    assert "governance authority" in text
 
 
 def test_mvp_loop_preserves_evidence_and_retention_transition_contracts() -> None:

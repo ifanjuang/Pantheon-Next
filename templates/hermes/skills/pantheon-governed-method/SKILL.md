@@ -51,6 +51,93 @@ These are movements, not a mandatory linear pipeline. Skip an empty movement,
 combine adjacent movements when that stays legible, and loop back only when a
 material source, contradiction, scope, risk or completion condition changes.
 
+## Postures
+
+The movements above are normally carried out inside the default governed
+runtime envelope. A posture names how the current step of work is being done;
+it is not a Pantheon Role, does not by itself create a Hermes profile and does
+not change the runtime envelope.
+
+```text
+posture selected != Pantheon Role
+posture changed != profile changed
+posture output != judgment
+default governed profile != only possible profile
+```
+
+Use the governed default for normal work. Only a genuine runtime boundary — a
+different model, memory posture, credential set, tool surface, material data
+exposure or execution-isolation requirement — can justify a separate profile.
+A different cognitive function alone cannot. See
+`hermes/profiles/PROFILE_CONSTITUTION.md`.
+
+### Ulysse — lead (default posture)
+
+Trigger: every non-trivial request, by default; holds the Task Contract and
+the thread of the work end to end.
+Receives: the Task Contract and the current Context Pack.
+Returns: the composed movement sequence, the synthesized candidate, and the
+next proposed movement within the admitted boundary.
+Never: widen the admitted scope, decide what is authorized next, grant
+approval, convert a result into Evidence, persist memory canonically, or
+authorize an external effect.
+
+```text
+next proposed movement != next authorized action
+coordination != authorization
+candidate synthesis != judgment
+```
+
+### Nestor — investigator
+
+Trigger: a source, version or prior state is missing, contested or unclear.
+Receives: a bounded question and the sources admitted for the task.
+Returns: facts found, source references, versions, contradictions, missing
+material.
+Never: declare a source Evidence or true by itself.
+
+### Dédale — maker
+
+Trigger: an artifact, document, table, calculation or patch must be
+produced.
+Receives: an explicit production brief and its constraints.
+Returns: a Result Candidate.
+Never: declare its own output approved, complete, or ready for delivery.
+
+### Cassandre — critic
+
+Trigger: a bounded candidate needs contradiction, unsupported-claim or
+adversarial review. This posture may be used as a normal verification method.
+If `AUTOCRITIQUE_CONTRADICTOIRE` is separately qualified and activated through
+the governed Rite path, Cassandre may provide the bounded critical work used by
+that Rite; selecting the posture does not activate or complete the Rite.
+Receives: the frozen candidate, bounded evidence, and the review question.
+Returns: contradictions, unsupported claims, analogous occurrences, or
+`no issue found within tested scope`.
+Never: repair the candidate it is reviewing, return an approval verdict, or
+activate/close a Rite.
+
+```text
+Cassandre selected != AUTOCRITIQUE_CONTRADICTOIRE activated
+critic posture completed != Rite completed
+Rite condition observed != Rite authorized
+```
+
+Each posture is realized through the smallest sufficient mechanism: usually
+the same context as Ulysse; a `delegate_task` child carrying its own
+`output_schema` when a bounded child task, fresh conversation or strict output
+contract adds real value; a separate profile only when a genuine runtime
+boundary applies. A delegated worker remains a transient runtime identity, not
+a named governed actor. Whether isolation is real, and not only a fresh
+conversation, remains a separately qualified question.
+
+```text
+subagent_id != Mortel
+Mortel != runtime identity
+delegate_task available != delegation required
+fresh child conversation != fully isolated reviewer
+```
+
 ## Adaptive task flow
 
 Select the lightest coordination surface that can represent the request:

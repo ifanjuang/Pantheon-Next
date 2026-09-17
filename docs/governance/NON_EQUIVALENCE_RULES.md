@@ -54,6 +54,8 @@ schema_valid != approved
 fixture_pass != runtime_success
 validator_success != runtime_success
 claim_extracted != claim_confirmed
+latest != applicable
+retrieved_predecessor != valid_predecessor
 ```
 
 ## Approval and external action
@@ -66,6 +68,7 @@ approve_for_internal_draft != authorize_external_send
 human_review_needed != human_approval_granted
 external_action_possible != external_action_authorized
 send_draft != send_authorization
+effect_executed != outcome_qualified
 ```
 
 ## Memory and register
@@ -114,6 +117,35 @@ reference_review != dependency_approval
 model_passport != model_router
 MCP_passport != tool_authorization
 ```
+
+## Dependency, order and sequencing
+
+```text
+depends_on != execution_order
+dependency_edge != execution_instruction
+dependency_satisfied != approval_granted
+task_completed != downstream_authorized
+scheduled != authorized
+runtime_order != governed_project_chronology
+parallelizable != safe_to_parallelize
+blocked_by != caused_by
+cycle_detected != invalid_dependency
+rite_completed != next_rite_authorized
+```
+
+A dependency relation describes what a governed object needs. It does not compute
+readiness. Whether a predecessor's exit criteria are met remains an APOLLO
+judgment, and whether the next step is permitted remains a THEMIS and approval
+question. Traversing an edge answers neither.
+
+A blocking relation is therefore asserted by a Role, a method or a human. It is not
+derived from state by a traversal. Deriving it would let the graph decide the next
+allowed action, which is the scheduler these rules exist to prevent.
+
+Relation vocabulary remains owned by `PANTHEON_GRAPH_MODEL.md` and, for the
+architecture domain, by `ARCHITECTURAL_PROJECT_GRAPH.md`. This section records the
+status collapses to avoid when those relations are read, not the relations
+themselves.
 
 ## Use in documents
 
