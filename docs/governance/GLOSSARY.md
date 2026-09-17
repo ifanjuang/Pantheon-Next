@@ -25,6 +25,8 @@ A Hermes Profile may execute under Task Contract and produce candidates.
 
 A Hermes Profile must not govern, approve, canonize, promote memory or merge code.
 
+A Hermes Profile is admitted for a demonstrated runtime boundary, not merely to mirror a Pantheon Role or cognitive function.
+
 ### Pantheon Skill
 
 A governed capability contract defined by Pantheon policy.
@@ -49,7 +51,7 @@ It records sources, assumptions, commands, outputs, risks, rollback notes and va
 
 ### Role Signal
 
-A governed signal emitted by a role or profile to request review, escalate risk, report a capability gap or produce a candidate.
+A governed signal emitted by a role or execution surface to request review, escalate risk, report a capability gap or produce a candidate.
 
 ### Registre Probatoire
 
@@ -137,17 +139,11 @@ A Hermes Profile does not replace a Pantheon Role.
 
 ## Canonical spelling
 
-Use:
+Use `HEPHAISTOS` for the Pantheon Role.
 
-- `HEPHAISTOS`
-- `hephaistos-agent`
-- `hermes/profiles/hephaistos/`
+Do not use `HEPHAESTUS` as the canonical Role spelling.
 
-Do not use as canonical spelling:
-
-- `HEPHAESTUS`
-- `hephaestus-agent`
-- `hermes/profiles/hephaestus/`
+There is no canonical Hermes profile named for HEPHAISTOS. A future profile, if any, must be named for and justified by its actual runtime boundary rather than by the Role name.
 
 ## Bilingual terms (EN ↔ FR)
 

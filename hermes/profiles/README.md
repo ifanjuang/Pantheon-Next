@@ -39,36 +39,34 @@ readiness, formulation or arbitration function should normally be expressed
 through a posture, Method, Skill, Capability or bounded delegation inside the
 governed runtime rather than by creating a profile.
 
-## Migration status
+## Role-aligned profile retirement
 
-This directory still contains seven historical Role-aligned execution-profile
-candidates:
+The historical Role-mirrored Hermes profile folders for APOLLO, ARGOS, ATHENA,
+HEPHAISTOS, IRIS, THEMIS and ZEUS have been retired.
 
-```text
-apollo
-argos
-athena
-hephaistos
-iris
-themis
-zeus
-```
+Their audit found no materially distinct model, memory posture, credential set,
+capability surface, data-exposure posture or execution-isolation requirement.
+Their `profile.yaml` and `soul.md` files only restated candidate-output classes,
+approval ceilings and Role responsibilities already owned by Pantheon governance
+and the governed Hermes method.
 
-Their presence is compatibility debt, not the target topology.
-
-They remain candidate-only and non-authoritative while their useful runtime
-differences are reviewed. They may be removed once any materially useful
-capability has been moved to the appropriate Method, Skill, Capability or genuine
-runtime-boundary owner.
+No replacement profile family is created.
 
 ```text
-profile folder exists != profile required
-historical Role alignment != current runtime architecture
-deleting profile shell != deleting useful capability
+retired Role mirror != retired governance Role
+profile shell removed != capability removed
+Role viewpoint needed != profile needed
 ```
 
-No `mnemosyne-agent` profile is required. The same rule now applies to every
-Pantheon Role: governance jurisdiction alone never creates runtime identity.
+Useful work remains available through the governed runtime envelope plus the
+appropriate posture, Method, Skill, Capability or bounded delegation.
+
+No `mnemosyne-agent` profile is required. The same rule applies to every Pantheon
+Role: governance jurisdiction alone never creates runtime identity.
+
+If a future requirement demonstrates a real runtime boundary, a profile may be
+introduced for that boundary. It must not be introduced merely to mirror a Role,
+work posture or cognitive function.
 
 ## Governed runtime envelope
 
