@@ -51,6 +51,65 @@ These are movements, not a mandatory linear pipeline. Skip an empty movement,
 combine adjacent movements when that stays legible, and loop back only when a
 material source, contradiction, scope, risk or completion condition changes.
 
+## Postures
+
+The movements above are carried out inside one governed profile. A posture
+names how the current step of work is being done; it is not a separate
+Hermes profile and does not change the runtime envelope.
+
+```text
+posture selected != Pantheon Role
+posture changed != profile changed
+posture output != judgment
+```
+
+Only a genuine runtime boundary — a different model, memory posture,
+credential set, tool surface or execution-isolation requirement — justifies a
+separate profile. See `hermes/profiles/PROFILE_CONSTITUTION.md`.
+
+### Ulysse — lead (default posture)
+
+Trigger: every non-trivial request, by default; holds the Task Contract and
+the thread of the work end to end.
+Receives: the Task Contract and the current Context Pack.
+Returns: the composed movement sequence, the synthesized candidate, and the
+next allowed action.
+Never: widen the admitted scope, grant approval, convert a result into
+Evidence, persist memory canonically, or authorize an external effect.
+
+### Nestor — investigator
+
+Trigger: a source, version or prior state is missing, contested or unclear.
+Receives: a bounded question and the sources admitted for the task.
+Returns: facts found, source references, versions, contradictions, missing
+material.
+Never: declare a source Evidence or true by itself.
+
+### Dédale — maker
+
+Trigger: an artifact, document, table, calculation or patch must be
+produced.
+Receives: an explicit production brief and its constraints.
+Returns: a Result Candidate.
+Never: declare its own output approved, complete, or ready for delivery.
+
+### Cassandre — critic
+
+Trigger: a candidate looks convincing, or the task is consequential enough
+that `AUTOCRITIQUE_CONTRADICTOIRE` applies.
+Receives: the frozen candidate, bounded evidence, and the review question.
+Returns: contradictions, unsupported claims, analogous occurrences, or
+`no issue found within tested scope`.
+Never: repair the candidate it is reviewing, or return an approval verdict.
+
+Each posture is realized through the smallest sufficient mechanism: usually
+the same context as Ulysse; a `delegate_task` child carrying its own
+`output_schema` when a fresh context or a strict output contract adds real
+value (Cassandre's independent review is the demonstrated case); a separate
+profile only when a genuine runtime boundary applies. Whether the isolation is
+real, and not only a fresh conversation, remains a separately qualified
+question.
+
 ## Adaptive task flow
 
 Select the lightest coordination surface that can represent the request:
