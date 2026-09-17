@@ -13,13 +13,17 @@ def _text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def _flat(text: str) -> str:
+    return " ".join(text.split())
+
+
 def test_governed_runtime_prefers_adaptive_qualified_selection_over_fixed_global_tool_lists() -> None:
     readme = _text(PROFILE_README)
     constitution = _text(PROFILE_CONSTITUTION)
     base = _text(BASE_SOUL_RULES)
 
     assert "qualified observable runtime capability surface" in readme
-    assert "Hermes may choose among the qualified runtime mechanisms" in readme
+    assert "Hermes may choose among qualified runtime mechanisms" in _flat(readme)
     assert "runtime_tool_selection: adaptive_within_admitted_boundary" in constitution
     assert "Hermes chooses execution means" in constitution
     assert "A fixed global tool allowlist as the normal expression of Pantheon governance" in constitution
@@ -38,7 +42,7 @@ def test_adaptive_selection_never_widens_governance_boundary() -> None:
 
     assert "tool available != effect authorized" in constitution
     assert "runtime choice != scope expansion" in base
-    assert "must not silently select it" in constitution
+    assert "Hermes must not silently select it" in _flat(constitution)
     assert "Capability Gap" in constitution
 
     assert "Hermes may decide how to execute inside that boundary" in integration
