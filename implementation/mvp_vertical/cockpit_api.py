@@ -15,7 +15,7 @@ from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import knowledge, store
+from . import decision_requests, knowledge, store
 from .contract import ContractError, resolve_source_within
 from .policy_gate import HttpPolicyClient, PolicyClient
 
@@ -300,8 +300,10 @@ def create_app(
     def knowledge_write(operation):
         try:
             return with_connection(operation)
-        except knowledge.KnowledgeNotFound as exc:
+        except (knowledge.KnowledgeNotFound, decision_requests.DecisionRecordNotFound) as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except decision_requests.DecisionRequestError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
         except knowledge.KnowledgeGatePolicyUnavailable as exc:
             raise HTTPException(status_code=503, detail=str(exc)) from exc
         except (knowledge.StaleKnowledgeWrite, knowledge.IdempotencyConflict) as exc:
@@ -338,13 +340,24 @@ def create_app(
             )
         fields = body.model_dump()
         decision_ref = fields.pop("human_decision_ref")
-        return knowledge_write(
-            lambda conn: knowledge.publish_knowledge(
-                conn, document_id=document_id, policy_client=policy_client,
-                decision_payload={"decision": {"decision_id": decision_ref}},
-                **fields
+
+        def publish(conn):
+            canonical_decision = (
+                decision_requests.policy_decision_payload(
+                    conn, decision_ref or "", expectation={}
+                )
+                if body.review_status == "reviewed" and policy_client is not None
+                else {}
             )
-        )
+            return knowledge.publish_knowledge(
+                conn,
+                document_id=document_id,
+                policy_client=policy_client,
+                decision_payload=canonical_decision,
+                **fields,
+            )
+
+        return knowledge_write(publish)
 
     @app.put("/knowledge/{knowledge_id}")
     def revise_knowledge(
@@ -408,13 +421,24 @@ def create_app(
     ) -> dict:
         fields = body.model_dump()
         decision_ref = fields.pop("human_decision_ref")
-        return knowledge_write(
-            lambda conn: knowledge.apply_edit_request(
-                conn, request_id=request_id, policy_client=policy_client,
-                decision_payload={"decision": {"decision_id": decision_ref}},
-                **fields
+
+        def apply_edit(conn):
+            canonical_decision = (
+                decision_requests.policy_decision_payload(
+                    conn, decision_ref or "", expectation={}
+                )
+                if policy_client is not None
+                else {}
             )
-        )
+            return knowledge.apply_edit_request(
+                conn,
+                request_id=request_id,
+                policy_client=policy_client,
+                decision_payload=canonical_decision,
+                **fields,
+            )
+
+        return knowledge_write(apply_edit)
 
     @app.get("/documents/{document_id}/markdown", response_class=PlainTextResponse)
     def document_markdown(

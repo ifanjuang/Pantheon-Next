@@ -87,6 +87,33 @@ def _bindings(conn, principal_ref: str) -> int:
         return int(cur.fetchone()[0])
 
 
+def _decision_payload(
+    *,
+    principal_ref: str,
+    issuer: str,
+    subject: str,
+    decision_id: str,
+    decided_by: str = "human:architect",
+) -> dict:
+    digest = human_access.binding_digest(
+        principal_ref=principal_ref,
+        issuer=issuer,
+        subject=subject,
+    )
+    return {
+        "decision": {
+            "decision_id": decision_id,
+            "decided_by": decided_by,
+            "approval_level": "C3",
+            "scope": {"scope_type": "human_principal", "scope_id": principal_ref},
+            "object_identity": f"human_oidc_binding:{principal_ref}:{issuer}:{subject}",
+            "content_digest": digest,
+            "expires_at": "2099-01-01T00:00:00Z",
+            "signature": "signed-canonical-decision",
+        }
+    }
+
+
 def test_an_allowed_binding_carries_its_own_digest_to_the_decision_point(conn) -> None:
     principal_ref = _principal(conn)
     client = StandInPolicyClient()
@@ -98,7 +125,13 @@ def test_an_allowed_binding_carries_its_own_digest_to_the_decision_point(conn) -
         subject="subject-1",
         bound_by="human:architect",
         policy_client=client,
-        decision_payload={"decision": {"decision_id": "decision-1"}},
+        decision_payload=_decision_payload(
+            principal_ref=principal_ref,
+            issuer="https://idp.example",
+            subject="subject-1",
+            decision_id="decision-1",
+            decided_by="human:architect",
+        ),
     )
     conn.commit()
 
@@ -138,7 +171,13 @@ def test_a_refused_binding_writes_nothing(conn) -> None:
             subject="subject-2",
             bound_by="human:architect",
             policy_client=client,
-            decision_payload={"decision": {"decision_id": "decision-2"}},
+            decision_payload=_decision_payload(
+            principal_ref=principal_ref,
+            issuer="https://idp.example",
+            subject="subject-2",
+            decision_id="decision-2",
+            decided_by="human:architect",
+        ),
         )
     conn.rollback()
     assert _bindings(conn, principal_ref) == 0, (
@@ -157,7 +196,13 @@ def test_an_unreachable_decision_point_fails_closed(conn) -> None:
             subject="subject-3",
             bound_by="human:architect",
             policy_client=_UnreachablePolicyClient(),
-            decision_payload={"decision": {"decision_id": "decision-3"}},
+            decision_payload=_decision_payload(
+            principal_ref=principal_ref,
+            issuer="https://idp.example",
+            subject="subject-3",
+            decision_id="decision-3",
+            decided_by="human:architect",
+        ),
         )
     conn.rollback()
     assert _bindings(conn, principal_ref) == 0, (
@@ -177,7 +222,13 @@ def test_a_binding_decided_by_a_non_human_is_refused(conn) -> None:
             subject="subject-4",
             bound_by="hermes:profile",
             policy_client=StandInPolicyClient(),
-            decision_payload={"decision": {"decision_id": "decision-4"}},
+            decision_payload=_decision_payload(
+            principal_ref=principal_ref,
+            issuer="https://idp.example",
+            subject="subject-4",
+            decision_id="decision-4",
+            decided_by="hermes:profile",
+        ),
         )
     conn.rollback()
     assert _bindings(conn, principal_ref) == 0

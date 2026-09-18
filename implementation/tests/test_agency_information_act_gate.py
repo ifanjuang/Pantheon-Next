@@ -81,6 +81,36 @@ def _draft(conn, project_id: str) -> dict:
     )
 
 
+def _decision_payload(
+    conn,
+    *,
+    information_id: str,
+    project_id: str,
+    decision_id: str,
+    decided_by: str = "architecte",
+) -> dict:
+    working = agency_information.get_information_context(conn, information_id)["current"]
+    content_digest = agency_information._digest(
+        {
+            key: value
+            for key, value in working.items()
+            if key not in {"status", "acted_at", "revision", "updated_at"}
+        }
+    )
+    return {
+        "decision": {
+            "decision_id": decision_id,
+            "decided_by": decided_by,
+            "approval_level": "C2",
+            "scope": {"scope_type": "project", "scope_id": project_id},
+            "object_identity": f"agency_information:{information_id}",
+            "content_digest": content_digest,
+            "expires_at": "2099-01-01T00:00:00Z",
+            "signature": "signed-canonical-decision",
+        }
+    }
+
+
 def test_acting_needs_no_decision_point_when_enforcement_is_off(conn) -> None:
     """policy_client defaults to None: existing direct callers are unchanged."""
     project = _project(conn)
@@ -98,7 +128,7 @@ def test_acting_needs_no_decision_point_when_enforcement_is_off(conn) -> None:
 def test_acting_is_refused_without_a_decision_reference(conn) -> None:
     project = _project(conn)
     draft = _draft(conn, project["project_id"])
-    with pytest.raises(agency_information.AgencyInformationGateRefused, match="decision reference"):
+    with pytest.raises(agency_information.AgencyInformationGateRefused, match="decision_payload.decision"):
         agency_information.act_working_information(
             conn,
             information_id=draft["information_id"],
@@ -124,7 +154,7 @@ def test_an_allowed_act_carries_the_content_digest_to_the_decision_point(conn) -
         actor_kind="human",
         actor="architecte",
         policy_client=client,
-        decision_payload={"decision": {"decision_id": "decision-1"}},
+        decision_payload=_decision_payload(conn, information_id=draft["information_id"], project_id=project["project_id"], decision_id="decision-1"),
     )
     assert acted["status"] == "acted"
 
@@ -159,7 +189,7 @@ def test_the_act_is_declared_to_the_decision_point_as_a_local_state_write(conn) 
         actor_kind="human",
         actor="architecte",
         policy_client=client,
-        decision_payload={"decision": {"decision_id": "decision-6"}},
+        decision_payload=_decision_payload(conn, information_id=draft["information_id"], project_id=project["project_id"], decision_id="decision-6"),
     )
 
     request = client.last_preflight["request"]
@@ -190,7 +220,7 @@ def test_a_refused_act_leaves_the_version_working_and_retryable(conn) -> None:
             actor_kind="human",
             actor="architecte",
             policy_client=client,
-            decision_payload={"decision": {"decision_id": "decision-2"}},
+            decision_payload=_decision_payload(conn, information_id=draft["information_id"], project_id=project["project_id"], decision_id="decision-2"),
         )
     unchanged = agency_information.get_information_context(conn, draft["information_id"])
     assert unchanged["current"]["status"] in agency_information.WORKING_STATUSES
@@ -211,7 +241,7 @@ def test_an_unreachable_decision_point_fails_closed(conn) -> None:
             actor_kind="human",
             actor="architecte",
             policy_client=_UnreachablePolicyClient(),
-            decision_payload={"decision": {"decision_id": "decision-3"}},
+            decision_payload=_decision_payload(conn, information_id=draft["information_id"], project_id=project["project_id"], decision_id="decision-3"),
         )
     unchanged = agency_information.get_information_context(conn, draft["information_id"])
     assert unchanged["current"]["status"] in agency_information.WORKING_STATUSES
@@ -238,7 +268,7 @@ def test_the_content_digest_changes_with_the_content(conn) -> None:
         actor_kind="human",
         actor="architecte",
         policy_client=client_a,
-        decision_payload={"decision": {"decision_id": "decision-4"}},
+        decision_payload=_decision_payload(conn, information_id=first["information_id"], project_id=project["project_id"], decision_id="decision-4"),
     )
     agency_information.act_working_information(
         conn,
@@ -247,7 +277,7 @@ def test_the_content_digest_changes_with_the_content(conn) -> None:
         actor_kind="human",
         actor="architecte",
         policy_client=client_b,
-        decision_payload={"decision": {"decision_id": "decision-5"}},
+        decision_payload=_decision_payload(conn, information_id=second["information_id"], project_id=project["project_id"], decision_id="decision-5"),
     )
     digest_a = client_a.last_decision["expectation"]["expected_digest"]
     digest_b = client_b.last_decision["expectation"]["expected_digest"]

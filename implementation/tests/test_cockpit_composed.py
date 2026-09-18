@@ -193,7 +193,7 @@ def test_composed_initializer_replays_owner_and_review_migrations_in_dependency_
     cockpit_composed.initialize_composed_schema()
     assert connection.commits == 1
     assert connection.closed is True
-    assert len(connection.statements) == 30
+    assert len(connection.statements) == 31
     assert "CREATE TABLE IF NOT EXISTS agency_apu_objects" in connection.statements[2]
     assert "model_version" in connection.statements[2]
     assert "CREATE TABLE IF NOT EXISTS agency_sources" in connection.statements[3]
@@ -211,21 +211,22 @@ def test_composed_initializer_replays_owner_and_review_migrations_in_dependency_
     assert "CREATE TABLE IF NOT EXISTS work_issue_scope_links" in connection.statements[14]
     assert "CREATE TABLE IF NOT EXISTS agency_decision_requests" in connection.statements[15]
     assert "CREATE TABLE IF NOT EXISTS agency_human_responses" in connection.statements[16]
-    assert "CREATE TABLE IF NOT EXISTS agency_entity_relations" in connection.statements[17]
-    assert "CREATE TABLE IF NOT EXISTS execution_results" in connection.statements[20]
-    assert "project_change_variant" in connection.statements[21]
-    assert "candidate_execution_id" in connection.statements[22]
-    assert "basis_refs" in connection.statements[23]
-    assert "agency_project_claims_validate_candidate_basis_refs" in connection.statements[23]
-    assert "CREATE TABLE IF NOT EXISTS agency_project_claim_conflict_candidates" in connection.statements[24]
-    assert "validate_agency_project_claim_conflict_pair" in connection.statements[24]
-    assert "agency_decision_request_scope_refs" in connection.statements[25]
-    assert "apu_object" in connection.statements[25]
-    assert "CREATE TABLE IF NOT EXISTS knowledge_edit_variants" in connection.statements[26]
-    assert "CREATE TABLE IF NOT EXISTS apu_mapping_review_events" in connection.statements[27]
-    assert "CREATE TABLE IF NOT EXISTS apu_write_command_candidates" in connection.statements[28]
-    assert "expected_owner_revision" in connection.statements[28]
-    assert "agency_apu_source_match_command_once" in connection.statements[29]
+    assert "agency_decision_requests_effect_binding_check" in connection.statements[17]
+    assert "CREATE TABLE IF NOT EXISTS agency_entity_relations" in connection.statements[18]
+    assert "CREATE TABLE IF NOT EXISTS execution_results" in connection.statements[21]
+    assert "project_change_variant" in connection.statements[22]
+    assert "candidate_execution_id" in connection.statements[23]
+    assert "basis_refs" in connection.statements[24]
+    assert "agency_project_claims_validate_candidate_basis_refs" in connection.statements[24]
+    assert "CREATE TABLE IF NOT EXISTS agency_project_claim_conflict_candidates" in connection.statements[25]
+    assert "validate_agency_project_claim_conflict_pair" in connection.statements[25]
+    assert "agency_decision_request_scope_refs" in connection.statements[26]
+    assert "apu_object" in connection.statements[26]
+    assert "CREATE TABLE IF NOT EXISTS knowledge_edit_variants" in connection.statements[27]
+    assert "CREATE TABLE IF NOT EXISTS apu_mapping_review_events" in connection.statements[28]
+    assert "CREATE TABLE IF NOT EXISTS apu_write_command_candidates" in connection.statements[29]
+    assert "expected_owner_revision" in connection.statements[29]
+    assert "agency_apu_source_match_command_once" in connection.statements[30]
 
 
 def test_composed_migrations_are_packaged_under_sql_directory():
@@ -245,6 +246,7 @@ def test_composed_migrations_are_packaged_under_sql_directory():
         (work_issue_scopes.MIGRATION, "016_work_issue_scopes.sql"),
         (decision_requests.MIGRATION, "018_decision_requests.sql"),
         (decision_requests.HUMAN_RESPONSE_MIGRATION, "038_human_response_resolution.sql"),
+        (decision_requests.EFFECT_BINDING_MIGRATION, "039_decision_effect_binding.sql"),
         (entity_relations.MIGRATION, "015_entity_relations.sql"),
         (agency_change_candidate_review.MIGRATION, "005_change_candidate_review.sql"),
         (contradictory_review_store.MIGRATION, "003_contradictory_review_candidates.sql"),

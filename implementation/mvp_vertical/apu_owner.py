@@ -443,18 +443,10 @@ def store_reviewed_dossier(
                 "scope": scope,
             },
         }
-        bound_decision = dict(decision_payload or {})
-        decision = dict(bound_decision.get("decision") or {})
-        decision.setdefault("decided_by", actor)
-        decision.setdefault("approval_level", required_ceiling)
-        decision.setdefault("scope", scope)
-        decision.setdefault(OBJECT_IDENTITY_KEY, dossier_object_ref)
-        decision.setdefault("content_digest", payload_digest)
-        bound_decision["decision"] = decision
-        bound_decision["expectation"] = expectation
-
         verdict = enforce_consequential(
-            policy_client, candidate=candidate, decision_payload=bound_decision
+            policy_client,
+            candidate=candidate,
+            decision_payload=dict(decision_payload or {}),
         )
         if not verdict.allowed:
             message = (

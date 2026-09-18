@@ -4,6 +4,11 @@ A Decision Request is an unresolved Gate. Questions resolve to HumanResponse;
 validation, approval and arbitration resolve to Decision records. None of these
 objects transitions a WorkIssue, resumes Hermes, admits Evidence or proves an
 external effect merely because it was recorded.
+
+A non-question request may bind one exact consequential effect before review.
+Those bounds are copied unchanged into the immutable Decision record. Runtime
+effect owners may compare that Decision with their own EffectExpectation; they
+may not manufacture Decision fields after the human has decided.
 """
 
 from __future__ import annotations
@@ -27,6 +32,9 @@ MIGRATION = Path(__file__).resolve().parent / "sql" / "018_decision_requests.sql
 HUMAN_RESPONSE_MIGRATION = (
     Path(__file__).resolve().parent / "sql" / "038_human_response_resolution.sql"
 )
+EFFECT_BINDING_MIGRATION = (
+    Path(__file__).resolve().parent / "sql" / "039_decision_effect_binding.sql"
+)
 REQUEST_SCHEMA = pantheon_contracts.schema_path("decision_request")
 RESPONSE_SCHEMA = pantheon_contracts.schema_path("human_response")
 DECISION_SCHEMA = pantheon_contracts.schema_path("mvp_governed_loop_objects")
@@ -35,6 +43,7 @@ DECISION_VALUES = frozenset({"approve", "refuse", "request_revision", "request_m
 DECISION_TYPES = frozenset({"question", "validation", "approval", "arbitration"})
 RESPONSE_MODES = frozenset({"decision_value", "single_option", "multiple_options", "free_text"})
 PRIORITIES = frozenset({"low", "normal", "high", "urgent"})
+APPROVAL_LEVELS = frozenset({"C0", "C1", "C2", "C3", "C4", "C5"})
 
 
 class DecisionRequestError(ValueError):
@@ -129,6 +138,62 @@ def _string_list(values: Iterable[str] | None, *, field: str) -> list[str]:
             seen.add(item)
             output.append(item)
     return output
+
+
+def _normalize_scope(value: dict[str, Any] | None) -> dict[str, str] | None:
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise DecisionRequestError("decision_scope must be an object")
+    scope_type = str(value.get("scope_type") or "").strip()
+    scope_id = str(value.get("scope_id") or "").strip()
+    if not scope_type or not scope_id:
+        raise DecisionRequestError("decision_scope requires scope_type and scope_id")
+    if set(value) != {"scope_type", "scope_id"}:
+        raise DecisionRequestError("decision_scope accepts only scope_type and scope_id")
+    return {"scope_type": scope_type, "scope_id": scope_id}
+
+
+def _normalize_expiry(value: datetime | str | None) -> str | None:
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        parsed = value
+    else:
+        text = str(value).strip()
+        if not text:
+            return None
+        if text.endswith("Z"):
+            text = text[:-1] + "+00:00"
+        try:
+            parsed = datetime.fromisoformat(text)
+        except ValueError as exc:
+            raise DecisionRequestError("expires_at must be an ISO 8601 timestamp") from exc
+    if parsed.tzinfo is None:
+        raise DecisionRequestError("expires_at must include a timezone")
+    return parsed.isoformat()
+
+
+def _normalize_effect_binding(
+    *,
+    decision_type: str,
+    approval_level: str | None,
+    decision_scope: dict[str, Any] | None,
+    expires_at: datetime | str | None,
+) -> tuple[str | None, dict[str, str] | None, str | None]:
+    level = str(approval_level).strip() if approval_level is not None else None
+    scope = _normalize_scope(decision_scope)
+    expiry = _normalize_expiry(expires_at)
+    values = (level, scope, expiry)
+    if any(value is not None for value in values) and not all(value is not None for value in values):
+        raise DecisionRequestError(
+            "effect-bound Decision Request requires approval_level, decision_scope and expires_at together"
+        )
+    if level is not None and level not in APPROVAL_LEVELS:
+        raise DecisionRequestError("approval_level must be C0..C5")
+    if decision_type == "question" and level is not None:
+        raise DecisionRequestError("question Decision Requests cannot carry effect-bound Decision fields")
+    return level, scope, expiry
 
 
 def _normalize_options(
@@ -253,6 +318,9 @@ def _request_projection(row: dict[str, Any], options: list[dict[str, Any]]) -> d
         "conversation_ref": request.get("conversation_ref"),
         "candidate_ref": request["candidate_ref"],
         "candidate_digest": _digest(request["candidate_digest"]),
+        "approval_level": request.get("approval_level"),
+        "decision_scope": request.get("decision_scope"),
+        "expires_at": request.get("expires_at"),
         "evidence_pack_ref": request.get("evidence_pack_ref"),
         "evidence_pack_digest": _digest(request["evidence_pack_digest"]) if request.get("evidence_pack_digest") else None,
         "source_refs": request.get("source_refs") or [],
@@ -313,6 +381,12 @@ def _decision_projection(row: dict[str, Any]) -> dict[str, Any]:
         "recorded_at": decision["recorded_at"],
         "supersedes_decision_id": decision.get("supersedes_decision_id"),
         "candidate_digest": _digest(decision["candidate_digest"]),
+        "approval_level": decision.get("approval_level"),
+        "scope": decision.get("scope"),
+        "object_identity": decision.get("object_identity"),
+        "content_digest": decision.get("content_digest"),
+        "expires_at": decision.get("expires_at"),
+        "signature": decision.get("signature"),
         "evidence_pack_digest": _digest(decision["evidence_pack_digest"]) if decision.get("evidence_pack_digest") else None,
         "decision_surface": decision["decision_surface"],
         "rationale": decision.get("rationale"),
@@ -370,6 +444,45 @@ def get_decision(conn: psycopg.Connection, decision_id: str) -> dict[str, Any]:
         "decision_record": _decision_projection(_decision_row(conn, decision_id)),
         "decision_is_not_execution": True,
         "result_validated": False,
+    }
+
+
+def policy_decision_payload(
+    conn: psycopg.Connection,
+    decision_id: str,
+    *,
+    expectation: dict[str, Any],
+) -> dict[str, Any]:
+    """Project one persisted Decision into the PDP transport shape.
+
+    This is a read projection only. It never adds authority or fills missing
+    Decision material. Direct consequential effects fail closed unless the exact
+    canonical record is an authenticated, approved, effect-bound and signed
+    Decision.
+    """
+    record = get_decision(conn, decision_id)["decision_record"]
+    if record.get("decision") != "approve":
+        raise DecisionRequestError("consequential effect requires an approved Decision record")
+    if record.get("identity_assurance") != "authenticated":
+        raise DecisionRequestError("consequential effect requires authenticated Decision identity")
+    fields = (
+        "decision_id",
+        "decided_by",
+        "approval_level",
+        "scope",
+        "object_identity",
+        "content_digest",
+        "expires_at",
+        "signature",
+    )
+    missing = [field for field in fields if record.get(field) in (None, "")]
+    if missing:
+        raise DecisionRequestError(
+            "canonical Decision is not effect-bound and signed; missing: " + ", ".join(missing)
+        )
+    return {
+        "decision": {field: record[field] for field in fields},
+        "expectation": dict(expectation),
     }
 
 
@@ -441,6 +554,9 @@ def create_request(
     project_ref: str | None = None,
     work_issue_ref: str | None = None,
     conversation_ref: str | None = None,
+    approval_level: str | None = None,
+    decision_scope: dict[str, Any] | None = None,
+    expires_at: datetime | str | None = None,
     evidence_pack_ref: str | None = None,
     evidence_pack_digest: str | dict[str, str] | None = None,
     source_refs: Iterable[str] | None = None,
@@ -465,6 +581,12 @@ def create_request(
     evidence_digest = _digest(evidence_pack_digest) if evidence_pack_digest else None
     if bool(evidence_pack_ref) != bool(evidence_digest):
         raise DecisionRequestError("Evidence Pack reference and digest must be supplied together")
+    level, bounded_scope, expiry = _normalize_effect_binding(
+        decision_type=decision_type,
+        approval_level=approval_level,
+        decision_scope=decision_scope,
+        expires_at=expires_at,
+    )
     normalized_options = _normalize_options(
         options,
         response_mode=response_mode,
@@ -484,6 +606,9 @@ def create_request(
         "conversation_ref": conversation_ref,
         "candidate_ref": str(candidate_ref).strip(),
         "candidate_digest": digest,
+        "approval_level": level,
+        "decision_scope": bounded_scope,
+        "expires_at": expiry,
         "evidence_pack_ref": evidence_pack_ref,
         "evidence_pack_digest": evidence_digest,
         "source_refs": _string_list(source_refs, field="source_refs"),
@@ -517,13 +642,15 @@ def create_request(
                     request_id, status, decision_type, question, priority,
                     response_mode, recommendation_candidate, blocking,
                     project_id, work_issue_id, conversation_ref,
-                    candidate_ref, candidate_digest,
+                    candidate_ref, candidate_digest, approval_level,
+                    decision_scope, expires_at,
                     evidence_pack_ref, evidence_pack_digest,
                     source_refs, evidence_gaps, blocked_action, next_safe_action,
                     decision_surface, decision_owner, created_by
                 ) VALUES (
                     %s, 'pending', %s, %s, %s, %s, %s, %s,
-                    %s, %s, %s, %s, %s, %s, %s, %s::jsonb, %s::jsonb,
+                    %s, %s, %s, %s, %s, %s, %s::jsonb, %s,
+                    %s, %s, %s::jsonb, %s::jsonb,
                     %s, %s, %s, %s, %s
                 )
                 """,
@@ -531,6 +658,7 @@ def create_request(
                     request_id, decision_type, question, priority, response_mode,
                     recommendation_candidate, blocking, project_ref, work_issue_ref,
                     conversation_ref, immutable_payload["candidate_ref"], digest["value"],
+                    level, json.dumps(bounded_scope) if bounded_scope else None, expiry,
                     evidence_pack_ref, evidence_digest["value"] if evidence_digest else None,
                     json.dumps(immutable_payload["source_refs"]),
                     json.dumps(immutable_payload["evidence_gaps"]),
@@ -675,6 +803,7 @@ def resolve_request(
     response_text: str | None = None,
     authenticated_principal: dict[str, Any] | None = None,
     rationale: str | None = None,
+    signature: str | None = None,
 ) -> dict[str, Any]:
     _validate_identity(identity_assurance, authenticated_principal)
     actor = str(decided_by).strip()
@@ -691,6 +820,8 @@ def resolve_request(
                 raise DecisionRequestError("question resolution requires response_id")
             if decision_id is not None or decision is not None:
                 raise DecisionRequestError("question resolution cannot carry Decision identity or value")
+            if signature is not None:
+                raise DecisionRequestError("HumanResponse cannot carry a Decision issuer signature")
             if rationale is not None and str(rationale).strip():
                 raise DecisionRequestError("question resolution cannot carry Decision rationale")
             selected, response = _validate_human_response(
@@ -773,6 +904,12 @@ def resolve_request(
             selected_option_ids=selected_option_ids,
             response_text=response_text,
         )
+        effect_bound = request.get("approval_level") is not None
+        signature_value = str(signature).strip() if signature else None
+        if signature_value and not effect_bound:
+            raise DecisionRequestError("unbound Decision cannot carry an issuer signature")
+        if signature_value and identity_assurance != "authenticated":
+            raise DecisionRequestError("issuer signature requires authenticated identity assurance")
         payload = {
             "decision_id": decision_identity,
             "decision": decision,
@@ -783,6 +920,12 @@ def resolve_request(
             "authenticated_principal": authenticated_principal,
             "rationale": str(rationale).strip() if rationale else None,
             "candidate_digest": request["candidate_digest"],
+            "approval_level": request.get("approval_level"),
+            "scope": request.get("decision_scope"),
+            "object_identity": request["candidate_ref"] if effect_bound else None,
+            "content_digest": request["candidate_digest"]["value"] if effect_bound else None,
+            "expires_at": request.get("expires_at"),
+            "signature": signature_value,
         }
         if _event_replayed(
             conn,
@@ -812,10 +955,13 @@ def resolve_request(
                     decision_id, request_id, applies_to, related_evidence_pack,
                     decision, decided_by, identity_assurance,
                     authenticated_principal, candidate_digest,
+                    approval_level, scope, object_identity, content_digest,
+                    expires_at, signature,
                     evidence_pack_digest, decision_surface, rationale, consequences
                 ) VALUES (
                     %s, %s, %s, %s, %s, %s, %s, %s::jsonb,
-                    %s, %s, %s, %s, %s::jsonb
+                    %s, %s, %s::jsonb, %s, %s, %s, %s,
+                    %s, %s, %s, %s::jsonb
                 )
                 """,
                 (
@@ -823,6 +969,12 @@ def resolve_request(
                     decision, actor, identity_assurance,
                     json.dumps(authenticated_principal) if authenticated_principal else None,
                     request["candidate_digest"]["value"],
+                    request.get("approval_level"),
+                    json.dumps(request.get("decision_scope")) if effect_bound else None,
+                    request["candidate_ref"] if effect_bound else None,
+                    request["candidate_digest"]["value"] if effect_bound else None,
+                    request.get("expires_at") if effect_bound else None,
+                    signature_value,
                     request["evidence_pack_digest"]["value"] if request.get("evidence_pack_digest") else None,
                     request["decision_surface"], payload["rationale"],
                     json.dumps(consequences, sort_keys=True, separators=(",", ":")),
@@ -840,6 +992,8 @@ def resolve_request(
             )
         except psycopg.errors.UniqueViolation as exc:
             raise DecisionRequestConflict("Decision identity exists or request is already resolved") from exc
+        except psycopg.errors.RaiseException as exc:
+            raise DecisionRequestError(str(exc)) from exc
         _insert_event(
             conn,
             request_id=request_id,

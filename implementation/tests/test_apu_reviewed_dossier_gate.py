@@ -79,6 +79,35 @@ def _dossier(project_id: str) -> dict:
     }
 
 
+def _decision_payload(
+    *,
+    project_id: str,
+    dossier: dict,
+    decision_id: str,
+    decided_by: str = "human:architect",
+    review_ref: str = "review:architect:2026-09-02",
+) -> dict:
+    digest = apu_owner._digest(
+        apu_owner._normalize_dossier(
+            project_id=project_id,
+            review_ref=review_ref,
+            **dossier,
+        )
+    )
+    return {
+        "decision": {
+            "decision_id": decision_id,
+            "decided_by": decided_by,
+            "approval_level": "C3",
+            "scope": {"scope_type": "project", "scope_id": project_id},
+            "object_identity": f"apu_reviewed_dossier:{project_id}",
+            "content_digest": digest,
+            "expires_at": "2099-01-01T00:00:00Z",
+            "signature": "signed-canonical-decision",
+        }
+    }
+
+
 def test_the_digest_binds_review_ref_to_the_dossier_as_one_unit() -> None:
     """A decision covers this dossier claiming this review_ref, not either alone."""
     project_id = _id("project")
@@ -156,7 +185,12 @@ def test_an_allowed_import_carries_the_dossier_digest_to_the_decision_point(conn
         actor="human:architect",
         idempotency_key=_id("apu-bootstrap"),
         policy_client=client,
-        decision_payload={"decision": {"decision_id": "decision-1"}},
+        decision_payload=_decision_payload(
+            project_id=project_id,
+            dossier=dossier,
+            decision_id="decision-1",
+            decided_by="human:architect",
+        ),
     )
     conn.commit()
 
@@ -198,7 +232,12 @@ def test_a_refused_import_installs_no_apu_state(conn) -> None:
             actor="human:architect",
             idempotency_key=_id("apu-bootstrap"),
             policy_client=client,
-            decision_payload={"decision": {"decision_id": "decision-2"}},
+            decision_payload=_decision_payload(
+            project_id=project_id,
+            dossier=dossier,
+            decision_id="decision-2",
+            decided_by="human:architect",
+        ),
         )
     conn.rollback()
     assert not _has_state(conn, project_id), (
@@ -219,7 +258,12 @@ def test_an_unreachable_decision_point_fails_closed(conn) -> None:
             actor="human:architect",
             idempotency_key=_id("apu-bootstrap"),
             policy_client=_UnreachablePolicyClient(),
-            decision_payload={"decision": {"decision_id": "decision-3"}},
+            decision_payload=_decision_payload(
+            project_id=project_id,
+            dossier=dossier,
+            decision_id="decision-3",
+            decided_by="human:architect",
+        ),
         )
     conn.rollback()
     assert not _has_state(conn, project_id)
@@ -239,7 +283,12 @@ def test_a_dossier_decided_by_a_non_human_is_refused(conn) -> None:
             actor="hermes:profile",
             idempotency_key=_id("apu-bootstrap"),
             policy_client=StandInPolicyClient(),
-            decision_payload={"decision": {"decision_id": "decision-4"}},
+            decision_payload=_decision_payload(
+            project_id=project_id,
+            dossier=dossier,
+            decision_id="decision-4",
+            decided_by="hermes:profile",
+        ),
         )
     conn.rollback()
     assert not _has_state(conn, project_id)

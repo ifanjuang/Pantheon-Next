@@ -363,18 +363,10 @@ def bind_oidc_identity(
                 "scope": scope,
             },
         }
-        bound_decision = dict(decision_payload or {})
-        decision = dict(bound_decision.get("decision") or {})
-        decision.setdefault("decided_by", bound_by)
-        decision.setdefault("approval_level", required_ceiling)
-        decision.setdefault("scope", scope)
-        decision.setdefault("object_identity", object_identity)
-        decision.setdefault("content_digest", digest)
-        bound_decision["decision"] = decision
-        bound_decision["expectation"] = expectation
-
         verdict = enforce_consequential(
-            policy_client, candidate=candidate, decision_payload=bound_decision
+            policy_client,
+            candidate=candidate,
+            decision_payload=dict(decision_payload or {}),
         )
         if not verdict.allowed:
             message = (
