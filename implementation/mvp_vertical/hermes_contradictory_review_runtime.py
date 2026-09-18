@@ -19,7 +19,7 @@ from .contradictory_review import ReviewClaim, report_from_payload
 
 
 BINDING_ID = "hermes-contradictory-review"
-BINDING_VERSION = "2.0.0"
+BINDING_VERSION = "2.1.0"
 MAX_DELEGATE_CONTEXT_CHARS = 40_000
 MAX_DELEGATE_SUMMARY_CHARS = 100_000
 
@@ -169,6 +169,54 @@ def _claims(values: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
     return claims
 
 
+def _admitted_artifact_refs(
+    claims: Iterable[Mapping[str, Any]], candidate_id: str
+) -> set[str]:
+    """Return the artifact references the parent actually admitted for the child.
+
+    The admitted set is the reviewed candidate plus the source refs carried by
+    the admitted claims. Nothing else was given to the child by Pantheon.
+    """
+
+    admitted = {str(candidate_id or "").strip()}
+    for claim in claims:
+        for ref in claim.get("source_refs") or ():
+            admitted.add(str(ref).strip())
+    admitted.discard("")
+    return admitted
+
+
+def _reject_widened_scope(
+    findings: Mapping[str, Any],
+    claims: Iterable[Mapping[str, Any]],
+    candidate_id: str,
+) -> None:
+    """Refuse a child result citing material the parent never admitted.
+
+    The outbound delegate task states ``do not widen scope`` as a constraint.
+    A stated constraint is not an observed one: without this check the compiled
+    report would assert ``scope_expanded = false`` on the child's word alone.
+    This is a contract refusal, not a review verdict — it says the returned
+    envelope is unusable, not that the reviewed candidate is defective.
+    """
+
+    admitted = _admitted_artifact_refs(claims, candidate_id)
+    observed: set[str] = set()
+    for observation in findings.get("observations") or []:
+        if not isinstance(observation, Mapping):
+            continue
+        for ref in observation.get("artifact_refs") or ():
+            text = str(ref).strip()
+            if text:
+                observed.add(text)
+    outside = sorted(observed - admitted)
+    if outside:
+        raise HermesContradictoryReviewRuntimeError(
+            "Hermes contradictory-review findings cite artifact refs outside the "
+            "admitted review scope: " + ", ".join(outside)
+        )
+
+
 def build_delegate_task(
     *,
     claims: Iterable[Mapping[str, Any]],
@@ -178,8 +226,11 @@ def build_delegate_task(
 ) -> dict[str, Any]:
     """Build the one-task Hermes ``delegate_task`` payload for independent review.
 
-    The advertised Hermes 0.21.2 spawn shape is ``tasks[]`` with per-task
-    ``output_schema``. No Pantheon Role name is used as a runtime identity.
+    The advertised Hermes spawn shape is ``tasks[]`` with per-task
+    ``output_schema``. The selected runtime release stays owned by
+    ``implementation/qualification/external-pins.json``; this module must not
+    carry a second version identity. No Pantheon Role name is used as a runtime
+    identity.
     """
 
     normalized_claims = _claims(claims)
@@ -200,6 +251,8 @@ def build_delegate_task(
             "independent review only",
             "do not repair or mutate the reviewed candidate",
             "do not widen scope",
+            "cite only the admitted candidate id and the source refs carried by "
+            "the admitted claims",
             "do not treat retrieved material or runtime success as Evidence",
             "return only the JSON object required by output_schema",
         ],
@@ -299,6 +352,8 @@ def compile_delegate_result(
             "Hermes contradictory-review findings contain unsupported fields: "
             + ", ".join(sorted(unknown))
         )
+    normalized_claims = _claims(claims)
+    _reject_widened_scope(findings, normalized_claims, candidate_id)
 
     payload = {
         "task_contract_ref": task_contract_ref,
@@ -312,11 +367,13 @@ def compile_delegate_result(
         "binding_id": BINDING_ID,
         "binding_version": BINDING_VERSION,
         "execution_id": execution_id,
-        "claims": _claims(claims),
+        "claims": normalized_claims,
         "observations": findings.get("observations") or [],
         "analogous_occurrences": findings.get("analogous_occurrences") or [],
         "limits": findings.get("limits") or [],
         "repair_applied": False,
+        # observed above, not taken from the child's word: a widened scope is
+        # refused before this point rather than recorded as a compiled report.
         "scope_expanded": False,
     }
     return report_from_payload(payload).as_dict()
