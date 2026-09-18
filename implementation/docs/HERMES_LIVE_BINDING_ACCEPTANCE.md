@@ -108,8 +108,8 @@ pantheon_context_entity
 Additional tools must be named individually with repeated `--allowed-tool` arguments and therefore remain an operator-reviewed expansion.
 
 ```text
-plugin installed != profile qualified
-profile reachable != safe
+plugin installed != runtime envelope qualified
+runtime route reachable != safe
 prompt says read-only != tool authority removed
 ```
 
@@ -245,7 +245,7 @@ python scripts/hermes_live_binding_acceptance.py \
   --idempotency-key live-proof-2026-07-26-001
 ```
 
-This command candidate assumes the operator has separately installed/configured the reviewed Hermes profile and plugin. The helper does not perform those actions.
+This command candidate assumes the operator has separately configured the reviewed Hermes runtime envelope and required plugin/capability surface. The helper does not perform those actions.
 
 ## Receipt semantics
 
@@ -304,7 +304,7 @@ It owns no queue, schedule, autonomous monitor or retry loop.
 
 - creation of the synthetic Work Issue/admission;
 - explicit `SYNTHETIC_ONLY` launch acknowledgement;
-- any future plugin/profile installation, enablement or activation;
+- any future plugin/capability installation, enablement or runtime activation;
 - any future real-dossier authorization.
 
 ### Forbidden
