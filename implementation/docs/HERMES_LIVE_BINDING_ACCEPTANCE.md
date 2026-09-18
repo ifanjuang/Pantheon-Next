@@ -151,6 +151,105 @@ active-context must be closed after governed return
 
 The helper does not poll in the background.
 
+## Épreuve d’Athéna / P2 cognitive readback
+
+The existing live binding already carries enough information for the synthetic
+P2/Athena qualification in issue #986. No Athena-specific harness, ContextGraph,
+Lens Engine or new runtime owner is required.
+
+Prepare each variant as a fresh admission from the `implementation/` directory:
+
+```bash
+python tools/p2_live_admission_preparer.py \
+  --variant A \
+  --ack SYNTHETIC_ONLY \
+  --actor "$PANTHEON_OPERATOR_ACTOR"
+
+python tools/p2_live_admission_preparer.py \
+  --variant B \
+  --ack SYNTHETIC_ONLY \
+  --actor "$PANTHEON_OPERATOR_ACTOR"
+
+python tools/p2_live_admission_preparer.py \
+  --variant IDENTITY-NONDETERMINANT \
+  --ack SYNTHETIC_ONLY \
+  --actor "$PANTHEON_OPERATOR_ACTOR"
+
+python tools/p2_live_admission_preparer.py \
+  --variant IDENTITY-DETERMINANT \
+  --ack SYNTHETIC_ONLY \
+  --actor "$PANTHEON_OPERATOR_ACTOR"
+```
+
+Each preparation receipt supplies a fresh `project_id`, `work_issue_id` and
+`admission_id` and records:
+
+```text
+execution_started = false
+hermes_run_created = false
+cognitive_result_observed = false   # ambiguity variants
+```
+
+Launch exactly one live proof for the resulting admission:
+
+```bash
+python scripts/hermes_live_binding_acceptance.py \
+  --run-live \
+  --ack SYNTHETIC_ONLY \
+  --admission-id admission-... \
+  --idempotency-key athena-p2-<variant>-<unique>
+```
+
+The external binding maps the fresh `admission_id` to the Hermes session and,
+on terminal completion, records Hermes output as a candidate-only runtime return.
+The bounded textual answer is available through the existing Work Issue read
+surface:
+
+```bash
+curl -sS \
+  -H "Authorization: Bearer $MVP_COCKPIT_API_KEY" \
+  "${PANTHEON_HERMES_API_BASE%/}/work/issues?case_ref=<project_id>"
+```
+
+Read:
+
+```text
+work_issues[]
+  .hermes_runs[]
+  .normalized_return.summary
+```
+
+for the exact returned `run_id`. The separate immutable Hermes Result Candidate
+retains richer candidate material; the Work Issue projection is sufficient for
+the first cognitive A/B and ambiguity comparison.
+
+For #986, compare fresh runs under the same selected model, runtime envelope and
+settings:
+
+```text
+A
+vs B
+
+IDENTITY-NONDETERMINANT
+vs IDENTITY-DETERMINANT
+```
+
+The evaluator checks the response against the issue's already-recorded criteria:
+fact/source distinction, explicit uncertainty, no silent identity collapse,
+targeted clarification when identity is determinant, proportionate context use
+and no implication that runtime output is professional truth.
+
+```text
+normalized_return.summary != Evidence
+Result Candidate != Project truth
+qualification expectation != observed model behavior
+same prompt != same admitted context
+fresh admission != reused session
+```
+
+A missing or inadequate cognitive answer is classified against existing owners
+before any new abstraction is proposed.
+
 ## PASS criteria
 
 A target proof is `pass` only when every required check is true:
