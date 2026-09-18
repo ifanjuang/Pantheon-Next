@@ -34,6 +34,7 @@ def conn():
         apu_owner.MIGRATION,
         decision_requests.MIGRATION,
         decision_requests.HUMAN_RESPONSE_MIGRATION,
+        decision_requests.EFFECT_BINDING_MIGRATION,
         execution_results.MIGRATION,
         agency_claims.MIGRATION,
         apu_cross_family.MIGRATION,

@@ -9,8 +9,9 @@ Rules:
 
 - fail closed on transport, malformed payload or non-eligible preflight;
 - bind human-decision validation to PEP-derived effect facts when supplied;
-- never let a validated decision override explicit PDP effect-denial flags;
-- consume one-shot decisions at the operational PEP when the PDP explicitly
+- require independently authenticated issuers for the closed direct-human effect class;
+- never let a validated Decision override explicit PDP effect-denial flags;
+- consume one-shot Decisions at the operational PEP when the PDP explicitly
   requires replay protection for a bounded external-effect qualification;
 - neutralize runtime/model smart approvals.
 
@@ -25,7 +26,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Callable, Protocol
 
-from .policy_request import bind_decision_payload, build_preflight_payload
+from .policy_request import (
+    PolicyRequestError,
+    bind_decision_payload,
+    build_preflight_payload,
+    requires_authenticated_human_decision,
+)
 
 _ELIGIBLE_DISPOSITIONS = frozenset(
     {
@@ -35,11 +41,6 @@ _ELIGIBLE_DISPOSITIONS = frozenset(
     }
 )
 
-# The decision-expectation field naming what the decision is about. Exported
-# as a constant, not just a literal, so a caller whose own module forbids the
-# lowercase phrase as a discarded legacy surface (apu_owner.py's baseline
-# contract predates this gate and reuses the phrase for something else) can
-# still build a conformant expectation without resurrecting that name.
 OBJECT_IDENTITY_KEY = "object_identity"
 
 
@@ -67,17 +68,16 @@ def enforce_consequential(
     decision_payload: dict[str, Any],
     consume_decision: Callable[[str], bool] | None = None,
 ) -> GateVerdict:
-    """Consult the PDP and decide whether the local executor may run.
-
-    When the PDP requires one-shot replay protection, an allow verdict is
-    impossible until the injected operational consumer has consumed the exact
-    decision id. This invariant lives here rather than only in one convenience
-    wrapper so direct effect-producing callers cannot bypass replay protection.
-    """
-
+    """Consult the PDP and decide whether the local executor may run."""
     try:
         bound_decision = bind_decision_payload(candidate, decision_payload)
         preflight_payload = build_preflight_payload(candidate, bound_decision)
+    except PolicyRequestError as exc:
+        return GateVerdict(False, "blocked_invalid_decision_envelope", [str(exc)])
+    except Exception as exc:
+        return GateVerdict(False, "policy_unavailable", [f"policy request binding failed: {exc}"])
+
+    try:
         preflight = client.preflight(preflight_payload)
     except Exception as exc:
         return GateVerdict(False, "policy_unavailable", [f"preflight call failed: {exc}"])
@@ -134,6 +134,16 @@ def enforce_consequential(
         reasons = [f"decision verdict: {validation.get('verdict', 'unknown')}"]
         reasons += list(validation.get("findings", []))
         return GateVerdict(False, disposition, reasons)
+
+    if (
+        requires_authenticated_human_decision(candidate)
+        and validation.get("issuer_authenticated") is not True
+    ):
+        reasons = [
+            "direct human consequential effect requires an independently authenticated issuer"
+        ]
+        reasons += list(validation.get("findings", []))
+        return GateVerdict(False, "blocked_unauthenticated_human_decision", reasons)
 
     decision = bound_decision.get("decision") or {}
     decision_id = str(decision.get("decision_id") or "").strip() or None
@@ -224,14 +234,7 @@ def governed_effect(
 
 
 class StandInPolicyClient:
-    """Deterministic offline PDP stand-in for tests; not Pantheon authority.
-
-    The stand-in is deliberately policy-version-neutral. Its external-effect
-    flag defaults to ``True`` for backward-compatible seam tests. Tests that
-    model a fail-closed Pantheon response pass ``external_effect_allowed=False``
-    explicitly. Live behavior always comes from ``HttpPolicyClient`` responses,
-    never from these defaults.
-    """
+    """Deterministic offline PDP stand-in for tests; not Pantheon authority."""
 
     _SYSTEM_PREFIXES = ("system", "service", "runtime", "hermes", "bot", "agent")
 
@@ -243,12 +246,14 @@ class StandInPolicyClient:
         canonical_effect_allowed: bool = False,
         gate_signal_validation_performed: bool = False,
         replay_guard_required: bool = False,
+        issuer_authenticated: bool = True,
     ):
         self._disposition = disposition
         self._external_effect_allowed = external_effect_allowed
         self._canonical_effect_allowed = canonical_effect_allowed
         self._gate_signal_validation_performed = gate_signal_validation_performed
         self._replay_guard_required = replay_guard_required
+        self._issuer_authenticated = issuer_authenticated
         self.last_preflight: dict[str, Any] | None = None
         self.last_decision: dict[str, Any] | None = None
 
@@ -284,7 +289,11 @@ class StandInPolicyClient:
         if expected_digest is not None and decision.get("content_digest") != expected_digest:
             findings.append("decision content_digest does not match effect digest")
         verdict = "valid" if not findings else "invalid"
-        return {"verdict": verdict, "findings": findings}
+        return {
+            "verdict": verdict,
+            "findings": findings,
+            "issuer_authenticated": self._issuer_authenticated if verdict == "valid" else False,
+        }
 
 
 class HttpPolicyClient:

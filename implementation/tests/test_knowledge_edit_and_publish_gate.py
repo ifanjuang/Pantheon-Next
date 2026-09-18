@@ -113,6 +113,83 @@ def _edit_request(conn, knowledge_id: str) -> dict:
     )
 
 
+def _canonical_decision(
+    *,
+    decision_id: str,
+    decided_by: str,
+    scope: dict[str, str],
+    object_identity: str,
+    content_digest: str,
+    approval_level: str = "C2",
+) -> dict:
+    return {
+        "decision": {
+            "decision_id": decision_id,
+            "decided_by": decided_by,
+            "approval_level": approval_level,
+            "scope": scope,
+            "object_identity": object_identity,
+            "content_digest": content_digest,
+            "expires_at": "2099-01-01T00:00:00Z",
+            "signature": "signed-canonical-decision",
+        }
+    }
+
+
+def _reviewed_publication_decision(
+    *,
+    decision_id: str,
+    knowledge_id: str,
+    document_id: str,
+    title: str,
+    markdown: str,
+    source_chunk_refs: list[str],
+    created_by: str = "human:architect",
+    actor_kind: str = "human",
+) -> dict:
+    payload_digest = knowledge._payload_digest(
+        {
+            "knowledge_id": knowledge_id,
+            "document_id": document_id,
+            "title": title,
+            "family": "techniques",
+            "markdown": markdown,
+            "source_chunk_refs": source_chunk_refs,
+            "created_by": created_by,
+            "actor_kind": actor_kind,
+            "review_status": "reviewed",
+            "expected_version": 0,
+        }
+    )
+    return _canonical_decision(
+        decision_id=decision_id,
+        decided_by=created_by,
+        scope={"scope_type": "project", "scope_id": "project-gate-a"},
+        object_identity=f"knowledge_item:{knowledge_id}",
+        content_digest=payload_digest,
+    )
+
+
+def _apply_decision(conn, *, request_id: str, decision_id: str, actor: str = "human:architect") -> dict:
+    request = knowledge.get_edit_request(conn, request_id)
+    apply_digest = knowledge._payload_digest(
+        {
+            "request_id": request_id,
+            "knowledge_id": request["knowledge_id"],
+            "base_version": request["base_version"],
+            "selected_text_digest": request["selected_text_digest"],
+            "replacement_markdown": request["replacement_markdown"],
+        }
+    )
+    return _canonical_decision(
+        decision_id=decision_id,
+        decided_by=actor,
+        scope={"scope_type": "project", "scope_id": "project-gate-a"},
+        object_identity=f"knowledge_edit_request:{request_id}",
+        content_digest=apply_digest,
+    )
+
+
 # --- publish_knowledge --------------------------------------------------------
 
 
@@ -124,7 +201,7 @@ def test_candidate_publication_needs_no_decision_point(conn, tmp_path) -> None:
 
 def test_publishing_as_reviewed_is_refused_without_a_decision_point(conn, tmp_path) -> None:
     document_id, refs = _source(conn, tmp_path)
-    with pytest.raises(knowledge.KnowledgeGateRefused, match="decision reference"):
+    with pytest.raises(knowledge.KnowledgeGateRefused, match="decision_payload.decision"):
         knowledge.publish_knowledge(
             conn,
             knowledge_id=f"knowledge.techniques.{uuid.uuid4().hex}",
@@ -162,7 +239,14 @@ def test_publishing_as_reviewed_carries_the_publication_digest_to_the_decision_p
         idempotency_key=f"publish-{uuid.uuid4().hex}",
         review_status="reviewed",
         policy_client=client,
-        decision_payload={"decision": {"decision_id": "decision-1"}},
+        decision_payload=_reviewed_publication_decision(
+            decision_id="decision-1",
+            knowledge_id=knowledge_id,
+            document_id=document_id,
+            title="Reprise des façades existantes",
+            markdown="# Reprise\n\nContenu.",
+            source_chunk_refs=refs,
+        ),
     )
     assert card["review_status"] == "reviewed"
 
@@ -196,7 +280,14 @@ def test_a_refused_reviewed_publication_writes_no_knowledge_item(conn, tmp_path)
             idempotency_key=f"publish-{uuid.uuid4().hex}",
             review_status="reviewed",
             policy_client=client,
-            decision_payload={"decision": {"decision_id": "decision-2"}},
+            decision_payload=_reviewed_publication_decision(
+                decision_id="decision-2",
+                knowledge_id=knowledge_id,
+                document_id=document_id,
+                title="Reprise",
+                markdown="# Reprise\\n\\nContenu.",
+                source_chunk_refs=refs,
+            ),
         )
     with pytest.raises(knowledge.KnowledgeNotFound):
         knowledge.get_knowledge_card(conn, knowledge_id)
@@ -258,7 +349,7 @@ def test_apply_is_refused_without_a_decision_point(conn, tmp_path) -> None:
     knowledge.complete_edit_request(
         conn, request_id=request["request_id"], replacement_markdown="Remplacement."
     )
-    with pytest.raises(knowledge.KnowledgeGateRefused, match="decision reference"):
+    with pytest.raises(knowledge.KnowledgeGateRefused, match="decision_payload.decision"):
         knowledge.apply_edit_request(
             conn,
             request_id=request["request_id"],
@@ -286,7 +377,9 @@ def test_an_allowed_apply_carries_the_replacement_digest_to_the_decision_point(
         actor_kind="human",
         idempotency_key=f"apply-{uuid.uuid4().hex}",
         policy_client=client,
-        decision_payload={"decision": {"decision_id": "decision-3"}},
+        decision_payload=_apply_decision(
+            conn, request_id=request["request_id"], decision_id="decision-3"
+        ),
     )
     assert applied["knowledge"]["version"] == 2
 
@@ -314,7 +407,9 @@ def test_a_refused_apply_leaves_the_request_proposed_and_retryable(conn, tmp_pat
             actor_kind="human",
             idempotency_key=f"apply-{uuid.uuid4().hex}",
             policy_client=client,
-            decision_payload={"decision": {"decision_id": "decision-4"}},
+            decision_payload=_apply_decision(
+            conn, request_id=request["request_id"], decision_id="decision-4"
+        ),
         )
     still_proposed = knowledge.get_edit_request(conn, request["request_id"])
     assert still_proposed["status"] == "proposed", (
@@ -339,7 +434,9 @@ def test_an_unreachable_decision_point_fails_closed(conn, tmp_path) -> None:
             actor_kind="human",
             idempotency_key=f"apply-{uuid.uuid4().hex}",
             policy_client=_UnreachablePolicyClient(),
-            decision_payload={"decision": {"decision_id": "decision-5"}},
+            decision_payload=_apply_decision(
+            conn, request_id=request["request_id"], decision_id="decision-5"
+        ),
         )
     unchanged = knowledge.get_knowledge_card(conn, card["knowledge_id"])
     assert unchanged["version"] == 1
@@ -349,10 +446,10 @@ def test_an_unreachable_decision_point_fails_closed(conn, tmp_path) -> None:
 
 
 def test_gate_knowledge_write_requires_a_decision_id() -> None:
-    with pytest.raises(knowledge.KnowledgeGateRefused, match="decision reference"):
+    with pytest.raises(knowledge.KnowledgeGateRefused, match="decision_payload.decision"):
         knowledge._gate_knowledge_write(
             StandInPolicyClient(),
-            intent="test_intent",
+            intent="publish_knowledge_reviewed",
             scope={"scope_type": "project", "scope_id": "p-1"},
             object_ref="knowledge_item:k-1",
             expected_digest="digest-1",
@@ -366,11 +463,17 @@ def test_gate_knowledge_write_allows_a_bound_decision() -> None:
     client = StandInPolicyClient()
     knowledge._gate_knowledge_write(
         client,
-        intent="test_intent",
+        intent="publish_knowledge_reviewed",
         scope={"scope_type": "project", "scope_id": "p-1"},
         object_ref="knowledge_item:k-1",
         expected_digest="digest-1",
-        decision_payload={"decision": {"decision_id": "decision-1"}},
+        decision_payload=_canonical_decision(
+            decision_id="decision-1",
+            decided_by="human:architect",
+            scope={"scope_type": "project", "scope_id": "p-1"},
+            object_identity="knowledge_item:k-1",
+            content_digest="digest-1",
+        ),
         actor="human:architect",
         required_ceiling="C2",
     )
@@ -382,11 +485,17 @@ def test_gate_knowledge_write_refuses_a_non_human_decider() -> None:
     with pytest.raises(knowledge.KnowledgeGateRefused):
         knowledge._gate_knowledge_write(
             StandInPolicyClient(),
-            intent="test_intent",
+            intent="publish_knowledge_reviewed",
             scope={"scope_type": "project", "scope_id": "p-1"},
             object_ref="knowledge_item:k-1",
             expected_digest="digest-1",
-            decision_payload={"decision": {"decision_id": "decision-1"}},
+            decision_payload=_canonical_decision(
+            decision_id="decision-1",
+            decided_by="hermes:profile",
+            scope={"scope_type": "project", "scope_id": "p-1"},
+            object_identity="knowledge_item:k-1",
+            content_digest="digest-1",
+        ),
             actor="hermes:profile",
             required_ceiling="C2",
         )

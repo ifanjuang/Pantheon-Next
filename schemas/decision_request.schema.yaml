@@ -6,7 +6,9 @@ description: >-
   resolving a validation, approval or arbitration creates a separate decision_record.
   The request is not itself a Decision and cannot authorize or resume execution.
   Optional scope_refs let the same request concern reviewed APU object identities
-  without creating an APU relation or transferring authority.
+  without creating an APU relation or transferring authority. A non-question request
+  may also bind one exact consequential effect before the human decides; those effect
+  bounds are descriptive decision context, not an execution permission.
 type: object
 required:
   - request_id
@@ -95,8 +97,32 @@ properties:
   candidate_ref:
     type: string
     minLength: 1
+    description: >-
+      Exact candidate or object the human is being asked to decide on. For an
+      effect-bound request this becomes the immutable Decision object_identity.
   candidate_digest:
     $ref: "#/$defs/sha256_digest"
+  approval_level:
+    type: [string, "null"]
+    pattern: "^C[0-5]$"
+    description: >-
+      Approval threshold at which this decision is presented to the human. It is
+      copied into the Decision record; the PDP independently derives the level
+      required by the attempted effect.
+  decision_scope:
+    oneOf:
+      - $ref: "#/$defs/decision_scope"
+      - type: "null"
+    description: >-
+      Exact governance scope the human decision covers. This is not scope_refs:
+      scope_refs are retrieval/context links, while decision_scope is one bounded
+      scope compared with a later EffectExpectation.
+  expires_at:
+    type: [string, "null"]
+    format: date-time
+    description: >-
+      Optional validity bound fixed before the human decides. Effect-bound requests
+      require it together with approval_level and decision_scope.
   evidence_pack_ref:
     type: [string, "null"]
     minLength: 1
@@ -208,6 +234,20 @@ allOf:
           maxItems: 0
   - if:
       properties:
+        decision_type:
+          const: question
+      required:
+        - decision_type
+    then:
+      properties:
+        approval_level:
+          type: "null"
+        decision_scope:
+          type: "null"
+        expires_at:
+          type: "null"
+  - if:
+      properties:
         status:
           const: resolved
         decision_type:
@@ -308,6 +348,19 @@ $defs:
   governed_id:
     type: string
     pattern: "^[a-z0-9][a-z0-9._-]*$"
+  decision_scope:
+    type: object
+    required:
+      - scope_type
+      - scope_id
+    properties:
+      scope_type:
+        type: string
+        minLength: 1
+      scope_id:
+        type: string
+        minLength: 1
+    additionalProperties: false
   decision_scope_ref:
     type: object
     required:
@@ -366,12 +419,16 @@ x-decision-request-rules:
   work_issue_continuation_is_separate: true
   apu_scope_requires_project_classification: true
   scope_refs_remain_request_owned: true
+  effect_bound_fields_are_fixed_before_decision: true
+  effect_bound_fields_are_atomic: true
 x-boundary:
   request_is_decision: false
   request_is_approval: false
   agency_decision_owner: false
   human_response_is_decision: false
   human_response_is_authorization: false
+  decision_scope_is_effect_authorization: false
+  approval_level_is_effect_authorization: false
   decision_record_is_execution: false
   decision_record_is_result_validation: false
   scope_ref_is_semantic_relation: false

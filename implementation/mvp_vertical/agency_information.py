@@ -382,24 +382,10 @@ def act_working_information(
                     "scope": scope,
                 },
             }
-            bound_decision = dict(decision_payload or {})
-            decision = dict(bound_decision.get("decision") or {})
-            decision_id = str(decision.get("decision_id") or "").strip()
-            if len(decision_id) < 2:
-                raise AgencyInformationGateRefused(
-                    "acting an Information version requires an immutable human "
-                    "decision reference (decision.decision_id) to route through "
-                    "the chokepoint; none was supplied"
-                )
-            decision.setdefault("decided_by", actor)
-            decision.setdefault("approval_level", required_ceiling)
-            decision.setdefault("scope", scope)
-            decision.setdefault(OBJECT_IDENTITY_KEY, object_ref)
-            decision.setdefault("content_digest", content_digest)
-            bound_decision["decision"] = decision
-            bound_decision["expectation"] = expectation
             verdict = enforce_consequential(
-                policy_client, candidate=candidate, decision_payload=bound_decision
+                policy_client,
+                candidate=candidate,
+                decision_payload=dict(decision_payload or {}),
             )
             if not verdict.allowed:
                 message = (

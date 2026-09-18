@@ -14,7 +14,7 @@ from typing import Any, Callable, Literal
 from fastapi import Depends, FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
-from . import agency_data, agency_directory, agency_information, agency_schema
+from . import agency_data, agency_directory, agency_information, agency_schema, decision_requests
 from .agency_change_candidate_api import install_agency_change_candidate_routes
 from .hermes_project_change_candidate_api import install_hermes_project_change_candidate_routes
 from .policy_gate import PolicyClient
@@ -132,6 +132,10 @@ def install_agency_data_routes(
             agency_information.InformationNotFound,
         ) as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except decision_requests.DecisionRecordNotFound as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except decision_requests.DecisionRequestError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
         except agency_information.AgencyInformationGatePolicyUnavailable as exc:
             raise HTTPException(status_code=503, detail=str(exc)) from exc
         except (
@@ -451,22 +455,27 @@ def install_agency_data_routes(
         actor: str = Depends(require_actor),
         policy_client: PolicyClient | None = Depends(require_policy_client),
     ) -> dict:
-        information = agency_operation(
-            lambda conn: agency_information.act_working_information(
+        def act(conn):
+            canonical_decision = {}
+            if policy_client is not None:
+                if not body.human_decision_ref:
+                    raise decision_requests.DecisionRequestError(
+                        "acting Information requires a canonical human Decision reference"
+                    )
+                canonical_decision = decision_requests.policy_decision_payload(
+                    conn, body.human_decision_ref, expectation={}
+                )
+            return agency_information.act_working_information(
                 conn,
                 information_id=information_id,
                 expected_revision=body.expected_revision,
                 actor_kind=writer_kind,
                 actor=actor,
                 policy_client=policy_client,
-                decision_payload={
-                    "decision": {
-                        "decision_id": body.human_decision_ref,
-                        "decided_by": actor,
-                    }
-                },
+                decision_payload=canonical_decision,
             )
-        )
+
+        information = agency_operation(act)
         return {
             "system_of_record": "postgres",
             "effect": "agency_information_acted",

@@ -7,7 +7,15 @@ import os
 import sys
 from pathlib import Path
 
-from . import apu_owner, human_access, register, storage_retention, store, terminal_gate_standin as gate
+from . import (
+    apu_owner,
+    decision_requests,
+    human_access,
+    register,
+    storage_retention,
+    store,
+    terminal_gate_standin as gate,
+)
 from .policy_gate import HttpPolicyClient
 from .contract import load_contract
 from .documents import DoclingServeClient
@@ -87,13 +95,13 @@ def main() -> int:
     p_bind.add_argument(
         "--decision-ref",
         required=True,
-        help="immutable reference of the human decision this binding is made under",
+        help="immutable reference of the canonical human Decision this binding is made under",
     )
     p_bind.add_argument("--reason", default=None)
     p_bind.add_argument(
         "--approval-level",
         default="C3",
-        help="approval ceiling the decision must carry (default: C3)",
+        help="approval ceiling the effect requires (default: C3)",
     )
 
     p_dossier = sub.add_parser(
@@ -126,7 +134,7 @@ def main() -> int:
     p_dossier.add_argument(
         "--decision-ref",
         required=True,
-        help="immutable reference of the human decision this import is made under",
+        help="immutable reference of the canonical human Decision this import is made under",
     )
     p_dossier.add_argument(
         "--idempotency-key",
@@ -135,7 +143,7 @@ def main() -> int:
     p_dossier.add_argument(
         "--approval-level",
         default="C3",
-        help="approval ceiling the decision must carry (default: C3)",
+        help="approval ceiling the effect requires (default: C3)",
     )
 
     p_card = sub.add_parser("document-card", help="project one ingested source as a card")
@@ -189,7 +197,6 @@ def main() -> int:
                 rationale=args.rationale,
             )
         except gate.GateRefusal as refusal:
-            # A refusal is a first-class governance outcome, not a crash.
             print(f"gate refused: {refusal}", file=sys.stderr)
             return 1
         text = gate.to_yaml(record)
@@ -200,10 +207,6 @@ def main() -> int:
             sys.stdout.write(text)
         return 0
 
-    # Retention proposal (Block 3) — no database, no perimeter. Reads a decision
-    # record and proposes a register candidate; refuses unless the decision was
-    # gate-produced and approved, retention is explicitly authorized, and a human
-    # (never the system) authorizes it. Writes nothing durable.
     if args.command == "register":
         decision = register.load_decision_record(args.decision_record)
         try:
@@ -253,11 +256,6 @@ def main() -> int:
     if args.command == "bind-oidc-identity":
         import yaml
 
-        # Fail closed here, not in the module. `human_access.bind_oidc_identity`
-        # takes an optional client like every other gated write in this package;
-        # what makes the chokepoint mandatory is the composition point refusing
-        # to call it without one. Disabling enforcement is an explicit act with
-        # a name, never a default.
         enforcement = (os.getenv("MVP_POLICY_ENFORCEMENT", "required") or "").strip()
         if enforcement not in {"required", "disabled"}:
             print(
@@ -268,9 +266,7 @@ def main() -> int:
             return 1
         base_url = os.getenv("MVP_POLICY_API_URL", "").strip()
         api_key = os.getenv("MVP_POLICY_API_KEY", "").strip()
-        policy_client = (
-            HttpPolicyClient(base_url, api_key) if base_url and api_key else None
-        )
+        policy_client = HttpPolicyClient(base_url, api_key) if base_url and api_key else None
         if enforcement == "required" and policy_client is None:
             print(
                 "Pantheon policy decision point is not configured; binding an "
@@ -284,6 +280,11 @@ def main() -> int:
         conn = human_access.connect()
         try:
             try:
+                canonical_decision = decision_requests.policy_decision_payload(
+                    conn,
+                    args.decision_ref,
+                    expectation={},
+                )
                 binding = human_access.bind_oidc_identity(
                     conn,
                     principal_ref=args.principal_ref,
@@ -292,15 +293,12 @@ def main() -> int:
                     bound_by=args.bound_by,
                     reason=args.reason,
                     policy_client=policy_client,
-                    decision_payload={
-                        "decision": {
-                            "decision_id": args.decision_ref,
-                            "decided_by": args.bound_by,
-                            "approval_level": args.approval_level,
-                        }
-                    },
+                    decision_payload=canonical_decision,
                     required_ceiling=args.approval_level,
                 )
+            except decision_requests.DecisionRequestError as exc:
+                print(f"canonical Decision refused for identity binding: {exc}", file=sys.stderr)
+                return 1
             except human_access.BindingPolicyUnavailable as exc:
                 print(f"identity binding failed closed: {exc}", file=sys.stderr)
                 return 1
@@ -333,9 +331,6 @@ def main() -> int:
     if args.command == "store-reviewed-dossier":
         import yaml
 
-        # Same fail-closed shape as bind-oidc-identity: enforcement is decided
-        # here, once, before any connection opens — not inside apu_owner.py,
-        # where an optional client would otherwise be silently skippable.
         enforcement = (os.getenv("MVP_POLICY_ENFORCEMENT", "required") or "").strip()
         if enforcement not in {"required", "disabled"}:
             print(
@@ -346,9 +341,7 @@ def main() -> int:
             return 1
         base_url = os.getenv("MVP_POLICY_API_URL", "").strip()
         api_key = os.getenv("MVP_POLICY_API_KEY", "").strip()
-        policy_client = (
-            HttpPolicyClient(base_url, api_key) if base_url and api_key else None
-        )
+        policy_client = HttpPolicyClient(base_url, api_key) if base_url and api_key else None
         if enforcement == "required" and policy_client is None:
             print(
                 "Pantheon policy decision point is not configured; installing a "
@@ -378,6 +371,11 @@ def main() -> int:
         conn = store.connect()
         try:
             try:
+                canonical_decision = decision_requests.policy_decision_payload(
+                    conn,
+                    args.decision_ref,
+                    expectation={},
+                )
                 installed = apu_owner.store_reviewed_dossier(
                     conn,
                     project_id=dossier["project_id"],
@@ -389,15 +387,12 @@ def main() -> int:
                     actor=args.actor,
                     idempotency_key=args.idempotency_key,
                     policy_client=policy_client,
-                    decision_payload={
-                        "decision": {
-                            "decision_id": args.decision_ref,
-                            "decided_by": args.actor,
-                            "approval_level": args.approval_level,
-                        }
-                    },
+                    decision_payload=canonical_decision,
                     required_ceiling=args.approval_level,
                 )
+            except decision_requests.DecisionRequestError as exc:
+                print(f"canonical Decision refused for dossier import: {exc}", file=sys.stderr)
+                return 1
             except apu_owner.ApuOwnerPolicyUnavailable as exc:
                 print(f"dossier import failed closed: {exc}", file=sys.stderr)
                 return 1

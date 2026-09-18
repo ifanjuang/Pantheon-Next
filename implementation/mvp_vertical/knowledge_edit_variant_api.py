@@ -7,7 +7,7 @@ from typing import Any, Callable, Literal
 from fastapi import Depends, Header, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from . import knowledge, knowledge_edit_variants
+from . import decision_requests, knowledge, knowledge_edit_variants
 from .policy_gate import PolicyClient
 
 
@@ -51,8 +51,10 @@ def _human_actor(value: str | None) -> str:
 
 
 def _translate(exc: Exception) -> HTTPException:
-    if isinstance(exc, knowledge.KnowledgeNotFound):
+    if isinstance(exc, (knowledge.KnowledgeNotFound, decision_requests.DecisionRecordNotFound)):
         return HTTPException(status_code=404, detail=str(exc))
+    if isinstance(exc, decision_requests.DecisionRequestError):
+        return HTTPException(status_code=422, detail=str(exc))
     if isinstance(
         exc,
         (
@@ -257,21 +259,27 @@ def install_knowledge_edit_variant_routes(
         policy_client: PolicyClient | None = Depends(require_policy_client),
     ) -> dict[str, Any]:
         actor = _human_actor(human_actor)
-        applied = operation(
-            lambda conn: knowledge_edit_variants.apply_selected_variant(
+
+        def apply_variant(conn):
+            canonical_decision = {}
+            if policy_client is not None:
+                if not body.human_decision_ref:
+                    raise decision_requests.DecisionRequestError(
+                        "applying a Knowledge variant requires a canonical human Decision reference"
+                    )
+                canonical_decision = decision_requests.policy_decision_payload(
+                    conn, body.human_decision_ref, expectation={}
+                )
+            return knowledge_edit_variants.apply_selected_variant(
                 conn,
                 request_id=request_id,
                 actor=actor,
                 idempotency_key=body.idempotency_key,
                 policy_client=policy_client,
-                decision_payload={
-                    "decision": {
-                        "decision_id": body.human_decision_ref,
-                        "decided_by": actor,
-                    }
-                },
+                decision_payload=canonical_decision,
             )
-        )
+
+        applied = operation(apply_variant)
         return {
             "effect": "knowledge_edit_variant_applied",
             "edit_applied": True,

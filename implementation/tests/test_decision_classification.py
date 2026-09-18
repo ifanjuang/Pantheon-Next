@@ -27,6 +27,7 @@ def conn():
             work_issue_scopes.MIGRATION,
             decision_requests.MIGRATION,
             decision_requests.HUMAN_RESPONSE_MIGRATION,
+            decision_requests.EFFECT_BINDING_MIGRATION,
         ):
             connection.execute(migration.read_text(encoding="utf-8"))
         connection.commit()

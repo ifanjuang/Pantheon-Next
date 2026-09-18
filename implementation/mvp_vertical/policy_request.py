@@ -4,12 +4,16 @@ Runtime adapters know the concrete effect being attempted (Paperless metadata
 update, project-document intake, capability action). The Pantheon HTTP API is
 intentionally generic. This module translates runtime facts into that generic
 contract without letting a caller redefine the object, digest, scope or known
-external-effect status that the human decision must cover.
+external-effect status that the human Decision must cover.
 """
 
 from __future__ import annotations
 
 from typing import Any
+
+
+class PolicyRequestError(ValueError):
+    """A policy request cannot preserve the required governance boundary."""
 
 
 _REQUEST_FIELDS = frozenset(
@@ -51,13 +55,9 @@ _PAPERLESS_EXTERNAL_EFFECT_KINDS = frozenset(
     }
 )
 
-# These five intents are the already-wired human-originated Cockpit/CLI writes
-# identified by the 2026-09-02 real-PDP audit. They are not delegated Hermes
-# tasks, so manufacturing a Task Contract for them would violate TASK_CONTRACTS.
-# Keep the recognition here, in the operational PEP translation layer, rather
-# than trusting an arbitrary caller to downgrade itself with
-# ``delegated_execution=false``. A new direct-human effect must be reviewed and
-# added explicitly; unknown effects remain delegated/fail-conservative.
+# Closed class of already-wired human-originated Cockpit/CLI writes. They are
+# not delegated Hermes tasks, so manufacturing a Task Contract for them would
+# violate TASK_CONTRACTS. Unknown/new effects remain delegated/fail-conservative.
 _DIRECT_HUMAN_EFFECT_INTENTS = frozenset(
     {
         "bind_oidc_identity",
@@ -68,12 +68,61 @@ _DIRECT_HUMAN_EFFECT_INTENTS = frozenset(
     }
 )
 
+# For a direct-human consequential effect the PEP accepts only the complete
+# credential projected from a persisted canonical DecisionRecord. Effect owners
+# may derive EffectExpectation; they may not fill any Decision field.
+_DIRECT_HUMAN_DECISION_FIELDS = frozenset(
+    {
+        "decision_id",
+        "decided_by",
+        "approval_level",
+        "scope",
+        "object_identity",
+        "content_digest",
+        "expires_at",
+        "signature",
+    }
+)
+
 # Issue #664 qualification fixture. Only this synthetic intent carries the
 # already-bound human decision into preflight so Pantheon can compose signed
 # gate validation before emitting the one bounded external-effect permission.
-# Real adapters remain on their existing transport contract until separately
-# qualified.
 _QUALIFICATION_EXTERNAL_EFFECT_INTENT = "qualification_external_effect"
+
+
+def _candidate_intent(candidate: dict[str, Any]) -> str:
+    request = candidate.get("request")
+    if isinstance(request, dict) and request.get("intent") not in (None, ""):
+        return str(request["intent"]).strip()
+    return str(
+        candidate.get("intent")
+        or candidate.get("effect_kind")
+        or candidate.get("action")
+        or ""
+    ).strip()
+
+
+def requires_authenticated_human_decision(candidate: dict[str, Any]) -> bool:
+    """Whether this closed direct-human effect class requires issuer proof."""
+    return _candidate_intent(candidate) in _DIRECT_HUMAN_EFFECT_INTENTS
+
+
+def _require_complete_direct_human_decision(
+    candidate: dict[str, Any],
+    decision: dict[str, Any],
+) -> None:
+    if not requires_authenticated_human_decision(candidate):
+        return
+    missing = sorted(
+        field
+        for field in _DIRECT_HUMAN_DECISION_FIELDS
+        if decision.get(field) in (None, "")
+    )
+    if missing:
+        raise PolicyRequestError(
+            "direct human consequential effect requires a complete canonical "
+            "signed Decision credential; missing: " + ", ".join(missing)
+        )
 
 
 def _scope_from_decision(decision_payload: dict[str, Any]) -> dict[str, Any] | None:
@@ -84,19 +133,7 @@ def _scope_from_decision(decision_payload: dict[str, Any]) -> dict[str, Any] | N
 
 
 def _pep_owned_request_overrides(candidate: dict[str, Any]) -> dict[str, bool]:
-    """Return effect facts that a runtime caller is not allowed to downgrade.
-
-    The legacy Paperless helpers accept a caller-supplied candidate mapping for
-    trace/context. Their executor is nevertheless known by the PEP: upload and
-    root-document metadata mutation are external state writes. Recognize those
-    effects both by their normal effect kind and by the structural fields the
-    helper itself always adds, so a caller cannot hide the effect by replacing
-    ``effect_kind`` or a nested ``request.external_effect`` value.
-
-    False positives intentionally fail conservative: classifying an ambiguous
-    candidate as an external write is safer than silently allowing one.
-    """
-
+    """Return effect facts that a runtime caller is not allowed to downgrade."""
     kind = str(candidate.get("effect_kind") or "").strip()
     paperless_upload_shape = "filename" in candidate and "content_hash" in candidate
     paperless_metadata_shape = "document_id" in candidate and "changed_fields" in candidate
@@ -113,30 +150,26 @@ def bind_decision_payload(
     candidate: dict[str, Any],
     decision_payload: dict[str, Any],
 ) -> dict[str, Any]:
-    """Bind decision validation to PEP-owned effect facts when provided.
+    """Bind a canonical Decision credential to PEP-owned effect facts.
 
-    ``decision`` remains caller-provided because it represents the human choice
-    reference. ``expectation`` is different: it states what the effect actually
-    requires. When an adapter supplies ``decision_expectation`` those fields are
-    authoritative for this execution attempt and caller-supplied expectation
-    values cannot override them.
-
-    Backward compatibility is deliberately narrow: adapters that have not yet
-    supplied ``decision_expectation`` retain their existing caller expectation.
-    New consequential bindings should always derive and supply the expectation
-    from runtime-observed identity, digest and Task Contract scope.
+    ``decision`` is caller-provided transport material only because the domain
+    owner has already loaded it from the canonical Decision store. For the closed
+    direct-human consequential class it must be complete before the effect owner
+    reaches this seam. ``expectation`` is different: it states what the effect
+    actually requires and is therefore owned by the effect adapter.
     """
-
     if not isinstance(decision_payload, dict):
-        raise ValueError("decision_payload must be a mapping")
+        raise PolicyRequestError("decision_payload must be a mapping")
     decision = decision_payload.get("decision")
     if not isinstance(decision, dict):
-        raise ValueError("decision_payload.decision must be a mapping")
+        raise PolicyRequestError("decision_payload.decision must be a mapping")
+
+    _require_complete_direct_human_decision(candidate, decision)
 
     explicit = candidate.get("decision_expectation")
     if explicit is not None:
         if not isinstance(explicit, dict):
-            raise ValueError("candidate.decision_expectation must be a mapping")
+            raise PolicyRequestError("candidate.decision_expectation must be a mapping")
         expectation = {
             key: explicit[key]
             for key in _EXPECTATION_FIELDS
@@ -144,13 +177,13 @@ def bind_decision_payload(
         }
         missing = sorted(_EXPECTATION_FIELDS - set(expectation))
         if missing:
-            raise ValueError(
+            raise PolicyRequestError(
                 "candidate.decision_expectation is incomplete: " + ", ".join(missing)
             )
     else:
         caller_expectation = decision_payload.get("expectation")
         if not isinstance(caller_expectation, dict):
-            raise ValueError("decision_payload.expectation must be a mapping")
+            raise PolicyRequestError("decision_payload.expectation must be a mapping")
         expectation = dict(caller_expectation)
 
     return {
@@ -163,31 +196,10 @@ def build_preflight_payload(
     candidate: dict[str, Any],
     decision_payload: dict[str, Any],
 ) -> dict[str, Any]:
-    """Translate one runtime candidate to ``pantheon.policy.v1`` preflight input.
-
-    Normal runtime candidates contain only ``request`` and ``gate_signals`` as
-    defined by the V0 transport. The synthetic #664 qualification intent also
-    carries ``decision_validation`` so the PDP can actually compose the existing
-    gate validator before emitting its fixture-only external-effect permission.
-    Runtime-specific keys such as ``effect_kind`` and ``document_id`` remain
-    local trace data and are not leaked into the policy transport schema.
-
-    Callers may provide an explicit ``request`` / ``gate_signals`` mapping. When
-    they provide only runtime-specific fields, conservative defaults are used:
-    a consequential effect is assumed to write state and affect an external
-    runtime unless the caller explicitly says otherwise. PEP-owned facts for
-    known external executors are applied last and therefore cannot be downgraded
-    by caller-provided request fields.
-
-    Direct-human execution posture is also PEP-owned. Only the closed set of
-    already-reviewed direct-human intents is translated to
-    ``delegated_execution=False``; every other intent defaults to delegated
-    execution even if its caller tries to claim otherwise.
-    """
-
+    """Translate one runtime candidate to ``pantheon.policy.v1`` preflight input."""
     explicit_request = candidate.get("request")
     if explicit_request is not None and not isinstance(explicit_request, dict):
-        raise ValueError("candidate.request must be a mapping")
+        raise PolicyRequestError("candidate.request must be a mapping")
 
     source_request = explicit_request or {}
     request: dict[str, Any] = {
@@ -212,8 +224,6 @@ def build_preflight_payload(
     if intent in _DIRECT_HUMAN_EFFECT_INTENTS:
         request["delegated_execution"] = False
     else:
-        # Unknown/new effects fail conservative. An arbitrary runtime candidate
-        # may not opt itself out of the Task Contract boundary by sending False.
         request["delegated_execution"] = True
 
     request.setdefault(
@@ -239,14 +249,11 @@ def build_preflight_payload(
             if inferred_scope is not None:
                 request["scope"] = inferred_scope
 
-    # Apply non-overridable executor facts only after caller/context values have
-    # been normalized. This closes the downgrade path where a Paperless write
-    # supplied request.external_effect=false.
     request.update(_pep_owned_request_overrides(candidate))
 
     explicit_signals = candidate.get("gate_signals")
     if explicit_signals is not None and not isinstance(explicit_signals, dict):
-        raise ValueError("candidate.gate_signals must be a mapping")
+        raise PolicyRequestError("candidate.gate_signals must be a mapping")
 
     source_signals = explicit_signals or {}
     gate_signals: dict[str, Any] = {
@@ -273,7 +280,7 @@ def build_preflight_payload(
         decision = decision_payload.get("decision")
         expectation = decision_payload.get("expectation")
         if not isinstance(decision, dict) or not isinstance(expectation, dict):
-            raise ValueError(
+            raise PolicyRequestError(
                 "qualification_external_effect requires a bound decision validation payload"
             )
         payload["decision_validation"] = {
