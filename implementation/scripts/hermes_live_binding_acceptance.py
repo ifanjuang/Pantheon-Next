@@ -67,7 +67,7 @@ def build_parser() -> argparse.ArgumentParser:
         action="append",
         default=[],
         help=(
-            "Concrete Hermes tool allowed on the reviewed acceptance profile. "
+            "Concrete Hermes tool allowed on the reviewed acceptance runtime envelope. "
             "Repeat for additional separately reviewed tools. Defaults to the two "
             "Pantheon context tools only."
         ),
