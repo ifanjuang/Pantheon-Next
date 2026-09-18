@@ -108,6 +108,50 @@ def test_resource_profile_contract(monkeypatch) -> None:
     assert response.json() == payload
 
 
+def test_work_issue_read_contract_preserves_hermes_cognitive_summary(monkeypatch) -> None:
+    projections = [
+        {
+            "work_issue": {
+                "issue_id": "issue-athena-live",
+                "case_ref": "project-athena-live",
+            },
+            "comments": [],
+            "hermes_runs": [
+                {
+                    "run_id": "run-athena-live",
+                    "status": "returned",
+                    "normalized_return": {
+                        "outcome": "result_candidate",
+                        "summary": "Bounded situated reasoning candidate.",
+                        "result_refs": [],
+                        "evidence_candidate_refs": [],
+                        "trace_refs": ["hermes://runs/run-athena-live"],
+                    },
+                }
+            ],
+            "events": [],
+            "governance_refs": [],
+        }
+    ]
+    monkeypatch.setattr(
+        work_issue_read,
+        "list_issue_projections",
+        lambda *_, **__: projections,
+    )
+    client = TestClient(create_cockpit_app(connect_fn=_Connection, api_key="read-key"))
+
+    response = client.get(
+        "/work/issues",
+        params={"case_ref": "project-athena-live"},
+        headers={"Authorization": "Bearer read-key"},
+    )
+
+    assert response.status_code == 200
+    returned = response.json()["work_issues"][0]["hermes_runs"][0]
+    assert returned["run_id"] == "run-athena-live"
+    assert returned["normalized_return"]["summary"] == "Bounded situated reasoning candidate."
+
+
 def test_work_issue_read_contract(monkeypatch) -> None:
     monkeypatch.setattr(work_issue_read, "list_issue_projections", lambda *_, **__: [])
     client = TestClient(create_cockpit_app(connect_fn=_Connection, api_key="read-key"))

@@ -145,6 +145,55 @@ def test_batched_list_preserves_governed_aggregate_and_card_metadata(conn) -> No
     }
 
 
+def test_list_issue_projections_exposes_bounded_hermes_cognitive_return(conn) -> None:
+    created = _create(
+        conn,
+        case_ref="project-athena-live",
+        title="Qualify one synthetic situated-reasoning run",
+    )
+    issue = created["work_issue"]
+    normalized_return = {
+        "outcome": "result_candidate",
+        "summary": (
+            "Source-backed: the admitted partition is 120 mm thick. "
+            "Interpretation: moving it may affect circulation and hosted elements. "
+            "Uncertainty: no global project traversal was performed."
+        ),
+        "result_refs": [],
+        "evidence_candidate_refs": [],
+        "trace_refs": ["hermes://runs/run-athena-live"],
+    }
+    conn.execute(
+        """
+        INSERT INTO hermes_runs (
+            run_id, issue_id, task_contract_ref, context_pack_ref,
+            status, requested_effect, returned_at, normalized_return
+        ) VALUES (
+            %s, %s, %s, %s, 'returned', 'read_only',
+            CURRENT_TIMESTAMP, %s::jsonb
+        )
+        """,
+        (
+            "run-athena-live",
+            issue["issue_id"],
+            "task-contract:athena-live",
+            "context-pack:athena-live",
+            json.dumps(normalized_return),
+        ),
+    )
+    conn.commit()
+
+    listed = work_issue_read.list_issue_projections(conn, "project-athena-live")
+
+    assert len(listed) == 1
+    run = listed[0]["hermes_runs"][0]
+    assert run["run_id"] == "run-athena-live"
+    assert run["status"] == "returned"
+    assert run["normalized_return"] == normalized_return
+    assert run["normalized_return"]["summary"].startswith("Source-backed:")
+    assert listed[0]["work_issue"]["case_ref"] == "project-athena-live"
+
+
 def test_list_issue_projections_refuses_unbounded_limit(conn) -> None:
     with pytest.raises(work_issues.WorkIssueError, match="limit"):
         work_issue_read.list_issue_projections(conn, "project-maison-a", limit=501)
