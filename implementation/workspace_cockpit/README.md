@@ -8,15 +8,17 @@ It scans the filesystem mirrors produced by Self-hosted LiveSync and projects
 document packages as cards. CouchDB remains a synchronization transport; the
 Cockpit does not query it directly. It also has no PostgreSQL or pgvector
 dependency. An optional transient sidecar can read the public event stream of
-an already-admitted Hermes run and project its visible Role stages.
+an already-admitted Hermes run and project observable runtime stages with
+display-only Pantheon Role labels. Those labels are a read projection:
+a worker is not a Pantheon Role, and the projection carries no authority.
 
 The local HTTP process exposes:
 
 - `/` for the Cockpit interface;
 - `/api/workspaces` for the current read-only projection;
 - `/api/health` for service supervision;
-- `/api/role-traces/*` as an optional same-origin, read-only proxy to the Role
-  sidecar.
+- `/api/role-traces/*` as the existing compatibility route for an optional
+  same-origin, read-only proxy to the observable-stage sidecar.
 
 The browser never receives the Hermes Runs key or either internal sidecar key.
 The sidecar is in-memory only and cannot create, approve, retry or stop a run.
@@ -37,8 +39,10 @@ docker compose --env-file deployment/ubuntu/release.env \
 ```
 
 The two containers have read-only root filesystems, no Linux capabilities and
-read-only vault mounts. The Role sidecar is the only component that reads the
+read-only vault mounts. The observable-stage sidecar is the only component that reads the
 configured public Hermes Runs stream; the Cockpit contacts only that sidecar.
+The historical `role-traces` route/name is retained for compatibility and
+must not be read as a claim that Hermes workers are Pantheon Roles.
 A native systemd alternative is also available:
 
 ```bash
