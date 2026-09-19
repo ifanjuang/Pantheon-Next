@@ -16,7 +16,6 @@ This directory contains explanatory, governance-grammar and bounded read-only pa
 | [Candidate Cockpit source](https://github.com/ifanjuang/Pantheon-Next/tree/main/implementation/mvp_vertical/cockpit) | Current co-located implementation source. | Executable candidate implementation / not adopted or deployed by repository presence. |
 | [Historical external MVP cockpit demo](https://ifanjuang.github.io/pantheon-mvp/) | Frozen public orientation to the former repository lineage; source was observed at [`7f3faf74afd59a07a9ab6026360881eb374df905`](https://github.com/ifanjuang/pantheon-mvp/tree/7f3faf74afd59a07a9ab6026360881eb374df905). | Historical demonstration only; not the current implementation source. |
 | [`pantheon-flow/entrees-sorties-memoire-d3.html`](pantheon-flow/entrees-sorties-memoire-d3.html) | Explanatory flow for context, candidates, human decision and governed records. | Documentation only. |
-| [`pantheon-rpg/`](pantheon-rpg/) | Narrative illustrations for responsibility paths. | Documentation only. |
 
 ## Placement rule
 
