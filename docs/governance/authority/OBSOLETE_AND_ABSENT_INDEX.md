@@ -55,6 +55,9 @@ Removed material remains available through Git history. Retained obsolete docume
 | `ROUTING_FOUNDATION.md` (removed; Git history) | obsolete | superseded | Resolved during the completed stub cleanup. |
 | `WORKFLOW_ADAPTATION.md` (removed; Git history) | obsolete | superseded | Merged into `WORKFLOW_LIFECYCLE.md` during the completed stub cleanup. |
 
+| Former Cockpit consolidation roadmap (removed; Git history) | obsolete validation-only roadmap | completed/superseded | The roadmap sequenced historical remediation issues, legacy external MVP reconciliation and prototype work. Current sequencing is owned by `docs/governance/ROADMAP.md`, while current Cockpit composition is owned by `docs/governance/COCKPIT_ARCHITECTURE.md` and the co-located implementation. |
+| Former Hermes execution-preparation convergence map (removed; Git history) | obsolete validation-only convergence map | completed/superseded | The map concluded that no generic execution-preparation object or runtime gap was demonstrated. Its surviving spine is now owned directly by Task Contract, Context Pack, Work Issue, Execution Admission, launch junction and runtime-return owners. Historical references to the former external `pantheon-mvp` implementation are no longer needed in the working tree. |
+
 ## Voluntarily absent
 
 A voluntarily absent item is excluded by doctrine, per the master index vocabulary. Its absence is a decision.
