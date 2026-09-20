@@ -107,28 +107,19 @@ workspace access != task authorization
 
 ### Optional user-enabled discovery routes
 
-Issue #1095 records two optional integrations behind this existing skill:
+Optional product mappings for these routes live in `docs/governance/HERMES_CAPABILITY_BINDINGS.md`; this skill keeps only the abstract runtime contract.
 
 ```text
-curated professional source library
--> optional Zotero read-only route
+curated_source_library
+= optional curated professional source-library route
 
-external academic discovery
--> optional Consensus MCP route
+academic_source_discovery
+= optional external academic-discovery route
 ```
 
-These are optional integrations, not default dependencies, adoption candidates or new research owners.
+The user chooses at environment/profile level whether a concrete binding for either route is enabled. Enabling a binding makes that route eligible for tactical use; it does not require invoking it on every task.
 
-The user chooses at environment/profile level whether each integration is enabled. The available posture may therefore be:
-
-```text
-neither enabled
-Zotero enabled
-Consensus enabled
-both enabled
-```
-
-Enabling an integration makes it eligible for tactical use; it does not require using it on every task. For each admitted research task, Hermes may invoke only an enabled route when it is materially useful and compatible with the Task Contract, source scope and data-exposure constraints. A task-specific instruction may further narrow the enabled set.
+For each admitted research task, Hermes may invoke only an enabled route when it is materially useful and compatible with the Task Contract, source scope and data-exposure constraints. A task-specific instruction may further narrow the enabled set.
 
 ```text
 installed != user-enabled
@@ -138,16 +129,16 @@ task-permitted != invoked
 invoked != Evidence
 ```
 
-When the user has enabled a curated-library route and the task permits it, prefer stable library / collection / item identifiers over physical storage paths. Collection membership may narrow discovery but does not establish Case identity, source applicability, Evidence status or professional authority.
+When a curated source-library route is enabled and task-permitted, prefer stable library / collection / item identifiers over physical storage paths. Collection membership may narrow discovery but does not establish Case identity, source applicability, Evidence status or professional authority.
 
-When the user has enabled an external academic-discovery route and the task permits it, treat returned rankings, metadata, snippets and generated takeaways as discovery material only. For material claims, inspect the original source when technically available before relying on it.
+When an external academic-discovery route is enabled and task-permitted, treat returned rankings, metadata, snippets and generated takeaways as discovery material only. For material claims, inspect the original source when technically available before relying on it.
 
-Do not hard-code a universal route order. Among enabled and task-permitted routes, prefer the least exposed and least expensive route that can materially answer the bounded question, then widen only when useful. A disabled integration must not be invoked.
+Do not hard-code a universal route order. Among enabled and task-permitted routes, prefer the least exposed and least expensive route that can materially answer the bounded question, then widen only when useful. A disabled route must not be invoked.
 
 A useful pattern may be:
 
 ```text
-user-enabled research integrations
+user-enabled research bindings
 -> admitted task / source / data-exposure scope
 -> Hermes selects materially useful route(s)
 -> inspect original material sources
