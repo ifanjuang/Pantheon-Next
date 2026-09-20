@@ -18,8 +18,8 @@ def test_activity_projection_is_presentation_only_and_proportional() -> None:
 
     for invariant in (
         "projection != persistence",
-        "visible role != activated role",
-        "handoff line != runtime dispatch",
+        "posture label != Pantheon Role",
+        "milestone != runtime dispatch",
         "retrieved source != truth",
         "runtime success != approval",
         "summary rationale != hidden chain-of-thought",
@@ -40,7 +40,7 @@ def test_activity_projection_has_small_normative_output_contract() -> None:
     assert "every documentary claim cites its task-local source [Sx]" in text
     assert "Méthode / Skill / Outil remain separate categories" in text
     assert "quantitative conclusions state their perimeter" in text
-    assert "do not invent one merely to satisfy the display format" in text
+    assert "Never synthesize a Pantheon Role label from runtime prose" in text
 
 
 def test_activity_projection_explains_action_reason_goal_result_without_cot() -> None:
@@ -115,13 +115,22 @@ def test_activity_projection_keeps_monetary_bases_and_prudent_envelope_coherent(
     assert "prudence label != reconciled high-case coverage" in text
 
 
-def test_activity_projection_handoff_is_responsibility_not_dispatch() -> None:
+def test_activity_projection_uses_runtime_milestones_and_optional_postures() -> None:
     text = SKILL.read_text(encoding="utf-8")
 
-    assert "A `→ Relais` line means the next responsibility" in text
-    assert "not a new agent or dispatch" in text
-    assert "If\nHermes actually delegates runtime work" in text
-    assert "If the governed context does not establish a Pantheon Role" in text
+    assert "Use `⚙ Hermes` for observable runtime milestones" in text
+    assert "Posture: Ulysse" in text
+    assert "Posture: Nestor" in text
+    assert "Posture: Dédale" in text
+    assert "Posture: Cassandre" in text
+    assert "posture changed != subagent created" in text
+    assert "next step proposed != next action authorized" in text
+    assert "Do not create a universal mapping from task conditions to Pantheon Roles" in text
+    for legacy_label in (
+        "🦉 Athena", "🔎 Argos", "⚖ Themis", "☀ Apollo",
+        "🛠 Hephaistos", "📨 Iris", "⚡ Zeus", "🧠 Mnemosyne",
+    ):
+        assert legacy_label not in text
 
 
 def test_activity_projection_supports_native_interim_or_compact_final_delivery() -> None:

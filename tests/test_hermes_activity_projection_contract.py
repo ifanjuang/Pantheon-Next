@@ -15,37 +15,35 @@ def test_activity_projection_skill_has_bounded_visible_contract() -> None:
     assert "name: pantheon-activity-projection" in text
     assert "status: candidate_template_only" in text
     assert "governed_by: docs/governance/CONVERSATION_ACTIVITY_PROJECTION.md" in text
-    assert "trace_reference: docs/governance/ROLE_DIALOGUE_TRACE.md" in text
+    assert "trace_reference:" not in text
     assert "summary rationale != hidden chain-of-thought" in text
     assert "one compact initial plan" in text
     assert "only meaningful milestones" in text
     assert "do not invent one merely" in text
-    assert "Hermes is a runtime, not a Pantheon Role" in text
-    assert "## Observable Role outcomes" in text
-    for readiness in (
-        "ready",
-        "ready_with_limits",
-        "needs_revision",
-        "needs_user_input",
-        "blocked",
+    assert "Pantheon Roles are governance jurisdictions, not runtime identities" in text
+    assert "Use `⚙ Hermes` for observable runtime milestones" in text
+    assert "Posture: Ulysse" in text
+    assert "Posture: Nestor" in text
+    assert "Posture: Dédale" in text
+    assert "Posture: Cassandre" in text
+    assert "posture selected != Pantheon Role activated" in text
+    for legacy_label in (
+        "🦉 Athena", "🔎 Argos", "⚖ Themis", "☀ Apollo",
+        "🛠 Hephaistos", "📨 Iris", "⚡ Zeus", "🧠 Mnemosyne",
     ):
-        assert readiness in text
-    assert "draft complete != transmission authorized" in text
-    assert "Do not activate extra Roles merely to populate" in text
-    for role in (
-        "Athena", "Argos", "Themis", "Apollo", "Hephaistos", "Iris", "Zeus", "Mnemosyne"
-    ):
-        assert role in text
+        assert legacy_label not in text
 
 
 def test_governed_profile_supplement_requires_progress_without_private_reasoning() -> None:
     text = SOUL_APPEND.read_text(encoding="utf-8")
     assert "For every non-trivial Pantheon-governed request" in text
-    assert "publish the plan before" in text
+    assert "publish one compact plan before" in text
     assert "material tool call" in text
-    assert "never private reasoning" in text
-    assert "Do not display every canonical Role" in text
-    assert "visible" in text and "role label identifies a governance responsibility" in text
+    assert "never\nprivate reasoning" in text
+    assert "Pantheon Roles are governance jurisdictions, not Hermes runtime identities" in text
+    assert "Do not generate ATHENA/ARGOS/THEMIS/APOLLO/HEPHAISTOS/IRIS/ZEUS/MNEMOSYNE labels" in text
+    assert "Do not hard-code a provider sequence" in text
+    assert "Posture: <optional, only when selected>" in text
 
 
 def test_linux_configurator_is_idempotent_and_keeps_a_backup() -> None:
