@@ -63,6 +63,10 @@ retrieved_predecessor != valid_predecessor
 ```text
 candidate != approval
 reviewable != approved
+runtime_approval != Pantheon_Decision
+runtime_always_allowance != governed_approval_ceiling
+pre_tool_call != Pantheon_PEP
+runtime_guard_passed != effect_authorized
 internal_draft_approval != external_send_authorization
 approve_for_internal_draft != authorize_external_send
 human_review_needed != human_approval_granted

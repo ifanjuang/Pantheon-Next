@@ -58,6 +58,65 @@ Wire compatibility still requires observation against the exact installed artifa
 
 Only deltas that change trust, state, tool, execution-host or administration boundaries are retained here.
 
+
+### 0.21.3 plugin control surface — exact pinned-source review
+
+The selected release commit `345cd2b057a452236de401d3534b8502a7465e8d`
+contains the plugin hooks `pre_llm_call`, `pre_tool_call`, `post_tool_call`,
+`subagent_start` / `subagent_stop` and the Kanban lifecycle observers used by
+the current improvement discussion. It also contains the separate
+`tool_request` and `tool_execution` middleware surfaces.
+
+The selected implementation gives `pre_tool_call` a deliberately mixed failure
+contract:
+
+- a timeout, still-running callback or callback worker-start failure is converted
+  into a blocking directive;
+- an ordinary callback exception is logged and skipped;
+- the managed tool executor also catches a failure of the pre-tool dispatch path
+  and continues with the original arguments.
+
+Therefore the source proves a timeout-oriented fail-closed behavior, not a
+Pantheon-owned universal fail-closed effect boundary.
+
+The exact tool middleware order also matters. `tool_request` runs before the
+normal Hermes policy path. `tool_execution` wraps the callback that enters that
+path, so execution middleware may short-circuit without calling `next_call`.
+A `pre_tool_call` hook is consequently a runtime defense-in-depth seam whose
+presence and invocation must be observed on the deployed route; it is not by
+itself proof that every possible effect traverses Pantheon's PEP.
+
+The `approve` directive is Hermes runtime approval. It invokes Hermes'
+approval gate and may use a `rule_key` whose runtime UX supports persistent
+`always` allowance. Pantheon must not use that mechanism to manufacture or
+replace a canonical Pantheon Decision.
+
+`pre_llm_call` exists as an ephemeral current-turn context injection seam. Its
+availability does not justify moving Context Pack admission into Hermes; any
+future use remains transport of already-admitted context only.
+
+Qualification consequences:
+
+```text
+pre_tool_call observed != Pantheon PEP
+pre_tool_call timeout fail-closed != universal hook failure fail-closed
+runtime approval != Pantheon Decision
+runtime always-allow != governed approval ceiling
+tool middleware present != every effect traverses pre_tool_call
+hook available != hook active on deployed route
+```
+
+A consequential-effect binding must therefore retain the existing Pantheon
+effect owner / PDP / PEP path and independently prove its deployed runtime guard
+when that guard is claimed. Loss of a required runtime guard must fail the
+qualification of that consequential binding; it must not silently downgrade an
+already admitted consequential task into another authorization mode. A separate
+read-only or propose-only admission may still be created through its normal
+governed path.
+
+This source review does not activate any hook, install any plugin, expose any
+consequential tool or qualify a local runtime.
+
 ### 0.21.3 state and remote-session patch
 
 Upstream 0.21.3 removes duplicate long-lived writer handles to `state.db`, makes read-only
