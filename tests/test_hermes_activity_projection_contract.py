@@ -185,3 +185,39 @@ def test_optional_runtime_dependencies_are_preflighted_before_profile_mutation()
     assert "preflight_whatsapp_runtime" in text
     assert '[[ -n "$LOCAL_MCP_SELECTED" ]] || die "local MCP bindings were not preflighted"' in text
     assert '[[ -n "$CURATED_STAGE_ROOT" ]] || die "curated skills were not staged"' in text
+
+
+def test_work_postures_never_become_runtime_or_governance_branch_keys() -> None:
+    posture_names = ("Ulysse", "Nestor", "Dédale", "Cassandre")
+    executable_roots = (
+        ROOT / "implementation" / "mvp_vertical",
+        ROOT / "implementation" / "hermes" / "plugins",
+        ROOT / "mcp-server" / "pantheon_mcp",
+    )
+    schema_root = ROOT / "schemas"
+
+    checked = []
+    for executable_root in executable_roots:
+        if not executable_root.exists():
+            continue
+        for path in sorted(executable_root.rglob("*.py")):
+            checked.append(path)
+            text = path.read_text(encoding="utf-8")
+            for posture in posture_names:
+                assert posture not in text, (
+                    f"presentation posture {posture!r} leaked into executable "
+                    f"runtime/governance code: {path.relative_to(ROOT)}"
+                )
+
+    if schema_root.exists():
+        for suffix in ("*.yaml", "*.yml", "*.json"):
+            for path in sorted(schema_root.rglob(suffix)):
+                checked.append(path)
+                text = path.read_text(encoding="utf-8")
+                for posture in posture_names:
+                    assert posture not in text, (
+                        f"presentation posture {posture!r} leaked into a governed "
+                        f"schema: {path.relative_to(ROOT)}"
+                    )
+
+    assert checked

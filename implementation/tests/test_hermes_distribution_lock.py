@@ -101,3 +101,68 @@ def test_active_validator_refuses_legacy_revision_and_path_escape() -> None:
     escaped["components"][0]["path"] = "../outside.py"
     errors = evaluate(escaped, monorepo_root=MONOREPO_ROOT)
     assert "component run-binding escapes Pantheon monorepo root" in errors
+
+
+def test_distribution_components_keep_translation_observation_without_authority() -> None:
+    manifest = _manifest()
+    expected_capabilities = {
+        "run-binding": {
+            "reserve-admitted-launch",
+            "submit-one-external-run",
+            "record-runtime-start",
+            "record-runtime-return",
+            "record-typed-project-variant-return",
+            "notify-role-trace-attachment",
+        },
+        "context-bridge": {
+            "read-admitted-context",
+            "read-admitted-entity",
+            "protect-model-bound-context",
+            "protect-gateway-attachments",
+        },
+        "runtime-observer": {
+            "observe-runs-api",
+            "qualify-profile-route",
+            "qualify-tool-surface",
+            "capture-memory-posture",
+            "qualify-memory-posture",
+            "capture-presentation-config",
+            "qualify-presentation-config",
+        },
+    }
+    actual = {
+        item["component_id"]: set(item.get("capabilities") or ())
+        for item in manifest["components"]
+    }
+    assert actual == expected_capabilities
+
+    forbidden_capability_fragments = (
+        "authorize",
+        "approve",
+        "decision",
+        "admit-evidence",
+        "execute-effect",
+        "schedule",
+        "queue",
+        "persist-memory",
+    )
+    for component_id, capabilities in actual.items():
+        for capability in capabilities:
+            assert not any(
+                fragment in capability for fragment in forbidden_capability_fragments
+            ), f"{component_id} acquired authority-like capability {capability!r}"
+
+    bridge_root = ROOT / "hermes" / "plugins" / "pantheon-context-bridge"
+    bridge_source = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in sorted(bridge_root.rglob("*.py"))
+    )
+    for forbidden in (
+        'register_hook("pre_tool_call"',
+        'register_middleware("tool_request"',
+        'register_middleware("tool_execution"',
+        "governed_effect(",
+        "policy_gate",
+        "DecisionRecord",
+    ):
+        assert forbidden not in bridge_source
