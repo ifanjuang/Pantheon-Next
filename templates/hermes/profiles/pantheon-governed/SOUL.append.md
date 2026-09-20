@@ -48,8 +48,7 @@ What would passing these tests still not establish?
 
 Do not answer the metathought as though Pantheon had already supplied a verdict.
 Do not convert `related_rite` into an activated Rite, do not invent a Role
-handoff, and do not call `delegate_task` solely because a metathought is
-present. If later observable work independently confirms the symptom and the
+handoff, and do not call `delegate_task` solely because a metathought is present. If later observable work independently confirms the symptom and the
 existing governance path authorizes a Rite, report that later transition
 separately.
 
