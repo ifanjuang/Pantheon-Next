@@ -37,6 +37,35 @@ All formerly open issues were reconciled on 2026-08-31:
 - former #227: real-environment Hermes/NAS qualification superseded by `#644` under `#607`;
 - former #338: non-project solicitation closed and locked.
 
+## Working-tree trace cleanup — 2026-09-20
+
+The imported repository originally carried a local `ai_logs/` trace corpus and
+the July `ADOPTION_REVIEW.md` snapshot. After monorepo convergence, current
+implementation docs, tests and owner contracts no longer consume those files.
+They were removed from the working tree under #1091 cleanup rather than kept as
+a second historical record beside Git and the current owners.
+
+The original contents remain recoverable from Git history and the former
+repository lineage. Their removal changes no implementation status, adoption
+state, Evidence status or authority.
+
+```text
+imported trace != current owner
+historical review != current adoption status
+Git history = archive
+```
+
+The standalone repository README now marks it as historical provenance only and
+forbids new implementation work. The repository is therefore eligible for the
+GitHub archive setting while remaining useful for original PR/issue URLs and
+original commit identifiers.
+
+```text
+retired repository != deleted provenance
+historical branch != active owner
+archived repository != authority transfer
+```
+
 The standalone repository README now marks it as historical provenance only and
 forbids new implementation work. The repository is therefore eligible for the
 GitHub archive setting while remaining useful for original PR/issue URLs and
