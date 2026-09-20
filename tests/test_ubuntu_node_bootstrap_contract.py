@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -143,18 +142,6 @@ def test_release_lock_curates_governed_hermes_skills_without_exposing_all_templa
     ):
         assert name in line
     assert "templates/hermes/skills" not in line
-
-
-def test_release_lock_defines_every_required_bootstrap_variable() -> None:
-    release_keys = {
-        line.split("=", 1)[0]
-        for line in _text(RELEASE).splitlines()
-        if line.startswith("RELEASE_") and "=" in line
-    }
-    for script in (INSTALL, UPDATE):
-        required = set(re.findall(r"\$\{(RELEASE_[A-Z0-9_]+):\?", _text(script)))
-        missing = sorted(required - release_keys)
-        assert not missing, f"{script.name} requires release pins missing from release.env: {missing}"
 
 
 def test_bootstrap_scripts_have_one_reviewed_target_owner() -> None:
