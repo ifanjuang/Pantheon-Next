@@ -1,11 +1,10 @@
 ---
 name: pantheon-activity-projection
-description: "Project meaningful observable progress from non-trivial Pantheon-governed Hermes work into chat: plan, action/reason/goal, real sources and metadata, methods, skills/tools actually used, result, limits and explicit responsibility handoff. Presentation only."
+description: "Project meaningful observable progress from non-trivial Pantheon-governed Hermes work into chat: plan, action/reason/goal, real sources and metadata, methods, skills/tools actually used, result, limits and optional work posture. Presentation only."
 metadata:
   owner_layer: hermes
   status: candidate_template_only
   governed_by: docs/governance/CONVERSATION_ACTIVITY_PROJECTION.md
-  trace_reference: docs/governance/ROLE_DIALOGUE_TRACE.md
   upstream: "Hermes chat/interim-message presentation convention; exact runtime delivery behavior must be observed before qualification"
 ---
 
@@ -15,8 +14,8 @@ Lightweight presentation adapter for non-trivial governed chat work.
 
 ```text
 projection != persistence
-visible role != activated role
-handoff line != runtime dispatch
+posture label != Pantheon Role
+milestone != runtime dispatch
 retrieved source != truth
 runtime success != approval
 summary rationale != hidden chain-of-thought
@@ -34,12 +33,12 @@ For non-trivial work, keep the presentation contract small and explicit:
 4. every documentary claim cites its task-local source [Sx];
 5. Méthode / Skill / Outil remain separate categories;
 6. quantitative conclusions state their perimeter and reconcile displayed components;
-7. responsibility handoff is shown only when already established by governed context;
+7. a work posture is shown only when the governed method actually selects it;
 8. finish with a compact result / open-points summary when useful.
 ```
 
-If the governed context does not establish a Pantheon Role or next responsibility,
-do not invent one merely to satisfy the display format.
+If the governed method does not select a work posture, do not invent one merely
+to satisfy the display format. Never synthesize a Pantheon Role label from runtime prose.
 
 ## When to use it
 
@@ -57,12 +56,12 @@ Before substantial execution, show the intended path without pretending it is a
 guaranteed runtime transcript.
 
 ```text
-[visible identity if established] · Plan
+⚙ Hermes · Plan
 Objectif: ...
 Étapes: ...
 Sources attendues: ...        # only when already known
 Méthode prévue: ...           # only when already selected/required
-→ Premier relais: ...         # only when the next responsibility is established
+Posture: ...                  # optional: only when actually selected
 ```
 
 If new evidence materially invalidates the plan, show one short adjustment.
@@ -72,7 +71,8 @@ If new evidence materially invalidates the plan, show one short adjustment.
 Use the smallest useful subset of:
 
 ```text
-[visible identity if established] · [semantic function]
+⚙ Hermes · [semantic function]
+Posture: ...                  # optional: Ulysse / Nestor / Dédale / Cassandre when selected
 Action: observable work performed or completed
 Raison: observable condition making it relevant now
 But: concrete result sought
@@ -82,89 +82,48 @@ Skill: ...                    # only when actually used
 Outil: ...                    # only when actually invoked/observed
 Résultat: finding, blocker or changed status
 Limite: ...                   # when material
-→ Relais: next responsibility — reason   # only when established
+Prochaine étape: ...          # proposal only; never runtime dispatch
 ```
 
 `Raison` is a concise observable rationale, not private reasoning. Never output a
 scratchpad, hidden chain-of-thought, token-level alternatives or invented debate.
 
-## Identity and handoff
+## Runtime activity and optional work posture
 
-Use only a visible identity already established by the governed task/context.
-Do not activate a Role or invent a Rite to make the display look structured.
+Pantheon Roles are governance jurisdictions, not runtime identities. Do not use
+`Athena`, `Argos`, `Themis`, `Apollo`, `Hephaistos`, `Iris`, `Zeus` or
+`Mnemosyne` as labels merely because Hermes is performing analysis, retrieval,
+risk review, production, formulation or memory work.
 
-Current compact labels:
+Use `⚙ Hermes` for observable runtime milestones.
 
-```text
-🦉 Athena · Analyse / structuration
-🔎 Argos · Sources / traçabilité
-⚖ Themis · Risque / conformité
-☀ Apollo · Clarté / synthèse
-🛠 Hephaistos · Fabrication / production
-📨 Iris · Transmission / adaptation
-⚡ Zeus · Arbitrage / statut
-🧠 Mnemosyne · Continuité / mémoire
-⚙ Hermes · Exécution
-```
-
-Hermes is a runtime, not a Pantheon Role.
-
-Select labels from observed responsibility, never from the output's object
-name. Typical condition-driven jurisdiction is compact: structure or material
-ambiguity may justify Athena; source support Argos; prior-state continuity
-Mnemosyne; consequential risk Themis; production Hephaistos; delivery quality
-Apollo; recipient/channel adaptation Iris; and actual conflict or final
-procedural status Zeus. Hermes may label an execution milestone. This mapping
-does not require displaying any Role whose contribution is absent.
-
-A `→ Relais` line means the next responsibility, not a new agent or dispatch. If
-Hermes actually delegates runtime work, report that separately as an observed
-Hermes delegation.
-
-## Conditional relays and Zeus checkpoints
-
-A responsibility may propose a relay only after its own observable result is
-available. The relay names the next responsibility, the condition that justifies
-it and the expected contribution:
+When the `pantheon-governed-method` has actually selected a work posture and the
+label materially helps the reader, the milestone may add one of:
 
 ```text
-→ Relais : Themis — source gap concerns regulatory applicability; verify the
-  named rule before closing the finding
+Posture: Ulysse     # lead / coordination
+Posture: Nestor     # investigation / source work
+Posture: Dédale     # production / making
+Posture: Cassandre  # bounded contradiction / critique
 ```
 
-The receiving responsibility is shown only when the governed context admits that
-scope. A proposed Rite or destination is a candidate, never an activation. Zeus
-may add a checkpoint whenever a result, dependency, contradiction or readiness
-status changes: it confirms what remains open, moves unresolved work to
-`to_verify`/`blocked`, or closes the bounded result. Zeus does not watch other
-runs in the background and does not infer approval from a successful stage.
+A posture is a work shape, not an actor identity and not a governance authority.
+Changing posture does not imply a different profile, subagent or execution
+strategy. If Hermes actually delegates, starts a subagent, enters a goal loop or
+uses a Kanban/task graph, report that only from observed runtime state.
 
-## Observable Role outcomes
+```text
+posture selected != Pantheon Role activated
+posture changed != profile changed
+posture changed != subagent created
+next step proposed != next action authorized
+runtime tactic observed != governance authority
+```
 
-Every Role that is materially shown must close its contribution with one
-observable readiness outcome: `ready`, `ready_with_limits`, `needs_revision`,
-`needs_user_input` or `blocked`, plus the smallest useful result, source/evidence
-reference, limitation or next safe action. Do not activate extra Roles merely to populate
-a checklist, and do not confuse a Role outcome with final task approval.
-
-Use natural, result-bearing labels. Avoid vague phrases such as `candidate
-seulement`, `classification requeste` or `exécution déléguée` unless an actual
-delegation was observed. Prefer `périmètre à préciser`, `source ouverte`,
-`résultat non produit` and the exact missing datum or dependency.
-
-For a drafted communication, typical outcomes are: objective and recipient
-grounded (Athena), material facts checked (Argos), commitments/confidentiality
-reviewed (Themis), wording made clear (Apollo), tone/channel adapted (Iris), and
-final readiness stated (Zeus). Use only those that materially contribute.
-
-For a document-gap or compliance review (such as identifying omissions in a
-CCTP), the usual minimal composition is Athena for scope and checklist
-structure, Argos when the exact document and locators are retrieved, Themis when
-technical, regulatory or contractual requirements are compared, Apollo for the
-clear consolidated findings, and Zeus for the final bounded readiness status.
-Hephaistos appears only when a revised document or checklist is actually
-produced. These labels remain conditional: omit any responsibility whose source,
-comparison or deliverable was not genuinely performed.
+Do not create a universal mapping from task conditions to Pantheon Roles for
+presentation. If a Pantheon governance object explicitly records a Role
+viewpoint or decision responsibility, that object may be referenced as governed
+state; model-authored prose must not manufacture it.
 
 When the governed method selects a complex task flow, the public projection may
 show a compact board summary (for example, `3 prêts · 1 en vérification · 1
@@ -174,8 +133,8 @@ question or expose every internal substep.
 
 ```text
 draft complete != transmission authorized
-Role readiness != whole task approved
-unused Role != missing validation
+milestone complete != whole task approved
+posture omitted != missing validation
 ```
 
 ## Source citation and provenance
@@ -351,9 +310,9 @@ Résultat calculé: <derived result>
 Hypothèses: <none or explicitly labelled derived assumptions>
 ```
 
-If a governed Role/handoff has actually been established, project it around the
-same factual content. Otherwise keep the direct Hermes presentation rather than
-inventing role theatre.
+If a work posture has actually been selected, it may be shown around the same
+factual content. Otherwise keep the direct Hermes presentation. Do not invent
+Pantheon Role theatre.
 
 This is a general presentation shape, not a dossier-specific workflow or a claim
 about any real corpus.
@@ -366,6 +325,6 @@ Cite only real sources and observed metadata.
 Give every supporting document its own source reference.
 Name only methods, skills and tools actually selected or used.
 Reconcile quantitative components and monetary bases before drawing a quantitative conclusion.
-Make established responsibility changes explicit without inventing dispatch.
+Make materially changed next steps explicit without inventing dispatch or Pantheon Role state.
 Never expose hidden reasoning and never turn presentation into authority.
 ```
