@@ -7,6 +7,12 @@
     approval: "Approbation",
     arbitration: "Arbitrage",
   });
+  const ACTION_LABELS = Object.freeze({
+    question: "Répondre",
+    validation: "Valider",
+    approval: "Approuver",
+    arbitration: "Arbitrer",
+  });
   const PRIORITY_LABELS = Object.freeze({
     low: "Faible",
     normal: "Normale",
@@ -49,6 +55,7 @@
     const request = requestData(envelope);
     const requestId = request.request_id || crypto.randomUUID();
     const typeLabel = TYPE_LABELS[request.decision_type] || "Décision";
+    const actionLabel = ACTION_LABELS[request.decision_type] || "Décider";
     const priorityLabel = PRIORITY_LABELS[request.priority] || text(request.priority, "Normale");
     const sources = Array.isArray(request.source_refs) ? request.source_refs : [];
     const gaps = Array.isArray(request.evidence_gaps) ? request.evidence_gaps : [];
@@ -70,7 +77,7 @@
         request.blocking ? "bloquant" : "non bloquant",
         ...gaps.map(gap => `écart: ${gap}`),
       ],
-      available_actions: request.status === "pending" ? ["Décider"] : [],
+      available_actions: request.status === "pending" ? [actionLabel] : [],
       back: [
         ["Type", typeLabel],
         ["Priorité", priorityLabel],
