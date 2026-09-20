@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 PROJECTION = COCKPIT / "projection" / "decision_request_projection.js"
 ACTIONS = COCKPIT / "actions" / "decision_request_actions.js"
+CARD_ACTIONS = COCKPIT / "actions" / "card_actions.js"
 ASSEMBLER = COCKPIT / "projection" / "child_collection_assembler.js"
 LOADER = COCKPIT / "data" / "cockpit_data_loader.js"
 DEFINITIONS = COCKPIT / "registries" / "card_projection_definitions.json"
@@ -24,7 +25,11 @@ def test_decision_request_projection_preserves_one_stable_identity() -> None:
 
     assert "decision-request:${requestId}" in source
     assert "request_is_not_decision: true" in source
-    assert 'available_actions: request.status === "pending" ? ["Décider"] : []' in source
+    assert 'question: "Répondre"' in source
+    assert 'validation: "Valider"' in source
+    assert 'approval: "Approuver"' in source
+    assert 'arbitration: "Arbitrer"' in source
+    assert 'available_actions: request.status === "pending" ? [actionLabel] : []' in source
     assert "PantheonGlobalDecisionRequests" in loader
     assert "PantheonProjectDecisionRequests" in loader
     assert "PantheonGlobalDecisionRequests" in assembler
@@ -53,6 +58,15 @@ def test_decision_action_records_only_a_human_determination() -> None:
     assert 'X-Pantheon-Human-Actor' in source
     assert "Cette opération crée un Decision record immuable" in source
 
+    assert 'const REQUEST_PREFIX = "decision-request:"' in source
+    assert "requestIdFromCard(card)" in source
+    assert 'const ACTION = "Décider"' not in source
+    assert "button.textContent?.trim()" not in source
+
+    generic_actions = CARD_ACTIONS.read_text(encoding="utf-8")
+    assert 'const DECISION_REQUEST_PREFIX = "decision-request:"' in generic_actions
+    assert "entityId.startsWith(DECISION_REQUEST_PREFIX)" in generic_actions
+
     for forbidden in (
         "handoff-submit",
         "handoff-admit",
@@ -66,7 +80,7 @@ def test_decision_action_records_only_a_human_determination() -> None:
         assert forbidden not in source
 
 
-@pytest.mark.parametrize("path", [PROJECTION, ACTIONS, ASSEMBLER, LOADER])
+@pytest.mark.parametrize("path", [PROJECTION, ACTIONS, CARD_ACTIONS, ASSEMBLER, LOADER])
 def test_decision_cockpit_javascript_parses(path: Path) -> None:
     node = shutil.which("node")
     if node is None:

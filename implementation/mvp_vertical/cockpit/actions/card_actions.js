@@ -3,6 +3,7 @@
 
   const $ = id => document.getElementById(id);
   const SUPPORTED = new Set(["Modifier avec Hermès", "Acter", "Nouvelle version", "Valider", "Refuser", "Inspecter les chunks"]);
+  const DECISION_REQUEST_PREFIX = "decision-request:";
 
   const key = prefix => `${prefix}-${globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`}`;
 
@@ -308,6 +309,9 @@
 
   function enableRenderedActions(root = document) {
     for (const button of root.querySelectorAll?.(":is(.card-actions, .v2-card-actions) button") || []) {
+      const card = button.closest?.(":is(.card, .v2-card)");
+      const entityId = card?.querySelector(":is(.card-entity-id, .v2-entity-id)")?.textContent?.trim() || "";
+      if (entityId.startsWith(DECISION_REQUEST_PREFIX)) continue;
       const label = button.textContent?.trim();
       if (!SUPPORTED.has(label)) continue;
       if (label === "Inspecter les chunks" && !hasCompiledDocument(button.closest(":is(.card, .v2-card)"))) {
