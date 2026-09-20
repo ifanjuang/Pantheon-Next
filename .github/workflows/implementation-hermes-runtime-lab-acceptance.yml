@@ -19,6 +19,7 @@ on:
       - "implementation/tools/run_hermes_runtime_lab_acceptance.sh"
       - "implementation/tools/validate_hermes_execution_trace_e_acceptance.py"
       - "implementation/tests/test_hermes_runtime_lab_acceptance_contract.py"
+      - "implementation/tests/fixtures/hermes_plugins/pantheon-effect-sentinel/**"
       - "implementation/tests/test_hermes_execution_trace_binding.py"
       - "implementation/tests/test_hermes_execution_trace_e_acceptance.py"
       - "implementation/tests/test_hermes_runs_observer.py"
@@ -45,6 +46,7 @@ jobs:
       PANTHEON_HERMES_API_BASE: http://127.0.0.1:9010
       PANTHEON_HERMES_API_KEY: pantheon-lab-key
       PANTHEON_HERMES_ACTOR: hermes-runtime-lab-binding
+      PANTHEON_RUN_PRETOOL_SENTINEL: "1"
 
     steps:
       - name: Checkout current monorepo candidate

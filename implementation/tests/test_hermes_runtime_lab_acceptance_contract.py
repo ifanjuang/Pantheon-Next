@@ -19,6 +19,13 @@ SEQUENCE = ROOT / "tools" / "run_hermes_runtime_lab_acceptance.sh"
 VARIANT_SEQUENCE = ROOT / "tools" / "run_hermes_project_variant_lab_acceptance.sh"
 HARNESS = ROOT / "tools" / "run_hermes_runtime_lab_acceptance.py"
 FIXTURE = ROOT / "tools" / "hermes_runtime_lab_fixture.py"
+SENTINEL_PLUGIN = (
+    ROOT
+    / "tests"
+    / "fixtures"
+    / "hermes_plugins"
+    / "pantheon-effect-sentinel"
+)
 VARIANT_HARNESS = ROOT / "tools" / "run_hermes_project_variant_lab_acceptance.py"
 VARIANT_FIXTURE = ROOT / "tools" / "hermes_project_variant_lab_fixture.py"
 DISTRIBUTION = ROOT / "mvp_vertical" / "hermes_distribution.py"
@@ -43,6 +50,7 @@ def test_lab_acceptance_is_registry_pinned_and_ephemeral() -> None:
     assert "HERMES_RELEASE_COMMIT" not in env
     assert "HERMES_VERSION" not in env
     assert env["PANTHEON_DISTRIBUTION_AUTHORITY_REF"] == DISTRIBUTION_AUTHORITY_REF
+    assert env["PANTHEON_RUN_PRETOOL_SENTINEL"] == "1"
     assert "PANTHEON_NEXT_REF" not in env
     assert env["HERMES_API_BASE"].endswith("/p/pantheon-governed")
     assert "export_external_qualification_pins.py" in raw
@@ -52,6 +60,10 @@ def test_lab_acceptance_is_registry_pinned_and_ephemeral() -> None:
     assert "bash tools/run_hermes_runtime_lab_acceptance.sh" in raw
     assert "implementation/qualification/external-pins.json" in workflow[True]["pull_request"]["paths"]
     assert "implementation/tools/run_hermes_runtime_lab_acceptance.sh" in workflow[True]["pull_request"]["paths"]
+    assert (
+        "implementation/tests/fixtures/hermes_plugins/pantheon-effect-sentinel/**"
+        in workflow[True]["pull_request"]["paths"]
+    )
     assert "Expose transitional pantheon-mvp workspace alias" not in raw
     assert "path: distribution-authority" in raw
     assert "templates/hermes/distribution/distribution-lock.schema.yaml" in raw
@@ -68,6 +80,7 @@ def test_variant_lab_uses_same_bounded_distribution_authority_and_registry_pin()
     env = job["env"]
     assert workflow["name"] == "Hermes Project Variant Lab"
     assert env["PANTHEON_DISTRIBUTION_AUTHORITY_REF"] == DISTRIBUTION_AUTHORITY_REF
+    assert "PANTHEON_RUN_PRETOOL_SENTINEL" not in env
     assert "HERMES_RELEASE_COMMIT" not in env
     assert "HERMES_VERSION" not in env
     assert "PANTHEON_NEXT_REF" not in env
@@ -179,6 +192,11 @@ def test_harness_fails_closed_and_does_not_claim_target_acceptance() -> None:
     assert "X-Hermes-Session-Key reached a fixture" in raw
     assert 'rollback.get("plugin_disabled") is True' in raw
     assert "This qualifies an ephemeral GitHub-hosted laboratory installation only." in raw
+    assert '"pre_tool_call_sentinel_exercised": sentinel_required' in raw
+    assert '"pre_tool_call_block_observed": bool(' in raw
+    assert '"pre_tool_call_exception_fail_open_observed": bool(' in raw
+    assert '"pre_tool_call_is_pantheon_pep": False' in raw
+    assert "sentinel-observation.json" in raw
 
 
 def test_fixture_uses_native_progressive_tool_disclosure() -> None:
@@ -221,3 +239,53 @@ def test_fixture_is_local_bounded_and_exercises_context_refusal() -> None:
     assert '"project_mutated": False' in raw
     assert "requests" not in raw
     assert "subprocess" not in raw
+
+
+def test_pre_tool_sentinel_is_lab_only_and_exercises_real_runs_route() -> None:
+    sequence = SEQUENCE.read_text(encoding="utf-8")
+    fixture = FIXTURE.read_text(encoding="utf-8")
+    plugin = (SENTINEL_PLUGIN / "__init__.py").read_text(encoding="utf-8")
+    manifest = yaml.safe_load(
+        (SENTINEL_PLUGIN / "plugin.yaml").read_text(encoding="utf-8")
+    )
+
+    ast.parse(plugin)
+    assert manifest["name"] == "pantheon-effect-sentinel"
+    assert manifest["provides_tools"] == ["pantheon_effect_sentinel"]
+    assert manifest["provides_hooks"] == ["pre_tool_call"]
+
+    assert "implementation/tests/fixtures/hermes_plugins/pantheon-effect-sentinel" in sequence
+    assert 'if [ "${PANTHEON_RUN_PRETOOL_SENTINEL:-0}" = "1" ]; then' in sequence
+    assert 'hermes plugins validate "$SENTINEL_SOURCE_DIR" --json' in sequence
+    assert 'hermes -p "$PROFILE" plugins doctor pantheon-effect-sentinel --ci' in sequence
+    assert '"$HERMES_API_BASE/v1/runs"' in sequence
+    assert "EXPECT_BLOCK" in sequence
+    assert "EXPECT_FAIL_OPEN" in sequence
+    assert 'test ! -e "$PANTHEON_SENTINEL_SINK"' in sequence
+    assert 'test -f "$PANTHEON_SENTINEL_SINK"' in sequence
+    assert '"pantheon_pep_qualified_by_this_test": False' in sequence
+    assert "sentinel_plugin_disabled" in sequence
+    assert "sentinel_tool_policy_restored" in sequence
+
+    assert 'SENTINEL_MARKER = "PANTHEON_EFFECT_SENTINEL_V1"' in fixture
+    assert '"pantheon effect sentinel"' in fixture
+    assert "SENTINEL_BLOCK_CONFIRMED" in fixture
+    assert "SENTINEL_FAIL_OPEN_CONFIRMED" in fixture
+
+    assert 'ctx.register_hook("pre_tool_call", _pre_tool_call)' in plugin
+    assert 'if mode == "block":' in plugin
+    assert 'if mode == "raise":' in plugin
+    assert 'raise RuntimeError("PANTHEON_SENTINEL_HOOK_EXCEPTION")' in plugin
+    assert '"effect_ran": True' in plugin
+    assert "governed_effect" not in plugin
+    assert "Decision" not in plugin
+    assert "Evidence" not in plugin
+
+
+def test_sentinel_qualification_runs_after_bounded_context_proof_and_before_rollback() -> None:
+    raw = SEQUENCE.read_text(encoding="utf-8")
+    reconcile = raw.index('pantheon-hermes reconcile')
+    sentinel = raw.index('phase "Qualify pre_tool_call with a synthetic effect sentinel"')
+    restore = raw.index('phase "Restore governed profile after sentinel qualification"')
+    disable_context = raw.index('hermes -p "$PROFILE" plugins disable pantheon-context-bridge')
+    assert reconcile < sentinel < restore < disable_context

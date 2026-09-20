@@ -216,6 +216,12 @@ def validate(artifacts: Path) -> dict[str, Any]:
     reconciliation = _load_json(artifacts / "return-receipt.json")
     fixture_state = _load_json(artifacts / "fixture-state.json")
     rollback = _load_json(artifacts / "rollback.json")
+    sentinel_required = os.environ.get("PANTHEON_RUN_PRETOOL_SENTINEL", "0").strip() == "1"
+    sentinel = (
+        _load_json(artifacts / "sentinel-observation.json")
+        if sentinel_required
+        else None
+    )
 
     _require(expected_version in version, f"unexpected Hermes version: {version}")
     _require(SHA256_RE.fullmatch(source_digest) is not None, "invalid source digest")
@@ -325,6 +331,68 @@ def validate(artifacts: Path) -> dict[str, Any]:
         "profile route remained reachable",
     )
 
+    if sentinel_required:
+        _require(sentinel is not None, "sentinel receipt is required")
+        _require(
+            sentinel.get("pre_tool_call_block_observed") is True,
+            "pre_tool_call block was not observed through the real Runs route",
+        )
+        _require(
+            sentinel.get("blocked_effect_sink_untouched") is True,
+            "blocked sentinel effect touched its sink",
+        )
+        _require(
+            sentinel.get("callback_exception_fail_open_observed") is True,
+            "ordinary pre_tool_call callback exception did not reproduce pinned fail-open semantics",
+        )
+        _require(
+            sentinel.get("exception_effect_sink_touched") is True,
+            "exception-path sentinel effect did not reach its synthetic sink",
+        )
+        _require_false(
+            sentinel,
+            "pantheon_pep_qualified_by_this_test",
+            "runtime sentinel was incorrectly promoted to Pantheon PEP qualification",
+        )
+        _require_false(
+            sentinel,
+            "technical_receipt_is_evidence",
+            "sentinel technical observation classified as Evidence",
+        )
+        _require_false(
+            sentinel,
+            "production_authorization",
+            "sentinel technical observation claimed production authorization",
+        )
+        _require(
+            rollback.get("sentinel_exercised") is True,
+            "sentinel run was not recorded as exercised",
+        )
+        _require(
+            rollback.get("sentinel_plugin_disabled") is True,
+            "sentinel plugin rollback failed",
+        )
+        _require(
+            rollback.get("sentinel_tool_policy_restored") is True,
+            "sentinel tool policy rollback failed",
+        )
+    else:
+        _require(
+            rollback.get("sentinel_exercised") is False,
+            "non-sentinel lab incorrectly claims the sentinel was exercised",
+        )
+
+    limits = [
+        "This qualifies an ephemeral GitHub-hosted laboratory installation only.",
+        "The NAS installation, OpenWebUI path and production rollback remain unobserved.",
+        "The inference provider and Pantheon API were deterministic local fixtures.",
+    ]
+    if sentinel_required:
+        limits.append(
+            "The effect sentinel is synthetic and characterizes Hermes hook behavior only; "
+            "it does not qualify Pantheon's PEP."
+        )
+
     summary = {
         "kind": "hermes_runtime_ephemeral_lab_acceptance",
         "status": "passed",
@@ -340,16 +408,22 @@ def validate(artifacts: Path) -> dict[str, Any]:
         "admitted_entity_read": True,
         "outside_entity_refused": True,
         "rollback_verified": True,
+        "pre_tool_call_sentinel_exercised": sentinel_required,
+        "pre_tool_call_block_observed": bool(
+            sentinel_required and sentinel and sentinel.get("pre_tool_call_block_observed") is True
+        ),
+        "pre_tool_call_exception_fail_open_observed": bool(
+            sentinel_required
+            and sentinel
+            and sentinel.get("callback_exception_fail_open_observed") is True
+        ),
+        "pre_tool_call_is_pantheon_pep": False,
         "target_installation_observed": False,
         "production_activated": False,
         "future_tasks_authorized": False,
         "result_accepted": False,
         "evidence_admitted": False,
-        "limits": [
-            "This qualifies an ephemeral GitHub-hosted laboratory installation only.",
-            "The NAS installation, OpenWebUI path and production rollback remain unobserved.",
-            "The inference provider and Pantheon API were deterministic local fixtures.",
-        ],
+        "limits": limits,
     }
     (artifacts / "acceptance-summary.json").write_text(
         json.dumps(summary, indent=2, ensure_ascii=False, sort_keys=True) + "\n",

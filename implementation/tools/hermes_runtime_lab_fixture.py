@@ -29,6 +29,10 @@ PROFILE_ENTITY_ID = "project-lab"
 OUTSIDE_ENTITY_ID = "project-outside"
 GOVERNED_TOOLS = {"pantheon_context_manifest", "pantheon_context_entity"}
 BRIDGE_TOOLS = {"tool_search", "tool_describe", "tool_call"}
+SENTINEL_TOOL = "pantheon_effect_sentinel"
+SENTINEL_MARKER = "PANTHEON_EFFECT_SENTINEL_V1"
+SENTINEL_EXPECT_BLOCK = "EXPECT_BLOCK"
+SENTINEL_EXPECT_FAIL_OPEN = "EXPECT_FAIL_OPEN"
 
 
 def _tool_name(item: Any) -> str:
@@ -66,6 +70,17 @@ def _tool_result_messages(messages: list[Any]) -> list[dict[str, Any]]:
         for item in messages
         if isinstance(item, dict) and item.get("role") == "tool"
     ]
+
+
+def _user_text(messages: list[Any]) -> str:
+    parts: list[str] = []
+    for item in messages:
+        if not isinstance(item, dict) or item.get("role") != "user":
+            continue
+        content = item.get("content")
+        if isinstance(content, str):
+            parts.append(content)
+    return "\n".join(parts)
 
 
 def _tool_call_message(step: int, name: str, arguments: dict[str, Any]) -> dict[str, Any]:
@@ -433,6 +448,74 @@ class Handler(BaseHTTPRequestHandler):
                 return
         self._send(HTTPStatus.NOT_FOUND, {"error": "not found"})
 
+    def _handle_sentinel_chat(
+        self,
+        body: dict[str, Any],
+        results: list[dict[str, Any]],
+        prompt_text: str,
+        step: int,
+    ) -> None:
+        expect_block = SENTINEL_EXPECT_BLOCK in prompt_text
+        expect_fail_open = SENTINEL_EXPECT_FAIL_OPEN in prompt_text
+        if expect_block == expect_fail_open:
+            self._send(
+                HTTPStatus.BAD_REQUEST,
+                {"error": "sentinel prompt must select exactly one expected outcome"},
+            )
+            return
+
+        marker_value = "block" if expect_block else "raise"
+        if step == 0:
+            response = _tool_call_message(
+                step,
+                "tool_search",
+                {"queries": ["pantheon effect sentinel"], "limit": 5},
+            )
+        elif step == 1:
+            response = _tool_call_message(
+                step,
+                "tool_describe",
+                {"names": [SENTINEL_TOOL]},
+            )
+        elif step == 2:
+            response = _tool_call_message(
+                step,
+                "tool_call",
+                {"name": SENTINEL_TOOL, "arguments": {"marker": marker_value}},
+            )
+        else:
+            tool_result = str(results[2].get("content", "")) if len(results) > 2 else ""
+            if expect_block:
+                observed = "PANTHEON_SENTINEL_BLOCKED" in tool_result
+                final = "SENTINEL_BLOCK_CONFIRMED"
+            else:
+                observed = "effect_ran" in tool_result and "true" in tool_result.lower()
+                final = "SENTINEL_FAIL_OPEN_CONFIRMED"
+            if not observed:
+                self._send(
+                    HTTPStatus.BAD_REQUEST,
+                    {
+                        "error": "sentinel outcome did not match the requested observation",
+                        "expected": marker_value,
+                    },
+                )
+                return
+            response = {
+                "id": f"chatcmpl-hermes-sentinel-{marker_value}",
+                "object": "chat.completion",
+                "created": int(time.time()),
+                "model": "lab-model",
+                "choices": [
+                    {
+                        "index": 0,
+                        "message": {"role": "assistant", "content": final},
+                        "finish_reason": "stop",
+                    }
+                ],
+                "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
+            }
+        self._send_completion(body, response)
+
     def _handle_chat(self, body: dict[str, Any]) -> None:
         messages = body.get("messages")
         if not isinstance(messages, list):
@@ -454,6 +537,11 @@ class Handler(BaseHTTPRequestHandler):
         step = len(results)
         with self.state.lock:
             self.state.provider_calls += 1
+
+        prompt_text = _user_text(messages)
+        if SENTINEL_MARKER in prompt_text:
+            self._handle_sentinel_chat(body, results, prompt_text, step)
+            return
 
         if step == 0:
             response = _tool_call_message(
