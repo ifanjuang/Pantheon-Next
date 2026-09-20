@@ -168,10 +168,3 @@ docs/governance/EXTERNAL_TOOLS_POLICY.md
 # WATCHLIST.md remains the policy/status/routing owner; SKILL_WATCHLIST.md is now
 # only a compact non-authoritative reference view over skill-ecosystem signals.
 docs/governance/SKILL_WATCHLIST.md
-
-# Deliberate Role/runtime convergence: the former Role Dialogue Trace mixed the
-# useful bounded Cockpit relay with an obsolete model-authored Pantheon Role
-# narration contract. The retained document now owns only the legacy compatibility
-# boundary while active Hermes presentation uses generic runtime milestones and
-# optional non-authoritative work postures.
-docs/governance/ROLE_DIALOGUE_TRACE.md
