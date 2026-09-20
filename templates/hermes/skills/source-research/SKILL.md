@@ -105,25 +105,25 @@ registered route != inspected source
 workspace access != task authorization
 ```
 
-### Candidate discovery-route separation
+### Optional user-selected discovery routes
 
-Issue #1095 records two replaceable candidate bindings behind this existing skill:
+Issue #1095 records two optional, user-selected routes behind this existing skill:
 
 ```text
 curated professional source library
--> Zotero read-only candidate
+-> optional Zotero read-only route
 
 external academic discovery
--> Consensus MCP candidate
+-> optional Consensus MCP route
 ```
 
-These are discovery routes, not new research owners.
+These are optional integrations, not default dependencies, adoption candidates or new research owners. The user may choose either, both or neither for a task.
 
-When a curated library route is admitted, prefer stable library / collection / item identifiers over physical storage paths. Collection membership may narrow discovery but does not establish Case identity, source applicability, Evidence status or professional authority.
+When the user selects a curated-library route and the task permits it, prefer stable library / collection / item identifiers over physical storage paths. Collection membership may narrow discovery but does not establish Case identity, source applicability, Evidence status or professional authority.
 
-When an external academic-discovery route is admitted, treat returned rankings, metadata, snippets and generated takeaways as discovery material only. For material claims, inspect the original source when technically available before relying on it.
+When the user selects an external academic-discovery route and the task permits it, treat returned rankings, metadata, snippets and generated takeaways as discovery material only. For material claims, inspect the original source when technically available before relying on it.
 
-Do not hard-code a universal route order. Prefer the least exposed and least expensive admitted route that can materially answer the bounded question, then widen only when useful.
+Do not auto-enable either route and do not hard-code a universal route order. Use only the routes the user selected for the task and that remain permitted by the applicable scope/authorization. If neither is selected, source-research continues through its other admitted routes.
 
 A useful pattern may be:
 
