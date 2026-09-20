@@ -60,8 +60,52 @@ Governing a capability is not implementing it.
 | `ifixai-ai/iFixAi` | Open-source AI operational-misalignment diagnostic with provider adapters, structural and judge-based inspections, scorecards and content-addressed run manifests. | External evaluation-method reference and watchlist item only; possible bounded Hermes-side lab runner against fictional fixtures after separate review. Not a Pantheon approval, certification or production gate. | External reference / watchlist | High if full model I/O, multi-provider judging, persistent telemetry, public test corpora or aggregate grades are treated as safe evidence | Accepté as method reference only; installation and operational use not approved | Documented decision; not installed; not approved; inactive | Distill coverage-disclosure and declared-versus-observed patterns. Do not run on client or production data; revisit only through a separate data-handling, telemetry, provider, cost and reproducibility review. |
 | `Brescou/langgraph-agent-stack` | Deployable LangGraph and FastAPI multi-agent template with typed domain packs, version routing, memory, providers, connectors, evaluation, observability and deployment scaffolding. | External runtime reference only; possible specialized Hermes-side orchestration binding if a proven capability gap requires stateful graph execution. Not Pantheon core and not a default Hermes runtime. | External reference / watchlist | Critical if its control plane, memory, review queue, plugins or routing become Pantheon authority or duplicate Hermes | Refusé as Pantheon runtime; accepté as design reference only | Documented decision; not installed; not approved; inactive | Distill bounded pack-contract, evaluation, canary, budget, supply-chain and interrupt/resume patterns only. Revisit a binding only after an explicit Hermes capability gap and separate governed review. |
 | `mr-september/hermes-uplink` | Third-party mobile PWA / thin client that proxies Hermes sessions and capabilities through a loopback proxy and Tailscale Funnel. | External UX reference only. It may inspire mobile session-resume patterns, but it is not a Pantheon Cockpit, selected/default Hermes client or governed action surface. | Reference only / refused for current architecture | Critical if it creates a direct Hermes bypass, exposes full sessions/capabilities through one shared credential or adds an ungoverned public endpoint | Refusé as integration; accepté as UX reference only | Documented decision; not installed; not approved; inactive | Do not adopt. Distill only bounded mobile and resumable-session UX patterns if they remain useful after comparison with official Hermes surfaces. |
+| `rednicv/hermes-improvements` v3.0.0 | Third-party Hermes enhancement package: vector memory prefetch, adaptive style/soul, task-complexity classification, reasoning/source trace helpers and a `run_conversation` wrapper installed by modifying Hermes `agent_init.py`. | Optional Hermes-side capability/reference only. Useful patterns may be distilled or rebound through a stable Hermes extension seam. It is not Pantheon core, not a required Hermes layer and must never pin Hermes to an older release. | Candidate / to verify | High if adaptive memory or learned rules are injected after Pantheon context admission, if core-file patching breaks on a Hermes upgrade, or if reasoning traces are mistaken for Evidence / exposed hidden reasoning | Accepté for bounded qualification only; bundle not accepted as-is | Documented decision; not installed; not approved; inactive | Re-test against the latest stable Hermes, require no version hold, classify cache-safe turn injection / adaptive workflow / memory separately, and prefer a native plugin/hook seam over patching `agent_init.py`. |
 
 ## Tool notes
+
+### Hermes Improvements v3.0.0
+
+Reviewed source: `rednicv/hermes-improvements` release `v3.0.0`, published 2026-09-20.
+
+Useful patterns:
+
+- cache-safe adaptive context rides the active user turn instead of mutating the stable system prompt;
+- a lightweight task-complexity signal may inform Hermes runtime tactic selection and can be compared through #1094;
+- vector-memory prefetch may reduce prompt bloat;
+- explicit uncertainty and source-attribution helpers may improve candidate readability.
+
+Current blockers to bundle adoption:
+
+1. Installation still edits Hermes `agent/agent_init.py` and wraps `run_conversation`. Pantheon now follows the latest stable Hermes release, so a third-party patch must adapt to Hermes rather than constrain the Hermes version.
+2. Adaptive memory and AdaptiveSoul inject runtime material into the active user turn. For Pantheon-governed runs, any such material must stay inside the admitted runtime/context boundary; it cannot silently widen a Context Pack or turn memory into Evidence.
+3. `ReasoningTracer` is presented as chain-of-thought-style tracing. Pantheon must not require, persist or expose hidden reasoning. Only explicit candidate rationale, source references, uncertainty and bounded runtime observations are admissible.
+4. The v3.0.0 release text claims a complete pass while embedding output that reports 3/38 prefetch failures. Inspection shows the E2E fixture creates test memory under a temporary `HERMES_HOME` but the direct prefetch section opens `~/.hermes/memories`; this likely explains those three failures, but the release proof is therefore not clean enough to count as qualification.
+5. Vector memory and adaptive memory overlap capabilities already available or being qualified through Hermes native memory / Hindsight. Duplication must show measurable gain before another persistent memory lane is admitted.
+
+Pantheon posture:
+
+```text
+latest stable Hermes
+-> always moves first
+
+third-party enhancement compatible
+-> optional binding / capability candidate
+
+third-party enhancement incompatible
+-> adapt / replace / disable the enhancement
+-> never hold Hermes back
+
+runtime memory injected
+!= admitted project fact
+!= Evidence
+
+reasoning trace
+!= Evidence
+!= required hidden chain-of-thought
+```
+
+A future qualification should test the modules independently rather than adopt the bundle as one authority-bearing package.
 
 ### GSAP Skills
 
