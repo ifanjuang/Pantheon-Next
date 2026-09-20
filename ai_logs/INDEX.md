@@ -14,7 +14,7 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **936**.
+Total indexed entries: **917**.
 
 | Date | Log | Subject |
 |---|---|---|
@@ -197,18 +197,15 @@ Total indexed entries: **936**.
 | 2026-08-09 | `2026/Q3/2026-08-09-project-anatomy-v02-match-continuity.md` | Project Anatomy V0.2 match-application continuity |
 | 2026-08-09 | `2026/Q3/2026-08-09-project-anatomy-v02-clean-baseline.md` | Project Anatomy V0.2 clean baseline |
 | 2026-08-09 | `2026/Q3/2026-08-09-observation-bundle-freshness-coverage-convergence.md` | Observation Bundle freshness and coverage convergence |
-| 2026-08-09 | `2026/Q3/2026-08-09-i9-passport-owner-convergence.md` | 2026-08-09 — I9 Capability Passport owner convergence |
 | 2026-08-09 | `2026/Q3/2026-08-09-i8-capability-vertical-qualification.md` | I8 — representative Capability vertical qualification |
 | 2026-08-09 | `2026/Q3/2026-08-09-i6-compatibility-observation.md` | 2026-08-09 — I6 exact-release compatibility observation |
 | 2026-08-09 | `2026/Q3/2026-08-09-i5-capability-activation.md` | 2026-08-09 — I5 scoped Capability Binding activation |
 | 2026-08-09 | `2026/Q3/2026-08-09-i4-capability-eligibility.md` | 2026-08-09 — I4 Capability eligibility convergence |
 | 2026-08-09 | `2026/Q3/2026-08-09-i3-capability-binding.md` | 2026-08-09 — I3 Capability Binding convergence |
-| 2026-08-09 | `2026/Q3/2026-08-09-i2-implementation-provenance.md` | 2026-08-09 — I2 implementation provenance convergence |
 | 2026-08-09 | `2026/Q3/2026-08-09-i1-capability-passport-authority-correction.md` | 2026-08-09 — I1 Capability / Passport authority correction |
 | 2026-08-09 | `2026/Q3/2026-08-09-i1-capability-identity-separation.md` | 2026-08-09 — I1 Capability identity separation |
 | 2026-08-09 | `2026/Q3/2026-08-09-h5-2-deterministic-corpus.md` | 2026-08-09 — H5.2 deterministic Project Anatomy corpus |
 | 2026-08-09 | `2026/Q3/2026-08-09-document-exchange-convergence.md` | 2026-08-09 — Agency document exchange convergence |
-| 2026-08-09 | `2026/Q3/2026-08-09-capability-governance-convergence-inventory.md` | 2026-08-09 — Capability governance convergence inventory |
 | 2026-08-08 | `2026/Q3/2026-08-08-opentakeoff-v02-specialization.md` | OpenTakeoff / drawing takeoff specialization on APU V0.2 |
 | 2026-08-08 | `2026/Q3/2026-08-08-landing-readme-system-diagrams.md` | Landing and README system diagrams |
 | 2026-08-08 | `2026/Q3/2026-08-08-document-purpose-currentness.md` | Document purpose-specific currentness convergence — 2026-08-08 |
@@ -224,7 +221,6 @@ Total indexed entries: **936**.
 | 2026-08-07 | `2026/Q3/2026-08-07-project-anatomy-design-rationale.md` | AI log — Project Anatomy design rationale preservation |
 | 2026-08-07 | `2026/Q3/2026-08-07-landing-diagram-governance-correction.md` | Landing diagrams — governance correction |
 | 2026-08-07 | `2026/Q3/2026-08-07-hermes-execution-trace-summary-contract.md` | AI intervention trace — Hermes execution trace summary contract |
-| 2026-08-07 | `2026/Q3/2026-08-07-hermes-execution-preparation-convergence.md` | AI intervention trace — Hermes execution preparation convergence |
 | 2026-08-07 | `2026/Q3/2026-08-07-external-runtime-memory-sandbox-priority.md` | External runtime memory sandbox priority |
 | 2026-08-07 | `2026/Q3/2026-08-07-agent-plugins-interoperability-review.md` | Agent Plugins interoperability review |
 | 2026-08-06 | `2026/Q3/2026-08-06-work-issue-scope-contract.md` | WorkIssue scope contract |
@@ -288,7 +284,6 @@ Total indexed entries: **936**.
 | 2026-07-23 | `2026/Q3/2026-07-23-document-lifecycle-governance-rfc.md` | 2026-07-23 — Governed document lifecycle RFC |
 | 2026-07-23 | `2026/Q3/2026-07-23-codex-coherence-fixes-and-impl-roadmap.md` | 2026-07-23 — Codex coherence fixes and implementation roadmap |
 | 2026-07-23 | `2026/Q3/2026-07-23-cockpit-information-architecture.md` | 2026-07-23 — Cockpit information architecture |
-| 2026-07-23 | `2026/Q3/2026-07-23-cartographie-integration-trois-depots.md` | 2026-07-23 — Cartographie d'intégration des trois zones (Next / MCP / MVP) |
 | 2026-07-23 | `2026-07-23-no-local-cockpit-boundary.md` | 2026-07-23 — No-local-cockpit boundary guard |
 | 2026-07-23 | `2026-07-23-next-mvp-placement-and-dashboard-cleanup.md` | 2026-07-23 — Next/MVP placement and dashboard cleanup |
 | 2026-07-22 | `2026-07-22-policy-http-refactor.md` | Policy transport adapter refactor |
@@ -320,7 +315,6 @@ Total indexed entries: **936**.
 | 2026-07-14 | `2026-07-14-langgraph-agent-stack-placement.md` | LangGraph Agent Stack external placement |
 | 2026-07-13 | `2026-07-13-strict-mcp-evidence-validation.md` | Strict MCP evidence validation |
 | 2026-07-13 | `2026-07-13-mvp-decision-schema-reconciliation.md` | 2026-07-13 — MVP decision vocabulary and schema reconciliation |
-| 2026-07-13 | `2026-07-13-cockpit-consolidation-roadmap.md` | Cockpit consolidation roadmap launch |
 | 2026-07-13 | `2026-07-13-card-stack-a1-reconciliation.md` | Card Stack A1 reconciliation |
 | 2026-07-12 | `2026-07-12-provisioner-handoff-contracts.md` | AI intervention trace — provisioner handoff contracts |
 | 2026-07-12 | `2026-07-12-handoff-human-decision-contract.md` | AI intervention trace — handoff human decision contract |
@@ -470,7 +464,6 @@ Total indexed entries: **936**.
 | 2026-06-30 | `2026-06-30-mcp-status-after-pr-239.md` | AI Log — MCP status alignment after PR #239 |
 | 2026-06-30 | `2026-06-30-fix-runtime-phrase-landing-queue.md` | AI log — unblock CI: reword affirmative "landing queue" |
 | 2026-06-30 | `2026-06-30-authority-index-mcp-alignment-applied.md` | AI log — AUTHORITY_INDEX.md MCP alignment applied |
-| 2026-06-30 | `2026-06-30-audit-qualite-global.md` | 2026-06-30 — Audit qualité global du dépôt |
 | 2026-06-29 | `2026-06-29_bfl_openai_image_proxy_cartography.md` | AI Log — BFL OpenAI Image Proxy cartography |
 | 2026-06-29 | `2026-06-29-moa-reference-role-cleanup.md` | AI Log — MoA Reference Role Cleanup |
 | 2026-06-29 | `2026-06-29-method-role-cleanup.md` | AI Log — Method Role Cleanup |
@@ -896,15 +889,10 @@ Total indexed entries: **936**.
 | 2026-05-17 | `2026-05-17-status-changelog-alignment.md` | AI Log — Status and changelog alignment |
 | 2026-05-17 | `2026-05-17-simple-tool-role-table.md` | AI Log — Simplified tool role table |
 | 2026-05-17 | `2026-05-17-sensitive-examples-draft-status.md` | AI Log — Sensitive examples draft status |
-| 2026-05-17 | `2026-05-17-rpg-assets-stable-fullwidth-final.md` | AI Log — RPG assets stable names and full-width README layout |
-| 2026-05-17 | `2026-05-17-rpg-asset-stable-name-execution.md` | AI Log — Pantheon RPG stable asset names execution |
-| 2026-05-17 | `2026-05-17-rpg-asset-rename-plan.md` | AI Log — Pantheon RPG asset rename plan |
-| 2026-05-17 | `2026-05-17-rpg-asset-register-readme-integration.md` | AI Log — Pantheon RPG asset register and README integration |
 | 2026-05-17 | `2026-05-17-readme-worked-example-samples.md` | AI Log — README worked-example samples |
 | 2026-05-17 | `2026-05-17-readme-toc-worked-examples-reader-actions.md` | AI Log — README TOC, worked examples and reader-oriented next steps |
 | 2026-05-17 | `2026-05-17-readme-professional-landing-structure.md` | AI Log — README professional landing structure |
 | 2026-05-17 | `2026-05-17-readme-method-positioning.md` | AI Log — README method positioning |
-| 2026-05-17 | `2026-05-17-readme-fr-rpg-fullwidth-sync.md` | AI Log — README.fr RPG full-width sync |
 | 2026-05-17 | `2026-05-17-rag-ingestion-pipeline.md` | AI Log — RAG ingestion pipeline doctrine |
 | 2026-05-17 | `2026-05-17-product-differentiation.md` | AI Log — Product differentiation doctrine |
 | 2026-05-17 | `2026-05-17-practitioner-hooks-regulatory-watch.md` | AI Log — Practitioner hooks and regulatory watch example |
@@ -922,23 +910,16 @@ Total indexed entries: **936**.
 | 2026-05-17 | `2026-05-17-context-pack-doctrine.md` | AI Log — Context Pack Doctrine Integration |
 | 2026-05-16 | `2026-05-16-readme-visual-narrative-distribution.md` | AI Log — README visual narrative distribution |
 | 2026-05-16 | `2026-05-16-readme-frontdoor-refactor.md` | AI Log — README front door and visual reading path refactor |
-| 2026-05-16 | `2026-05-16-pantheon-rpg-visual-production-guides.md` | AI Log — Pantheon RPG visual production guides |
 | 2026-05-16 | `2026-05-16-local-installation-and-governed-channels.md` | AI Log — local installation and governed channels framing |
 | 2026-05-15 | `2026-05-15-readme-traceability-boundaries.md` | AI Log — README traceability and boundary clarification |
-| 2026-05-15 | `2026-05-15-readme-rpg-board-links.md` | AI Log — README RPG board links |
 | 2026-05-15 | `2026-05-15-readme-repetition-reduction.md` | AI Log — README repetition reduction and product narrative cleanup |
 | 2026-05-15 | `2026-05-15-readme-professional-pitch-practical-usage.md` | AI Log — README professional pitch and practical usage |
 | 2026-05-15 | `2026-05-15-readme-product-governance-layer.md` | AI Log — README product governance repositioning |
 | 2026-05-15 | `2026-05-15-readme-control-mastery-positioning.md` | AI Log — README control and mastery positioning |
 | 2026-05-15 | `2026-05-15-readme-anchor-narrative.md` | AI Log — README anchor narrative update |
 | 2026-05-15 | `2026-05-15-readme-ai-adoption-objection.md` | AI Log — README AI adoption objection framing |
-| 2026-05-15 | `2026-05-15-pantheon-rpg-city-memory-export-provenance.md` | Pantheon RPG City Memory Export Provenance Update |
 | 2026-05-15 | `2026-05-15-bilingual-readme-professional-entry.md` | AI Log — Bilingual README professional entry |
 | 2026-05-14 | `2026-05-14-workflow-language-stabilization.md` | AI Log — Workflow Language Stabilization |
-| 2026-05-14 | `2026-05-14-pantheon-rpg-visual-system.md` | Pantheon RPG visual system |
-| 2026-05-14 | `2026-05-14-pantheon-rpg-phase-1-prompt-workspace.md` | Pantheon RPG phase 1 prompt workspace |
-| 2026-05-14 | `2026-05-14-pantheon-rpg-composition-study-prompt.md` | Pantheon RPG composition study prompt |
-| 2026-05-14 | `2026-05-14-pantheon-rpg-city-memory-board.md` | Pantheon RPG city memory board |
 | 2026-05-14 | `2026-05-14-integration-knowledge-scope-stabilization.md` | AI Log — 2026-05-14 — Integration, Knowledge and Scope Stabilization |
 | 2026-05-13 | `2026-05-13-role-semantics-stabilization.md` | AI Log — Role Semantics Stabilization |
 | 2026-05-13 | `2026-05-13-memory-governance-stabilization.md` | AI Log — Memory Governance Stabilization |
