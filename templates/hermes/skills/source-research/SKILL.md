@@ -105,9 +105,9 @@ registered route != inspected source
 workspace access != task authorization
 ```
 
-### Optional user-selected discovery routes
+### Optional user-enabled discovery routes
 
-Issue #1095 records two optional, user-selected routes behind this existing skill:
+Issue #1095 records two optional integrations behind this existing skill:
 
 ```text
 curated professional source library
@@ -117,28 +117,48 @@ external academic discovery
 -> optional Consensus MCP route
 ```
 
-These are optional integrations, not default dependencies, adoption candidates or new research owners. The user may choose either, both or neither for a task.
+These are optional integrations, not default dependencies, adoption candidates or new research owners.
 
-When the user selects a curated-library route and the task permits it, prefer stable library / collection / item identifiers over physical storage paths. Collection membership may narrow discovery but does not establish Case identity, source applicability, Evidence status or professional authority.
+The user chooses at environment/profile level whether each integration is enabled. The available posture may therefore be:
 
-When the user selects an external academic-discovery route and the task permits it, treat returned rankings, metadata, snippets and generated takeaways as discovery material only. For material claims, inspect the original source when technically available before relying on it.
+```text
+neither enabled
+Zotero enabled
+Consensus enabled
+both enabled
+```
 
-Do not auto-enable either route and do not hard-code a universal route order. Use only the routes the user selected for the task and that remain permitted by the applicable scope/authorization. If neither is selected, source-research continues through its other admitted routes.
+Enabling an integration makes it eligible for tactical use; it does not require using it on every task. For each admitted research task, Hermes may invoke only an enabled route when it is materially useful and compatible with the Task Contract, source scope and data-exposure constraints. A task-specific instruction may further narrow the enabled set.
+
+```text
+installed != user-enabled
+configured != user-enabled
+user-enabled != task-permitted
+task-permitted != invoked
+invoked != Evidence
+```
+
+When the user has enabled a curated-library route and the task permits it, prefer stable library / collection / item identifiers over physical storage paths. Collection membership may narrow discovery but does not establish Case identity, source applicability, Evidence status or professional authority.
+
+When the user has enabled an external academic-discovery route and the task permits it, treat returned rankings, metadata, snippets and generated takeaways as discovery material only. For material claims, inspect the original source when technically available before relying on it.
+
+Do not hard-code a universal route order. Among enabled and task-permitted routes, prefer the least exposed and least expensive route that can materially answer the bounded question, then widen only when useful. A disabled integration must not be invoked.
 
 A useful pattern may be:
 
 ```text
-admitted project/source context
--> curated source library when relevant
--> external academic discovery when useful
+user-enabled research integrations
+-> admitted task / source / data-exposure scope
+-> Hermes selects materially useful route(s)
 -> inspect original material sources
 -> challenge / reconcile
 -> source-grounded Result Candidate
 ```
 
-Discovery must not silently promote a source into a curated library. A candidate worth retaining may return a `source_addition_candidate`; any library mutation requires separate write capability and authorization.
+Discovery must not silently promote a source into a curated library. A source worth retaining may return a `source_addition_candidate`; any library mutation requires separate write capability and authorization.
 
 ```text
+enabled != automatically used
 curated != true
 discovered != inspected
 library membership != Evidence
