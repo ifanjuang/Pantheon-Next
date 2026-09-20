@@ -105,6 +105,48 @@ registered route != inspected source
 workspace access != task authorization
 ```
 
+### Candidate discovery-route separation
+
+Issue #1095 records two replaceable candidate bindings behind this existing skill:
+
+```text
+curated professional source library
+-> Zotero read-only candidate
+
+external academic discovery
+-> Consensus MCP candidate
+```
+
+These are discovery routes, not new research owners.
+
+When a curated library route is admitted, prefer stable library / collection / item identifiers over physical storage paths. Collection membership may narrow discovery but does not establish Case identity, source applicability, Evidence status or professional authority.
+
+When an external academic-discovery route is admitted, treat returned rankings, metadata, snippets and generated takeaways as discovery material only. For material claims, inspect the original source when technically available before relying on it.
+
+Do not hard-code a universal route order. Prefer the least exposed and least expensive admitted route that can materially answer the bounded question, then widen only when useful.
+
+A useful pattern may be:
+
+```text
+admitted project/source context
+-> curated source library when relevant
+-> external academic discovery when useful
+-> inspect original material sources
+-> challenge / reconcile
+-> source-grounded Result Candidate
+```
+
+Discovery must not silently promote a source into a curated library. A candidate worth retaining may return a `source_addition_candidate`; any library mutation requires separate write capability and authorization.
+
+```text
+curated != true
+discovered != inspected
+library membership != Evidence
+collection name != governed Case identity
+academic search result != source support
+source_addition_candidate != library mutation
+```
+
 Prefer source classes appropriate to the question, generally:
 
 1. primary or official sources;
