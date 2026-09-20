@@ -1,7 +1,7 @@
 # Role Dialogue Trace
 
-Status: legacy compatibility specification — transient presentation path retained
-for existing Cockpit consumers after the Role/runtime convergence of #1085/#1086.
+Status: candidate support specification — legacy compatibility path retained for
+existing Cockpit consumers after the Role/runtime convergence of #1085/#1086.
 
 This document no longer defines the active Hermes presentation model.
 
