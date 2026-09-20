@@ -105,6 +105,59 @@ registered route != inspected source
 workspace access != task authorization
 ```
 
+### Optional user-enabled discovery routes
+
+Optional product mappings for these routes live in `docs/governance/HERMES_CAPABILITY_BINDINGS.md`; this skill keeps only the abstract runtime contract.
+
+```text
+curated_source_library
+= optional curated professional source-library route
+
+academic_source_discovery
+= optional external academic-discovery route
+```
+
+The user chooses at environment/profile level whether a concrete binding for either route is enabled. Enabling a binding makes that route eligible for tactical use; it does not require invoking it on every task.
+
+For each admitted research task, Hermes may invoke only an enabled route when it is materially useful and compatible with the Task Contract, source scope and data-exposure constraints. A task-specific instruction may further narrow the enabled set.
+
+```text
+installed != user-enabled
+configured != user-enabled
+user-enabled != task-permitted
+task-permitted != invoked
+invoked != Evidence
+```
+
+When a curated source-library route is enabled and task-permitted, prefer stable library / collection / item identifiers over physical storage paths. Collection membership may narrow discovery but does not establish Case identity, source applicability, Evidence status or professional authority.
+
+When an external academic-discovery route is enabled and task-permitted, treat returned rankings, metadata, snippets and generated takeaways as discovery material only. For material claims, inspect the original source when technically available before relying on it.
+
+Do not hard-code a universal route order. Among enabled and task-permitted routes, prefer the least exposed and least expensive route that can materially answer the bounded question, then widen only when useful. A disabled route must not be invoked.
+
+A useful pattern may be:
+
+```text
+user-enabled research bindings
+-> admitted task / source / data-exposure scope
+-> Hermes selects materially useful route(s)
+-> inspect original material sources
+-> challenge / reconcile
+-> source-grounded Result Candidate
+```
+
+Discovery must not silently promote a source into a curated library. A source worth retaining may return a `source_addition_candidate`; any library mutation requires separate write capability and authorization.
+
+```text
+enabled != automatically used
+curated != true
+discovered != inspected
+library membership != Evidence
+collection name != governed Case identity
+academic search result != source support
+source_addition_candidate != library mutation
+```
+
 Prefer source classes appropriate to the question, generally:
 
 1. primary or official sources;

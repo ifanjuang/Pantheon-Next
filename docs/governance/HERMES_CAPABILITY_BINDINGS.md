@@ -61,6 +61,8 @@ Runtime status remains separate from candidate status.
 | Capability slot | Current external-binding posture | Notes |
 |---|---|---|
 | `web_evidence_intake` | `xberg-io/crawlberg` preferred candidate | Public-web intake with provenance; browser/SSRF/antibot boundaries remain relevant. |
+| `curated_source_library` | `unbound` | User/profile-specific optional route. Zotero read-only may be enabled by the user as one external implementation; it is not a default Pantheon binding. |
+| `academic_source_discovery` | `unbound` | User/profile-specific optional route. Consensus MCP may be enabled by the user as one external implementation; it is not a default Pantheon binding. |
 | `external_connector_gateway` | Nango candidate | Optional scoped API connector gateway; credentials and writes remain separately governed. |
 | `observability` | Langfuse preferred candidate | Optional Hermes trace/cost/latency visibility; traces are not Evidence or approval. |
 | `document_structural_analysis` | Docling preferred candidate | Existing bounded path; extraction is derivative, not source truth. |
@@ -72,6 +74,69 @@ Runtime status remains separate from candidate status.
 | `agent_artifact_transfer` | `shehryarsaroya/agenttransfer` to verify | Optional transport/handoff capability; receipts are not proof. |
 | `bounded_workflow_runtime` | no default binding | LangGraph remains a reference for a demonstrated stateful-workflow gap, not a second runtime. |
 | `document_parsing_rag_ingestion` | no integrated-stack adoption | RAGFlow remains reference/watch only because its bundled agents/workflows/memory/UI duplicate replaceable responsibilities. |
+
+## User-enabled source-research options
+
+The source-research skill remains product-agnostic. Product-specific mappings belong here.
+
+For the optional source-research routes above, the preferred control split is:
+
+```text
+environment/profile:
+user enables neither / one / both optional bindings
+
+task:
+Hermes may invoke only enabled + task-permitted routes
+when materially useful
+```
+
+This is user opt-in, not automatic adoption and not per-task micromanagement by default.
+
+```text
+installed != user-enabled
+configured != user-enabled
+user-enabled != task-permitted
+task-permitted != invoked
+enabled != automatically used
+```
+
+### Zotero
+
+Zotero may satisfy `curated_source_library` when the user wants their curated research library available to Hermes.
+
+Initial posture is read-only. Prefer stable library / collection / item identifiers over filesystem storage paths.
+
+```text
+Zotero collection != governed Case identity
+item in library != Evidence
+attachment present != inspected source
+physical storage path != governed identity
+```
+
+### Consensus
+
+Consensus MCP may satisfy `academic_source_discovery` when the user wants external academic discovery available to Hermes.
+
+Its results remain discovery material until original sources are inspected where technically available.
+
+```text
+Consensus result != inspected source
+generated takeaway != source content
+ranking != authority
+Consensus synthesis != Evidence
+```
+
+Environment-level enablement does not authorize disclosure of private or dossier-specific data. Query minimization and Task Contract/data-exposure constraints still apply.
+
+Neither option creates an automatic promotion path:
+
+```text
+Consensus discovery
+-> optional source_addition_candidate
+-> separate human choice / write authorization if retention is desired
+
+Consensus -> Zotero automatic write = forbidden by default
+```
 
 ## Native Hermes baseline
 
