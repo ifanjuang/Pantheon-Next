@@ -131,6 +131,71 @@ runtime trace != Evidence
 benchmark corpus != training dataset
 ```
 
+## Runtime coordination strategy is an evaluation dimension
+
+Issue #1093 records a bounded improvement question raised from current Hermes native coordination surfaces: direct execution, `delegate_task`, goal-style iteration and Kanban/task-graph execution may have different quality, cost, latency and traceability characteristics for the same admitted task.
+
+Pantheon should not pre-emptively convert those runtime tactics into a new governed execution-mode ontology.
+
+```text
+direct / delegation / goal / Kanban
+= Hermes runtime tactics
+
+separate profile/bot envelope
+= exceptional runtime-boundary choice
+
+runtime tactic
+!= Task Contract
+!= Execution Admission
+!= authorization
+!= Pantheon Role
+!= Evidence status
+```
+
+The preferred hypothesis is the least-complex sufficient strategy:
+
+```text
+one bounded pass sufficient
+-> direct
+
+independent bounded subtasks materially help
+-> delegation
+
+the same bounded task needs attempt/check/revision
+-> goal-style loop
+
+durable dependent tasks, blockers or handoffs are material
+-> Kanban
+
+persistent specialization is materially useful
+and a distinct runtime boundary is demonstrated
+(model/provider exposure, memory/context injection, credentials, tool surface,
+private-data exposure, execution isolation, or host/deployment trust)
+-> profile/bot envelope
+
+persistent specialization without a distinct runtime boundary
+-> keep the governed default; prefer Method / Skill / bounded delegation
+```
+
+This is not a fixed routing table. It is a qualification hypothesis.
+
+Reuse the existing #644 / #986 live campaign and, when useful, #827 professional workloads to compare materially plausible strategies under the same task, admitted context, model/runtime envelope, toolset and review criteria. Observe useful-result quality, misses, false positives, provenance retention, tool calls, cost/token signals when available, latency, stop/blocker behavior, unnecessary decomposition and trace/readback quality.
+
+Decision rule:
+
+```text
+Hermes strategy choice is adequate
+-> no Pantheon selector
+
+failure belongs to prompt / skill / tool / context / runtime configuration
+-> fix that existing owner
+
+repeated residual failure remains after existing owners are corrected
+-> justify the smallest explicit constraint in the nearest existing owner
+```
+
+Do not add by default an `ExecutionMode` object, Pantheon dispatcher, Pantheon Kanban engine, scheduler/queue, second admission path or Bot/Profile-to-Role mapping.
+
 ## Failure classification gate
 
 Before changing model weights, a failure must be classified against the layers that can already explain it:
