@@ -27,7 +27,7 @@ da74cc056bbb3038a9313e41d37e879234aa0538
 
 This includes merged PR #1057, which changed the governed Hermes profile/capability composition. The native baseline must therefore record the exact post-#1057 profile/configuration actually used by each run; never treat the name `pantheon-governed` as a sufficient identity by itself.
 
-The reviewed deployment target remains `nousresearch/hermes-agent:v2026.9.11`, but repository configuration is not proof of the runtime installed on the Linux node.
+The reviewed deployment target is `nousresearch/hermes-agent:v2026.9.14` (Hermes Agent 0.21.3), the latest published stable release observed on 2026-09-20. Repository configuration is not proof of the runtime installed on the Linux node.
 
 Before running, observe the live runtime identity:
 
@@ -70,7 +70,7 @@ hermes --version | tee "$OUT/hermes-version.txt"
 Define an exact observed runtime identity. Example only:
 
 ```bash
-export HERMES_BENCH_RUNTIME_IDENTITY='nousresearch/hermes-agent:v2026.9.11@<observed-digest-or-version>'
+export HERMES_BENCH_RUNTIME_IDENTITY='nousresearch/hermes-agent:v2026.9.14@<observed-digest-or-version>'
 ```
 
 Record a profile identity that changes when the effective profile changes. Prefer a digest of the actual profile/projection files over a name alone. Do not hash secrets into a public artifact; the digest may remain local.
