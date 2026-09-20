@@ -2,7 +2,7 @@
   "use strict";
 
   const $ = id => document.getElementById(id);
-  const ACTION = "Décider";
+  const REQUEST_PREFIX = "decision-request:";
 
   function unique(prefix) {
     return `${prefix}-${globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`}`;
@@ -16,14 +16,18 @@
     return { token, actor };
   }
 
+  function requestIdFromCard(card) {
+    const entityId = card?.querySelector(":is(.card-entity-id, .v2-entity-id)")?.textContent?.trim() || "";
+    return entityId.startsWith(REQUEST_PREFIX) ? entityId.slice(REQUEST_PREFIX.length) : null;
+  }
+
   function currentRequestId() {
     const card = document.querySelector("#v2-stage :is(.card, .v2-card)");
-    const entityId = card?.querySelector(":is(.card-entity-id, .v2-entity-id)")?.textContent?.trim() || "";
-    const prefix = "decision-request:";
-    if (!entityId.startsWith(prefix)) {
+    const requestId = requestIdFromCard(card);
+    if (!requestId) {
       throw new Error("Cette action exige une Carte Decision Request.");
     }
-    return entityId.slice(prefix.length);
+    return requestId;
   }
 
   async function request(path, { method = "GET", body = null } = {}) {
@@ -170,11 +174,13 @@
   }
 
   function enable(root = document) {
-    for (const button of root.querySelectorAll?.(":is(.card-actions, .v2-card-actions) button") || []) {
-      if (button.textContent?.trim() !== ACTION) continue;
-      button.disabled = false;
-      button.title = "";
-      button.dataset.decisionRequestAction = "resolve";
+    for (const card of root.querySelectorAll?.(":is(.card, .v2-card)") || []) {
+      if (!requestIdFromCard(card)) continue;
+      for (const button of card.querySelectorAll?.(":is(.card-actions, .v2-card-actions) button") || []) {
+        button.disabled = false;
+        button.title = "";
+        button.dataset.decisionRequestAction = "resolve";
+      }
     }
   }
 
