@@ -37,6 +37,8 @@ FIXTURE_PID=""
 GATEWAY_PID=""
 PLUGIN_INSTALLED=false
 PLUGIN_ENABLED=false
+SENTINEL_PLUGIN_INSTALLED=false
+SENTINEL_PLUGIN_ENABLED=false
 
 phase() {
   printf '\n== %s ==\n' "$1"
@@ -44,6 +46,10 @@ phase() {
 
 cleanup() {
   set +e
+  if [ "$SENTINEL_PLUGIN_ENABLED" = true ] && [ -x "$HERMES_VENV/bin/hermes" ]; then
+    "$HERMES_VENV/bin/hermes" -p "$PROFILE" plugins disable pantheon-effect-sentinel \
+      > "$LAB_ARTIFACTS/sentinel-plugin-disable-cleanup.txt" 2>&1
+  fi
   if [ "$PLUGIN_ENABLED" = true ] && [ -x "$HERMES_VENV/bin/hermes" ]; then
     "$HERMES_VENV/bin/hermes" -p "$PROFILE" plugins disable pantheon-context-bridge \
       > "$LAB_ARTIFACTS/plugin-disable-cleanup.txt" 2>&1
@@ -243,13 +249,184 @@ python tools/run_hermes_runtime_lab_acceptance.py wait-http \
   --timeout 10 \
   --output "$LAB_ARTIFACTS/fixture-state.json"
 
+if [ "${PANTHEON_RUN_PRETOOL_SENTINEL:-0}" = "1" ]; then
+phase "Qualify pre_tool_call with a synthetic effect sentinel"
+# This phase temporarily widens only the ephemeral lab profile after the bounded
+# context acceptance has completed. The sentinel plugin is a test fixture, not a
+# Pantheon distribution component or production capability.
+if [ -n "$GATEWAY_PID" ]; then
+  kill "$GATEWAY_PID"
+  wait "$GATEWAY_PID" 2>/dev/null || true
+  GATEWAY_PID=""
+fi
+
+SENTINEL_SOURCE="file://$MONOREPO_ROOT#implementation/tests/fixtures/hermes_plugins/pantheon-effect-sentinel"
+SENTINEL_SOURCE_DIR="$MONOREPO_ROOT/implementation/tests/fixtures/hermes_plugins/pantheon-effect-sentinel"
+export PANTHEON_SENTINEL_MODE_FILE="$LAB_ROOT/sentinel-mode.txt"
+export PANTHEON_SENTINEL_SINK="$LAB_ROOT/sentinel-effect.json"
+rm -f "$PANTHEON_SENTINEL_SINK"
+printf 'block\n' > "$PANTHEON_SENTINEL_MODE_FILE"
+cat >> "$HERMES_HOME/profiles/$PROFILE/.env" <<EOF
+PANTHEON_SENTINEL_MODE_FILE=$PANTHEON_SENTINEL_MODE_FILE
+PANTHEON_SENTINEL_SINK=$PANTHEON_SENTINEL_SINK
+EOF
+
+hermes plugins validate "$SENTINEL_SOURCE_DIR" --json \
+  > "$LAB_ARTIFACTS/sentinel-plugin-validation.json"
+hermes -p "$PROFILE" plugins install "$SENTINEL_SOURCE" --no-enable \
+  > "$LAB_ARTIFACTS/sentinel-plugin-install.txt" 2>&1
+SENTINEL_PLUGIN_INSTALLED=true
+hermes -p "$PROFILE" plugins enable pantheon-effect-sentinel \
+  > "$LAB_ARTIFACTS/sentinel-plugin-enable.txt"
+SENTINEL_PLUGIN_ENABLED=true
+hermes -p "$PROFILE" plugins doctor pantheon-effect-sentinel --ci \
+  > "$LAB_ARTIFACTS/sentinel-plugin-doctor.txt"
+hermes -p "$PROFILE" config set platform_toolsets.api_server \
+  '["pantheon_context","pantheon_effect_sentinel"]' \
+  > "$LAB_ARTIFACTS/sentinel-tool-policy-set.txt"
+
+HERMES_PLUGINS_DEBUG=1 hermes gateway run \
+  > "$LAB_ARTIFACTS/hermes-gateway-sentinel.log" 2>&1 &
+GATEWAY_PID=$!
+python tools/run_hermes_runtime_lab_acceptance.py wait-http \
+  --url "$HERMES_API_BASE/v1/capabilities" \
+  --bearer "$HERMES_API_KEY" \
+  --timeout 90 \
+  --output "$LAB_ARTIFACTS/sentinel-profile-capabilities.json"
+
+submit_sentinel_run() {
+  local label="$1"
+  local expectation="$2"
+  local session_id="sentinel-$label"
+  local request_file="$LAB_ROOT/sentinel-$label-request.json"
+  local submit_file="$LAB_ARTIFACTS/sentinel-$label-submit.json"
+  local terminal_file="$LAB_ARTIFACTS/sentinel-$label-terminal.json"
+
+  python - "$expectation" "$session_id" "$request_file" <<'PY'
+import json
+import pathlib
+import sys
+
+expectation, session_id, output = sys.argv[1:4]
+payload = {
+    "input": (
+        "PANTHEON_EFFECT_SENTINEL_V1 "
+        + expectation
+        + " Call pantheon_effect_sentinel exactly once."
+    ),
+    "session_id": session_id,
+}
+pathlib.Path(output).write_text(
+    json.dumps(payload, ensure_ascii=False, sort_keys=True),
+    encoding="utf-8",
+)
+PY
+
+  curl --silent --show-error --fail-with-body \
+    -H "Authorization: Bearer $HERMES_API_KEY" \
+    -H "Content-Type: application/json" \
+    --data-binary "@$request_file" \
+    "$HERMES_API_BASE/v1/runs" \
+    > "$submit_file"
+
+  local run_id
+  run_id="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["run_id"])' "$submit_file")"
+  python tools/run_hermes_runtime_lab_acceptance.py wait-run \
+    --base-url "$HERMES_API_BASE" \
+    --api-key "$HERMES_API_KEY" \
+    --run-id "$run_id" \
+    --timeout 120 \
+    --output "$terminal_file"
+}
+
+# Positive guard proof: the hook is invoked on the actual Runs route and the
+# synthetic effect handler must not touch its sink.
+rm -f "$PANTHEON_SENTINEL_SINK"
+printf 'block\n' > "$PANTHEON_SENTINEL_MODE_FILE"
+submit_sentinel_run "block" "EXPECT_BLOCK"
+python - "$LAB_ARTIFACTS/sentinel-block-terminal.json" <<'PY'
+import json
+import sys
+value = json.load(open(sys.argv[1]))
+assert value["status"] == "completed", value
+assert "SENTINEL_BLOCK_CONFIRMED" in str(value.get("output") or ""), value
+PY
+test ! -e "$PANTHEON_SENTINEL_SINK"
+printf '{"sink_touched":false}\n' > "$LAB_ARTIFACTS/sentinel-block-sink.json"
+
+# Failure-semantics proof: an ordinary plugin callback exception is currently
+# fail-open in the pinned Hermes release. This must stay an observation and must
+# never be mistaken for a Pantheon PEP guarantee.
+rm -f "$PANTHEON_SENTINEL_SINK"
+printf 'raise\n' > "$PANTHEON_SENTINEL_MODE_FILE"
+submit_sentinel_run "raise" "EXPECT_FAIL_OPEN"
+python - "$LAB_ARTIFACTS/sentinel-raise-terminal.json" <<'PY'
+import json
+import sys
+value = json.load(open(sys.argv[1]))
+assert value["status"] == "completed", value
+assert "SENTINEL_FAIL_OPEN_CONFIRMED" in str(value.get("output") or ""), value
+PY
+test -f "$PANTHEON_SENTINEL_SINK"
+cp "$PANTHEON_SENTINEL_SINK" "$LAB_ARTIFACTS/sentinel-raise-sink.json"
+
+python - "$LAB_ARTIFACTS" <<'PY'
+import json
+import pathlib
+import sys
+
+artifacts = pathlib.Path(sys.argv[1])
+block = json.loads((artifacts / "sentinel-block-terminal.json").read_text())
+raised = json.loads((artifacts / "sentinel-raise-terminal.json").read_text())
+sink = json.loads((artifacts / "sentinel-raise-sink.json").read_text())
+receipt = {
+    "kind": "hermes_pre_tool_call_sentinel_observation",
+    "synthetic": True,
+    "pre_tool_call_block_observed": (
+        block.get("status") == "completed"
+        and "SENTINEL_BLOCK_CONFIRMED" in str(block.get("output") or "")
+    ),
+    "blocked_effect_sink_untouched": not json.loads(
+        (artifacts / "sentinel-block-sink.json").read_text()
+    )["sink_touched"],
+    "callback_exception_fail_open_observed": (
+        raised.get("status") == "completed"
+        and "SENTINEL_FAIL_OPEN_CONFIRMED" in str(raised.get("output") or "")
+        and sink.get("effect_ran") is True
+    ),
+    "exception_effect_sink_touched": sink.get("effect_ran") is True,
+    "pantheon_pep_qualified_by_this_test": False,
+    "production_authorization": False,
+    "technical_receipt_is_evidence": False,
+}
+(artifacts / "sentinel-observation.json").write_text(
+    json.dumps(receipt, indent=2, sort_keys=True) + "\n",
+    encoding="utf-8",
+)
+PY
+
+phase "Restore governed profile after sentinel qualification"
+if [ -n "$GATEWAY_PID" ]; then
+  kill "$GATEWAY_PID"
+  wait "$GATEWAY_PID" 2>/dev/null || true
+  GATEWAY_PID=""
+fi
+hermes -p "$PROFILE" plugins disable pantheon-effect-sentinel \
+  > "$LAB_ARTIFACTS/sentinel-plugin-disable.txt"
+SENTINEL_PLUGIN_ENABLED=false
+hermes -p "$PROFILE" config set platform_toolsets.api_server '["pantheon_context"]' \
+  > "$LAB_ARTIFACTS/sentinel-tool-policy-restore.txt"
+fi
+
 phase "Disable profile plugin and stop gateway"
 hermes -p "$PROFILE" plugins disable pantheon-context-bridge \
   > "$LAB_ARTIFACTS/plugin-disable.txt"
 PLUGIN_ENABLED=false
-kill "$GATEWAY_PID"
-wait "$GATEWAY_PID" 2>/dev/null || true
-GATEWAY_PID=""
+if [ -n "$GATEWAY_PID" ]; then
+  kill "$GATEWAY_PID"
+  wait "$GATEWAY_PID" 2>/dev/null || true
+  GATEWAY_PID=""
+fi
 sleep 1
 if curl --silent --fail --max-time 2 \
     -H "Authorization: Bearer $HERMES_API_KEY" \
@@ -257,8 +434,13 @@ if curl --silent --fail --max-time 2 \
   echo "profile route remained reachable after gateway rollback" >&2
   exit 1
 fi
-printf '{"gateway_stopped":true,"profile_route_unreachable":true,"plugin_disabled":true}\n' \
-  > "$LAB_ARTIFACTS/rollback.json"
+if [ "${PANTHEON_RUN_PRETOOL_SENTINEL:-0}" = "1" ]; then
+  printf '{"gateway_stopped":true,"profile_route_unreachable":true,"plugin_disabled":true,"sentinel_exercised":true,"sentinel_plugin_disabled":true,"sentinel_tool_policy_restored":true}\n' \
+    > "$LAB_ARTIFACTS/rollback.json"
+else
+  printf '{"gateway_stopped":true,"profile_route_unreachable":true,"plugin_disabled":true,"sentinel_exercised":false,"sentinel_plugin_disabled":false,"sentinel_tool_policy_restored":false}\n' \
+    > "$LAB_ARTIFACTS/rollback.json"
+fi
 
 phase "Validate technical receipts"
 python tools/run_hermes_runtime_lab_acceptance.py validate \
