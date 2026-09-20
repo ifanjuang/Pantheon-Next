@@ -27,7 +27,7 @@ da74cc056bbb3038a9313e41d37e879234aa0538
 
 This includes merged PR #1057, which changed the governed Hermes profile/capability composition. The native baseline must therefore record the exact post-#1057 profile/configuration actually used by each run; never treat the name `pantheon-governed` as a sufficient identity by itself.
 
-The reviewed deployment target is `nousresearch/hermes-agent:v2026.9.14` (Hermes Agent 0.21.3), the latest published stable release observed on 2026-09-20. Repository configuration is not proof of the runtime installed on the Linux node.
+For this qualification slice, the repository-selected Hermes target is `nousresearch/hermes-agent:v2026.9.14` (Hermes Agent 0.21.3), as recorded by the existing external-qualification owner on 2026-09-20. This runbook does not own Hermes release tracking, installation, or upgrade policy. Repository configuration is not proof of the runtime installed on the Linux node.
 
 Before running, observe the live runtime identity:
 
