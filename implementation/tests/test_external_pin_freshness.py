@@ -12,7 +12,10 @@ behind `observe_all` and is exercised by the scheduled workflow, not here.
 
 ```text
 observation refreshed != pin moved
-update_available != update_authorized
+update_available != task_authorized
+
+A pin with `tracking_policy=follow_latest_stable` is different: a newer stable
+release keeps the freshness signal actionable until the qualification pin moves.
 ```
 """
 
@@ -93,6 +96,18 @@ def test_observation_records_are_structurally_complete(observations) -> None:
             )
 
 
+def test_follow_latest_stable_pins_cannot_record_acknowledged_lag(
+    registry, observations
+) -> None:
+    for pin_id, pin in registry["pins"].items():
+        if pin.get("tracking_policy") != "follow_latest_stable":
+            continue
+        delta = observations["observations"][pin_id]["delta"]
+        assert not (
+            isinstance(delta, dict) and delta.get("state") == "acknowledged"
+        ), f"{pin_id}: follow_latest_stable cannot be closed as an acknowledged lag"
+
+
 def test_the_observation_record_claims_no_authority(observations) -> None:
     assert observations["authority"] == {
         "deployment_truth": False,
@@ -162,6 +177,46 @@ def test_a_dated_decision_closes_the_signal_without_moving_the_pin() -> None:
     assert report["rows"][0]["signal"] == "acknowledged_lag"
     assert report["actionable"] == []
     assert registry["pins"]["thing"]["version"] == "1.0.0"
+
+
+def test_follow_latest_stable_cannot_close_lag_by_acknowledgement() -> None:
+    registry, observations = _minimal()
+    registry["pins"]["thing"]["tracking_policy"] = "follow_latest_stable"
+    registry["pins"]["thing"]["release_tag"] = "v1.0.0"
+    observations["observations"]["thing"]["latest_seen"] = "v1.1.0"
+    observations["observations"]["thing"]["delta"] = {
+        "state": "acknowledged",
+        "reason": "temporary compatibility concern",
+        "decided_on": "2026-08-31",
+    }
+
+    report = compare(registry, observations, {"thing": "v1.1.0"})
+
+    assert report["rows"][0]["tracking_policy"] == "follow_latest_stable"
+    assert report["rows"][0]["selected_release"] == "v1.0.0"
+    assert report["rows"][0]["signal"] == "required_update_pending"
+    assert report["actionable"] == ["thing"]
+
+
+def test_follow_latest_stable_detects_pin_lag_even_if_delta_says_none() -> None:
+    registry, observations = _minimal()
+    registry["pins"]["thing"]["tracking_policy"] = "follow_latest_stable"
+    registry["pins"]["thing"]["release_tag"] = "v1.0.0"
+    observations["observations"]["thing"]["latest_seen"] = "v1.1.0"
+    observations["observations"]["thing"]["delta"] = "none"
+
+    report = compare(registry, observations, {"thing": "v1.1.0"})
+
+    assert report["rows"][0]["signal"] == "required_update_pending"
+    assert report["actionable"] == ["thing"]
+
+
+def test_follow_latest_stable_requires_a_selected_release_tag() -> None:
+    registry, observations = _minimal()
+    registry["pins"]["thing"]["tracking_policy"] = "follow_latest_stable"
+
+    with pytest.raises(FreshnessError, match="requires release_tag"):
+        compare(registry, observations, {"thing": "v1.0.0"})
 
 
 def test_an_unreachable_host_does_not_read_as_aligned() -> None:

@@ -182,6 +182,13 @@ def compare(
         else:
             observation_state = "observation_stale"
 
+        tracking_policy = pins[pin_id].get("tracking_policy", "reviewed_pin")
+        selected_release = pins[pin_id].get("release_tag")
+        if tracking_policy == "follow_latest_stable" and not selected_release:
+            raise FreshnessError(
+                f"{pin_id}: follow_latest_stable requires release_tag in the pin registry"
+            )
+
         if source == "derived_from_source_pin":
             # Its freshness question belongs to the pin it follows; reporting a
             # lag here would double-count that pin's signal.
@@ -195,8 +202,15 @@ def compare(
             signal = "unreachable"
         elif observation_state == "observation_stale":
             signal = "observation_stale"
+        elif (
+            tracking_policy == "follow_latest_stable"
+            and record["latest_seen"] != selected_release
+        ):
+            signal = "required_update_pending"
         elif delta == "none":
             signal = "aligned"
+        elif acknowledged and tracking_policy == "follow_latest_stable":
+            signal = "required_update_pending"
         elif acknowledged:
             signal = "acknowledged_lag"
         else:
@@ -210,6 +224,8 @@ def compare(
                 "observed_on": record["observed_on"],
                 "upstream_head_now": head,
                 "source": source,
+                "tracking_policy": tracking_policy,
+                "selected_release": selected_release,
                 "signal": signal,
                 "note": delta.get("reason") if isinstance(delta, dict) else None,
             }
@@ -224,7 +240,10 @@ def compare(
         "rows": rows,
         "counts": counts,
         "actionable": sorted(
-            row["pin"] for row in rows if row["signal"] in {"observation_stale", "unacknowledged_lag"}
+            row["pin"]
+            for row in rows
+            if row["signal"]
+            in {"observation_stale", "unacknowledged_lag", "required_update_pending"}
         ),
         # Kept apart from `actionable` on purpose: an unreachable host is not a
         # drift claim about the pin, and must not be reported as one. It is a

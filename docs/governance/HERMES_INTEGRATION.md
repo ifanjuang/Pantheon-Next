@@ -95,6 +95,10 @@ Hermes WebUI selected != Pantheon authority transferred
 
 Hermes version changes are adapter/review events by default.
 
+Pantheon follows the latest published stable Hermes release. A new stable Hermes release moves the runtime qualification target; Pantheon adapts its bindings, tests and projections rather than holding Hermes on an older release to preserve a historical integration assumption.
+
+Stable Hermes features are embraced as runtime capabilities by default. They do not require a matching Pantheon object, Role, Rite, Profile or service merely because they exist, and they do not inherit Pantheon authority.
+
 They do not rewrite the Pantheon kernel unless they reveal a missing tool-agnostic governance distinction.
 
 Pantheon owns concepts such as:
@@ -118,9 +122,13 @@ profiles
 skills
 tools
 MCP connections
+connectors
 runtime plugins
 subagents
 delegation
+bot / groupchat coordination
+goal-style iteration
+Kanban / task-graph coordination
 background tasks
 scheduling / automation
 provider configuration
@@ -132,7 +140,9 @@ runtime-client interaction state
 
 ```text
 runtime feature added != Pantheon authority added
+runtime feature available != task authorized
 runtime configuration != governance doctrine
+new stable release != reason to preserve an older Hermes runtime
 ```
 
 ## 4. Consequential-effect chokepoint
@@ -528,10 +538,24 @@ Release-specific review belongs to:
 - `HERMES_CAPABILITY_BINDINGS.md` — optional binding governance;
 - deployment/operator artifacts for the exact installed instance.
 
+The latest published stable Hermes release is always the current qualification target. The exact commit/ref remains pinned so tests and observations are reproducible, but the pin is a moving qualification snapshot rather than a compatibility ceiling.
+
+```text
+new stable release published
+-> qualification target moves
+-> pin / adapter / tests are refreshed
+-> current target is requalified
+-> Pantheon bindings adapt where needed
+```
+
+A compatibility failure is classified and repaired in the nearest existing adapter, binding, Skill, Method, context owner or runtime qualification. The normal response is not to keep an older Hermes release. If a newly available capability is unsafe for a consequential task, Pantheon governs that task/effect rather than pretending the capability does not exist.
+
 Before claiming an operational Hermes capability, verify the exact deployed release, binding, profile, tool surface and relevant acceptance evidence.
 
 ```text
-release reviewed != release installed
+latest stable selected != deployed instance updated
+release reviewed != professional capability validated
+runtime feature available != task authorized
 repository implementation != deployment
 endpoint documented != live instance compatible
 profile created != profile qualified

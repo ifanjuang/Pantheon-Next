@@ -8,7 +8,7 @@
     "version_comparison": "No mechanical comparison is made between `latest_seen` and the pinned version. Upstream identifiers are heterogeneous — Hermes Agent 0.20.6 ships as tag `v2026.8.27` — so a human records the `delta` verdict. The tool only detects that upstream moved past `latest_seen`.",
     "delta_states": {
       "none": "the pin is on the upstream head recorded here",
-      "acknowledged": "a newer upstream release exists and a dated human decision explains why the pin stays",
+      "acknowledged": "a newer upstream release exists and a dated human decision explains why the pin stays; this cannot close freshness for pins whose tracking_policy is follow_latest_stable",
       "open": "a newer upstream release exists and no decision has been recorded"
     }
   },
@@ -19,7 +19,7 @@
       "latest_seen": "v2026.9.14",
       "observed_on": "2026-09-15",
       "delta": "none",
-      "note": "Observed from the stable GitHub release v2026.9.14 (Hermes Agent 0.21.3), published 2026-09-14; the annotated release tag resolves to commit 345cd2b057a452236de401d3534b8502a7465e8d. Pantheon's separate candidate qualification pin now selects that exact tagged source. The release addresses remote dashboard refresh handling and duplicate state.db writer handles; selecting it does not by itself prove installation, activation, runtime health, task authorization or full qualification."
+      "note": "Observed from the stable GitHub release v2026.9.14 (Hermes Agent 0.21.3), published 2026-09-14; the annotated release tag resolves to commit 345cd2b057a452236de401d3534b8502a7465e8d. Pantheon's qualification pin follows the latest stable Hermes release. A future stable release therefore becomes the next qualification target rather than an optional lag decision. Selecting or following that release does not by itself prove deployment, runtime health, task authorization, Evidence, or professional validation."
     },
     "personal-ai-router": {
       "source": "github_releases_latest",

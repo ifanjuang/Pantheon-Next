@@ -55,6 +55,16 @@ def test_external_pin_registry_is_bounded_and_non_authoritative() -> None:
     assert len(prefixes) == len(set(prefixes))
     assert all(re.fullmatch(r"[A-Z][A-Z0-9_]*", prefix) for prefix in prefixes)
 
+    assert pins["hermes-agent"].get("tracking_policy") == "follow_latest_stable"
+    assert pins["hermes-agent"].get("release_tag") == "v2026.9.14"
+
+    allowed_tracking_policies = {"reviewed_pin", "follow_latest_stable"}
+    for pin_id, pin in pins.items():
+        assert pin.get("tracking_policy", "reviewed_pin") in allowed_tracking_policies, pin_id
+
+        if pin.get("tracking_policy") == "follow_latest_stable":
+            assert isinstance(pin.get("release_tag"), str) and pin["release_tag"], pin_id
+
     for pin_id, pin in pins.items():
         assert isinstance(pin["version"], str) and pin["version"]
         if pin["kind"] == "git":
