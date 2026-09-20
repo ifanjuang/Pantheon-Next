@@ -2,12 +2,9 @@
 
 The Ubuntu node scripts read their pins as `${RELEASE_X:?release.env missing
 RELEASE_X}`. Under `set -Eeuo pipefail` an undefined name is not a warning: the
-script dies on its first line, before any action. Ten such names are consumed
-and never defined, so four scripts cannot run at all:
+script dies on its first line, before any action. Seven such names remain
+undefined, all in optional post-baseline configurators:
 
-    install-node, update-node        RELEASE_TORCHVISION_VERSION
-                                     RELEASE_TORCHAUDIO_VERSION
-                                     RELEASE_LIVESYNC_BUILD_NPM_VERSION
     configure-docling-local          RELEASE_DOCLING_VERSION
                                      RELEASE_DOCLING_MCP_VERSION
                                      RELEASE_DOCLING_PYTHON
@@ -21,7 +18,7 @@ until a script was actually run on a machine.
 
 `release.env` carries *reviewed* deployment targets. A value invented to make
 this test pass would assert a review that never happened -- and a wrong CUDA
-pin breaks a real node. So the ten names below are recorded as debt rather than
+pin breaks a real node. So the seven names below are recorded as debt rather than
 filled in: the ratchet is the floor, and it only shrinks. Adding a reviewed
 value to `release.env` and deleting its line here is the whole retirement path.
 A *new* undefined name fails immediately, with no seeded debt to hide in.
@@ -46,13 +43,10 @@ KNOWN_UNDEFINED_RELEASE_PINS = {
     "RELEASE_DOCLING_MCP_VERSION",
     "RELEASE_DOCLING_PYTHON",
     "RELEASE_DOCLING_VERSION",
-    "RELEASE_LIVESYNC_BUILD_NPM_VERSION",
     "RELEASE_MARKER_PDF_VERSION",
     "RELEASE_MARKER_PYTHON",
     "RELEASE_NVIDIA_CONTAINER_TOOLKIT_VERSION",
     "RELEASE_OBSIDIAN_MARKER_VERSION",
-    "RELEASE_TORCHAUDIO_VERSION",
-    "RELEASE_TORCHVISION_VERSION",
 }
 
 
