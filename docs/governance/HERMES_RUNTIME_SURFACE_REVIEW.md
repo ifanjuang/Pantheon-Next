@@ -86,6 +86,27 @@ A `pre_tool_call` hook is consequently a runtime defense-in-depth seam whose
 presence and invocation must be observed on the deployed route; it is not by
 itself proof that every possible effect traverses Pantheon's PEP.
 
+The boundary it defends is explicit: it may reject an illegitimate
+governed-effect request while that request is still inside the admitted Hermes
+runtime/tool surface. The authoritative consequential-effect chokepoint remains
+the separate Pantheon-owned effect owner / PEP described by
+`HERMES_EXECUTION_ADMISSION_BRIDGE.md` and `HERMES_INTEGRATION.md`.
+
+```text
+pre_tool_call
+-> secondary guard on the Hermes-side effect-request path
+
+effect chokepoint
+-> non-bypassable Pantheon-owned path to the exact consequential operation
+
+secondary guard failure
+!= chokepoint failure
+!= raw consequential credential exposed
+```
+
+This document owns the release-specific guard semantics and qualification. It
+does not redefine the effect chokepoint.
+
 The `approve` directive is Hermes runtime approval. It invokes Hermes'
 approval gate and may use a `rule_key` whose runtime UX supports persistent
 `always` allowance. Pantheon must not use that mechanism to manufacture or
