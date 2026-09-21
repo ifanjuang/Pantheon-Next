@@ -418,6 +418,11 @@ def validate(artifacts: Path) -> dict[str, Any]:
             and sentinel.get("callback_exception_fail_open_observed") is True
         ),
         "pre_tool_call_is_pantheon_pep": False,
+        "pre_tool_call_sentinel_claim_scope": (
+            "ephemeral_pinned_release_lab_only" if sentinel_required else None
+        ),
+        "deployed_route_guard_qualified": False,
+        "repeat_sentinel_on_claimed_deployed_route": sentinel_required,
         "target_installation_observed": False,
         "production_activated": False,
         "future_tasks_authorized": False,
