@@ -117,10 +117,10 @@ governed path.
 This source review does not activate any hook, install any plugin, expose any
 consequential tool or qualify a local runtime.
 
-A candidate ephemeral laboratory proof now reuses the existing pinned-runtime
+A candidate ephemeral laboratory characterization now reuses the existing pinned-runtime
 GitHub acceptance harness. It installs a lab-only synthetic effect sentinel
 outside the Pantheon distribution and exercises it through the same Hermes
-`/v1/runs` surface. The candidate proof requires both observations:
+`/v1/runs` surface. The characterization requires both observations:
 
 ```text
 pre_tool_call returns block -> synthetic effect sink remains untouched
@@ -130,7 +130,7 @@ pre_tool_call callback raises -> synthetic effect sink is touched
 The second observation is intentionally a characterization of the selected
 Hermes fail-open exception path, not a desired safety property. The sentinel
 receipt explicitly records that it does not qualify Pantheon's PEP, authorize
-production use or create Evidence. Passing the ephemeral laboratory proof still
+production use or create Evidence. Passing the ephemeral laboratory characterization still
 does not prove the behavior of a NAS/production target; a claimed consequential
 runtime guard must be repeated against that exact deployed route.
 
