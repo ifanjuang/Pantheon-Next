@@ -134,6 +134,21 @@ production use or create Evidence. Passing the ephemeral laboratory proof still
 does not prove the behavior of a NAS/production target; a claimed consequential
 runtime guard must be repeated against that exact deployed route.
 
+Permanent citation ceiling:
+
+```text
+#1105 pass != deployed route guard qualified
+same Hermes source commit != same deployed route behavior
+ephemeral lab route != NAS / production route
+```
+
+#1105 and its generated receipts may be cited only as characterization of the
+pinned Hermes release in the ephemeral GitHub lab. They must not satisfy a
+target-installation, NAS, production, profile-route or consequential-guard
+acceptance field. A deployed-route guard claim requires a fresh receipt bound to
+the exact installed artifact identity/digest, named profile route, observed tool
+surface and observation time.
+
 ### 0.21.3 state and remote-session patch
 
 Upstream 0.21.3 removes duplicate long-lived writer handles to `state.db`, makes read-only
