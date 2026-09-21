@@ -179,6 +179,31 @@ persistent specialization without a distinct runtime boundary
 
 This is not a fixed routing table. It is a qualification hypothesis.
 
+Execution-strategy choice never moves the consequential-effect boundary. Before
+a governed admission that may request a consequential effect is launched, the
+admitted tool/capability envelope must already exclude any raw provider route or
+credential that would allow Hermes to bypass the effect-specific Pantheon owner.
+
+```text
+direct / delegation / goal / Kanban
+!= consequential authority
+
+raw consequential tool / credential
+-> not exposed to Hermes
+
+governed effect request
+-> terminates at Pantheon-owned effect owner / PEP
+
+pre_tool_call
+-> optional second-line runtime guard
+-> never the sole PEP
+```
+
+Hermes may choose how to perform admitted work. It may not choose a path around
+the effect owner, enlarge the effect ceiling or convert runtime approval into a
+Pantheon Decision. A missing or bypassed runtime guard is a runtime
+qualification failure, not permission to expose the raw effect.
+
 Reuse the existing #644 / #986 live campaign and, when useful, #827 professional workloads to compare materially plausible strategies under the same task, admitted context, model/runtime envelope, toolset and review criteria. Observe useful-result quality, misses, false positives, provenance retention, tool calls, cost/token signals when available, latency, stop/blocker behavior, unnecessary decomposition and trace/readback quality.
 
 Decision rule:

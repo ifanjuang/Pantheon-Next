@@ -86,6 +86,27 @@ A `pre_tool_call` hook is consequently a runtime defense-in-depth seam whose
 presence and invocation must be observed on the deployed route; it is not by
 itself proof that every possible effect traverses Pantheon's PEP.
 
+The boundary it defends is explicit: it may reject an illegitimate
+governed-effect request while that request is still inside the admitted Hermes
+runtime/tool surface. The authoritative consequential-effect chokepoint remains
+the separate Pantheon-owned effect owner / PEP described by
+`HERMES_EXECUTION_ADMISSION_BRIDGE.md` and `HERMES_INTEGRATION.md`.
+
+```text
+pre_tool_call
+-> secondary guard on the Hermes-side effect-request path
+
+effect chokepoint
+-> non-bypassable Pantheon-owned path to the exact consequential operation
+
+secondary guard failure
+!= chokepoint failure
+!= raw consequential credential exposed
+```
+
+This document owns the release-specific guard semantics and qualification. It
+does not redefine the effect chokepoint.
+
 The `approve` directive is Hermes runtime approval. It invokes Hermes'
 approval gate and may use a `rule_key` whose runtime UX supports persistent
 `always` allowance. Pantheon must not use that mechanism to manufacture or
@@ -117,10 +138,10 @@ governed path.
 This source review does not activate any hook, install any plugin, expose any
 consequential tool or qualify a local runtime.
 
-A candidate ephemeral laboratory proof now reuses the existing pinned-runtime
+A candidate ephemeral laboratory characterization now reuses the existing pinned-runtime
 GitHub acceptance harness. It installs a lab-only synthetic effect sentinel
 outside the Pantheon distribution and exercises it through the same Hermes
-`/v1/runs` surface. The candidate proof requires both observations:
+`/v1/runs` surface. The characterization requires both observations:
 
 ```text
 pre_tool_call returns block -> synthetic effect sink remains untouched
@@ -130,9 +151,24 @@ pre_tool_call callback raises -> synthetic effect sink is touched
 The second observation is intentionally a characterization of the selected
 Hermes fail-open exception path, not a desired safety property. The sentinel
 receipt explicitly records that it does not qualify Pantheon's PEP, authorize
-production use or create Evidence. Passing the ephemeral laboratory proof still
+production use or create Evidence. Passing the ephemeral laboratory characterization still
 does not prove the behavior of a NAS/production target; a claimed consequential
 runtime guard must be repeated against that exact deployed route.
+
+Permanent citation ceiling:
+
+```text
+#1105 pass != deployed route guard qualified
+same Hermes source commit != same deployed route behavior
+ephemeral lab route != NAS / production route
+```
+
+#1105 and its generated receipts may be cited only as characterization of the
+pinned Hermes release in the ephemeral GitHub lab. They must not satisfy a
+target-installation, NAS, production, profile-route or consequential-guard
+acceptance field. A deployed-route guard claim requires a fresh receipt bound to
+the exact installed artifact identity/digest, named profile route, observed tool
+surface and observation time.
 
 ### 0.21.3 state and remote-session patch
 

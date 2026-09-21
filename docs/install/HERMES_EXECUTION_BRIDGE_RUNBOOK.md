@@ -481,6 +481,31 @@ Routine rollback must not delete Hermes sessions, memory files, PostgreSQL data,
 
 ## Acceptance boundary
 
+The GitHub sentinel introduced by #1105 is not target acceptance. If an
+operational or consequential binding claims a Hermes-side runtime guard such as
+`pre_tool_call`, that guard must be re-observed on the exact deployed artifact
+and exact named profile route. The retained target receipt must bind at least:
+
+```text
+installed Hermes artifact identity / digest
+named profile route
+observed tool surface
+guard behavior
+observation time
+target identity sufficient to distinguish it from the GitHub lab
+```
+
+If no reviewed target-local sentinel procedure is available, record the
+Hermes-side guard as `not_qualified`; do not substitute the #1105 lab receipt.
+This does not weaken the Pantheon-owned effect PEP, which must remain the
+non-bypassable consequential-effect boundary independently of the runtime guard.
+
+```text
+#1105 lab pass != target runtime guard qualified
+runtime guard unqualified != effect PEP unavailable
+pre_tool_call != Pantheon PEP
+```
+
 A real installation is accepted only when all of the following are observed together:
 
 ```text

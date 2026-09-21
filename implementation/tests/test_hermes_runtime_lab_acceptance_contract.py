@@ -196,6 +196,10 @@ def test_harness_fails_closed_and_does_not_claim_target_acceptance() -> None:
     assert '"pre_tool_call_block_observed": bool(' in raw
     assert '"pre_tool_call_exception_fail_open_observed": bool(' in raw
     assert '"pre_tool_call_is_pantheon_pep": False' in raw
+    assert '"pre_tool_call_sentinel_claim_scope": (' in raw
+    assert '"ephemeral_pinned_release_lab_only" if sentinel_required else None' in raw
+    assert '"deployed_route_guard_qualified": False' in raw
+    assert '"repeat_sentinel_on_claimed_deployed_route": sentinel_required' in raw
     assert "sentinel-observation.json" in raw
 
 
@@ -241,6 +245,8 @@ def test_fixture_is_local_bounded_and_exercises_context_refusal() -> None:
     assert "subprocess" not in raw
 
 
+# Keep this path in the runtime-lab trigger set: changing the proof ceiling must
+# re-run the exact pinned Hermes sentinel characterization, not only static CI.
 def test_pre_tool_sentinel_is_lab_only_and_exercises_real_runs_route() -> None:
     sequence = SEQUENCE.read_text(encoding="utf-8")
     fixture = FIXTURE.read_text(encoding="utf-8")
@@ -264,6 +270,9 @@ def test_pre_tool_sentinel_is_lab_only_and_exercises_real_runs_route() -> None:
     assert 'test ! -e "$PANTHEON_SENTINEL_SINK"' in sequence
     assert 'test -f "$PANTHEON_SENTINEL_SINK"' in sequence
     assert '"pantheon_pep_qualified_by_this_test": False' in sequence
+    assert '"claim_scope": "ephemeral_pinned_release_lab_only"' in sequence
+    assert '"deployed_route_guard_qualified": False' in sequence
+    assert '"repeat_on_claimed_deployed_route": True' in sequence
     assert "sentinel_plugin_disabled" in sequence
     assert "sentinel_tool_policy_restored" in sequence
 

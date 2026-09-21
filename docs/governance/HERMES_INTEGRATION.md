@@ -17,7 +17,8 @@ Pantheon Cockpit is the governed projection surface, not a second Hermes runtime
 
 ```text
 Optional runtime client     -> runtime interaction
-Hermes Agent                -> external execution / PEP responsibility
+Hermes Agent                -> admitted reasoning / runtime execution
+Pantheon effect owner / PEP -> exact consequential external effect
 Pantheon Cockpit            -> governed Cards, status, Evidence gaps and decisions
 Pantheon Next               -> governance / PDP responsibility
 human                       -> consequential decision
@@ -62,13 +63,20 @@ Release- and feature-specific review belongs to `HERMES_RUNTIME_SURFACE_REVIEW.m
 
 Pantheon governs legitimacy.
 
-Hermes executes admitted work externally.
+Hermes executes admitted reasoning and runtime work externally.
 
-The external execution runtime enforces consequential-effect policy as the Policy Enforcement Point.
+Consequential-effect enforcement belongs to an effect-specific Pantheon-owned
+PEP / adapter outside Hermes' internal hook chain. Before a governed task is
+launched, its admitted capability and tool surface must exclude any raw
+consequential route or credential that could bypass that owner.
 
 The current Pantheon decision interface is the bounded policy service described by `mcp-server/docs/HTTP_API_CONTRACT.md`.
 
-That service exposes deterministic policy/preflight decisions as the Policy Decision Point; it does not perform the consequential effect.
+That service exposes deterministic policy/preflight decisions as the Policy
+Decision Point; it does not perform the consequential effect. The exact
+effect-specific owner may perform the external operation after the applicable
+PDP / canonical Decision / one-use checks have passed. This does not make the
+Pantheon kernel an execution runtime.
 
 Optional runtime clients expose interaction with the execution runtime.
 
@@ -158,7 +166,23 @@ illegitimate scope expansion
 professional or contractual consequence
 ```
 
-Before such an effect occurs, the external runtime/PEP must consult the Pantheon policy decision appropriate to that effect.
+Before such an effect occurs, the exact effect-specific PEP must consult the
+Pantheon policy decision appropriate to that effect. That PEP is a Pantheon-owned
+integration boundary, not a Hermes-internal hook.
+
+Before launch:
+
+```text
+raw consequential provider tool / credential
+-> not admitted to Hermes
+
+governed effect-request capability
+-> may be admitted when the Task Contract permits it
+
+pre_tool_call
+-> optional defense in depth only
+-> never the sole effect boundary
+```
 
 Conceptually:
 
@@ -166,38 +190,62 @@ Conceptually:
 Task Contract / governed request
         |
         v
-Pantheon policy check (PDP)
+Execution Admission / admitted tool envelope
         |
-        +--> block / needs_revision / needs_evidence / needs_approval
+        v
+Hermes reasoning / runtime work
         |
-        +--> allow / allow_with_gate
-                     |
-                     v
-              external runtime / PEP
-                     |
-                     v
-              consequential effect
-                     |
-                     v
-          Outcome Observation Candidate
+        +--> Result Candidate / Runtime Observation
+        |
+        +--> Effect Request Candidate
+                    |
+                    v
+          Pantheon effect owner / PEP
+                    |
+                    v
+          Pantheon policy check (PDP)
+          + canonical Decision / gate
+                    |
+          +---------+-------------------+
+          |                             |
+          v                             v
+        block                     allow exact effect
+                                        |
+                                        v
+                               consequential effect
+                                        |
+                                        v
+                           Outcome Observation Candidate
 ```
 
-Pantheon does not perform the effect.
+Pantheon core and the PDP do not perform the effect. The effect-specific
+owner/PEP may perform the exact external operation. Credentials or provider
+routes whose possession would allow bypass must remain with that owner rather
+than with the Hermes runtime.
 
-Hermes must not substitute model judgment, runtime smart approval or client UI state for the policy check when the effect requires it.
+Hermes must not substitute model judgment, runtime smart approval, client UI
+state or a successful `pre_tool_call` hook for the policy check when the effect
+requires it.
 
-The PEP is responsible for:
+The effect-specific PEP is responsible for:
 
 - fail-closed behavior when required policy is unavailable;
-- validating the applicable gate signals when the deployed binding requires them;
+- validating the applicable gate signals and exact effect payload;
 - consuming one-use authorization/idempotency state where relevant;
 - performing the external operation only after the gate is satisfied;
 - returning a truthful technical outcome observation.
 
+A Hermes-side guard such as `pre_tool_call` may reject an illegitimate request
+earlier, but loss, bypass or failure of that guard must not make the raw effect
+reachable.
+
 ```text
+pre_tool_call != Pantheon PEP
+runtime approval != Pantheon Decision
 policy allow != effect executed
 signed decision != one-use consumption
 runtime retry != renewed authorization
+guard bypassed != effect boundary bypassed
 ```
 
 ## 5. What Pantheon may provide to Hermes
@@ -611,8 +659,10 @@ If Pantheon must replay or own Hermes runtime state to govern the result, the bo
 ## 22. Final invariants
 
 ```text
-Pantheon governs; Hermes executes.
+Pantheon governs; Hermes executes admitted runtime work.
+Pantheon-owned effect owner / PEP remains outside Hermes internals.
 PDP decision != PEP execution.
+pre_tool_call != Pantheon PEP.
 execution success != authorization.
 runtime output != Evidence.
 retrieved != true.
