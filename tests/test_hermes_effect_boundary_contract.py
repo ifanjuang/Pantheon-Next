@@ -8,6 +8,7 @@ INTEGRATION = ROOT / "docs" / "governance" / "HERMES_INTEGRATION.md"
 IMPROVEMENT = ROOT / "docs" / "architecture" / "HERMES_IMPROVEMENT_PATH.md"
 NON_EQ = ROOT / "docs" / "governance" / "NON_EQUIVALENCE_RULES.md"
 SURFACE = ROOT / "docs" / "governance" / "HERMES_RUNTIME_SURFACE_REVIEW.md"
+ADMISSION = ROOT / "docs" / "governance" / "HERMES_EXECUTION_ADMISSION_BRIDGE.md"
 RUNBOOK = ROOT / "docs" / "install" / "HERMES_EXECUTION_BRIDGE_RUNBOOK.md"
 
 
@@ -49,3 +50,21 @@ def test_ephemeral_sentinel_never_counts_as_deployed_route_qualification() -> No
     assert "#1105 lab pass != target runtime guard qualified" in runbook
     assert "If no reviewed target-local sentinel procedure is available" in runbook
     assert "do not substitute the #1105 lab receipt" in runbook
+
+
+def test_effect_chokepoint_and_runtime_guard_owners_cross_reference_each_other() -> None:
+    admission = ADMISSION.read_text(encoding="utf-8")
+    surface = SURFACE.read_text(encoding="utf-8")
+
+    assert "HERMES_RUNTIME_SURFACE_REVIEW.md" in admission
+    assert "Hermes pre_tool_call" in admission
+    assert "defense in depth for the admitted runtime/tool surface" in admission
+    assert "runtime guard != effect chokepoint" in admission
+    assert "raw consequential effect must\nstill remain unreachable" in admission
+
+    assert "HERMES_EXECUTION_ADMISSION_BRIDGE.md" in surface
+    assert "governed-effect request" in surface
+    assert "authoritative consequential-effect chokepoint remains" in surface
+    assert "secondary guard on the Hermes-side effect-request path" in surface
+    assert "This document owns the release-specific guard semantics and qualification." in surface
+    assert "It\ndoes not redefine the effect chokepoint." in surface
