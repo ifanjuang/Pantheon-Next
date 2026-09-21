@@ -245,6 +245,8 @@ def test_fixture_is_local_bounded_and_exercises_context_refusal() -> None:
     assert "subprocess" not in raw
 
 
+# Keep this path in the runtime-lab trigger set: changing the proof ceiling must
+# re-run the exact pinned Hermes sentinel characterization, not only static CI.
 def test_pre_tool_sentinel_is_lab_only_and_exercises_real_runs_route() -> None:
     sequence = SEQUENCE.read_text(encoding="utf-8")
     fixture = FIXTURE.read_text(encoding="utf-8")
