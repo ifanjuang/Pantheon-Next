@@ -382,6 +382,9 @@ sink = json.loads((artifacts / "sentinel-raise-sink.json").read_text())
 receipt = {
     "kind": "hermes_pre_tool_call_sentinel_observation",
     "synthetic": True,
+    "claim_scope": "ephemeral_pinned_release_lab_only",
+    "deployed_route_guard_qualified": False,
+    "repeat_on_claimed_deployed_route": True,
     "pre_tool_call_block_observed": (
         block.get("status") == "completed"
         and "SENTINEL_BLOCK_CONFIRMED" in str(block.get("output") or "")
