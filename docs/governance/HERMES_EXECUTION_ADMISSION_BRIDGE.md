@@ -27,6 +27,35 @@ admission granted != consequential effect authorized
 read_only admission  != later write/external/canonical authority
 ```
 
+The effect chokepoint is the non-bypassable Pantheon-owned effect boundary
+described by `HERMES_INTEGRATION.md`. Hermes may additionally expose a
+release-specific second-line runtime guard such as `pre_tool_call`, but that
+guard is not the chokepoint and does not authorize the effect.
+
+Its role is narrower:
+
+```text
+Hermes pre_tool_call
+-> early rejection of an illegitimate governed-effect request
+-> defense in depth for the admitted runtime/tool surface
+
+Effect chokepoint / Pantheon effect owner / PEP
+-> exact policy / Decision / one-use validation
+-> only path that may reach the consequential credential or provider operation
+```
+
+The exact semantics, failure modes and deployed-route qualification of that
+runtime guard belong to `HERMES_RUNTIME_SURFACE_REVIEW.md`. If the runtime
+guard is absent, bypassed or unqualified, the raw consequential effect must
+still remain unreachable because the chokepoint is independent of Hermes
+internals.
+
+```text
+runtime guard != effect chokepoint
+runtime guard passed != effect authorized
+runtime guard absent != raw effect exposed
+```
+
 ## Core distinction
 
 ```text
