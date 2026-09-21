@@ -30,6 +30,7 @@ def test_consequential_effect_boundary_is_not_owned_by_hermes_hooks() -> None:
 
     assert "pre_tool_call != Pantheon_PEP" in non_eq
     assert "runtime_guard_available != effect_boundary_owned" in non_eq
+    assert "runtime_guard_unqualified != Pantheon_PEP_unavailable" in non_eq
 
     assert "Hermes Agent                -> external execution / PEP responsibility" not in integration
     assert "Pantheon does not perform the effect." not in integration
