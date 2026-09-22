@@ -221,6 +221,236 @@ repeated residual failure remains after existing owners are corrected
 
 Do not add by default an `ExecutionMode` object, Pantheon dispatcher, Pantheon Kanban engine, scheduler/queue, second admission path or Bot/Profile-to-Role mapping.
 
+## Empirical execution-strategy qualification slices
+
+Issue #1093 owns the empirical follow-up. The objective is not to benchmark every
+Hermes coordination feature or build a second evaluation runtime. It is to qualify
+the smallest useful execution tactic on representative Pantheon/IFJA workloads,
+reusing already-merged live surfaces.
+
+Documentation integration baseline for this qualification owner:
+
+```text
+Pantheon main = 3cccdb29aac25efc3b9fad0e4512e600f4b1343f
+Hermes selected = v0.21.3 / v2026.9.14
+Hermes commit = 345cd2b057a452236de401d3534b8502a7465e8d
+
+#1109 = consequential-effect boundary invariant
+#1105 Runtime Lab = bounded /v1/runs observation + technical receipts
+#986 / P2 = situated professional reasoning qualification
+```
+
+The documentation integration baseline is provenance for this qualification owner,
+not a permanent experimental baseline. Each empirical run must record its own exact
+Pantheon ref, Hermes release/commit, model/provider, admitted capability/tool
+surface and controlled input/context identity.
+
+This qualification inherits the consequential-effect boundary defined immediately
+above. Every Q1/Q2/Q3 comparison must preserve the same admitted capability and
+effect boundary; the execution tactic is the variable under test.
+
+```text
+strategy under test != authorization strategy
+Q1 / Q2 / Q3 tactic change != consequential-effect boundary change
+strategy success != permission to expose raw consequential credentials
+```
+
+#1105-style sentinel observations remain release/lab characterization only; they
+do not qualify a deployed route guard or move the Pantheon-owned effect chokepoint.
+
+The qualification is deliberately pairwise because these tactics do not all live
+at the same runtime layer:
+
+```text
+Q1 — direct vs delegate_task
+same admitted task, same model/runtime envelope, same sources and review criteria
+-> determine whether bounded delegation produces material quality/coverage/latency gain
+
+Q2 — direct vs goal-style iteration
+same bounded artifact or analysis with an objective verification/correction criterion
+-> determine whether additional turns improve the result before looping becomes waste
+
+Q3 — goal-style workflow without vs with Kanban projection/persistence
+same durable dependent-work scenario and same attempt/check/revision workflow
+with at least one real blocker/recovery point in both arms
+-> vary only Kanban projection/persisted task state, dependencies and handoffs
+-> determine whether that additional durable coordination materially helps
+```
+
+Q1 is first because it is technically closest to the existing live Runs/P2 path.
+Do not reproduce a generic Hermes delegation benchmark. Use a small set of
+representative Pantheon/IFJA cases and treat upstream/community observations only
+as prior context, not as local qualification.
+
+For comparable runs, hold constant wherever the runtime surface permits:
+
+```text
+Task Contract / admitted question
+Context Pack / source set
+model + provider + exact runtime identity
+effective profile identity + projected Skill set
+effective inference settings / model_options digest
+(context length, reasoning level, routing and relevant compression settings)
+tool surface except the tactic under test
+output contract / review criteria
+same initial mutable runtime state under experiment control
+(runtime/external memory, writable workspace, task artifacts and resettable caches)
+fresh admission + fresh session
+```
+
+Record the effective profile identity and non-secret settings digest for every arm,
+following the existing native-baseline posture rather than relying on a profile
+name alone. If the effective profile, projected Skills, model options or other
+controlled inference settings differ between matched arms, the comparison is
+inconclusive and must not be attributed to the execution tactic.
+
+A fresh session is not by itself a clean initial state. Before every arm and
+repetition, start experiment-controlled mutable stores from the same known state,
+using existing isolation/reset mechanisms such as an ephemeral namespace,
+disposable workspace or equivalent reset. Record the state identity/digest where
+the runtime exposes one. Do not add a Pantheon snapshot owner for this purpose.
+
+If equal initial mutable state cannot be demonstrated for the stores that can
+carry information across sessions, classify the matched comparison as
+inconclusive. Q3 keeps the same initial state between arms but may intentionally
+exercise persistence inside the Kanban arm; that persistence is the treatment,
+not a pre-existing difference.
+
+Each representative case uses repeated matched trials. The default minimum is
+three repetitions per tactic/arm with a fresh admission and fresh session for
+every repetition, unless an existing qualification owner requires more.
+
+Run the arms as time-local matched pairs rather than as one block per tactic.
+Predeclare and record a randomized or counterbalanced arm order for each pair so
+provider-load drift, warm caches, throttling or other time-correlated effects are
+not systematically assigned to one tactic. With an odd number of pairs, first-arm
+counts may differ by at most one.
+
+Before execution, declare the outcome-independent runtime/provider drift signals
+that can invalidate a pair and their threshold or boolean trigger. Such signals
+must be provider-wide or runtime-wide observations measured independently of
+either tactic arm, for example an external health/status signal or an independent
+control probe that crosses its predeclared threshold.
+
+Do not use an arm-local throttle, rate-limit, timeout, provider error, latency,
+quality score or other event that may have been caused by the tactic itself as a
+drift exclusion signal. Those events remain part of that tactic's observed
+coordination cost/outcome. A pair may be replaced only when the predeclared
+independent drift rule fires. Keep the excluded pair in the run record with its
+signal, threshold/trigger and exclusion reason; append the replacement rather
+than erasing the observation.
+
+For the default repeated slice:
+
+```text
+quantitative signals (latency / tool calls / token-cost signals)
+-> compare the median per arm and retain the per-run values
+
+quality / provenance / blocker behavior
+-> record each repetition; any critical-boundary regression fails that arm
+
+claimed material tactic benefit inside one case
+-> must recur in the same direction across a majority of matched repetitions
+   and must not be contradicted by the aggregate signal
+
+workload-class preference
+-> independent representative case is the unit of generalization
+-> with the default three predeclared cases, the same tactic benefit must hold
+   in at least two cases and no case may introduce a critical-boundary regression
+-> do not weight a case more heavily because it has more repetitions
+
+split / tied independent cases
+-> no workload-class preference; keep the simpler tactic as the default hypothesis
+
+single run or isolated outlier
+-> inconclusive; never a workload-class strategy rule
+```
+
+Declare both the within-case aggregation rule and the cross-case generalization
+rule before matched runs start so neither decision rule is chosen after observing
+results.
+
+Where qualitative P2/professional review contributes to tactic selection, present
+reviewable outputs under opaque run identifiers in randomized order and remove
+tactic labels, arm order and coordination metadata that are not themselves part
+of the review criterion. Reviewers must score the declared rubric without knowing
+which tactic produced each artifact wherever the artifact permits that blinding.
+
+If tactic identity is intrinsically visible and cannot be blinded, the subjective
+rating remains a descriptive observation but cannot by itself establish a
+workload-class tactic preference. In that case, the preference must be supported
+by objective checks/signals under the predeclared rule, while critical provenance,
+scope, blocker and authorization regressions remain disqualifying regardless of
+blinding.
+
+Q3 requires stricter variable isolation: both arms use the same goal-style
+attempt/check/revision workflow and the same task/dependency scenario. The only
+intended treatment difference is the Kanban projection/persistence surface and
+the durable state/handoff behavior it provides. If iteration behavior also differs,
+the Q3 comparison is inconclusive because more than one execution dimension moved.
+
+Observe at minimum:
+
+```text
+material findings found
+material findings missed
+false or unsupported claims
+provenance retention
+explicit uncertainty / blocker behavior
+latency
+tool calls
+token/cost signals when available
+delegation / iteration / task count
+duplicated or unnecessary coordination
+```
+
+A more complex tactic is not preferred merely because it succeeds. It must produce
+a material benefit that justifies its coordination cost and must not degrade a
+critical boundary such as provenance, scope, blocker handling or authorization.
+
+```text
+same useful result + more coordination
+-> simpler tactic remains preferred
+
+materially better result or materially lower latency
+with preserved boundaries
+-> more complex tactic may be justified for that workload class
+
+one successful run
+!= general strategy rule
+```
+
+The Runtime Lab may establish that a tactic was actually exercised and collect
+technical observations. P2/#986 may establish bounded professional-result
+observations. Neither receipt is Evidence or professional truth.
+
+```text
+runtime trace != Evidence
+technical receipt != Evidence
+P2 result candidate != professional validation
+strategy observed != strategy preferred
+benchmark result != authorization
+```
+
+After forced pairwise runs, only test automatic strategy choice where Hermes
+actually owns that choice. Do not pretend that direct/delegation, session goal
+control and durable Kanban dispatch are one interchangeable selector surface.
+
+If Hermes already chooses the least-complex sufficient tactic adequately, add no
+Pantheon selector. If repeated residual mis-selection remains, first fix the
+nearest existing Hermes prompt/Skill/tool/runtime owner. Retain the cases that
+exposed the failure as regression cases, but do not qualify the correction only
+by re-running cases inspected during tuning.
+
+Before selecting a correction, freeze a held-out set for the same workload class.
+After the nearest-owner correction, require both regression success on the
+original cases and the same direction of improvement on the untouched held-out
+cases under the same matched-run controls. A correction that helps only the cases
+used to choose it is case-specific tuning, not a workload-class strategy rule.
+
+Only a repeated residual failure that survives this held-out validation after
+existing-owner corrections can justify the smallest additional constraint.
+
 ## Failure classification gate
 
 Before changing model weights, a failure must be classified against the layers that can already explain it:
