@@ -304,6 +304,13 @@ Each representative case uses repeated matched trials. The default minimum is
 three repetitions per tactic/arm with a fresh admission and fresh session for
 every repetition, unless an existing qualification owner requires more.
 
+Run the arms as time-local matched pairs rather than as one block per tactic.
+Predeclare and record a randomized or counterbalanced arm order for each pair so
+provider-load drift, warm caches, throttling or other time-correlated effects are
+not systematically assigned to one tactic. With an odd number of pairs, first-arm
+counts may differ by at most one; if material runtime/provider drift is observed,
+the affected pair is inconclusive and must be repeated or the slice expanded.
+
 For the default repeated slice:
 
 ```text
