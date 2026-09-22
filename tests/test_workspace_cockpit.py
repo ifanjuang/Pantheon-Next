@@ -29,7 +29,7 @@ def test_complete_source_cartouche_bundle_projects_rich_card(tmp_path: Path) -> 
     dce = tmp_path / "DCE"
     dce.mkdir()
     (dce / "CCTP_IND_C.pdf").write_bytes(b"%PDF-fixture")
-    (dce / "CCTP_IND_C.md").write_text(
+    (dce / ".CCTP_IND_C.pdf.md").write_text(
         """---
 document_id: doc-cctp-c
 source: CCTP_IND_C.pdf
@@ -59,12 +59,12 @@ CCTP du lot structure pour la consultation DCE.
     document = next(card for card in cards if card["kind"] == "document")
     folder = next(card for card in cards if card["kind"] == "folder")
 
-    assert result["projection"] == "affaires_source_cartouche_v1"
+    assert result["projection"] == "affaires_source_cartouche_v2"
     assert document["status"] == "COMPLETE"
     assert document["document_id"] == "doc-cctp-c"
     assert document["source"] == "CCTP_IND_C.pdf"
     assert document["source_present"] is True
-    assert document["cartouche"] == "CCTP_IND_C.md"
+    assert document["cartouche"] == ".CCTP_IND_C.pdf.md"
     assert document["cartouche_present"] is True
     assert document["title"] == "CCTP — Lot 03 Ossature bois"
     assert document["document_type"] == "CCTP"
@@ -79,6 +79,61 @@ CCTP du lot structure pour la consultation DCE.
     assert folder["can_generate_folder_context"] is True
     assert result["document_count"] == 1
     assert result["folder_count"] == 1
+
+
+def test_markdown_source_is_not_confused_with_hidden_cartouche(tmp_path: Path) -> None:
+    module = _module()
+    (tmp_path / "notes.md").write_text("# Notes source\n\nContenu métier.", encoding="utf-8")
+    (tmp_path / ".notes.md.md").write_text(
+        """---
+document_id: doc-notes
+source: notes.md
+type: NOTE
+---
+# Cartouche de notes
+
+## Résumé
+Notes de réunion.
+""",
+        encoding="utf-8",
+    )
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=1)
+    documents = [card for card in _cards(result) if card["kind"] == "document"]
+
+    assert len(documents) == 1
+    card = documents[0]
+    assert card["name"] == "notes.md"
+    assert card["cartouche"] == ".notes.md.md"
+    assert card["status"] == "COMPLETE"
+    assert card["document_id"] == "doc-notes"
+    assert card["hindsight_eligible"] is True
+
+
+def test_same_stem_different_source_extensions_have_distinct_cartouches(tmp_path: Path) -> None:
+    module = _module()
+    (tmp_path / "CCTP.pdf").write_bytes(b"%PDF")
+    (tmp_path / "CCTP.docx").write_bytes(b"DOCX")
+    (tmp_path / ".CCTP.pdf.md").write_text(
+        "---\ndocument_id: doc-pdf\nsource: CCTP.pdf\n---\n# PDF\n",
+        encoding="utf-8",
+    )
+    (tmp_path / ".CCTP.docx.md").write_text(
+        "---\ndocument_id: doc-docx\nsource: CCTP.docx\n---\n# DOCX\n",
+        encoding="utf-8",
+    )
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=1)
+    documents = sorted(
+        (card for card in _cards(result) if card["kind"] == "document"),
+        key=lambda card: card["name"],
+    )
+
+    assert [(card["name"], card["cartouche"], card["document_id"]) for card in documents] == [
+        ("CCTP.docx", ".CCTP.docx.md", "doc-docx"),
+        ("CCTP.pdf", ".CCTP.pdf.md", "doc-pdf"),
+    ]
+    assert all(card["status"] == "COMPLETE" for card in documents)
 
 
 def test_source_without_cartouche_is_visible_with_generate_affordance(tmp_path: Path) -> None:
@@ -99,7 +154,7 @@ def test_source_without_cartouche_is_visible_with_generate_affordance(tmp_path: 
 
 def test_cartouche_without_source_is_explicitly_missing(tmp_path: Path) -> None:
     module = _module()
-    (tmp_path / "DPGF.md").write_text(
+    (tmp_path / ".DPGF.xlsx.md").write_text(
         """---
 document_id: doc-dpgf
 source: DPGF.xlsx
@@ -198,7 +253,7 @@ def test_workspace_index_persists_reconstructible_snapshot_and_detects_changes(t
     assert first_folder["folder_context_present"] is False
     assert first["index_state"]["last_reconcile_reason"] == "test-initial"
 
-    (dce / "CCTP.md").write_text(
+    (dce / ".CCTP.pdf.md").write_text(
         """---
 document_id: doc-cctp
 source: CCTP.pdf
@@ -278,7 +333,7 @@ def test_reconcile_move_preserves_cartouche_identity_when_pair_moves_together(tm
     target_dir.mkdir()
 
     (source_dir / "CCTP_IND_C.pdf").write_bytes(b"%PDF")
-    (source_dir / "CCTP_IND_C.md").write_text(
+    (source_dir / ".CCTP_IND_C.pdf.md").write_text(
         """---
 document_id: doc-cctp-c
 source: CCTP_IND_C.pdf
@@ -306,7 +361,7 @@ source: CCTP_IND_C.pdf
     assert before_doc["status"] == "COMPLETE"
 
     (source_dir / "CCTP_IND_C.pdf").rename(target_dir / "CCTP_IND_C.pdf")
-    (source_dir / "CCTP_IND_C.md").rename(target_dir / "CCTP_IND_C.md")
+    (source_dir / ".CCTP_IND_C.pdf.md").rename(target_dir / ".CCTP_IND_C.pdf.md")
 
     after = index.reconcile("after-move")
     after_doc = next(
@@ -343,7 +398,7 @@ def test_declared_source_cannot_escape_cartouche_directory(tmp_path: Path) -> No
     package = tmp_path / "Rapport"
     package.mkdir()
     (package / "Rapport.pdf").write_bytes(b"%PDF-report")
-    (package / "Rapport.md").write_text(
+    (package / ".Rapport.pdf.md").write_text(
         """---
 document_id: doc-rapport
 source: ../outside.pdf
@@ -381,7 +436,7 @@ def test_heavy_sources_stay_visible_and_temp_backups_are_ignored(tmp_path: Path)
 def test_malformed_cartouche_is_check_not_source_loss(tmp_path: Path) -> None:
     module = _module()
     (tmp_path / "Notice.pdf").write_bytes(b"%PDF-fixture")
-    (tmp_path / "Notice.md").write_text(
+    (tmp_path / ".Notice.pdf.md").write_text(
         """---
 document_id: [
 ---
@@ -412,7 +467,7 @@ def test_check_mode_returns_affaires_projection_without_database(tmp_path: Path)
     assert result.returncode == 0
     payload = json.loads(result.stdout)
     assert payload["read_only"] is True
-    assert payload["projection"] == "affaires_source_cartouche_v1"
+    assert payload["projection"] == "affaires_source_cartouche_v2"
     assert payload["totals"]["FOLDER"] == 1
     assert payload["item_count"] == 1
 
