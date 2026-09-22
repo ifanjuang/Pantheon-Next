@@ -221,6 +221,129 @@ repeated residual failure remains after existing owners are corrected
 
 Do not add by default an `ExecutionMode` object, Pantheon dispatcher, Pantheon Kanban engine, scheduler/queue, second admission path or Bot/Profile-to-Role mapping.
 
+## Empirical execution-strategy qualification slices
+
+Issue #1093 owns the empirical follow-up. The objective is not to benchmark every
+Hermes coordination feature or build a second evaluation runtime. It is to qualify
+the smallest useful execution tactic on representative Pantheon/IFJA workloads,
+reusing already-merged live surfaces.
+
+Documentation integration baseline for this qualification owner:
+
+```text
+Pantheon main = 3cccdb29aac25efc3b9fad0e4512e600f4b1343f
+Hermes selected = v0.21.3 / v2026.9.14
+Hermes commit = 345cd2b057a452236de401d3534b8502a7465e8d
+
+#1109 = consequential-effect boundary invariant
+#1105 Runtime Lab = bounded /v1/runs observation + technical receipts
+#986 / P2 = situated professional reasoning qualification
+```
+
+The documentation integration baseline is provenance for this qualification owner,
+not a permanent experimental baseline. Each empirical run must record its own exact
+Pantheon ref, Hermes release/commit, model/provider, admitted capability/tool
+surface and controlled input/context identity.
+
+This qualification inherits the consequential-effect boundary defined immediately
+above. Every Q1/Q2/Q3 comparison must preserve the same admitted capability and
+effect boundary; the execution tactic is the variable under test.
+
+```text
+strategy under test != authorization strategy
+Q1 / Q2 / Q3 tactic change != consequential-effect boundary change
+strategy success != permission to expose raw consequential credentials
+```
+
+#1105-style sentinel observations remain release/lab characterization only; they
+do not qualify a deployed route guard or move the Pantheon-owned effect chokepoint.
+
+The qualification is deliberately pairwise because these tactics do not all live
+at the same runtime layer:
+
+```text
+Q1 — direct vs delegate_task
+same admitted task, same model/runtime envelope, same sources and review criteria
+-> determine whether bounded delegation produces material quality/coverage/latency gain
+
+Q2 — direct vs goal-style iteration
+same bounded artifact or analysis with an objective verification/correction criterion
+-> determine whether additional turns improve the result before looping becomes waste
+
+Q3 — goal-style iteration vs Kanban
+same durable dependent-work scenario with at least one real blocker/recovery point
+-> determine whether persisted task state, dependencies and handoffs materially help
+```
+
+Q1 is first because it is technically closest to the existing live Runs/P2 path.
+Do not reproduce a generic Hermes delegation benchmark. Use a small set of
+representative Pantheon/IFJA cases and treat upstream/community observations only
+as prior context, not as local qualification.
+
+For comparable runs, hold constant wherever the runtime surface permits:
+
+```text
+Task Contract / admitted question
+Context Pack / source set
+model + provider + runtime release
+tool surface except the tactic under test
+output contract / review criteria
+fresh admission + fresh session
+```
+
+Observe at minimum:
+
+```text
+material findings found
+material findings missed
+false or unsupported claims
+provenance retention
+explicit uncertainty / blocker behavior
+latency
+tool calls
+token/cost signals when available
+delegation / iteration / task count
+duplicated or unnecessary coordination
+```
+
+A more complex tactic is not preferred merely because it succeeds. It must produce
+a material benefit that justifies its coordination cost and must not degrade a
+critical boundary such as provenance, scope, blocker handling or authorization.
+
+```text
+same useful result + more coordination
+-> simpler tactic remains preferred
+
+materially better result or materially lower latency
+with preserved boundaries
+-> more complex tactic may be justified for that workload class
+
+one successful run
+!= general strategy rule
+```
+
+The Runtime Lab may establish that a tactic was actually exercised and collect
+technical observations. P2/#986 may establish bounded professional-result
+observations. Neither receipt is Evidence or professional truth.
+
+```text
+runtime trace != Evidence
+technical receipt != Evidence
+P2 result candidate != professional validation
+strategy observed != strategy preferred
+benchmark result != authorization
+```
+
+After forced pairwise runs, only test automatic strategy choice where Hermes
+actually owns that choice. Do not pretend that direct/delegation, session goal
+control and durable Kanban dispatch are one interchangeable selector surface.
+
+If Hermes already chooses the least-complex sufficient tactic adequately, add no
+Pantheon selector. If repeated residual mis-selection remains, first fix the
+nearest existing Hermes prompt/Skill/tool/runtime owner and re-run the same cases.
+Only a repeated residual failure after those corrections can justify the smallest
+additional constraint.
+
 ## Failure classification gate
 
 Before changing model weights, a failure must be classified against the layers that can already explain it:
