@@ -171,7 +171,7 @@ def build_source_intake_draft(
         "origin_system": "google_drive",
         "origin_external_ref": candidate.file_id,
         "raw_source_ref": candidate.source_locator,
-        "mime_type": materialized.materialized_mime_type,
+        "mime_type": candidate.mime_type,
         "metadata": {
             "google_drive": {
                 "file_id": candidate.file_id,
@@ -183,6 +183,7 @@ def build_source_intake_draft(
                 "scope_folder_id": candidate.scope_folder_id,
                 "scope_drive_id": candidate.scope_drive_id,
                 "original_mime_type": candidate.mime_type,
+                "materialized_mime_type": materialized.materialized_mime_type,
                 "export_mime_type": materialized.export_mime_type,
                 "materialized_content_sha256": materialized.content_sha256,
                 "materialized_representation_preserved": False,
