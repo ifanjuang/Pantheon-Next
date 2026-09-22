@@ -1,9 +1,9 @@
 const STATUS = {
-  COHERENT: { label: "Cohérent", color: "#287652" },
+  COMPLETE: { label: "Complet", color: "#287652" },
   CHECK: { label: "À vérifier", color: "#a76800" },
-  INVALID: { label: "Invalide", color: "#a53535" },
-  QUALIFIABLE: { label: "Qualifiable", color: "#6648a8" },
-  FREE: { label: "Libre", color: "#7a7d83" },
+  CARTOUCHE_MISSING: { label: "Cartouche manquant", color: "#6648a8" },
+  SOURCE_MISSING: { label: "Source manquante", color: "#a53535" },
+  FOLDER: { label: "Dossier", color: "#315d9c" },
 };
 
 const state = { data: null, workspace: "all", status: "all", query: "" };
@@ -16,29 +16,100 @@ const escapeHtml = (value) => String(value ?? "")
   .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
   .replaceAll('"', "&quot;").replaceAll("'", "&#039;");
 
-function resource(label, value) {
-  return `<div class="resource"><strong>${Number(value || 0)}</strong><span>${label}</span></div>`;
+function tagTemplate(tag) {
+  return `<span class="tag">${escapeHtml(tag)}</span>`;
+}
+
+function tagsTemplate(tags) {
+  if (!Array.isArray(tags) || tags.length === 0) return "";
+  return `<div class="tags" aria-label="Tags">${tags.map(tagTemplate).join("")}</div>`;
+}
+
+function fact(label, value, stateClass = "") {
+  if (value === null || value === undefined || value === "") return "";
+  return `<div class="fact ${stateClass}"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`;
+}
+
+function documentCardBody(card) {
+  const details = [
+    card.document_type,
+    card.phase,
+    card.index ? `Indice ${card.index}` : "",
+    card.document_date,
+  ].filter(Boolean);
+
+  const summary = card.summary
+    ? `<p class="card-summary">${escapeHtml(card.summary)}</p>`
+    : "";
+
+  const facts = [
+    fact("Chemin", card.path),
+    fact("Source", card.source_present ? (card.source || card.name) : "Manquante", card.source_present ? "" : "fact-alert"),
+    fact("Cartouche", card.cartouche_present ? card.cartouche : "Absent", card.cartouche_present ? "" : "fact-alert"),
+    fact("Identité", card.document_id),
+    fact("Émetteur", card.issuer),
+  ].join("");
+
+  const generate = card.can_generate_cartouche
+    ? `<div class="card-action">
+        <button type="button" disabled title="La route d’écriture du cartouche n’est pas encore qualifiée">Générer le cartouche</button>
+        <small>Action visible, écriture non activée dans cette tranche.</small>
+      </div>`
+    : "";
+
+  return `
+    <div class="document-meta">
+      <span class="file-type">${escapeHtml(card.extension || "FILE")}</span>
+      ${details.length ? `<span>${escapeHtml(details.join(" · "))}</span>` : ""}
+    </div>
+    ${summary}
+    ${tagsTemplate(card.tags)}
+    <div class="facts">${facts}</div>
+    ${generate}
+  `;
+}
+
+function folderCardBody(card) {
+  const summary = card.summary
+    ? `<p class="card-summary">${escapeHtml(card.summary)}</p>`
+    : `<p class="card-summary muted">Contexte de dossier non renseigné.</p>`;
+  const facts = [
+    fact("Chemin", card.path),
+    fact("Contexte", card.folder_context || "Aucun _folder.md"),
+    fact("Phase", card.phase),
+    fact("Projet", card.project),
+  ].join("");
+  return `
+    <div class="document-meta"><span class="file-type">DOSSIER</span></div>
+    ${summary}
+    ${tagsTemplate(card.tags)}
+    <div class="facts">${facts}</div>
+  `;
 }
 
 function cardTemplate(card) {
   const warnings = card.warnings?.length
     ? `<ul class="warnings">${card.warnings.map((warning) => `<li>${escapeHtml(warning)}</li>`).join("")}</ul>`
     : "";
-  return `<article class="card" data-status="${escapeHtml(card.status)}">
+  const body = card.kind === "folder" ? folderCardBody(card) : documentCardBody(card);
+  const classes = [
+    "card",
+    card.kind === "folder" ? "folder-card" : "document-card",
+    card.status === "CARTOUCHE_MISSING" ? "missing-cartouche" : "",
+    card.status === "SOURCE_MISSING" ? "missing-source" : "",
+  ].filter(Boolean).join(" ");
+
+  return `<article class="${classes}" data-status="${escapeHtml(card.status)}">
     <div class="card-head">
-      <div class="card-kicker"><span>${escapeHtml(card.workspace)}</span><span class="status">${STATUS[card.status]?.label || card.status}</span></div>
-      <h2>${escapeHtml(card.name)}</h2>
-      <p class="subtitle">${escapeHtml(card.subtitle)}</p>
+      <div class="card-kicker">
+        <span>${escapeHtml(card.workspace)}</span>
+        <span class="status">${escapeHtml(STATUS[card.status]?.label || card.status)}</span>
+      </div>
+      <h2>${escapeHtml(card.title || card.name)}</h2>
+      <p class="subtitle">${escapeHtml(card.subtitle || "")}</p>
     </div>
-    <div class="resource-grid">
-      ${resource("Markdown", card.resources.markdown)}${resource("PDF", card.resources.pdf)}
-      ${resource("Images", card.resources.images)}${resource("Tableaux", card.resources.tables)}
-    </div>
-    <div class="facts">
-      <div class="fact"><span>Chemin</span><strong>${escapeHtml(card.path)}</strong></div>
-      <div class="fact"><span>Manifeste</span><strong>${escapeHtml(card.manifest || "Absent")}</strong></div>
-      <div class="fact"><span>Document principal</span><strong>${escapeHtml(card.primary_markdown || "Non détecté")}</strong></div>
-    </div>${warnings}
+    ${body}
+    ${warnings}
   </article>`;
 }
 
@@ -51,7 +122,16 @@ function renderCards() {
   const cards = allCards().filter((card) => {
     const workspaceMatch = state.workspace === "all" || card.workspace === state.workspace;
     const statusMatch = state.status === "all" || card.status === state.status;
-    const text = `${card.name} ${card.subtitle} ${card.path}`.toLocaleLowerCase("fr");
+    const text = [
+      card.name,
+      card.title,
+      card.subtitle,
+      card.summary,
+      card.path,
+      card.source,
+      card.cartouche,
+      ...(card.tags || []),
+    ].filter(Boolean).join(" ").toLocaleLowerCase("fr");
     return workspaceMatch && statusMatch && (!query || text.includes(query));
   });
   elements.cards.innerHTML = cards.map(cardTemplate).join("");
@@ -74,7 +154,7 @@ function filtersTemplate() {
 }
 
 function renderSummary() {
-  elements["package-count"].textContent = state.data.package_count;
+  elements["package-count"].textContent = state.data.item_count ?? state.data.package_count ?? 0;
   elements["status-counts"].innerHTML = Object.entries(STATUS).map(([name, item]) =>
     `<div class="count" style="--state:${item.color}"><strong>${state.data.totals[name] || 0}</strong><span>${item.label}</span></div>`,
   ).join("");
@@ -92,7 +172,7 @@ async function load() {
     state.data = await response.json();
     renderSummary(); tabsTemplate(); filtersTemplate(); renderCards();
   } catch (error) {
-    elements.error.textContent = "Impossible de lire les miroirs locaux. Vérifiez le service et ses permissions.";
+    elements.error.textContent = "Impossible de lire AFFAIRES. Vérifiez le service, le montage NAS et ses permissions.";
     elements.error.hidden = false;
   } finally {
     elements.loading.hidden = true;
