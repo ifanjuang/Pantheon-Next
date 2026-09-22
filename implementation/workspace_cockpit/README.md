@@ -45,8 +45,10 @@ Slice 1 (#1112) is merged and Slice 2 is implemented as candidate #1115.
 The current implementation:
 
 - remains read-only for professional source/cartouche material;
-- recognizes `source.ext + source.md` bundles;
+- recognizes `source.ext + .source.ext.md` bundles;
 - reads optional `_folder.md` context and explicitly exposes whether each folder has one;
+- recognizes document cartouches only through the hidden full-source naming rule `.SOURCE.ext.md`;
+- treats an ordinary Markdown file such as `notes.md` as a possible source, with `.notes.md.md` as its cartouche;
 - does not confuse a document cartouche with the folder cartouche;
 - renders complete, cartouche-missing and source-missing states;
 - reads only bounded Markdown plus filesystem metadata during reconciliation;
@@ -60,7 +62,7 @@ The current implementation:
 The remaining migration owned by #660 is:
 
 ```text
-Slice 1  source.ext + source.md projection and broken-pair states — merged #1112
+Slice 1  source.ext + .source.ext.md projection and broken-pair states — merged #1112
 Slice 2  reconstructible index + watcher + periodic reconcile — candidate #1115
 Slice 3  same daemon emits bounded Hindsight producer operations
 Slice 4  Ubuntu deployment converges from vault mirrors to reviewed AFFAIRES root
