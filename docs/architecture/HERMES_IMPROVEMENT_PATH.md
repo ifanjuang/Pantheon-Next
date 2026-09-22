@@ -313,13 +313,18 @@ not systematically assigned to one tactic. With an odd number of pairs, first-ar
 counts may differ by at most one.
 
 Before execution, declare the outcome-independent runtime/provider drift signals
-that can invalidate a pair and their threshold or boolean trigger. Examples may
-include an observed provider throttle/rate-limit event, runtime-health failure or
-other external telemetry that is independent of the tactic result. Do not infer
-drift from an unfavorable latency, quality score or tactic outcome. A pair may be
-replaced only when the predeclared independent drift rule fires. Keep the excluded
-pair in the run record with its signal, threshold/trigger and exclusion reason;
-append the replacement rather than erasing the observation.
+that can invalidate a pair and their threshold or boolean trigger. Such signals
+must be provider-wide or runtime-wide observations measured independently of
+either tactic arm, for example an external health/status signal or an independent
+control probe that crosses its predeclared threshold.
+
+Do not use an arm-local throttle, rate-limit, timeout, provider error, latency,
+quality score or other event that may have been caused by the tactic itself as a
+drift exclusion signal. Those events remain part of that tactic's observed
+coordination cost/outcome. A pair may be replaced only when the predeclared
+independent drift rule fires. Keep the excluded pair in the run record with its
+signal, threshold/trigger and exclusion reason; append the replacement rather
+than erasing the observation.
 
 For the default repeated slice:
 
