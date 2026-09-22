@@ -38,22 +38,24 @@ Historical qualifications of those components remain useful evidence and are not
 
 ## Current implementation state
 
-The executable code in this directory predates the selected target and is being migrated in bounded slices.
+The executable code in this directory is being migrated in bounded slices.
 
-At the current repository state it is still:
+The Slice 1 candidate (#1112) now:
 
-- read-only;
-- based on directory-package projection;
-- able to recognize `document.yaml` and same-named Markdown;
-- configured by the Ubuntu deployment against historical LiveSync filesystem mirrors;
-- recursively scanned when `/api/workspaces` is requested.
+- remains read-only;
+- recognizes `source.ext + source.md` bundles;
+- reads optional `_folder.md` context;
+- renders complete, cartouche-missing and source-missing states;
+- reads only bounded Markdown plus filesystem metadata during ordinary projection;
+- keeps heavy source bytes unopened;
+- exposes a disabled Generate cartouche affordance without introducing a write path;
+- still scans on each `/api/workspaces` request;
+- is still configured by the Ubuntu deployment against historical LiveSync filesystem mirrors.
 
-Those are observed implementation facts, not the selected final topology.
-
-The migration owned by #660 is:
+The remaining migration owned by #660 is:
 
 ```text
-Slice 1  source.ext + source.md projection and broken-pair states
+Slice 1  source.ext + source.md projection and broken-pair states — candidate implemented
 Slice 2  reconstructible index + watcher + periodic reconcile
 Slice 3  same daemon emits bounded Hindsight producer operations
 Slice 4  Ubuntu deployment converges from vault mirrors to reviewed AFFAIRES root
