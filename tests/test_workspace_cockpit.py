@@ -75,6 +75,8 @@ CCTP du lot structure pour la consultation DCE.
     assert document["hindsight_eligible"] is True
     assert document["warnings"] == []
     assert folder["status"] == "FOLDER"
+    assert folder["folder_context_present"] is False
+    assert folder["can_generate_folder_context"] is True
     assert result["document_count"] == 1
     assert result["folder_count"] == 1
 
@@ -263,6 +265,76 @@ def test_index_state_must_remain_outside_workspace_root(tmp_path: Path) -> None:
     root.mkdir()
     assert module._path_is_within(root / ".state" / "index.sqlite3", root) is True
     assert module._path_is_within(tmp_path / "state" / "index.sqlite3", root) is False
+
+
+
+def test_reconcile_move_preserves_cartouche_identity_when_pair_moves_together(tmp_path: Path) -> None:
+    module = _module()
+    affaires = tmp_path / "AFFAIRES"
+    state = tmp_path / "state" / "index.sqlite3"
+    source_dir = affaires / "DCE"
+    target_dir = affaires / "MARCHE"
+    source_dir.mkdir(parents=True)
+    target_dir.mkdir()
+
+    (source_dir / "CCTP_IND_C.pdf").write_bytes(b"%PDF")
+    (source_dir / "CCTP_IND_C.md").write_text(
+        """---
+document_id: doc-cctp-c
+source: CCTP_IND_C.pdf
+---
+# CCTP
+""",
+        encoding="utf-8",
+    )
+
+    index = module.WorkspaceIndex(
+        [("Affaires", affaires)],
+        3,
+        state,
+        reconcile_seconds=60,
+        debounce_seconds=0.01,
+        enable_watcher=False,
+    )
+    before = index.reconcile("before-move")
+    before_doc = next(
+        card
+        for card in before["workspaces"][0]["cards"]
+        if card["kind"] == "document" and card["document_id"] == "doc-cctp-c"
+    )
+    assert before_doc["path"] == "DCE/CCTP_IND_C.pdf"
+    assert before_doc["status"] == "COMPLETE"
+
+    (source_dir / "CCTP_IND_C.pdf").rename(target_dir / "CCTP_IND_C.pdf")
+    (source_dir / "CCTP_IND_C.md").rename(target_dir / "CCTP_IND_C.md")
+
+    after = index.reconcile("after-move")
+    after_doc = next(
+        card
+        for card in after["workspaces"][0]["cards"]
+        if card["kind"] == "document" and card["document_id"] == "doc-cctp-c"
+    )
+    assert after_doc["path"] == "MARCHE/CCTP_IND_C.pdf"
+    assert after_doc["status"] == "COMPLETE"
+    assert after_doc["document_id"] == before_doc["document_id"]
+
+
+def test_linux_inotify_accelerates_change_detection_when_available(tmp_path: Path) -> None:
+    module = _module()
+    if not module.sys.platform.startswith("linux"):
+        return
+
+    root = tmp_path / "AFFAIRES"
+    root.mkdir()
+    observed = module.threading.Event()
+    watcher = module._InotifyWatcher([("Affaires", root)], 2, observed.set)
+    assert watcher.start() is True
+    try:
+        (root / "Notice.pdf").write_bytes(b"%PDF")
+        assert observed.wait(2.0) is True
+        assert watcher.mode == "inotify"
+    finally:
+        watcher.stop()
 
 
 def test_declared_source_cannot_escape_cartouche_directory(tmp_path: Path) -> None:
