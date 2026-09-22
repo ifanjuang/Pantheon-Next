@@ -115,6 +115,8 @@ def materialize_content(
     export_mime_type: str | None = None,
 ) -> DriveMaterializedContent:
     _validate_candidate_identity(candidate)
+    if candidate.can_download is not True:
+        raise GoogleDriveReadError("provider did not prove capabilities.canDownload before materialization")
     if not isinstance(content, bytes) or not content:
         raise GoogleDriveReadError("materialized content must be non-empty bytes")
 
