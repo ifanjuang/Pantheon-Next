@@ -246,6 +246,8 @@ LIEUREY/
 
 It can provide display/context fields and retrieval hints.
 
+Architecture-agency folder conventions and their optional posture remain owned by `docs/domain-packs/architecture/DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md`. The inspector must accept another existing organization as usable; it may observe or propose a mapping, but it must not silently reorganize AFFAIRES.
+
 Do not require it for every directory.
 
 ```text
@@ -290,6 +292,40 @@ sync state / last error
 The index is technical cache/state only.
 
 Deleting it must cause a rebuild, not loss of professional knowledge.
+
+### Workspace-health projection
+
+The Cockpit should preserve a report-oriented health view without turning presentation labels into professional status.
+
+Candidate states include:
+
+```text
+COMPLETE
+source + cartouche are present and structurally coherent
+
+CARTOUCHE_MISSING
+source exists but no cartouche is paired
+
+SOURCE_MISSING
+cartouche exists but its declared source is absent
+
+CHECK
+pair exists but local deterministic checks need attention
+
+SYNC_ERROR
+the technical producer has not converged with its target
+```
+
+These states support counts, filters and anomaly review. They are local projection vocabulary only:
+
+```text
+workspace health != professional currentness
+health finding != defect confirmed
+SYNC_ERROR != source invalid
+COMPLETE != Evidence
+```
+
+The view may suggest a correction or explicit Generate action, but it must not auto-fix, rename, merge, archive, relink or rewrite professional material merely because a health check fires.
 
 ## 10. One producer
 
