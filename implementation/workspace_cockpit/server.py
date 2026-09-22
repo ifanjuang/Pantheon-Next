@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only local Cockpit projection for LiveSync filesystem mirrors."""
+"""Read-only Cockpit projection for AFFAIRES source + Markdown cartouche bundles."""
 
 from __future__ import annotations
 
@@ -23,25 +23,15 @@ import yaml
 
 APP_ROOT = Path(__file__).resolve().parent
 STATIC_ROOT = APP_ROOT / "static"
-MANIFEST_NAMES = ("document.yaml", "document.yml", "manifest.yaml", "manifest.yml")
-PACKAGE_CHILDREN = {"archives", "assets", "images", "tableaux", "tables", "annexes"}
+PROJECTION_ID = "affaires_source_cartouche_v1"
 MARKDOWN_EXTENSIONS = {".md", ".markdown"}
-PDF_EXTENSIONS = {".pdf"}
-IMAGE_EXTENSIONS = {".avif", ".gif", ".jpeg", ".jpg", ".png", ".svg", ".tif", ".tiff", ".webp"}
-TABLE_EXTENSIONS = {".csv", ".ods", ".tsv", ".xls", ".xlsx"}
-DOCUMENT_EXTENSIONS = MARKDOWN_EXTENSIONS | PDF_EXTENSIONS | IMAGE_EXTENSIONS | TABLE_EXTENSIONS | {
-    ".doc",
-    ".docx",
-    ".dwg",
-    ".dxf",
-    ".ifc",
-    ".odt",
-    ".ppt",
-    ".pptx",
-}
-MAX_MANIFEST_BYTES = 256 * 1024
-MAX_FILES_PER_PACKAGE = 4_000
-MAX_PACKAGES = 5_000
+LEGACY_MANIFEST_NAMES = {"document.yaml", "document.yml", "manifest.yaml", "manifest.yml"}
+HINDSIGHT_ELIGIBLE_EXTENSIONS = {".pdf", ".docx", ".xlsx", ".pptx", ".txt", ".html", ".htm"}
+HEAVY_VISIBLE_EXTENSIONS = {".rvt", ".rfa", ".rte", ".psd", ".psb"}
+TEMP_SUFFIXES = {".bak", ".lock", ".lck", ".swp", ".tmp", ".temp", ".autosave"}
+MAX_CARTOUCHE_BYTES = 512 * 1024
+MAX_ITEMS = 10_000
+STATUS_NAMES = ("COMPLETE", "CHECK", "CARTOUCHE_MISSING", "SOURCE_MISSING", "FOLDER")
 
 
 def _visible(path: Path) -> bool:
@@ -50,158 +40,377 @@ def _visible(path: Path) -> bool:
 
 def _direct_files(path: Path) -> list[Path]:
     try:
-        return [item for item in path.iterdir() if item.is_file() and _visible(item)]
+        return sorted(
+            (item for item in path.iterdir() if item.is_file() and _visible(item)),
+            key=lambda item: item.name.casefold(),
+        )
     except OSError:
         return []
 
 
-def _manifest_paths(path: Path) -> list[Path]:
-    by_name = {item.name.casefold(): item for item in _direct_files(path)}
-    return [by_name[name] for name in MANIFEST_NAMES if name in by_name]
+def _is_temp_or_backup(path: Path) -> bool:
+    name = path.name.casefold()
+    if name.startswith("~$") or name.startswith(".~lock."):
+        return True
+    if path.suffix.casefold() in TEMP_SUFFIXES:
+        return True
+    # Revit numbered backup copies: Model.0001.rvt, Model.0002.rvt, ...
+    if re.search(r"\.\d{4}\.r(?:vt|fa|te)$", name):
+        return True
+    return False
 
 
-def _same_named_markdown(path: Path) -> Path | None:
-    expected = {f"{path.name}{suffix}".casefold() for suffix in MARKDOWN_EXTENSIONS}
-    return next((item for item in _direct_files(path) if item.name.casefold() in expected), None)
+def _is_source_file(path: Path) -> bool:
+    if not _visible(path) or _is_temp_or_backup(path):
+        return False
+    if path.suffix.casefold() in MARKDOWN_EXTENSIONS:
+        return False
+    if path.name.casefold() in LEGACY_MANIFEST_NAMES:
+        return False
+    return True
 
 
-def _read_manifest(path: Path) -> tuple[dict[str, Any] | None, str | None]:
+def _read_cartouche(path: Path) -> tuple[dict[str, Any], str, str | None]:
+    """Read one bounded Markdown cartouche without touching its source bytes."""
     try:
-        if path.stat().st_size > MAX_MANIFEST_BYTES:
-            return None, "Manifeste trop volumineux"
-        value = yaml.safe_load(path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeError, yaml.YAMLError):
-        return None, "Manifeste YAML illisible"
-    if not isinstance(value, dict):
-        return None, "Le manifeste doit contenir un objet YAML"
+        if path.stat().st_size > MAX_CARTOUCHE_BYTES:
+            return {}, "", "Cartouche Markdown trop volumineux"
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError):
+        return {}, "", "Cartouche Markdown illisible"
+
+    metadata: dict[str, Any] = {}
+    body = text
+    lines = text.splitlines()
+    if lines and lines[0].strip() == "---":
+        closing = next((idx for idx, line in enumerate(lines[1:], start=1) if line.strip() == "---"), None)
+        if closing is None:
+            return {}, text, "Frontmatter YAML non terminé"
+        raw_frontmatter = "\n".join(lines[1:closing])
+        try:
+            parsed = yaml.safe_load(raw_frontmatter) if raw_frontmatter.strip() else {}
+        except yaml.YAMLError:
+            return {}, "\n".join(lines[closing + 1 :]), "Frontmatter YAML illisible"
+        if parsed is None:
+            parsed = {}
+        if not isinstance(parsed, dict):
+            return {}, "\n".join(lines[closing + 1 :]), "Le frontmatter doit contenir un objet YAML"
+        metadata = parsed
+        body = "\n".join(lines[closing + 1 :])
+
+    return metadata, body, None
+
+
+def _meta_string(metadata: dict[str, Any], key: str) -> str | None:
+    value = metadata.get(key)
+    if isinstance(value, str) and value.strip():
+        return value.strip()
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        return str(value)
+    return None
+
+
+def _meta_tags(metadata: dict[str, Any]) -> list[str]:
+    value = metadata.get("tags")
+    if isinstance(value, str):
+        return [item.strip() for item in value.split(",") if item.strip()]
+    if isinstance(value, list):
+        return [str(item).strip() for item in value if isinstance(item, (str, int, float)) and str(item).strip()]
+    return []
+
+
+def _first_heading(body: str) -> str | None:
+    for line in body.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("# ") and len(stripped) > 2:
+            return stripped[2:].strip()
+    return None
+
+
+def _summary_excerpt(body: str, limit: int = 800) -> str:
+    lines = body.splitlines()
+    start: int | None = None
+    for idx, line in enumerate(lines):
+        heading = line.strip().casefold()
+        if heading in {"## résumé", "## resume"}:
+            start = idx + 1
+            break
+
+    chunks: list[str] = []
+    if start is not None:
+        for line in lines[start:]:
+            stripped = line.strip()
+            if stripped.startswith("## "):
+                break
+            if stripped:
+                chunks.append(stripped)
+    else:
+        paragraph: list[str] = []
+        for line in lines:
+            stripped = line.strip()
+            if not stripped:
+                if paragraph:
+                    break
+                continue
+            if stripped.startswith("#"):
+                continue
+            paragraph.append(stripped)
+        chunks = paragraph
+
+    text = " ".join(chunks).strip()
+    if len(text) > limit:
+        return text[: limit - 1].rstrip() + "…"
+    return text
+
+
+def _mtime_iso(path: Path) -> str | None:
+    try:
+        return datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc).isoformat().replace("+00:00", "Z")
+    except OSError:
+        return None
+
+
+def _safe_source_ref(value: str | None) -> tuple[str | None, str | None]:
+    if not value:
+        return None, None
+    if "/" in value or "\\" in value or value in {".", ".."}:
+        return None, "La source déclarée doit rester dans le même dossier"
+    if Path(value).is_absolute() or Path(value).name != value:
+        return None, "La source déclarée doit rester dans le même dossier"
     return value, None
 
 
-def _nested(mapping: dict[str, Any], *keys: str) -> Any:
-    current: Any = mapping
-    for key in keys:
-        if not isinstance(current, dict):
-            return None
-        current = current.get(key)
-    return current
+def _subtitle(metadata: dict[str, Any]) -> str:
+    parts = [
+        _meta_string(metadata, "type"),
+        _meta_string(metadata, "phase"),
+        _meta_string(metadata, "index"),
+        _meta_string(metadata, "document_date"),
+    ]
+    return " · ".join(part for part in parts if part) or "Cartouche Markdown"
 
 
-def _declared_file_exists(package: Path, declared: Any) -> bool:
-    """Accept only regular files that remain inside their package directory."""
-    if not isinstance(declared, str) or not declared.strip():
-        return False
-    candidate = package / declared
+def _document_card(workspace: str, root: Path, source: Path, cartouche: Path | None) -> dict[str, Any]:
+    relative_source = source.relative_to(root).as_posix()
+    extension = source.suffix.casefold()
     try:
-        if candidate.is_symlink():
-            return False
-        resolved = candidate.resolve(strict=True)
-        resolved.relative_to(package.resolve(strict=True))
-        return resolved.is_file()
-    except (OSError, RuntimeError, ValueError):
-        return False
-
-
-def _resource_counts(path: Path) -> tuple[dict[str, int], int, str | None, str | None]:
-    counts = {"markdown": 0, "pdf": 0, "images": 0, "tables": 0, "other": 0}
-    seen = 0
-    newest = 0.0
-    try:
-        for directory, names, files in os.walk(path, followlinks=False):
-            names[:] = [name for name in names if not name.startswith(".")]
-            for name in files:
-                if name.startswith("."):
-                    continue
-                seen += 1
-                if seen > MAX_FILES_PER_PACKAGE:
-                    return counts, seen - 1, None, "Inventaire limité aux 4 000 premiers fichiers"
-                item = Path(directory) / name
-                try:
-                    if item.is_symlink():
-                        continue
-                    newest = max(newest, item.stat().st_mtime)
-                except OSError:
-                    continue
-                suffix = item.suffix.casefold()
-                if suffix in MARKDOWN_EXTENSIONS:
-                    counts["markdown"] += 1
-                elif suffix in PDF_EXTENSIONS:
-                    counts["pdf"] += 1
-                elif suffix in IMAGE_EXTENSIONS:
-                    counts["images"] += 1
-                elif suffix in TABLE_EXTENSIONS:
-                    counts["tables"] += 1
-                elif name.casefold() not in MANIFEST_NAMES:
-                    counts["other"] += 1
+        size = source.stat().st_size
     except OSError:
-        return counts, seen, None, "Dossier partiellement illisible"
-    modified = (
-        datetime.fromtimestamp(newest, tz=timezone.utc).isoformat().replace("+00:00", "Z")
-        if newest
-        else None
-    )
-    return counts, seen, modified, None
+        size = None
 
+    if cartouche is None:
+        return {
+            "workspace": workspace,
+            "kind": "document",
+            "path": relative_source,
+            "parent_path": source.parent.relative_to(root).as_posix() if source.parent != root else "",
+            "name": source.name,
+            "title": source.name,
+            "subtitle": "Cartouche manquant",
+            "summary": "",
+            "status": "CARTOUCHE_MISSING",
+            "document_id": None,
+            "source": source.name,
+            "source_present": True,
+            "cartouche": None,
+            "cartouche_present": False,
+            "can_generate_cartouche": True,
+            "project": None,
+            "phase": None,
+            "document_type": None,
+            "index": None,
+            "document_date": None,
+            "issuer": None,
+            "tags": [],
+            "extension": extension.removeprefix(".").upper() or "FILE",
+            "source_size": size,
+            "hindsight_eligible": extension in HINDSIGHT_ELIGIBLE_EXTENSIONS,
+            "heavy_binary": extension in HEAVY_VISIBLE_EXTENSIONS,
+            "modified_at": _mtime_iso(source),
+            "warnings": [],
+        }
 
-def inspect_package(workspace: str, root: Path, path: Path) -> dict[str, Any]:
-    manifests = _manifest_paths(path)
-    manifest_data: dict[str, Any] = {}
-    manifest_error = None
-    if manifests:
-        manifest_data, manifest_error = _read_manifest(manifests[0])
-        manifest_data = manifest_data or {}
-
-    primary = _same_named_markdown(path)
-    direct_document_files = [item for item in _direct_files(path) if item.suffix.casefold() in DOCUMENT_EXTENSIONS]
-    declared_markdown = _nested(manifest_data, "representation", "markdown", "file")
-    declared_exists = _declared_file_exists(path, declared_markdown)
-
+    metadata, body, cartouche_error = _read_cartouche(cartouche)
     warnings: list[str] = []
-    if len(manifests) > 1:
-        warnings.append("Plusieurs manifestes concurrents")
-    if manifests and primary is None:
-        warnings.append(f"Markdown principal attendu : {path.name}.md")
-    if declared_markdown and not declared_exists:
-        warnings.append("La représentation Markdown déclarée est introuvable")
+    if cartouche_error:
+        warnings.append(cartouche_error)
 
-    if manifest_error:
-        status = "INVALID"
-        warnings.append(manifest_error)
-    elif manifests and primary and len(manifests) == 1:
-        status = "COHERENT"
-    elif manifests:
-        status = "CHECK"
-    elif primary or direct_document_files:
-        status = "QUALIFIABLE"
-    else:
-        status = "FREE"
+    declared, source_ref_error = _safe_source_ref(_meta_string(metadata, "source"))
+    if source_ref_error:
+        warnings.append(source_ref_error)
+    elif declared is None:
+        warnings.append("Source non déclarée dans le cartouche")
+    elif declared.casefold() != source.name.casefold():
+        warnings.append(f"Source déclarée différente du fichier apparié : {declared}")
 
-    counts, file_count, modified_at, inventory_note = _resource_counts(path)
-    if inventory_note:
-        warnings.append(inventory_note)
-        if status == "COHERENT":
-            status = "CHECK"
+    document_id = _meta_string(metadata, "document_id")
+    if not document_id:
+        warnings.append("document_id absent du cartouche")
 
-    full_name = _nested(manifest_data, "display", "full_name")
-    family_id = _nested(manifest_data, "identity", "document_family_id")
-    relative_path = path.relative_to(root).as_posix()
+    title = _meta_string(metadata, "title") or _first_heading(body) or source.stem
+    status = "CHECK" if warnings else "COMPLETE"
     return {
         "workspace": workspace,
-        "path": relative_path,
-        "name": path.name,
-        "subtitle": full_name if isinstance(full_name, str) and full_name.strip() else "Dossier non qualifié",
+        "kind": "document",
+        "path": relative_source,
+        "parent_path": source.parent.relative_to(root).as_posix() if source.parent != root else "",
+        "name": source.name,
+        "title": title,
+        "subtitle": _subtitle(metadata),
+        "summary": _summary_excerpt(body),
         "status": status,
-        "manifest": manifests[0].name if manifests else None,
-        "primary_markdown": primary.name if primary else None,
-        "declared_markdown": declared_markdown if isinstance(declared_markdown, str) else None,
-        "document_family_id": family_id if isinstance(family_id, str) else None,
-        "resources": counts,
-        "file_count": file_count,
-        "modified_at": modified_at,
+        "document_id": document_id,
+        "source": source.name,
+        "source_present": True,
+        "cartouche": cartouche.name,
+        "cartouche_present": True,
+        "can_generate_cartouche": False,
+        "project": _meta_string(metadata, "project"),
+        "phase": _meta_string(metadata, "phase"),
+        "document_type": _meta_string(metadata, "type"),
+        "index": _meta_string(metadata, "index"),
+        "document_date": _meta_string(metadata, "document_date"),
+        "issuer": _meta_string(metadata, "issuer"),
+        "tags": _meta_tags(metadata),
+        "extension": extension.removeprefix(".").upper() or "FILE",
+        "source_size": size,
+        "hindsight_eligible": extension in HINDSIGHT_ELIGIBLE_EXTENSIONS,
+        "heavy_binary": extension in HEAVY_VISIBLE_EXTENSIONS,
+        "modified_at": max(
+            (value for value in (_mtime_iso(source), _mtime_iso(cartouche)) if value),
+            default=None,
+        ),
         "warnings": warnings,
     }
 
 
-def _iter_package_paths(root: Path, max_depth: int) -> Iterable[Path]:
+def _orphan_cartouche_card(workspace: str, root: Path, cartouche: Path) -> dict[str, Any]:
+    metadata, body, cartouche_error = _read_cartouche(cartouche)
+    warnings: list[str] = []
+    if cartouche_error:
+        warnings.append(cartouche_error)
+
+    declared, source_ref_error = _safe_source_ref(_meta_string(metadata, "source"))
+    if source_ref_error:
+        warnings.append(source_ref_error)
+
+    source_path: Path | None = None
+    source_present = False
+    if declared:
+        candidate = cartouche.parent / declared
+        try:
+            source_present = candidate.is_file() and not candidate.is_symlink() and _is_source_file(candidate)
+        except OSError:
+            source_present = False
+        if source_present:
+            source_path = candidate
+            warnings.append("La source existe mais son basename ne correspond pas au cartouche")
+    else:
+        warnings.append("Source non déclarée dans le cartouche")
+
+    document_id = _meta_string(metadata, "document_id")
+    if not document_id:
+        warnings.append("document_id absent du cartouche")
+
+    title = _meta_string(metadata, "title") or _first_heading(body) or cartouche.stem
+    status = "CHECK" if source_present else "SOURCE_MISSING"
+    return {
+        "workspace": workspace,
+        "kind": "document",
+        "path": (source_path or cartouche).relative_to(root).as_posix(),
+        "parent_path": cartouche.parent.relative_to(root).as_posix() if cartouche.parent != root else "",
+        "name": source_path.name if source_path else cartouche.name,
+        "title": title,
+        "subtitle": _subtitle(metadata) if source_present else "Source manquante",
+        "summary": _summary_excerpt(body),
+        "status": status,
+        "document_id": document_id,
+        "source": declared,
+        "source_present": source_present,
+        "cartouche": cartouche.name,
+        "cartouche_present": True,
+        "can_generate_cartouche": False,
+        "project": _meta_string(metadata, "project"),
+        "phase": _meta_string(metadata, "phase"),
+        "document_type": _meta_string(metadata, "type"),
+        "index": _meta_string(metadata, "index"),
+        "document_date": _meta_string(metadata, "document_date"),
+        "issuer": _meta_string(metadata, "issuer"),
+        "tags": _meta_tags(metadata),
+        "extension": source_path.suffix.removeprefix(".").upper() if source_path else None,
+        "source_size": source_path.stat().st_size if source_path else None,
+        "hindsight_eligible": bool(source_path and source_path.suffix.casefold() in HINDSIGHT_ELIGIBLE_EXTENSIONS),
+        "heavy_binary": bool(source_path and source_path.suffix.casefold() in HEAVY_VISIBLE_EXTENSIONS),
+        "modified_at": max(
+            (value for value in (_mtime_iso(cartouche), _mtime_iso(source_path) if source_path else None) if value),
+            default=None,
+        ),
+        "warnings": warnings,
+    }
+
+
+def _folder_card(workspace: str, root: Path, folder: Path) -> dict[str, Any]:
+    folder_context = next(
+        (item for item in _direct_files(folder) if item.name.casefold() == "_folder.md"),
+        None,
+    )
+    metadata: dict[str, Any] = {}
+    body = ""
+    warnings: list[str] = []
+    if folder_context:
+        metadata, body, error = _read_cartouche(folder_context)
+        if error:
+            warnings.append(error)
+
+    relative_path = folder.relative_to(root).as_posix()
+    return {
+        "workspace": workspace,
+        "kind": "folder",
+        "path": relative_path,
+        "parent_path": folder.parent.relative_to(root).as_posix() if folder.parent != root else "",
+        "name": folder.name,
+        "title": _meta_string(metadata, "title") or _first_heading(body) or folder.name,
+        "subtitle": _meta_string(metadata, "phase") or "Dossier",
+        "summary": _summary_excerpt(body),
+        "status": "CHECK" if warnings else "FOLDER",
+        "folder_context": folder_context.name if folder_context else None,
+        "project": _meta_string(metadata, "project"),
+        "phase": _meta_string(metadata, "phase"),
+        "tags": _meta_tags(metadata),
+        "modified_at": max(
+            (value for value in (_mtime_iso(folder), _mtime_iso(folder_context) if folder_context else None) if value),
+            default=None,
+        ),
+        "warnings": warnings,
+    }
+
+
+def _directory_document_cards(workspace: str, root: Path, folder: Path) -> list[dict[str, Any]]:
+    direct = _direct_files(folder)
+    sources = [item for item in direct if _is_source_file(item)]
+    cartouches = [
+        item
+        for item in direct
+        if item.suffix.casefold() in MARKDOWN_EXTENSIONS and item.name.casefold() != "_folder.md"
+    ]
+    cartouche_by_stem = {item.stem.casefold(): item for item in cartouches}
+
+    cards: list[dict[str, Any]] = []
+    paired_cartouches: set[Path] = set()
+    for source in sources:
+        cartouche = cartouche_by_stem.get(source.stem.casefold())
+        if cartouche:
+            paired_cartouches.add(cartouche)
+        cards.append(_document_card(workspace, root, source, cartouche))
+
+    for cartouche in cartouches:
+        if cartouche not in paired_cartouches:
+            cards.append(_orphan_cartouche_card(workspace, root, cartouche))
+
+    return cards
+
+
+def _walk_directories(root: Path, max_depth: int) -> Iterable[Path]:
     def visit(parent: Path, depth: int) -> Iterable[Path]:
         if depth > max_depth:
             return
@@ -213,11 +422,8 @@ def _iter_package_paths(root: Path, max_depth: int) -> Iterable[Path]:
         except OSError:
             return
         for child in children:
-            if child.name.casefold() in PACKAGE_CHILDREN:
-                continue
             yield child
-            is_boundary = bool(_manifest_paths(child) or _same_named_markdown(child))
-            if not is_boundary and depth < max_depth:
+            if depth < max_depth:
                 yield from visit(child, depth + 1)
 
     yield from visit(root, 1)
@@ -225,33 +431,48 @@ def _iter_package_paths(root: Path, max_depth: int) -> Iterable[Path]:
 
 def scan_workspaces(roots: list[tuple[str, Path]], max_depth: int = 2) -> dict[str, Any]:
     workspaces: list[dict[str, Any]] = []
-    totals = {status: 0 for status in ("COHERENT", "CHECK", "INVALID", "QUALIFIABLE", "FREE")}
-    total_packages = 0
+    totals = {status: 0 for status in STATUS_NAMES}
+    total_items = 0
+    document_count = 0
+    folder_count = 0
+
     for label, root in roots:
         cards: list[dict[str, Any]] = []
         errors: list[str] = []
         root_available = root.is_dir() and os.access(root, os.R_OK | os.X_OK)
         if not root_available:
-            errors.append("Miroir local indisponible")
+            errors.append("Source AFFAIRES indisponible")
         else:
-            try:
-                for path in _iter_package_paths(root, max_depth):
-                    if total_packages >= MAX_PACKAGES:
-                        errors.append("Inventaire global limité à 5 000 dossiers")
-                        break
-                    card = inspect_package(label, root, path)
-                    cards.append(card)
-                    totals[card["status"]] += 1
-                    total_packages += 1
-            except OSError:
-                errors.append("Lecture du miroir interrompue")
+            candidates: list[dict[str, Any]] = []
+            candidates.extend(_directory_document_cards(label, root, root))
+            for folder in _walk_directories(root, max_depth):
+                candidates.append(_folder_card(label, root, folder))
+                candidates.extend(_directory_document_cards(label, root, folder))
+                if len(candidates) >= MAX_ITEMS:
+                    errors.append(f"Inventaire limité aux {MAX_ITEMS} premiers éléments")
+                    break
+
+            for card in candidates[:MAX_ITEMS]:
+                cards.append(card)
+                totals[card["status"]] = totals.get(card["status"], 0) + 1
+                total_items += 1
+                if card["kind"] == "folder":
+                    folder_count += 1
+                else:
+                    document_count += 1
+
         workspaces.append({"name": label, "available": root_available, "cards": cards, "errors": errors})
+
     return {
         "generated_at": datetime.now(tz=timezone.utc).isoformat().replace("+00:00", "Z"),
+        "projection": PROJECTION_ID,
         "read_only": True,
         "totals": totals,
         "workspace_count": len(workspaces),
-        "package_count": total_packages,
+        "item_count": total_items,
+        "package_count": total_items,
+        "document_count": document_count,
+        "folder_count": folder_count,
         "workspaces": workspaces,
     }
 
