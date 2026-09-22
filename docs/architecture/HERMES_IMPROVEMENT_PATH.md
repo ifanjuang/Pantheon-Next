@@ -310,8 +310,16 @@ Run the arms as time-local matched pairs rather than as one block per tactic.
 Predeclare and record a randomized or counterbalanced arm order for each pair so
 provider-load drift, warm caches, throttling or other time-correlated effects are
 not systematically assigned to one tactic. With an odd number of pairs, first-arm
-counts may differ by at most one; if material runtime/provider drift is observed,
-the affected pair is inconclusive and must be repeated or the slice expanded.
+counts may differ by at most one.
+
+Before execution, declare the outcome-independent runtime/provider drift signals
+that can invalidate a pair and their threshold or boolean trigger. Examples may
+include an observed provider throttle/rate-limit event, runtime-health failure or
+other external telemetry that is independent of the tactic result. Do not infer
+drift from an unfavorable latency, quality score or tactic outcome. A pair may be
+replaced only when the predeclared independent drift rule fires. Keep the excluded
+pair in the run record with its signal, threshold/trigger and exclusion reason;
+append the replacement rather than erasing the observation.
 
 For the default repeated slice:
 
@@ -332,6 +340,19 @@ single run or isolated outlier
 
 The case-specific review criterion and aggregation rule must be declared before
 the matched runs start so the decision rule is not chosen after observing results.
+
+Where qualitative P2/professional review contributes to tactic selection, present
+reviewable outputs under opaque run identifiers in randomized order and remove
+tactic labels, arm order and coordination metadata that are not themselves part
+of the review criterion. Reviewers must score the declared rubric without knowing
+which tactic produced each artifact wherever the artifact permits that blinding.
+
+If tactic identity is intrinsically visible and cannot be blinded, the subjective
+rating remains a descriptive observation but cannot by itself establish a
+workload-class tactic preference. In that case, the preference must be supported
+by objective checks/signals under the predeclared rule, while critical provenance,
+scope, blocker and authorization regressions remain disqualifying regardless of
+blinding.
 
 Q3 requires stricter variable isolation: both arms use the same goal-style
 attempt/check/revision workflow and the same task/dependency scenario. The only
