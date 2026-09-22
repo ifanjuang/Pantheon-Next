@@ -22,8 +22,9 @@ def test_operational_health_pilot_reuses_existing_workspace_owners() -> None:
     ]
     assert "report-only workspace audit" in obsidian
     assert "It must not auto-fix, rename, merge, archive, relink or rewrite professional material." in obsidian
-    assert "## 10. Workspace-health view" in inspector
-    assert "## 11. Deterministic validation" in inspector
+    assert "### Workspace-health projection" in inspector
+    assert "workspace health != professional currentness" in inspector
+    assert "must not auto-fix, rename, merge, archive, relink or rewrite professional material" in inspector
 
 
 def test_prior_art_is_not_promoted_to_dependency_or_qualification_pin() -> None:

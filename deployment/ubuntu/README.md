@@ -2,6 +2,8 @@
 
 Status: operator convenience artifact — candidate, non-authoritative.
 
+Selection update (2026-09-22): the selected professional Workspace target is now `NAS / AFFAIRES → one AFFAIRES indexer/sync daemon → Cockpit + Hindsight` as owned by #660/#659 and `docs/architecture/WORKSPACE_MANIFEST_INSPECTOR_CANDIDATE.md`. The current installer still carries CouchDB/LiveSync/vault-mirror compatibility from the earlier qualification. Those components are migration-state tooling, not requirements of the selected AFFAIRES topology.
+
 This directory turns the existing manual installation runbook into a bounded convenience path for one Ubuntu compute node. It does not make Pantheon an installer, package manager, runtime owner, approval engine, or deployment authority.
 
 The generic owners remain:
@@ -10,9 +12,9 @@ The generic owners remain:
 - `docs/install/COMMON_BASELINE_RUNBOOK.md`;
 - `docs/governance/BOOTSTRAP_INSTALLATION_LADDER.md`.
 
-## Intended profile
+## Current installer profile during Workspace migration
 
-The first profile deliberately consolidates the active compute/runtime path on one Ubuntu host:
+The current installer still consolidates the previously qualified compute/runtime components on one Ubuntu host. This is observed installer behavior during migration, not the selected final Workspace topology:
 
 ```text
 Ubuntu node
@@ -41,7 +43,7 @@ The local Ollama service uses a 65,536-token effective context window. Hermes
 0.21 requires at least 64K; the model's larger advertised native window is not
 the effective runtime window unless Ollama is configured accordingly.
 
-A NAS is not required in the active execution path. It may remain project storage and/or a backup/snapshot target. A later Syncthing profile may replicate the Ubuntu filesystem mirror to a NAS without making that replica a second LiveSync producer.
+Hermes execution itself does not make a NAS an authority dependency. However, the selected professional Workspace path uses the reviewed NAS `/AFFAIRES` tree as its source filesystem for the Cockpit/Hindsight producer. The historical Ubuntu-local LiveSync mirror remains compatibility state until #660 Slice 4 converges deployment. A filesystem path still does not become governed identity merely because it is mounted.
 
 ## Install
 
@@ -77,10 +79,12 @@ Hindsight    no — optional profile only, even with --with-hindsight
 Pantheon MCP installed/validated, but not exposed as an independently authorized service
 ```
 
-The optional Hindsight container alone is not the qualified workspace-ingestion
-topology. That topology also requires a separately installed and activated
-`hindsight-obsidian-sync` producer. This first installer does not install or
-activate that producer.
+The optional Hindsight container alone is not a qualified AFFAIRES ingestion route.
+The earlier Obsidian topology used a separately installed
+`hindsight-obsidian-sync` producer; that is now historical compatibility rather
+than the selected target. #660 owns the single AFFAIRES producer and #659 owns
+Hindsight retain/retrieval qualification. This installer does not yet activate
+that new producer.
 
 ## Governed visible Role milestones
 
@@ -172,9 +176,11 @@ URL and key are configured. The Workspace Cockpit on port 8189 can expose the
 same projection through an optional transient sidecar. The browser receives no
 Hermes credential, and neither component gains run-control or approval methods.
 
-For a new localhost-only Self-hosted LiveSync deployment, provision the
-authenticated CouchDB posture, the `pantheon-obsidian` database, and a retained
-encryption secret with:
+### Historical / optional LiveSync compatibility
+
+For a localhost-only Self-hosted LiveSync deployment that is still deliberately
+needed by another workflow, provision the authenticated CouchDB posture, the
+`pantheon-obsidian` database, and a retained encryption secret with:
 
 ```bash
 sudo ./configure-livesync-local
@@ -256,10 +262,15 @@ leaving the reviewed LiveSync source commit unchanged.
 
 ## Read-only Workspace Cockpit
 
-The first local Cockpit slice does not require PostgreSQL or pgvector. It reads
-the filesystem mirrors produced by LiveSync and projects folders as Pantheon
-Cards without reading CouchDB directly, duplicating document content, or
-writing to the vaults.
+The executable Workspace Cockpit is currently the historical read-only slice: it
+does not require PostgreSQL or pgvector, reads the filesystem mirrors produced by
+LiveSync, and projects folders as Pantheon Cards without reading CouchDB directly.
+
+That is migration state. The selected target reuses the same
+`implementation/workspace_cockpit` owner and evolves it toward source/cartouche
+bundles over the reviewed AFFAIRES root, a reconstructible index, watcher +
+periodic reconcile, and one shared Hindsight producer. Do not add a parallel
+filesystem Cockpit to bypass that migration.
 
 The recommended deployment reuses the locally cached, release-pinned Hermes
 Python image without sharing Hermes state or credentials:

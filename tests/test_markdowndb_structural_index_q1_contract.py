@@ -63,13 +63,13 @@ def test_provider_neutral_pattern_remains_owned_by_existing_workspace_candidate(
 
     assert corpus["workspace"]["authorized_scope"]["include_prefixes"] == ["projects/maison/"]
     for invariant in (
-        "plugin local index/cache\n= reconstructible projection state",
-        "## 15. Local-first index/cache",
-        "initial bounded scan",
-        "reconstructible local index",
-        "plugin index/cache != authority",
-        "Deleting it must cause at most a rebuild.",
-        "The reconstructible local index should not require synchronization.",
+        "one AFFAIRES indexer/sync daemon",
+        "initial scan",
+        "reconstructible technical index",
+        "The index is technical cache/state only.",
+        "Deleting it must cause a rebuild, not loss of professional knowledge.",
+        "watcher   = responsiveness",
+        "reconcile = convergence guarantee",
     ):
         assert invariant in inspector
 

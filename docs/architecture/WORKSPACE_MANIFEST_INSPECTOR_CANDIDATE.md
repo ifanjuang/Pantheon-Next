@@ -1,1063 +1,678 @@
-# Workspace Manifest Inspector — candidate companion to file-native convergence
+# Workspace / AFFAIRES cartouche inspector and sync target
 
-Status: candidate architecture note — first read-only Linux projection implemented.
+Status: selected target architecture; implementation remains bounded by #660 and Hindsight qualification by #659.
 
-Implementation note (2026-09-12): the bounded first slice lives under
-`implementation/workspace_cockpit/` with its operator installer at
-`deployment/ubuntu/configure-workspace-cockpit-local` and its recommended
-container definition at `deployment/ubuntu/compose.workspace-cockpit-local.yaml`.
-It reads only the local filesystem mirrors produced by LiveSync, exposes no
-file-content endpoint and performs no workspace write. PostgreSQL, pgvector and
-direct CouchDB access are outside this slice.
-
-Parent roadmap: `docs/roadmaps/FILE_NATIVE_CONTROL_CONVERGENCE.md` in PR #687.
-Parent workspace exploration: Pantheon-Next #684.
-Related qualification: #660 for Self-hosted LiveSync/CouchDB offline, reconnect, conflict and optional Obsidian Web behavior.
-
-This note defines one bounded UX/adapter candidate for the file-native convergence roadmap. It does **not** adopt a production manifest schema, migrate a current owner, create a new Document identity model, modify currentness semantics, extend the Tag Registry, implement an Obsidian plugin or authorize production writes.
-
-## 1. Repository facts this candidate must respect
-
-Checkpoint: 2026-08-22.
+Current decision baseline:
 
 ```text
-Pantheon-Next/main = 8c15eff5c767c76410db9e0f3a2e388f85ed1aac
-pantheon-mvp/main  = d960862dd0e23b7003a0f3e4ee0ea630ffc12af9
+Pantheon-Next/main = c5860fe8750ca6c81d9b8dfb4e21e1427ff6e865
 ```
 
-Observed contracts relevant to this slice:
+This document remains the architecture owner for the Workspace Cockpit filesystem projection. It supersedes the earlier productive target based on Obsidian + Self-hosted LiveSync + CouchDB + Ubuntu-local vault mirrors.
 
-- the existing Professional Document family contract uses a stable `document_family_id` UUID across revisions;
-- Document currentness is a **read-only calculated projection** per declared purpose, with `resolved | unresolved | conflicting`, and is explicitly not a persisted universal current-version authority;
-- professional purposes already include `latest_received`, `latest_reviewed`, `current_working`, `current_for_coordination`, `current_for_consultation`, `current_contractual`, `current_for_execution`, `current_for_site` and `latest_as_built_candidate`;
-- the current Tag Registry accepts simple stable slugs and currently exposes the `type` and `subject` groups; slash-separated hierarchical tag paths are not part of the current schema;
-- WorkIssue already carries comments, Hermes runs and events and has `waiting` as a governed status, but persistence/transition enforcement belongs to its reviewed executable adapter;
-- #660 remains open: CouchDB on Synology, native Obsidian clients with Self-hosted LiveSync, offline/reconnect/conflict qualification and optional Obsidian Web are **targets to verify**, not completed production facts;
-- `Pantheon-plugins` has no observed Obsidian Pantheon implementation; its current open implementation PR is the draft Revit adapter.
+Historical LiveSync/Obsidian qualification remains useful capability evidence, especially #703, #706 and #717. It no longer selects the productive AFFAIRES topology.
 
-Therefore this note must not invent parallel Document IDs, parallel currentness, a second tag vocabulary, a second Work owner or a new synchronization owner.
+## 1. Goal
 
-## 2. Goal
+Project the existing professional filesystem into the Cockpit and Hindsight without creating a second document authority.
 
-Make file-native workspace health understandable and actionable close to the files, especially from Obsidian, while retaining the existing Pantheon Card visual grammar.
-
-Candidate UX:
+Selected target:
 
 ```text
-selected workspace object
-→ Pantheon inspector Card
-→ local manifest/package diagnostics
-→ safe direct edits where explicitly allowed
-→ optional Hermes semantic assistance
-```
-
-The candidate plugin is primarily:
-
-```text
-local workspace inspector
-+ manifest editor
-+ deterministic consistency checker
-+ Card projection surface
-+ optional fluid Card navigation
-```
-
-It is not:
-
-```text
-business database
-Document lifecycle owner
-currentness owner
-workflow engine
-memory system
-Hindsight replacement
-sync engine
-approval engine
-new Card authority
-```
-
-## 3. Authority model
-
-Keep the file-native roadmap model unchanged:
-
-```text
-Files / Sources = professional and workspace content
-Pantheon        = rules and governed boundaries
-Hermes          = reasoning and action runtime
-Hindsight       = derived retrieval and associations
-Cockpit         = projection and interaction
-```
-
-For this slice:
-
-```text
-manifest file
-= source metadata only for a logical object whose responsibility
-  has explicitly become file-native
-
-plugin local index/cache
-= reconstructible projection state
-
-plugin offline outbox
-= unsent device-local user intent
-
-Card
-= composed projection
-
-Pantheon
-= normative validation and governed-boundary rules
-
-Hermes
-= semantic enrichment and candidate work
-```
-
-Preserve:
-
-```text
-manifest present != governed identity admitted
-manifest valid != professional approval
-folder contains files != logical Document
-folder/path != governed identity
-plugin warning != professional currentness result
-local outbox item != WorkIssue
-Hermes proposal != manifest truth
-Swiper position != authority
-sync success != Evidence
-```
-
-## 4. Manifestability — logical object, not filesystem entry
-
-Do **not** require a manifest for every file or folder.
-
-Architecture-agency folder conventions and their optional posture are owned by `docs/domain-packs/architecture/DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md`. The Inspector must accept another existing organization as usable. It may expose a mapping or reclassification proposal, but neither manifest absence nor divergence from the recommended profile makes an ordinary folder invalid or authorizes a move.
-
-One candidate document package may contain several physical entries:
-
-```text
-CCTP/
-├── document.yaml
-├── CCTP.md
-├── CCTP - Ind C.pdf
-├── assets/
-└── Archives/
-    └── CCTP - Ind B.pdf
-```
-
-This may represent one logical professional Document family, not one Pantheon object per file.
-
-Examples that may legitimately remain unmanifested:
-
-```text
-Notes/
-Photos/
-assets/
-ordinary working notes
-temporary images
-pure navigation folders
-```
-
-The inspector may expose these **UX health states**:
-
-```text
-FREE
-no manifest is expected
-
-QUALIFIABLE
-local observations suggest a logical object could benefit from qualification,
-but no governed identity is inferred
-
-COHERENT
-manifest/package passes the applicable local structural checks
-
-CHECK
-non-fatal divergence or stale derived metadata requires attention
-
-INVALID
-manifest cannot satisfy the applicable contract
-```
-
-These labels are presentation vocabulary only. In particular:
-
-```text
-COHERENT health state
-!= managed/protected write posture
-```
-
-A heuristic may suggest `QUALIFIABLE`, but only an explicit rule/qualification path may make a manifest required.
-
-Optional Obsidian skills or second-brain behavior are consumers of this posture, not alternative manifest owners. They may discover, read or lint a sidecar and prepare a correction candidate, but they must not silently create a required-manifest rule, redefine manifest semantics, mutate professional status or move files. The capability boundary and optional layering are recorded in `docs/governance/OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md`.
-
-## 5. Candidate document sidecar
-
-For a real document package, `document.yaml` remains a reasonable candidate user-facing sidecar name because it is readable, editable and schema-validatable.
-
-Do not maintain YAML and JSON mirrors of the same sidecar by default.
-
-### Identity constraint
-
-If the sidecar represents an existing governed Professional Document, it must reuse the existing Document family/version identity semantics rather than inventing a second ID namespace.
-
-Current contracts use UUIDs such as:
-
-```text
-document_family_id
-Document version identity
-```
-
-Therefore examples such as:
-
-```text
-document:cctp-lieurey
-revision:cctp-C
-```
-
-must **not** be treated as adopted IDs.
-
-An offline skeleton may exist before qualification, but it must not silently manufacture a governed Document identity. The eventual qualification path must first determine whether it maps to an existing Document family/revision or creates a new admitted identity under the applicable owner.
-
-### Illustrative carrier only
-
-The exact schema is intentionally not fixed here. A future sidecar may need concepts equivalent to:
-
-```yaml
-schema: <candidate schema identity/version>
-
-identity:
-  document_family_id: <existing admitted UUID or unresolved candidate>
-
-display:
-  full_name: Cahier des clauses techniques particulières — DCE
-
-artifact_origin: authored
-
-tags:
-  - cctp
-
-representation:
-  markdown:
-    file: CCTP.md
-    role: <candidate representation role>
-
-represented_version:
-  document_version_id: <existing admitted UUID when known>
-  index_label: C
-
-derived_summary:
-  text: CCTP de consultation...
-  based_on_digest: sha256:...
-  generation_status: generated_unreviewed
-```
-
-This is explanatory structure, not a schema proposal ready for implementation.
-
-### Tag constraint
-
-The example deliberately uses current-compatible simple slugs such as `cctp`.
-
-Candidate paths discussed elsewhere, for example:
-
-```text
-type/cctp
-phase/dce
-sujet/lot/plomberie
-```
-
-require explicit Tag Registry convergence first. The current `stable_slug` contract does not accept slash-separated paths and the current operational groups are only `type` and `subject`.
-
-Do not persist candidate hierarchical tags through this sidecar before that convergence is reviewed.
-
-## 6. Authored, received and derived are separate dimensions
-
-Do not use one `document_role: derived` value to mean both a received professional artifact and its generated Markdown representation.
-
-Separate at least conceptually:
-
-```text
-ARTIFACT ORIGIN / AUTHORSHIP
-= authored internally | received/external | other declared origin
-
-REPRESENTATION ROLE
-= canonical working representation | exact source/snapshot | derived representation
-```
-
-### Internally authored example
-
-```text
-CCTP.md
-= candidate canonical working representation after owner migration
-
-CCTP - Ind C.pdf
-= exact issued/export snapshot when declared as such
-```
-
-The PDF is not automatically the source owner merely because it exists next to the Markdown.
-
-### Received/external example
-
-```text
-Rapport BET - Ind C.pdf
-= exact received source
-
-Rapport BET.md
-= derived structural/Markdown representation
-```
-
-The received artifact itself is not `derived`; only its generated representation is.
-
-Hermes may analyse a derived Markdown representation, but must not rewrite it as though it were the exact received source.
-
-If a generated Markdown file changes after generation, automatic regeneration must first compare its current digest with the last generated-output/baseline digest. A mismatch is a deterministic overwrite-risk signal; the system must not claim it has semantically classified the human change merely from the digest.
-
-## 7. Sidecar scope versus currentness
-
-Candidate sidecar responsibilities may include:
-
-```text
-stable identity mapping once admitted
-schema identity/version
-full human designation
-artifact origin / representation role
-current-compatible classification refs
-representation refs
-represented version/index label
-source/snapshot refs and digests where applicable
-derived summary + exact basis digest
-source-to-source change summary + both exact basis digests
-conversion/derivation provenance where useful
-```
-
-Do **not** make ordinary editable sidecar fields authoritative for:
-
-```text
-latest_received
-latest_reviewed
-current_working
-current_for_coordination
-current_for_consultation
-current_contractual
-current_for_execution
-current_for_site
-Evidence admission
-Decision legitimacy
-authorization
-professional approval
-```
-
-Currentness is already defined as a calculated purpose-specific projection from governed inputs.
-
-Therefore:
-
-```text
-represented index label = C
-!= C is current_for_execution
-
-latest_received = D
-!= D is contractual or executable authority
-```
-
-The inspector may display currentness only from the applicable currentness projection/resolver. Offline, it must show that overlay as unavailable or based on a clearly identified last-known projection; it must never infer it from filenames, path order, modification time or the sidecar alone.
-
-## 8. Card projection
-
-The Card is a **composition**, not a YAML mirror.
-
-Candidate inputs:
-
-```text
-manifest
-+ observed local package state
-+ locally available/pinned registry rules
-+ purpose-specific Pantheon currentness projection when available
-+ related Work projection when relevant
-→ Card
-```
-
-### Title/subtitle rule
-
-For filesystem/workspace navigation:
-
-```text
-Card title
-= actual selected folder/file name
-
-Card subtitle
-= fuller human designation from the sidecar or a reviewed/generated proposal
-```
-
-Example:
-
-```text
-CCTP
-Cahier des clauses techniques particulières — DCE
-```
-
-The semantic subtitle does not replace the filesystem title.
-
-### No sidecar
-
-```text
-CCTP
-Dossier non qualifié
-
-Markdown détecté
-PDF détecté
-
-[ Générer la fiche ]
-```
-
-The Card remains a neutral workspace projection. It does not claim the folder already is a governed Document.
-
-### Sidecar present
-
-```text
-CCTP
-Cahier des clauses techniques particulières — DCE
-
-✓ Manifest structurel
-✓ Source/référence locale
-⚠ MD représente C
-? Currentness distante indisponible ou projetée séparément
-✓ Tags connus localement
-⚠ Résumé fondé sur un ancien digest
-
-[ Modifier ]
-[ Modifier avec Hermes ]
-```
-
-If the currentness projection is online and resolves `latest_received = D`, the Card may add that fact while preserving the distinction between `latest_received` and other professional purposes.
-
-Do not encode candidate status/phase/portée dimensions in the sidecar merely to reproduce a visual example until their actual owner/registry contract is resolved.
-
-## 9. Preserve Pantheon Card design; Swiper remains presentation
-
-Reuse the existing Pantheon Card visual grammar where practical:
-
-```text
-front   = understand
-back    = work around the object
-details = provenance / diagnostics
-```
-
-Candidate Obsidian surface:
-
-```text
-Obsidian custom ItemView
-→ Pantheon Card presentation
-→ optional fluid Card navigation
-```
-
-Swiper is a good implementation candidate because the Cockpit already uses and tests it, but:
-
-```text
-Card contract != Swiper
-```
-
-If retained in an Obsidian plugin, the dependency should be bundled/pinned with the plugin rather than fetched from a runtime CDN so the local UI does not depend on network availability.
-
-Mobile support must use Obsidian-compatible APIs and avoid unconditional Node/Electron dependencies.
-
-## 10. Workspace-health view
-
-The plugin-specific value is a quality-control view, not a second file explorer.
-
-Candidate summary:
-
-```text
-PANTHEON — WORKSPACE
-
-183 coherent
- 12 check
-  3 invalid
- 27 qualifiable
-```
-
-Candidate filters:
-
-```text
-All
-Errors
-Check
-Without manifest
-Stale derived metadata
-```
-
-A Card/Swiper sequence over anomalies is useful because it creates a review workflow without giving the Card a new lifecycle.
-
-## 11. Deterministic validation
-
-Most structural checks should not require Hermes.
-
-Candidate local checks, **only when the required basis is locally available**:
-
-```text
-invalid YAML
-unsupported schema version
-duplicate admitted ID within the locally declared scope
-missing locally referenced source
-missing representation
-relative path/reference mismatch
-digest mismatch
-unknown tag against the locally pinned Tag Registry revision
-summary basis digest stale
-change-summary before/after digest stale
-derived Markdown current digest != last generated-output digest
-represented source/version binding stale when exact local basis proves it
-```
-
-For relations:
-
-```text
-locally resolvable target missing
-→ local broken-reference warning
-
-external/server-owned target unavailable offline
-→ unknown/unresolved locally
-→ not automatically broken
-```
-
-A filesystem-placement warning is also local only:
-
-```text
-newer-looking file observed under Archives/
-→ organization warning candidate
-!= professional currentness decision
-```
-
-## 12. Offline rule bundle / validation provenance
-
-Offline validation cannot claim parity with Pantheon rules unless the client knows which rules it used.
-
-The prototype must therefore define a local rule-bundle posture equivalent to:
-
-```text
-schema identity + revision/digest
-Tag Registry identity + revision/digest
-validator compatibility version
-```
-
-The plugin may use a bundled/pinned or previously qualified local rule snapshot, but every local health result should be attributable to that rule revision.
-
-On reconnect, the server remains free to revalidate against the current applicable normative contracts.
-
-```text
-local validation passed
-!= server/current-rule validation passed
-```
-
-Do not create a new rules service merely to solve this. One normative rule owner plus conformance tests is sufficient unless implementation evidence proves otherwise.
-
-## 13. Hermes-assisted generation and modification
-
-Use Hermes only where semantic interpretation adds value.
-
-Candidate actions:
-
-```text
-Générer/enrichir la fiche
-Générer ou mettre à jour le résumé
-Analyser les principaux changements
-Proposer des tags compatibles
-Expliquer une incohérence
-Proposer une correction de fiche
-```
-
-Separate responsibilities:
-
-```text
-DETERMINISTIC / ADAPTER
-observed files
-paths
-exact digests
-existing identity lookup/resolution
-schema/registry validation
-version/source bindings available from owners
-
-HERMES
-full human designation
-summary
-semantic classification candidates
-principal-change summary
-ambiguity explanation
-proposed correction
-```
-
-A button may say `Générer la fiche`, but Hermes must not invent:
-
-```text
-governed identity
-exact digest
-Document version identity
-purpose-specific currentness
-professional approval
-```
-
-### No-manifest generation path
-
-Preferred candidate sequence:
-
-```text
-inspect exact local package
-→ determine whether qualification is eligible
-→ resolve/reuse existing Document family/version identity when available
-→ create only an unadmitted skeleton if identity cannot be governed offline
-→ Hermes semantic enrichment if requested/available
-→ validate against applicable rules
-→ bounded write
-→ re-read
-```
-
-Creating a sidecar is not itself Document admission.
-
-Generated semantic fields should record their exact basis and become stale when that basis changes.
-
-## 14. Direct editing versus governed fields
-
-The inspector may expose direct controls only for fields whose owner/write posture permits it.
-
-Candidate split:
-
-```text
-LOW-CONSEQUENCE CANDIDATES
-full display name
-ordinary currently valid tag refs
-working derived-summary text
-other explicitly admitted workspace metadata
-
-MANAGED / DETERMINISTIC
-identity mapping
-schema version
-source/snapshot digests
-representation bindings
-version refs
-
-PROJECTED OR GOVERNED ELSEWHERE
-purpose-specific currentness
-Evidence
-Decision
-authorization
-professional approval
-```
-
-This split is not adopted until Phase 2 owner/doctrine convergence classifies the actual fields.
-
-`Modifier avec Hermes` should produce a bounded proposal/diff against an expected current basis digest. Consequential application remains subject to the existing Workspace write/gate model.
-
-## 15. Local-first index/cache
-
-Basic manifest health should not require a server round-trip.
-
-Candidate behavior:
-
-```text
-local vault
-→ initial bounded scan
-→ reconstructible local index
-→ Cards / warnings / filters
-```
-
-Then use incremental vault events:
-
-```text
-create
-modify
-rename
-move/delete observation
-→ revalidate affected object/package
-```
-
-A manual full rescan remains available for repair/rebuild.
-
-Possible cached observations:
-
-```text
-path → package candidate
-manifest path/digest
-rule-bundle revision used
-schema status
-source/representation digest observations
-warnings
-last local scan observation
-```
-
-But:
-
-```text
-plugin index/cache != authority
-```
-
-Deleting it must cause at most a rebuild.
-
-## 16. Offline behavior
-
-Where the local vault contains the required files and local rule bundle, the inspector should remain useful without Pantheon/Hermes/Hindsight connectivity.
-
-Candidate offline-capable functions:
-
-```text
-browse local Cards
-read manifests
-run local deterministic checks
-edit fields explicitly allowed offline
-create an unadmitted deterministic skeleton
-inspect local source/representation consistency
-prepare a Hermes request for later submission
-```
-
-Degraded overlays must be explicit:
-
-```text
-Hermes unavailable
-→ semantic generation unavailable
-→ optional local intent queue
-
-Pantheon/currentness unavailable
-→ local manifest health remains available
-→ currentness overlay unavailable or explicitly last-known
-
-Hindsight unavailable
-→ semantic retrieval unavailable
-→ local manifest inspection remains available
-```
-
-## 17. Offline Hermes outbox
-
-An unsent request is device-local intent, not a WorkIssue or Hermes task.
-
-Candidate envelope dimensions:
-
-```text
-request/correlation ID
-local target locator
-admitted target identity if already known
-expected manifest/package digest or revision basis
-action
-creation time
-idempotency key
-```
-
-Exact fields remain open.
-
-Reconnect behavior:
-
-```text
-resolve current target
-→ compare current basis with expected basis
-→ unchanged: submit one idempotent request candidate
-→ changed: mark local intent stale/conflicted
-→ never send blindly
-```
-
-### Device-local means proven device-local
-
-Do **not** assume Obsidian plugin data is device-local merely because it is stored by the plugin.
-
-Self-hosted LiveSync can optionally synchronize selected hidden/configuration/plugin files under `.obsidian`. Therefore the prototype must prove that the chosen outbox persistence is excluded from the qualified synchronization path, or use another explicitly device-local mechanism.
-
-```text
-outbox storage observed local on one device
-!= guaranteed device-local under every LiveSync configuration
-```
-
-Server idempotency remains defence in depth even when the outbox is correctly device-local.
-
-The existing `pantheon-mvp` mobile editor is precedent for local queued Hermes edit requests with idempotency; reuse the invariant, not necessarily its current localStorage implementation.
-
-## 18. WorkIssue and Hermes boundary
-
-Do not say that WorkIssue begins only after execution admission.
-
-The current sequence may create durable Work before runtime admission.
-
-Candidate boundary:
-
-```text
-device-local unsent intent
-→ server receipt + validation
-→ bounded handoff / WorkIssue when durable treatment is needed
-→ separate execution admission when applicable
-→ Hermes runtime
-```
-
-If Hermes needs clarification, the existing Work model can represent a `waiting` state and comments. A future Card projection may surface the related question, but that UI behavior is not currently implemented by this note.
-
-```text
-human response to issue
-!= Decision
-!= approval
-!= Evidence
-```
-
-Do not use WorkIssue, Hermes Kanban or a synchronized vault exchange file as the owner of **unsent** device-local clicks.
-
-A Hermes runtime-side queue/Kanban, if used for admitted execution, remains runtime organization rather than professional Work authority.
-
-## 19. Sync and NAS topology
-
-#660 is a qualification issue, not a completed deployment contract.
-
-Target under test:
-
-```text
-PC / portable / mobile
-= native Obsidian + Self-hosted LiveSync
+NAS / AFFAIRES
         │
         ▼
-CouchDB on Synology
-        ▲
+one AFFAIRES indexer/sync daemon
         │
-other qualified Obsidian client
+        ├─ initial scan
+        ├─ filesystem watcher
+        ├─ periodic reconcile
+        ├─ source/cartouche pairing
+        ├─ reconstructible technical index
+        │
+        ├────────────► Cockpit
+        │
+        └────────────► Hindsight
 ```
+
+The daemon is a technical synchronization/indexing component. It is not a business database, professional truth owner, Project identity owner, Evidence owner or approval engine.
+
+## 2. Authority boundaries
 
 Preserve:
 
 ```text
-CouchDB = synchronization transport/state
-CouchDB != memory
-CouchDB != Pantheon authority
-sync success != Evidence
-```
-
-Source workspace files and manifests may use the selected vault sync path once #660 qualifies it.
-
-The reconstructible local index should not require synchronization.
-
-The outbox must be excluded from synchronization unless a different, explicitly designed multi-device intent owner is later demonstrated.
-
-For managed/protected records, a sync conflict must be surfaced and must not silently create a professional currentness or approval decision.
-
-### NAS
-
-Do not require Obsidian or the Inspector plugin on the NAS.
-
-Candidate service topology:
-
-```text
-clients
-= Obsidian + Pantheon Inspector
-
-NAS
-= Pantheon services as deployed
-+ Hermes
-+ Hindsight
-+ CouchDB
-+ other qualified services/adapters
-```
-
-If #660 later qualifies an optional Obsidian Web/Docker client on the NAS, that client may run Self-hosted LiveSync and, if useful, the same Inspector plugin. It remains optional and must not become an authority merely because it is always on.
-
-## 20. Hindsight boundary
-
-Do not index raw manifest YAML as a separate semantic note by default.
-
-Preferred candidate direction:
-
-```text
-document.yaml
-→ metadata/classification carrier
-
-Document.md
-→ semantic content
-→ Hindsight derived retrieval
-```
-
-Selected manifest metadata may enrich ingestion context only after the actual Tag/Document mapping is defined.
-
-```text
-Hindsight metadata copy != manifest authority
-Hindsight result != source citation
+source bytes != cartouche interpretation
+cartouche != Evidence
 retrieved != truth
+memory != Evidence
+folder != governed identity
+sync success != authorization
+projection != persistence
 ```
 
-Derived summaries may assist retrieval only with their generated/stale posture preserved.
+The source file remains the source for its content.
 
-## 21. Plugin repository posture
+The Markdown cartouche is an intentional human/derived description of that source. It may improve retrieval and Cockpit presentation but does not rewrite what the source proves.
 
-No Obsidian Pantheon plugin is currently observed in `Pantheon-plugins`.
+Pantheon remains responsible for governed identities, decisions and professional authority where applicable.
 
-If this candidate survives doctrine and synthetic-fixture review, `Pantheon-plugins` is a reasonable repository candidate because it already separates local adapters/plugins from Pantheon-Next governance.
+Hindsight remains derived retrieval/memory.
 
-This is a repository-placement recommendation, not an implementation authorization.
+Cockpit remains projection and interaction.
 
-## 22. First synthetic prototype
+## 3. User-facing document convention
 
-Use a non-client/sandbox vault only.
-
-The implemented Linux slice covers the read-only subset: Card rendering,
-folder/file selection through the index, the five local health states,
-manifest/Markdown naming checks, resource counts, filters and workspace-health
-counters. Manifest editing, Hermes actions, outbox behavior and governed owner
-mapping remain unimplemented.
-
-Minimum proof:
+A normal documented source is represented by a pair:
 
 ```text
-Obsidian custom view
-Pantheon Card visual grammar
-optional bundled/pinned Swiper or equivalent fluid navigation
-active folder/file selection
-FREE versus QUALIFIABLE distinction
-manifest absent → neutral Card
-manifest present → composed Card
-current-compatible tag validation
-deterministic local health checks with rule-bundle revision
-workspace-health counters/filter
-safe fixture-only direct edit
-Generate/Modify-with-Hermes intent button
-device-local outbox proof under the selected LiveSync settings
-reconnect basis/digest conflict check
+CCTP_IND_C.pdf
+CCTP_IND_C.md
 ```
 
-Do not add:
+or:
 
 ```text
-production owner migration
-new Document/currentness owner
-new tag owner
-new database
-new sync engine
-new runtime scheduler
-new memory
-automatic approval
-protected production write
+DPGF.xlsx
+DPGF.md
 ```
 
-## 23. Acceptance tests
+The source may be PDF, DOCX, XLSX, PPTX or another admitted professional file type.
 
-### Manifestability / non-overreach
+The sidecar is Markdown, not a parallel JSON/YAML business sidecar.
 
 ```text
-ordinary folder without manifest = FREE, not error
-heuristic package suggestion = QUALIFIABLE, not governed Document
-sidecar creation alone does not admit Document identity
-assets do not each become Pantheon objects
-one logical package may contain many physical files
+source.ext = source
+source.md  = cartouche
 ```
 
-### Identity
+The cartouche may contain YAML frontmatter because Markdown frontmatter is a convenient carrier, but the user-facing artifact remains one `.md` file.
+
+## 4. Cartouche contract
+
+Candidate minimal frontmatter:
+
+```yaml
+---
+document_id: doc_...
+source: CCTP_IND_C.pdf
+project: LIEUREY
+phase: DCE
+type: CCTP
+index: C
+document_date: 2026-09-12
+issuer: FRONTSign
+tags:
+  - structure
+  - ossature-bois
+---
+```
+
+Candidate body:
+
+```markdown
+# CCTP — Lot 03 Ossature bois
+
+## Résumé
+...
+
+## Points importants
+...
+
+## Limites / incertitudes
+...
+
+## Relations
+...
+```
+
+Fields are not automatically governed merely because they appear in frontmatter.
+
+In particular:
 
 ```text
-existing Document family is reused when qualification resolves it
-unadmitted offline skeleton cannot manufacture professional admission
-move/rename preserves admitted stable family identity
-local duplicate admitted IDs are surfaced
-unknown/foreign identity is not selected by path order
+project hint != governed project_id
+folder name != governed project_id
+index label != professional currentness
+summary != source claim
+relation note != governed relation
 ```
 
-### Currentness
+## 5. Identity
+
+The cartouche may carry a stable `document_id` for the filesystem bundle.
+
+This identity exists to keep the source/cartouche pair stable across ordinary filesystem moves. It must not silently replace an already governed Professional Document identity where one exists.
+
+When a bundle later maps to a governed Document owner, reuse/resolve that owner rather than create a competing identity system.
+
+### Move
+
+The operator moves both files together:
 
 ```text
-index label alone cannot create current_for_execution
-latest_received cannot be treated as universal authority
-unresolved/conflicting currentness remains visible
-currentness unavailable offline is not inferred from filename/mtime/path
+/DCE/CCTP_IND_C.pdf
+/DCE/CCTP_IND_C.md
+
+→
+
+/MARCHE/CCTP_IND_C.pdf
+/MARCHE/CCTP_IND_C.md
 ```
 
-### Tags
+The stable cartouche identity remains the same.
+
+The path changes.
 
 ```text
-current simple slugs validate against exact local Tag Registry revision
-slash-separated candidate paths are rejected until registry convergence adopts them
-unknown tag is surfaced without invented semantics
+path != identity
 ```
 
-### Derived metadata
+### New index / new physical document
+
+If the user intentionally keeps the old file and creates a new indexed file:
 
 ```text
-source basis digest changes → generated summary stale
-comparison basis digest changes → generated change summary stale
-derived Markdown digest differs from generated baseline → no silent overwrite
+CCTP_IND_B.pdf + CCTP_IND_B.md
+CCTP_IND_C.pdf + CCTP_IND_C.md
 ```
 
-### Card
+they are separate bundles with separate cartouche identities unless an explicit governed relation later links them.
+
+Do not infer a hidden version chain merely from similar names or contents.
+
+## 6. Pairing
+
+Primary pairing rule:
 
 ```text
-Card title = real folder/file name
-Card subtitle may use reviewed/generated full designation
-Card remains projection without sidecar
-Swiper/navigation state has no authority effect
+same basename
++ cartouche declares the source
+→ paired bundle
 ```
 
-### Offline/local rules
+The explicit source reference is a consistency check, not a second identity owner.
+
+If filesystem events arrive separately during a move/save, use a bounded grace/stability window before declaring a source or cartouche deleted.
+
+## 7. Broken-pair states
+
+### Source + cartouche
+
+Cockpit renders the rich document card from the cartouche and verifies the declared source exists.
+
+### Source without cartouche
+
+The source remains visible.
+
+Render a deliberately different minimal card:
 
 ```text
-Cards render without network
-local validation records schema/registry revision used
-local index deletion → rebuild succeeds
-server reconnect may revalidate against newer rules
+CCTP_IND_C.pdf
+PDF
+
+Cartouche manquant
+
+[ Générer le cartouche ]
 ```
 
-### Outbox
+Do not silently invent business metadata from the filename.
+
+The first productive posture is that an uncartouched file is visible but not automatically promoted to the normal Hindsight document route.
+
+### Cartouche without source
+
+Render an explicit source-missing state.
 
 ```text
-offline intent remains device-local under qualified sync settings
-same basis on reconnect → one idempotent submission candidate
-changed basis → stale/conflict; no blind send
-second device does not receive the outbox through ordinary vault sync
+cartouche present != source present
 ```
 
-### Work/governance
+Never treat a retained summary as proof that the source still exists.
+
+## 8. Folder context
+
+Optional `_folder.md` may describe a folder when that context has actual value:
 
 ```text
-unsent intent != WorkIssue
-server receipt may create Work before execution admission
-waiting/comment does not become Decision or approval
-manifest edit cannot admit Evidence/Decision/approval
-Hermes generated summary remains derived/candidate
+LIEUREY/
+└─ DCE/
+   ├─ _folder.md
+   ├─ CCTP_IND_C.pdf
+   ├─ CCTP_IND_C.md
+   ├─ DPGF.xlsx
+   └─ DPGF.md
 ```
 
-### Sync
+It can provide display/context fields and retrieval hints.
+
+Architecture-agency folder conventions and their optional posture remain owned by `docs/domain-packs/architecture/DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md`. The inspector must accept another existing organization as usable; it may observe or propose a mapping, but it must not silently reorganize AFFAIRES.
+
+Do not require it for every directory.
 
 ```text
-manifest change through qualified sync path → local revalidation
-manifest conflict → visible conflict; no silent governed merge
-plugin index does not need cross-device synchronization
+_folder.md != Project identity
+folder context != professional approval
 ```
 
-## 24. Open decisions
+## 9. Cockpit navigation
 
-Resolve only when a bounded fixture or owner migration demonstrates the need:
+The existing `implementation/workspace_cockpit` is the component to evolve. Do not add a parallel filesystem Cockpit.
+
+The current implementation recursively scans LiveSync filesystem mirrors on each `/api/workspaces` request. That is acceptable as historical implementation evidence, but it is not the selected performance model for large AFFAIRES trees.
+
+Target behavior:
 
 ```text
-which logical object types deserve sidecars
-exact sidecar schema IDs and fields
-exact mapping to existing Document family/version schemas
-whether non-document objects use object-specific or generic sidecar names
-how an offline candidate skeleton represents unresolved identity
-exact low-consequence versus managed field split
-final Card field grammar
-whether Swiper remains preferred after mobile prototype
-exact local rule-bundle packaging/update mechanism
-exact device-local outbox persistence mechanism
-final #660 hidden/config/plugin sync posture
-first low-consequence real owner migration candidate
+filesystem changes
+→ daemon updates reconstructible index
+
+Cockpit navigation
+→ reads index
+→ does not recursively rescan AFFAIRES on every click
 ```
 
-Do not solve these with speculative abstractions.
-
-## 25. Conclusion
-
-The intended UX stays small:
+The index may keep:
 
 ```text
-select workspace object
-→ see one Pantheon Card
-→ understand local manifest/package health
-→ edit explicitly safe metadata
-→ ask Hermes for semantic assistance when useful
-→ keep local inspection usable offline
-→ synchronize source files through the qualified vault path
+path
+parent path
+basename
+kind
+document_id
+source_present
+card_present
+source mtime / size / digest state
+card mtime / digest
+frontmatter projection
+summary excerpt
+sync state / last error
 ```
 
-The architecture stays smaller than the interface:
+The index is technical cache/state only.
+
+Deleting it must cause a rebuild, not loss of professional knowledge.
+
+### Workspace-health projection
+
+The Cockpit should preserve a report-oriented health view without turning presentation labels into professional status.
+
+Candidate states include:
 
 ```text
-manifest = metadata carrier for one logical object after explicit owner mapping
-Card = projection
-plugin index = reconstructible
-outbox = proven device-local unsent intent
-Pantheon = normative rules and governed boundaries
-Hermes = semantic/action runtime
-Hindsight = derived retrieval
-sync = transport, not truth
+COMPLETE
+source + cartouche are present and structurally coherent
+
+CARTOUCHE_MISSING
+source exists but no cartouche is paired
+
+SOURCE_MISSING
+cartouche exists but its declared source is absent
+
+CHECK
+pair exists but local deterministic checks need attention
+
+SYNC_ERROR
+the technical producer has not converged with its target
 ```
 
-This companion should feed later doctrine/schema work only where repository evidence demonstrates a real owner-migration need.
+These states support counts, filters and anomaly review. They are local projection vocabulary only:
+
+```text
+workspace health != professional currentness
+health finding != defect confirmed
+SYNC_ERROR != source invalid
+COMPLETE != Evidence
+```
+
+The view may suggest a correction or explicit Generate action, but it must not auto-fix, rename, merge, archive, relink or rewrite professional material merely because a health check fires.
+
+## 10. One producer
+
+Do not introduce:
+
+```text
+Cockpit watcher
++
+Hindsight watcher
+```
+
+Use one daemon:
+
+```text
+AFFAIRES daemon
+├─ maintains Cockpit index
+└─ emits Hindsight synchronization operations
+```
+
+This removes duplicated scans, duplicated event handling and competing delete/rename semantics.
+
+## 11. Watcher + reconcile
+
+Use both mechanisms:
+
+```text
+watcher   = responsiveness
+reconcile = convergence guarantee
+```
+
+Startup performs a full reconcile.
+
+A periodic reconcile catches:
+
+- NAS/SMB events missed during outages;
+- daemon downtime;
+- event coalescing;
+- transient move/save sequences;
+- state-cache loss/rebuild.
+
+The watcher must not be considered the source of truth.
+
+## 12. Technical persistence
+
+A small SQLite database or equivalent is acceptable for the daemon.
+
+It may hold technical state such as:
+
+```text
+document_id
+current path
+source/card digests
+size / mtime
+last_seen
+Hindsight source/card ids
+last sync state
+last error
+```
+
+It must not become the only owner of:
+
+- title;
+- summary;
+- tags;
+- limits;
+- project meaning;
+- document type;
+- professional status.
+
+Those human-readable descriptive fields belong in the cartouche when this file-native representation owns them.
+
+## 13. Hindsight boundary
+
+#659 owns Hindsight runtime and retain/retrieval qualification.
+
+Candidate Hindsight mapping:
+
+```text
+bundle id = doc_...
+
+doc_...:source
+→ eligible source file
+→ Hindsight files/retain
+→ parsed source content
+
+doc_...:card
+→ cartouche Markdown
+→ optional lightweight retain/chunks/verbatim
+→ directly retrievable description
+```
+
+Do not assume the second document is valuable until measured.
+
+Qualification must compare:
+
+```text
+A = source only
+B = source + bounded cartouche metadata/context
+C = source + separately retrievable cartouche
+```
+
+Select the smallest mapping that materially improves retrieval without confusing provenance or duplicating answers.
+
+## 14. Context passed to source extraction
+
+The cartouche may supply bounded identification context such as:
+
+```text
+document type
+project/affaire hint
+phase
+index
+issuer
+document date
+stable tags
+```
+
+Do not silently feed a speculative/derived summary into source extraction as though it were source fact.
+
+```text
+context for orientation != source evidence
+```
+
+## 15. Emails and illustrative attachments
+
+A logical source does not always equal one physical attachment.
+
+For an email:
+
+```text
+email body
++ inline images
++ ordinary illustrative photos
+→ one logical multimodal Hindsight document where appropriate
+```
+
+A genuinely autonomous attached document may become its own source/cartouche bundle after classification.
+
+Do not create a standalone Hindsight document for every decorative/illustrative photo by default.
+
+## 16. File eligibility
+
+Initial automatic Hindsight eligibility:
+
+- PDF with native text;
+- DOCX;
+- XLSX;
+- PPTX;
+- TXT/MD/HTML where useful.
+
+No automatic OCR.
+
+For a scanned PDF/image requiring OCR:
+
+```text
+visible in Cockpit
+→ OCR needed / unavailable state
+→ explicit user/Pantheon action
+→ derived OCR result
+```
+
+Do not NAS-wide OCR automatically.
+
+Initially exclude from automatic Hindsight retain:
+
+- RVT/RFA/RTE;
+- PSD/PSB;
+- unsupported/heavy binaries;
+- lock files;
+- temporary files;
+- backup/autosave/cache/log artifacts.
+
+A specialized BIM extraction path may be added later only when demonstrated necessary.
+
+## 17. Cockpit generation action
+
+`Générer le cartouche` is an explicit user action.
+
+Candidate sequence:
+
+```text
+observe exact source
+→ create stable bundle/cartouche skeleton
+→ exact technical metadata
+→ optional Hermes semantic enrichment
+→ render as draft cartouche
+→ re-read/validate
+```
+
+Hermes may propose:
+
+- full title;
+- summary;
+- tags;
+- important points;
+- limits;
+- semantic relations.
+
+Hermes must not invent:
+
+- file digest;
+- source existence;
+- governed Project identity;
+- Evidence;
+- professional currentness;
+- approval.
+
+Generation success does not automatically make the cartouche professionally validated.
+
+## 18. Current Pantheon data owners
+
+The repository already has Postgres-backed governed Information and document/extraction structures.
+
+This file-native cartouche must not silently duplicate those authorities.
+
+Observed current distinctions remain:
+
+```text
+source_documents
+= governed/ingested source representation in the MVP store
+
+Information
+= canonical Postgres-backed Information object
+
+AFFAIRES cartouche
+= filesystem-native descriptive representation
+```
+
+Where a cartouche is later promoted/mapped into a governed object, use an explicit mapping/admission path.
+
+Do not make Cockpit rendering itself persistence.
+
+## 19. Historical topology
+
+The following are no longer required by the selected AFFAIRES target:
+
+```text
+Obsidian
+Self-hosted LiveSync
+CouchDB
+headless LiveSync filesystem mirror
+hindsight-obsidian-sync
+document.yaml as the default business sidecar
+```
+
+They may remain in historical qualification records or optional unrelated workflows.
+
+Do not interpret their historical qualification as a requirement to retain them.
+
+## 20. Migration of the current Workspace Cockpit
+
+Current implementation facts:
+
+- `implementation/workspace_cockpit/server.py` is read-only;
+- it currently projects directory packages;
+- it recognizes `document.yaml`;
+- it expects same-named folder Markdown;
+- it recursively scans on request;
+- Ubuntu deployment currently mounts LiveSync vault mirrors.
+
+Migration sequence:
+
+### Slice 1 — source/cartouche projection
+
+- recognize source.ext + source.md pairs;
+- parse bounded frontmatter/body;
+- expose complete, missing-card and missing-source states;
+- preserve safe path handling;
+- keep UI read-only except the separately gated generate action.
+
+### Slice 2 — index/reconcile
+
+- build reconstructible index;
+- make navigation index-backed;
+- initial + periodic reconcile;
+- watcher/debounce;
+- move/delete grace behavior.
+
+### Slice 3 — Hindsight producer
+
+- one producer from the same daemon;
+- explicit eligible formats;
+- source retain;
+- optional cartouche retain based on #659 A/B/C result;
+- delete/update reconciliation;
+- no automatic OCR.
+
+### Slice 4 — deployment convergence
+
+- mount the actual reviewed AFFAIRES root read-only/read-write only as required by explicit cartouche-generation posture;
+- retire CouchDB/LiveSync/vault-mirror requirements from the active Workspace Cockpit baseline;
+- keep historical tooling only if another demonstrated workflow still uses it.
+
+## 21. Performance acceptance
+
+Ordinary folder navigation must not depend on hashing or parsing every source file in AFFAIRES.
+
+Expected:
+
+```text
+open Cockpit folder
+→ index lookup / bounded immediate children
+→ render
+```
+
+Heavy hashing, parsing and Hindsight retain happen asynchronously in daemon reconciliation, not in the UI request path.
+
+Qualification should measure at least:
+
+- initial cold scan;
+- warm folder navigation;
+- 1 changed cartouche;
+- 1 changed PDF;
+- move of a source/cartouche pair;
+- daemon restart;
+- NAS unavailable then restored.
+
+## 22. Security and safety
+
+Reject:
+
+- symlink escapes outside admitted roots;
+- relative source refs escaping the bundle/root;
+- arbitrary server path reads from browser input;
+- public unauthenticated write actions;
+- secret values in cartouches;
+- automatic consequential writes based solely on a filesystem event.
+
+The generated cartouche action requires an explicit user request and whatever existing admission/authorization path applies to the actual write surface.
+
+## 23. Done criteria
+
+The target is qualified when:
+
+- one source + one Markdown cartouche is the normal user-facing document bundle;
+- no separate JSON/YAML business sidecar is required;
+- complete and broken pairs are represented explicitly;
+- Cockpit shows folders/files without full-tree rescans on each navigation;
+- the technical index is reconstructible;
+- watcher + periodic reconcile converge after restart/outage;
+- source + cartouche moves preserve stable bundle identity;
+- one daemon owns both Cockpit indexing and Hindsight synchronization;
+- unsupported/heavy/temp files do not enter Hindsight automatically;
+- OCR is explicit only;
+- Hindsight source/card provenance remains distinguishable;
+- no folder/path is silently promoted into governed Project identity;
+- no cartouche/retrieval result is promoted into Evidence automatically;
+- current Postgres/governed owners remain authoritative where applicable.
+
+Tracking: #660 for filesystem/Cockpit producer, #659 for Hindsight runtime and retain/retrieval qualification.

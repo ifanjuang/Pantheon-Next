@@ -72,7 +72,10 @@ def test_obsidian_second_brain_remains_optional_and_subordinate() -> None:
     ):
         assert invariant in obsidian
 
-    assert "consumers of this posture, not alternative manifest owners" in inspector
+    historical = inspector.split("## 19. Historical topology", 1)[1]
+    assert "Obsidian" in historical
+    assert "no longer required by the selected AFFAIRES target" in historical
+    assert "optional unrelated workflows" in historical
     assert "an Obsidian/second-brain skill is not a workspace prerequisite" in instructions
 
 

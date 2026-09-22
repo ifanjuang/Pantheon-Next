@@ -219,7 +219,8 @@ def test_updater_never_follows_main_or_silently_updates_stateful_services() -> N
 
 def test_operator_readme_preserves_authority_and_storage_boundaries() -> None:
     text = _text(README)
-    assert "A NAS is not required in the active execution path" in text
+    assert "Hermes execution itself does not make a NAS an authority dependency." in text
+    assert "the selected professional Workspace path uses the reviewed NAS `/AFFAIRES` tree as its source filesystem" in text
     assert "filesystem mirror != governed identity" in text
     assert "installed != activated" in text
     assert "Syncthing" in text and "optional" in text
