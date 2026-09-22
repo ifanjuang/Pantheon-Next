@@ -167,10 +167,12 @@ def test_materialization_lab_has_no_source_write_authority():
 
 
 def test_materialization_requires_provider_download_capability():
-    with pytest.raises(GoogleDriveReadError, match="canDownload"):
-        direct_google_content_request(_candidate(can_download=False))
-    with pytest.raises(GoogleDriveReadError, match="canDownload"):
-        direct_google_content_request(_candidate(can_download=None))
+    for value in (False, None):
+        candidate = _candidate(can_download=value)
+        with pytest.raises(GoogleDriveReadError, match="canDownload"):
+            direct_google_content_request(candidate)
+        with pytest.raises(GoogleDriveReadError, match="canDownload"):
+            materialize_content(candidate, b"unexpected bytes")
 
 
 def test_intake_draft_keys_remain_compatible_with_current_source_owner():
