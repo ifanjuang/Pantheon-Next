@@ -110,6 +110,22 @@ Notes de réunion.
     assert card["hindsight_eligible"] is True
 
 
+def test_plain_markdown_with_matching_stem_is_never_treated_as_pdf_cartouche(tmp_path: Path) -> None:
+    module = _module()
+    (tmp_path / "CCTP.pdf").write_bytes(b"%PDF")
+    (tmp_path / "CCTP.md").write_text("# CCTP source Markdown\n", encoding="utf-8")
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=1)
+    documents = sorted(
+        (card for card in _cards(result) if card["kind"] == "document"),
+        key=lambda card: card["name"],
+    )
+
+    assert [card["name"] for card in documents] == ["CCTP.md", "CCTP.pdf"]
+    assert all(card["status"] == "CARTOUCHE_MISSING" for card in documents)
+    assert all(card["cartouche_present"] is False for card in documents)
+
+
 def test_same_stem_different_source_extensions_have_distinct_cartouches(tmp_path: Path) -> None:
     module = _module()
     (tmp_path / "CCTP.pdf").write_bytes(b"%PDF")
