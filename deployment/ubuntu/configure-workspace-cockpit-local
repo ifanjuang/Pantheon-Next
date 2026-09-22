@@ -90,10 +90,11 @@ trap 'rm -f "$unit_tmp"' EXIT
   printf '\n%s\n' '[Service]'
   printf 'User=%s\n' "$SERVICE_USER"
   printf 'WorkingDirectory=%s\n' "$INSTALL_ROOT"
-  printf 'ExecStart=/usr/bin/python3 %s/server.py --host %s --port %s --max-depth 2' "$INSTALL_ROOT" "$BIND_ADDRESS" "$PORT"
+  printf 'ExecStart=/usr/bin/python3 %s/server.py --host %s --port %s --max-depth 2 --state-db /var/lib/pantheon-workspace-cockpit/index.sqlite3 --reconcile-seconds 60 --watch-debounce-ms 500' "$INSTALL_ROOT" "$BIND_ADDRESS" "$PORT"
   for vault in "${VAULTS[@]}"; do printf ' --root %s' "$vault"; done
   printf '\n'
   printf '%s\n' 'Restart=on-failure' 'RestartSec=3' 'UMask=0077'
+  printf '%s\n' 'StateDirectory=pantheon-workspace-cockpit' 'StateDirectoryMode=0700'
   printf '%s\n' 'NoNewPrivileges=true' 'PrivateDevices=true' 'PrivateTmp=true'
   printf '%s\n' 'ProtectControlGroups=true' 'ProtectHome=true' 'ProtectKernelModules=true' 'ProtectKernelTunables=true' 'ProtectSystem=strict'
   printf '%s\n' 'RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX' 'RestrictNamespaces=true' 'RestrictRealtime=true' 'RestrictSUIDSGID=true'

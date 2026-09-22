@@ -114,3 +114,8 @@ h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp
   .cards { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
+
+.folder-context-state { display: inline-flex; align-items: center; min-height: 1.7rem; padding: .22rem .55rem; border-radius: 999px; font-size: .7rem; font-weight: 850; }
+.folder-context-state.is-present { background: rgb(40 118 82 / 10%); color: var(--green); }
+.folder-context-state.is-missing { background: rgb(122 125 131 / 10%); color: var(--muted); }
+.fact-muted strong { color: var(--muted); }

@@ -232,7 +232,7 @@ Never treat a retained summary as proof that the source still exists.
 
 ## 8. Folder context
 
-Optional `_folder.md` may describe a folder when that context has actual value:
+Optional `_folder.md` may describe a folder when that context has actual value. The projection must explicitly distinguish `folder_context_present=true` from `false`; document cartouches such as `CCTP.md` do not satisfy the folder-context check:
 
 ```text
 LIEUREY/
@@ -598,13 +598,17 @@ Migration sequence:
 - preserve safe same-directory source references;
 - keep the UI read-only; a visible Generate affordance does not authorize a write.
 
-### Slice 2 — index/reconcile
+### Slice 2 — index/reconcile — implementation candidate #1115
 
-- build reconstructible index;
-- make navigation index-backed;
-- initial + periodic reconcile;
-- watcher/debounce;
-- move/delete grace behavior.
+- build a reconstructible SQLite technical index outside watched roots;
+- keep the current Cockpit snapshot in memory so `/api/workspaces` does not rescan AFFAIRES per request;
+- perform a startup reconcile and periodic full reconcile;
+- use Linux inotify only as a responsiveness accelerator;
+- coalesce filesystem event bursts through a bounded debounce window before reconcile;
+- preserve source/cartouche `document_id` when the operator moves both files together;
+- expose `folder_context_present` so a folder explicitly reports whether `_folder.md` exists;
+- do not treat a missing `_folder.md` as invalid because folder context remains optional;
+- keep the state database reconstructible and non-authoritative.
 
 ### Slice 3 — Hindsight producer
 

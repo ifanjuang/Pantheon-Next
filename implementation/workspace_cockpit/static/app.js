@@ -75,12 +75,15 @@ function folderCardBody(card) {
     : `<p class="card-summary muted">Contexte de dossier non renseigné.</p>`;
   const facts = [
     fact("Chemin", card.path),
-    fact("Contexte", card.folder_context || "Aucun _folder.md"),
+    fact("Cartouche dossier", card.folder_context_present ? (card.folder_context || "_folder.md") : "Absent", card.folder_context_present ? "" : "fact-muted"),
     fact("Phase", card.phase),
     fact("Projet", card.project),
   ].join("");
+  const contextBadge = card.folder_context_present
+    ? '<span class="folder-context-state is-present">Cartouche présent</span>'
+    : '<span class="folder-context-state is-missing">Sans _folder.md</span>';
   return `
-    <div class="document-meta"><span class="file-type">DOSSIER</span></div>
+    <div class="document-meta"><span class="file-type">DOSSIER</span>${contextBadge}</div>
     ${summary}
     ${tagsTemplate(card.tags)}
     <div class="facts">${facts}</div>
