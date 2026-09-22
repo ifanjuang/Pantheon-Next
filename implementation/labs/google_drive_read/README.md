@@ -70,9 +70,12 @@ source_kind
 origin_system
 origin_external_ref
 raw_source_ref
-mime_type
+mime_type  # original Google Drive record MIME
 metadata
 ```
+
+The top-level `mime_type` remains the original Google Drive record MIME. Any
+download/export MIME stays representation provenance in metadata.
 
 The current Source contract defines `checksum` as SHA-256 of preserved bytes.
 This lab does not retain bytes, so it deliberately does **not** populate that
