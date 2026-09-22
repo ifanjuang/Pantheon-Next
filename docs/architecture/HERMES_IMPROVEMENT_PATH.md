@@ -293,6 +293,8 @@ effective inference settings / model_options digest
 (context length, reasoning level, routing and relevant compression settings)
 tool surface except the tactic under test
 output contract / review criteria
+same initial mutable runtime state under experiment control
+(runtime/external memory, writable workspace, task artifacts and resettable caches)
 fresh admission + fresh session
 ```
 
@@ -301,6 +303,18 @@ following the existing native-baseline posture rather than relying on a profile
 name alone. If the effective profile, projected Skills, model options or other
 controlled inference settings differ between matched arms, the comparison is
 inconclusive and must not be attributed to the execution tactic.
+
+A fresh session is not by itself a clean initial state. Before every arm and
+repetition, start experiment-controlled mutable stores from the same known state,
+using existing isolation/reset mechanisms such as an ephemeral namespace,
+disposable workspace or equivalent reset. Record the state identity/digest where
+the runtime exposes one. Do not add a Pantheon snapshot owner for this purpose.
+
+If equal initial mutable state cannot be demonstrated for the stores that can
+carry information across sessions, classify the matched comparison as
+inconclusive. Q3 keeps the same initial state between arms but may intentionally
+exercise persistence inside the Kanban arm; that persistence is the treatment,
+not a pre-existing difference.
 
 Each representative case uses repeated matched trials. The default minimum is
 three repetitions per tactic/arm with a fresh admission and fresh session for
@@ -335,16 +349,26 @@ quantitative signals (latency / tool calls / token-cost signals)
 quality / provenance / blocker behavior
 -> record each repetition; any critical-boundary regression fails that arm
 
-claimed material tactic benefit
+claimed material tactic benefit inside one case
 -> must recur in the same direction across a majority of matched repetitions
    and must not be contradicted by the aggregate signal
+
+workload-class preference
+-> independent representative case is the unit of generalization
+-> with the default three predeclared cases, the same tactic benefit must hold
+   in at least two cases and no case may introduce a critical-boundary regression
+-> do not weight a case more heavily because it has more repetitions
+
+split / tied independent cases
+-> no workload-class preference; keep the simpler tactic as the default hypothesis
 
 single run or isolated outlier
 -> inconclusive; never a workload-class strategy rule
 ```
 
-The case-specific review criterion and aggregation rule must be declared before
-the matched runs start so the decision rule is not chosen after observing results.
+Declare both the within-case aggregation rule and the cross-case generalization
+rule before matched runs start so neither decision rule is chosen after observing
+results.
 
 Where qualitative P2/professional review contributes to tactic selection, present
 reviewable outputs under opaque run identifiers in randomized order and remove
