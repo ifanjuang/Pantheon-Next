@@ -285,11 +285,44 @@ For comparable runs, hold constant wherever the runtime surface permits:
 ```text
 Task Contract / admitted question
 Context Pack / source set
-model + provider + runtime release
+model + provider + exact runtime identity
+effective profile identity + projected Skill set
+effective inference settings / model_options digest
+(context length, reasoning level, routing and relevant compression settings)
 tool surface except the tactic under test
 output contract / review criteria
 fresh admission + fresh session
 ```
+
+Record the effective profile identity and non-secret settings digest for every arm,
+following the existing native-baseline posture rather than relying on a profile
+name alone. If the effective profile, projected Skills, model options or other
+controlled inference settings differ between matched arms, the comparison is
+inconclusive and must not be attributed to the execution tactic.
+
+Each representative case uses repeated matched trials. The default minimum is
+three repetitions per tactic/arm with a fresh admission and fresh session for
+every repetition, unless an existing qualification owner requires more.
+
+For the default repeated slice:
+
+```text
+quantitative signals (latency / tool calls / token-cost signals)
+-> compare the median per arm and retain the per-run values
+
+quality / provenance / blocker behavior
+-> record each repetition; any critical-boundary regression fails that arm
+
+claimed material tactic benefit
+-> must recur in the same direction across a majority of matched repetitions
+   and must not be contradicted by the aggregate signal
+
+single run or isolated outlier
+-> inconclusive; never a workload-class strategy rule
+```
+
+The case-specific review criterion and aggregation rule must be declared before
+the matched runs start so the decision rule is not chosen after observing results.
 
 Observe at minimum:
 
