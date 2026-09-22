@@ -577,24 +577,26 @@ Do not interpret their historical qualification as a requirement to retain them.
 
 ## 20. Migration of the current Workspace Cockpit
 
-Current implementation facts:
+Current implementation facts after the Slice 1 candidate (#1112):
 
-- `implementation/workspace_cockpit/server.py` is read-only;
-- it currently projects directory packages;
-- it recognizes `document.yaml`;
-- it expects same-named folder Markdown;
-- it recursively scans on request;
-- Ubuntu deployment currently mounts LiveSync vault mirrors.
+- `implementation/workspace_cockpit/server.py` remains read-only;
+- it projects `source.ext + source.md` bundles and optional `_folder.md` context;
+- it exposes `COMPLETE`, `CHECK`, `CARTOUCHE_MISSING`, `SOURCE_MISSING` and `FOLDER`;
+- bounded Markdown is read, while heavy source bytes are not opened for ordinary projection;
+- temp/lock/Revit-backup files are filtered and heavy professional binaries remain visible;
+- the Generate cartouche affordance is visible but has no write route in this slice;
+- it still scans on request rather than through the selected reconstructible index;
+- Ubuntu deployment still mounts historical LiveSync vault mirrors.
 
 Migration sequence:
 
-### Slice 1 — source/cartouche projection
+### Slice 1 — source/cartouche projection — implemented candidate #1112
 
 - recognize source.ext + source.md pairs;
 - parse bounded frontmatter/body;
 - expose complete, missing-card and missing-source states;
-- preserve safe path handling;
-- keep UI read-only except the separately gated generate action.
+- preserve safe same-directory source references;
+- keep the UI read-only; a visible Generate affordance does not authorize a write.
 
 ### Slice 2 — index/reconcile
 
