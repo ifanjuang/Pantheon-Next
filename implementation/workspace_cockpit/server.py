@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
@@ -107,6 +107,8 @@ def _meta_string(metadata: dict[str, Any], key: str) -> str | None:
         return value.strip()
     if isinstance(value, (int, float)) and not isinstance(value, bool):
         return str(value)
+    if isinstance(value, (date, datetime)):
+        return value.isoformat()
     return None
 
 
@@ -170,6 +172,13 @@ def _mtime_iso(path: Path) -> str | None:
         return None
 
 
+def _file_size(path: Path) -> int | None:
+    try:
+        return path.stat().st_size
+    except OSError:
+        return None
+
+
 def _safe_source_ref(value: str | None) -> tuple[str | None, str | None]:
     if not value:
         return None, None
@@ -193,10 +202,7 @@ def _subtitle(metadata: dict[str, Any]) -> str:
 def _document_card(workspace: str, root: Path, source: Path, cartouche: Path | None) -> dict[str, Any]:
     relative_source = source.relative_to(root).as_posix()
     extension = source.suffix.casefold()
-    try:
-        size = source.stat().st_size
-    except OSError:
-        size = None
+    size = _file_size(source)
 
     if cartouche is None:
         return {
@@ -338,7 +344,7 @@ def _orphan_cartouche_card(workspace: str, root: Path, cartouche: Path) -> dict[
         "issuer": _meta_string(metadata, "issuer"),
         "tags": _meta_tags(metadata),
         "extension": source_path.suffix.removeprefix(".").upper() if source_path else None,
-        "source_size": source_path.stat().st_size if source_path else None,
+        "source_size": _file_size(source_path) if source_path else None,
         "hindsight_eligible": bool(source_path and source_path.suffix.casefold() in HINDSIGHT_ELIGIBLE_EXTENSIONS),
         "heavy_binary": bool(source_path and source_path.suffix.casefold() in HEAVY_VISIBLE_EXTENSIONS),
         "modified_at": max(
@@ -535,7 +541,7 @@ class CockpitHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:  # noqa: N802 - stdlib handler API
         path = urlparse(self.path).path
         if path == "/api/health":
-            self._json({"status": "ok", "read_only": True, "role_trace": bool(self.role_trace_url)})
+            self._json({"status": "ok", "projection": PROJECTION_ID, "read_only": True, "role_trace": bool(self.role_trace_url)})
             return
         if path == "/api/workspaces":
             self._json(scan_workspaces(self.roots, self.max_depth))
