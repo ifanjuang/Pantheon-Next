@@ -40,23 +40,28 @@ Historical qualifications of those components remain useful evidence and are not
 
 The executable code in this directory is being migrated in bounded slices.
 
-The Slice 1 candidate (#1112) now:
+Slice 1 (#1112) is merged and Slice 2 is implemented as candidate #1115.
 
-- remains read-only;
+The current implementation:
+
+- remains read-only for professional source/cartouche material;
 - recognizes `source.ext + source.md` bundles;
-- reads optional `_folder.md` context;
+- reads optional `_folder.md` context and explicitly exposes whether each folder has one;
+- does not confuse a document cartouche with the folder cartouche;
 - renders complete, cartouche-missing and source-missing states;
-- reads only bounded Markdown plus filesystem metadata during ordinary projection;
+- reads only bounded Markdown plus filesystem metadata during reconciliation;
 - keeps heavy source bytes unopened;
 - exposes a disabled Generate cartouche affordance without introducing a write path;
-- still scans on each `/api/workspaces` request;
+- serves `/api/workspaces` from an in-memory indexed snapshot;
+- persists only reconstructible technical state in SQLite outside watched roots;
+- uses Linux inotify as an accelerator and a periodic full reconcile as the convergence guarantee;
 - is still configured by the Ubuntu deployment against historical LiveSync filesystem mirrors.
 
 The remaining migration owned by #660 is:
 
 ```text
-Slice 1  source.ext + source.md projection and broken-pair states — candidate implemented
-Slice 2  reconstructible index + watcher + periodic reconcile
+Slice 1  source.ext + source.md projection and broken-pair states — merged #1112
+Slice 2  reconstructible index + watcher + periodic reconcile — candidate #1115
 Slice 3  same daemon emits bounded Hindsight producer operations
 Slice 4  Ubuntu deployment converges from vault mirrors to reviewed AFFAIRES root
 ```
