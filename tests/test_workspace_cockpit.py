@@ -355,12 +355,19 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     assert "127.0.0.1" in text
     assert "NoNewPrivileges=true" in text
     assert "ProtectSystem=strict" in text
+    assert "StateDirectory=pantheon-workspace-cockpit" in text
+    assert "--state-db /var/lib/pantheon-workspace-cockpit/index.sqlite3" in text
+    assert "--reconcile-seconds 60" in text
     assert "setfacl" in text
     assert "pgvector" not in text.lower()
     compose = COMPOSE.read_text(encoding="utf-8")
     # Slice 1 keeps the historical read-only mounts; deployment convergence is #660 Slice 4.
     assert "read_only: true" in compose
     assert compose.count(":ro") == 3
+    assert "workspace-cockpit-state:/state" in compose
+    assert "WORKSPACE_INDEX_DB: /state/index.sqlite3" in compose
+    assert "WORKSPACE_RECONCILE_SECONDS" in compose
+    assert "WORKSPACE_WATCH_DEBOUNCE_MS" in compose
     assert "127.0.0.1" in compose
     assert "role-trace:" in compose
     assert "ROLE_TRACE_ATTACH_KEY" in compose
