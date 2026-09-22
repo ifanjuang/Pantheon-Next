@@ -19,7 +19,7 @@ import struct
 import sys
 import threading
 import time
-from typing import Any, Iterable
+from typing import Any, Callable, Iterable
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
@@ -519,7 +519,7 @@ class _InotifyWatcher:
         self,
         roots: list[tuple[str, Path]],
         max_depth: int,
-        on_event: callable,
+        on_event: Callable[[], None],
     ) -> None:
         self._roots = [root for _, root in roots]
         self._max_depth = max_depth
