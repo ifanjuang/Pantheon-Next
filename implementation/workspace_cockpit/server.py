@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import ctypes
 from datetime import date, datetime, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -12,7 +13,12 @@ import mimetypes
 import os
 from pathlib import Path
 import re
+import select
+import sqlite3
+import struct
 import sys
+import threading
+import time
 from typing import Any, Iterable
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
@@ -483,9 +489,397 @@ def scan_workspaces(roots: list[tuple[str, Path]], max_depth: int = 2) -> dict[s
     }
 
 
+class _InotifyWatcher:
+    """Best-effort Linux event accelerator; periodic reconcile remains authoritative."""
+
+    _EVENT = struct.Struct("iIII")
+    _IN_ATTRIB = 0x00000004
+    _IN_CLOSE_WRITE = 0x00000008
+    _IN_MOVED_FROM = 0x00000040
+    _IN_MOVED_TO = 0x00000080
+    _IN_CREATE = 0x00000100
+    _IN_DELETE = 0x00000200
+    _IN_DELETE_SELF = 0x00000400
+    _IN_MOVE_SELF = 0x00000800
+    _IN_Q_OVERFLOW = 0x00004000
+    _IN_IGNORED = 0x00008000
+    _IN_ISDIR = 0x40000000
+    _WATCH_MASK = (
+        _IN_ATTRIB
+        | _IN_CLOSE_WRITE
+        | _IN_MOVED_FROM
+        | _IN_MOVED_TO
+        | _IN_CREATE
+        | _IN_DELETE
+        | _IN_DELETE_SELF
+        | _IN_MOVE_SELF
+    )
+
+    def __init__(
+        self,
+        roots: list[tuple[str, Path]],
+        max_depth: int,
+        on_event: callable,
+    ) -> None:
+        self._roots = [root for _, root in roots]
+        self._max_depth = max_depth
+        self._on_event = on_event
+        self._fd = -1
+        self._libc: Any = None
+        self._watches: dict[int, Path] = {}
+        self._watch_lock = threading.RLock()
+        self._stop = threading.Event()
+        self._rebuild = threading.Event()
+        self._thread: threading.Thread | None = None
+        self.mode = "reconcile-only"
+
+    def _within_depth(self, path: Path) -> bool:
+        for root in self._roots:
+            try:
+                depth = len(path.relative_to(root).parts)
+            except ValueError:
+                continue
+            if depth <= self._max_depth:
+                return True
+        return False
+
+    def _add_watch(self, path: Path) -> None:
+        if self._fd < 0 or not self._within_depth(path):
+            return
+        try:
+            if not path.is_dir() or path.is_symlink() or not _visible(path):
+                return
+        except OSError:
+            return
+        wd = self._libc.inotify_add_watch(self._fd, os.fsencode(path), self._WATCH_MASK)
+        if wd >= 0:
+            with self._watch_lock:
+                self._watches[int(wd)] = path
+
+    def _reset_watches(self) -> None:
+        if self._fd < 0:
+            return
+        with self._watch_lock:
+            old = list(self._watches)
+            self._watches.clear()
+        for wd in old:
+            try:
+                self._libc.inotify_rm_watch(self._fd, wd)
+            except Exception:
+                pass
+        for root in self._roots:
+            try:
+                if not root.is_dir():
+                    continue
+            except OSError:
+                continue
+            self._add_watch(root)
+            for folder in _walk_directories(root, self._max_depth):
+                self._add_watch(folder)
+
+    def start(self) -> bool:
+        if not sys.platform.startswith("linux"):
+            return False
+        try:
+            libc = ctypes.CDLL(None, use_errno=True)
+            libc.inotify_init1.argtypes = [ctypes.c_int]
+            libc.inotify_init1.restype = ctypes.c_int
+            libc.inotify_add_watch.argtypes = [ctypes.c_int, ctypes.c_char_p, ctypes.c_uint32]
+            libc.inotify_add_watch.restype = ctypes.c_int
+            libc.inotify_rm_watch.argtypes = [ctypes.c_int, ctypes.c_int]
+            libc.inotify_rm_watch.restype = ctypes.c_int
+            fd = libc.inotify_init1(os.O_NONBLOCK | getattr(os, "O_CLOEXEC", 0))
+        except (AttributeError, OSError):
+            return False
+        if fd < 0:
+            return False
+
+        self._libc = libc
+        self._fd = int(fd)
+        self._reset_watches()
+        self.mode = "inotify"
+        self._thread = threading.Thread(target=self._run, name="workspace-inotify", daemon=True)
+        self._thread.start()
+        return True
+
+    def request_rebuild(self) -> None:
+        if self._fd >= 0:
+            self._rebuild.set()
+
+    def _run(self) -> None:
+        while not self._stop.is_set():
+            if self._rebuild.is_set():
+                self._rebuild.clear()
+                self._reset_watches()
+            try:
+                readable, _, _ = select.select([self._fd], [], [], 0.5)
+            except (OSError, ValueError):
+                if self._stop.is_set():
+                    break
+                continue
+            if not readable:
+                continue
+            try:
+                payload = os.read(self._fd, 64 * 1024)
+            except BlockingIOError:
+                continue
+            except OSError:
+                if self._stop.is_set():
+                    break
+                continue
+
+            offset = 0
+            changed = False
+            rebuild = False
+            while offset + self._EVENT.size <= len(payload):
+                wd, mask, _cookie, name_len = self._EVENT.unpack_from(payload, offset)
+                offset += self._EVENT.size
+                raw_name = payload[offset : offset + name_len]
+                offset += name_len
+                name = raw_name.rstrip(b"\0").decode(errors="surrogateescape") if raw_name else ""
+
+                if mask & self._IN_Q_OVERFLOW:
+                    changed = True
+                    rebuild = True
+                    continue
+
+                with self._watch_lock:
+                    base = self._watches.get(wd)
+                if mask & self._IN_IGNORED:
+                    with self._watch_lock:
+                        self._watches.pop(wd, None)
+                    continue
+
+                if base and name and mask & self._IN_ISDIR and mask & (self._IN_CREATE | self._IN_MOVED_TO):
+                    self._add_watch(base / name)
+                    rebuild = True
+                if mask & self._IN_ISDIR and mask & (
+                    self._IN_DELETE_SELF | self._IN_MOVE_SELF | self._IN_MOVED_FROM | self._IN_DELETE
+                ):
+                    rebuild = True
+                if mask & self._WATCH_MASK:
+                    changed = True
+
+            if rebuild:
+                self._rebuild.set()
+            if changed:
+                self._on_event()
+
+    def stop(self) -> None:
+        self._stop.set()
+        if self._thread:
+            self._thread.join(timeout=2)
+        if self._fd >= 0:
+            try:
+                os.close(self._fd)
+            except OSError:
+                pass
+            self._fd = -1
+        self.mode = "stopped"
+
+
+class WorkspaceIndex:
+    """Reconstructible technical index for fast Cockpit reads and later sync ownership."""
+
+    SCHEMA_VERSION = "1"
+
+    def __init__(
+        self,
+        roots: list[tuple[str, Path]],
+        max_depth: int,
+        state_db: Path,
+        *,
+        reconcile_seconds: float = 60.0,
+        debounce_seconds: float = 0.5,
+        enable_watcher: bool = True,
+    ) -> None:
+        self.roots = roots
+        self.max_depth = max_depth
+        self.state_db = state_db
+        self.reconcile_seconds = max(0.1, float(reconcile_seconds))
+        self.debounce_seconds = max(0.0, float(debounce_seconds))
+        self.enable_watcher = enable_watcher
+        self._snapshot: dict[str, Any] = {
+            "generated_at": None,
+            "projection": PROJECTION_ID,
+            "read_only": True,
+            "totals": {status: 0 for status in STATUS_NAMES},
+            "workspace_count": len(roots),
+            "item_count": 0,
+            "package_count": 0,
+            "document_count": 0,
+            "folder_count": 0,
+            "workspaces": [{"name": label, "available": False, "cards": [], "errors": ["Index non initialisé"]} for label, _ in roots],
+            "index_state": {"mode": "initializing", "watcher": "reconcile-only"},
+        }
+        self._snapshot_lock = threading.RLock()
+        self._reconcile_lock = threading.Lock()
+        self._dirty = threading.Event()
+        self._stop = threading.Event()
+        self._coordinator: threading.Thread | None = None
+        self._watcher = _InotifyWatcher(roots, max_depth, self.mark_dirty)
+        self._watcher_mode = "reconcile-only"
+        self._last_error: str | None = None
+
+    def _persist(self, snapshot: dict[str, Any], reason: str) -> str | None:
+        try:
+            self.state_db.parent.mkdir(parents=True, exist_ok=True)
+            connection = sqlite3.connect(self.state_db, timeout=5)
+            try:
+                connection.execute("PRAGMA journal_mode=DELETE")
+                connection.execute("PRAGMA synchronous=NORMAL")
+                connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS workspace_entries (
+                        entry_key TEXT PRIMARY KEY,
+                        workspace TEXT NOT NULL,
+                        kind TEXT NOT NULL,
+                        path TEXT NOT NULL,
+                        status TEXT NOT NULL,
+                        payload_json TEXT NOT NULL,
+                        observed_at TEXT NOT NULL
+                    )
+                    """
+                )
+                connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS workspace_meta (
+                        key TEXT PRIMARY KEY,
+                        value TEXT NOT NULL
+                    )
+                    """
+                )
+                observed_at = snapshot["generated_at"] or ""
+                with connection:
+                    connection.execute("DELETE FROM workspace_entries")
+                    for workspace in snapshot["workspaces"]:
+                        workspace_name = workspace["name"]
+                        for card in workspace["cards"]:
+                            entry_key = json.dumps(
+                                [workspace_name, card.get("kind"), card.get("path"), card.get("cartouche")],
+                                ensure_ascii=False,
+                                separators=(",", ":"),
+                            )
+                            connection.execute(
+                                """
+                                INSERT INTO workspace_entries(
+                                    entry_key, workspace, kind, path, status, payload_json, observed_at
+                                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                                """,
+                                (
+                                    entry_key,
+                                    workspace_name,
+                                    card.get("kind") or "",
+                                    card.get("path") or "",
+                                    card.get("status") or "",
+                                    json.dumps(card, ensure_ascii=False, separators=(",", ":")),
+                                    observed_at,
+                                ),
+                            )
+                    meta = {
+                        "schema_version": self.SCHEMA_VERSION,
+                        "projection": PROJECTION_ID,
+                        "last_reconcile_at": observed_at,
+                        "last_reconcile_reason": reason,
+                    }
+                    connection.executemany(
+                        "INSERT OR REPLACE INTO workspace_meta(key, value) VALUES (?, ?)",
+                        list(meta.items()),
+                    )
+            finally:
+                connection.close()
+        except (OSError, sqlite3.Error) as exc:
+            return f"{type(exc).__name__}: {exc}"
+        return None
+
+    def reconcile(self, reason: str = "manual") -> dict[str, Any]:
+        with self._reconcile_lock:
+            snapshot = scan_workspaces(self.roots, self.max_depth)
+            index_state = {
+                "mode": "indexed",
+                "watcher": self._watcher_mode,
+                "last_reconcile_at": snapshot["generated_at"],
+                "last_reconcile_reason": reason,
+                "reconcile_seconds": self.reconcile_seconds,
+            }
+            snapshot["index_state"] = index_state
+            persistence_error = self._persist(snapshot, reason)
+            if persistence_error:
+                index_state["state_error"] = persistence_error
+                self._last_error = persistence_error
+            else:
+                self._last_error = None
+            with self._snapshot_lock:
+                self._snapshot = snapshot
+            if self._watcher_mode == "inotify":
+                self._watcher.request_rebuild()
+            return snapshot
+
+    def snapshot(self) -> dict[str, Any]:
+        with self._snapshot_lock:
+            return self._snapshot
+
+    def health(self) -> dict[str, Any]:
+        with self._snapshot_lock:
+            state = dict(self._snapshot.get("index_state") or {})
+        state["state_error"] = self._last_error
+        return state
+
+    def mark_dirty(self) -> None:
+        self._dirty.set()
+
+    def _coordinator_loop(self) -> None:
+        next_periodic = time.monotonic() + self.reconcile_seconds
+        while not self._stop.is_set():
+            timeout = max(0.0, next_periodic - time.monotonic())
+            dirty = self._dirty.wait(timeout)
+            if self._stop.is_set():
+                break
+            if dirty:
+                if self._stop.wait(self.debounce_seconds):
+                    break
+                self._dirty.clear()
+                reason = "watch"
+            else:
+                reason = "periodic"
+            try:
+                self.reconcile(reason)
+            except Exception as exc:  # defensive: an index failure must not kill the HTTP service
+                self._last_error = f"{type(exc).__name__}: {exc}"
+                print(f"workspace-cockpit: reconcile failed: {self._last_error}", file=sys.stderr)
+            next_periodic = time.monotonic() + self.reconcile_seconds
+
+    def start(self) -> None:
+        if self.enable_watcher and self._watcher.start():
+            self._watcher_mode = "inotify"
+        self.reconcile("startup")
+        self._coordinator = threading.Thread(
+            target=self._coordinator_loop,
+            name="workspace-reconcile",
+            daemon=True,
+        )
+        self._coordinator.start()
+
+    def stop(self) -> None:
+        self._stop.set()
+        self._dirty.set()
+        if self._coordinator:
+            self._coordinator.join(timeout=2)
+        self._watcher.stop()
+
+
+def _path_is_within(candidate: Path, root: Path) -> bool:
+    try:
+        candidate.resolve(strict=False).relative_to(root.resolve(strict=False))
+        return True
+    except (OSError, RuntimeError, ValueError):
+        return False
+
+
 class CockpitHandler(BaseHTTPRequestHandler):
     roots: list[tuple[str, Path]] = []
     max_depth = 2
+    workspace_index: WorkspaceIndex | None = None
     role_trace_url = ""
     role_trace_key = ""
 
@@ -541,10 +935,22 @@ class CockpitHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:  # noqa: N802 - stdlib handler API
         path = urlparse(self.path).path
         if path == "/api/health":
-            self._json({"status": "ok", "projection": PROJECTION_ID, "read_only": True, "role_trace": bool(self.role_trace_url)})
+            index_state = self.workspace_index.health() if self.workspace_index else {"mode": "direct-scan"}
+            self._json(
+                {
+                    "status": "ok",
+                    "projection": PROJECTION_ID,
+                    "read_only": True,
+                    "role_trace": bool(self.role_trace_url),
+                    "index": index_state,
+                }
+            )
             return
         if path == "/api/workspaces":
-            self._json(scan_workspaces(self.roots, self.max_depth))
+            if self.workspace_index:
+                self._json(self.workspace_index.snapshot())
+            else:
+                self._json(scan_workspaces(self.roots, self.max_depth))
             return
         if path == "/api/role-traces/latest":
             self._proxy_role_trace("/internal/role-traces/latest")
@@ -593,6 +999,24 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--port", type=int, default=8189)
     parser.add_argument("--root", action="append", type=_root, required=True)
     parser.add_argument("--max-depth", type=int, default=2, choices=range(1, 5))
+    parser.add_argument(
+        "--state-db",
+        default=os.getenv("WORKSPACE_INDEX_DB", "/tmp/pantheon-workspace-cockpit/index.sqlite3"),
+        help="absolute path to reconstructible SQLite index state",
+    )
+    parser.add_argument(
+        "--reconcile-seconds",
+        type=float,
+        default=float(os.getenv("WORKSPACE_RECONCILE_SECONDS", "60")),
+        help="periodic full reconcile interval (default 60s)",
+    )
+    parser.add_argument(
+        "--watch-debounce-ms",
+        type=int,
+        default=int(os.getenv("WORKSPACE_WATCH_DEBOUNCE_MS", "500")),
+        help="coalesce filesystem event bursts before reconcile",
+    )
+    parser.add_argument("--no-watch", action="store_true", help="disable inotify acceleration; periodic reconcile remains")
     parser.add_argument("--check", action="store_true", help="scan once, print summary, and exit")
     return parser
 
@@ -603,8 +1027,29 @@ def main(argv: list[str] | None = None) -> int:
         result = scan_workspaces(args.root, args.max_depth)
         print(json.dumps(result, ensure_ascii=False))
         return 0 if all(workspace["available"] for workspace in result["workspaces"]) else 1
+    state_db = Path(args.state_db)
+    if not state_db.is_absolute():
+        raise SystemExit("--state-db must be an absolute path")
+    if args.reconcile_seconds < 0.1:
+        raise SystemExit("--reconcile-seconds must be >= 0.1")
+    if args.watch_debounce_ms < 0:
+        raise SystemExit("--watch-debounce-ms must be >= 0")
+    if any(_path_is_within(state_db, root) for _, root in args.root):
+        raise SystemExit("--state-db must remain outside every watched workspace root")
+
     CockpitHandler.roots = args.root
     CockpitHandler.max_depth = args.max_depth
+    workspace_index = WorkspaceIndex(
+        args.root,
+        args.max_depth,
+        state_db,
+        reconcile_seconds=args.reconcile_seconds,
+        debounce_seconds=args.watch_debounce_ms / 1000.0,
+        enable_watcher=not args.no_watch,
+    )
+    workspace_index.start()
+    CockpitHandler.workspace_index = workspace_index
+
     role_trace_url = os.getenv("WORKSPACE_ROLE_TRACE_URL", "").strip().rstrip("/")
     role_trace_key = os.getenv("WORKSPACE_ROLE_TRACE_KEY", "").strip()
     if bool(role_trace_url) != bool(role_trace_key):
@@ -621,6 +1066,7 @@ def main(argv: list[str] | None = None) -> int:
         pass
     finally:
         server.server_close()
+        workspace_index.stop()
     return 0
 
 
