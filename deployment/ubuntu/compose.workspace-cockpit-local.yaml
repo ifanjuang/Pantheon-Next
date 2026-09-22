@@ -20,6 +20,9 @@ services:
     environment:
       WORKSPACE_ROLE_TRACE_URL: http://role-trace:8190
       WORKSPACE_ROLE_TRACE_KEY: ${ROLE_TRACE_READ_KEY:?set ROLE_TRACE_READ_KEY outside the repository}
+      WORKSPACE_INDEX_DB: /state/index.sqlite3
+      WORKSPACE_RECONCILE_SECONDS: ${WORKSPACE_RECONCILE_SECONDS:-60}
+      WORKSPACE_WATCH_DEBOUNCE_MS: ${WORKSPACE_WATCH_DEBOUNCE_MS:-500}
     depends_on:
       role-trace:
         condition: service_healthy
@@ -27,6 +30,7 @@ services:
       - /srv/pantheon/obsidian:/vaults/ifja:ro
       - /srv/pantheon/obsidian-affaires:/vaults/affaires:ro
       - /srv/pantheon/obsidian-documentaires:/vaults/documentaires:ro
+      - workspace-cockpit-state:/state
     healthcheck:
       test:
         - CMD
@@ -67,3 +71,6 @@ services:
       timeout: 3s
       retries: 5
       start_period: 5s
+
+volumes:
+  workspace-cockpit-state:
