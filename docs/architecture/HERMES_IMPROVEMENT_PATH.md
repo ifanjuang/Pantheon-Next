@@ -270,9 +270,11 @@ Q2 — direct vs goal-style iteration
 same bounded artifact or analysis with an objective verification/correction criterion
 -> determine whether additional turns improve the result before looping becomes waste
 
-Q3 — goal-style iteration vs Kanban
-same durable dependent-work scenario with at least one real blocker/recovery point
--> determine whether persisted task state, dependencies and handoffs materially help
+Q3 — goal-style workflow without vs with Kanban projection/persistence
+same durable dependent-work scenario and same attempt/check/revision workflow
+with at least one real blocker/recovery point in both arms
+-> vary only Kanban projection/persisted task state, dependencies and handoffs
+-> determine whether that additional durable coordination materially helps
 ```
 
 Q1 is first because it is technically closest to the existing live Runs/P2 path.
@@ -331,6 +333,12 @@ single run or isolated outlier
 The case-specific review criterion and aggregation rule must be declared before
 the matched runs start so the decision rule is not chosen after observing results.
 
+Q3 requires stricter variable isolation: both arms use the same goal-style
+attempt/check/revision workflow and the same task/dependency scenario. The only
+intended treatment difference is the Kanban projection/persistence surface and
+the durable state/handoff behavior it provides. If iteration behavior also differs,
+the Q3 comparison is inconclusive because more than one execution dimension moved.
+
 Observe at minimum:
 
 ```text
@@ -380,9 +388,18 @@ control and durable Kanban dispatch are one interchangeable selector surface.
 
 If Hermes already chooses the least-complex sufficient tactic adequately, add no
 Pantheon selector. If repeated residual mis-selection remains, first fix the
-nearest existing Hermes prompt/Skill/tool/runtime owner and re-run the same cases.
-Only a repeated residual failure after those corrections can justify the smallest
-additional constraint.
+nearest existing Hermes prompt/Skill/tool/runtime owner. Retain the cases that
+exposed the failure as regression cases, but do not qualify the correction only
+by re-running cases inspected during tuning.
+
+Before selecting a correction, freeze a held-out set for the same workload class.
+After the nearest-owner correction, require both regression success on the
+original cases and the same direction of improvement on the untouched held-out
+cases under the same matched-run controls. A correction that helps only the cases
+used to choose it is case-specific tuning, not a workload-class strategy rule.
+
+Only a repeated residual failure that survives this held-out validation after
+existing-owner corrections can justify the smallest additional constraint.
 
 ## Failure classification gate
 
