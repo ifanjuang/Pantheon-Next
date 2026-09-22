@@ -130,6 +130,7 @@ def test_source_intake_draft_uses_existing_owner_fields_without_claiming_admissi
     assert draft["raw_source_ref"] == "gdrive://file/file-1"
     assert "checksum" not in draft
     assert draft["mime_type"] == "application/pdf"
+    assert draft["metadata"]["google_drive"]["materialized_mime_type"] == "application/pdf"
     assert draft["metadata"]["google_drive"]["provider_version"] == "17"
     assert draft["metadata"]["google_drive"]["materialized_content_sha256"] == materialized.content_sha256
     assert draft["metadata"]["google_drive"]["materialized_representation_preserved"] is False
@@ -182,3 +183,20 @@ def test_intake_draft_keys_remain_compatible_with_current_source_owner():
     owner_fields = set(signature(source_intake.create_source).parameters) - {"conn"}
     assert set(draft) <= owner_fields
     assert {"source_id", "received_at", "actor", "actor_kind", "idempotency_key"}.isdisjoint(draft)
+
+
+def test_native_source_mime_remains_distinct_from_export_representation():
+    candidate = _candidate(
+        mime_type="application/vnd.google-apps.document",
+        content_checksum=None,
+    )
+    exported = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    materialized = materialize_content(
+        candidate,
+        b"docx bytes",
+        export_mime_type=exported,
+    )
+    draft = build_source_intake_draft(candidate, materialized)
+    assert draft["mime_type"] == "application/vnd.google-apps.document"
+    assert draft["metadata"]["google_drive"]["materialized_mime_type"] == exported
+    assert draft["metadata"]["google_drive"]["export_mime_type"] == exported
