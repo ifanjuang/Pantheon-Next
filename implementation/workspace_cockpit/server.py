@@ -386,6 +386,8 @@ def _folder_card(workspace: str, root: Path, folder: Path) -> dict[str, Any]:
         "summary": _summary_excerpt(body),
         "status": "CHECK" if warnings else "FOLDER",
         "folder_context": folder_context.name if folder_context else None,
+        "folder_context_present": folder_context is not None,
+        "can_generate_folder_context": folder_context is None,
         "project": _meta_string(metadata, "project"),
         "phase": _meta_string(metadata, "phase"),
         "tags": _meta_tags(metadata),
