@@ -125,6 +125,18 @@ These records are observation and triage only. They do not approve Claude Code, 
 |---|---|---|---|---|
 | `hesreallyhim/awesome-claude-code` | Claude Code ecosystem catalogue / awesome list | Map skills, hooks, MCP servers, sandboxes, memory/context persistence, observability, cost monitoring and security tooling into Capability Slot review without adopting dependencies. Route `SKILL.md`-style resources to `SKILL_WATCHLIST.md`; route execution candidates to `HERMES_CAPABILITY_BINDINGS.md`; route operational-state patterns to `PANTHEON_CONTROL_PLANE_BOUNDARY.md`. | Catalogue treated as trust registry, install queue, plugin marketplace, MCP catalogue, provider router plan, proof of safety or evidence of approval. | boundary_required |
 
+## Current deliberation and agent-safety watch items
+
+These records are observation and distillation inputs only. They do not select
+dependencies, runtimes, security authorities or execution strategies.
+
+| Reference | Type | Pantheon interest | Primary risk | Status |
+|---|---|---|---|---|
+| `0xNyk/council-of-high-intelligence` | multi-perspective deliberation method / optional runtime experiments | independent problem restatement, method diversity, anonymized cross-review, anti-conformity, dissent-preserving synthesis, compromises and kill criteria | persona roster becomes Pantheon Role; Council becomes fifth execution strategy/runtime; consensus/vote becomes Decision or Evidence | method_review_required |
+| `0xNyk/agent-security` | deterministic repository/content safety tripwires | non-executing static pre-vet before deeper external Skill/repository qualification; explicit claim ceiling and UNKNOWN posture | scanner CLEAN becomes safety/admission proof; tool becomes PEP/security authority; upstream scripts imported without gap comparison | method_review_required |
+
+Detailed bounded review: `reference_reviews/0XNYK_COUNCIL_AGENT_SECURITY.md`.
+
 ## Current IFC / OpenBIM watch items
 
 Observed 2026-09-06 while converging Project Anatomy and Hermes context. These records do not select an IFC runtime, parser, serialization, schema generation, geometry engine or workflow UI. IFC remains a source language / adapter profile; Project Anatomy remains the project-understanding model.

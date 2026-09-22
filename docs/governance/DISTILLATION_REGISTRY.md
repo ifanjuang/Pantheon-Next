@@ -113,6 +113,10 @@ runtime support != governance requirement
 | Memory Curation Report | agent_memory_curator_agent | memory proposals should report accepted, proposed, rejected, redacted, conflict and deprecation status | `MEMORY.md`, `EVIDENCE_PACK.md`, `SCOPE_ISOLATION.md` | candidate |
 | Skill Manager Demotion | skillsgate | skill inventory and compatibility UX may inform governed projection but not installation authority | `WATCHLIST.md`, `REJECTED_PATTERNS.md`, `REFERENCE_BOUNDARIES.md` | governed_projection_candidate |
 | Profile identity layer | SOUL.md, Hermes Personality & SOUL.md | stabilize Hermes execution posture without granting governance authority | `HERMES_INTEGRATION.md`, `reference_reviews/SOUL_MD_HERMES_PROFILE.md`, future `hermes/profiles` writing guidance | hermes_candidate_constraint |
+| Independent framing before deliberation | `0xNyk/council-of-high-intelligence` | independently restate a hard question before multi-perspective analysis; surface material framing divergence rather than silently averaging incompatible problem definitions | `GOVERNANCE_COLLEGE.md`, Hermes Method/Skill qualification after #1093 | method_review_required |
+| Anonymous adversarial cross-review | `0xNyk/council-of-high-intelligence` | separate argument quality from persona/provider prestige; require concrete objections and preserve dissent before synthesis | `GOVERNANCE_COLLEGE.md`, Hermes Method/Skill qualification after #1093 | method_review_required |
+| Decision-oriented dissent summary | `0xNyk/council-of-high-intelligence` | expose convergences, unresolved disagreements, uncertainties, acceptable compromises, missing evidence and kill criteria as candidate review material without converting consensus into a Decision | `USER_DECISION_GATE.md`, existing Result/Decision Request owners | candidate |
+| Deterministic external pre-vet | `0xNyk/agent-security` | run non-executing static tripwires before deeper external repository/Skill qualification; report matched patterns and coverage limits with an explicit claim ceiling | `EXTERNAL_TOOLS_POLICY.md`, existing Capability/Skill qualification tests | method_review_required |
 
 ## Distillation rules
 
