@@ -1,54 +1,115 @@
 # Workspace Cockpit
 
-This is the first read-only Linux projection of the workspace manifest
-inspector described in
+This is the filesystem Workspace projection owned by Pantheon for local document browsing.
+
+Architecture owner:
 [`docs/architecture/WORKSPACE_MANIFEST_INSPECTOR_CANDIDATE.md`](../../docs/architecture/WORKSPACE_MANIFEST_INSPECTOR_CANDIDATE.md).
 
-It scans the filesystem mirrors produced by Self-hosted LiveSync and projects
-document packages as cards. CouchDB remains a synchronization transport; the
-Cockpit does not query it directly. It also has no PostgreSQL or pgvector
-dependency. An optional transient sidecar can read the public event stream of
-an already-admitted Hermes run and project observable runtime stages with
-display-only Pantheon Role labels. Those labels are a read projection:
-a worker is not a Pantheon Role, and the projection carries no authority.
+Tracking:
+- #660 owns the AFFAIRES filesystem/cartouche index and single producer;
+- #659 owns Hindsight runtime and retain/retrieval qualification.
 
-The local HTTP process exposes:
+## Selected target
+
+The selected professional target is now:
+
+```text
+NAS / AFFAIRES
+      │
+      ▼
+one AFFAIRES indexer/sync daemon
+      │
+      ├────────► Workspace Cockpit
+      └────────► Hindsight
+```
+
+A normal document bundle is:
+
+```text
+source.ext
+source.md
+```
+
+where the Markdown file is the document cartouche. Optional `_folder.md` files may add useful folder context.
+
+The target does not require Obsidian, Self-hosted LiveSync, CouchDB, a LiveSync filesystem mirror, `hindsight-obsidian-sync`, or `document.yaml` as a business sidecar.
+
+Historical qualifications of those components remain useful evidence and are not erased by this migration.
+
+## Current implementation state
+
+The executable code in this directory predates the selected target and is being migrated in bounded slices.
+
+At the current repository state it is still:
+
+- read-only;
+- based on directory-package projection;
+- able to recognize `document.yaml` and same-named Markdown;
+- configured by the Ubuntu deployment against historical LiveSync filesystem mirrors;
+- recursively scanned when `/api/workspaces` is requested.
+
+Those are observed implementation facts, not the selected final topology.
+
+The migration owned by #660 is:
+
+```text
+Slice 1  source.ext + source.md projection and broken-pair states
+Slice 2  reconstructible index + watcher + periodic reconcile
+Slice 3  same daemon emits bounded Hindsight producer operations
+Slice 4  Ubuntu deployment converges from vault mirrors to reviewed AFFAIRES root
+```
+
+Do not create a second filesystem Cockpit or an independent Hindsight watcher to bypass this migration.
+
+## Authority boundaries
+
+```text
+source bytes != cartouche interpretation
+cartouche != Evidence
+retrieved != truth
+memory != Evidence
+folder != governed identity
+projection != persistence
+sync success != authorization
+```
+
+The Workspace Cockpit is a projection. It does not become a document authority merely because it can render or edit a cartouche.
+
+Postgres-backed governed Information and existing governed document/extraction owners remain authoritative where their contracts apply.
+
+## Local HTTP surface
+
+The current local HTTP process exposes:
 
 - `/` for the Cockpit interface;
-- `/api/workspaces` for the current read-only projection;
+- `/api/workspaces` for the current filesystem projection;
 - `/api/health` for service supervision;
-- `/api/role-traces/*` as the existing compatibility route for an optional
-  same-origin, read-only proxy to the observable-stage sidecar.
+- `/api/role-traces/*` as the existing compatibility route for the optional same-origin, read-only observable-stage sidecar.
 
-The browser never receives the Hermes Runs key or either internal sidecar key.
-The sidecar is in-memory only and cannot create, approve, retry or stop a run.
+The browser never receives the Hermes Runs key or internal sidecar keys. The sidecar is in-memory only and cannot create, approve, retry or stop a run.
 
-Run against the repository fixture:
+## Current local execution
+
+The historical fixture remains runnable while the migration is in progress:
 
 ```bash
 python3 implementation/workspace_cockpit/server.py \
   --root FIXTURE="$PWD/docs/examples/workspace_manifest_inspector/workspace"
 ```
 
-The recommended Linux installation uses the already pinned local Hermes Python
-runtime as a base image, but does not mount Hermes state or credentials:
+The existing container/native installers remain compatibility surfaces until Slice 4 replaces their active Workspace inputs. Do not interpret their LiveSync mounts as the selected architecture.
 
-```bash
-docker compose --env-file deployment/ubuntu/release.env \
-  -f deployment/ubuntu/compose.workspace-cockpit-local.yaml up -d --build
+## Hindsight boundary
+
+The Workspace Cockpit does not itself make retrieved material authoritative.
+
+Candidate mapping owned by #659:
+
+```text
+doc_...:source  → source file via Hindsight files/retain
+doc_...:card    → optional separately retrievable Markdown cartouche
 ```
 
-The two containers have read-only root filesystems, no Linux capabilities and
-read-only vault mounts. The observable-stage sidecar is the only component that reads the
-configured public Hermes Runs stream; the Cockpit contacts only that sidecar.
-The historical `role-traces` route/name is retained for compatibility and
-must not be read as a claim that Hermes workers are Pantheon Roles.
-A native systemd alternative is also available:
+#659 must compare source-only, bounded cartouche context, and separately retrievable cartouche before the richer mapping is selected.
 
-```bash
-sudo deployment/ubuntu/configure-workspace-cockpit-local --user "$USER" --enable
-```
-
-The native installer grants the selected unprivileged service user read/traverse ACLs
-on the configured mirrors. The application contains no mutation route and does
-not serve document contents.
+No automatic OCR is part of the AFFAIRES baseline.
