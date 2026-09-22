@@ -404,6 +404,8 @@ A stateful CouchDB/Hindsight version change is refused unless the operator first
 
 ## Version posture
 
+The current Hindsight qualification/deployment candidate is 0.10.1. Upstream released it on 2026-09-21. The container digest remains deliberately unrecorded until the exact target image is pulled and observed on the qualification node; version selection is not runtime activation or qualification success.
+
 `release.env` is a deployment-candidate lock, not the external qualification registry. It may intentionally differ from `implementation/qualification/external-pins.json` where a newer upstream stable release has been reviewed for installation but has not been promoted as a qualified Pantheon binding.
 
 In particular, the first profile keeps Self-hosted LiveSync on the repository's exact executable qualification ref rather than silently replacing that proof with a newer plugin release.
