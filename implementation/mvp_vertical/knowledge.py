@@ -750,6 +750,11 @@ def build_knowledge_recompile_context(
                     {
                         "chunk_ref": chunk["chunk_ref"],
                         "text_digest": chunk["text_digest"],
+                        "observed_body_digest": (
+                            _digest(chunk["body"])
+                            if chunk["body"] is not None
+                            else None
+                        ),
                         "structural_locator": chunk["structural_locator"],
                     }
                     for chunk in dependency["frozen_chunks"]
@@ -848,7 +853,7 @@ def get_recompile_context_for_request(
     if not expected:
         raise KnowledgeError("edit request is not a Knowledge recompile request")
     context = build_knowledge_recompile_context(conn, request["knowledge_id"])
-    if context["context_digest"] != expected:
+    if context["context_digest"] != expected or not context["ready_for_candidate"]:
         raise StaleKnowledgeWrite(
             "Knowledge recompile source context changed after the request was queued"
         )
@@ -1487,6 +1492,7 @@ def apply_edit_request(
                 )
                 if (
                     context["context_digest"] != recompile_digest
+                    or not context["ready_for_candidate"]
                     or not replacement_source_chunk_refs
                     or not set(replacement_source_chunk_refs).issubset(
                         set(context["allowed_source_chunk_refs"])
