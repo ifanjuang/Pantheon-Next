@@ -284,6 +284,212 @@ def test_source_change_calculates_knowledge_impact_without_mutating_knowledge(
     assert knowledge.get_knowledge_card(conn, knowledge_id)["version"] == 1
 
 
+def test_recompile_request_is_candidate_only_and_apply_rebinds_provenance(
+    conn, tmp_path
+) -> None:
+    contract, sources = _multi_source_fixture(conn, tmp_path)
+    primary, supporting = list(sources.values())
+    knowledge_id = f"knowledge.techniques.{uuid.uuid4().hex}"
+    original_markdown = "# Façade\n\nSynthèse avant évolution du compte-rendu."
+
+    knowledge.publish_knowledge(
+        conn,
+        knowledge_id=knowledge_id,
+        document_id=primary["document_id"],
+        title="Synthèse façade recompilable",
+        family="techniques",
+        markdown=original_markdown,
+        source_chunk_refs=[primary["chunk_ref"], supporting["chunk_ref"]],
+        created_by="hermes-test",
+        actor_kind="hermes",
+        idempotency_key=f"publish-{uuid.uuid4().hex}",
+    )
+
+    supporting["path"].write_text(
+        "# CR chantier\n\nLe support est repris et le primaire est désormais prescrit.",
+        encoding="utf-8",
+    )
+    assert store.ingest(
+        conn,
+        contract,
+        tmp_path,
+        ingestion_id=f"reingest-{uuid.uuid4().hex}",
+    ) == 2
+
+    context = knowledge.build_knowledge_recompile_context(conn, knowledge_id)
+    assert context["needs_recompile"] is True
+    assert context["ready_for_candidate"] is True
+    assert context["context_complete"] is True
+    assert context["allowed_source_chunk_refs"]
+
+    request_id = f"recompile-{uuid.uuid4().hex}"
+    queued = knowledge.create_recompile_request(
+        conn,
+        request_id=request_id,
+        knowledge_id=knowledge_id,
+        requested_by="human:architect",
+        idempotency_key=f"request-{uuid.uuid4().hex}",
+    )
+    request = queued["edit_request"]
+    assert request["status"] == "queued_for_hermes"
+    assert request["selection_start"] == 0
+    assert request["selection_end"] == len(original_markdown)
+    assert request["recompile_context_digest"] == context["context_digest"]
+    assert queued["candidate_only"] is True
+    assert queued["applies_automatically"] is False
+
+    # Queueing alone is not a Knowledge write.
+    assert knowledge.get_knowledge_markdown(conn, knowledge_id) == original_markdown
+    assert knowledge.get_knowledge_card(conn, knowledge_id)["version"] == 1
+
+    hermes_context = knowledge.get_recompile_context_for_request(conn, request_id)
+    chosen_refs = [
+        dependency["current_candidate_chunks"][0]["chunk_ref"]
+        for dependency in hermes_context["dependencies"]
+        if dependency["current_candidate_chunks"]
+    ]
+    assert len(chosen_refs) == 2
+
+    proposed_markdown = (
+        "# Façade\n\nLe support est repris ; le primaire prescrit doit être intégré "
+        "à la synthèse actuelle."
+    )
+    proposal = knowledge.complete_edit_request(
+        conn,
+        request_id=request_id,
+        replacement_markdown=proposed_markdown,
+        replacement_source_chunk_refs=chosen_refs,
+    )
+    assert proposal["status"] == "proposed"
+    assert proposal["replacement_source_chunk_refs"] == chosen_refs
+
+    # Hermes proposing still does not write Knowledge.
+    assert knowledge.get_knowledge_markdown(conn, knowledge_id) == original_markdown
+    assert knowledge.get_knowledge_source_state(conn, knowledge_id)["status"] == "needs_recompile"
+
+    applied = knowledge.apply_edit_request(
+        conn,
+        request_id=request_id,
+        actor="human:architect",
+        actor_kind="human",
+        idempotency_key=f"apply-{uuid.uuid4().hex}",
+    )
+    assert applied["knowledge"]["version"] == 2
+    assert applied["knowledge"]["source_chunk_refs"] == chosen_refs
+    assert knowledge.get_knowledge_markdown(conn, knowledge_id) == proposed_markdown
+
+    refreshed = knowledge.get_knowledge_source_state(conn, knowledge_id)
+    assert refreshed["status"] == "current"
+    assert refreshed["needs_recompile"] is False
+    assert refreshed["dependency_count"] == 2
+
+
+def test_recompile_proposal_conflicts_if_source_context_moves_again(
+    conn, tmp_path
+) -> None:
+    contract, sources = _multi_source_fixture(conn, tmp_path)
+    primary, supporting = list(sources.values())
+    knowledge_id = f"knowledge.techniques.{uuid.uuid4().hex}"
+
+    knowledge.publish_knowledge(
+        conn,
+        knowledge_id=knowledge_id,
+        document_id=primary["document_id"],
+        title="Synthèse façade à contexte figé",
+        family="techniques",
+        markdown="# Façade\n\nVersion initiale.",
+        source_chunk_refs=[primary["chunk_ref"], supporting["chunk_ref"]],
+        created_by="hermes-test",
+        actor_kind="hermes",
+        idempotency_key=f"publish-{uuid.uuid4().hex}",
+    )
+
+    supporting["path"].write_text(
+        "# CR chantier\n\nPremière évolution.",
+        encoding="utf-8",
+    )
+    assert store.ingest(
+        conn,
+        contract,
+        tmp_path,
+        ingestion_id=f"reingest-a-{uuid.uuid4().hex}",
+    ) == 2
+
+    request_id = f"recompile-{uuid.uuid4().hex}"
+    queued = knowledge.create_recompile_request(
+        conn,
+        request_id=request_id,
+        knowledge_id=knowledge_id,
+        requested_by="human:architect",
+        idempotency_key=f"request-{uuid.uuid4().hex}",
+    )
+    queued_context = queued["recompile_context"]
+    old_allowed = list(queued_context["allowed_source_chunk_refs"])
+
+    supporting["path"].write_text(
+        "# CR chantier\n\nDeuxième évolution après mise en file.",
+        encoding="utf-8",
+    )
+    assert store.ingest(
+        conn,
+        contract,
+        tmp_path,
+        ingestion_id=f"reingest-b-{uuid.uuid4().hex}",
+    ) == 2
+
+    with pytest.raises(
+        knowledge.StaleKnowledgeWrite,
+        match="source context changed",
+    ):
+        knowledge.get_recompile_context_for_request(conn, request_id)
+
+    proposal = knowledge.complete_edit_request(
+        conn,
+        request_id=request_id,
+        replacement_markdown="# Façade\n\nProposition devenue obsolète.",
+        replacement_source_chunk_refs=old_allowed,
+    )
+    assert proposal["status"] == "conflict"
+    assert knowledge.get_knowledge_card(conn, knowledge_id)["version"] == 1
+
+
+def test_ordinary_edit_does_not_rebind_source_provenance(conn, tmp_path) -> None:
+    card, _document_id = _publish(conn, tmp_path)
+    knowledge_id = card["knowledge_id"]
+    original_refs = list(card["source_chunk_refs"])
+    markdown = knowledge.get_knowledge_markdown(conn, knowledge_id)
+    selected = "Préparer le support existant."
+    start = markdown.index(selected)
+    request_id = f"edit-{uuid.uuid4().hex}"
+
+    knowledge.create_edit_request(
+        conn,
+        request_id=request_id,
+        knowledge_id=knowledge_id,
+        instruction_kind="rewrite",
+        instruction="Reformuler sans changer les sources.",
+        base_version=1,
+        selection_start=start,
+        selection_end=start + len(selected),
+        selected_text=selected,
+        requested_by="human:architect",
+        idempotency_key=f"request-{uuid.uuid4().hex}",
+    )
+    knowledge.complete_edit_request(
+        conn,
+        request_id=request_id,
+        replacement_markdown="Préparer soigneusement le support existant.",
+    )
+    applied = knowledge.apply_edit_request(
+        conn,
+        request_id=request_id,
+        actor="human:architect",
+        actor_kind="human",
+        idempotency_key=f"apply-{uuid.uuid4().hex}",
+    )
+    assert applied["knowledge"]["source_chunk_refs"] == original_refs
+
+
 def test_stale_revision_refuses_without_partial_effect(conn, tmp_path) -> None:
     card, _document_id = _publish(conn, tmp_path)
     knowledge_id = card["knowledge_id"]
