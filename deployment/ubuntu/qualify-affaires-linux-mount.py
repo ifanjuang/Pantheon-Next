@@ -158,8 +158,6 @@ def main() -> int:
             report["reconcile_rebuild"],
         )
         report["qualified"] = all(required)
-        print(json.dumps(report, indent=2, ensure_ascii=False))
-        return 0 if report["qualified"] else 1
     finally:
         shutil.rmtree(state_dir, ignore_errors=True)
         if args.keep:
@@ -167,6 +165,9 @@ def main() -> int:
         else:
             shutil.rmtree(probe, ignore_errors=True)
             report["cleanup"] = not probe.exists()
+
+    print(json.dumps(report, indent=2, ensure_ascii=False))
+    return 0 if report.get("qualified") else 1
 
 
 if __name__ == "__main__":
