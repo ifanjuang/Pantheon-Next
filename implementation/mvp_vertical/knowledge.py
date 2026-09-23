@@ -1480,7 +1480,6 @@ def apply_edit_request(
     validates must cover this exact replacement applied to this exact
     selection of this exact Knowledge version.
     """
-    request = get_edit_request(conn, request_id)
     apply_payload_digest = _payload_digest(
         {
             "request_id": request_id,
@@ -1489,17 +1488,6 @@ def apply_edit_request(
             "idempotency_key": idempotency_key,
         }
     )
-    if request["status"] == "applied":
-        if (
-            request["apply_idempotency_key"] != idempotency_key
-            or request["apply_payload_digest"] != apply_payload_digest
-        ):
-            raise IdempotencyConflict("edit request was already applied by a different effect")
-        return request["apply_result_snapshot"]
-    if request["status"] == "conflict":
-        raise StaleKnowledgeWrite("edit request already conflicts with a newer Knowledge version")
-    if request["status"] != "proposed" or request["replacement_markdown"] is None:
-        raise KnowledgeError("edit request has no applicable Hermes proposal")
     # The Knowledge revision, the request's status transition and the stored
     # result snapshot are one effect and commit together. Splitting them across
     # transactions left two windows in which a crash produced a revised
@@ -1513,7 +1501,28 @@ def apply_edit_request(
     # rather than by committing the caller's work first.
     try:
         with conn.transaction():
-            # Re-read under lock: the checks above ran outside this transaction.
+            # Own the transaction before the first database read. On psycopg's
+            # default autocommit=False a SELECT performed first would create an
+            # implicit outer transaction and reduce this block to a savepoint;
+            # cockpit_api then closes the connection and would roll the applied
+            # Knowledge back despite returning success.
+            request = get_edit_request(conn, request_id)
+            if request["status"] == "applied":
+                if (
+                    request["apply_idempotency_key"] != idempotency_key
+                    or request["apply_payload_digest"] != apply_payload_digest
+                ):
+                    raise IdempotencyConflict(
+                        "edit request was already applied by a different effect"
+                    )
+                return request["apply_result_snapshot"]
+            if request["status"] == "conflict":
+                raise StaleKnowledgeWrite(
+                    "edit request already conflicts with a newer Knowledge version"
+                )
+            if request["status"] != "proposed" or request["replacement_markdown"] is None:
+                raise KnowledgeError("edit request has no applicable Hermes proposal")
+
             item = _knowledge_row(conn, request["knowledge_id"], lock=True)
             start, end = request["selection_start"], request["selection_end"]
             selected = item["markdown"][start:end]
