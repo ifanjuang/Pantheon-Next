@@ -289,6 +289,44 @@ def _resolve_current_source_chunks(
     return resolved
 
 
+def _write_knowledge_source_bindings(
+    conn: psycopg.Connection,
+    *,
+    knowledge_id: str,
+    source_chunk_refs: list[str],
+    resolved_chunks: dict[str, dict],
+    replace_existing: bool,
+) -> None:
+    """Persist exact source dependencies under the existing Knowledge owner."""
+    if replace_existing:
+        conn.execute(
+            "DELETE FROM knowledge_source_chunks WHERE knowledge_id = %s",
+            (knowledge_id,),
+        )
+    for chunk_reference in source_chunk_refs:
+        source_chunk = resolved_chunks[chunk_reference]
+        ordinal = int(source_chunk["chunk_no"])
+        conn.execute(
+            """
+            INSERT INTO knowledge_source_chunks (
+                knowledge_id, chunk_ref, document_id, extraction_id, ordinal,
+                text_digest, source_ref, source_digest, structural_locator
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            (
+                knowledge_id,
+                chunk_reference,
+                source_chunk["document_id"],
+                source_chunk["extraction_id"],
+                ordinal,
+                _digest(source_chunk["body"]),
+                source_chunk["source_ref"],
+                source_chunk["source_digest"],
+                source_chunk["structural_locator"] or f"chunk/{ordinal}",
+            ),
+        )
+
+
 def _event_replay(
     conn: psycopg.Connection,
     *,
@@ -526,6 +564,288 @@ def list_document_knowledge_impacts(
     }
 
 
+def build_knowledge_recompile_context(
+    conn: psycopg.Connection, knowledge_id: str
+) -> dict:
+    """Build bounded old/new source context for one stale Knowledge publication.
+
+    The context is a candidate input, not a write. For changed documents it
+    exposes current chunks with the same structural locator as a frozen cited
+    chunk, plus an ordinal neighbour on each side. This keeps the handoff
+    bounded while still tolerating small document-structure shifts.
+    """
+    item = _knowledge_row(conn, knowledge_id)
+    state = get_knowledge_source_state(conn, knowledge_id)
+    markdown = str(item["markdown"])
+
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            """
+            SELECT ksc.document_id, ksc.chunk_ref, ksc.extraction_id,
+                   ksc.source_ref, ksc.source_digest, ksc.ordinal,
+                   ksc.text_digest, ksc.structural_locator,
+                   oldc.body AS old_body
+              FROM knowledge_source_chunks ksc
+              JOIN source_documents d ON d.document_id = ksc.document_id
+              LEFT JOIN chunks oldc
+                ON oldc.dossier = d.dossier
+               AND oldc.source_ref = ksc.source_ref
+               AND oldc.source_digest = ksc.source_digest
+               AND oldc.chunk_no = ksc.ordinal
+             WHERE ksc.knowledge_id = %s
+             ORDER BY ksc.document_id, ksc.ordinal, ksc.chunk_ref
+            """,
+            (knowledge_id,),
+        )
+        frozen_rows = [dict(row) for row in cur.fetchall()]
+
+    if not frozen_rows:
+        raise KnowledgeError("Knowledge has no source dependencies to recompile")
+
+    dependency_state = {
+        dependency["document_id"]: dependency
+        for dependency in state["dependencies"]
+    }
+    document_ids = sorted(dependency_state)
+
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            """
+            SELECT d.document_id, d.source_ref, d.source_digest,
+                   d.current_extraction_id AS extraction_id,
+                   d.analysis_status, cb.compilation_id,
+                   c.chunk_no, c.body,
+                   COALESCE(p.structural_locator, '') AS structural_locator
+              FROM source_documents d
+              JOIN document_compilation_bindings cb
+                ON cb.document_id = d.document_id
+              JOIN structured_compilations sc
+                ON sc.compilation_id = cb.compilation_id
+               AND sc.extraction_id = d.current_extraction_id
+              JOIN chunks c
+                ON c.dossier = d.dossier
+               AND c.source_ref = d.source_ref
+               AND c.source_digest = d.source_digest
+              LEFT JOIN retrieval_chunk_projections p
+                ON p.dossier = c.dossier
+               AND p.source_ref = c.source_ref
+               AND p.source_digest = c.source_digest
+               AND p.chunk_no = c.chunk_no
+             WHERE d.document_id = ANY(%s)
+             ORDER BY d.document_id, c.chunk_no
+            """,
+            (document_ids,),
+        )
+        current_rows = [dict(row) for row in cur.fetchall()]
+
+    frozen_by_document: dict[str, list[dict]] = {}
+    for row in frozen_rows:
+        frozen_by_document.setdefault(row["document_id"], []).append(row)
+
+    current_by_document: dict[str, list[dict]] = {}
+    for row in current_rows:
+        current_by_document.setdefault(row["document_id"], []).append(row)
+
+    projected_dependencies: list[dict] = []
+    allowed_source_chunk_refs: list[str] = []
+    context_complete = True
+
+    for document_id in document_ids:
+        dependency = dependency_state[document_id]
+        frozen = frozen_by_document.get(document_id, [])
+        current = current_by_document.get(document_id, [])
+        selected_current: list[dict] = []
+
+        if dependency["state"] == "current":
+            selected_refs = set(dependency["chunk_refs"])
+            for row in current:
+                reference = chunk_ref(row["compilation_id"], row["chunk_no"])
+                if reference in selected_refs:
+                    selected_current.append(row)
+        elif dependency["state"] in {"source_changed", "extraction_changed", "source_needs_review"}:
+            frozen_locators = {
+                str(row["structural_locator"] or "")
+                for row in frozen
+                if str(row["structural_locator"] or "")
+            }
+            frozen_ordinals = {int(row["ordinal"]) for row in frozen}
+            neighbour_ordinals = {
+                ordinal + delta
+                for ordinal in frozen_ordinals
+                for delta in (-1, 0, 1)
+                if ordinal + delta >= 0
+            }
+            for row in current:
+                locator = str(row["structural_locator"] or "")
+                if locator in frozen_locators or int(row["chunk_no"]) in neighbour_ordinals:
+                    selected_current.append(row)
+        else:
+            selected_current = []
+
+        if dependency["state"] != "source_failed" and not selected_current:
+            context_complete = False
+
+        frozen_projection = [
+            {
+                "chunk_ref": row["chunk_ref"],
+                "source_ref": row["source_ref"],
+                "source_digest": row["source_digest"],
+                "extraction_id": row["extraction_id"],
+                "ordinal": int(row["ordinal"]),
+                "text_digest": row["text_digest"],
+                "structural_locator": row["structural_locator"],
+                "body": row["old_body"],
+            }
+            for row in frozen
+        ]
+        current_projection: list[dict] = []
+        for row in selected_current:
+            reference = chunk_ref(row["compilation_id"], row["chunk_no"])
+            allowed_source_chunk_refs.append(reference)
+            current_projection.append(
+                {
+                    "chunk_ref": reference,
+                    "source_ref": row["source_ref"],
+                    "source_digest": row["source_digest"],
+                    "extraction_id": row["extraction_id"],
+                    "ordinal": int(row["chunk_no"]),
+                    "text_digest": _digest(row["body"]),
+                    "structural_locator": row["structural_locator"],
+                    "body": row["body"],
+                }
+            )
+
+        projected_dependencies.append(
+            {
+                **dependency,
+                "frozen_chunks": frozen_projection,
+                "current_candidate_chunks": current_projection,
+            }
+        )
+
+    allowed_source_chunk_refs = list(dict.fromkeys(allowed_source_chunk_refs))
+    basis = {
+        "knowledge_id": knowledge_id,
+        "knowledge_version": item["version"],
+        "markdown_digest": item["markdown_digest"],
+        "source_state_status": state["status"],
+        "dependencies": [
+            {
+                "document_id": dependency["document_id"],
+                "state": dependency["state"],
+                "bound_source_digest": dependency["bound_source_digest"],
+                "bound_extraction_id": dependency["bound_extraction_id"],
+                "current_source_digest": dependency["current_source_digest"],
+                "current_extraction_id": dependency["current_extraction_id"],
+                "frozen_chunks": [
+                    {
+                        "chunk_ref": chunk["chunk_ref"],
+                        "text_digest": chunk["text_digest"],
+                        "structural_locator": chunk["structural_locator"],
+                    }
+                    for chunk in dependency["frozen_chunks"]
+                ],
+                "current_candidate_chunks": [
+                    {
+                        "chunk_ref": chunk["chunk_ref"],
+                        "text_digest": chunk["text_digest"],
+                        "structural_locator": chunk["structural_locator"],
+                    }
+                    for chunk in dependency["current_candidate_chunks"]
+                ],
+            }
+            for dependency in projected_dependencies
+        ],
+    }
+    context_digest = _payload_digest(basis)
+    ready = (
+        state["needs_recompile"]
+        and state["status"] != "blocked_by_source"
+        and context_complete
+        and bool(allowed_source_chunk_refs)
+    )
+
+    return {
+        "knowledge_id": knowledge_id,
+        "parent_project_id": state["parent_project_id"],
+        "base_version": item["version"],
+        "base_markdown": markdown,
+        "base_markdown_digest": item["markdown_digest"],
+        "source_state_status": state["status"],
+        "needs_recompile": state["needs_recompile"],
+        "ready_for_candidate": ready,
+        "context_complete": context_complete,
+        "context_digest": context_digest,
+        "allowed_source_chunk_refs": allowed_source_chunk_refs,
+        "dependencies": projected_dependencies,
+        "authority": {
+            "changes_knowledge": False,
+            "selects_sources": False,
+            "is_evidence": False,
+            "is_memory": False,
+        },
+    }
+
+
+def create_recompile_request(
+    conn: psycopg.Connection,
+    *,
+    request_id: str,
+    knowledge_id: str,
+    requested_by: str,
+    idempotency_key: str,
+) -> dict:
+    """Queue one full-document recompile through the existing edit-request owner."""
+    context = build_knowledge_recompile_context(conn, knowledge_id)
+    if not context["needs_recompile"]:
+        raise KnowledgeError("Knowledge is current; no recompile request is needed")
+    if not context["ready_for_candidate"]:
+        raise KnowledgeError(
+            "Knowledge recompile context is incomplete or blocked by a source"
+        )
+    markdown = context["base_markdown"]
+    request = create_edit_request(
+        conn,
+        request_id=request_id,
+        knowledge_id=knowledge_id,
+        instruction_kind="verify",
+        instruction=(
+            "Recompile the complete Knowledge Markdown against the bounded current "
+            "source context. Preserve supported content, revise superseded claims, "
+            "keep unresolved contradictions explicit, and cite only source chunk "
+            "references admitted by the recompile context."
+        ),
+        base_version=context["base_version"],
+        selection_start=0,
+        selection_end=len(markdown),
+        selected_text=markdown,
+        requested_by=requested_by,
+        idempotency_key=idempotency_key,
+        recompile_context_digest=context["context_digest"],
+    )
+    return {
+        "edit_request": request,
+        "recompile_context": context,
+        "candidate_only": True,
+        "applies_automatically": False,
+    }
+
+
+def get_recompile_context_for_request(
+    conn: psycopg.Connection, request_id: str
+) -> dict:
+    request = get_edit_request(conn, request_id)
+    expected = request.get("recompile_context_digest")
+    if not expected:
+        raise KnowledgeError("edit request is not a Knowledge recompile request")
+    context = build_knowledge_recompile_context(conn, request["knowledge_id"])
+    if context["context_digest"] != expected:
+        raise StaleKnowledgeWrite(
+            "Knowledge recompile source context changed after the request was queued"
+        )
+    return context
+
+
 def _insert_event(
     conn: psycopg.Connection,
     *,
@@ -656,28 +976,13 @@ def publish_knowledge(
                 json.dumps(source_chunk_refs), review_status, created_by,
             ),
         )
-        for chunk_reference in source_chunk_refs:
-            source_chunk = resolved_chunks[chunk_reference]
-            ordinal = int(source_chunk["chunk_no"])
-            conn.execute(
-                """
-                INSERT INTO knowledge_source_chunks (
-                    knowledge_id, chunk_ref, document_id, extraction_id, ordinal,
-                    text_digest, source_ref, source_digest, structural_locator
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """,
-                (
-                    knowledge_id,
-                    chunk_reference,
-                    source_chunk["document_id"],
-                    source_chunk["extraction_id"],
-                    ordinal,
-                    _digest(source_chunk["body"]),
-                    source_chunk["source_ref"],
-                    source_chunk["source_digest"],
-                    source_chunk["structural_locator"] or f"chunk/{ordinal}",
-                ),
-            )
+        _write_knowledge_source_bindings(
+            conn,
+            knowledge_id=knowledge_id,
+            source_chunk_refs=source_chunk_refs,
+            resolved_chunks=resolved_chunks,
+            replace_existing=False,
+        )
         snapshot = get_knowledge_card(conn, knowledge_id)
         _insert_event(
             conn, aggregate_ref=knowledge_id, event_type="knowledge_published",
@@ -698,6 +1003,7 @@ def revise_knowledge(
     actor_kind: str,
     idempotency_key: str,
     review_status: str | None = None,
+    source_chunk_refs: list[str] | None = None,
 ) -> dict:
     if not markdown.strip() or actor_kind not in ACTOR_KINDS:
         raise KnowledgeError("non-empty Markdown and a valid actor kind are required")
@@ -707,6 +1013,7 @@ def revise_knowledge(
         "knowledge_id": knowledge_id, "markdown": markdown,
         "expected_version": expected_version, "actor": actor, "actor_kind": actor_kind,
         "review_status": review_status,
+        "source_chunk_refs": source_chunk_refs,
     }
     pdigest = _payload_digest(payload)
     with conn.transaction():
@@ -721,22 +1028,79 @@ def revise_knowledge(
                 f"stale Knowledge version: expected {expected_version}, current {row['version']}"
             )
         next_status = review_status or row["review_status"]
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                UPDATE knowledge_items
-                   SET markdown = %s, markdown_digest = %s, review_status = %s,
-                       version = version + 1, updated_at = CURRENT_TIMESTAMP
-                 WHERE knowledge_id = %s AND version = %s
-                """,
-                (markdown, _digest(markdown), next_status, knowledge_id, expected_version),
+        resolved_chunks: dict[str, dict] | None = None
+        primary_document: dict | None = None
+        if source_chunk_refs is not None:
+            primary_document = _document_row(conn, row["document_id"])
+            resolved_chunks = _resolve_current_source_chunks(
+                conn,
+                parent_project_id=primary_document["parent_project_id"],
+                source_chunk_refs=source_chunk_refs,
             )
+            if not any(
+                chunk["document_id"] == row["document_id"]
+                for chunk in resolved_chunks.values()
+            ):
+                raise KnowledgeError(
+                    "Knowledge recompile must retain at least one current chunk "
+                    "from its primary source document"
+                )
+
+        with conn.cursor() as cur:
+            if source_chunk_refs is None:
+                cur.execute(
+                    """
+                    UPDATE knowledge_items
+                       SET markdown = %s, markdown_digest = %s, review_status = %s,
+                           version = version + 1, updated_at = CURRENT_TIMESTAMP
+                     WHERE knowledge_id = %s AND version = %s
+                    """,
+                    (markdown, _digest(markdown), next_status, knowledge_id, expected_version),
+                )
+            else:
+                assert primary_document is not None
+                cur.execute(
+                    """
+                    UPDATE knowledge_items
+                       SET markdown = %s, markdown_digest = %s, review_status = %s,
+                           source_version = %s, source_digest = %s, extraction_id = %s,
+                           source_chunk_refs = %s::jsonb,
+                           version = version + 1, updated_at = CURRENT_TIMESTAMP
+                     WHERE knowledge_id = %s AND version = %s
+                    """,
+                    (
+                        markdown,
+                        _digest(markdown),
+                        next_status,
+                        primary_document["source_version"],
+                        primary_document["source_digest"],
+                        primary_document["extraction_id"],
+                        json.dumps(source_chunk_refs),
+                        knowledge_id,
+                        expected_version,
+                    ),
+                )
             if cur.rowcount != 1:
                 raise StaleKnowledgeWrite("Knowledge changed before the revision was persisted")
+
+        if source_chunk_refs is not None:
+            assert resolved_chunks is not None
+            _write_knowledge_source_bindings(
+                conn,
+                knowledge_id=knowledge_id,
+                source_chunk_refs=source_chunk_refs,
+                resolved_chunks=resolved_chunks,
+                replace_existing=True,
+            )
+
         snapshot = get_knowledge_card(conn, knowledge_id)
         event_type = (
             "knowledge_review_status_changed"
-            if markdown == row["markdown"] and next_status != row["review_status"]
+            if (
+                markdown == row["markdown"]
+                and next_status != row["review_status"]
+                and source_chunk_refs is None
+            )
             else "knowledge_revised"
         )
         _insert_event(
@@ -762,6 +1126,7 @@ def create_edit_request(
     requested_by: str,
     idempotency_key: str,
     replacement_markdown: str | None = None,
+    recompile_context_digest: str | None = None,
 ) -> dict:
     if instruction_kind not in INSTRUCTION_KINDS or not instruction.strip():
         raise KnowledgeError("invalid or empty intelligent-edit instruction")
@@ -771,6 +1136,7 @@ def create_edit_request(
         "base_version": base_version, "selection_start": selection_start,
         "selection_end": selection_end, "selected_text": selected_text,
         "requested_by": requested_by, "replacement_markdown": replacement_markdown,
+        "recompile_context_digest": recompile_context_digest,
     }
     pdigest = _payload_digest(payload)
     with conn.transaction():
@@ -801,14 +1167,14 @@ def create_edit_request(
             INSERT INTO knowledge_edit_requests (
                 request_id, knowledge_id, instruction_kind, instruction, base_version,
                 selection_start, selection_end, selected_text_digest,
-                replacement_markdown, status, requested_by,
+                replacement_markdown, recompile_context_digest, status, requested_by,
                 request_idempotency_key, request_payload_digest
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """,
             (
                 request_id, knowledge_id, instruction_kind, instruction, base_version,
                 selection_start, selection_end, _digest(selected_text), replacement_markdown,
-                status, requested_by, idempotency_key, pdigest,
+                recompile_context_digest, status, requested_by, idempotency_key, pdigest,
             ),
         )
     return get_edit_request(conn, request_id)
@@ -847,7 +1213,11 @@ def list_edit_requests(
 
 
 def complete_edit_request(
-    conn: psycopg.Connection, *, request_id: str, replacement_markdown: str
+    conn: psycopg.Connection,
+    *,
+    request_id: str,
+    replacement_markdown: str,
+    replacement_source_chunk_refs: list[str] | None = None,
 ) -> dict:
     """Hermes fills in the proposal it was queued for; nothing else may call this.
 
@@ -863,9 +1233,15 @@ def complete_edit_request(
         raise KnowledgeError("Hermes proposal must contain replacement Markdown")
     with conn.transaction():
         request = get_edit_request(conn, request_id)
+        normalized_refs = (
+            list(replacement_source_chunk_refs)
+            if replacement_source_chunk_refs is not None
+            else None
+        )
         if (
             request["status"] == "proposed"
             and request["replacement_markdown"] == replacement_markdown
+            and request.get("replacement_source_chunk_refs") == normalized_refs
         ):
             return request
         if request["status"] != "queued_for_hermes":
@@ -876,10 +1252,49 @@ def complete_edit_request(
             )
         item = _knowledge_row(conn, request["knowledge_id"], lock=True)
         status = "proposed" if item["version"] == request["base_version"] else "conflict"
+
+        recompile_digest = request.get("recompile_context_digest")
+        if recompile_digest:
+            if not normalized_refs:
+                raise KnowledgeError(
+                    "Knowledge recompile proposal must declare replacement source chunk refs"
+                )
+            context = build_knowledge_recompile_context(conn, request["knowledge_id"])
+            if context["context_digest"] != recompile_digest:
+                status = "conflict"
+            else:
+                allowed = set(context["allowed_source_chunk_refs"])
+                if not set(normalized_refs).issubset(allowed):
+                    raise KnowledgeError(
+                        "Knowledge recompile proposal cites chunks outside its bounded context"
+                    )
+                primary = _knowledge_row(conn, request["knowledge_id"])
+                if not any(
+                    chunk["document_id"] == primary["document_id"]
+                    for chunk in _resolve_current_source_chunks(
+                        conn,
+                        parent_project_id=context["parent_project_id"],
+                        source_chunk_refs=normalized_refs,
+                    ).values()
+                ):
+                    raise KnowledgeError(
+                        "Knowledge recompile proposal must retain a primary-source chunk"
+                    )
+        elif normalized_refs is not None:
+            raise KnowledgeError(
+                "ordinary intelligent edits cannot replace Knowledge source provenance"
+            )
+
         conn.execute(
-            "UPDATE knowledge_edit_requests SET replacement_markdown = %s, status = %s, "
+            "UPDATE knowledge_edit_requests SET replacement_markdown = %s, "
+            "replacement_source_chunk_refs = %s::jsonb, status = %s, "
             "updated_at = CURRENT_TIMESTAMP WHERE request_id = %s",
-            (replacement_markdown, status, request_id),
+            (
+                replacement_markdown,
+                json.dumps(normalized_refs) if normalized_refs is not None else None,
+                status,
+                request_id,
+            ),
         )
     return get_edit_request(conn, request_id)
 
@@ -965,6 +1380,9 @@ def apply_edit_request(
                         "base_version": request["base_version"],
                         "selected_text_digest": request["selected_text_digest"],
                         "replacement_markdown": request["replacement_markdown"],
+                        "replacement_source_chunk_refs": request.get(
+                            "replacement_source_chunk_refs"
+                        ),
                     }
                 )
                 _gate_knowledge_write(
@@ -981,15 +1399,39 @@ def apply_edit_request(
                     required_ceiling=required_ceiling,
                 )
 
+            recompile_digest = request.get("recompile_context_digest")
+            replacement_source_chunk_refs = request.get("replacement_source_chunk_refs")
+            if recompile_digest:
+                context = build_knowledge_recompile_context(
+                    conn, request["knowledge_id"]
+                )
+                if (
+                    context["context_digest"] != recompile_digest
+                    or not replacement_source_chunk_refs
+                    or not set(replacement_source_chunk_refs).issubset(
+                        set(context["allowed_source_chunk_refs"])
+                    )
+                ):
+                    raise _EditRequestConflict
+
             revised = (
                 item["markdown"][:start]
                 + request["replacement_markdown"]
                 + item["markdown"][end:]
             )
             snapshot = revise_knowledge(
-                conn, knowledge_id=request["knowledge_id"], markdown=revised,
-                expected_version=request["base_version"], actor=actor,
-                actor_kind=actor_kind, idempotency_key=idempotency_key,
+                conn,
+                knowledge_id=request["knowledge_id"],
+                markdown=revised,
+                expected_version=request["base_version"],
+                actor=actor,
+                actor_kind=actor_kind,
+                idempotency_key=idempotency_key,
+                source_chunk_refs=(
+                    list(replacement_source_chunk_refs)
+                    if recompile_digest
+                    else None
+                ),
             )
             conn.execute(
                 "UPDATE knowledge_edit_requests SET status = 'applied', applied_version = %s, "
