@@ -38,6 +38,8 @@ Linux AFFAIRES indexer/sync daemon
 
 The filesystem watcher belongs to the AFFAIRES daemon, not to Hindsight. Hindsight receives bounded producer operations from that daemon.
 
+The professional source root remains **NAS / AFFAIRES** as mounted on Linux. There is **one AFFAIRES indexer/sync daemon** for this route; "Linux" describes where that single owner runs, not a second component.
+
 The daemon is a technical synchronization/indexing component. It is not a business database, professional truth owner, Project identity owner, Evidence owner or approval engine.
 
 ## 2. Authority boundaries
