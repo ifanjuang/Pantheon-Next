@@ -522,6 +522,103 @@ def test_recompile_context_refuses_tampered_frozen_source_chunk(
         )
 
 
+def test_recompile_proposal_conflicts_if_frozen_context_is_tampered_after_queue(
+    conn, tmp_path
+) -> None:
+    contract, sources = _multi_source_fixture(conn, tmp_path)
+    primary, supporting = list(sources.values())
+    knowledge_id = f"knowledge.techniques.{uuid.uuid4().hex}"
+
+    knowledge.publish_knowledge(
+        conn,
+        knowledge_id=knowledge_id,
+        document_id=primary["document_id"],
+        title="Synthèse façade avec historique contrôlé",
+        family="techniques",
+        markdown="# Façade\n\nVersion initiale.",
+        source_chunk_refs=[primary["chunk_ref"], supporting["chunk_ref"]],
+        created_by="hermes-test",
+        actor_kind="hermes",
+        idempotency_key=f"publish-{uuid.uuid4().hex}",
+    )
+
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT source_ref, source_digest, ordinal
+              FROM knowledge_source_chunks
+             WHERE knowledge_id = %s
+               AND document_id = %s
+            """,
+            (knowledge_id, supporting["document_id"]),
+        )
+        old_source_ref, old_source_digest, old_ordinal = cur.fetchone()
+
+    supporting["path"].write_text(
+        "# CR chantier\n\nNouvelle version du compte-rendu.",
+        encoding="utf-8",
+    )
+    assert store.ingest(
+        conn,
+        contract,
+        tmp_path,
+        ingestion_id=f"reingest-{uuid.uuid4().hex}",
+    ) == 2
+
+    request_id = f"recompile-{uuid.uuid4().hex}"
+    queued = knowledge.create_recompile_request(
+        conn,
+        request_id=request_id,
+        knowledge_id=knowledge_id,
+        requested_by="human:architect",
+        idempotency_key=f"request-{uuid.uuid4().hex}",
+    )
+    context = queued["recompile_context"]
+    chosen_refs = [
+        dependency["current_candidate_chunks"][0]["chunk_ref"]
+        for dependency in context["dependencies"]
+        if dependency["current_candidate_chunks"]
+    ]
+    knowledge.complete_edit_request(
+        conn,
+        request_id=request_id,
+        replacement_markdown="# Façade\n\nProposition fondée sur le contexte figé.",
+        replacement_source_chunk_refs=chosen_refs,
+    )
+
+    conn.execute(
+        """
+        UPDATE chunks
+           SET body = 'historique altéré après proposition'
+         WHERE source_ref = %s
+           AND source_digest = %s
+           AND chunk_no = %s
+        """,
+        (old_source_ref, old_source_digest, old_ordinal),
+    )
+    conn.commit()
+
+    with pytest.raises(
+        knowledge.StaleKnowledgeWrite,
+        match="source context changed",
+    ):
+        knowledge.get_recompile_context_for_request(conn, request_id)
+
+    with pytest.raises(
+        knowledge.StaleKnowledgeWrite,
+        match="Knowledge changed after the intelligent edit was proposed",
+    ):
+        knowledge.apply_edit_request(
+            conn,
+            request_id=request_id,
+            actor="human:architect",
+            actor_kind="human",
+            idempotency_key=f"apply-{uuid.uuid4().hex}",
+        )
+    assert knowledge.get_edit_request(conn, request_id)["status"] == "conflict"
+    assert knowledge.get_knowledge_card(conn, knowledge_id)["version"] == 1
+
+
 def test_recompile_proposal_conflicts_if_source_context_moves_again(
     conn, tmp_path
 ) -> None:
