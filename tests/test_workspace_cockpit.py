@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -541,6 +542,117 @@ def test_heavy_sources_stay_visible_and_temp_backups_are_ignored(tmp_path: Path)
     assert all(card["status"] == "CARTOUCHE_MISSING" for card in documents)
     assert all(card["heavy_binary"] is True for card in documents)
     assert all(card["hindsight_eligible"] is False for card in documents)
+
+
+
+def test_declared_source_sha256_is_verified_when_present(tmp_path: Path) -> None:
+    module = _module()
+    source_bytes = b"exact-source-bytes"
+    digest = hashlib.sha256(source_bytes).hexdigest()
+    (tmp_path / "Notice.pdf").write_bytes(source_bytes)
+    (tmp_path / ".Notice.pdf.md").write_text(
+        f"""---
+schema: pantheon/cartouche/v1
+document_id: doc-notice
+source: Notice.pdf
+source_sha256: {digest}
+source_size_bytes: {len(source_bytes)}
+---
+# Notice
+""",
+        encoding="utf-8",
+    )
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=1)
+    card = next(card for card in _cards(result) if card["name"] == "Notice.pdf")
+
+    assert card["status"] == "COMPLETE"
+    assert card["source_sha256"] == digest
+    assert card["source_sha256_verified"] is True
+    assert card["source_integrity"] == "VERIFIED"
+    assert card["declared_source_size"] == len(source_bytes)
+
+
+def test_declared_source_sha256_mismatch_is_check(tmp_path: Path) -> None:
+    module = _module()
+    (tmp_path / "Notice.pdf").write_bytes(b"actual-bytes")
+    wrong_digest = hashlib.sha256(b"other-bytes").hexdigest()
+    (tmp_path / ".Notice.pdf.md").write_text(
+        f"""---
+schema: pantheon/cartouche/v1
+document_id: doc-notice
+source: Notice.pdf
+source_sha256: {wrong_digest}
+source_size_bytes: 12
+---
+# Notice
+""",
+        encoding="utf-8",
+    )
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=1)
+    card = next(card for card in _cards(result) if card["name"] == "Notice.pdf")
+
+    assert card["status"] == "CHECK"
+    assert card["source_sha256_verified"] is False
+    assert card["source_integrity"] == "MISMATCH"
+    assert any("source_sha256" in warning for warning in card["warnings"])
+
+
+def test_email_bundle_requires_verified_sha256_and_exact_size(tmp_path: Path) -> None:
+    module = _module()
+    raw = b"From: a@example.com\r\nTo: b@example.com\r\nSubject: Test\r\n\r\nBody\r\n"
+    digest = hashlib.sha256(raw).hexdigest()
+    (tmp_path / "mail.eml").write_bytes(raw)
+    (tmp_path / ".mail.eml.md").write_text(
+        f"""---
+schema: pantheon/cartouche/v1
+document_id: email-thread-123
+source: mail.eml
+source_sha256: {digest}
+source_size_bytes: {len(raw)}
+type: email
+gmail_message_id: msg-123
+gmail_thread_id: thread-123
+---
+# Test
+""",
+        encoding="utf-8",
+    )
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=1)
+    card = next(card for card in _cards(result) if card["name"] == "mail.eml")
+
+    assert card["status"] == "COMPLETE"
+    assert card["source_integrity"] == "VERIFIED"
+    assert card["source_sha256_verified"] is True
+    assert card["hindsight_eligible"] is False
+
+
+def test_email_bundle_without_integrity_fields_is_check(tmp_path: Path) -> None:
+    module = _module()
+    (tmp_path / "mail.eml").write_bytes(b"Subject: Test\r\n\r\nBody")
+    (tmp_path / ".mail.eml.md").write_text(
+        """---
+schema: pantheon/cartouche/v1
+document_id: email-thread-123
+source: mail.eml
+type: email
+gmail_message_id: msg-123
+gmail_thread_id: thread-123
+---
+# Test
+""",
+        encoding="utf-8",
+    )
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=1)
+    card = next(card for card in _cards(result) if card["name"] == "mail.eml")
+
+    assert card["status"] == "CHECK"
+    assert card["source_integrity"] == "UNDECLARED"
+    assert any("source_sha256 absent" in warning for warning in card["warnings"])
+    assert any("source_size_bytes absent" in warning for warning in card["warnings"])
 
 
 def test_malformed_cartouche_is_check_not_source_loss(tmp_path: Path) -> None:
