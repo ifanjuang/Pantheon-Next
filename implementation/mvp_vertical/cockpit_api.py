@@ -393,13 +393,14 @@ def create_app(
         decision_ref = fields.pop("human_decision_ref")
 
         def publish(conn):
-            canonical_decision = (
-                decision_requests.policy_decision_payload(
-                    conn, decision_ref or "", expectation={}
-                )
-                if body.review_status == "reviewed" and policy_client is not None
-                else {}
-            )
+            canonical_decision = {}
+            if body.review_status == "reviewed" and policy_client is not None:
+                # Finish the read-only Decision lookup before the Knowledge
+                # persistence owner starts its own top-level transaction.
+                with conn.transaction():
+                    canonical_decision = decision_requests.policy_decision_payload(
+                        conn, decision_ref or "", expectation={}
+                    )
             return knowledge.publish_knowledge(
                 conn,
                 document_id=document_id,
@@ -509,13 +510,15 @@ def create_app(
         decision_ref = fields.pop("human_decision_ref")
 
         def apply_edit(conn):
-            canonical_decision = (
-                decision_requests.policy_decision_payload(
-                    conn, decision_ref or "", expectation={}
-                )
-                if policy_client is not None
-                else {}
-            )
+            canonical_decision = {}
+            if policy_client is not None:
+                # Keep the canonical Decision read separate from the Knowledge
+                # apply transaction. Otherwise psycopg would leave an implicit
+                # transaction open and the owner transaction would be a savepoint.
+                with conn.transaction():
+                    canonical_decision = decision_requests.policy_decision_payload(
+                        conn, decision_ref or "", expectation={}
+                    )
             return knowledge.apply_edit_request(
                 conn,
                 request_id=request_id,
