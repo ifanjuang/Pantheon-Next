@@ -19,21 +19,24 @@ Project the existing professional filesystem into the Cockpit and Hindsight with
 Selected target:
 
 ```text
-NAS / AFFAIRES
-        │
-        ▼
-one AFFAIRES indexer/sync daemon
-        │
-        ├─ initial scan
-        ├─ filesystem watcher
-        ├─ periodic reconcile
-        ├─ source/cartouche pairing
-        ├─ reconstructible technical index
-        │
-        ├────────────► Cockpit
-        │
-        └────────────► Hindsight
+NAS
+└─ AFFAIRES
+      │
+      │ mounted on the Linux compute host
+      ▼
+Linux AFFAIRES indexer/sync daemon
+      │
+      ├─ initial scan
+      ├─ filesystem watcher
+      ├─ periodic reconcile
+      ├─ source/cartouche pairing
+      ├─ reconstructible technical index
+      │
+      ├────────────► Cockpit
+      └────────────► Hindsight 0.10.x on Linux
 ```
+
+The filesystem watcher belongs to the AFFAIRES daemon, not to Hindsight. Hindsight receives bounded producer operations from that daemon.
 
 The daemon is a technical synchronization/indexing component. It is not a business database, professional truth owner, Project identity owner, Evidence owner or approval engine.
 
@@ -103,6 +106,7 @@ Candidate minimal frontmatter:
 
 ```yaml
 ---
+schema: pantheon/cartouche/v1
 document_id: doc_...
 source: CCTP_IND_C.pdf
 project: LIEUREY
@@ -148,6 +152,10 @@ relation note != governed relation
 ```
 
 ## 5. Identity
+
+The cartouche carries a stable `document_id` for the filesystem bundle and `schema: pantheon/cartouche/v1`. A missing or incompatible schema makes the card `CHECK`, not `COMPLETE`.
+
+The `document_id` must be unique across the admitted AFFAIRES projection. A copied pair that duplicates an existing `document_id` is rendered `CHECK` with `DUPLICATE_DOCUMENT_ID` and must not be synchronized to Hindsight until resolved.
 
 The cartouche may carry a stable `document_id` for the filesystem bundle.
 
@@ -201,9 +209,9 @@ cartouche name  = .SOURCE.ext.md
 → paired bundle
 ```
 
-The filename relation is exact and one-to-one. The explicit `source` reference remains a consistency check, not a second identity owner.
+The filename relation is exact, one-to-one and case-sensitive on Linux. The explicit `source` reference must match the exact source filename and remains a consistency check, not a second identity owner.
 
-Do not infer pairing from a shared stem alone.
+Do not infer pairing from a shared stem alone. Do not case-fold the Linux pairing key. If multiple source names collapse to the same case-insensitive / Unicode-normalized portable name, keep them distinct but render `CHECK` because the mounted NAS or another client may not preserve that distinction.
 
 If filesystem events arrive separately during a move/save, use a bounded grace/stability window before declaring a source or cartouche deleted.
 
@@ -244,7 +252,7 @@ Never treat a retained summary as proof that the source still exists.
 
 ## 8. Folder context
 
-Optional `_folder.md` may describe a folder when that context has actual value. The projection must explicitly distinguish `folder_context_present=true` from `false`; document cartouches such as `CCTP.md` do not satisfy the folder-context check:
+Optional `_folder.md` may describe a folder when that context has actual value. When present, its frontmatter uses `schema: pantheon/folder-context/v1`. The projection must explicitly distinguish `folder_context_present=true` from `false`; document cartouches such as `CCTP.md` do not satisfy the folder-context check:
 
 ```text
 LIEUREY/
@@ -694,3 +702,37 @@ The target is qualified when:
 - current Postgres/governed owners remain authoritative where applicable.
 
 Tracking: #660 for filesystem/Cockpit producer, #659 for Hindsight runtime and retain/retrieval qualification.
+
+
+## Linux-mounted NAS qualification
+
+The productive topology is qualified from the Linux host that runs the Workspace daemon and Hindsight.
+
+```text
+Linux host
+├─ mounted NAS path /.../AFFAIRES
+├─ Workspace Cockpit/indexer/sync daemon
+└─ Hindsight 0.10.x
+```
+
+The mount qualification must exercise the mounted path itself:
+
+```bash
+python3 deployment/ubuntu/qualify-affaires-linux-mount.py --root /path/to/mounted/AFFAIRES
+```
+
+The probe verifies:
+
+- dot-prefixed cartouche round-trip on the mounted filesystem;
+- exact source/cartouche projection;
+- rename while preserving `document_id`;
+- reconstructible reconcile state;
+- Linux inotify propagation when provided by the mount.
+
+An absent inotify event is a degraded performance signal, not a correctness failure, because periodic reconcile remains the convergence guarantee.
+
+```text
+mount visible != mount healthy
+inotify observed != convergence proof
+reconcile success != professional validation
+```
