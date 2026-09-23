@@ -267,9 +267,10 @@ def install_knowledge_edit_variant_routes(
                     raise decision_requests.DecisionRequestError(
                         "applying a Knowledge variant requires a canonical human Decision reference"
                     )
-                canonical_decision = decision_requests.policy_decision_payload(
-                    conn, body.human_decision_ref, expectation={}
-                )
+                with conn.transaction():
+                    canonical_decision = decision_requests.policy_decision_payload(
+                        conn, body.human_decision_ref, expectation={}
+                    )
             return knowledge_edit_variants.apply_selected_variant(
                 conn,
                 request_id=request_id,
