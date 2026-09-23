@@ -19,6 +19,7 @@ import struct
 import sys
 import threading
 import time
+import unicodedata
 from typing import Any, Callable, Iterable
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
@@ -29,7 +30,9 @@ import yaml
 
 APP_ROOT = Path(__file__).resolve().parent
 STATIC_ROOT = APP_ROOT / "static"
-PROJECTION_ID = "affaires_source_cartouche_v2"
+PROJECTION_ID = "affaires_source_cartouche_v3"
+CARTOUCHE_SCHEMA = "pantheon/cartouche/v1"
+FOLDER_CONTEXT_SCHEMA = "pantheon/folder-context/v1"
 MARKDOWN_EXTENSIONS = {".md", ".markdown"}
 LEGACY_MANIFEST_NAMES = {"document.yaml", "document.yml", "manifest.yaml", "manifest.yml"}
 HINDSIGHT_ELIGIBLE_EXTENSIONS = {".pdf", ".docx", ".xlsx", ".pptx", ".txt", ".md", ".markdown", ".html", ".htm"}
@@ -136,6 +139,15 @@ def _meta_string(metadata: dict[str, Any], key: str) -> str | None:
     if isinstance(value, (date, datetime)):
         return value.isoformat()
     return None
+
+
+def _schema_warning(metadata: dict[str, Any], expected: str) -> str | None:
+    schema = _meta_string(metadata, "schema")
+    if schema == expected:
+        return None
+    if schema is None:
+        return f"schema absent (attendu: {expected})"
+    return f"schema incompatible: {schema} (attendu: {expected})"
 
 
 def _meta_tags(metadata: dict[str, Any]) -> list[str]:
@@ -266,13 +278,17 @@ def _document_card(workspace: str, root: Path, source: Path, cartouche: Path | N
     warnings: list[str] = []
     if cartouche_error:
         warnings.append(cartouche_error)
+    else:
+        schema_warning = _schema_warning(metadata, CARTOUCHE_SCHEMA)
+        if schema_warning:
+            warnings.append(schema_warning)
 
     declared, source_ref_error = _safe_source_ref(_meta_string(metadata, "source"))
     if source_ref_error:
         warnings.append(source_ref_error)
     elif declared is None:
         warnings.append("Source non déclarée dans le cartouche")
-    elif declared.casefold() != source.name.casefold():
+    elif declared != source.name:
         warnings.append(f"Source déclarée différente du fichier apparié : {declared}")
 
     document_id = _meta_string(metadata, "document_id")
@@ -321,6 +337,10 @@ def _orphan_cartouche_card(workspace: str, root: Path, cartouche: Path) -> dict[
     warnings: list[str] = []
     if cartouche_error:
         warnings.append(cartouche_error)
+    else:
+        schema_warning = _schema_warning(metadata, CARTOUCHE_SCHEMA)
+        if schema_warning:
+            warnings.append(schema_warning)
 
     declared, source_ref_error = _safe_source_ref(_meta_string(metadata, "source"))
     if source_ref_error:
@@ -394,6 +414,10 @@ def _folder_card(workspace: str, root: Path, folder: Path) -> dict[str, Any]:
         metadata, body, error = _read_cartouche(folder_context)
         if error:
             warnings.append(error)
+        else:
+            schema_warning = _schema_warning(metadata, FOLDER_CONTEXT_SCHEMA)
+            if schema_warning:
+                warnings.append(schema_warning)
 
     relative_path = folder.relative_to(root).as_posix()
     return {
@@ -424,20 +448,47 @@ def _directory_document_cards(workspace: str, root: Path, folder: Path) -> list[
     direct = _direct_files(folder)
     sources = [item for item in direct if _is_source_file(item)]
     cartouches = [item for item in direct if _is_document_cartouche(item)]
-    cartouche_by_name = {item.name.casefold(): item for item in cartouches}
+    # Pairing is exact and case-sensitive because Linux filenames are exact identifiers.
+    cartouche_by_name = {item.name: item for item in cartouches}
 
     cards: list[dict[str, Any]] = []
     paired_cartouches: set[Path] = set()
+    source_cards: list[dict[str, Any]] = []
     for source in sources:
-        expected_name = _cartouche_name_for_source(source.name).casefold()
+        expected_name = _cartouche_name_for_source(source.name)
         cartouche = cartouche_by_name.get(expected_name)
         if cartouche:
             paired_cartouches.add(cartouche)
-        cards.append(_document_card(workspace, root, source, cartouche))
+        card = _document_card(workspace, root, source, cartouche)
+        cards.append(card)
+        source_cards.append(card)
+
+    # Portable storage can be case-insensitive and normalize Unicode even when Linux does not.
+    portable_groups: dict[str, list[dict[str, Any]]] = {}
+    for card in source_cards:
+        key = unicodedata.normalize("NFC", card["name"]).casefold()
+        portable_groups.setdefault(key, []).append(card)
+    for group in portable_groups.values():
+        exact_names = {card["name"] for card in group}
+        if len(group) > 1 and len(exact_names) > 1:
+            for card in group:
+                card["status"] = "CHECK"
+                card["name_conflict"] = "CASE_OR_UNICODE_COLLISION"
+                card["warnings"].append("Collision potentielle de nom sur stockage case-insensitive/normalisé")
 
     for cartouche in cartouches:
-        if cartouche not in paired_cartouches:
-            cards.append(_orphan_cartouche_card(workspace, root, cartouche))
+        if cartouche in paired_cartouches:
+            continue
+        metadata, _body, read_error = _read_cartouche(cartouche)
+        # Ignore unrelated hidden Markdown unless it declares itself as a Pantheon cartouche
+        # or otherwise carries cartouche-shaped metadata.
+        if (
+            read_error is None
+            and _meta_string(metadata, "schema") != CARTOUCHE_SCHEMA
+            and not any(key in metadata for key in ("source", "document_id"))
+        ):
+            continue
+        cards.append(_orphan_cartouche_card(workspace, root, cartouche))
 
     return cards
 
@@ -463,10 +514,6 @@ def _walk_directories(root: Path, max_depth: int) -> Iterable[Path]:
 
 def scan_workspaces(roots: list[tuple[str, Path]], max_depth: int = 2) -> dict[str, Any]:
     workspaces: list[dict[str, Any]] = []
-    totals = {status: 0 for status in STATUS_NAMES}
-    total_items = 0
-    document_count = 0
-    folder_count = 0
 
     for label, root in roots:
         cards: list[dict[str, Any]] = []
@@ -484,16 +531,36 @@ def scan_workspaces(roots: list[tuple[str, Path]], max_depth: int = 2) -> dict[s
                     errors.append(f"Inventaire limité aux {MAX_ITEMS} premiers éléments")
                     break
 
-            for card in candidates[:MAX_ITEMS]:
-                cards.append(card)
-                totals[card["status"]] = totals.get(card["status"], 0) + 1
-                total_items += 1
-                if card["kind"] == "folder":
-                    folder_count += 1
-                else:
-                    document_count += 1
+            cards.extend(candidates[:MAX_ITEMS])
 
         workspaces.append({"name": label, "available": root_available, "cards": cards, "errors": errors})
+
+    # A copied bundle must not silently become the same Hindsight document in two places.
+    document_ids: dict[str, list[dict[str, Any]]] = {}
+    for workspace in workspaces:
+        for card in workspace["cards"]:
+            if card.get("kind") == "document" and card.get("document_id"):
+                document_ids.setdefault(card["document_id"], []).append(card)
+    for document_id, duplicates in document_ids.items():
+        if len(duplicates) < 2:
+            continue
+        for card in duplicates:
+            card["status"] = "CHECK"
+            card["identity_conflict"] = "DUPLICATE_DOCUMENT_ID"
+            card["warnings"].append(f"document_id dupliqué dans AFFAIRES: {document_id}")
+
+    totals = {status: 0 for status in STATUS_NAMES}
+    total_items = 0
+    document_count = 0
+    folder_count = 0
+    for workspace in workspaces:
+        for card in workspace["cards"]:
+            totals[card["status"]] = totals.get(card["status"], 0) + 1
+            total_items += 1
+            if card["kind"] == "folder":
+                folder_count += 1
+            else:
+                document_count += 1
 
     return {
         "generated_at": datetime.now(tz=timezone.utc).isoformat().replace("+00:00", "Z"),
