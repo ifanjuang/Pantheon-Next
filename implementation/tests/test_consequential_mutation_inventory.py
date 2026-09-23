@@ -1295,7 +1295,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "`complete_edit_request` now refuses every decided status other than "
             "an identical replay of an already-proposed replacement."
         ),
-
+    },
     ("knowledge_edit_variants.py", "create_variant_request"): {
         "gate": "none",
         "local_guards": ("status and replacement_markdown are literals in the INSERT", "locked snapshot with base_version equality", "selection range and text matched against the snapshot", "idempotency with payload digest"),
@@ -1329,15 +1329,15 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
         "local_guards": ("status must be queued_for_hermes or proposed", "row lock", "non-empty reason", "idempotency with payload digest", "event records the refusal"),
         "reviewed": (
             "Refuses an edit, which is safety-increasing, and records why. The "
-            "finding is not in this function but in what happens after it: the "
-            "rejection it writes is reversible by `complete_edit_request`, and "
-            "this function clears no selection, so a rejected request can arrive "
-            "back at `proposed` with its selection intact. Recorded here so the "
-            "reversal is findable from the function that is supposed to be "
-            "terminal."
+            "request row is locked and only queued_for_hermes or proposed may "
+            "transition to rejected. The former reopen defect is closed in "
+            "`knowledge.complete_edit_request`: Hermes may complete only a request "
+            "still queued_for_hermes, with a narrow identical-proposal replay "
+            "exception after it is already proposed. A rejected request is now "
+            "terminal on both the variant and direct proposal paths."
         ),
     },
-    ("knowledge_edit_variants.py", "select_variant"): {
+        ("knowledge_edit_variants.py", "select_variant"): {
         "gate": "none",
         "local_guards": ("status must be proposed", "row lock", "variant ownership", "idempotency with payload digest", "event records the selection"),
         "reviewed": (
