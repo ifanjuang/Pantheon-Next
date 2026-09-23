@@ -363,6 +363,7 @@ def _document_card(workspace: str, root: Path, source: Path, cartouche: Path | N
             "source_integrity": "UNDECLARED",
             "declared_source_size": None,
             "hindsight_eligible": extension in HINDSIGHT_ELIGIBLE_EXTENSIONS,
+            "hindsight_representation": "source" if extension in HINDSIGHT_ELIGIBLE_EXTENSIONS else None,
             "heavy_binary": extension in HEAVY_VISIBLE_EXTENSIONS,
             "modified_at": _mtime_iso(source),
             "warnings": [],
@@ -399,6 +400,12 @@ def _document_card(workspace: str, root: Path, source: Path, cartouche: Path | N
 
     title = _meta_string(metadata, "title") or _first_heading(body) or source.stem
     status = "CHECK" if warnings else "COMPLETE"
+    source_hindsight_eligible = extension in HINDSIGHT_ELIGIBLE_EXTENSIONS
+    email_cartouche_eligible = (
+        extension == ".eml"
+        and status == "COMPLETE"
+        and integrity.get("source_sha256_verified") is True
+    )
     return {
         "workspace": workspace,
         "kind": "document",
@@ -425,7 +432,12 @@ def _document_card(workspace: str, root: Path, source: Path, cartouche: Path | N
         "extension": extension.removeprefix(".").upper() or "FILE",
         "source_size": size,
         **integrity,
-        "hindsight_eligible": extension in HINDSIGHT_ELIGIBLE_EXTENSIONS,
+        "hindsight_eligible": source_hindsight_eligible or email_cartouche_eligible,
+        "hindsight_representation": (
+            "cartouche" if email_cartouche_eligible
+            else "source" if source_hindsight_eligible
+            else None
+        ),
         "heavy_binary": extension in HEAVY_VISIBLE_EXTENSIONS,
         "modified_at": max(
             (value for value in (_mtime_iso(source), _mtime_iso(cartouche)) if value),
@@ -511,7 +523,29 @@ def _orphan_cartouche_card(workspace: str, root: Path, cartouche: Path) -> dict[
         "extension": source_path.suffix.removeprefix(".").upper() if source_path else None,
         "source_size": _file_size(source_path) if source_path else None,
         **integrity,
-        "hindsight_eligible": bool(source_path and source_path.suffix.casefold() in HINDSIGHT_ELIGIBLE_EXTENSIONS),
+        "hindsight_eligible": bool(
+            source_path
+            and status == "COMPLETE"
+            and (
+                source_path.suffix.casefold() in HINDSIGHT_ELIGIBLE_EXTENSIONS
+                or (
+                    source_path.suffix.casefold() == ".eml"
+                    and integrity.get("source_sha256_verified") is True
+                )
+            )
+        ),
+        "hindsight_representation": (
+            "cartouche"
+            if source_path
+            and source_path.suffix.casefold() == ".eml"
+            and status == "COMPLETE"
+            and integrity.get("source_sha256_verified") is True
+            else "source"
+            if source_path
+            and source_path.suffix.casefold() in HINDSIGHT_ELIGIBLE_EXTENSIONS
+            and status == "COMPLETE"
+            else None
+        ),
         "heavy_binary": bool(source_path and source_path.suffix.casefold() in HEAVY_VISIBLE_EXTENSIONS),
         "modified_at": max(
             (value for value in (_mtime_iso(cartouche), _mtime_iso(source_path) if source_path else None) if value),
