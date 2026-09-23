@@ -811,71 +811,77 @@ def create_recompile_request(
 ) -> dict:
     """Record one full-document recompile through the existing edit-request owner."""
 
-    # Replays must be stable even when the Knowledge/source state has moved
-    # after the original request was created. The request row is the durable
-    # effect; the potentially stale source context is read separately through
-    # get_recompile_context_for_request().
-    with conn.cursor(row_factory=dict_row) as cur:
-        cur.execute(
-            """
-            SELECT request_id, knowledge_id, requested_by, recompile_context_digest
-              FROM knowledge_edit_requests
-             WHERE request_idempotency_key = %s
-            """,
-            (idempotency_key,),
-        )
-        replay = cur.fetchone()
-    if replay is not None:
-        if (
-            replay["request_id"] != request_id
-            or replay["knowledge_id"] != knowledge_id
-            or replay["requested_by"] != requested_by
-            or not replay["recompile_context_digest"]
-        ):
-            raise IdempotencyConflict(
-                "recompile request idempotency key belongs to a different immutable effect"
+    # Own the outer transaction. Context reads happen before create_edit_request();
+    # without this boundary they would start an implicit transaction and turn the
+    # inner transaction into a savepoint that cockpit_api.with_connection() would
+    # roll back when it closes the connection.
+    with conn.transaction():
+        # Replays must be stable even when the Knowledge/source state has moved
+        # after the original request was created. The request row is the durable
+        # effect; the potentially stale source context is read separately through
+        # get_recompile_context_for_request().
+        with conn.cursor(row_factory=dict_row) as cur:
+            cur.execute(
+                """
+                SELECT request_id, knowledge_id, requested_by, recompile_context_digest
+                  FROM knowledge_edit_requests
+                 WHERE request_idempotency_key = %s
+                """,
+                (idempotency_key,),
             )
-        request = get_edit_request(conn, request_id)
-        return {
-            "edit_request": request,
-            "recompile_context_digest": request["recompile_context_digest"],
-            "candidate_only": True,
-            "applies_automatically": False,
-        }
-
-    context = build_knowledge_recompile_context(conn, knowledge_id)
-    if not context["needs_recompile"]:
-        raise KnowledgeError("Knowledge is current; no recompile request is needed")
-    if not context["ready_for_candidate"]:
-        raise KnowledgeError(
-            "Knowledge recompile context is incomplete or blocked by a source"
-        )
-    markdown = context["base_markdown"]
-    request = create_edit_request(
-        conn,
-        request_id=request_id,
-        knowledge_id=knowledge_id,
-        instruction_kind="verify",
-        instruction=(
-            "Recompile the complete Knowledge Markdown against the bounded current "
-            "source context. Preserve supported content, revise superseded claims, "
-            "keep unresolved contradictions explicit, and cite only source chunk "
-            "references admitted by the recompile context."
-        ),
-        base_version=context["base_version"],
-        selection_start=0,
-        selection_end=len(markdown),
-        selected_text=markdown,
-        requested_by=requested_by,
-        idempotency_key=idempotency_key,
-        recompile_context_digest=context["context_digest"],
-    )
-    return {
-        "edit_request": request,
-        "recompile_context_digest": context["context_digest"],
-        "candidate_only": True,
-        "applies_automatically": False,
-    }
+            replay = cur.fetchone()
+        if replay is not None:
+            if (
+                replay["request_id"] != request_id
+                or replay["knowledge_id"] != knowledge_id
+                or replay["requested_by"] != requested_by
+                or not replay["recompile_context_digest"]
+            ):
+                raise IdempotencyConflict(
+                    "recompile request idempotency key belongs to a different immutable effect"
+                )
+            request = get_edit_request(conn, request_id)
+            result = {
+                "edit_request": request,
+                "recompile_context_digest": request["recompile_context_digest"],
+                "candidate_only": True,
+                "applies_automatically": False,
+            }
+        else:
+            context = build_knowledge_recompile_context(conn, knowledge_id)
+            if not context["needs_recompile"]:
+                raise KnowledgeError("Knowledge is current; no recompile request is needed")
+            if not context["ready_for_candidate"]:
+                raise KnowledgeError(
+                    "Knowledge recompile context is incomplete or blocked by a source"
+                )
+            markdown = context["base_markdown"]
+            request = create_edit_request(
+                conn,
+                request_id=request_id,
+                knowledge_id=knowledge_id,
+                instruction_kind="verify",
+                instruction=(
+                    "Recompile the complete Knowledge Markdown against the bounded current "
+                    "source context. Preserve supported content, revise superseded claims, "
+                    "keep unresolved contradictions explicit, and cite only source chunk "
+                    "references admitted by the recompile context."
+                ),
+                base_version=context["base_version"],
+                selection_start=0,
+                selection_end=len(markdown),
+                selected_text=markdown,
+                requested_by=requested_by,
+                idempotency_key=idempotency_key,
+                recompile_context_digest=context["context_digest"],
+            )
+            result = {
+                "edit_request": request,
+                "recompile_context_digest": context["context_digest"],
+                "candidate_only": True,
+                "applies_automatically": False,
+            }
+    return result
 
 
 def get_recompile_context_for_request(
