@@ -340,6 +340,11 @@ def test_recompile_request_is_candidate_only_and_apply_rebinds_provenance(
     assert queued["candidate_only"] is True
     assert queued["applies_automatically"] is False
 
+    # The wrapper owns and commits its outer transaction. A caller/API close
+    # must not erase a request merely because context reads preceded the write.
+    conn.rollback()
+    assert knowledge.get_edit_request(conn, request_id)["request_id"] == request_id
+
     # Queueing alone is not a Knowledge write.
     assert knowledge.get_knowledge_markdown(conn, knowledge_id) == original_markdown
     assert knowledge.get_knowledge_card(conn, knowledge_id)["version"] == 1
