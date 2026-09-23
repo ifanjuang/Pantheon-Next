@@ -9,6 +9,7 @@ import pytest
 
 from mvp_vertical import knowledge, store
 from mvp_vertical.contract import TaskContract
+from mvp_vertical.policy_gate import StandInPolicyClient
 
 
 @pytest.fixture
@@ -367,13 +368,43 @@ def test_recompile_request_is_candidate_only_and_apply_rebinds_provenance(
     assert knowledge.get_knowledge_markdown(conn, knowledge_id) == original_markdown
     assert knowledge.get_knowledge_source_state(conn, knowledge_id)["status"] == "needs_recompile"
 
+    client = StandInPolicyClient()
+    apply_digest = knowledge._payload_digest(
+        {
+            "request_id": request_id,
+            "knowledge_id": knowledge_id,
+            "base_version": request["base_version"],
+            "selected_text_digest": request["selected_text_digest"],
+            "replacement_markdown": proposed_markdown,
+            "recompile_context_digest": request["recompile_context_digest"],
+            "replacement_source_chunk_refs": chosen_refs,
+        }
+    )
+    decision_payload = {
+        "decision": {
+            "decision_id": f"decision-{uuid.uuid4().hex}",
+            "decided_by": "human:architect",
+            "approval_level": "C2",
+            "scope": {
+                "scope_type": "project",
+                "scope_id": "project-maison-a",
+            },
+            "object_identity": f"knowledge_edit_request:{request_id}",
+            "content_digest": apply_digest,
+            "expires_at": "2099-01-01T00:00:00Z",
+            "signature": "signed-recompile-decision",
+        }
+    }
     applied = knowledge.apply_edit_request(
         conn,
         request_id=request_id,
         actor="human:architect",
         actor_kind="human",
         idempotency_key=f"apply-{uuid.uuid4().hex}",
+        policy_client=client,
+        decision_payload=decision_payload,
     )
+    assert client.last_decision["expectation"]["expected_digest"] == apply_digest
     assert applied["knowledge"]["version"] == 2
     assert applied["knowledge"]["source_chunk_refs"] == chosen_refs
     assert knowledge.get_knowledge_markdown(conn, knowledge_id) == proposed_markdown
@@ -405,6 +436,82 @@ def test_recompile_request_is_candidate_only_and_apply_rebinds_provenance(
     assert resulting_snapshot["version"] == 2
     assert resulting_snapshot["markdown"] == proposed_markdown
     assert resulting_snapshot["source_chunk_refs"] == chosen_refs
+
+
+def test_recompile_context_refuses_tampered_frozen_source_chunk(
+    conn, tmp_path
+) -> None:
+    contract, sources = _multi_source_fixture(conn, tmp_path)
+    primary, supporting = list(sources.values())
+    knowledge_id = f"knowledge.techniques.{uuid.uuid4().hex}"
+
+    knowledge.publish_knowledge(
+        conn,
+        knowledge_id=knowledge_id,
+        document_id=primary["document_id"],
+        title="Synthèse façade avec provenance figée",
+        family="techniques",
+        markdown="# Façade\n\nVersion initiale.",
+        source_chunk_refs=[primary["chunk_ref"], supporting["chunk_ref"]],
+        created_by="hermes-test",
+        actor_kind="hermes",
+        idempotency_key=f"publish-{uuid.uuid4().hex}",
+    )
+
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT source_ref, source_digest, ordinal
+              FROM knowledge_source_chunks
+             WHERE knowledge_id = %s
+               AND document_id = %s
+            """,
+            (knowledge_id, supporting["document_id"]),
+        )
+        old_source_ref, old_source_digest, old_ordinal = cur.fetchone()
+
+    supporting["path"].write_text(
+        "# CR chantier\n\nLe support est repris dans la nouvelle version.",
+        encoding="utf-8",
+    )
+    assert store.ingest(
+        conn,
+        contract,
+        tmp_path,
+        ingestion_id=f"reingest-{uuid.uuid4().hex}",
+    ) == 2
+
+    # Simulate corruption of the immutable historical retrieval chunk. The
+    # frozen provenance digest must make the old side of the recompile diff
+    # unusable rather than silently accepting the modified body.
+    conn.execute(
+        """
+        UPDATE chunks
+           SET body = 'contenu historique altéré'
+         WHERE source_ref = %s
+           AND source_digest = %s
+           AND chunk_no = %s
+        """,
+        (old_source_ref, old_source_digest, old_ordinal),
+    )
+    conn.commit()
+
+    context = knowledge.build_knowledge_recompile_context(conn, knowledge_id)
+    assert context["needs_recompile"] is True
+    assert context["context_complete"] is False
+    assert context["ready_for_candidate"] is False
+
+    with pytest.raises(
+        knowledge.KnowledgeError,
+        match="context is incomplete",
+    ):
+        knowledge.create_recompile_request(
+            conn,
+            request_id=f"recompile-{uuid.uuid4().hex}",
+            knowledge_id=knowledge_id,
+            requested_by="human:architect",
+            idempotency_key=f"request-{uuid.uuid4().hex}",
+        )
 
 
 def test_recompile_proposal_conflicts_if_source_context_moves_again(
