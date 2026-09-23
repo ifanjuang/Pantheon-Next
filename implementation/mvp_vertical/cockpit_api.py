@@ -297,6 +297,34 @@ def create_app(
             headers={"X-Pantheon-Knowledge": "generated", "Cache-Control": "private, no-cache"},
         )
 
+    @app.get("/knowledge/{knowledge_id}/sources")
+    def knowledge_sources(
+        knowledge_id: str,
+        _authorized: None = Depends(require_api_key),
+    ) -> dict:
+        try:
+            return with_connection(
+                lambda conn: knowledge.get_knowledge_source_state(conn, knowledge_id)
+            )
+        except knowledge.KnowledgeNotFound as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except knowledge.KnowledgeError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    @app.get("/documents/{document_id}/knowledge-impacts")
+    def document_knowledge_impacts(
+        document_id: str,
+        _authorized: None = Depends(require_api_key),
+    ) -> dict:
+        try:
+            return with_connection(
+                lambda conn: knowledge.list_document_knowledge_impacts(conn, document_id)
+            )
+        except knowledge.KnowledgeNotFound as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except knowledge.KnowledgeError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
     def knowledge_write(operation):
         try:
             return with_connection(operation)
