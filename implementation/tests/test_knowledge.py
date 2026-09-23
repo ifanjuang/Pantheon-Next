@@ -324,12 +324,13 @@ def test_recompile_request_is_candidate_only_and_apply_rebinds_provenance(
     assert context["allowed_source_chunk_refs"]
 
     request_id = f"recompile-{uuid.uuid4().hex}"
+    request_key = f"request-{uuid.uuid4().hex}"
     queued = knowledge.create_recompile_request(
         conn,
         request_id=request_id,
         knowledge_id=knowledge_id,
         requested_by="human:architect",
-        idempotency_key=f"request-{uuid.uuid4().hex}",
+        idempotency_key=request_key,
     )
     request = queued["edit_request"]
     assert request["status"] == "queued_for_hermes"
@@ -444,6 +445,17 @@ def test_recompile_request_is_candidate_only_and_apply_rebinds_provenance(
     assert resulting_snapshot["version"] == 2
     assert resulting_snapshot["markdown"] == proposed_markdown
     assert resulting_snapshot["source_chunk_refs"] == chosen_refs
+
+    replayed = knowledge.create_recompile_request(
+        conn,
+        request_id=request_id,
+        knowledge_id=knowledge_id,
+        requested_by="human:architect",
+        idempotency_key=request_key,
+    )
+    assert replayed["edit_request"]["status"] == "applied"
+    assert replayed["edit_request"]["request_id"] == request_id
+    assert replayed["recompile_context_digest"] == request["recompile_context_digest"]
 
 
 def test_recompile_context_refuses_tampered_frozen_source_chunk(
@@ -573,7 +585,7 @@ def test_recompile_proposal_conflicts_if_frozen_context_is_tampered_after_queue(
         requested_by="human:architect",
         idempotency_key=f"request-{uuid.uuid4().hex}",
     )
-    context = queued["recompile_context"]
+    context = knowledge.get_recompile_context_for_request(conn, request_id)
     chosen_refs = [
         dependency["current_candidate_chunks"][0]["chunk_ref"]
         for dependency in context["dependencies"]
@@ -658,7 +670,7 @@ def test_recompile_proposal_conflicts_if_source_context_moves_again(
         requested_by="human:architect",
         idempotency_key=f"request-{uuid.uuid4().hex}",
     )
-    queued_context = queued["recompile_context"]
+    queued_context = knowledge.get_recompile_context_for_request(conn, request_id)
     old_allowed = list(queued_context["allowed_source_chunk_refs"])
 
     supporting["path"].write_text(
