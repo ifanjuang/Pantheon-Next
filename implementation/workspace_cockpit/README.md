@@ -90,7 +90,17 @@ declared checksum != verified checksum
 verified source bytes != professional truth
 ```
 
-For email `.eml` bundles, both `source_sha256` and `source_size_bytes` are mandatory. A complete email bundle whose declared hash does not match the exact stored RAW bytes is projected as `CHECK` and must not become eligible for the normal Hindsight producer route.
+For email `.eml` bundles, both `source_sha256` and `source_size_bytes` are mandatory. A complete email bundle whose declared hash does not match the exact stored RAW bytes is projected as `CHECK`.
+
+A verified complete email bundle is Hindsight-eligible only through its Markdown cartouche/clean derivative. The raw `.eml` is never selected as the Hindsight source representation:
+
+```text
+verified .eml + .eml.md
+→ hindsight_representation = cartouche
+
+raw .eml
+↛ direct Hindsight file retain
+```
 
 Example:
 
