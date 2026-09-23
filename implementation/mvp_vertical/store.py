@@ -224,7 +224,7 @@ CREATE TABLE IF NOT EXISTS knowledge_edit_requests (
 -- sorted by a random UUID. CREATE TABLE IF NOT EXISTS above never revisits a
 -- table that already exists, so existing databases are corrected here. Guarded on
 -- the value this adds, so a started-up installation performs a catalog read only.
-DO $$
+DO $knowledge_events$
 BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns
@@ -236,13 +236,13 @@ BEGIN
             ALTER COLUMN occurred_at SET DEFAULT clock_timestamp();
     END IF;
 END;
-$;
+$knowledge_events$;
 
 -- Slice #1118 extends the existing intelligent-edit request with optional
 -- recompile provenance. Existing installations keep the same owner/table; the
 -- two nullable columns merely bind a full-document recompilation proposal to
 -- the exact source-state snapshot it was produced from.
-DO $
+DO $knowledge_recompile$
 BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns
@@ -261,7 +261,7 @@ BEGIN
             ADD COLUMN replacement_source_chunk_refs JSONB;
     END IF;
 END;
-$;
+$knowledge_recompile$;
 """ + STRUCTURED_EXTRACTION_DDL + VERSIONED_RETRIEVAL_DDL
 
 
