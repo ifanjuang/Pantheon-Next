@@ -134,11 +134,11 @@ def test_same_stem_different_source_extensions_have_distinct_cartouches(tmp_path
     (tmp_path / "CCTP.pdf").write_bytes(b"%PDF")
     (tmp_path / "CCTP.docx").write_bytes(b"DOCX")
     (tmp_path / ".CCTP.pdf.md").write_text(
-        "---\ndocument_id: doc-pdf\nsource: CCTP.pdf\n---\n# PDF\n",
+        "---\nschema: pantheon/cartouche/v1\ndocument_id: doc-pdf\nsource: CCTP.pdf\n---\n# PDF\n",
         encoding="utf-8",
     )
     (tmp_path / ".CCTP.docx.md").write_text(
-        "---\ndocument_id: doc-docx\nsource: CCTP.docx\n---\n# DOCX\n",
+        "---\nschema: pantheon/cartouche/v1\ndocument_id: doc-docx\nsource: CCTP.docx\n---\n# DOCX\n",
         encoding="utf-8",
     )
 
