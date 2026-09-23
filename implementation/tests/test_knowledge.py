@@ -513,6 +513,89 @@ def test_ordinary_edit_does_not_rebind_source_provenance(conn, tmp_path) -> None
     assert applied["knowledge"]["source_chunk_refs"] == original_refs
 
 
+def test_ordinary_revision_keeps_pre_recompile_idempotency_digest(
+    conn, tmp_path
+) -> None:
+    card, _document_id = _publish(conn, tmp_path)
+    knowledge_id = card["knowledge_id"]
+    key = f"legacy-revise-{uuid.uuid4().hex}"
+    proposed = "# Reprise des façades\n\nPréparer puis contrôler le support."
+    arguments = {
+        "knowledge_id": knowledge_id,
+        "markdown": proposed,
+        "expected_version": 1,
+        "actor": "mobile-user",
+        "actor_kind": "human",
+        "idempotency_key": key,
+        "review_status": None,
+    }
+    expected_digest = knowledge._payload_digest(
+        {
+            "knowledge_id": knowledge_id,
+            "markdown": proposed,
+            "expected_version": 1,
+            "actor": "mobile-user",
+            "actor_kind": "human",
+            "review_status": None,
+        }
+    )
+
+    first = knowledge.revise_knowledge(conn, **arguments)
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT payload_digest FROM knowledge_events WHERE idempotency_key = %s",
+            (key,),
+        )
+        assert cur.fetchone()[0] == expected_digest
+
+    # A retry from a client that obtained the key before Slice 2 must replay
+    # instead of conflicting because a new nullable field was added later.
+    assert knowledge.revise_knowledge(conn, **arguments) == first
+
+
+def test_ordinary_edit_request_keeps_pre_recompile_idempotency_digest(
+    conn, tmp_path
+) -> None:
+    card, _document_id = _publish(conn, tmp_path)
+    knowledge_id = card["knowledge_id"]
+    markdown = knowledge.get_knowledge_markdown(conn, knowledge_id)
+    selected = "Préparer le support existant."
+    start = markdown.index(selected)
+    request_id = f"legacy-edit-{uuid.uuid4().hex}"
+    key = f"legacy-request-{uuid.uuid4().hex}"
+    arguments = {
+        "request_id": request_id,
+        "knowledge_id": knowledge_id,
+        "instruction_kind": "rewrite",
+        "instruction": "Reformuler sans changer le sens.",
+        "base_version": 1,
+        "selection_start": start,
+        "selection_end": start + len(selected),
+        "selected_text": selected,
+        "requested_by": "mobile-user",
+        "idempotency_key": key,
+        "replacement_markdown": None,
+    }
+    expected_digest = knowledge._payload_digest(
+        {
+            "request_id": request_id,
+            "knowledge_id": knowledge_id,
+            "instruction_kind": "rewrite",
+            "instruction": "Reformuler sans changer le sens.",
+            "base_version": 1,
+            "selection_start": start,
+            "selection_end": start + len(selected),
+            "selected_text": selected,
+            "requested_by": "mobile-user",
+            "replacement_markdown": None,
+        }
+    )
+
+    first = knowledge.create_edit_request(conn, **arguments)
+    assert first["request_payload_digest"] == expected_digest
+    assert knowledge.create_edit_request(conn, **arguments) == first
+
+
 def test_stale_revision_refuses_without_partial_effect(conn, tmp_path) -> None:
     card, _document_id = _publish(conn, tmp_path)
     knowledge_id = card["knowledge_id"]
