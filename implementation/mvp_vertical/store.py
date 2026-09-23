@@ -203,6 +203,8 @@ CREATE TABLE IF NOT EXISTS knowledge_edit_requests (
     selection_end INT NOT NULL CHECK (selection_end >= selection_start),
     selected_text_digest TEXT NOT NULL,
     replacement_markdown TEXT,
+    recompile_context_digest TEXT,
+    replacement_source_chunk_refs JSONB,
     status TEXT NOT NULL CHECK (
         status IN ('queued_for_hermes', 'proposed', 'applied', 'conflict', 'rejected')
     ),
@@ -234,7 +236,32 @@ BEGIN
             ALTER COLUMN occurred_at SET DEFAULT clock_timestamp();
     END IF;
 END;
-$$;
+$;
+
+-- Slice #1118 extends the existing intelligent-edit request with optional
+-- recompile provenance. Existing installations keep the same owner/table; the
+-- two nullable columns merely bind a full-document recompilation proposal to
+-- the exact source-state snapshot it was produced from.
+DO $
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+         WHERE table_name = 'knowledge_edit_requests'
+           AND column_name = 'recompile_context_digest'
+    ) THEN
+        ALTER TABLE knowledge_edit_requests
+            ADD COLUMN recompile_context_digest TEXT;
+    END IF;
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+         WHERE table_name = 'knowledge_edit_requests'
+           AND column_name = 'replacement_source_chunk_refs'
+    ) THEN
+        ALTER TABLE knowledge_edit_requests
+            ADD COLUMN replacement_source_chunk_refs JSONB;
+    END IF;
+END;
+$;
 """ + STRUCTURED_EXTRACTION_DDL + VERSIONED_RETRIEVAL_DDL
 
 
