@@ -29,10 +29,10 @@ A normal document bundle is:
 
 ```text
 source.ext
-source.md
+.source.ext.md
 ```
 
-where the Markdown file is the document cartouche. Optional `_folder.md` files may add useful folder context.
+where the hidden Markdown file is the document cartouche and preserves the complete source filename. Optional `_folder.md` files may add useful folder context.
 
 The target does not require Obsidian, Self-hosted LiveSync, CouchDB, a LiveSync filesystem mirror, `hindsight-obsidian-sync`, or `document.yaml` as a business sidecar.
 
@@ -71,6 +71,43 @@ Slice 4  Ubuntu deployment converges from vault mirrors to reviewed AFFAIRES roo
 ```
 
 Do not create a second filesystem Cockpit or an independent Hindsight watcher to bypass this migration.
+
+
+## Source integrity
+
+A cartouche may bind itself to exact source bytes with:
+
+```yaml
+source_sha256: <64 lowercase hexadecimal characters>
+source_size_bytes: <exact source byte length>
+```
+
+When `source_sha256` is declared, the daemon hashes the source during reconciliation and reports whether it matches. This is deliberately conditional: ordinary AFFAIRES navigation still avoids hashing every large source merely to render the Cockpit.
+
+```text
+filename pairing != byte identity
+declared checksum != verified checksum
+verified source bytes != professional truth
+```
+
+For email `.eml` bundles, both `source_sha256` and `source_size_bytes` are mandatory. A complete email bundle whose declared hash does not match the exact stored RAW bytes is projected as `CHECK` and must not become eligible for the normal Hindsight producer route.
+
+Example:
+
+```yaml
+schema: pantheon/cartouche/v1
+document_id: email-thread-...
+source: 2026-09-23_Dupont.eml
+source_sha256: 0123456789abcdef...
+source_size_bytes: 184327
+type: email
+gmail_message_id: ...
+gmail_thread_id: ...
+```
+
+The checksum is a source↔derivative integrity binding, not the governed document identity. A Gmail thread update may keep a stable logical bundle `document_id` while replacing the current RAW source and therefore changing `gmail_message_id`, `source_sha256` and `source_size_bytes`.
+
+The Markdown cartouche does not embed its own checksum.
 
 ## Authority boundaries
 
