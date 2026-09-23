@@ -30,6 +30,8 @@ def test_document_knowledge_api_mounts_only_stable_routes() -> None:
         ("GET", "/projects/{parent_project_id}/knowledge"),
         ("GET", "/knowledge/{knowledge_id}"),
         ("GET", "/knowledge/{knowledge_id}/markdown"),
+        ("GET", "/knowledge/{knowledge_id}/sources"),
+        ("GET", "/documents/{document_id}/knowledge-impacts"),
         ("POST", "/documents/{document_id}/knowledge"),
         ("PUT", "/knowledge/{knowledge_id}"),
         ("POST", "/knowledge/{knowledge_id}/edit-requests"),
