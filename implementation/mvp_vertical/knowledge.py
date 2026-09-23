@@ -809,7 +809,40 @@ def create_recompile_request(
     requested_by: str,
     idempotency_key: str,
 ) -> dict:
-    """Queue one full-document recompile through the existing edit-request owner."""
+    """Record one full-document recompile through the existing edit-request owner."""
+
+    # Replays must be stable even when the Knowledge/source state has moved
+    # after the original request was created. The request row is the durable
+    # effect; the potentially stale source context is read separately through
+    # get_recompile_context_for_request().
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            """
+            SELECT request_id, knowledge_id, requested_by, recompile_context_digest
+              FROM knowledge_edit_requests
+             WHERE request_idempotency_key = %s
+            """,
+            (idempotency_key,),
+        )
+        replay = cur.fetchone()
+    if replay is not None:
+        if (
+            replay["request_id"] != request_id
+            or replay["knowledge_id"] != knowledge_id
+            or replay["requested_by"] != requested_by
+            or not replay["recompile_context_digest"]
+        ):
+            raise IdempotencyConflict(
+                "recompile request idempotency key belongs to a different immutable effect"
+            )
+        request = get_edit_request(conn, request_id)
+        return {
+            "edit_request": request,
+            "recompile_context_digest": request["recompile_context_digest"],
+            "candidate_only": True,
+            "applies_automatically": False,
+        }
+
     context = build_knowledge_recompile_context(conn, knowledge_id)
     if not context["needs_recompile"]:
         raise KnowledgeError("Knowledge is current; no recompile request is needed")
@@ -839,7 +872,7 @@ def create_recompile_request(
     )
     return {
         "edit_request": request,
-        "recompile_context": context,
+        "recompile_context_digest": context["context_digest"],
         "candidate_only": True,
         "applies_automatically": False,
     }
