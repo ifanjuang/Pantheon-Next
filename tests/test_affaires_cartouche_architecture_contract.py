@@ -18,7 +18,7 @@ def test_affaires_workspace_has_one_source_cartouche_contract() -> None:
         "NAS / AFFAIRES",
         "one AFFAIRES indexer/sync daemon",
         "source.ext = source",
-        "source.md  = cartouche",
+        ".source.ext.md = cartouche",
         "watcher   = responsiveness",
         "reconcile = convergence guarantee",
         "folder != governed identity",

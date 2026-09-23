@@ -29,10 +29,10 @@ import yaml
 
 APP_ROOT = Path(__file__).resolve().parent
 STATIC_ROOT = APP_ROOT / "static"
-PROJECTION_ID = "affaires_source_cartouche_v1"
+PROJECTION_ID = "affaires_source_cartouche_v2"
 MARKDOWN_EXTENSIONS = {".md", ".markdown"}
 LEGACY_MANIFEST_NAMES = {"document.yaml", "document.yml", "manifest.yaml", "manifest.yml"}
-HINDSIGHT_ELIGIBLE_EXTENSIONS = {".pdf", ".docx", ".xlsx", ".pptx", ".txt", ".html", ".htm"}
+HINDSIGHT_ELIGIBLE_EXTENSIONS = {".pdf", ".docx", ".xlsx", ".pptx", ".txt", ".md", ".markdown", ".html", ".htm"}
 HEAVY_VISIBLE_EXTENSIONS = {".rvt", ".rfa", ".rte", ".psd", ".psb"}
 TEMP_SUFFIXES = {".bak", ".lock", ".lck", ".swp", ".tmp", ".temp", ".autosave"}
 MAX_CARTOUCHE_BYTES = 512 * 1024
@@ -45,13 +45,31 @@ def _visible(path: Path) -> bool:
 
 
 def _direct_files(path: Path) -> list[Path]:
+    """Return direct regular files, including dot-prefixed cartouches.
+
+    Source admission still filters ordinary hidden files separately.
+    """
     try:
         return sorted(
-            (item for item in path.iterdir() if item.is_file() and _visible(item)),
+            (item for item in path.iterdir() if item.is_file() and not item.is_symlink()),
             key=lambda item: item.name.casefold(),
         )
     except OSError:
         return []
+
+
+def _cartouche_name_for_source(source_name: str) -> str:
+    return f".{source_name}.md"
+
+
+def _is_document_cartouche(path: Path) -> bool:
+    name = path.name
+    return (
+        name.startswith(".")
+        and name.casefold().endswith(".md")
+        and len(name) > len("..md")
+        and not _is_temp_or_backup(path)
+    )
 
 
 def _is_temp_or_backup(path: Path) -> bool:
@@ -69,7 +87,9 @@ def _is_temp_or_backup(path: Path) -> bool:
 def _is_source_file(path: Path) -> bool:
     if not _visible(path) or _is_temp_or_backup(path):
         return False
-    if path.suffix.casefold() in MARKDOWN_EXTENSIONS:
+    if path.name.casefold() == "_folder.md":
+        return False
+    if _is_document_cartouche(path):
         return False
     if path.name.casefold() in LEGACY_MANIFEST_NAMES:
         return False
@@ -324,7 +344,8 @@ def _orphan_cartouche_card(workspace: str, root: Path, cartouche: Path) -> dict[
     if not document_id:
         warnings.append("document_id absent du cartouche")
 
-    title = _meta_string(metadata, "title") or _first_heading(body) or cartouche.stem
+    fallback_title = cartouche.name[1:-3] if _is_document_cartouche(cartouche) else cartouche.stem
+    title = _meta_string(metadata, "title") or _first_heading(body) or fallback_title
     status = "CHECK" if source_present else "SOURCE_MISSING"
     return {
         "workspace": workspace,
@@ -402,17 +423,14 @@ def _folder_card(workspace: str, root: Path, folder: Path) -> dict[str, Any]:
 def _directory_document_cards(workspace: str, root: Path, folder: Path) -> list[dict[str, Any]]:
     direct = _direct_files(folder)
     sources = [item for item in direct if _is_source_file(item)]
-    cartouches = [
-        item
-        for item in direct
-        if item.suffix.casefold() in MARKDOWN_EXTENSIONS and item.name.casefold() != "_folder.md"
-    ]
-    cartouche_by_stem = {item.stem.casefold(): item for item in cartouches}
+    cartouches = [item for item in direct if _is_document_cartouche(item)]
+    cartouche_by_name = {item.name.casefold(): item for item in cartouches}
 
     cards: list[dict[str, Any]] = []
     paired_cartouches: set[Path] = set()
     for source in sources:
-        cartouche = cartouche_by_stem.get(source.stem.casefold())
+        expected_name = _cartouche_name_for_source(source.name).casefold()
+        cartouche = cartouche_by_name.get(expected_name)
         if cartouche:
             paired_cartouches.add(cartouche)
         cards.append(_document_card(workspace, root, source, cartouche))

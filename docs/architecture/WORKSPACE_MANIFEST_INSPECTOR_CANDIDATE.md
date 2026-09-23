@@ -63,27 +63,36 @@ Cockpit remains projection and interaction.
 
 ## 3. User-facing document convention
 
-A normal documented source is represented by a pair:
+A normal documented source is represented by a pair in which the cartouche is dot-prefixed and preserves the complete source filename, including its extension:
 
 ```text
 CCTP_IND_C.pdf
-CCTP_IND_C.md
+.CCTP_IND_C.pdf.md
 ```
 
 or:
 
 ```text
 DPGF.xlsx
-DPGF.md
+.DPGF.xlsx.md
 ```
 
-The source may be PDF, DOCX, XLSX, PPTX or another admitted professional file type.
+A Markdown source is unambiguous as well:
+
+```text
+notes.md
+.notes.md.md
+```
+
+The source may be PDF, DOCX, XLSX, PPTX, Markdown or another admitted professional file type.
+
+The leading dot distinguishes a document cartouche from an ordinary Markdown source. Preserving the complete source filename prevents collisions when several source formats share the same stem, for example `CCTP.pdf` and `CCTP.docx`.
 
 The sidecar is Markdown, not a parallel JSON/YAML business sidecar.
 
 ```text
 source.ext = source
-source.md  = cartouche
+.source.ext.md = cartouche
 ```
 
 The cartouche may contain YAML frontmatter because Markdown frontmatter is a convenient carrier, but the user-facing artifact remains one `.md` file.
@@ -152,12 +161,12 @@ The operator moves both files together:
 
 ```text
 /DCE/CCTP_IND_C.pdf
-/DCE/CCTP_IND_C.md
+/DCE/.CCTP_IND_C.pdf.md
 
 →
 
 /MARCHE/CCTP_IND_C.pdf
-/MARCHE/CCTP_IND_C.md
+/MARCHE/.CCTP_IND_C.pdf.md
 ```
 
 The stable cartouche identity remains the same.
@@ -173,8 +182,8 @@ path != identity
 If the user intentionally keeps the old file and creates a new indexed file:
 
 ```text
-CCTP_IND_B.pdf + CCTP_IND_B.md
-CCTP_IND_C.pdf + CCTP_IND_C.md
+CCTP_IND_B.pdf + .CCTP_IND_B.pdf.md
+CCTP_IND_C.pdf + .CCTP_IND_C.pdf.md
 ```
 
 they are separate bundles with separate cartouche identities unless an explicit governed relation later links them.
@@ -186,12 +195,15 @@ Do not infer a hidden version chain merely from similar names or contents.
 Primary pairing rule:
 
 ```text
-same basename
-+ cartouche declares the source
+source filename = SOURCE.ext
+cartouche name  = .SOURCE.ext.md
++ cartouche declares source: SOURCE.ext
 → paired bundle
 ```
 
-The explicit source reference is a consistency check, not a second identity owner.
+The filename relation is exact and one-to-one. The explicit `source` reference remains a consistency check, not a second identity owner.
+
+Do not infer pairing from a shared stem alone.
 
 If filesystem events arrive separately during a move/save, use a bounded grace/stability window before declaring a source or cartouche deleted.
 
@@ -239,9 +251,9 @@ LIEUREY/
 └─ DCE/
    ├─ _folder.md
    ├─ CCTP_IND_C.pdf
-   ├─ CCTP_IND_C.md
+   ├─ .CCTP_IND_C.pdf.md
    ├─ DPGF.xlsx
-   └─ DPGF.md
+   └─ .DPGF.xlsx.md
 ```
 
 It can provide display/context fields and retrieval hints.
@@ -580,7 +592,7 @@ Do not interpret their historical qualification as a requirement to retain them.
 Current implementation facts after the Slice 1 candidate (#1112):
 
 - `implementation/workspace_cockpit/server.py` remains read-only;
-- it projects `source.ext + source.md` bundles and optional `_folder.md` context;
+- it projects `source.ext + .source.ext.md` bundles and optional `_folder.md` context;
 - it exposes `COMPLETE`, `CHECK`, `CARTOUCHE_MISSING`, `SOURCE_MISSING` and `FOLDER`;
 - bounded Markdown is read, while heavy source bytes are not opened for ordinary projection;
 - temp/lock/Revit-backup files are filtered and heavy professional binaries remain visible;
@@ -592,7 +604,7 @@ Migration sequence:
 
 ### Slice 1 — source/cartouche projection — implemented candidate #1112
 
-- recognize source.ext + source.md pairs;
+- recognize source.ext + .source.ext.md pairs;
 - parse bounded frontmatter/body;
 - expose complete, missing-card and missing-source states;
 - preserve safe same-directory source references;
