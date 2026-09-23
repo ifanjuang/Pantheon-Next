@@ -626,7 +626,8 @@ gmail_thread_id: thread-123
     assert card["status"] == "COMPLETE"
     assert card["source_integrity"] == "VERIFIED"
     assert card["source_sha256_verified"] is True
-    assert card["hindsight_eligible"] is False
+    assert card["hindsight_eligible"] is True
+    assert card["hindsight_representation"] == "cartouche"
 
 
 def test_email_bundle_without_integrity_fields_is_check(tmp_path: Path) -> None:
@@ -651,6 +652,8 @@ gmail_thread_id: thread-123
 
     assert card["status"] == "CHECK"
     assert card["source_integrity"] == "UNDECLARED"
+    assert card["hindsight_eligible"] is False
+    assert card["hindsight_representation"] is None
     assert any("source_sha256 absent" in warning for warning in card["warnings"])
     assert any("source_size_bytes absent" in warning for warning in card["warnings"])
 
