@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SERVER = ROOT / "implementation" / "workspace_cockpit" / "server.py"
 INSTALLER = ROOT / "deployment" / "ubuntu" / "configure-workspace-cockpit-local"
 COMPOSE = ROOT / "deployment" / "ubuntu" / "compose.workspace-cockpit-local.yaml"
+MOUNT_QUALIFIER = ROOT / "deployment" / "ubuntu" / "qualify-affaires-linux-mount.py"
 
 
 def _module():
@@ -582,8 +583,33 @@ def test_check_mode_returns_affaires_projection_without_database(tmp_path: Path)
     assert payload["item_count"] == 1
 
 
+def test_linux_affaires_mount_qualification_probe_runs_on_local_filesystem(tmp_path: Path) -> None:
+    result = subprocess.run(
+        ["python3", str(MOUNT_QUALIFIER), "--root", str(tmp_path)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    payload = json.loads(result.stdout)
+    assert payload["qualified"] is True
+    assert payload["dotfile_roundtrip"] is True
+    assert payload["initial_projection"] is True
+    assert payload["rename_projection"] is True
+    assert payload["identity_preserved"] is True
+    assert payload["reconcile_rebuild"] is True
+    assert payload["cleanup"] is True
+    assert payload["inotify"] in {
+        "observed",
+        "not-observed-reconcile-required",
+        "unavailable-reconcile-required",
+    }
+
+
 def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     subprocess.run(["bash", "-n", str(INSTALLER)], check=True)
+    subprocess.run(["python3", "-m", "py_compile", str(MOUNT_QUALIFIER)], check=True)
     subprocess.run(
         ["node", "--check", str(ROOT / "implementation" / "workspace_cockpit" / "static" / "app.js")],
         check=True,
