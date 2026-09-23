@@ -7,6 +7,7 @@ use exact optimistic versions and immutable idempotency keys.
 
 from __future__ import annotations
 
+import difflib
 import hashlib
 import json
 import uuid
@@ -852,6 +853,45 @@ def get_recompile_context_for_request(
             "Knowledge recompile source context changed after the request was queued"
         )
     return context
+
+
+def get_recompile_candidate(
+    conn: psycopg.Connection, request_id: str
+) -> dict:
+    """Project one proposed recompile as a human-readable candidate/diff."""
+    request = get_edit_request(conn, request_id)
+    if not request.get("recompile_context_digest"):
+        raise KnowledgeError("edit request is not a Knowledge recompile request")
+    if request["status"] != "proposed" or not request.get("replacement_markdown"):
+        raise KnowledgeError("Knowledge recompile request has no reviewable proposal")
+
+    context = get_recompile_context_for_request(conn, request_id)
+    replacement = str(request["replacement_markdown"])
+    diff = "".join(
+        difflib.unified_diff(
+            context["base_markdown"].splitlines(keepends=True),
+            replacement.splitlines(keepends=True),
+            fromfile=f"{request['knowledge_id']}@v{request['base_version']}",
+            tofile=f"{request['knowledge_id']}@candidate-v{request['base_version'] + 1}",
+        )
+    )
+    return {
+        "request_id": request_id,
+        "knowledge_id": request["knowledge_id"],
+        "base_version": request["base_version"],
+        "recompile_context_digest": request["recompile_context_digest"],
+        "replacement_markdown": replacement,
+        "replacement_source_chunk_refs": list(
+            request.get("replacement_source_chunk_refs") or []
+        ),
+        "diff": diff,
+        "authority": {
+            "changes_knowledge": False,
+            "accepts_candidate": False,
+            "is_evidence": False,
+            "is_memory": False,
+        },
+    }
 
 
 def _knowledge_content_snapshot(
