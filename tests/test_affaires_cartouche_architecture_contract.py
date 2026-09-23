@@ -16,7 +16,7 @@ def test_affaires_workspace_has_one_source_cartouche_contract() -> None:
 
     for invariant in (
         "NAS / AFFAIRES",
-        "one AFFAIRES indexer/sync daemon",
+        "Linux AFFAIRES indexer/sync daemon",
         "source.ext = source",
         ".source.ext.md = cartouche",
         "watcher   = responsiveness",
