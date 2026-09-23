@@ -15,13 +15,15 @@ The selected professional target is now:
 
 ```text
 NAS / AFFAIRES
-      │
+      │ mounted on Linux
       ▼
-one AFFAIRES indexer/sync daemon
+one Linux AFFAIRES indexer/sync daemon
       │
       ├────────► Workspace Cockpit
-      └────────► Hindsight
+      └────────► Hindsight on Linux
 ```
+
+Hindsight does not own a second filesystem watcher. The Workspace daemon watches/reconciles the mounted NAS path and is the only producer into Hindsight.
 
 A normal document bundle is:
 
@@ -122,3 +124,14 @@ doc_...:card    → optional separately retrievable Markdown cartouche
 #659 must compare source-only, bounded cartouche context, and separately retrievable cartouche before the richer mapping is selected.
 
 No automatic OCR is part of the AFFAIRES baseline.
+
+
+## Linux NAS mount qualification
+
+From the Linux host that mounts AFFAIRES and runs the Workspace/Hindsight stack:
+
+```bash
+python3 deployment/ubuntu/qualify-affaires-linux-mount.py --root /path/to/mounted/AFFAIRES
+```
+
+The probe writes and removes one temporary pair, validates hidden cartouche persistence, exact pairing, rename identity and reconcile rebuild. It also reports whether inotify events propagate through the mount; periodic reconcile remains mandatory even when they do.

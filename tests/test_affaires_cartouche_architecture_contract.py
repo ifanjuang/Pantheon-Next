@@ -16,7 +16,7 @@ def test_affaires_workspace_has_one_source_cartouche_contract() -> None:
 
     for invariant in (
         "NAS / AFFAIRES",
-        "one AFFAIRES indexer/sync daemon",
+        "Linux AFFAIRES indexer/sync daemon",
         "source.ext = source",
         ".source.ext.md = cartouche",
         "watcher   = responsiveness",
@@ -24,6 +24,12 @@ def test_affaires_workspace_has_one_source_cartouche_contract() -> None:
         "folder != governed identity",
         "memory != Evidence",
         "source bytes != cartouche interpretation",
+        "schema: pantheon/cartouche/v1",
+        "case-sensitive on Linux",
+        "DUPLICATE_DOCUMENT_ID",
+        "mounted on the Linux compute host",
+        "The filesystem watcher belongs to the AFFAIRES daemon, not to Hindsight.",
+        "inotify observed != convergence proof",
         "no separate JSON/YAML business sidecar is required",
     ):
         assert invariant in text
