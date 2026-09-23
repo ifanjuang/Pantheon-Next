@@ -262,7 +262,7 @@ Any later recompile operation must produce a candidate/diff and reuse the existi
 
 ### Incremental recompile candidate
 
-A stale Knowledge item may queue a full-document intelligent-edit request against one exact Knowledge version and one exact calculated source-context digest.
+A bounded external adapter may represent a stale Knowledge item as a full-document intelligent-edit request bound to one exact Knowledge version and one exact calculated source-context digest.
 
 The bounded recompile context contains:
 
@@ -297,7 +297,7 @@ If either changes, the request conflicts and must be regenerated. An accepted re
 Ordinary intelligent edits do not rebind source provenance.
 
 ```text
-recompile queued != Knowledge changed
+recompile request recorded != Knowledge changed
 Hermes proposal != accepted revision
 source-context match != human authorization
 recompile apply = Markdown revision + exact provenance rebind
