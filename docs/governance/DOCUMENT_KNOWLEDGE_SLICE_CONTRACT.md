@@ -260,6 +260,50 @@ freshness projection != Evidence
 
 Any later recompile operation must produce a candidate/diff and reuse the existing governed Knowledge revision/apply path for the actual write.
 
+### Incremental recompile candidate
+
+A stale Knowledge item may queue a full-document intelligent-edit request against one exact Knowledge version and one exact calculated source-context digest.
+
+The bounded recompile context contains:
+
+```text
+current Knowledge Markdown
++ frozen source chunks previously cited
++ current candidate chunks around the same structural locators / ordinals
++ exact source/extraction digests
++ allowed current source_chunk_refs
+```
+
+This context is deliberately local to the existing source dependencies. It is not a new retrieval corpus and does not authorize a broad Project search.
+
+Hermes may return:
+
+```text
+replacement Markdown
++ replacement current source_chunk_refs
+```
+
+The proposal remains an edit-request candidate. It does not update Knowledge.
+
+A recompile proposal is applicable only while both are still exact:
+
+```text
+Knowledge base version
+source-context digest
+```
+
+If either changes, the request conflicts and must be regenerated. An accepted recompile reuses the existing Knowledge edit apply chokepoint and the existing `revise_knowledge` persistence owner. Markdown and source provenance are then rebound in one transaction.
+
+Ordinary intelligent edits do not rebind source provenance.
+
+```text
+recompile queued != Knowledge changed
+Hermes proposal != accepted revision
+source-context match != human authorization
+recompile apply = Markdown revision + exact provenance rebind
+ordinary edit = Markdown revision + provenance preserved
+```
+
 The authority block is always:
 
 ```text
