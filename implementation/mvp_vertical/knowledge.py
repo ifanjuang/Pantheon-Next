@@ -1062,8 +1062,12 @@ def revise_knowledge(
         "knowledge_id": knowledge_id, "markdown": markdown,
         "expected_version": expected_version, "actor": actor, "actor_kind": actor_kind,
         "review_status": review_status,
-        "source_chunk_refs": source_chunk_refs,
     }
+    # Preserve the pre-Slice-2 idempotency digest for ordinary revisions.
+    # Provenance participates in the immutable effect only when this is an
+    # actual recompile/rebind.
+    if source_chunk_refs is not None:
+        payload["source_chunk_refs"] = source_chunk_refs
     pdigest = _payload_digest(payload)
     with conn.transaction():
         replay = _event_replay(
@@ -1189,8 +1193,11 @@ def create_edit_request(
         "base_version": base_version, "selection_start": selection_start,
         "selection_end": selection_end, "selected_text": selected_text,
         "requested_by": requested_by, "replacement_markdown": replacement_markdown,
-        "recompile_context_digest": recompile_context_digest,
     }
+    # Existing ordinary edit requests keep their historical payload digest.
+    # Only recompile requests bind the additional source-context identity.
+    if recompile_context_digest is not None:
+        payload["recompile_context_digest"] = recompile_context_digest
     pdigest = _payload_digest(payload)
     with conn.transaction():
         with conn.cursor(row_factory=dict_row) as cur:
