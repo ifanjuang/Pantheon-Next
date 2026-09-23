@@ -1138,7 +1138,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge.py", "apply_edit_request"): {
         "gate": "enforce_consequential",
-        "local_guards": ("request status", "re-read under lock", "version and selection digest", "single transaction with audit", "idempotency", "chokepoint after the re-read under lock, expectation bound to a digest of the exact replacement", "unconditional: apply always needs a decision, not just a review_status=\"reviewed\" claim"),
+        "local_guards": ("request status", "re-read under lock", "version and selection digest", "single transaction with audit", "idempotency", "recompile source-context digest and allowed current source refs are rechecked before apply", "chokepoint after the re-read under lock, expectation bound to a digest of the exact replacement and recompile provenance when present", "unconditional: apply always needs a decision, not just a review_status=\"reviewed\" claim"),
         "reviewed": (
             "Wired, at the point this entry itself named: `create_edit_request` "
             "accepts `replacement_markdown` from its caller and sets `proposed` on "
@@ -1166,7 +1166,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge.py", "complete_edit_request"): {
         "gate": "none",
-        "local_guards": ("non-empty replacement", "Hermes bearer key on the route", "version comparison against base_version", "status must be queued_for_hermes, or an identical replay of the same proposed replacement"),
+        "local_guards": ("non-empty replacement", "Hermes bearer key on the route", "version comparison against base_version", "status must be queued_for_hermes, or an identical replay of the same proposed replacement", "recompile proposals must match the frozen source-context digest", "replacement source refs must stay inside the bounded context and retain a current primary-source chunk", "ordinary edits cannot replace provenance"),
         "reviewed": (
             "Corrected. Reads as Hermes filling in the proposal it was queued for. "
             "It took no actor, no idempotency key, wrote no event, and guarded no "
@@ -1205,6 +1205,27 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "rather than duplicated here."
         ),
     },
+    ("knowledge.py", "create_recompile_request"): {
+        "gate": "none",
+        "local_guards": (
+            "Knowledge source state must require recompilation",
+            "bounded recompile context must be complete and not source-blocked",
+            "full Markdown snapshot and exact base_version are delegated to create_edit_request",
+            "recompile_context_digest freezes the source-state candidate basis",
+            "idempotency is enforced by the existing edit-request owner",
+        ),
+        "reviewed": (
+            "Creates no Knowledge revision and authorizes no effect. It is a thin "
+            "candidate constructor over `create_edit_request`: first it computes the "
+            "bounded source context, refuses a current or incomplete Knowledge item, "
+            "then records a full-document edit request tied to the exact Knowledge "
+            "version and source-context digest. The live route requires the editor "
+            "key, while `requested_by` remains asserted attribution. Hermes can only "
+            "fill the resulting proposal; the existing `apply_edit_request` "
+            "chokepoint remains the place where Markdown and, for a recompile, exact "
+            "source provenance may change."
+        ),
+    },
     ("knowledge.py", "publish_knowledge"): {
         "gate": "enforce_consequential",
         "local_guards": ("non-empty knowledge_id, title and Markdown", "family membership", "expected_version must be 0", "idempotency", "chokepoint, only when review_status=\"reviewed\" is requested, expectation bound to the publish digest"),
@@ -1240,7 +1261,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge.py", "revise_knowledge"): {
         "gate": "none",
-        "local_guards": ("expected_version optimistic concurrency", "actor_kind membership", "idempotency with payload digest"),
+        "local_guards": ("expected_version optimistic concurrency", "actor_kind membership", "idempotency with payload digest", "optional provenance rebind resolves only current chunks in the primary Project and retains a primary-source chunk", "Markdown and provenance rebind share one transaction", "base and resulting content/provenance snapshots are persisted in knowledge_events"),
         "reviewed": (
             "The revision primitive, not an entry point: its own route, "
             "`PUT /knowledge/{knowledge_id}`, is retired and raises 410. It holds as "
