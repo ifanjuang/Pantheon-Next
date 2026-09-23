@@ -423,6 +423,12 @@ def test_recompile_request_is_candidate_only_and_apply_rebinds_provenance(
     assert applied["knowledge"]["source_chunk_refs"] == chosen_refs
     assert knowledge.get_knowledge_markdown(conn, knowledge_id) == proposed_markdown
 
+    # Applying must have committed a top-level transaction, not merely a
+    # savepoint hidden inside an implicit read transaction.
+    conn.rollback()
+    assert knowledge.get_knowledge_card(conn, knowledge_id)["version"] == 2
+    assert knowledge.get_knowledge_markdown(conn, knowledge_id) == proposed_markdown
+
     refreshed = knowledge.get_knowledge_source_state(conn, knowledge_id)
     assert refreshed["status"] == "current"
     assert refreshed["needs_recompile"] is False
