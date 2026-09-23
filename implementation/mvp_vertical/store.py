@@ -189,6 +189,8 @@ CREATE TABLE IF NOT EXISTS knowledge_events (
     idempotency_key TEXT NOT NULL UNIQUE,
     payload_digest TEXT NOT NULL,
     result_snapshot JSONB NOT NULL,
+    base_content_snapshot JSONB,
+    resulting_content_snapshot JSONB,
     occurred_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
 );
 CREATE TABLE IF NOT EXISTS knowledge_edit_requests (
@@ -237,6 +239,31 @@ BEGIN
     END IF;
 END;
 $knowledge_events$;
+
+-- Knowledge event replay keeps its existing compact result_snapshot contract.
+-- These nullable content snapshots preserve the exact editorial Markdown and
+-- source bindings across accepted revisions without creating another history
+-- owner or changing idempotent replay payloads.
+DO $knowledge_event_history$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+         WHERE table_name = 'knowledge_events'
+           AND column_name = 'base_content_snapshot'
+    ) THEN
+        ALTER TABLE knowledge_events
+            ADD COLUMN base_content_snapshot JSONB;
+    END IF;
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+         WHERE table_name = 'knowledge_events'
+           AND column_name = 'resulting_content_snapshot'
+    ) THEN
+        ALTER TABLE knowledge_events
+            ADD COLUMN resulting_content_snapshot JSONB;
+    END IF;
+END;
+$knowledge_event_history$;
 
 -- Slice #1118 extends the existing intelligent-edit request with optional
 -- recompile provenance. Existing installations keep the same owner/table; the
