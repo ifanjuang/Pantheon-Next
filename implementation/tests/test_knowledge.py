@@ -48,6 +48,59 @@ def _source(conn, tmp_path: Path) -> tuple[str, list[str]]:
     return card["document_id"], [f"chunk.{compilation_id}.0000"]
 
 
+def _multi_source_fixture(
+    conn,
+    tmp_path: Path,
+    *,
+    parent_project_id: str = "project-maison-a",
+) -> tuple[TaskContract, dict[str, dict]]:
+    suffix = uuid.uuid4().hex
+    dossier = f"knowledge-multi-{suffix}"
+    source_refs = (
+        f"Projects/MULTI/30_DCE/CCTP-{suffix}.md",
+        f"Projects/MULTI/50_CHANTIER/CR-{suffix}.md",
+    )
+    contents = (
+        "# CCTP\n\nLa façade reçoit un enduit minéral.",
+        "# CR chantier\n\nLe support existant nécessite une reprise locale.",
+    )
+    for source_ref, body in zip(source_refs, contents, strict=True):
+        path = tmp_path / source_ref
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(body, encoding="utf-8")
+
+    raw = {
+        "object_type": "task_contract",
+        "object_id": f"tc.multi.{suffix}",
+        "contract_id": f"tc.multi.{suffix}",
+        "scope": {
+            "dossier": dossier,
+            "parent_project_id": parent_project_id,
+            "declared_sources": [{"source_ref": source_ref} for source_ref in source_refs],
+        },
+    }
+    contract = TaskContract(
+        raw=raw,
+        path=tmp_path / f"task_contract-{suffix}.yaml",
+        dossier=dossier,
+        sources=source_refs,
+    )
+    assert store.ingest(
+        conn, contract, tmp_path, ingestion_id=f"ingest-multi-{suffix}"
+    ) == 2
+
+    sources: dict[str, dict] = {}
+    for source_ref in source_refs:
+        card = store.get_document_card(conn, dossier, source_ref)
+        compilation_id = card["structured_extraction"]["compilation_id"]
+        sources[source_ref] = {
+            "path": tmp_path / source_ref,
+            "document_id": card["document_id"],
+            "chunk_ref": f"chunk.{compilation_id}.0000",
+        }
+    return contract, sources
+
+
 def _publish(conn, tmp_path: Path) -> tuple[dict, str]:
     document_id, refs = _source(conn, tmp_path)
     knowledge_id = f"knowledge.techniques.{uuid.uuid4().hex}"
@@ -105,6 +158,130 @@ def test_publish_replay_is_idempotent_and_key_content_is_immutable(conn, tmp_pat
 
     with pytest.raises(knowledge.IdempotencyConflict):
         knowledge.publish_knowledge(conn, **{**arguments, "title": "Autre titre"})
+
+
+def test_publish_can_bind_current_chunks_from_multiple_same_project_documents(
+    conn, tmp_path
+) -> None:
+    _contract, sources = _multi_source_fixture(conn, tmp_path)
+    primary, supporting = list(sources.values())
+    knowledge_id = f"knowledge.techniques.{uuid.uuid4().hex}"
+
+    card = knowledge.publish_knowledge(
+        conn,
+        knowledge_id=knowledge_id,
+        document_id=primary["document_id"],
+        title="Synthèse façade multi-source",
+        family="techniques",
+        markdown="# Façade\n\nSynthèse du CCTP et du compte-rendu.",
+        source_chunk_refs=[primary["chunk_ref"], supporting["chunk_ref"]],
+        created_by="hermes-test",
+        actor_kind="hermes",
+        idempotency_key=f"publish-{uuid.uuid4().hex}",
+    )
+
+    assert card["source_chunk_refs"] == [
+        primary["chunk_ref"],
+        supporting["chunk_ref"],
+    ]
+    state = knowledge.get_knowledge_source_state(conn, knowledge_id)
+    assert state["status"] == "current"
+    assert state["needs_recompile"] is False
+    assert state["dependency_count"] == 2
+    assert [item["is_primary"] for item in state["dependencies"]] == [True, False]
+    assert {item["document_id"] for item in state["dependencies"]} == {
+        primary["document_id"],
+        supporting["document_id"],
+    }
+
+    # The legacy transport slice remains a truthful primary-document view; the
+    # full cross-source relation is projected separately by source state.
+    snapshot = knowledge.validate_document_knowledge_slice(conn, knowledge_id)
+    assert {
+        chunk["document_ref"] for chunk in snapshot["chunks"]
+    } == {primary["document_id"]}
+
+
+def test_multisource_publication_refuses_cross_project_chunk(conn, tmp_path) -> None:
+    _contract_a, sources_a = _multi_source_fixture(
+        conn, tmp_path, parent_project_id="project-a"
+    )
+    _contract_b, sources_b = _multi_source_fixture(
+        conn, tmp_path, parent_project_id="project-b"
+    )
+    primary = next(iter(sources_a.values()))
+    foreign = next(iter(sources_b.values()))
+
+    with pytest.raises(knowledge.KnowledgeError, match="primary Project scope"):
+        knowledge.publish_knowledge(
+            conn,
+            knowledge_id=f"knowledge.techniques.{uuid.uuid4().hex}",
+            document_id=primary["document_id"],
+            title="Invalid cross-project synthesis",
+            family="techniques",
+            markdown="# Refus attendu",
+            source_chunk_refs=[primary["chunk_ref"], foreign["chunk_ref"]],
+            created_by="hermes-test",
+            actor_kind="hermes",
+            idempotency_key=f"publish-{uuid.uuid4().hex}",
+        )
+
+
+def test_source_change_calculates_knowledge_impact_without_mutating_knowledge(
+    conn, tmp_path
+) -> None:
+    contract, sources = _multi_source_fixture(conn, tmp_path)
+    primary, supporting = list(sources.values())
+    knowledge_id = f"knowledge.techniques.{uuid.uuid4().hex}"
+    original_markdown = "# Façade\n\nSynthèse stable avant nouvelle source."
+
+    knowledge.publish_knowledge(
+        conn,
+        knowledge_id=knowledge_id,
+        document_id=primary["document_id"],
+        title="Synthèse façade à maintenir",
+        family="techniques",
+        markdown=original_markdown,
+        source_chunk_refs=[primary["chunk_ref"], supporting["chunk_ref"]],
+        created_by="hermes-test",
+        actor_kind="hermes",
+        idempotency_key=f"publish-{uuid.uuid4().hex}",
+    )
+    before = knowledge.get_knowledge_source_state(conn, knowledge_id)
+    assert before["status"] == "current"
+
+    supporting["path"].write_text(
+        "# CR chantier\n\nLe support est désormais repris et accepté visuellement.",
+        encoding="utf-8",
+    )
+    assert store.ingest(
+        conn,
+        contract,
+        tmp_path,
+        ingestion_id=f"reingest-{uuid.uuid4().hex}",
+    ) == 2
+
+    after = knowledge.get_knowledge_source_state(conn, knowledge_id)
+    assert after["status"] == "needs_recompile"
+    assert after["needs_recompile"] is True
+    changed = next(
+        item
+        for item in after["dependencies"]
+        if item["document_id"] == supporting["document_id"]
+    )
+    assert changed["state"] == "source_changed"
+    assert changed["source_changed"] is True
+    assert changed["bound_source_digest"] != changed["current_source_digest"]
+
+    impacts = knowledge.list_document_knowledge_impacts(
+        conn, supporting["document_id"]
+    )
+    assert [item["knowledge_id"] for item in impacts["knowledge"]] == [knowledge_id]
+    assert impacts["knowledge"][0]["status"] == "needs_recompile"
+
+    # Impact calculation is observation only.
+    assert knowledge.get_knowledge_markdown(conn, knowledge_id) == original_markdown
+    assert knowledge.get_knowledge_card(conn, knowledge_id)["version"] == 1
 
 
 def test_stale_revision_refuses_without_partial_effect(conn, tmp_path) -> None:
