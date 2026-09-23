@@ -648,7 +648,15 @@ def build_knowledge_recompile_context(
 
     projected_dependencies: list[dict] = []
     allowed_source_chunk_refs: list[str] = []
-    context_complete = True
+    # The old side of the diff is part of the candidate basis too. A missing
+    # historical chunk or a body that no longer matches the frozen provenance
+    # digest makes the context incomplete rather than silently compiling from
+    # an unverifiable prior state.
+    context_complete = all(
+        row["old_body"] is not None
+        and _digest(row["old_body"]) == row["text_digest"]
+        for row in frozen_rows
+    )
 
     for document_id in document_ids:
         dependency = dependency_state[document_id]
@@ -1431,6 +1439,24 @@ def apply_edit_request(
             ):
                 raise _EditRequestConflict
 
+            recompile_digest = request.get("recompile_context_digest")
+            replacement_source_chunk_refs = request.get("replacement_source_chunk_refs")
+            if recompile_digest:
+                context = build_knowledge_recompile_context(
+                    conn, request["knowledge_id"]
+                )
+                if (
+                    context["context_digest"] != recompile_digest
+                    or not replacement_source_chunk_refs
+                    or not set(replacement_source_chunk_refs).issubset(
+                        set(context["allowed_source_chunk_refs"])
+                    )
+                ):
+                    raise _EditRequestConflict
+
+            # All staleness checks, including the recompile source basis, are
+            # complete before asking the decision point to authorize the exact
+            # effect. The recompile digest is part of that effect identity.
             if policy_client is not None:
                 document = _document_row(conn, item["document_id"])
                 apply_payload = {
@@ -1440,9 +1466,10 @@ def apply_edit_request(
                     "selected_text_digest": request["selected_text_digest"],
                     "replacement_markdown": request["replacement_markdown"],
                 }
-                if request.get("recompile_context_digest"):
-                    apply_payload["replacement_source_chunk_refs"] = request.get(
-                        "replacement_source_chunk_refs"
+                if recompile_digest:
+                    apply_payload["recompile_context_digest"] = recompile_digest
+                    apply_payload["replacement_source_chunk_refs"] = (
+                        replacement_source_chunk_refs
                     )
                 apply_digest = _payload_digest(apply_payload)
                 _gate_knowledge_write(
@@ -1458,21 +1485,6 @@ def apply_edit_request(
                     actor=actor,
                     required_ceiling=required_ceiling,
                 )
-
-            recompile_digest = request.get("recompile_context_digest")
-            replacement_source_chunk_refs = request.get("replacement_source_chunk_refs")
-            if recompile_digest:
-                context = build_knowledge_recompile_context(
-                    conn, request["knowledge_id"]
-                )
-                if (
-                    context["context_digest"] != recompile_digest
-                    or not replacement_source_chunk_refs
-                    or not set(replacement_source_chunk_refs).issubset(
-                        set(context["allowed_source_chunk_refs"])
-                    )
-                ):
-                    raise _EditRequestConflict
 
             revised = (
                 item["markdown"][:start]
