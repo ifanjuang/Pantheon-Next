@@ -31,6 +31,7 @@ def test_complete_source_cartouche_bundle_projects_rich_card(tmp_path: Path) -> 
     (dce / "CCTP_IND_C.pdf").write_bytes(b"%PDF-fixture")
     (dce / ".CCTP_IND_C.pdf.md").write_text(
         """---
+schema: pantheon/cartouche/v1
 document_id: doc-cctp-c
 source: CCTP_IND_C.pdf
 project: LIEUREY
@@ -59,7 +60,7 @@ CCTP du lot structure pour la consultation DCE.
     document = next(card for card in cards if card["kind"] == "document")
     folder = next(card for card in cards if card["kind"] == "folder")
 
-    assert result["projection"] == "affaires_source_cartouche_v2"
+    assert result["projection"] == "affaires_source_cartouche_v3"
     assert document["status"] == "COMPLETE"
     assert document["document_id"] == "doc-cctp-c"
     assert document["source"] == "CCTP_IND_C.pdf"
@@ -86,6 +87,7 @@ def test_markdown_source_is_not_confused_with_hidden_cartouche(tmp_path: Path) -
     (tmp_path / "notes.md").write_text("# Notes source\n\nContenu métier.", encoding="utf-8")
     (tmp_path / ".notes.md.md").write_text(
         """---
+schema: pantheon/cartouche/v1
 document_id: doc-notes
 source: notes.md
 type: NOTE
@@ -152,6 +154,92 @@ def test_same_stem_different_source_extensions_have_distinct_cartouches(tmp_path
     assert all(card["status"] == "COMPLETE" for card in documents)
 
 
+def test_pairing_is_exact_case_sensitive_and_never_reuses_one_cartouche(tmp_path: Path) -> None:
+    module = _module()
+    (tmp_path / "Report.PDF").write_bytes(b"%PDF-upper")
+    (tmp_path / "report.pdf").write_bytes(b"%PDF-lower")
+    (tmp_path / ".Report.PDF.md").write_text(
+        """---
+schema: pantheon/cartouche/v1
+document_id: doc-upper
+source: Report.PDF
+---
+# Upper
+""",
+        encoding="utf-8",
+    )
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=1)
+    documents = {card["name"]: card for card in _cards(result) if card["kind"] == "document"}
+
+    assert documents["Report.PDF"]["cartouche"] == ".Report.PDF.md"
+    assert documents["Report.PDF"]["document_id"] == "doc-upper"
+    assert documents["report.pdf"]["cartouche_present"] is False
+    assert documents["report.pdf"]["status"] == "CHECK"
+    assert documents["Report.PDF"]["status"] == "CHECK"
+    assert documents["Report.PDF"]["name_conflict"] == "CASE_OR_UNICODE_COLLISION"
+    assert documents["report.pdf"]["name_conflict"] == "CASE_OR_UNICODE_COLLISION"
+
+
+def test_duplicate_document_id_marks_both_copied_bundles_check(tmp_path: Path) -> None:
+    module = _module()
+    for folder_name in ("DCE", "COPIE"):
+        folder = tmp_path / folder_name
+        folder.mkdir()
+        (folder / "CCTP.pdf").write_bytes(b"%PDF")
+        (folder / ".CCTP.pdf.md").write_text(
+            """---
+schema: pantheon/cartouche/v1
+document_id: doc-shared
+source: CCTP.pdf
+---
+# CCTP
+""",
+            encoding="utf-8",
+        )
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=2)
+    duplicates = [
+        card for card in _cards(result)
+        if card["kind"] == "document" and card.get("document_id") == "doc-shared"
+    ]
+
+    assert len(duplicates) == 2
+    assert all(card["status"] == "CHECK" for card in duplicates)
+    assert all(card["identity_conflict"] == "DUPLICATE_DOCUMENT_ID" for card in duplicates)
+    assert all(any("document_id dupliqué" in warning for warning in card["warnings"]) for card in duplicates)
+
+
+def test_missing_or_wrong_cartouche_schema_is_check(tmp_path: Path) -> None:
+    module = _module()
+    (tmp_path / "Notice.pdf").write_bytes(b"%PDF")
+    (tmp_path / ".Notice.pdf.md").write_text(
+        """---
+document_id: doc-notice
+source: Notice.pdf
+---
+# Notice
+""",
+        encoding="utf-8",
+    )
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=1)
+    card = next(card for card in _cards(result) if card["name"] == "Notice.pdf")
+
+    assert card["status"] == "CHECK"
+    assert any("schema absent" in warning for warning in card["warnings"])
+
+
+def test_unrelated_hidden_markdown_without_cartouche_metadata_is_ignored(tmp_path: Path) -> None:
+    module = _module()
+    (tmp_path / ".tooling.md").write_text("# Tooling private note\n", encoding="utf-8")
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=1)
+
+    assert result["document_count"] == 0
+    assert _cards(result) == []
+
+
 def test_source_without_cartouche_is_visible_with_generate_affordance(tmp_path: Path) -> None:
     module = _module()
     (tmp_path / "Notice.pdf").write_bytes(b"%PDF-fixture")
@@ -172,6 +260,7 @@ def test_cartouche_without_source_is_explicitly_missing(tmp_path: Path) -> None:
     module = _module()
     (tmp_path / ".DPGF.xlsx.md").write_text(
         """---
+schema: pantheon/cartouche/v1
 document_id: doc-dpgf
 source: DPGF.xlsx
 type: DPGF
@@ -200,6 +289,7 @@ def test_folder_context_is_projected_without_creating_identity(tmp_path: Path) -
     dce.mkdir()
     (dce / "_folder.md").write_text(
         """---
+schema: pantheon/folder-context/v1
 project: LIEUREY
 phase: DCE
 tags:
@@ -271,6 +361,7 @@ def test_workspace_index_persists_reconstructible_snapshot_and_detects_changes(t
 
     (dce / ".CCTP.pdf.md").write_text(
         """---
+schema: pantheon/cartouche/v1
 document_id: doc-cctp
 source: CCTP.pdf
 type: CCTP
@@ -279,7 +370,7 @@ type: CCTP
 """,
         encoding="utf-8",
     )
-    (dce / "_folder.md").write_text("# DCE\n", encoding="utf-8")
+    (dce / "_folder.md").write_text("---\nschema: pantheon/folder-context/v1\n---\n# DCE\n", encoding="utf-8")
 
     second = index.reconcile("test-change")
     second_doc = next(card for card in second["workspaces"][0]["cards"] if card["kind"] == "document")
@@ -351,6 +442,7 @@ def test_reconcile_move_preserves_cartouche_identity_when_pair_moves_together(tm
     (source_dir / "CCTP_IND_C.pdf").write_bytes(b"%PDF")
     (source_dir / ".CCTP_IND_C.pdf.md").write_text(
         """---
+schema: pantheon/cartouche/v1
 document_id: doc-cctp-c
 source: CCTP_IND_C.pdf
 ---
@@ -416,6 +508,7 @@ def test_declared_source_cannot_escape_cartouche_directory(tmp_path: Path) -> No
     (package / "Rapport.pdf").write_bytes(b"%PDF-report")
     (package / ".Rapport.pdf.md").write_text(
         """---
+schema: pantheon/cartouche/v1
 document_id: doc-rapport
 source: ../outside.pdf
 ---
@@ -454,6 +547,7 @@ def test_malformed_cartouche_is_check_not_source_loss(tmp_path: Path) -> None:
     (tmp_path / "Notice.pdf").write_bytes(b"%PDF-fixture")
     (tmp_path / ".Notice.pdf.md").write_text(
         """---
+schema: pantheon/cartouche/v1
 document_id: [
 ---
 # Notice
@@ -483,7 +577,7 @@ def test_check_mode_returns_affaires_projection_without_database(tmp_path: Path)
     assert result.returncode == 0
     payload = json.loads(result.stdout)
     assert payload["read_only"] is True
-    assert payload["projection"] == "affaires_source_cartouche_v2"
+    assert payload["projection"] == "affaires_source_cartouche_v3"
     assert payload["totals"]["FOLDER"] == 1
     assert payload["item_count"] == 1
 
