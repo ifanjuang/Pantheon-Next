@@ -1373,18 +1373,18 @@ def apply_edit_request(
 
             if policy_client is not None:
                 document = _document_row(conn, item["document_id"])
-                apply_digest = _payload_digest(
-                    {
-                        "request_id": request_id,
-                        "knowledge_id": request["knowledge_id"],
-                        "base_version": request["base_version"],
-                        "selected_text_digest": request["selected_text_digest"],
-                        "replacement_markdown": request["replacement_markdown"],
-                        "replacement_source_chunk_refs": request.get(
-                            "replacement_source_chunk_refs"
-                        ),
-                    }
-                )
+                apply_payload = {
+                    "request_id": request_id,
+                    "knowledge_id": request["knowledge_id"],
+                    "base_version": request["base_version"],
+                    "selected_text_digest": request["selected_text_digest"],
+                    "replacement_markdown": request["replacement_markdown"],
+                }
+                if request.get("recompile_context_digest"):
+                    apply_payload["replacement_source_chunk_refs"] = request.get(
+                        "replacement_source_chunk_refs"
+                    )
+                apply_digest = _payload_digest(apply_payload)
                 _gate_knowledge_write(
                     policy_client,
                     intent="apply_edit_request",
