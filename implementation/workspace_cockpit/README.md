@@ -92,15 +92,17 @@ verified source bytes != professional truth
 
 For email `.eml` bundles, both `source_sha256` and `source_size_bytes` are mandatory. A complete email bundle whose declared hash does not match the exact stored RAW bytes is projected as `CHECK`.
 
-A verified complete email bundle is Hindsight-eligible only through its Markdown cartouche/clean derivative. The raw `.eml` is never selected as the Hindsight source representation:
+A verified complete email bundle can become a Hindsight producer candidate only through its Markdown cartouche/clean derivative. The raw `.eml` is not supported by the selected Hindsight 0.10.1 MarkItDown file parser and must never be treated as a direct file-retain source.
 
 ```text
 verified .eml + .eml.md
-→ hindsight_representation = cartouche
+→ hindsight_representation_candidate = cartouche
 
 raw .eml
 ↛ direct Hindsight file retain
 ```
+
+This does not pre-empt #659's still-open A/B/C producer qualification. `hindsight_eligible` means only that the bundle is structurally eligible to be considered by that producer; the selected durable retain mapping remains owned by #659.
 
 Example:
 
@@ -158,6 +160,20 @@ python3 implementation/workspace_cockpit/server.py \
 The existing container/native installers remain compatibility surfaces until Slice 4 replaces their active Workspace inputs. Do not interpret their LiveSync mounts as the selected architecture.
 
 ## Hindsight boundary
+
+A source whose cartouche is missing or whose bundle status is `CHECK` is never producer-eligible, even if the source file extension is supported by Hindsight. Format support and producer eligibility are separate projections:
+
+```text
+PDF format supported + cartouche missing
+→ visible in Cockpit
+→ hindsight_format_supported = true
+→ hindsight_eligible = false
+
+complete stable bundle
+→ may become hindsight_eligible
+→ actual retain mapping still qualified by #659
+```
+
 
 The Workspace Cockpit does not itself make retrieved material authoritative.
 
