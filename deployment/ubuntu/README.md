@@ -451,3 +451,18 @@ The following remain intentionally optional rather than becoming hidden baseline
 - automatic custom-node or model marketplace management.
 
 Those can be added only when their actual configuration and qualification needs are demonstrated.
+
+
+## Qualify the mounted AFFAIRES path
+
+The productive Workspace/Hindsight topology is evaluated from this Linux host against the NAS path as mounted here. Hindsight remains local to Linux; the AFFAIRES daemon is the filesystem watcher and Hindsight producer.
+
+Before enabling the producer, run:
+
+```bash
+python3 deployment/ubuntu/qualify-affaires-linux-mount.py --root /path/to/mounted/AFFAIRES
+```
+
+The probe is self-cleaning by default. It requires write access because future cartouche generation also requires the Linux service to create `.SOURCE.ext.md` files. Use `--keep` only for manual inspection.
+
+If the probe reports `inotify: not-observed-reconcile-required`, the mount can still qualify for correctness: keep periodic reconcile enabled and treat watcher delivery only as an optimization.
