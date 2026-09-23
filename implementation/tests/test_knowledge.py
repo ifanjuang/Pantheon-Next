@@ -364,6 +364,14 @@ def test_recompile_request_is_candidate_only_and_apply_rebinds_provenance(
     assert proposal["status"] == "proposed"
     assert proposal["replacement_source_chunk_refs"] == chosen_refs
 
+    review = knowledge.get_recompile_candidate(conn, request_id)
+    assert review["replacement_source_chunk_refs"] == chosen_refs
+    assert review["authority"]["changes_knowledge"] is False
+    assert review["authority"]["accepts_candidate"] is False
+    assert f"{knowledge_id}@v1" in review["diff"]
+    assert f"{knowledge_id}@candidate-v2" in review["diff"]
+    assert "Le support est repris" in review["diff"]
+
     # Hermes proposing still does not write Knowledge.
     assert knowledge.get_knowledge_markdown(conn, knowledge_id) == original_markdown
     assert knowledge.get_knowledge_source_state(conn, knowledge_id)["status"] == "needs_recompile"
