@@ -217,7 +217,15 @@ def test_ab_variants_share_one_scope_and_selection_does_not_apply(conn, tmp_path
     assert applied["knowledge"]["version"] == 2
     assert applied["review"]["edit_request"]["status"] == "applied"
     assert "Purger les parties" in knowledge.get_knowledge_markdown(conn, card["knowledge_id"])
-    event_types = [event["event_type"] for event in applied["review"]["review_events"]]
+
+    # The review projection above starts a read transaction after the apply.
+    # Rolling it back must not erase the accepted Knowledge revision or audit.
+    conn.rollback()
+    assert knowledge.get_knowledge_card(conn, card["knowledge_id"])["version"] == 2
+    persisted_review = knowledge_edit_variants.get_variant_review(conn, request_id)
+    assert persisted_review["edit_request"]["status"] == "applied"
+
+    event_types = [event["event_type"] for event in persisted_review["review_events"]]
     assert event_types == [
         "variant_projected",
         "variant_projected",
