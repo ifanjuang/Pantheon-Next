@@ -383,6 +383,29 @@ def test_recompile_request_is_candidate_only_and_apply_rebinds_provenance(
     assert refreshed["needs_recompile"] is False
     assert refreshed["dependency_count"] == 2
 
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT base_content_snapshot, resulting_content_snapshot
+              FROM knowledge_events
+             WHERE aggregate_ref = %s
+               AND event_type = 'knowledge_revised'
+             ORDER BY occurred_at DESC, event_id DESC
+             LIMIT 1
+            """,
+            (knowledge_id,),
+        )
+        base_snapshot, resulting_snapshot = cur.fetchone()
+    assert base_snapshot["version"] == 1
+    assert base_snapshot["markdown"] == original_markdown
+    assert base_snapshot["source_chunk_refs"] == [
+        primary["chunk_ref"],
+        supporting["chunk_ref"],
+    ]
+    assert resulting_snapshot["version"] == 2
+    assert resulting_snapshot["markdown"] == proposed_markdown
+    assert resulting_snapshot["source_chunk_refs"] == chosen_refs
+
 
 def test_recompile_proposal_conflicts_if_source_context_moves_again(
     conn, tmp_path
