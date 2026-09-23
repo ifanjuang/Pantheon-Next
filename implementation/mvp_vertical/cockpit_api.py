@@ -475,6 +475,15 @@ def create_app(
             )
         )
 
+    @app.get("/edit-requests/{request_id}/recompile-review")
+    def intelligent_edit_recompile_review(
+        request_id: str,
+        _authorized: None = Depends(require_editor_key),
+    ) -> dict:
+        return knowledge_write(
+            lambda conn: knowledge.get_recompile_candidate(conn, request_id)
+        )
+
     @app.get("/edit-requests")
     def intelligent_edit_queue(
         status: Literal[
