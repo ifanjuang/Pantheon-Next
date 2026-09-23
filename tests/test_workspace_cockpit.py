@@ -255,7 +255,9 @@ def test_source_without_cartouche_is_visible_with_generate_affordance(tmp_path: 
     assert card["source_present"] is True
     assert card["cartouche_present"] is False
     assert card["can_generate_cartouche"] is True
-    assert card["hindsight_eligible"] is True
+    assert card["hindsight_format_supported"] is True
+    assert card["hindsight_eligible"] is False
+    assert card["hindsight_representation_candidate"] is None
 
 
 def test_cartouche_without_source_is_explicitly_missing(tmp_path: Path) -> None:
@@ -545,6 +547,29 @@ def test_heavy_sources_stay_visible_and_temp_backups_are_ignored(tmp_path: Path)
 
 
 
+def test_check_bundle_is_never_hindsight_producer_eligible(tmp_path: Path) -> None:
+    module = _module()
+    (tmp_path / "Notice.pdf").write_bytes(b"%PDF")
+    (tmp_path / ".Notice.pdf.md").write_text(
+        """---
+schema: wrong/schema
+document_id: doc-notice
+source: Notice.pdf
+---
+# Notice
+""",
+        encoding="utf-8",
+    )
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=1)
+    card = next(card for card in _cards(result) if card["name"] == "Notice.pdf")
+
+    assert card["status"] == "CHECK"
+    assert card["hindsight_format_supported"] is True
+    assert card["hindsight_eligible"] is False
+    assert card["hindsight_representation_candidate"] is None
+
+
 def test_declared_source_sha256_is_verified_when_present(tmp_path: Path) -> None:
     module = _module()
     source_bytes = b"exact-source-bytes"
@@ -627,7 +652,7 @@ gmail_thread_id: thread-123
     assert card["source_integrity"] == "VERIFIED"
     assert card["source_sha256_verified"] is True
     assert card["hindsight_eligible"] is True
-    assert card["hindsight_representation"] == "cartouche"
+    assert card["hindsight_representation_candidate"] == "cartouche"
 
 
 def test_email_bundle_without_integrity_fields_is_check(tmp_path: Path) -> None:
@@ -653,7 +678,7 @@ gmail_thread_id: thread-123
     assert card["status"] == "CHECK"
     assert card["source_integrity"] == "UNDECLARED"
     assert card["hindsight_eligible"] is False
-    assert card["hindsight_representation"] is None
+    assert card["hindsight_representation_candidate"] is None
     assert any("source_sha256 absent" in warning for warning in card["warnings"])
     assert any("source_size_bytes absent" in warning for warning in card["warnings"])
 
