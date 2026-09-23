@@ -144,6 +144,94 @@ def test_knowledge_reads_accept_editor_key_and_writes_require_it(monkeypatch) ->
     assert hermes_queue.json()["edit_requests"][0]["status"] == "queued_for_hermes"
 
 
+def test_recompile_routes_keep_editor_and_hermes_roles_separate(monkeypatch) -> None:
+    observed = {}
+
+    monkeypatch.setattr(
+        knowledge,
+        "build_knowledge_recompile_context",
+        lambda _conn, knowledge_id: {
+            "knowledge_id": knowledge_id,
+            "ready_for_candidate": True,
+        },
+    )
+    monkeypatch.setattr(
+        knowledge,
+        "create_recompile_request",
+        lambda _conn, **values: observed.setdefault("create", values) or {
+            "candidate_only": True,
+            "applies_automatically": False,
+        },
+    )
+    monkeypatch.setattr(
+        knowledge,
+        "get_recompile_context_for_request",
+        lambda _conn, request_id: {
+            "request_id": request_id,
+            "context_digest": "digest-1",
+        },
+    )
+    monkeypatch.setattr(
+        knowledge,
+        "get_recompile_candidate",
+        lambda _conn, request_id: {
+            "request_id": request_id,
+            "diff": "--- base\n+++ candidate\n",
+            "authority": {"changes_knowledge": False},
+        },
+    )
+
+    client = TestClient(
+        create_app(
+            connect_fn=_Connection,
+            api_key="read-key",
+            editor_api_key="editor-key",
+            hermes_api_key="hermes-key",
+            policy_enforcement="disabled",
+        )
+    )
+    editor = {"Authorization": "Bearer editor-key"}
+    hermes = {"Authorization": "Bearer hermes-key"}
+
+    create_body = {
+        "request_id": "recompile-1",
+        "requested_by": "human:architect",
+        "idempotency_key": "recompile-request-1",
+    }
+    assert client.post(
+        "/knowledge/knowledge.techniques.facades/recompile-requests",
+        json=create_body,
+        headers=hermes,
+    ).status_code == 401
+    created = client.post(
+        "/knowledge/knowledge.techniques.facades/recompile-requests",
+        json=create_body,
+        headers=editor,
+    )
+    assert created.status_code == 202
+    assert observed["create"]["knowledge_id"] == "knowledge.techniques.facades"
+
+    assert client.get(
+        "/edit-requests/recompile-1/recompile-context",
+        headers=editor,
+    ).status_code == 401
+    assert client.get(
+        "/edit-requests/recompile-1/recompile-context",
+        headers=hermes,
+    ).status_code == 200
+
+    assert client.get(
+        "/edit-requests/recompile-1/recompile-review",
+        headers=hermes,
+    ).status_code == 401
+    review = client.get(
+        "/edit-requests/recompile-1/recompile-review",
+        headers=editor,
+    )
+    assert review.status_code == 200
+    assert review.json()["authority"]["changes_knowledge"] is False
+
+
 def test_mobile_editor_shell_is_available() -> None:
     client = TestClient(create_app(connect_fn=_Connection, api_key="read-key"))
     response = client.get("/editor/")
