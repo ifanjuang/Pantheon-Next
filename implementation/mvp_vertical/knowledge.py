@@ -846,6 +846,37 @@ def get_recompile_context_for_request(
     return context
 
 
+def _knowledge_content_snapshot(
+    conn: psycopg.Connection,
+    knowledge_id: str,
+) -> dict:
+    """Freeze editorial content and exact source bindings for revision history."""
+    item = _knowledge_row(conn, knowledge_id)
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            """
+            SELECT chunk_ref, document_id, extraction_id, ordinal, text_digest,
+                   source_ref, source_digest, structural_locator
+              FROM knowledge_source_chunks
+             WHERE knowledge_id = %s
+             ORDER BY document_id, ordinal, chunk_ref
+            """,
+            (knowledge_id,),
+        )
+        sources = [dict(row) for row in cur.fetchall()]
+    return {
+        "knowledge_id": knowledge_id,
+        "version": item["version"],
+        "title": item["title"],
+        "family": item["family"],
+        "review_status": item["review_status"],
+        "markdown": item["markdown"],
+        "markdown_digest": item["markdown_digest"],
+        "source_chunk_refs": list(item["source_chunk_refs"]),
+        "source_dependencies": sources,
+    }
+
+
 def _insert_event(
     conn: psycopg.Connection,
     *,
@@ -857,19 +888,35 @@ def _insert_event(
     idempotency_key: str,
     payload_digest: str,
     snapshot: dict,
+    base_content_snapshot: dict | None = None,
+    resulting_content_snapshot: dict | None = None,
 ) -> None:
     conn.execute(
         """
         INSERT INTO knowledge_events (
             event_id, aggregate_ref, event_type, actor, actor_kind,
             expected_version, resulting_version, idempotency_key,
-            payload_digest, result_snapshot
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb)
+            payload_digest, result_snapshot, base_content_snapshot,
+            resulting_content_snapshot
+        ) VALUES (
+            %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb, %s::jsonb, %s::jsonb
+        )
         """,
         (
             f"event-{uuid.uuid4().hex}", aggregate_ref, event_type, actor, actor_kind,
             expected_version, expected_version + 1, idempotency_key,
-            payload_digest, json.dumps(snapshot, ensure_ascii=False),
+            payload_digest,
+            json.dumps(snapshot, ensure_ascii=False),
+            (
+                json.dumps(base_content_snapshot, ensure_ascii=False)
+                if base_content_snapshot is not None
+                else None
+            ),
+            (
+                json.dumps(resulting_content_snapshot, ensure_ascii=False)
+                if resulting_content_snapshot is not None
+                else None
+            ),
         ),
     )
 
@@ -984,10 +1031,12 @@ def publish_knowledge(
             replace_existing=False,
         )
         snapshot = get_knowledge_card(conn, knowledge_id)
+        resulting_content_snapshot = _knowledge_content_snapshot(conn, knowledge_id)
         _insert_event(
             conn, aggregate_ref=knowledge_id, event_type="knowledge_published",
             actor=created_by, actor_kind=actor_kind, expected_version=0,
             idempotency_key=idempotency_key, payload_digest=pdigest, snapshot=snapshot,
+            resulting_content_snapshot=resulting_content_snapshot,
         )
         validate_document_knowledge_slice(conn, knowledge_id)
     return snapshot
@@ -1027,6 +1076,7 @@ def revise_knowledge(
             raise StaleKnowledgeWrite(
                 f"stale Knowledge version: expected {expected_version}, current {row['version']}"
             )
+        base_content_snapshot = _knowledge_content_snapshot(conn, knowledge_id)
         next_status = review_status or row["review_status"]
         resolved_chunks: dict[str, dict] | None = None
         primary_document: dict | None = None
@@ -1094,6 +1144,7 @@ def revise_knowledge(
             )
 
         snapshot = get_knowledge_card(conn, knowledge_id)
+        resulting_content_snapshot = _knowledge_content_snapshot(conn, knowledge_id)
         event_type = (
             "knowledge_review_status_changed"
             if (
@@ -1107,6 +1158,8 @@ def revise_knowledge(
             conn, aggregate_ref=knowledge_id, event_type=event_type,
             actor=actor, actor_kind=actor_kind, expected_version=expected_version,
             idempotency_key=idempotency_key, payload_digest=pdigest, snapshot=snapshot,
+            base_content_snapshot=base_content_snapshot,
+            resulting_content_snapshot=resulting_content_snapshot,
         )
         validate_document_knowledge_slice(conn, knowledge_id)
     return snapshot
