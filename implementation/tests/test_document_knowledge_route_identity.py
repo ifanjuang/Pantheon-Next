@@ -35,6 +35,7 @@ def test_document_knowledge_api_mounts_only_stable_routes() -> None:
         ("GET", "/documents/{document_id}/knowledge-impacts"),
         ("POST", "/knowledge/{knowledge_id}/recompile-requests"),
         ("GET", "/edit-requests/{request_id}/recompile-context"),
+        ("GET", "/edit-requests/{request_id}/recompile-review"),
         ("POST", "/documents/{document_id}/knowledge"),
         ("PUT", "/knowledge/{knowledge_id}"),
         ("POST", "/knowledge/{knowledge_id}/edit-requests"),
