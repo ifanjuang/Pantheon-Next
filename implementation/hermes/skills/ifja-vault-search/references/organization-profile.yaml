@@ -16,11 +16,13 @@ sources:
       - "_Projets/{designation}"
       - "Projets/{designation}"
       - "Notion/_Affaires/{designation}.md"
+    local_reader_binding: ifja-vault-read
   documentaires:
     logical_name: DOCUMENTAIRES
     hermes_binding: hindsight-documentaires
     hindsight_bank: IFJA_DOCUMENTAIRES
     purpose: transversal professional reference material
+    local_reader_binding: ifja-vault-read
   conversation_memory:
     logical_name: HERMES_MEMORY
     hindsight_bank: hermes
@@ -42,6 +44,12 @@ documents:
   textual_analysis_binding: docling
   visual_analysis_binding: marker
   physical_affaires_root: /srv/pantheon/obsidian-affaires
+  physical_documentaires_root: /srv/pantheon/obsidian-documentaires
+  markdown_reader_tools:
+    - find_ifja_projects
+    - list_ifja_project_sources
+    - search_ifja_markdown
+    - read_ifja_markdown_lines
 
 boundaries:
   config_values_are_not_doctrine: true

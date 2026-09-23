@@ -63,6 +63,14 @@ change the answer, permitted action or consequence.
    result does not select a project, and a failed first recall does not establish
    that the source is absent until the targeted keyword search and bounded
    AFFAIRES inventory fallback have also been attempted.
+   If these do not return an exact file, use the `ifja-vault-read` binding:
+   `find_ifja_projects` on the user-provided designation, then
+   `list_ifja_project_sources` on the selected `_Projets/<name>` directory.
+   Resolve the project before adding topic words; a filename need not contain
+   `permis` to be relevant to a permit question. The inventory ranks explicit
+   topic tokens and nearby document families such as `Urbanisme`, `PLUi`, `PC`
+   and `CERFA`, but a path match remains only a lead. A Hindsight path naming
+   a directory is not a file: inventory the project to find the nested source.
    For a document-family query, normalize the project/document terms and include
    the relevant filename tokens and professional aliases in the bounded search
    (for example, a CCTP may also be labelled CCAP, DCE or cahier des charges).
@@ -179,6 +187,14 @@ silently establish currentness.
    open that exact local source (Docling for a file needing extraction) rather
    than asking for an upload or declaring the document absent. Distinguish
    `binding_unavailable`, `no_match` and `indexing_gap` in the limitation.
+   For an exact Markdown path, use `search_ifja_markdown` only to locate lines,
+   then `read_ifja_markdown_lines` for the bounded passage being cited. Supply
+   `project_ref` for AFFAIRES; never supply one project's path with another
+   project's reference. For DOCUMENTAIRES leave `project_ref` empty and keep
+   the general reference separate from project facts. A search preview,
+   Hindsight excerpt or internal `spillover` cache is not an inspected passage.
+   Markdown extracted from a PDF is a derivative; use Docling on the original
+   PDF when page, graphic, signature or source-original verification matters.
 4. Use one targeted recall when the request is conceptual, associative or the
    exact source remains unknown.
 5. For a recent project or information possibly awaiting synchronization, use
@@ -200,6 +216,12 @@ Never report that Hindsight is unavailable solely because a recall or search
 returned no match. Availability is established by the active MCP catalogue and
 connectivity test; an empty result is a search outcome and may indicate an
 indexing gap or an overly narrow query.
+
+Never report a project absent solely from an empty Hindsight result. Distinguish
+`no_name_match_in_mirror`, `project_present_source_not_found`,
+`source_present_but_not_readable`, and `source_inspected_requested_fact_not_found`
+within the scope actually checked. Do not silently substitute another project
+or infer that a missing permit file means no permit work has occurred.
 
 Do not turn a generic remembered checklist into a regulatory conclusion. Each
 technical, legal, contractual or standards requirement must be tied to an exact

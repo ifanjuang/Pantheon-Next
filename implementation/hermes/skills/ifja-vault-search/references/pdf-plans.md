@@ -15,7 +15,11 @@ confirmer qu'il s'agit de la dernière version applicable.
 
 ## Inventaire physique
 
-Après confirmation du répertoire du projet, lister les PDF hors archives :
+Après confirmation du répertoire du projet, appeler
+`list_ifja_project_sources(project_ref, topic)` via `ifja-vault-read`. Garder
+les PDF du projet seulement ; le score de chemin n'est pas une inspection.
+Le script ci-dessous reste un diagnostic opérateur si la liaison MCP n'est
+pas active, et non une instruction à inventer un outil terminal dans Hermes :
 
 ```bash
 SKILL_ROOT="${HERMES_HOME:-$HOME/.hermes}/skills/ifja-vault-search"

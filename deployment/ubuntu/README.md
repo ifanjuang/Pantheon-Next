@@ -132,14 +132,45 @@ request, manifest and admitted runtime bindings; they do not redefine the
 profile identity.
 
 `--with-ifja-adapter` adds `ifja-project-context` and `ifja-vault-search` as
-contextual modules. With that explicit adapter, `--bind-local-mcp` copies no secrets and no arbitrary server. It merges only the
+contextual modules. With that explicit adapter, `--bind-local-mcp` copies no
+arbitrary server. It merges only the
 already configured local `Doclin`, `hindsight-affaires`,
 `hindsight-documentaires` and `pantheon-policy` entries from the default profile
-into the governed profile. The copied Pantheon Policy entry is narrowed to the
+into the governed profile and adds the separately installed, loopback-only
+`ifja-vault-read` binding with its dedicated bearer credential. The copied
+Pantheon Policy entry is narrowed to the
 reviewed read-only consultation, request classification/preflight, candidate
 skeleton and Context Pack tools. It derives a recall-only `hindsight-memory` binding
 from the already configured local Hindsight endpoint and refuses a partial result
 when either required professional Hindsight binding is absent.
+
+### IFJA exact-source fallback
+
+The optional IFJA reader resolves a project directory before topic keywords,
+lists bounded `.md`/PDF candidates within that project, and provides
+line-located, capped reads of exact Markdown files. It can also read an exact
+DOCUMENTAIRES Markdown path. It cannot write files or open arbitrary host paths;
+AFFAIRES reads require a matching project reference. PDF content still goes
+through Docling. Inventory matches and search previews are not source
+inspection or Evidence.
+
+The reader runs as the existing `pantheon-docling` service user, which already
+has the vault ACL. Do not broaden the Hermes container user's filesystem ACL.
+Installation and profile binding are separate explicit steps:
+
+```bash
+deployment/ubuntu/configure-ifja-vault-read-local --check
+sudo deployment/ubuntu/configure-ifja-vault-read-local --apply --enable
+deployment/ubuntu/configure-hermes-activity-projection --check \
+  --with-ifja-adapter --bind-local-mcp
+sudo deployment/ubuntu/configure-hermes-activity-projection --apply --restart \
+  --with-ifja-adapter --bind-local-mcp
+```
+
+The service binds only `127.0.0.1:8021` and requires a retained token under
+`/srv/pantheon/docling`; the token is not printed. The configurator puts only
+this credential and the four reviewed read-only tool names in the governed
+profile's MCP binding. A configuration checkpoint precedes profile changes.
 
 `--with-curated-default-skills` retains the profile's `.no-bundled-skills`
 boundary and copies only architecture diagrams, Excalidraw, Obsidian, PDF,
