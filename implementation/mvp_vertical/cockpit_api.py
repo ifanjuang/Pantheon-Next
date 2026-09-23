@@ -61,8 +61,15 @@ class EditRequestBody(BaseModel):
     replacement_markdown: str | None = None
 
 
+class RecompileRequestBody(BaseModel):
+    request_id: str
+    requested_by: str
+    idempotency_key: str
+
+
 class EditProposalBody(BaseModel):
     replacement_markdown: str
+    source_chunk_refs: list[str] | None = None
 
 
 class ApplyEditBody(BaseModel):
@@ -311,6 +318,22 @@ def create_app(
         except knowledge.KnowledgeError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
+    @app.get("/knowledge/{knowledge_id}/recompile-context")
+    def knowledge_recompile_context(
+        knowledge_id: str,
+        _authorized: None = Depends(require_api_key),
+    ) -> dict:
+        try:
+            return with_connection(
+                lambda conn: knowledge.build_knowledge_recompile_context(
+                    conn, knowledge_id
+                )
+            )
+        except knowledge.KnowledgeNotFound as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except knowledge.KnowledgeError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
     @app.get("/documents/{document_id}/knowledge-impacts")
     def document_knowledge_impacts(
         document_id: str,
@@ -402,6 +425,18 @@ def create_app(
             ),
         )
 
+    @app.post("/knowledge/{knowledge_id}/recompile-requests", status_code=202)
+    def request_knowledge_recompile(
+        knowledge_id: str,
+        body: RecompileRequestBody,
+        _authorized: None = Depends(require_editor_key),
+    ) -> dict:
+        return knowledge_write(
+            lambda conn: knowledge.create_recompile_request(
+                conn, knowledge_id=knowledge_id, **body.model_dump()
+            )
+        )
+
     @app.post("/knowledge/{knowledge_id}/edit-requests", status_code=202)
     def request_intelligent_edit(
         knowledge_id: str,
@@ -422,7 +457,21 @@ def create_app(
     ) -> dict:
         return knowledge_write(
             lambda conn: knowledge.complete_edit_request(
-                conn, request_id=request_id, replacement_markdown=body.replacement_markdown
+                conn,
+                request_id=request_id,
+                replacement_markdown=body.replacement_markdown,
+                replacement_source_chunk_refs=body.source_chunk_refs,
+            )
+        )
+
+    @app.get("/edit-requests/{request_id}/recompile-context")
+    def intelligent_edit_recompile_context(
+        request_id: str,
+        _authorized: None = Depends(require_hermes_key),
+    ) -> dict:
+        return knowledge_write(
+            lambda conn: knowledge.get_recompile_context_for_request(
+                conn, request_id
             )
         )
 
