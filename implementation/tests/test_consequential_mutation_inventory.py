@@ -1138,7 +1138,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge.py", "apply_edit_request"): {
         "gate": "enforce_consequential",
-        "local_guards": ("request status", "re-read under lock", "version and selection digest", "single transaction with audit", "idempotency", "recompile source-context digest and allowed current source refs are rechecked before apply", "chokepoint after the re-read under lock, expectation bound to a digest of the exact replacement and recompile provenance when present", "unconditional: apply always needs a decision, not just a review_status=\"reviewed\" claim"),
+        "local_guards": ("request status", "transaction owned before the first database read", "Knowledge row re-read under lock", "version and selection digest", "single transaction with audit", "idempotency", "recompile source-context digest, frozen-content integrity and allowed current source refs are rechecked before apply", "chokepoint after all staleness checks, expectation bound to a digest of the exact replacement, recompile context and provenance when present", "unconditional: apply always needs a decision, not just a review_status=\"reviewed\" claim"),
         "reviewed": (
             "Wired, at the point this entry itself named: `create_edit_request` "
             "accepts `replacement_markdown` from its caller and sets `proposed` on "
@@ -1157,11 +1157,12 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "`_EditRequestConflict` handler untouched — refusal is not staleness, "
             "so the request stays `proposed` and retryable once a real decision "
             "exists, rather than being marked `conflict`. "
-            "Three production paths reach this function: the direct "
-            "`apply_intelligent_edit` route, and `apply_selected_variant`'s two "
-            "call sites (replay and real). All three thread `policy_client` "
-            "through; missing one would have reopened exactly the gap this entry "
-            "records."
+            "Two production adapters reach this function: the direct "
+            "`apply_intelligent_edit` route and `apply_selected_variant`. Both "
+            "thread `policy_client` through. The owner now opens its transaction "
+            "before its first database read; this matters with psycopg "
+            "autocommit=False, because reading first would make the apparent "
+            "transaction a savepoint that an API connection close could roll back."
         ),
     },
     ("knowledge.py", "complete_edit_request"): {
@@ -1213,6 +1214,8 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "full Markdown snapshot and exact base_version are delegated to create_edit_request",
             "recompile_context_digest freezes the source-state candidate basis",
             "idempotency is enforced by the existing edit-request owner",
+            "the outer transaction starts before source-context reads so the request commits rather than remaining inside an implicit-read savepoint",
+            "replay returns the durable request even after Knowledge/source state later changes",
         ),
         "reviewed": (
             "Creates no Knowledge revision and authorizes no effect. It is a thin "
@@ -1277,23 +1280,22 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge_edit_variants.py", "apply_selected_variant"): {
         "gate": "none",
-        "local_guards": ("status re-checked under lock", "selection unchanged under lock", "variant ownership", "audit inside the apply transaction", "idempotent replay when already applied"),
+        "local_guards": ("preparation transaction owns its first read", "status re-checked under lock", "selection unchanged under lock", "variant ownership", "selected replacement preparation commits before delegation", "Knowledge revision and variant_applied audit share the apply owner transaction", "idempotent replay when already applied"),
         "reviewed": (
-            "Reasoning rewritten, regime unchanged. It said the request had "
-            "already selected the variant, and selection is genuinely recorded "
-            "here — `selected_by`, an event, an idempotency key. What the "
-            "selection does not survive is a rejection: `reject_request` does not "
-            "clear `selected_variant_id`, and `knowledge.complete_edit_request` "
-            "returns a rejected request to `proposed`, after which this function "
-            "finds a `proposed` status and an intact selection and applies the "
-            "variant a human refused. The gate stays recorded at "
-            "`knowledge.apply_edit_request`, which this delegates to and which is "
-            "where the Knowledge changes; wiring it there covers this path, so "
-            "recording it twice would overstate what has to be wired. One caveat: "
-            "the `replacement_markdown` write here commits in its own transaction "
-            "before the delegation, so it would survive a refusal downstream."
+            "Regime unchanged: selecting or preparing a variant does not mutate "
+            "Knowledge, and the consequential write remains delegated to "
+            "`knowledge.apply_edit_request`. The request and selected variant are "
+            "validated and locked in a first, explicit preparation transaction; "
+            "that transaction may persist the selected replacement Markdown but "
+            "cannot apply it. The second transaction belongs to the Knowledge "
+            "owner, where the revision and `variant_applied` audit commit together. "
+            "This separation is intentional: a downstream refusal may leave the "
+            "candidate prepared, but never a partially applied Knowledge revision. "
+            "The older rejection-reopen defect no longer applies because "
+            "`complete_edit_request` now refuses every decided status other than "
+            "an identical replay of an already-proposed replacement."
         ),
-    },
+
     ("knowledge_edit_variants.py", "create_variant_request"): {
         "gate": "none",
         "local_guards": ("status and replacement_markdown are literals in the INSERT", "locked snapshot with base_version equality", "selection range and text matched against the snapshot", "idempotency with payload digest"),
