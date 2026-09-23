@@ -737,57 +737,51 @@ def apply_selected_variant(
     decision_payload: dict[str, Any] | None = None,
     required_ceiling: str = "C2",
 ) -> dict[str, Any]:
-    """Apply the selected variant, forwarding the gate to `apply_edit_request`.
+    """Apply the selected variant, forwarding the gate to apply_edit_request.
 
-    Two call sites below both reach `knowledge.apply_edit_request`, the
-    replay branch and the real one. Both must carry `policy_client` through:
-    it is the only Knowledge Markdown mutation this function performs, and
-    the whole point of gating it there was that no caller could reach it
-    ungated. A route wired to supply a client but a forwarding function that
-    drops it on the floor would be exactly that, one call away.
+    Variant preparation and Knowledge application are deliberately two
+    transactions. The first freezes the selected candidate into the existing
+    edit request; the second is owned by knowledge.apply_edit_request, where
+    the consequential Markdown write and variant_applied audit commit
+    atomically.
     """
-    request = _request_row(conn, request_id)
-    if request["status"] == "applied":
-        applied = knowledge.apply_edit_request(
-            conn,
-            request_id=request_id,
-            actor=actor,
-            actor_kind="human",
-            idempotency_key=idempotency_key,
-            policy_client=policy_client,
-            decision_payload=decision_payload,
-            required_ceiling=required_ceiling,
-        )
-        return {**applied, "review": get_variant_review(conn, request_id)}
-    if request["status"] != "proposed":
-        raise KnowledgeEditVariantConflict(
-            f"selected variant cannot be applied from status {request['status']}"
-        )
-    if not request.get("selected_variant_id"):
-        raise KnowledgeEditVariantError("select one proposal variant before applying it")
-    variant = _variant_row(conn, request["selected_variant_id"])
-    if variant["request_id"] != request_id:
-        raise KnowledgeEditVariantError("selected variant does not belong to this request")
-
+    variant: dict[str, Any] | None = None
     with conn.transaction():
-        locked = _request_row(conn, request_id, lock=True)
-        if locked["status"] != "proposed" or locked["selected_variant_id"] != variant["variant_id"]:
-            raise KnowledgeEditVariantConflict("edit request changed before application")
-        conn.execute(
-            "UPDATE knowledge_edit_requests SET replacement_markdown = %s, "
-            "updated_at = CURRENT_TIMESTAMP WHERE request_id = %s",
-            (variant["replacement_markdown"], request_id),
-        )
+        request = _request_row(conn, request_id)
+        if request["status"] != "applied":
+            if request["status"] != "proposed":
+                raise KnowledgeEditVariantConflict(
+                    f"selected variant cannot be applied from status {request['status']}"
+                )
+            if not request.get("selected_variant_id"):
+                raise KnowledgeEditVariantError(
+                    "select one proposal variant before applying it"
+                )
+            variant = _variant_row(conn, request["selected_variant_id"])
+            if variant["request_id"] != request_id:
+                raise KnowledgeEditVariantError(
+                    "selected variant does not belong to this request"
+                )
 
-    def record_application(active: psycopg.Connection, applied_result: dict[str, Any]) -> None:
-        """Write the audit inside the apply transaction, never beside it.
+            locked = _request_row(conn, request_id, lock=True)
+            if (
+                locked["status"] != "proposed"
+                or locked["selected_variant_id"] != variant["variant_id"]
+            ):
+                raise KnowledgeEditVariantConflict(
+                    "edit request changed before application"
+                )
+            conn.execute(
+                "UPDATE knowledge_edit_requests SET replacement_markdown = %s, "
+                "updated_at = CURRENT_TIMESTAMP WHERE request_id = %s",
+                (variant["replacement_markdown"], request_id),
+            )
 
-        A separate transaction left two failure windows: an applied Knowledge
-        revision with no `variant_applied` event, so the review history lost
-        which variant was applied and by whom; or an event describing an
-        application that had rolled back.
-        """
-        if _event_by_key(active, idempotency_key) is not None:
+    def record_application(
+        active: psycopg.Connection, applied_result: dict[str, Any]
+    ) -> None:
+        """Write the audit inside the apply transaction, never beside it."""
+        if variant is None or _event_by_key(active, idempotency_key) is not None:
             return
         _insert_event(
             active,
@@ -818,8 +812,6 @@ def apply_selected_variant(
         required_ceiling=required_ceiling,
     )
     return {**applied, "review": get_variant_review(conn, request_id)}
-
-
 
 def project_execution_result_variant(
     conn: psycopg.Connection,
