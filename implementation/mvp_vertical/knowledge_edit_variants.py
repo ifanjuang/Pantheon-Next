@@ -512,20 +512,25 @@ def _project_execution_result_variant_inner(
 ) -> dict[str, Any]:
     if len(idempotency_key.strip()) < 8:
         raise KnowledgeEditVariantError("projection idempotency key is required")
-    result = _execution_result_item(conn, execution_result_id, result_ref)
-    payload = dict(result["payload"])
-    request_id = str(payload.get("request_ref") or "")
-    if not request_id:
-        raise KnowledgeEditVariantError("candidate request_ref is required")
-    projection_digest = _payload_digest(
-        {
-            "execution_result_id": execution_result_id,
-            "result_ref": result_ref,
-            "source_payload_digest": result["payload_digest"],
-        }
-    )
 
+    # Own the transaction before reading the Execution Result. With psycopg's
+    # autocommit=False, reading it first would create an implicit outer
+    # transaction and reduce the projection write to a savepoint that the API
+    # connection close could roll back.
     with conn.transaction():
+        result = _execution_result_item(conn, execution_result_id, result_ref)
+        payload = dict(result["payload"])
+        request_id = str(payload.get("request_ref") or "")
+        if not request_id:
+            raise KnowledgeEditVariantError("candidate request_ref is required")
+        projection_digest = _payload_digest(
+            {
+                "execution_result_id": execution_result_id,
+                "result_ref": result_ref,
+                "source_payload_digest": result["payload_digest"],
+            }
+        )
+
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
                 "SELECT request_id, payload_digest FROM knowledge_edit_variants "
@@ -547,11 +552,6 @@ def _project_execution_result_variant_inner(
             )
         item = _knowledge_snapshot(conn, request["knowledge_id"], lock=True)
         if _scope_status(request, item) != "current":
-            conn.execute(
-                "UPDATE knowledge_edit_requests SET status = 'conflict', "
-                "updated_at = CURRENT_TIMESTAMP WHERE request_id = %s",
-                (request_id,),
-            )
             raise KnowledgeEditVariantConflict(
                 "Knowledge changed before the execution result was projected"
             )
@@ -626,7 +626,8 @@ def _project_execution_result_variant_inner(
                 "updated_at = CURRENT_TIMESTAMP WHERE request_id = %s",
                 (request_id,),
             )
-    return get_variant_review(conn, request_id)
+        projected = get_variant_review(conn, request_id)
+    return projected
 
 
 def select_variant(
@@ -638,15 +639,19 @@ def select_variant(
     idempotency_key: str,
 ) -> dict[str, Any]:
     payload = {"request_id": request_id, "variant_id": variant_id, "actor": actor}
-    replay = _event_by_key(conn, idempotency_key)
-    if replay is not None:
-        if replay["request_id"] != request_id or replay["payload_digest"] != _payload_digest(payload):
-            raise knowledge.IdempotencyConflict(
-                "variant selection idempotency key belongs to another review event"
-            )
-        return get_variant_review(conn, request_id)
 
+    # Idempotency lookup and selection are one top-level transaction. A lookup
+    # before this block would open an implicit transaction and turn the actual
+    # selection into a savepoint.
     with conn.transaction():
+        replay = _event_by_key(conn, idempotency_key)
+        if replay is not None:
+            if replay["request_id"] != request_id or replay["payload_digest"] != _payload_digest(payload):
+                raise knowledge.IdempotencyConflict(
+                    "variant selection idempotency key belongs to another review event"
+                )
+            return get_variant_review(conn, request_id)
+
         request = _request_row(conn, request_id, lock=True)
         if request["status"] != "proposed":
             raise KnowledgeEditVariantConflict(
@@ -676,7 +681,8 @@ def select_variant(
                 "evidence_admitted": False,
             },
         )
-    return get_variant_review(conn, request_id)
+        selected = get_variant_review(conn, request_id)
+    return selected
 
 
 def reject_request(
@@ -691,15 +697,16 @@ def reject_request(
     if not normalized_reason:
         raise KnowledgeEditVariantError("rejection reason is required")
     payload = {"request_id": request_id, "actor": actor, "reason": normalized_reason}
-    replay = _event_by_key(conn, idempotency_key)
-    if replay is not None:
-        if replay["request_id"] != request_id or replay["payload_digest"] != _payload_digest(payload):
-            raise knowledge.IdempotencyConflict(
-                "rejection idempotency key belongs to another review event"
-            )
-        return get_variant_review(conn, request_id)
 
     with conn.transaction():
+        replay = _event_by_key(conn, idempotency_key)
+        if replay is not None:
+            if replay["request_id"] != request_id or replay["payload_digest"] != _payload_digest(payload):
+                raise knowledge.IdempotencyConflict(
+                    "rejection idempotency key belongs to another review event"
+                )
+            return get_variant_review(conn, request_id)
+
         request = _request_row(conn, request_id, lock=True)
         if request["status"] not in {"queued_for_hermes", "proposed"}:
             raise KnowledgeEditVariantConflict(
@@ -724,7 +731,8 @@ def reject_request(
                 "evidence_admitted": False,
             },
         )
-    return get_variant_review(conn, request_id)
+        rejected = get_variant_review(conn, request_id)
+    return rejected
 
 
 def apply_selected_variant(
@@ -829,20 +837,23 @@ def project_execution_result_variant(
             idempotency_key=idempotency_key,
         )
     except KnowledgeEditVariantConflict:
-        result = _execution_result_item(conn, execution_result_id, result_ref)
-        request_id = str(dict(result.get("payload") or {}).get("request_ref") or "")
-        if request_id:
-            try:
-                request = _request_row(conn, request_id)
-                item = _knowledge_snapshot(conn, request["knowledge_id"])
-            except knowledge.KnowledgeNotFound:
-                pass
-            else:
-                if (
-                    request["status"] in {"queued_for_hermes", "proposed"}
-                    and _scope_status(request, item) != "current"
-                ):
-                    with conn.transaction():
+        # The failed projection transaction has rolled back. Re-open one
+        # explicit transaction for the durable conflict transition so no
+        # preliminary read can turn that write into a savepoint.
+        with conn.transaction():
+            result = _execution_result_item(conn, execution_result_id, result_ref)
+            request_id = str(dict(result.get("payload") or {}).get("request_ref") or "")
+            if request_id:
+                try:
+                    request = _request_row(conn, request_id)
+                    item = _knowledge_snapshot(conn, request["knowledge_id"])
+                except knowledge.KnowledgeNotFound:
+                    pass
+                else:
+                    if (
+                        request["status"] in {"queued_for_hermes", "proposed"}
+                        and _scope_status(request, item) != "current"
+                    ):
                         conn.execute(
                             "UPDATE knowledge_edit_requests SET status = 'conflict', "
                             "updated_at = CURRENT_TIMESTAMP WHERE request_id = %s "
