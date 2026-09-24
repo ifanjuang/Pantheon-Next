@@ -322,6 +322,8 @@ def test_recompile_request_is_candidate_only_and_apply_rebinds_provenance(
     assert context["ready_for_candidate"] is True
     assert context["context_complete"] is True
     assert context["allowed_source_chunk_refs"]
+    # The context read is a separate HTTP-style request in production.
+    conn.rollback()
 
     request_id = f"recompile-{uuid.uuid4().hex}"
     request_key = f"request-{uuid.uuid4().hex}"
@@ -385,6 +387,9 @@ def test_recompile_request_is_candidate_only_and_apply_rebinds_provenance(
         if dependency["current_candidate_chunks"]
     ]
     assert len(chosen_refs) == 2
+    # Hermes context retrieval is read-only and uses a separate connection in
+    # the API; close that read transaction before the proposal write.
+    conn.rollback()
 
     proposed_markdown = (
         "# Façade\n\nLe support est repris ; le primaire prescrit doit être intégré "
@@ -410,6 +415,8 @@ def test_recompile_request_is_candidate_only_and_apply_rebinds_provenance(
     # Hermes proposing still does not write Knowledge.
     assert knowledge.get_knowledge_markdown(conn, knowledge_id) == original_markdown
     assert knowledge.get_knowledge_source_state(conn, knowledge_id)["status"] == "needs_recompile"
+    # Review/source-state reads are separate requests from the consequential apply.
+    conn.rollback()
 
     client = StandInPolicyClient()
     apply_digest = knowledge._payload_digest(
@@ -521,14 +528,14 @@ def test_recompile_context_refuses_tampered_frozen_source_chunk(
     with conn.cursor() as cur:
         cur.execute(
             """
-            SELECT source_ref, source_digest, ordinal
+            SELECT ordinal
               FROM knowledge_source_chunks
              WHERE knowledge_id = %s
                AND document_id = %s
             """,
             (knowledge_id, supporting["document_id"]),
         )
-        old_source_ref, old_source_digest, old_ordinal = cur.fetchone()
+        old_ordinal = cur.fetchone()[0]
 
     supporting["path"].write_text(
         "# CR chantier\n\nLe support est repris dans la nouvelle version.",
@@ -541,9 +548,9 @@ def test_recompile_context_refuses_tampered_frozen_source_chunk(
         ingestion_id=f"reingest-{uuid.uuid4().hex}",
     ) == 2
 
-    # Simulate corruption of the immutable historical retrieval chunk. The
-    # frozen provenance digest must make the old side of the recompile diff
-    # unusable rather than silently accepting the modified body.
+    # Simulate corruption of the frozen cited-body provenance. The frozen
+    # text digest must make the old side unusable rather than silently
+    # accepting the modified snapshot.
     conn.execute(
         """
         UPDATE knowledge_source_chunks
