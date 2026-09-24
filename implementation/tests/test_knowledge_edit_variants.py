@@ -452,6 +452,56 @@ def test_apply_and_its_audit_commit_together(conn, tmp_path, monkeypatch) -> Non
 
 
 
+def test_variant_apply_conflict_status_survives_enclosing_transaction(
+    conn, tmp_path
+) -> None:
+    card = _publish(conn, tmp_path)
+    review = _request(conn, card, count=1)
+    request_id = review["edit_request"]["request_id"]
+
+    execution_id, result_ref = _store_variant_result(
+        conn,
+        review,
+        label="A",
+        replacement="Préparer soigneusement le support.",
+    )
+    proposed = _project(conn, execution_id, result_ref)
+    knowledge_edit_variants.select_variant(
+        conn,
+        request_id=request_id,
+        variant_id=proposed["variants"][0]["variant_id"],
+        actor="human@agency",
+        idempotency_key=_id("select"),
+    )
+
+    markdown = knowledge.get_knowledge_markdown(conn, card["knowledge_id"])
+    conn.rollback()
+    knowledge.revise_knowledge(
+        conn,
+        knowledge_id=card["knowledge_id"],
+        markdown=markdown + "\n\nRévision concurrente.",
+        expected_version=card["version"],
+        actor="architecte",
+        actor_kind="human",
+        idempotency_key=_id("concurrent-revision"),
+    )
+
+    with pytest.raises(
+        knowledge.StaleKnowledgeWrite,
+        match="Knowledge changed after the intelligent edit was proposed",
+    ):
+        knowledge_edit_variants.apply_selected_variant(
+            conn,
+            request_id=request_id,
+            actor="human@agency",
+            idempotency_key=_id("apply"),
+        )
+
+    stored = knowledge_edit_variants.get_variant_review(conn, request_id)
+    assert stored["edit_request"]["status"] == "conflict"
+    assert knowledge.get_knowledge_card(conn, card["knowledge_id"])["version"] == 2
+
+
 def test_projection_conflict_status_survives_inner_rollback(conn, tmp_path) -> None:
     card = _publish(conn, tmp_path)
     review = _request(conn, card, count=1)
