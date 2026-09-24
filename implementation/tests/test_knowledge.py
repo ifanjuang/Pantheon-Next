@@ -926,6 +926,107 @@ def test_recompile_proposal_conflicts_if_source_context_moves_again(
     assert knowledge.get_knowledge_card(conn, knowledge_id)["version"] == 1
 
 
+def test_recompile_apply_locks_source_state_through_policy(
+    conn, tmp_path, monkeypatch
+) -> None:
+    contract, sources = _multi_source_fixture(conn, tmp_path)
+    primary, supporting = list(sources.values())
+    knowledge_id = f"knowledge.techniques.{uuid.uuid4().hex}"
+
+    knowledge.publish_knowledge(
+        conn,
+        knowledge_id=knowledge_id,
+        document_id=primary["document_id"],
+        title="Synthèse façade verrouillée",
+        family="techniques",
+        markdown="# Façade\n\nVersion initiale.",
+        source_chunk_refs=[primary["chunk_ref"], supporting["chunk_ref"]],
+        created_by="hermes-test",
+        actor_kind="hermes",
+        idempotency_key=f"publish-{uuid.uuid4().hex}",
+    )
+
+    supporting["path"].write_text(
+        "# CR chantier\n\nNouvelle prescription à recompiler.",
+        encoding="utf-8",
+    )
+    assert store.ingest(
+        conn,
+        contract,
+        tmp_path,
+        ingestion_id=f"reingest-{uuid.uuid4().hex}",
+    ) == 2
+
+    request_id = f"recompile-{uuid.uuid4().hex}"
+    knowledge.create_recompile_request(
+        conn,
+        request_id=request_id,
+        knowledge_id=knowledge_id,
+        requested_by="human:architect",
+        idempotency_key=f"request-{uuid.uuid4().hex}",
+    )
+    context = knowledge.get_recompile_context_for_request(conn, request_id)
+    chosen_refs = [
+        dependency["current_candidate_chunks"][0]["chunk_ref"]
+        for dependency in context["dependencies"]
+        if dependency["current_candidate_chunks"]
+    ]
+    knowledge.complete_edit_request(
+        conn,
+        request_id=request_id,
+        replacement_markdown="# Façade\n\nSynthèse recompilée.",
+        replacement_source_chunk_refs=chosen_refs,
+    )
+    conn.rollback()
+
+    dependency_ids = sorted(
+        dependency["document_id"] for dependency in context["dependencies"]
+    )
+    checked = {"source_documents": False, "bindings": False}
+
+    def assert_source_state_locked(_policy_client, **_kwargs):
+        contender = psycopg.connect(store.dsn_from_env())
+        try:
+            with pytest.raises(psycopg.errors.LockNotAvailable):
+                with contender.transaction():
+                    contender.execute(
+                        "SELECT document_id FROM source_documents "
+                        "WHERE document_id = ANY(%s) ORDER BY document_id "
+                        "FOR UPDATE NOWAIT",
+                        (dependency_ids,),
+                    )
+            checked["source_documents"] = True
+
+            with pytest.raises(psycopg.errors.LockNotAvailable):
+                with contender.transaction():
+                    contender.execute(
+                        "SELECT document_id FROM document_compilation_bindings "
+                        "WHERE document_id = ANY(%s) ORDER BY document_id "
+                        "FOR UPDATE NOWAIT",
+                        (dependency_ids,),
+                    )
+            checked["bindings"] = True
+        finally:
+            contender.close()
+
+    monkeypatch.setattr(
+        knowledge, "_gate_knowledge_write", assert_source_state_locked
+    )
+    applied = knowledge.apply_edit_request(
+        conn,
+        request_id=request_id,
+        actor="human:architect",
+        actor_kind="human",
+        idempotency_key=f"apply-{uuid.uuid4().hex}",
+        policy_client=object(),
+        decision_payload={},
+    )
+
+    assert checked == {"source_documents": True, "bindings": True}
+    assert applied["knowledge"]["version"] == 2
+    assert applied["knowledge"]["source_chunk_refs"] == chosen_refs
+
+
 def test_ordinary_edit_does_not_rebind_source_provenance(conn, tmp_path) -> None:
     card, _document_id = _publish(conn, tmp_path)
     knowledge_id = card["knowledge_id"]
