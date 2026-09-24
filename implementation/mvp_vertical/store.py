@@ -861,6 +861,12 @@ def ingest(
     # Cache lookups are reads but psycopg starts a transaction for them. End
     # that read transaction before the atomic replacement below.
     conn.commit()
+
+    # Every multi-document writer takes source-document row locks in this
+    # stable identity order. Knowledge recompile apply uses the same ordering,
+    # so ingestion and provenance rebinding cannot deadlock on shared sources.
+    prepared.sort(key=lambda entry: _document_id(contract.dossier, entry[0]))
+
     total = 0
     with conn.transaction():
         for (
