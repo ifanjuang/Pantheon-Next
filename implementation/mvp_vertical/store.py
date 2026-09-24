@@ -170,6 +170,7 @@ CREATE TABLE IF NOT EXISTS knowledge_source_chunks (
     extraction_id TEXT NOT NULL REFERENCES extraction_runs(extraction_id) ON DELETE RESTRICT,
     ordinal INT NOT NULL CHECK (ordinal >= 0),
     text_digest TEXT NOT NULL,
+    body_snapshot TEXT,
     source_ref TEXT NOT NULL,
     source_digest TEXT NOT NULL,
     structural_locator TEXT NOT NULL,
@@ -239,6 +240,22 @@ BEGIN
     END IF;
 END;
 $knowledge_events$;
+
+-- Slice #1118 freezes the exact cited chunk body inside the existing
+-- provenance relation. Legacy rows remain nullable and may use retained
+-- historical chunks when their frozen digest still matches.
+DO $knowledge_source_body_snapshot$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+         WHERE table_name = 'knowledge_source_chunks'
+           AND column_name = 'body_snapshot'
+    ) THEN
+        ALTER TABLE knowledge_source_chunks
+            ADD COLUMN body_snapshot TEXT;
+    END IF;
+END;
+$knowledge_source_body_snapshot$;
 
 -- Knowledge event replay keeps its existing compact result_snapshot contract.
 -- These nullable content snapshots preserve the exact editorial Markdown and
