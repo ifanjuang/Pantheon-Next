@@ -1138,7 +1138,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge.py", "apply_edit_request"): {
         "gate": "enforce_consequential",
-        "local_guards": ("request status", "transaction owned before the first database read", "Knowledge row re-read under lock", "version and selection digest", "single transaction with audit", "idempotency", "recompile source-context digest, frozen-content integrity and allowed current source refs are rechecked before apply", "chokepoint after all staleness checks, expectation bound to a digest of the exact replacement, recompile context and provenance when present", "unconditional: apply always needs a decision, not just a review_status=\"reviewed\" claim"),
+        "local_guards": ("request row locked before status/admission checks", "transaction owned before the first database read", "Knowledge row re-read under lock", "version and selection digest", "single transaction with audit", "idempotency", "recompile source-context digest, frozen-content integrity and allowed current source refs are rechecked before apply", "chokepoint after all staleness checks, expectation bound to a digest of the exact replacement, recompile context and provenance when present", "unconditional: apply always needs a decision, not just a review_status=\"reviewed\" claim"),
         "reviewed": (
             "Wired, at the point this entry itself named: `create_edit_request` "
             "accepts `replacement_markdown` from its caller and sets `proposed` on "
@@ -1167,7 +1167,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge.py", "complete_edit_request"): {
         "gate": "none",
-        "local_guards": ("non-empty replacement", "Hermes bearer key on the route", "version comparison against base_version", "status must be queued_for_hermes, or an identical replay of the same proposed replacement", "recompile proposals must match the frozen source-context digest", "replacement source refs must stay inside the bounded context and retain a current primary-source chunk", "ordinary edits cannot replace provenance"),
+        "local_guards": ("non-empty replacement", "Hermes bearer key on the route", "request row locked across terminal-status check and proposal transition", "version comparison against base_version", "status must be queued_for_hermes, or an identical replay of the same proposed replacement", "recompile proposals must match the frozen source-context digest", "replacement source refs must stay inside the bounded context and retain a current primary-source chunk", "ordinary edits cannot replace provenance"),
         "reviewed": (
             "Corrected. Reads as Hermes filling in the proposal it was queued for. "
             "It took no actor, no idempotency key, wrote no event, and guarded no "
@@ -1280,20 +1280,19 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge_edit_variants.py", "apply_selected_variant"): {
         "gate": "none",
-        "local_guards": ("preparation transaction owns its first read", "status re-checked under lock", "selection unchanged under lock", "variant ownership", "selected replacement preparation commits before delegation", "Knowledge revision and variant_applied audit share the apply owner transaction", "idempotent replay when already applied"),
+        "local_guards": ("top-level transaction owns request lock before variant validation", "status and selected_variant_id checked under that lock", "variant ownership", "replacement prepared with selected_variant_id/status predicate", "request lock is retained across delegated Knowledge apply", "Knowledge revision and variant_applied audit commit inside the same outer transaction", "idempotent replay when already applied"),
         "reviewed": (
-            "Regime unchanged: selecting or preparing a variant does not mutate "
-            "Knowledge, and the consequential write remains delegated to "
-            "`knowledge.apply_edit_request`. The request and selected variant are "
-            "validated and locked in a first, explicit preparation transaction; "
-            "that transaction may persist the selected replacement Markdown but "
-            "cannot apply it. The second transaction belongs to the Knowledge "
-            "owner, where the revision and `variant_applied` audit commit together. "
-            "This separation is intentional: a downstream refusal may leave the "
-            "candidate prepared, but never a partially applied Knowledge revision. "
-            "The older rejection-reopen defect no longer applies because "
-            "`complete_edit_request` now refuses every decided status other than "
-            "an identical replay of an already-proposed replacement."
+            "The consequential write remains delegated to "
+            "`knowledge.apply_edit_request`, but candidate preparation is no longer "
+            "a separately committed transaction. `apply_selected_variant` locks the "
+            "request row first, resolves the immutable variant currently selected, "
+            "prepares exactly that replacement with a selected-id/status predicate, "
+            "and keeps the lock while the Knowledge owner applies it. The delegated "
+            "owner may use a savepoint here because this wrapper deliberately owns "
+            "the top-level transaction. A competing select/reject/apply therefore "
+            "cannot change the selection between review and persistence, and the "
+            "`variant_applied` event cannot name a different candidate from the "
+            "Markdown that actually committed."
         ),
     },
     ("knowledge_edit_variants.py", "create_variant_request"): {
