@@ -1264,7 +1264,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge.py", "revise_knowledge"): {
         "gate": "none",
-        "local_guards": ("expected_version optimistic concurrency", "actor_kind membership", "idempotency with payload digest", "optional provenance rebind resolves only current chunks in the primary Project and retains a primary-source chunk", "Markdown and provenance rebind share one transaction", "base and resulting content/provenance snapshots are persisted in knowledge_events"),
+        "local_guards": ("expected_version optimistic concurrency", "actor_kind membership", "idempotency with payload digest", "optional provenance rebind resolves only current chunks in the primary Project and retains a primary-source chunk", "Markdown and provenance rebind share one transaction", "base and resulting content/provenance snapshots are persisted in knowledge_events", "knowledge_events is append-only at the PostgreSQL layer"),
         "reviewed": (
             "The revision primitive, not an entry point: its own route, "
             "`PUT /knowledge/{knowledge_id}`, is retired and raises 410. It holds as "
