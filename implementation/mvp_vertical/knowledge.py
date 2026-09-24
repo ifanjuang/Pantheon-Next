@@ -311,8 +311,8 @@ def _write_knowledge_source_bindings(
             """
             INSERT INTO knowledge_source_chunks (
                 knowledge_id, chunk_ref, document_id, extraction_id, ordinal,
-                text_digest, source_ref, source_digest, structural_locator
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                text_digest, body_snapshot, source_ref, source_digest, structural_locator
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """,
             (
                 knowledge_id,
@@ -321,6 +321,7 @@ def _write_knowledge_source_bindings(
                 source_chunk["extraction_id"],
                 ordinal,
                 _digest(source_chunk["body"]),
+                source_chunk["body"],
                 source_chunk["source_ref"],
                 source_chunk["source_digest"],
                 source_chunk["structural_locator"] or f"chunk/{ordinal}",
@@ -570,10 +571,10 @@ def build_knowledge_recompile_context(
 ) -> dict:
     """Build exact old/new context for the Knowledge's existing dependencies.
 
-    The context is a candidate input, not a write. For every changed dependency
-    it exposes the complete prior technical chunk version and the complete
-    current technical chunk version. The bound is the Knowledge's already-cited
-    documents, never a broad Project retrieval.
+    The old side is the exact body snapshot of every chunk the Knowledge cited.
+    For each changed dependency the new side is the complete current technical
+    chunk version. The bound is the Knowledge's already-cited documents, never
+    a broad Project retrieval.
     """
     item = _knowledge_row(conn, knowledge_id)
     state = get_knowledge_source_state(conn, knowledge_id)
@@ -584,7 +585,7 @@ def build_knowledge_recompile_context(
             """
             SELECT ksc.document_id, ksc.chunk_ref, ksc.extraction_id,
                    ksc.source_ref, ksc.source_digest, ksc.ordinal,
-                   ksc.text_digest, ksc.structural_locator,
+                   ksc.text_digest, ksc.body_snapshot, ksc.structural_locator,
                    oldc.body AS old_body
               FROM knowledge_source_chunks ksc
               JOIN source_documents d ON d.document_id = ksc.document_id
@@ -654,8 +655,14 @@ def build_knowledge_recompile_context(
     # digest makes the context incomplete rather than silently compiling from
     # an unverifiable prior state.
     context_complete = all(
-        row["old_body"] is not None
-        and _digest(row["old_body"]) == row["text_digest"]
+        (row["body_snapshot"] if row["body_snapshot"] is not None else row["old_body"])
+        is not None
+        and _digest(
+            row["body_snapshot"]
+            if row["body_snapshot"] is not None
+            else row["old_body"]
+        )
+        == row["text_digest"]
         for row in frozen_rows
     )
 
@@ -664,37 +671,6 @@ def build_knowledge_recompile_context(
         frozen = frozen_by_document.get(document_id, [])
         current = current_by_document.get(document_id, [])
         selected_current: list[dict] = []
-
-        old_source_rows: list[dict] = []
-        if frozen:
-            old_compilation_ref, _ = _split_chunk_ref(frozen[0]["chunk_ref"])
-            with conn.cursor(row_factory=dict_row) as cur:
-                cur.execute(
-                    """
-                    SELECT c.chunk_no, c.body,
-                           COALESCE(p.structural_locator, '') AS structural_locator
-                      FROM source_documents d
-                      JOIN chunks c
-                        ON c.dossier = d.dossier
-                       AND c.source_ref = %s
-                       AND c.source_digest = %s
-                      LEFT JOIN retrieval_chunk_projections p
-                        ON p.dossier = c.dossier
-                       AND p.source_ref = c.source_ref
-                       AND p.source_digest = c.source_digest
-                       AND p.chunk_no = c.chunk_no
-                     WHERE d.document_id = %s
-                     ORDER BY c.chunk_no
-                    """,
-                    (
-                        dependency["bound_source_ref"],
-                        dependency["bound_source_digest"],
-                        document_id,
-                    ),
-                )
-                old_source_rows = [dict(row) for row in cur.fetchall()]
-        else:
-            old_compilation_ref = ""
 
         if dependency["state"] == "current":
             selected_refs = set(dependency["chunk_refs"])
@@ -716,16 +692,6 @@ def build_knowledge_recompile_context(
 
         if dependency["state"] != "source_failed" and not selected_current:
             context_complete = False
-        if (
-            dependency["state"] in {
-                "source_changed",
-                "extraction_changed",
-                "source_needs_review",
-            }
-            and not old_source_rows
-        ):
-            context_complete = False
-
         frozen_projection = [
             {
                 "chunk_ref": row["chunk_ref"],
@@ -735,19 +701,13 @@ def build_knowledge_recompile_context(
                 "ordinal": int(row["ordinal"]),
                 "text_digest": row["text_digest"],
                 "structural_locator": row["structural_locator"],
-                "body": row["old_body"],
+                "body": (
+                    row["body_snapshot"]
+                    if row["body_snapshot"] is not None
+                    else row["old_body"]
+                ),
             }
             for row in frozen
-        ]
-        old_source_projection = [
-            {
-                "chunk_ref": chunk_ref(old_compilation_ref, row["chunk_no"]),
-                "ordinal": int(row["chunk_no"]),
-                "text_digest": _digest(row["body"]),
-                "structural_locator": row["structural_locator"],
-                "body": row["body"],
-            }
-            for row in old_source_rows
         ]
         current_projection: list[dict] = []
         for row in selected_current:
@@ -770,7 +730,6 @@ def build_knowledge_recompile_context(
             {
                 **dependency,
                 "frozen_chunks": frozen_projection,
-                "old_source_chunks": old_source_projection,
                 "current_candidate_chunks": current_projection,
             }
         )
@@ -802,15 +761,6 @@ def build_knowledge_recompile_context(
                         "structural_locator": chunk["structural_locator"],
                     }
                     for chunk in dependency["frozen_chunks"]
-                ],
-                "old_source_chunks": [
-                    {
-                        "chunk_ref": chunk["chunk_ref"],
-                        "text_digest": chunk["text_digest"],
-                        "observed_body_digest": _digest(chunk["body"]),
-                        "structural_locator": chunk["structural_locator"],
-                    }
-                    for chunk in dependency["old_source_chunks"]
                 ],
                 "current_candidate_chunks": [
                     {
@@ -1001,7 +951,7 @@ def _knowledge_content_snapshot(
         cur.execute(
             """
             SELECT chunk_ref, document_id, extraction_id, ordinal, text_digest,
-                   source_ref, source_digest, structural_locator
+                   body_snapshot, source_ref, source_digest, structural_locator
               FROM knowledge_source_chunks
              WHERE knowledge_id = %s
              ORDER BY document_id, ordinal, chunk_ref
