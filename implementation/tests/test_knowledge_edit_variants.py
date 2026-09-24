@@ -173,6 +173,10 @@ def test_ab_variants_share_one_scope_and_selection_does_not_apply(conn, tmp_path
     review = _request(conn, card, count=2)
     request_id = review["edit_request"]["request_id"]
     original = knowledge.get_knowledge_markdown(conn, card["knowledge_id"])
+    # Production review actions use separate API connections. End the read-only
+    # snapshot before the first projection so subsequent mutation owners open
+    # genuine top-level transactions rather than savepoints.
+    conn.rollback()
 
     execution_a, result_a = _store_variant_result(
         conn,
