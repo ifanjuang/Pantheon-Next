@@ -566,6 +566,51 @@ def list_document_knowledge_impacts(
     }
 
 
+def _lock_knowledge_source_dependencies(
+    conn: psycopg.Connection,
+    knowledge_id: str,
+) -> list[str]:
+    """Serialize recompile apply against technical source/binding replacement.
+
+    Ingestion updates source_documents before document_compilation_bindings in
+    one transaction. Taking the same locks in that order makes the accepted
+    recompile observe either the complete previous technical state or the
+    complete next one, never a mixture across the policy/persistence window.
+    """
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT d.document_id
+              FROM source_documents d
+             WHERE d.document_id IN (
+                       SELECT DISTINCT ksc.document_id
+                         FROM knowledge_source_chunks ksc
+                        WHERE ksc.knowledge_id = %s
+                   )
+             ORDER BY d.document_id
+             FOR UPDATE
+            """,
+            (knowledge_id,),
+        )
+        document_ids = [row[0] for row in cur.fetchall()]
+    if not document_ids:
+        raise KnowledgeError("Knowledge has no source dependencies to lock")
+
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT document_id
+              FROM document_compilation_bindings
+             WHERE document_id = ANY(%s)
+             ORDER BY document_id
+             FOR UPDATE
+            """,
+            (document_ids,),
+        )
+        cur.fetchall()
+    return document_ids
+
+
 def build_knowledge_recompile_context(
     conn: psycopg.Connection, knowledge_id: str
 ) -> dict:
@@ -1557,6 +1602,10 @@ def apply_edit_request(
             recompile_digest = request.get("recompile_context_digest")
             replacement_source_chunk_refs = request.get("replacement_source_chunk_refs")
             if recompile_digest:
+                # Hold the existing technical source owners stable from final
+                # context verification through authorization and provenance
+                # persistence. Ingestion takes these locks in the same order.
+                _lock_knowledge_source_dependencies(conn, request["knowledge_id"])
                 context = build_knowledge_recompile_context(
                     conn, request["knowledge_id"]
                 )
