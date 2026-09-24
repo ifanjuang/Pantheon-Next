@@ -157,7 +157,7 @@ def main() -> int:
             report["identity_preserved"],
             report["reconcile_rebuild"],
         )
-        report["qualified"] = all(required)
+        report["qualified_core"] = all(required)
     finally:
         shutil.rmtree(state_dir, ignore_errors=True)
         if args.keep:
@@ -166,8 +166,12 @@ def main() -> int:
             shutil.rmtree(probe, ignore_errors=True)
             report["cleanup"] = not probe.exists()
 
+    report["qualified"] = bool(
+        report.get("qualified_core")
+        and (args.keep or report["cleanup"])
+    )
     print(json.dumps(report, indent=2, ensure_ascii=False))
-    return 0 if report.get("qualified") else 1
+    return 0 if report["qualified"] else 1
 
 
 if __name__ == "__main__":
