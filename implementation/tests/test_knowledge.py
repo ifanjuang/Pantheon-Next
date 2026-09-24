@@ -987,6 +987,8 @@ def test_apply_locks_edit_request_before_policy_admission(
         requested_by="human:architect",
         idempotency_key=f"request-{uuid.uuid4().hex}",
     )
+    # Request creation and Hermes completion are separate API requests.
+    conn.rollback()
     knowledge.complete_edit_request(
         conn,
         request_id=request_id,
