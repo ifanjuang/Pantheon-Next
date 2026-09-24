@@ -370,21 +370,14 @@ def test_recompile_request_is_candidate_only_and_apply_rebinds_provenance(
             ),
         )
         current_chunk_count = cur.fetchone()[0]
-        cur.execute(
-            """
-            SELECT count(*)
-              FROM chunks
-             WHERE source_ref = %s
-               AND source_digest = %s
-            """,
-            (
-                changed_dependency["bound_source_ref"],
-                changed_dependency["bound_source_digest"],
-            ),
-        )
-        old_chunk_count = cur.fetchone()[0]
     assert len(changed_dependency["current_candidate_chunks"]) == current_chunk_count
-    assert len(changed_dependency["old_source_chunks"]) == old_chunk_count
+    assert len(changed_dependency["frozen_chunks"]) == len(
+        changed_dependency["chunk_refs"]
+    )
+    assert all(
+        knowledge._digest(chunk["body"]) == chunk["text_digest"]
+        for chunk in changed_dependency["frozen_chunks"]
+    )
 
     chosen_refs = [
         dependency["current_candidate_chunks"][0]["chunk_ref"]
@@ -553,13 +546,13 @@ def test_recompile_context_refuses_tampered_frozen_source_chunk(
     # unusable rather than silently accepting the modified body.
     conn.execute(
         """
-        UPDATE chunks
-           SET body = 'contenu historique altéré'
-         WHERE source_ref = %s
-           AND source_digest = %s
-           AND chunk_no = %s
+        UPDATE knowledge_source_chunks
+           SET body_snapshot = 'contenu de provenance altéré'
+         WHERE knowledge_id = %s
+           AND document_id = %s
+           AND ordinal = %s
         """,
-        (old_source_ref, old_source_digest, old_ordinal),
+        (knowledge_id, supporting["document_id"], old_ordinal),
     )
     conn.commit()
 
@@ -647,13 +640,13 @@ def test_recompile_proposal_conflicts_if_frozen_context_is_tampered_after_queue(
 
     conn.execute(
         """
-        UPDATE chunks
-           SET body = 'historique altéré après proposition'
-         WHERE source_ref = %s
-           AND source_digest = %s
-           AND chunk_no = %s
+        UPDATE knowledge_source_chunks
+           SET body_snapshot = 'provenance altérée après proposition'
+         WHERE knowledge_id = %s
+           AND document_id = %s
+           AND ordinal = %s
         """,
-        (old_source_ref, old_source_digest, old_ordinal),
+        (knowledge_id, supporting["document_id"], old_ordinal),
     )
     conn.commit()
 
