@@ -241,6 +241,32 @@ BEGIN
 END;
 $knowledge_events$;
 
+-- Knowledge revision history is the retained owner for exact before/after
+-- snapshots. Match the repository's other event logs: rows may be appended,
+-- never rewritten or deleted after they are recorded.
+CREATE OR REPLACE FUNCTION reject_knowledge_event_mutation()
+RETURNS trigger AS $knowledge_event_guard$
+BEGIN
+    RAISE EXCEPTION 'knowledge_events are append-only';
+END;
+$knowledge_event_guard$ LANGUAGE plpgsql;
+
+DO $knowledge_events_append_only$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+          FROM pg_trigger
+         WHERE tgname = 'knowledge_events_append_only'
+           AND tgrelid = 'knowledge_events'::regclass
+           AND NOT tgisinternal
+    ) THEN
+        CREATE TRIGGER knowledge_events_append_only
+        BEFORE UPDATE OR DELETE ON knowledge_events
+        FOR EACH ROW EXECUTE FUNCTION reject_knowledge_event_mutation();
+    END IF;
+END;
+$knowledge_events_append_only$;
+
 -- Slice #1118 freezes the exact cited chunk body inside the existing
 -- provenance relation. Legacy rows remain nullable and may use retained
 -- historical chunks when their frozen digest still matches.
