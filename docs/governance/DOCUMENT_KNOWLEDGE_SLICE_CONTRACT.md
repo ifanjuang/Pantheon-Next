@@ -269,12 +269,13 @@ The bounded recompile context contains:
 ```text
 current Knowledge Markdown
 + frozen source chunks previously cited
-+ current candidate chunks around the same structural locators / ordinals
-+ exact source/extraction digests
++ complete prior chunk version for each changed existing dependency
++ complete current chunk version for each changed existing dependency
++ exact source/extraction digests and analysis state
 + allowed current source_chunk_refs
 ```
 
-This context is deliberately local to the existing source dependencies. It is not a new retrieval corpus and does not authorize a broad Project search.
+This context is deliberately local to the existing source dependencies. It is not a new retrieval corpus and does not authorize a broad Project search. A changed dependency is compared as an exact technical version, not by a structural-locator or ordinal-neighbour heuristic; a new or moved section therefore remains visible without admitting unrelated Project sources.
 
 Hermes may return:
 
@@ -283,7 +284,7 @@ replacement Markdown
 + replacement current source_chunk_refs
 ```
 
-The proposal remains an edit-request candidate. It does not update Knowledge.
+The proposal remains an edit-request candidate. It does not update Knowledge. A read-only review projection may expose the full-document unified diff and the proposed current source refs; projecting that diff does not select or accept the candidate.
 
 A recompile proposal is applicable only while both are still exact:
 
