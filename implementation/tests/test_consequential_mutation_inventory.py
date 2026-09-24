@@ -1138,7 +1138,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge.py", "apply_edit_request"): {
         "gate": "enforce_consequential",
-        "local_guards": ("request row locked before status/admission checks", "transaction owned before the first database read", "Knowledge row re-read under lock", "version and selection digest", "single transaction with audit", "idempotency", "recompile source-context digest, frozen-content integrity and allowed current source refs are rechecked before apply", "chokepoint after all staleness checks, expectation bound to a digest of the exact replacement, recompile context and provenance when present", "unconditional: apply always needs a decision, not just a review_status=\"reviewed\" claim"),
+        "local_guards": ("request row locked before status/admission checks", "transaction owned before the first database read", "Knowledge row re-read under lock", "version and selection digest", "single transaction with audit", "idempotency", "stale conflict transition only updates a still-proposed request", "recompile source-context digest, frozen-content integrity and allowed current source refs are rechecked before apply", "chokepoint after all staleness checks, expectation bound to a digest of the exact replacement, recompile context and provenance when present", "unconditional: apply always needs a decision, not just a review_status=\"reviewed\" claim"),
         "reviewed": (
             "Wired, at the point this entry itself named: `create_edit_request` "
             "accepts `replacement_markdown` from its caller and sets `proposed` on "
@@ -1292,7 +1292,9 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "the top-level transaction. A competing select/reject/apply therefore "
             "cannot change the selection between review and persistence, and the "
             "`variant_applied` event cannot name a different candidate from the "
-            "Markdown that actually committed."
+            "Markdown that actually committed. If the delegated owner detects stale "
+            "Knowledge, the wrapper catches that signal inside the outer transaction "
+            "long enough to commit the owner's conflict transition, then re-raises it."
         ),
     },
     ("knowledge_edit_variants.py", "create_variant_request"): {
