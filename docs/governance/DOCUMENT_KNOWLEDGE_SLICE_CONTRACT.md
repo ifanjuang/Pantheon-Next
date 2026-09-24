@@ -268,14 +268,13 @@ The bounded recompile context contains:
 
 ```text
 current Knowledge Markdown
-+ frozen source chunks previously cited
-+ complete prior chunk version for each changed existing dependency
++ exact frozen body snapshots for the source chunks previously cited
 + complete current chunk version for each changed existing dependency
 + exact source/extraction digests and analysis state
 + allowed current source_chunk_refs
 ```
 
-This context is deliberately local to the existing source dependencies. It is not a new retrieval corpus and does not authorize a broad Project search. A changed dependency is compared as an exact technical version, not by a structural-locator or ordinal-neighbour heuristic; a new or moved section therefore remains visible without admitting unrelated Project sources.
+This context is deliberately local to the existing source dependencies. It is not a new retrieval corpus and does not authorize a broad Project search. The old side is the exact cited basis frozen by Knowledge provenance; the new side is the complete current technical chunk version of each changed existing dependency. This avoids structural-locator or ordinal-neighbour heuristics while not duplicating unrelated historical source content or admitting unrelated Project sources. Legacy provenance rows without a frozen body may use a retained historical chunk only when its body still matches the frozen text digest; otherwise recompilation blocks rather than inventing old context.
 
 Hermes may return:
 
