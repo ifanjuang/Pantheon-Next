@@ -746,50 +746,20 @@ def apply_selected_variant(
     decision_payload: dict[str, Any] | None = None,
     required_ceiling: str = "C2",
 ) -> dict[str, Any]:
-    """Apply the selected variant, forwarding the gate to apply_edit_request.
+    """Apply exactly the variant selected under the same transaction lock.
 
-    Variant preparation and Knowledge application are deliberately two
-    transactions. The first freezes the selected candidate into the existing
-    edit request; the second is owned by knowledge.apply_edit_request, where
-    the consequential Markdown write and variant_applied audit commit
-    atomically.
+    The wrapper owns one top-level transaction from selected-variant validation
+    through the existing Knowledge apply owner. apply_edit_request therefore
+    runs as a nested savepoint intentionally: the request row remains locked,
+    so another review action cannot change selected_variant_id or the prepared
+    replacement between review and persistence.
     """
     variant: dict[str, Any] | None = None
-    with conn.transaction():
-        request = _request_row(conn, request_id)
-        if request["status"] != "applied":
-            if request["status"] != "proposed":
-                raise KnowledgeEditVariantConflict(
-                    f"selected variant cannot be applied from status {request['status']}"
-                )
-            if not request.get("selected_variant_id"):
-                raise KnowledgeEditVariantError(
-                    "select one proposal variant before applying it"
-                )
-            variant = _variant_row(conn, request["selected_variant_id"])
-            if variant["request_id"] != request_id:
-                raise KnowledgeEditVariantError(
-                    "selected variant does not belong to this request"
-                )
-
-            locked = _request_row(conn, request_id, lock=True)
-            if (
-                locked["status"] != "proposed"
-                or locked["selected_variant_id"] != variant["variant_id"]
-            ):
-                raise KnowledgeEditVariantConflict(
-                    "edit request changed before application"
-                )
-            conn.execute(
-                "UPDATE knowledge_edit_requests SET replacement_markdown = %s, "
-                "updated_at = CURRENT_TIMESTAMP WHERE request_id = %s",
-                (variant["replacement_markdown"], request_id),
-            )
 
     def record_application(
         active: psycopg.Connection, applied_result: dict[str, Any]
     ) -> None:
-        """Write the audit inside the apply transaction, never beside it."""
+        """Write the variant audit inside the same accepted effect."""
         if variant is None or _event_by_key(active, idempotency_key) is not None:
             return
         _insert_event(
@@ -809,18 +779,48 @@ def apply_selected_variant(
             },
         )
 
-    applied = knowledge.apply_edit_request(
-        conn,
-        request_id=request_id,
-        actor=actor,
-        actor_kind="human",
-        idempotency_key=idempotency_key,
-        on_applied=record_application,
-        policy_client=policy_client,
-        decision_payload=decision_payload,
-        required_ceiling=required_ceiling,
-    )
     with conn.transaction():
+        request = _request_row(conn, request_id, lock=True)
+        if request["status"] != "applied":
+            if request["status"] != "proposed":
+                raise KnowledgeEditVariantConflict(
+                    f"selected variant cannot be applied from status {request['status']}"
+                )
+            if not request.get("selected_variant_id"):
+                raise KnowledgeEditVariantError(
+                    "select one proposal variant before applying it"
+                )
+            variant = _variant_row(conn, request["selected_variant_id"])
+            if variant["request_id"] != request_id:
+                raise KnowledgeEditVariantError(
+                    "selected variant does not belong to this request"
+                )
+
+            # Prepare exactly the immutable variant currently selected while
+            # the request row remains locked through the delegated apply.
+            with conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE knowledge_edit_requests SET replacement_markdown = %s, "
+                    "updated_at = CURRENT_TIMESTAMP WHERE request_id = %s "
+                    "AND selected_variant_id = %s AND status = 'proposed'",
+                    (variant["replacement_markdown"], request_id, variant["variant_id"]),
+                )
+                if cur.rowcount != 1:
+                    raise KnowledgeEditVariantConflict(
+                        "selected variant changed before application"
+                    )
+
+        applied = knowledge.apply_edit_request(
+            conn,
+            request_id=request_id,
+            actor=actor,
+            actor_kind="human",
+            idempotency_key=idempotency_key,
+            on_applied=record_application,
+            policy_client=policy_client,
+            decision_payload=decision_payload,
+            required_ceiling=required_ceiling,
+        )
         review = get_variant_review(conn, request_id)
     return {**applied, "review": review}
 
