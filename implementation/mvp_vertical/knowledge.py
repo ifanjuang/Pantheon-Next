@@ -568,12 +568,12 @@ def list_document_knowledge_impacts(
 def build_knowledge_recompile_context(
     conn: psycopg.Connection, knowledge_id: str
 ) -> dict:
-    """Build bounded old/new source context for one stale Knowledge publication.
+    """Build exact old/new context for the Knowledge's existing dependencies.
 
-    The context is a candidate input, not a write. For changed documents it
-    exposes current chunks with the same structural locator as a frozen cited
-    chunk, plus an ordinal neighbour on each side. This keeps the handoff
-    bounded while still tolerating small document-structure shifts.
+    The context is a candidate input, not a write. For every changed dependency
+    it exposes the complete prior technical chunk version and the complete
+    current technical chunk version. The bound is the Knowledge's already-cited
+    documents, never a broad Project retrieval.
     """
     item = _knowledge_row(conn, knowledge_id)
     state = get_knowledge_source_state(conn, knowledge_id)
@@ -665,33 +665,65 @@ def build_knowledge_recompile_context(
         current = current_by_document.get(document_id, [])
         selected_current: list[dict] = []
 
+        old_source_rows: list[dict] = []
+        if frozen:
+            old_compilation_ref, _ = _split_chunk_ref(frozen[0]["chunk_ref"])
+            with conn.cursor(row_factory=dict_row) as cur:
+                cur.execute(
+                    """
+                    SELECT c.chunk_no, c.body,
+                           COALESCE(p.structural_locator, '') AS structural_locator
+                      FROM source_documents d
+                      JOIN chunks c
+                        ON c.dossier = d.dossier
+                       AND c.source_ref = %s
+                       AND c.source_digest = %s
+                      LEFT JOIN retrieval_chunk_projections p
+                        ON p.dossier = c.dossier
+                       AND p.source_ref = c.source_ref
+                       AND p.source_digest = c.source_digest
+                       AND p.chunk_no = c.chunk_no
+                     WHERE d.document_id = %s
+                     ORDER BY c.chunk_no
+                    """,
+                    (
+                        dependency["bound_source_ref"],
+                        dependency["bound_source_digest"],
+                        document_id,
+                    ),
+                )
+                old_source_rows = [dict(row) for row in cur.fetchall()]
+        else:
+            old_compilation_ref = ""
+
         if dependency["state"] == "current":
             selected_refs = set(dependency["chunk_refs"])
             for row in current:
                 reference = chunk_ref(row["compilation_id"], row["chunk_no"])
                 if reference in selected_refs:
                     selected_current.append(row)
-        elif dependency["state"] in {"source_changed", "extraction_changed", "source_needs_review"}:
-            frozen_locators = {
-                str(row["structural_locator"] or "")
-                for row in frozen
-                if str(row["structural_locator"] or "")
-            }
-            frozen_ordinals = {int(row["ordinal"]) for row in frozen}
-            neighbour_ordinals = {
-                ordinal + delta
-                for ordinal in frozen_ordinals
-                for delta in (-1, 0, 1)
-                if ordinal + delta >= 0
-            }
-            for row in current:
-                locator = str(row["structural_locator"] or "")
-                if locator in frozen_locators or int(row["chunk_no"]) in neighbour_ordinals:
-                    selected_current.append(row)
+        elif dependency["state"] in {
+            "source_changed",
+            "extraction_changed",
+            "source_needs_review",
+        }:
+            # Exact new side: expose the complete current version of the
+            # already-dependent document. This catches moved/new sections that
+            # no locator/ordinal-neighbour heuristic can prove equivalent.
+            selected_current = list(current)
         else:
             selected_current = []
 
         if dependency["state"] != "source_failed" and not selected_current:
+            context_complete = False
+        if (
+            dependency["state"] in {
+                "source_changed",
+                "extraction_changed",
+                "source_needs_review",
+            }
+            and not old_source_rows
+        ):
             context_complete = False
 
         frozen_projection = [
@@ -706,6 +738,16 @@ def build_knowledge_recompile_context(
                 "body": row["old_body"],
             }
             for row in frozen
+        ]
+        old_source_projection = [
+            {
+                "chunk_ref": chunk_ref(old_compilation_ref, row["chunk_no"]),
+                "ordinal": int(row["chunk_no"]),
+                "text_digest": _digest(row["body"]),
+                "structural_locator": row["structural_locator"],
+                "body": row["body"],
+            }
+            for row in old_source_rows
         ]
         current_projection: list[dict] = []
         for row in selected_current:
@@ -728,6 +770,7 @@ def build_knowledge_recompile_context(
             {
                 **dependency,
                 "frozen_chunks": frozen_projection,
+                "old_source_chunks": old_source_projection,
                 "current_candidate_chunks": current_projection,
             }
         )
@@ -759,6 +802,15 @@ def build_knowledge_recompile_context(
                         "structural_locator": chunk["structural_locator"],
                     }
                     for chunk in dependency["frozen_chunks"]
+                ],
+                "old_source_chunks": [
+                    {
+                        "chunk_ref": chunk["chunk_ref"],
+                        "text_digest": chunk["text_digest"],
+                        "observed_body_digest": _digest(chunk["body"]),
+                        "structural_locator": chunk["structural_locator"],
+                    }
+                    for chunk in dependency["old_source_chunks"]
                 ],
                 "current_candidate_chunks": [
                     {
