@@ -810,18 +810,30 @@ def apply_selected_variant(
                         "selected variant changed before application"
                     )
 
-        applied = knowledge.apply_edit_request(
-            conn,
-            request_id=request_id,
-            actor=actor,
-            actor_kind="human",
-            idempotency_key=idempotency_key,
-            on_applied=record_application,
-            policy_client=policy_client,
-            decision_payload=decision_payload,
-            required_ceiling=required_ceiling,
-        )
+        apply_conflict: knowledge.StaleKnowledgeWrite | None = None
+        applied: dict[str, Any] | None = None
+        try:
+            applied = knowledge.apply_edit_request(
+                conn,
+                request_id=request_id,
+                actor=actor,
+                actor_kind="human",
+                idempotency_key=idempotency_key,
+                on_applied=record_application,
+                policy_client=policy_client,
+                decision_payload=decision_payload,
+                required_ceiling=required_ceiling,
+            )
+        except knowledge.StaleKnowledgeWrite as exc:
+            # apply_edit_request has already converted the still-proposed request
+            # to durable conflict. Catch inside this enclosing transaction so that
+            # transition commits instead of being undone by the wrapper rollback.
+            apply_conflict = exc
         review = get_variant_review(conn, request_id)
+
+    if apply_conflict is not None:
+        raise apply_conflict
+    assert applied is not None
     return {**applied, "review": review}
 
 
