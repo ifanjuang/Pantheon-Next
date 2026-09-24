@@ -1335,9 +1335,18 @@ def create_edit_request(
     return get_edit_request(conn, request_id)
 
 
-def get_edit_request(conn: psycopg.Connection, request_id: str) -> dict:
+def get_edit_request(
+    conn: psycopg.Connection,
+    request_id: str,
+    *,
+    lock: bool = False,
+) -> dict:
+    suffix = " FOR UPDATE" if lock else ""
     with conn.cursor(row_factory=dict_row) as cur:
-        cur.execute("SELECT * FROM knowledge_edit_requests WHERE request_id = %s", (request_id,))
+        cur.execute(
+            f"SELECT * FROM knowledge_edit_requests WHERE request_id = %s{suffix}",
+            (request_id,),
+        )
         row = cur.fetchone()
     if row is None:
         raise KnowledgeNotFound(f"unknown intelligent edit request: {request_id}")
@@ -1387,7 +1396,10 @@ def complete_edit_request(
     if not replacement_markdown:
         raise KnowledgeError("Hermes proposal must contain replacement Markdown")
     with conn.transaction():
-        request = get_edit_request(conn, request_id)
+        # The terminal-status check and proposal transition share the request
+        # row lock. A concurrent human reject/select/apply cannot race this
+        # read and then be overwritten by the Hermes proposal update.
+        request = get_edit_request(conn, request_id, lock=True)
         normalized_refs = (
             list(replacement_source_chunk_refs)
             if replacement_source_chunk_refs is not None
@@ -1512,7 +1524,11 @@ def apply_edit_request(
             # implicit outer transaction and reduce this block to a savepoint;
             # cockpit_api then closes the connection and would roll the applied
             # Knowledge back despite returning success.
-            request = get_edit_request(conn, request_id)
+            # Serialize all applies and review-state changes on the request
+            # before locking the Knowledge item. Without this row lock, two apply
+            # calls can both observe "proposed"; the loser may later mark an
+            # already-applied request as conflict after waiting on Knowledge.
+            request = get_edit_request(conn, request_id, lock=True)
             if request["status"] == "applied":
                 if (
                     request["apply_idempotency_key"] != idempotency_key
@@ -1627,9 +1643,13 @@ def apply_edit_request(
                 on_applied(conn, result)
     except _EditRequestConflict:
         with conn.transaction():
+            # The failed attempt has released its request lock. Preserve a
+            # terminal decision made in the meantime; only the still-proposed
+            # request discovered stale by this attempt may become conflict.
             conn.execute(
                 "UPDATE knowledge_edit_requests SET status = 'conflict', "
-                "updated_at = CURRENT_TIMESTAMP WHERE request_id = %s",
+                "updated_at = CURRENT_TIMESTAMP "
+                "WHERE request_id = %s AND status = 'proposed'",
                 (request_id,),
             )
         raise StaleKnowledgeWrite(
