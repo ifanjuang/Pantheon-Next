@@ -746,6 +746,7 @@ def build_knowledge_recompile_context(
                 "bound_extraction_id": dependency["bound_extraction_id"],
                 "current_source_digest": dependency["current_source_digest"],
                 "current_extraction_id": dependency["current_extraction_id"],
+                "analysis_status": dependency["analysis_status"],
                 "frozen_chunks": [
                     {
                         "chunk_ref": chunk["chunk_ref"],
@@ -1412,7 +1413,10 @@ def complete_edit_request(
                     "Knowledge recompile proposal must declare replacement source chunk refs"
                 )
             context = build_knowledge_recompile_context(conn, request["knowledge_id"])
-            if context["context_digest"] != recompile_digest:
+            if (
+                context["context_digest"] != recompile_digest
+                or not context["ready_for_candidate"]
+            ):
                 status = "conflict"
             else:
                 allowed = set(context["allowed_source_chunk_refs"])
