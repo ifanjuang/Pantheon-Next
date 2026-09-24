@@ -292,7 +292,7 @@ Knowledge base version
 source-context digest
 ```
 
-If either changes, the request conflicts and must be regenerated. An accepted recompile reuses the existing Knowledge edit apply chokepoint and the existing `revise_knowledge` persistence owner. Markdown and source provenance are then rebound in one transaction.
+If either changes, the request conflicts and must be regenerated. During an accepted recompile, the existing technical source rows and their compilation bindings are locked in stable order from the final context check through authorization and persistence; a concurrent ingestion therefore serializes wholly before or after the accepted effect rather than changing its source basis mid-apply. The recompile reuses the existing Knowledge edit apply chokepoint and the existing `revise_knowledge` persistence owner. Markdown and source provenance are then rebound in one transaction.
 
 Accepted revisions also preserve the exact editorial/provenance state before and after the write in the existing `knowledge_events` owner. That event history is append-only at the PostgreSQL layer: accepted revision records may be appended but not updated or deleted. Legacy events created before these snapshots existed remain nullable; no historical Markdown or provenance is invented or backfilled.
 
