@@ -505,6 +505,152 @@ def test_recompile_request_is_candidate_only_and_apply_rebinds_provenance(
     assert replayed["recompile_context_digest"] == request["recompile_context_digest"]
 
 
+def test_recompile_context_prefers_frozen_body_over_historical_chunk_row(
+    conn, tmp_path
+) -> None:
+    contract, sources = _multi_source_fixture(conn, tmp_path)
+    primary, supporting = list(sources.values())
+    knowledge_id = f"knowledge.techniques.{uuid.uuid4().hex}"
+
+    knowledge.publish_knowledge(
+        conn,
+        knowledge_id=knowledge_id,
+        document_id=primary["document_id"],
+        title="Synthèse façade à ancien contexte figé",
+        family="techniques",
+        markdown="# Façade\n\nVersion initiale.",
+        source_chunk_refs=[primary["chunk_ref"], supporting["chunk_ref"]],
+        created_by="hermes-test",
+        actor_kind="hermes",
+        idempotency_key=f"publish-{uuid.uuid4().hex}",
+    )
+
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT source_ref, source_digest, ordinal, body_snapshot, text_digest
+              FROM knowledge_source_chunks
+             WHERE knowledge_id = %s
+               AND document_id = %s
+            """,
+            (knowledge_id, supporting["document_id"]),
+        )
+        old_source_ref, old_source_digest, old_ordinal, frozen_body, frozen_digest = (
+            cur.fetchone()
+        )
+    assert frozen_body is not None
+    assert knowledge._digest(frozen_body) == frozen_digest
+
+    supporting["path"].write_text(
+        "# CR chantier\n\nLe support est repris dans la nouvelle version.",
+        encoding="utf-8",
+    )
+    assert store.ingest(
+        conn,
+        contract,
+        tmp_path,
+        ingestion_id=f"reingest-{uuid.uuid4().hex}",
+    ) == 2
+
+    # The retrieval cache is not the historical authority for a Knowledge
+    # citation anymore. Even if that retained row changes, the frozen cited
+    # body remains exact.
+    conn.execute(
+        """
+        UPDATE chunks
+           SET body = 'historique de retrieval altéré'
+         WHERE source_ref = %s
+           AND source_digest = %s
+           AND chunk_no = %s
+        """,
+        (old_source_ref, old_source_digest, old_ordinal),
+    )
+    conn.commit()
+
+    context = knowledge.build_knowledge_recompile_context(conn, knowledge_id)
+    dependency = next(
+        item
+        for item in context["dependencies"]
+        if item["document_id"] == supporting["document_id"]
+    )
+    frozen = next(
+        chunk for chunk in dependency["frozen_chunks"] if chunk["ordinal"] == old_ordinal
+    )
+    assert context["context_complete"] is True
+    assert context["ready_for_candidate"] is True
+    assert frozen["body"] == frozen_body
+    assert knowledge._digest(frozen["body"]) == frozen["text_digest"]
+
+
+def test_legacy_recompile_context_fails_closed_if_retained_chunk_changed(
+    conn, tmp_path
+) -> None:
+    contract, sources = _multi_source_fixture(conn, tmp_path)
+    primary, supporting = list(sources.values())
+    knowledge_id = f"knowledge.techniques.{uuid.uuid4().hex}"
+
+    knowledge.publish_knowledge(
+        conn,
+        knowledge_id=knowledge_id,
+        document_id=primary["document_id"],
+        title="Synthèse façade legacy",
+        family="techniques",
+        markdown="# Façade\n\nVersion initiale.",
+        source_chunk_refs=[primary["chunk_ref"], supporting["chunk_ref"]],
+        created_by="hermes-test",
+        actor_kind="hermes",
+        idempotency_key=f"publish-{uuid.uuid4().hex}",
+    )
+
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT source_ref, source_digest, ordinal
+              FROM knowledge_source_chunks
+             WHERE knowledge_id = %s
+               AND document_id = %s
+            """,
+            (knowledge_id, supporting["document_id"]),
+        )
+        old_source_ref, old_source_digest, old_ordinal = cur.fetchone()
+    conn.execute(
+        """
+        UPDATE knowledge_source_chunks
+           SET body_snapshot = NULL
+         WHERE knowledge_id = %s
+        """,
+        (knowledge_id,),
+    )
+    conn.commit()
+
+    supporting["path"].write_text(
+        "# CR chantier\n\nNouvelle version.",
+        encoding="utf-8",
+    )
+    assert store.ingest(
+        conn,
+        contract,
+        tmp_path,
+        ingestion_id=f"reingest-{uuid.uuid4().hex}",
+    ) == 2
+    conn.execute(
+        """
+        UPDATE chunks
+           SET body = 'ancien chunk altéré'
+         WHERE source_ref = %s
+           AND source_digest = %s
+           AND chunk_no = %s
+        """,
+        (old_source_ref, old_source_digest, old_ordinal),
+    )
+    conn.commit()
+
+    context = knowledge.build_knowledge_recompile_context(conn, knowledge_id)
+    assert context["needs_recompile"] is True
+    assert context["context_complete"] is False
+    assert context["ready_for_candidate"] is False
+
+
 def test_recompile_context_refuses_tampered_frozen_source_chunk(
     conn, tmp_path
 ) -> None:
