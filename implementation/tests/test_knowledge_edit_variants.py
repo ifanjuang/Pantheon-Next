@@ -207,6 +207,8 @@ def test_ab_variants_share_one_scope_and_selection_does_not_apply(conn, tmp_path
     assert selected["variant_selected_is_edit_applied"] is False
     assert knowledge.get_knowledge_markdown(conn, card["knowledge_id"]) == original
     assert knowledge.get_knowledge_card(conn, card["knowledge_id"])["version"] == 1
+    # Selection/review and apply are separate API requests.
+    conn.rollback()
 
     applied = knowledge_edit_variants.apply_selected_variant(
         conn,
@@ -327,6 +329,8 @@ def test_apply_and_its_audit_commit_together(conn, tmp_path, monkeypatch) -> Non
 
     before_version = knowledge.get_knowledge_card(conn, card["knowledge_id"])["version"]
     before = knowledge_edit_variants.get_variant_review(conn, request_id)
+    # Review is a separate request from apply.
+    conn.rollback()
 
     real_insert = knowledge_edit_variants._insert_event
 
@@ -349,6 +353,7 @@ def test_apply_and_its_audit_commit_together(conn, tmp_path, monkeypatch) -> Non
     assert knowledge.get_knowledge_card(conn, card["knowledge_id"])["version"] == before_version
     assert after["edit_request"]["status"] == before["edit_request"]["status"]
     assert len(after["review_events"]) == len(before["review_events"])
+    conn.rollback()
 
     monkeypatch.setattr(knowledge_edit_variants, "_insert_event", real_insert)
     applied = knowledge_edit_variants.apply_selected_variant(
