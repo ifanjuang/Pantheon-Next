@@ -414,7 +414,8 @@ def create_variant_request(
                 request_payload_digest,
             ),
         )
-    return get_variant_review(conn, request_id)
+        created = get_variant_review(conn, request_id)
+    return created
 
 
 def _execution_result_item(
