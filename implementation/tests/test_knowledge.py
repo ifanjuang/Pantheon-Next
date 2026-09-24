@@ -493,6 +493,34 @@ def test_recompile_request_is_candidate_only_and_apply_rebinds_provenance(
     assert resulting_snapshot["markdown"] == proposed_markdown
     assert resulting_snapshot["source_chunk_refs"] == chosen_refs
 
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT event_id
+              FROM knowledge_events
+             WHERE aggregate_ref = %s
+               AND event_type = 'knowledge_revised'
+             ORDER BY occurred_at DESC, event_id DESC
+             LIMIT 1
+            """,
+            (knowledge_id,),
+        )
+        revision_event_id = cur.fetchone()[0]
+    conn.rollback()
+
+    with pytest.raises(Exception, match="knowledge_events are append-only"):
+        conn.execute(
+            "UPDATE knowledge_events SET actor = 'rewritten' WHERE event_id = %s",
+            (revision_event_id,),
+        )
+    conn.rollback()
+    with pytest.raises(Exception, match="knowledge_events are append-only"):
+        conn.execute(
+            "DELETE FROM knowledge_events WHERE event_id = %s",
+            (revision_event_id,),
+        )
+    conn.rollback()
+
     replayed = knowledge.create_recompile_request(
         conn,
         request_id=request_id,
