@@ -580,15 +580,10 @@ def _lock_knowledge_source_dependencies(
     with conn.cursor() as cur:
         cur.execute(
             """
-            SELECT d.document_id
-              FROM source_documents d
-             WHERE d.document_id IN (
-                       SELECT DISTINCT ksc.document_id
-                         FROM knowledge_source_chunks ksc
-                        WHERE ksc.knowledge_id = %s
-                   )
-             ORDER BY d.document_id
-             FOR UPDATE
+            SELECT DISTINCT ksc.document_id
+              FROM knowledge_source_chunks ksc
+             WHERE ksc.knowledge_id = %s
+             ORDER BY ksc.document_id
             """,
             (knowledge_id,),
         )
@@ -596,18 +591,29 @@ def _lock_knowledge_source_dependencies(
     if not document_ids:
         raise KnowledgeError("Knowledge has no source dependencies to lock")
 
-    with conn.cursor() as cur:
-        cur.execute(
-            """
-            SELECT document_id
-              FROM document_compilation_bindings
-             WHERE document_id = ANY(%s)
-             ORDER BY document_id
-             FOR UPDATE
-            """,
-            (document_ids,),
-        )
-        cur.fetchall()
+    # Lock one row at a time in explicit document-id order. The ingestion owner
+    # writes documents in this same order, preventing a multi-source deadlock.
+    for document_id in document_ids:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT document_id FROM source_documents "
+                "WHERE document_id = %s FOR UPDATE",
+                (document_id,),
+            )
+            if cur.fetchone() is None:
+                raise KnowledgeError(
+                    f"Knowledge source dependency disappeared: {document_id}"
+                )
+    for document_id in document_ids:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT document_id FROM document_compilation_bindings "
+                "WHERE document_id = %s FOR UPDATE",
+                (document_id,),
+            )
+            # A missing binding is handled by the context-ready check below;
+            # the source row lock prevents ingestion from installing one midway.
+            cur.fetchone()
     return document_ids
 
 
