@@ -106,6 +106,10 @@ def _multi_source_fixture(
 def _publish(conn, tmp_path: Path) -> tuple[dict, str]:
     document_id, refs = _source(conn, tmp_path)
     knowledge_id = f"knowledge.techniques.{uuid.uuid4().hex}"
+    # Source/card inspection and Knowledge publication are separate requests in
+    # production. End the helper's read transaction so publish_knowledge owns
+    # the top-level transaction exactly as the API route does.
+    conn.rollback()
     card = knowledge.publish_knowledge(
         conn,
         knowledge_id=knowledge_id,
