@@ -350,6 +350,42 @@ def test_recompile_request_is_candidate_only_and_apply_rebinds_provenance(
     assert knowledge.get_knowledge_card(conn, knowledge_id)["version"] == 1
 
     hermes_context = knowledge.get_recompile_context_for_request(conn, request_id)
+
+    changed_dependency = next(
+        dependency
+        for dependency in hermes_context["dependencies"]
+        if dependency["document_id"] == supporting["document_id"]
+    )
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT count(*)
+              FROM chunks
+             WHERE source_ref = %s
+               AND source_digest = %s
+            """,
+            (
+                changed_dependency["current_source_ref"],
+                changed_dependency["current_source_digest"],
+            ),
+        )
+        current_chunk_count = cur.fetchone()[0]
+        cur.execute(
+            """
+            SELECT count(*)
+              FROM chunks
+             WHERE source_ref = %s
+               AND source_digest = %s
+            """,
+            (
+                changed_dependency["bound_source_ref"],
+                changed_dependency["bound_source_digest"],
+            ),
+        )
+        old_chunk_count = cur.fetchone()[0]
+    assert len(changed_dependency["current_candidate_chunks"]) == current_chunk_count
+    assert len(changed_dependency["old_source_chunks"]) == old_chunk_count
+
     chosen_refs = [
         dependency["current_candidate_chunks"][0]["chunk_ref"]
         for dependency in hermes_context["dependencies"]
