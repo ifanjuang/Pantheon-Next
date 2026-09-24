@@ -1317,8 +1317,9 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "CANDIDATE_AUTHORITY sets selects_variant, applies_edit, "
             "validates_knowledge, admits_evidence, promotes_memory and "
             "authorizes_task all False. It refuses any status outside "
-            "`{queued_for_hermes, proposed}` — the guard `complete_edit_request` "
-            "lacks — so a rejected request cannot receive a projection. The "
+            "`{queued_for_hermes, proposed}`, matching the terminal-status guard "
+            "now enforced by `complete_edit_request`; a rejected request cannot "
+            "receive a projection or be reopened through Hermes. The "
             "staleness conflict is written in its own transaction after the "
             "attempt unwinds, so discovering it does not depend on the attempt "
             "committing."
@@ -1337,7 +1338,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "terminal on both the variant and direct proposal paths."
         ),
     },
-        ("knowledge_edit_variants.py", "select_variant"): {
+    ("knowledge_edit_variants.py", "select_variant"): {
         "gate": "none",
         "local_guards": ("status must be proposed", "row lock", "variant ownership", "idempotency with payload digest", "event records the selection"),
         "reviewed": (
