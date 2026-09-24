@@ -60,6 +60,9 @@ def _publish(conn, tmp_path: Path) -> dict:
     assert store.ingest(conn, contract, tmp_path, ingestion_id=f"ingest-{suffix}") == 1
     document = store.get_document_card(conn, dossier, source_ref)
     compilation_id = document["structured_extraction"]["compilation_id"]
+    # Document-card lookup and Knowledge publication are separate requests in
+    # production; end the read transaction before the write owner begins.
+    conn.rollback()
     return knowledge.publish_knowledge(
         conn,
         knowledge_id=f"knowledge.techniques.{suffix}",
@@ -78,6 +81,8 @@ def _request(conn, card: dict, *, count: int = 2) -> dict:
     markdown = knowledge.get_knowledge_markdown(conn, card["knowledge_id"])
     selected = "Préparer le support existant."
     start = markdown.index(selected)
+    # The editor request starts on a fresh API connection in production.
+    conn.rollback()
     return knowledge_edit_variants.create_variant_request(
         conn,
         request_id=_id("edit"),
