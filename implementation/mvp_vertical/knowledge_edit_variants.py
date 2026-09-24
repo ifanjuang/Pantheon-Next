@@ -819,7 +819,10 @@ def apply_selected_variant(
         decision_payload=decision_payload,
         required_ceiling=required_ceiling,
     )
-    return {**applied, "review": get_variant_review(conn, request_id)}
+    with conn.transaction():
+        review = get_variant_review(conn, request_id)
+    return {**applied, "review": review}
+
 
 def project_execution_result_variant(
     conn: psycopg.Connection,
