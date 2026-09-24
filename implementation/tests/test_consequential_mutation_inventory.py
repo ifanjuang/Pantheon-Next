@@ -1298,7 +1298,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge_edit_variants.py", "create_variant_request"): {
         "gate": "none",
-        "local_guards": ("status and replacement_markdown are literals in the INSERT", "locked snapshot with base_version equality", "selection range and text matched against the snapshot", "idempotency with payload digest"),
+        "local_guards": ("transaction owned before first database read", "status and replacement_markdown are literals in the INSERT", "locked snapshot with base_version equality", "selection range and text matched against the snapshot", "idempotency with payload digest"),
         "reviewed": (
             "The same table as `knowledge.create_edit_request`, and the "
             "instructive contrast with it: here the INSERT writes "
@@ -1311,7 +1311,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge_edit_variants.py", "project_execution_result_variant"): {
         "gate": "none",
-        "local_guards": ("status must be queued_for_hermes or proposed", "scope currency re-checked under lock", "candidate payload validated against the contract", "conflict persisted after the rollback", "idempotency with projection digest"),
+        "local_guards": ("transaction owned before the Execution Result read", "status must be queued_for_hermes or proposed", "scope currency re-checked under lock", "candidate payload validated against the contract", "conflict persisted in a fresh top-level transaction after rollback", "idempotency with projection digest"),
         "reviewed": (
             "Projects a Hermes candidate and declares its authority as data: "
             "CANDIDATE_AUTHORITY sets selects_variant, applies_edit, "
@@ -1327,7 +1327,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge_edit_variants.py", "reject_request"): {
         "gate": "none",
-        "local_guards": ("status must be queued_for_hermes or proposed", "row lock", "non-empty reason", "idempotency with payload digest", "event records the refusal"),
+        "local_guards": ("transaction owned before idempotency lookup", "status must be queued_for_hermes or proposed", "row lock", "non-empty reason", "idempotency with payload digest", "event records the refusal"),
         "reviewed": (
             "Refuses an edit, which is safety-increasing, and records why. The "
             "request row is locked and only queued_for_hermes or proposed may "
@@ -1340,7 +1340,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge_edit_variants.py", "select_variant"): {
         "gate": "none",
-        "local_guards": ("status must be proposed", "row lock", "variant ownership", "idempotency with payload digest", "event records the selection"),
+        "local_guards": ("transaction owned before idempotency lookup", "status must be proposed", "row lock", "variant ownership", "idempotency with payload digest", "event records the selection"),
         "reviewed": (
             "Records the human choice between two candidates; it mutates no "
             "Knowledge and the event says so explicitly "
