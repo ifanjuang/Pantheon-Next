@@ -5,6 +5,7 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
+import psycopg
 import pytest
 
 from mvp_vertical import execution_results, knowledge, knowledge_edit_variants, store
@@ -309,6 +310,81 @@ def test_rejection_is_non_mutating_and_records_append_only_history(conn, tmp_pat
             (variant_id,),
         )
     conn.rollback()
+
+
+def test_selected_variant_lock_is_held_through_apply_owner(
+    conn, tmp_path, monkeypatch
+) -> None:
+    card = _publish(conn, tmp_path)
+    review = _request(conn, card, count=2)
+    request_id = review["edit_request"]["request_id"]
+
+    execution_a, result_a = _store_variant_result(
+        conn,
+        review,
+        label="A",
+        replacement="Nettoyer et préparer le support existant.",
+    )
+    _project(conn, execution_a, result_a)
+    execution_b, result_b = _store_variant_result(
+        conn,
+        review,
+        label="B",
+        replacement="Purger, dépoussiérer puis appliquer le primaire.",
+    )
+    proposed = _project(conn, execution_b, result_b)
+    variant_b = next(
+        variant for variant in proposed["variants"] if variant["variant_label"] == "B"
+    )
+    knowledge_edit_variants.select_variant(
+        conn,
+        request_id=request_id,
+        variant_id=variant_b["variant_id"],
+        actor="human@agency",
+        idempotency_key=_id("select"),
+    )
+
+    class ApplyObserved(RuntimeError):
+        pass
+
+    def inspect_locked_apply(active, **values):
+        with active.cursor() as cur:
+            cur.execute(
+                "SELECT selected_variant_id, replacement_markdown "
+                "FROM knowledge_edit_requests WHERE request_id = %s",
+                (request_id,),
+            )
+            selected_variant_id, replacement_markdown = cur.fetchone()
+        assert selected_variant_id == variant_b["variant_id"]
+        assert replacement_markdown == variant_b["replacement_markdown"]
+
+        contender = psycopg.connect(store.dsn_from_env())
+        try:
+            with pytest.raises(psycopg.errors.LockNotAvailable):
+                with contender.transaction():
+                    contender.execute(
+                        "SELECT 1 FROM knowledge_edit_requests "
+                        "WHERE request_id = %s FOR UPDATE NOWAIT",
+                        (request_id,),
+                    )
+        finally:
+            contender.close()
+        raise ApplyObserved
+
+    monkeypatch.setattr(knowledge, "apply_edit_request", inspect_locked_apply)
+    with pytest.raises(ApplyObserved):
+        knowledge_edit_variants.apply_selected_variant(
+            conn,
+            request_id=request_id,
+            actor="human@agency",
+            idempotency_key=_id("apply"),
+        )
+
+    # The sentinel unwinds the enclosing transaction, so preparation alone
+    # cannot leak a replacement into the durable request.
+    stored = knowledge.get_edit_request(conn, request_id)
+    assert stored["selected_variant_id"] == variant_b["variant_id"]
+    assert stored["replacement_markdown"] is None
 
 
 def test_apply_and_its_audit_commit_together(conn, tmp_path, monkeypatch) -> None:
