@@ -5,6 +5,7 @@ from __future__ import annotations
 import uuid
 from pathlib import Path
 
+import psycopg
 import pytest
 
 from mvp_vertical import knowledge, store
@@ -956,6 +957,70 @@ def test_ordinary_edit_does_not_rebind_source_provenance(conn, tmp_path) -> None
         idempotency_key=f"apply-{uuid.uuid4().hex}",
     )
     assert applied["knowledge"]["source_chunk_refs"] == original_refs
+
+
+def test_apply_locks_edit_request_before_policy_admission(
+    conn, tmp_path, monkeypatch
+) -> None:
+    card, _document_id = _publish(conn, tmp_path)
+    knowledge_id = card["knowledge_id"]
+    markdown = knowledge.get_knowledge_markdown(conn, knowledge_id)
+    selected = "Préparer le support existant."
+    start = markdown.index(selected)
+    request_id = f"edit-lock-{uuid.uuid4().hex}"
+
+    conn.rollback()
+    knowledge.create_edit_request(
+        conn,
+        request_id=request_id,
+        knowledge_id=knowledge_id,
+        instruction_kind="rewrite",
+        instruction="Reformuler.",
+        base_version=1,
+        selection_start=start,
+        selection_end=start + len(selected),
+        selected_text=selected,
+        requested_by="human:architect",
+        idempotency_key=f"request-{uuid.uuid4().hex}",
+    )
+    knowledge.complete_edit_request(
+        conn,
+        request_id=request_id,
+        replacement_markdown="Préparer soigneusement le support existant.",
+    )
+    # Apply is a separate API request in production.
+    conn.rollback()
+
+    checked = {"locked": False}
+
+    def assert_request_locked(_policy_client, **_kwargs):
+        contender = psycopg.connect(store.dsn_from_env())
+        try:
+            with pytest.raises(psycopg.errors.LockNotAvailable):
+                with contender.transaction():
+                    contender.execute(
+                        "SELECT 1 FROM knowledge_edit_requests "
+                        "WHERE request_id = %s FOR UPDATE NOWAIT",
+                        (request_id,),
+                    )
+        finally:
+            contender.close()
+        checked["locked"] = True
+
+    monkeypatch.setattr(knowledge, "_gate_knowledge_write", assert_request_locked)
+
+    applied = knowledge.apply_edit_request(
+        conn,
+        request_id=request_id,
+        actor="human:architect",
+        actor_kind="human",
+        idempotency_key=f"apply-{uuid.uuid4().hex}",
+        policy_client=object(),
+        decision_payload={},
+    )
+    assert checked["locked"] is True
+    assert applied["edit_request"]["status"] == "applied"
+    assert knowledge.get_edit_request(conn, request_id)["status"] == "applied"
 
 
 def test_ordinary_revision_keeps_pre_recompile_idempotency_digest(
