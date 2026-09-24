@@ -170,6 +170,7 @@ CREATE TABLE IF NOT EXISTS knowledge_source_chunks (
     extraction_id TEXT NOT NULL REFERENCES extraction_runs(extraction_id) ON DELETE RESTRICT,
     ordinal INT NOT NULL CHECK (ordinal >= 0),
     text_digest TEXT NOT NULL,
+    body_snapshot TEXT,
     source_ref TEXT NOT NULL,
     source_digest TEXT NOT NULL,
     structural_locator TEXT NOT NULL,
@@ -189,6 +190,8 @@ CREATE TABLE IF NOT EXISTS knowledge_events (
     idempotency_key TEXT NOT NULL UNIQUE,
     payload_digest TEXT NOT NULL,
     result_snapshot JSONB NOT NULL,
+    base_content_snapshot JSONB,
+    resulting_content_snapshot JSONB,
     occurred_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
 );
 CREATE TABLE IF NOT EXISTS knowledge_edit_requests (
@@ -203,6 +206,8 @@ CREATE TABLE IF NOT EXISTS knowledge_edit_requests (
     selection_end INT NOT NULL CHECK (selection_end >= selection_start),
     selected_text_digest TEXT NOT NULL,
     replacement_markdown TEXT,
+    recompile_context_digest TEXT,
+    replacement_source_chunk_refs JSONB,
     status TEXT NOT NULL CHECK (
         status IN ('queued_for_hermes', 'proposed', 'applied', 'conflict', 'rejected')
     ),
@@ -222,7 +227,7 @@ CREATE TABLE IF NOT EXISTS knowledge_edit_requests (
 -- sorted by a random UUID. CREATE TABLE IF NOT EXISTS above never revisits a
 -- table that already exists, so existing databases are corrected here. Guarded on
 -- the value this adds, so a started-up installation performs a catalog read only.
-DO $$
+DO $knowledge_events$
 BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns
@@ -234,7 +239,99 @@ BEGIN
             ALTER COLUMN occurred_at SET DEFAULT clock_timestamp();
     END IF;
 END;
-$$;
+$knowledge_events$;
+
+-- Knowledge revision history is the retained owner for exact before/after
+-- snapshots. Match the repository's other event logs: rows may be appended,
+-- never rewritten or deleted after they are recorded.
+CREATE OR REPLACE FUNCTION reject_knowledge_event_mutation()
+RETURNS trigger AS $knowledge_event_guard$
+BEGIN
+    RAISE EXCEPTION 'knowledge_events are append-only';
+END;
+$knowledge_event_guard$ LANGUAGE plpgsql;
+
+DO $knowledge_events_append_only$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+          FROM pg_trigger
+         WHERE tgname = 'knowledge_events_append_only'
+           AND tgrelid = 'knowledge_events'::regclass
+           AND NOT tgisinternal
+    ) THEN
+        CREATE TRIGGER knowledge_events_append_only
+        BEFORE UPDATE OR DELETE ON knowledge_events
+        FOR EACH ROW EXECUTE FUNCTION reject_knowledge_event_mutation();
+    END IF;
+END;
+$knowledge_events_append_only$;
+
+-- Slice #1118 freezes the exact cited chunk body inside the existing
+-- provenance relation. Legacy rows remain nullable and may use retained
+-- historical chunks when their frozen digest still matches.
+DO $knowledge_source_body_snapshot$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+         WHERE table_name = 'knowledge_source_chunks'
+           AND column_name = 'body_snapshot'
+    ) THEN
+        ALTER TABLE knowledge_source_chunks
+            ADD COLUMN body_snapshot TEXT;
+    END IF;
+END;
+$knowledge_source_body_snapshot$;
+
+-- Knowledge event replay keeps its existing compact result_snapshot contract.
+-- These nullable content snapshots preserve the exact editorial Markdown and
+-- source bindings across accepted revisions without creating another history
+-- owner or changing idempotent replay payloads.
+DO $knowledge_event_history$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+         WHERE table_name = 'knowledge_events'
+           AND column_name = 'base_content_snapshot'
+    ) THEN
+        ALTER TABLE knowledge_events
+            ADD COLUMN base_content_snapshot JSONB;
+    END IF;
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+         WHERE table_name = 'knowledge_events'
+           AND column_name = 'resulting_content_snapshot'
+    ) THEN
+        ALTER TABLE knowledge_events
+            ADD COLUMN resulting_content_snapshot JSONB;
+    END IF;
+END;
+$knowledge_event_history$;
+
+-- Slice #1118 extends the existing intelligent-edit request with optional
+-- recompile provenance. Existing installations keep the same owner/table; the
+-- two nullable columns merely bind a full-document recompilation proposal to
+-- the exact source-state snapshot it was produced from.
+DO $knowledge_recompile$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+         WHERE table_name = 'knowledge_edit_requests'
+           AND column_name = 'recompile_context_digest'
+    ) THEN
+        ALTER TABLE knowledge_edit_requests
+            ADD COLUMN recompile_context_digest TEXT;
+    END IF;
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+         WHERE table_name = 'knowledge_edit_requests'
+           AND column_name = 'replacement_source_chunk_refs'
+    ) THEN
+        ALTER TABLE knowledge_edit_requests
+            ADD COLUMN replacement_source_chunk_refs JSONB;
+    END IF;
+END;
+$knowledge_recompile$;
 """ + STRUCTURED_EXTRACTION_DDL + VERSIONED_RETRIEVAL_DDL
 
 
@@ -764,6 +861,12 @@ def ingest(
     # Cache lookups are reads but psycopg starts a transaction for them. End
     # that read transaction before the atomic replacement below.
     conn.commit()
+
+    # Every multi-document writer takes source-document row locks in this
+    # stable identity order. Knowledge recompile apply uses the same ordering,
+    # so ingestion and provenance rebinding cannot deadlock on shared sources.
+    prepared.sort(key=lambda entry: _document_id(contract.dossier, entry[0]))
+
     total = 0
     with conn.transaction():
         for (

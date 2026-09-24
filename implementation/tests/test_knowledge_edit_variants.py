@@ -5,6 +5,7 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
+import psycopg
 import pytest
 
 from mvp_vertical import execution_results, knowledge, knowledge_edit_variants, store
@@ -60,6 +61,9 @@ def _publish(conn, tmp_path: Path) -> dict:
     assert store.ingest(conn, contract, tmp_path, ingestion_id=f"ingest-{suffix}") == 1
     document = store.get_document_card(conn, dossier, source_ref)
     compilation_id = document["structured_extraction"]["compilation_id"]
+    # Document-card lookup and Knowledge publication are separate requests in
+    # production; end the read transaction before the write owner begins.
+    conn.rollback()
     return knowledge.publish_knowledge(
         conn,
         knowledge_id=f"knowledge.techniques.{suffix}",
@@ -78,6 +82,8 @@ def _request(conn, card: dict, *, count: int = 2) -> dict:
     markdown = knowledge.get_knowledge_markdown(conn, card["knowledge_id"])
     selected = "Préparer le support existant."
     start = markdown.index(selected)
+    # The editor request starts on a fresh API connection in production.
+    conn.rollback()
     return knowledge_edit_variants.create_variant_request(
         conn,
         request_id=_id("edit"),
@@ -168,6 +174,10 @@ def test_ab_variants_share_one_scope_and_selection_does_not_apply(conn, tmp_path
     review = _request(conn, card, count=2)
     request_id = review["edit_request"]["request_id"]
     original = knowledge.get_knowledge_markdown(conn, card["knowledge_id"])
+    # Production review actions use separate API connections. End the read-only
+    # snapshot before the first projection so subsequent mutation owners open
+    # genuine top-level transactions rather than savepoints.
+    conn.rollback()
 
     execution_a, result_a = _store_variant_result(
         conn,
@@ -207,6 +217,8 @@ def test_ab_variants_share_one_scope_and_selection_does_not_apply(conn, tmp_path
     assert selected["variant_selected_is_edit_applied"] is False
     assert knowledge.get_knowledge_markdown(conn, card["knowledge_id"]) == original
     assert knowledge.get_knowledge_card(conn, card["knowledge_id"])["version"] == 1
+    # Selection/review and apply are separate API requests.
+    conn.rollback()
 
     applied = knowledge_edit_variants.apply_selected_variant(
         conn,
@@ -217,7 +229,15 @@ def test_ab_variants_share_one_scope_and_selection_does_not_apply(conn, tmp_path
     assert applied["knowledge"]["version"] == 2
     assert applied["review"]["edit_request"]["status"] == "applied"
     assert "Purger les parties" in knowledge.get_knowledge_markdown(conn, card["knowledge_id"])
-    event_types = [event["event_type"] for event in applied["review"]["review_events"]]
+
+    # The review projection above starts a read transaction after the apply.
+    # Rolling it back must not erase the accepted Knowledge revision or audit.
+    conn.rollback()
+    assert knowledge.get_knowledge_card(conn, card["knowledge_id"])["version"] == 2
+    persisted_review = knowledge_edit_variants.get_variant_review(conn, request_id)
+    assert persisted_review["edit_request"]["status"] == "applied"
+
+    event_types = [event["event_type"] for event in persisted_review["review_events"]]
     assert event_types == [
         "variant_projected",
         "variant_projected",
@@ -292,6 +312,81 @@ def test_rejection_is_non_mutating_and_records_append_only_history(conn, tmp_pat
     conn.rollback()
 
 
+def test_selected_variant_lock_is_held_through_apply_owner(
+    conn, tmp_path, monkeypatch
+) -> None:
+    card = _publish(conn, tmp_path)
+    review = _request(conn, card, count=2)
+    request_id = review["edit_request"]["request_id"]
+
+    execution_a, result_a = _store_variant_result(
+        conn,
+        review,
+        label="A",
+        replacement="Nettoyer et préparer le support existant.",
+    )
+    _project(conn, execution_a, result_a)
+    execution_b, result_b = _store_variant_result(
+        conn,
+        review,
+        label="B",
+        replacement="Purger, dépoussiérer puis appliquer le primaire.",
+    )
+    proposed = _project(conn, execution_b, result_b)
+    variant_b = next(
+        variant for variant in proposed["variants"] if variant["variant_label"] == "B"
+    )
+    knowledge_edit_variants.select_variant(
+        conn,
+        request_id=request_id,
+        variant_id=variant_b["variant_id"],
+        actor="human@agency",
+        idempotency_key=_id("select"),
+    )
+
+    class ApplyObserved(RuntimeError):
+        pass
+
+    def inspect_locked_apply(active, **values):
+        with active.cursor() as cur:
+            cur.execute(
+                "SELECT selected_variant_id, replacement_markdown "
+                "FROM knowledge_edit_requests WHERE request_id = %s",
+                (request_id,),
+            )
+            selected_variant_id, replacement_markdown = cur.fetchone()
+        assert selected_variant_id == variant_b["variant_id"]
+        assert replacement_markdown == variant_b["replacement_markdown"]
+
+        contender = psycopg.connect(store.dsn_from_env())
+        try:
+            with pytest.raises(psycopg.errors.LockNotAvailable):
+                with contender.transaction():
+                    contender.execute(
+                        "SELECT 1 FROM knowledge_edit_requests "
+                        "WHERE request_id = %s FOR UPDATE NOWAIT",
+                        (request_id,),
+                    )
+        finally:
+            contender.close()
+        raise ApplyObserved
+
+    monkeypatch.setattr(knowledge, "apply_edit_request", inspect_locked_apply)
+    with pytest.raises(ApplyObserved):
+        knowledge_edit_variants.apply_selected_variant(
+            conn,
+            request_id=request_id,
+            actor="human@agency",
+            idempotency_key=_id("apply"),
+        )
+
+    # The sentinel unwinds the enclosing transaction, so preparation alone
+    # cannot leak a replacement into the durable request.
+    stored = knowledge.get_edit_request(conn, request_id)
+    assert stored["selected_variant_id"] == variant_b["variant_id"]
+    assert stored["replacement_markdown"] is None
+
+
 def test_apply_and_its_audit_commit_together(conn, tmp_path, monkeypatch) -> None:
     """The applied revision and its variant_applied audit are one effect.
 
@@ -319,6 +414,8 @@ def test_apply_and_its_audit_commit_together(conn, tmp_path, monkeypatch) -> Non
 
     before_version = knowledge.get_knowledge_card(conn, card["knowledge_id"])["version"]
     before = knowledge_edit_variants.get_variant_review(conn, request_id)
+    # Review is a separate request from apply.
+    conn.rollback()
 
     real_insert = knowledge_edit_variants._insert_event
 
@@ -341,6 +438,7 @@ def test_apply_and_its_audit_commit_together(conn, tmp_path, monkeypatch) -> Non
     assert knowledge.get_knowledge_card(conn, card["knowledge_id"])["version"] == before_version
     assert after["edit_request"]["status"] == before["edit_request"]["status"]
     assert len(after["review_events"]) == len(before["review_events"])
+    conn.rollback()
 
     monkeypatch.setattr(knowledge_edit_variants, "_insert_event", real_insert)
     applied = knowledge_edit_variants.apply_selected_variant(
@@ -352,6 +450,56 @@ def test_apply_and_its_audit_commit_together(conn, tmp_path, monkeypatch) -> Non
     assert applied["knowledge"]["version"] == before_version + 1
     assert "variant_applied" in [e["event_type"] for e in applied["review"]["review_events"]]
 
+
+
+def test_variant_apply_conflict_status_survives_enclosing_transaction(
+    conn, tmp_path
+) -> None:
+    card = _publish(conn, tmp_path)
+    review = _request(conn, card, count=1)
+    request_id = review["edit_request"]["request_id"]
+
+    execution_id, result_ref = _store_variant_result(
+        conn,
+        review,
+        label="A",
+        replacement="Préparer soigneusement le support.",
+    )
+    proposed = _project(conn, execution_id, result_ref)
+    knowledge_edit_variants.select_variant(
+        conn,
+        request_id=request_id,
+        variant_id=proposed["variants"][0]["variant_id"],
+        actor="human@agency",
+        idempotency_key=_id("select"),
+    )
+
+    markdown = knowledge.get_knowledge_markdown(conn, card["knowledge_id"])
+    conn.rollback()
+    knowledge.revise_knowledge(
+        conn,
+        knowledge_id=card["knowledge_id"],
+        markdown=markdown + "\n\nRévision concurrente.",
+        expected_version=card["version"],
+        actor="architecte",
+        actor_kind="human",
+        idempotency_key=_id("concurrent-revision"),
+    )
+
+    with pytest.raises(
+        knowledge.StaleKnowledgeWrite,
+        match="Knowledge changed after the intelligent edit was proposed",
+    ):
+        knowledge_edit_variants.apply_selected_variant(
+            conn,
+            request_id=request_id,
+            actor="human@agency",
+            idempotency_key=_id("apply"),
+        )
+
+    stored = knowledge_edit_variants.get_variant_review(conn, request_id)
+    assert stored["edit_request"]["status"] == "conflict"
+    assert knowledge.get_knowledge_card(conn, card["knowledge_id"])["version"] == 2
 
 
 def test_projection_conflict_status_survives_inner_rollback(conn, tmp_path) -> None:

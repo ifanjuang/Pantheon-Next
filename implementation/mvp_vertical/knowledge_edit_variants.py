@@ -414,7 +414,8 @@ def create_variant_request(
                 request_payload_digest,
             ),
         )
-    return get_variant_review(conn, request_id)
+        created = get_variant_review(conn, request_id)
+    return created
 
 
 def _execution_result_item(
@@ -512,20 +513,25 @@ def _project_execution_result_variant_inner(
 ) -> dict[str, Any]:
     if len(idempotency_key.strip()) < 8:
         raise KnowledgeEditVariantError("projection idempotency key is required")
-    result = _execution_result_item(conn, execution_result_id, result_ref)
-    payload = dict(result["payload"])
-    request_id = str(payload.get("request_ref") or "")
-    if not request_id:
-        raise KnowledgeEditVariantError("candidate request_ref is required")
-    projection_digest = _payload_digest(
-        {
-            "execution_result_id": execution_result_id,
-            "result_ref": result_ref,
-            "source_payload_digest": result["payload_digest"],
-        }
-    )
 
+    # Own the transaction before reading the Execution Result. With psycopg's
+    # autocommit=False, reading it first would create an implicit outer
+    # transaction and reduce the projection write to a savepoint that the API
+    # connection close could roll back.
     with conn.transaction():
+        result = _execution_result_item(conn, execution_result_id, result_ref)
+        payload = dict(result["payload"])
+        request_id = str(payload.get("request_ref") or "")
+        if not request_id:
+            raise KnowledgeEditVariantError("candidate request_ref is required")
+        projection_digest = _payload_digest(
+            {
+                "execution_result_id": execution_result_id,
+                "result_ref": result_ref,
+                "source_payload_digest": result["payload_digest"],
+            }
+        )
+
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
                 "SELECT request_id, payload_digest FROM knowledge_edit_variants "
@@ -547,11 +553,6 @@ def _project_execution_result_variant_inner(
             )
         item = _knowledge_snapshot(conn, request["knowledge_id"], lock=True)
         if _scope_status(request, item) != "current":
-            conn.execute(
-                "UPDATE knowledge_edit_requests SET status = 'conflict', "
-                "updated_at = CURRENT_TIMESTAMP WHERE request_id = %s",
-                (request_id,),
-            )
             raise KnowledgeEditVariantConflict(
                 "Knowledge changed before the execution result was projected"
             )
@@ -626,7 +627,8 @@ def _project_execution_result_variant_inner(
                 "updated_at = CURRENT_TIMESTAMP WHERE request_id = %s",
                 (request_id,),
             )
-    return get_variant_review(conn, request_id)
+        projected = get_variant_review(conn, request_id)
+    return projected
 
 
 def select_variant(
@@ -638,15 +640,19 @@ def select_variant(
     idempotency_key: str,
 ) -> dict[str, Any]:
     payload = {"request_id": request_id, "variant_id": variant_id, "actor": actor}
-    replay = _event_by_key(conn, idempotency_key)
-    if replay is not None:
-        if replay["request_id"] != request_id or replay["payload_digest"] != _payload_digest(payload):
-            raise knowledge.IdempotencyConflict(
-                "variant selection idempotency key belongs to another review event"
-            )
-        return get_variant_review(conn, request_id)
 
+    # Idempotency lookup and selection are one top-level transaction. A lookup
+    # before this block would open an implicit transaction and turn the actual
+    # selection into a savepoint.
     with conn.transaction():
+        replay = _event_by_key(conn, idempotency_key)
+        if replay is not None:
+            if replay["request_id"] != request_id or replay["payload_digest"] != _payload_digest(payload):
+                raise knowledge.IdempotencyConflict(
+                    "variant selection idempotency key belongs to another review event"
+                )
+            return get_variant_review(conn, request_id)
+
         request = _request_row(conn, request_id, lock=True)
         if request["status"] != "proposed":
             raise KnowledgeEditVariantConflict(
@@ -676,7 +682,8 @@ def select_variant(
                 "evidence_admitted": False,
             },
         )
-    return get_variant_review(conn, request_id)
+        selected = get_variant_review(conn, request_id)
+    return selected
 
 
 def reject_request(
@@ -691,15 +698,16 @@ def reject_request(
     if not normalized_reason:
         raise KnowledgeEditVariantError("rejection reason is required")
     payload = {"request_id": request_id, "actor": actor, "reason": normalized_reason}
-    replay = _event_by_key(conn, idempotency_key)
-    if replay is not None:
-        if replay["request_id"] != request_id or replay["payload_digest"] != _payload_digest(payload):
-            raise knowledge.IdempotencyConflict(
-                "rejection idempotency key belongs to another review event"
-            )
-        return get_variant_review(conn, request_id)
 
     with conn.transaction():
+        replay = _event_by_key(conn, idempotency_key)
+        if replay is not None:
+            if replay["request_id"] != request_id or replay["payload_digest"] != _payload_digest(payload):
+                raise knowledge.IdempotencyConflict(
+                    "rejection idempotency key belongs to another review event"
+                )
+            return get_variant_review(conn, request_id)
+
         request = _request_row(conn, request_id, lock=True)
         if request["status"] not in {"queued_for_hermes", "proposed"}:
             raise KnowledgeEditVariantConflict(
@@ -724,7 +732,8 @@ def reject_request(
                 "evidence_admitted": False,
             },
         )
-    return get_variant_review(conn, request_id)
+        rejected = get_variant_review(conn, request_id)
+    return rejected
 
 
 def apply_selected_variant(
@@ -737,57 +746,21 @@ def apply_selected_variant(
     decision_payload: dict[str, Any] | None = None,
     required_ceiling: str = "C2",
 ) -> dict[str, Any]:
-    """Apply the selected variant, forwarding the gate to `apply_edit_request`.
+    """Apply exactly the variant selected under the same transaction lock.
 
-    Two call sites below both reach `knowledge.apply_edit_request`, the
-    replay branch and the real one. Both must carry `policy_client` through:
-    it is the only Knowledge Markdown mutation this function performs, and
-    the whole point of gating it there was that no caller could reach it
-    ungated. A route wired to supply a client but a forwarding function that
-    drops it on the floor would be exactly that, one call away.
+    The wrapper owns one top-level transaction from selected-variant validation
+    through the existing Knowledge apply owner. apply_edit_request therefore
+    runs as a nested savepoint intentionally: the request row remains locked,
+    so another review action cannot change selected_variant_id or the prepared
+    replacement between review and persistence.
     """
-    request = _request_row(conn, request_id)
-    if request["status"] == "applied":
-        applied = knowledge.apply_edit_request(
-            conn,
-            request_id=request_id,
-            actor=actor,
-            actor_kind="human",
-            idempotency_key=idempotency_key,
-            policy_client=policy_client,
-            decision_payload=decision_payload,
-            required_ceiling=required_ceiling,
-        )
-        return {**applied, "review": get_variant_review(conn, request_id)}
-    if request["status"] != "proposed":
-        raise KnowledgeEditVariantConflict(
-            f"selected variant cannot be applied from status {request['status']}"
-        )
-    if not request.get("selected_variant_id"):
-        raise KnowledgeEditVariantError("select one proposal variant before applying it")
-    variant = _variant_row(conn, request["selected_variant_id"])
-    if variant["request_id"] != request_id:
-        raise KnowledgeEditVariantError("selected variant does not belong to this request")
+    variant: dict[str, Any] | None = None
 
-    with conn.transaction():
-        locked = _request_row(conn, request_id, lock=True)
-        if locked["status"] != "proposed" or locked["selected_variant_id"] != variant["variant_id"]:
-            raise KnowledgeEditVariantConflict("edit request changed before application")
-        conn.execute(
-            "UPDATE knowledge_edit_requests SET replacement_markdown = %s, "
-            "updated_at = CURRENT_TIMESTAMP WHERE request_id = %s",
-            (variant["replacement_markdown"], request_id),
-        )
-
-    def record_application(active: psycopg.Connection, applied_result: dict[str, Any]) -> None:
-        """Write the audit inside the apply transaction, never beside it.
-
-        A separate transaction left two failure windows: an applied Knowledge
-        revision with no `variant_applied` event, so the review history lost
-        which variant was applied and by whom; or an event describing an
-        application that had rolled back.
-        """
-        if _event_by_key(active, idempotency_key) is not None:
+    def record_application(
+        active: psycopg.Connection, applied_result: dict[str, Any]
+    ) -> None:
+        """Write the variant audit inside the same accepted effect."""
+        if variant is None or _event_by_key(active, idempotency_key) is not None:
             return
         _insert_event(
             active,
@@ -806,19 +779,62 @@ def apply_selected_variant(
             },
         )
 
-    applied = knowledge.apply_edit_request(
-        conn,
-        request_id=request_id,
-        actor=actor,
-        actor_kind="human",
-        idempotency_key=idempotency_key,
-        on_applied=record_application,
-        policy_client=policy_client,
-        decision_payload=decision_payload,
-        required_ceiling=required_ceiling,
-    )
-    return {**applied, "review": get_variant_review(conn, request_id)}
+    with conn.transaction():
+        request = _request_row(conn, request_id, lock=True)
+        if request["status"] != "applied":
+            if request["status"] != "proposed":
+                raise KnowledgeEditVariantConflict(
+                    f"selected variant cannot be applied from status {request['status']}"
+                )
+            if not request.get("selected_variant_id"):
+                raise KnowledgeEditVariantError(
+                    "select one proposal variant before applying it"
+                )
+            variant = _variant_row(conn, request["selected_variant_id"])
+            if variant["request_id"] != request_id:
+                raise KnowledgeEditVariantError(
+                    "selected variant does not belong to this request"
+                )
 
+            # Prepare exactly the immutable variant currently selected while
+            # the request row remains locked through the delegated apply.
+            with conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE knowledge_edit_requests SET replacement_markdown = %s, "
+                    "updated_at = CURRENT_TIMESTAMP WHERE request_id = %s "
+                    "AND selected_variant_id = %s AND status = 'proposed'",
+                    (variant["replacement_markdown"], request_id, variant["variant_id"]),
+                )
+                if cur.rowcount != 1:
+                    raise KnowledgeEditVariantConflict(
+                        "selected variant changed before application"
+                    )
+
+        apply_conflict: knowledge.StaleKnowledgeWrite | None = None
+        applied: dict[str, Any] | None = None
+        try:
+            applied = knowledge.apply_edit_request(
+                conn,
+                request_id=request_id,
+                actor=actor,
+                actor_kind="human",
+                idempotency_key=idempotency_key,
+                on_applied=record_application,
+                policy_client=policy_client,
+                decision_payload=decision_payload,
+                required_ceiling=required_ceiling,
+            )
+        except knowledge.StaleKnowledgeWrite as exc:
+            # apply_edit_request has already converted the still-proposed request
+            # to durable conflict. Catch inside this enclosing transaction so that
+            # transition commits instead of being undone by the wrapper rollback.
+            apply_conflict = exc
+        review = get_variant_review(conn, request_id)
+
+    if apply_conflict is not None:
+        raise apply_conflict
+    assert applied is not None
+    return {**applied, "review": review}
 
 
 def project_execution_result_variant(
@@ -837,20 +853,23 @@ def project_execution_result_variant(
             idempotency_key=idempotency_key,
         )
     except KnowledgeEditVariantConflict:
-        result = _execution_result_item(conn, execution_result_id, result_ref)
-        request_id = str(dict(result.get("payload") or {}).get("request_ref") or "")
-        if request_id:
-            try:
-                request = _request_row(conn, request_id)
-                item = _knowledge_snapshot(conn, request["knowledge_id"])
-            except knowledge.KnowledgeNotFound:
-                pass
-            else:
-                if (
-                    request["status"] in {"queued_for_hermes", "proposed"}
-                    and _scope_status(request, item) != "current"
-                ):
-                    with conn.transaction():
+        # The failed projection transaction has rolled back. Re-open one
+        # explicit transaction for the durable conflict transition so no
+        # preliminary read can turn that write into a savepoint.
+        with conn.transaction():
+            result = _execution_result_item(conn, execution_result_id, result_ref)
+            request_id = str(dict(result.get("payload") or {}).get("request_ref") or "")
+            if request_id:
+                try:
+                    request = _request_row(conn, request_id)
+                    item = _knowledge_snapshot(conn, request["knowledge_id"])
+                except knowledge.KnowledgeNotFound:
+                    pass
+                else:
+                    if (
+                        request["status"] in {"queued_for_hermes", "proposed"}
+                        and _scope_status(request, item) != "current"
+                    ):
                         conn.execute(
                             "UPDATE knowledge_edit_requests SET status = 'conflict', "
                             "updated_at = CURRENT_TIMESTAMP WHERE request_id = %s "

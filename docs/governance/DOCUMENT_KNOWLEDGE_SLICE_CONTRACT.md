@@ -260,6 +260,52 @@ freshness projection != Evidence
 
 Any later recompile operation must produce a candidate/diff and reuse the existing governed Knowledge revision/apply path for the actual write.
 
+### Incremental recompile candidate
+
+A bounded external adapter may represent a stale Knowledge item as a full-document intelligent-edit request bound to one exact Knowledge version and one exact calculated source-context digest.
+
+The bounded recompile context contains:
+
+```text
+current Knowledge Markdown
++ exact frozen body snapshots for the source chunks previously cited
++ complete current chunk version for each changed existing dependency
++ exact source/extraction digests and analysis state
++ allowed current source_chunk_refs
+```
+
+This context is deliberately local to the existing source dependencies. It is not a new retrieval corpus and does not authorize a broad Project search. The old side is the exact cited basis frozen by Knowledge provenance; the new side is the complete current technical chunk version of each changed existing dependency. This avoids structural-locator or ordinal-neighbour heuristics while not duplicating unrelated historical source content or admitting unrelated Project sources. Legacy provenance rows without a frozen body may use a retained historical chunk only when its body still matches the frozen text digest; otherwise recompilation blocks rather than inventing old context.
+
+Hermes may return:
+
+```text
+replacement Markdown
++ replacement current source_chunk_refs
+```
+
+The proposal remains an edit-request candidate. It does not update Knowledge. A read-only review projection may expose the full-document unified diff and the proposed current source refs; projecting that diff does not select or accept the candidate.
+
+A recompile proposal is applicable only while both are still exact:
+
+```text
+Knowledge base version
+source-context digest
+```
+
+If either changes, the request conflicts and must be regenerated. During an accepted recompile, the existing technical source rows and their compilation bindings are locked in stable order from the final context check through authorization and persistence; a concurrent ingestion therefore serializes wholly before or after the accepted effect rather than changing its source basis mid-apply. The recompile reuses the existing Knowledge edit apply chokepoint and the existing `revise_knowledge` persistence owner. Markdown and source provenance are then rebound in one transaction.
+
+Accepted revisions also preserve the exact editorial/provenance state before and after the write in the existing `knowledge_events` owner. That event history is append-only at the PostgreSQL layer: accepted revision records may be appended but not updated or deleted. Legacy events created before these snapshots existed remain nullable; no historical Markdown or provenance is invented or backfilled.
+
+Ordinary intelligent edits do not rebind source provenance.
+
+```text
+recompile request recorded != Knowledge changed
+Hermes proposal != accepted revision
+source-context match != human authorization
+recompile apply = Markdown revision + exact provenance rebind
+ordinary edit = Markdown revision + provenance preserved
+```
+
 The authority block is always:
 
 ```text
