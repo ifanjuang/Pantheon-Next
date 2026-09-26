@@ -249,11 +249,16 @@ The delete boundary is deliberate. Hindsight observations are derived state, and
 No automatic OCR is part of the AFFAIRES baseline. The reviewed Hindsight deployment posture is:
 
 ```text
+HINDSIGHT_API_RETAIN_MISSION=<professional-document chronology extraction mission>
 HINDSIGHT_API_FILE_PARSER=markitdown
 HINDSIGHT_API_FILE_DELETE_AFTER_RETAIN=true
 HINDSIGHT_API_FILE_PARSER_MARKITDOWN_OCR_ENABLED=false
 HINDSIGHT_API_STORE_DOCUMENT_TEXT=true
 ```
+
+The retain mission asks Hindsight to preserve explicit chronology stated by the source itself: document date, revision/index/version token and explicit supersession relationships. It also tells Hindsight to preserve conflicting chronology statements rather than silently resolving them. The producer sends `timestamp: "unset"` for these reference documents so ingestion time is never presented to the extraction model as the document's event date.
+
+Cartouche-declared `index` and `document_date` remain useful Workspace hints, but they are deliberately not sent to Hindsight as the source revision/date. The source content must establish those observations.
 
 So uploaded source bytes are intended to be transient inside Hindsight after file conversion, while extracted document text/chunks and derived memories remain durable Hindsight state.
 
