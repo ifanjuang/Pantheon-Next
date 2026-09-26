@@ -28,8 +28,16 @@ from urllib.request import Request, urlopen
 
 import yaml
 
+# server.py is intentionally executable as a standalone script rather than a package.
+# Add only its own directory so the colocated producer module is importable in both
+# systemd/Docker execution and importlib-based contract tests.
+_MODULE_ROOT = Path(__file__).resolve().parent
+if str(_MODULE_ROOT) not in sys.path:
+    sys.path.insert(0, str(_MODULE_ROOT))
+from hindsight_producer import HindsightHTTPClient, HindsightProducer
 
-APP_ROOT = Path(__file__).resolve().parent
+
+APP_ROOT = _MODULE_ROOT
 STATIC_ROOT = APP_ROOT / "static"
 PROJECTION_ID = "affaires_source_cartouche_v3"
 CARTOUCHE_SCHEMA = "pantheon/cartouche/v1"
@@ -939,6 +947,7 @@ class WorkspaceIndex:
         reconcile_seconds: float = 60.0,
         debounce_seconds: float = 0.5,
         enable_watcher: bool = True,
+        producer: HindsightProducer | None = None,
     ) -> None:
         self.roots = roots
         self.max_depth = max_depth
@@ -946,6 +955,7 @@ class WorkspaceIndex:
         self.reconcile_seconds = max(0.1, float(reconcile_seconds))
         self.debounce_seconds = max(0.0, float(debounce_seconds))
         self.enable_watcher = enable_watcher
+        self.producer = producer
         self._snapshot: dict[str, Any] = {
             "generated_at": None,
             "projection": PROJECTION_ID,
@@ -958,6 +968,7 @@ class WorkspaceIndex:
             "folder_count": 0,
             "workspaces": [{"name": label, "available": False, "cards": [], "errors": ["Index non initialisé"]} for label, _ in roots],
             "index_state": {"mode": "initializing", "watcher": "reconcile-only"},
+            "hindsight_producer": {"enabled": producer is not None},
         }
         self._snapshot_lock = threading.RLock()
         self._reconcile_lock = threading.Lock()
@@ -1042,6 +1053,16 @@ class WorkspaceIndex:
     def reconcile(self, reason: str = "manual") -> dict[str, Any]:
         with self._reconcile_lock:
             snapshot = scan_workspaces(self.roots, self.max_depth)
+            if self.producer is None:
+                snapshot["hindsight_producer"] = {"enabled": False}
+            else:
+                try:
+                    snapshot["hindsight_producer"] = self.producer.reconcile(snapshot)
+                except Exception as exc:  # producer failure must not take Cockpit navigation down
+                    snapshot["hindsight_producer"] = {
+                        **self.producer.health(),
+                        "last_error": f"{type(exc).__name__}: {exc}",
+                    }
             index_state = {
                 "mode": "indexed",
                 "watcher": self._watcher_mode,
@@ -1070,6 +1091,9 @@ class WorkspaceIndex:
         with self._snapshot_lock:
             state = dict(self._snapshot.get("index_state") or {})
         state["state_error"] = self._last_error
+        state["hindsight_producer"] = (
+            self.producer.health() if self.producer is not None else {"enabled": False}
+        )
         return state
 
     def mark_dirty(self) -> None:
@@ -1264,6 +1288,27 @@ def build_parser() -> argparse.ArgumentParser:
         help="coalesce filesystem event bursts before reconcile",
     )
     parser.add_argument("--no-watch", action="store_true", help="disable inotify acceleration; periodic reconcile remains")
+    parser.add_argument(
+        "--hindsight-url",
+        default=os.getenv("WORKSPACE_HINDSIGHT_URL", ""),
+        help="Hindsight base URL; producer stays disabled when omitted",
+    )
+    parser.add_argument(
+        "--hindsight-bank-id",
+        default=os.getenv("WORKSPACE_HINDSIGHT_BANK_ID", ""),
+        help="target Hindsight bank id; required with --hindsight-url",
+    )
+    parser.add_argument(
+        "--hindsight-parser",
+        default=os.getenv("WORKSPACE_HINDSIGHT_PARSER", "markitdown"),
+        help="file parser requested from Hindsight (default markitdown)",
+    )
+    parser.add_argument(
+        "--hindsight-max-submits-per-reconcile",
+        type=int,
+        default=int(os.getenv("WORKSPACE_HINDSIGHT_MAX_SUBMITS_PER_RECONCILE", "4")),
+        help="bound new Hindsight file submissions per reconcile",
+    )
     parser.add_argument("--check", action="store_true", help="scan once, print summary, and exit")
     return parser
 
@@ -1281,8 +1326,28 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit("--reconcile-seconds must be >= 0.1")
     if args.watch_debounce_ms < 0:
         raise SystemExit("--watch-debounce-ms must be >= 0")
+    if args.hindsight_max_submits_per_reconcile < 1:
+        raise SystemExit("--hindsight-max-submits-per-reconcile must be >= 1")
+    if bool(args.hindsight_url.strip()) != bool(args.hindsight_bank_id.strip()):
+        raise SystemExit("--hindsight-url and --hindsight-bank-id must be configured together")
     if any(_path_is_within(state_db, root) for _, root in args.root):
         raise SystemExit("--state-db must remain outside every watched workspace root")
+
+    producer: HindsightProducer | None = None
+    if args.hindsight_url.strip():
+        client = HindsightHTTPClient(
+            args.hindsight_url.strip(),
+            args.hindsight_bank_id.strip(),
+            authorization=os.getenv("WORKSPACE_HINDSIGHT_AUTHORIZATION", "").strip(),
+            timeout_seconds=float(os.getenv("WORKSPACE_HINDSIGHT_TIMEOUT_SECONDS", "30")),
+            parser=args.hindsight_parser,
+        )
+        producer = HindsightProducer(
+            roots=args.root,
+            state_db=state_db,
+            client=client,
+            max_submits_per_reconcile=args.hindsight_max_submits_per_reconcile,
+        )
 
     CockpitHandler.roots = args.root
     CockpitHandler.max_depth = args.max_depth
@@ -1293,6 +1358,7 @@ def main(argv: list[str] | None = None) -> int:
         reconcile_seconds=args.reconcile_seconds,
         debounce_seconds=args.watch_debounce_ms / 1000.0,
         enable_watcher=not args.no_watch,
+        producer=producer,
     )
     workspace_index.start()
     CockpitHandler.workspace_index = workspace_index
