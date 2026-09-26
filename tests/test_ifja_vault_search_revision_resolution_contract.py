@@ -26,6 +26,7 @@ def test_latest_document_resolution_uses_source_chronology_not_ingest_metadata()
 
 def test_revision_date_conflicts_do_not_hide_human_errors() -> None:
     text = SKILL.read_text(encoding="utf-8")
+    normalized = " ".join(text.split())
 
     assert "revision_date_conflict" in text
     assert "duplicate_revision" in text
