@@ -150,11 +150,13 @@ check_profile_config() {
 
   check_builtin_memory_empty
   profile_has_api_key || die "profile-specific API_SERVER_KEY is missing"
-  if ! profile_key_is_distinct_from_default; then
-    status=$?
-    if ((status == 42)); then
-      die "reconciliation API key must differ from the default Hermes API key"
-    fi
+  set +e
+  profile_key_is_distinct_from_default
+  key_status=$?
+  set -e
+  if ((key_status == 42)); then
+    die "reconciliation API key must differ from the default Hermes API key"
+  elif ((key_status != 0)); then
     die "cannot verify reconciliation API key"
   fi
 
@@ -172,12 +174,12 @@ apply_profile_config() {
       || die "set HERMES_RECONCILIATION_API_KEY before --apply"
   fi
 
+  hermes -p "$PROFILE" memory off >/dev/null
   hermes -p "$PROFILE" config set platform_toolsets.api_server '["no_mcp"]' >/dev/null
   hermes -p "$PROFILE" config set --force plugins.enabled '[]' >/dev/null
   hermes -p "$PROFILE" config set --force mcp_servers '{}' >/dev/null
   hermes -p "$PROFILE" config set context.engine compressor >/dev/null
   hermes -p "$PROFILE" config set tools.tool_search.enabled false >/dev/null
-  hermes -p "$PROFILE" memory off >/dev/null
 
   if [[ -n "$API_KEY" ]]; then
     docker exec \
