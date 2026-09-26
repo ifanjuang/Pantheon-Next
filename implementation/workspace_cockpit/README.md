@@ -59,7 +59,7 @@ The current implementation:
 - serves `/api/workspaces` from an in-memory indexed snapshot;
 - persists only reconstructible technical state in SQLite outside watched roots;
 - uses Linux inotify as an accelerator and a periodic full reconcile as the convergence guarantee;
-- is still configured by the Ubuntu deployment against historical LiveSync filesystem mirrors.
+- is configured by the Ubuntu deployment against the reviewed AFFAIRES path mounted directly by Linux; no source-tree mirror is required.
 
 The remaining migration owned by #660 is:
 
@@ -67,7 +67,7 @@ The remaining migration owned by #660 is:
 Slice 1  source.ext + .source.ext.md projection and broken-pair states — merged #1112
 Slice 2  reconstructible index + watcher + periodic reconcile — candidate #1115
 Slice 3  same daemon emits bounded Hindsight producer operations
-Slice 4  Ubuntu deployment converges from vault mirrors to reviewed AFFAIRES root
+Slice 4  Ubuntu deployment converges from vault mirrors to the reviewed Linux-mounted AFFAIRES root — implemented candidate
 ```
 
 Do not create a second filesystem Cockpit or an independent Hindsight watcher to bypass this migration.
@@ -148,7 +148,7 @@ python3 implementation/workspace_cockpit/server.py \
   --root FIXTURE="$PWD/docs/examples/workspace_manifest_inspector/workspace"
 ```
 
-The existing container/native installers remain compatibility surfaces until Slice 4 replaces their active Workspace inputs. Do not interpret their LiveSync mounts as the selected architecture.
+The container/native installers now require the Linux-visible AFFAIRES mount directly. They do not create, synchronize or maintain a local source-tree copy.
 
 ## Hindsight boundary
 
@@ -175,3 +175,34 @@ python3 deployment/ubuntu/qualify-affaires-linux-mount.py --root /path/to/mounte
 ```
 
 The probe writes and removes one temporary pair, validates hidden cartouche persistence, exact pairing, rename identity and reconcile rebuild. It also reports whether inotify events propagate through the mount; periodic reconcile remains mandatory even when they do.
+
+## No local source mirror
+
+The professional source tree remains on the NAS.
+
+```text
+NAS / AFFAIRES
+      │
+      │ mounted by Linux
+      ▼
+/path/to/mounted/AFFAIRES
+      │
+      ├─ Workspace daemon reads in place
+      └─ Hindsight producer reads in place
+```
+
+Pantheon does not maintain a second durable copy of `AFFAIRES` on the Linux disk.
+
+Allowed local state is reconstructible or derived:
+
+```text
+/var/lib/pantheon-workspace-cockpit/index.sqlite3
+Hindsight durable derived-memory volumes
+temporary process buffers / bounded transient extraction
+```
+
+These are not professional source copies.
+
+For the container deployment set `AFFAIRES_ROOT` to the Linux-mounted NAS path. For native systemd installation use `--affaires-root /path/to/mounted/AFFAIRES`.
+
+The installer verifies read/traverse access but never rewrites NAS ACLs recursively.
