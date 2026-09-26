@@ -251,7 +251,7 @@ def _validate_model_candidate(text: str) -> dict[str, Any]:
 @dataclass(frozen=True)
 class HermesCallResult:
     candidate: dict[str, Any]
-    session_id: str
+    session_deleted: bool
 
 
 class HermesReconciliationClient:
@@ -351,8 +351,24 @@ class HermesReconciliationClient:
             raise ReconciliationResidencyError(
                 "Hermes did not return a session id, so transient-session cleanup cannot be proven"
             )
-        candidate = _validate_model_candidate(_response_text(payload))
-        return HermesCallResult(candidate=candidate, session_id=session_id)
+        candidate_error: Exception | None = None
+        candidate: dict[str, Any] | None = None
+        try:
+            candidate = _validate_model_candidate(_response_text(payload))
+        except Exception as exc:  # cleanup remains mandatory even for malformed model output
+            candidate_error = exc
+
+        try:
+            self.delete_session(session_id)
+        except ReconciliationError as exc:
+            raise ReconciliationResidencyError(
+                "Hermes reconciliation session could not be deleted"
+            ) from exc
+
+        if candidate_error is not None:
+            raise candidate_error
+        assert candidate is not None
+        return HermesCallResult(candidate=candidate, session_deleted=True)
 
     def delete_session(self, session_id: str) -> None:
         if not session_id:
@@ -481,12 +497,6 @@ class MemoryReconciliationService:
         )
 
         call = self.hermes.reconcile(packet)
-        try:
-            self.hermes.delete_session(call.session_id)
-        except ReconciliationError as exc:
-            raise ReconciliationResidencyError(
-                "Hermes reconciliation completed but its transient session could not be deleted"
-            ) from exc
 
         valid_memory_ids = {
             item.get("id") for item in packet["memories"] if isinstance(item, dict)
@@ -515,7 +525,7 @@ class MemoryReconciliationService:
             "hermes": {
                 "profile_contract": "dedicated-no-tool",
                 "responses_store": False,
-                "session_deleted": True,
+                "session_deleted": call.session_deleted,
             },
             "summary": call.candidate["summary"],
             "findings": call.candidate["findings"],
