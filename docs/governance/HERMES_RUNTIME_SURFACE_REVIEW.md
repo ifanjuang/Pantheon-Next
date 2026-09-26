@@ -2,7 +2,8 @@
 
 Status: candidate external-runtime review and selected qualification target — not installed, observed, activated or task-authorized.
 Boundary profile: external_reference_review.
-Current reviewed/selected Pantheon target: Hermes Agent 0.21.3 (`v2026.9.14`) — live runtime qualification remains open.
+Current reviewed target: Hermes Agent 0.21.3 (`v2026.9.14`).
+Qualification status: live runtime qualification remains open.
 Current upstream stable requalification candidate: Hermes Agent 0.21.5 (`v2026.9.24`).
 
 ## Responsibility
