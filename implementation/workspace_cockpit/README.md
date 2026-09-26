@@ -383,6 +383,31 @@ The URL may target a separately supervised profile or a multiplexed
 `/p/<profile>` API surface, but it must resolve to the dedicated no-tool profile.
 The API key is profile-specific.
 
+The Ubuntu operator helper can create or verify that profile without activating a
+gateway or changing profile routing:
+
+```bash
+export HERMES_RECONCILIATION_API_KEY="$(openssl rand -hex 32)"
+sudo -E bash deployment/ubuntu/configure-hermes-reconciliation-profile --apply
+
+# Once a dedicated route has been activated separately, qualify the live surface:
+bash deployment/ubuntu/configure-hermes-reconciliation-profile --check \
+  --runtime-url http://127.0.0.1:8642/p/reconciliation
+```
+
+The helper disables external memory, requires built-in profile memory files to
+remain empty, keeps only Hermes' no-bundled-skills baseline, disables dynamic tool
+search, empties MCP/plugin bindings, and refuses a reconciliation API key equal to
+the default Hermes API key. With `--runtime-url` it also verifies the live
+`/v1/toolsets` surface is empty and that the Responses API plus session deletion
+endpoint are advertised. It deliberately does **not** start a profile gateway,
+enable multiplexing, change routes, or write Cockpit configuration.
+
+```text
+configured profile != activated route
+runtime route observed != task authorization
+```
+
 ```text
 reconciliation candidate != memory update
 declared inconsistency != proven source defect
