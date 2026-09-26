@@ -29,10 +29,10 @@ A normal document bundle is:
 
 ```text
 source.ext
-source.md
+.source.ext.md
 ```
 
-where the Markdown file is the document cartouche. Optional `_folder.md` files may add useful folder context.
+where the hidden Markdown file is the document cartouche and preserves the complete source filename. Optional `_folder.md` files may add useful folder context.
 
 The target does not require Obsidian, Self-hosted LiveSync, CouchDB, a LiveSync filesystem mirror, `hindsight-obsidian-sync`, or `document.yaml` as a business sidecar.
 
@@ -71,6 +71,46 @@ Slice 4  Ubuntu deployment converges from vault mirrors to reviewed AFFAIRES roo
 ```
 
 Do not create a second filesystem Cockpit or an independent Hindsight watcher to bypass this migration.
+
+## Source integrity
+
+A cartouche may optionally bind itself to exact source bytes:
+
+```yaml
+source_sha256: <64 hexadecimal characters>
+source_size_bytes: <exact source byte length>
+```
+
+The checksum is verified only when it is declared. Ordinary AFFAIRES navigation therefore does not hash every large source.
+
+```text
+document_id = logical document identity
+path        = current location
+source_sha256 = observed byte identity
+
+filename pairing != byte identity
+declared checksum != verified checksum
+verified source bytes != professional truth
+```
+
+For `.eml` bundles, `source_sha256` and `source_size_bytes` are required because the RAW message and its Markdown derivative must remain explicitly bound. A missing, invalid or mismatched integrity declaration makes the bundle `CHECK`.
+
+Producer eligibility is separate from parser-format support:
+
+```text
+format supported + CARTOUCHE_MISSING/CHECK
+→ visible in Cockpit
+→ hindsight_format_supported = true
+→ hindsight_eligible = false
+
+COMPLETE source format supported
+→ hindsight_representation_candidate = source
+
+verified COMPLETE .eml
+→ hindsight_representation_candidate = cartouche
+```
+
+These fields are only structural candidates for the producer owned by #659. They do not select Hindsight's durable A/B/C mapping and do not authorize a retain/write.
 
 ## Authority boundaries
 
