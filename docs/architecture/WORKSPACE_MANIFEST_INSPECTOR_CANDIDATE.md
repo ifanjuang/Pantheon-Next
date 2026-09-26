@@ -610,6 +610,8 @@ Hermes may propose:
 - limits;
 - semantic relations.
 
+Hermes must not populate `revision_mode` or `revision_of` merely from filename similarity, index ordering, dates or inferred chronology. A revision relationship must come from an explicit human declaration or another specifically admitted authoritative relation source.
+
 Hermes must not invent:
 
 - file digest;
