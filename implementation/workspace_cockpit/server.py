@@ -1309,6 +1309,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=int(os.getenv("WORKSPACE_HINDSIGHT_MAX_SUBMITS_PER_RECONCILE", "4")),
         help="bound new Hindsight file submissions per reconcile",
     )
+    parser.add_argument(
+        "--hindsight-max-file-mb",
+        type=int,
+        default=int(os.getenv("WORKSPACE_HINDSIGHT_MAX_FILE_MB", "100")),
+        help="reject a source before buffering it when larger than this many MiB",
+    )
     parser.add_argument("--check", action="store_true", help="scan once, print summary, and exit")
     return parser
 
@@ -1328,6 +1334,8 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit("--watch-debounce-ms must be >= 0")
     if args.hindsight_max_submits_per_reconcile < 1:
         raise SystemExit("--hindsight-max-submits-per-reconcile must be >= 1")
+    if args.hindsight_max_file_mb < 1:
+        raise SystemExit("--hindsight-max-file-mb must be >= 1")
     if bool(args.hindsight_url.strip()) != bool(args.hindsight_bank_id.strip()):
         raise SystemExit("--hindsight-url and --hindsight-bank-id must be configured together")
     if any(_path_is_within(state_db, root) for _, root in args.root):
@@ -1341,6 +1349,7 @@ def main(argv: list[str] | None = None) -> int:
             authorization=os.getenv("WORKSPACE_HINDSIGHT_AUTHORIZATION", "").strip(),
             timeout_seconds=float(os.getenv("WORKSPACE_HINDSIGHT_TIMEOUT_SECONDS", "30")),
             parser=args.hindsight_parser,
+            max_file_bytes=args.hindsight_max_file_mb * 1024 * 1024,
         )
         producer = HindsightProducer(
             roots=args.root,
