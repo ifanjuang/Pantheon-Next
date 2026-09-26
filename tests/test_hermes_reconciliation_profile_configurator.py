@@ -35,6 +35,11 @@ def test_reconciliation_profile_configurator_enforces_no_tool_boundary() -> None
     assert "config set tools.tool_search.enabled false" in text
     assert 'toolsets = get("/v1/toolsets")' in text
     assert 'row.get("enabled") is True' in text
+    assert 'toolsets.get("object") != "list"' in text
+    assert 'toolsets.get("platform") != "api_server"' in text
+    assert 'not isinstance(toolsets.get("data"), list)' in text
+    assert 'rows = toolsets["data"]' in text
+    assert "malformed /v1/toolsets row" in text
     assert "reconciliation profile exposes enabled toolsets" in text
 
 
@@ -42,6 +47,7 @@ def test_reconciliation_profile_configurator_keeps_memory_packet_local() -> None
     text = _text()
     assert 'config set memory.provider ""' in text
     assert "memories/MEMORY.md memories/USER.md MEMORY.md USER.md" in text
+    assert 'test -f "$root/skills/.no-bundled-skills"' in text
     assert "dedicated profile carries built-in memory content" in text
     assert '''[[ "$provider" == '""' || "$provider" == "null" ]]''' in text
     assert "external memory provider must be disabled" in text
@@ -50,6 +56,7 @@ def test_reconciliation_profile_configurator_keeps_memory_packet_local() -> None
 def test_reconciliation_profile_configurator_requires_separate_secret_and_runtime_contract() -> None:
     text = _text()
     assert "HERMES_RECONCILIATION_API_KEY" in text
+    assert 'test "$PANTHEON_RECONCILIATION_API_KEY" = "$API_SERVER_KEY"' in text
     assert "reconciliation API key must differ from the default Hermes API key" in text
     assert '--runtime-url requires HERMES_RECONCILIATION_API_KEY' in text
     assert 'features.get("responses_api") is not True' in text
