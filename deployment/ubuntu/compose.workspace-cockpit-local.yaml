@@ -27,9 +27,7 @@ services:
       role-trace:
         condition: service_healthy
     volumes:
-      - /srv/pantheon/obsidian:/vaults/ifja:ro
-      - /srv/pantheon/obsidian-affaires:/vaults/affaires:ro
-      - /srv/pantheon/obsidian-documentaires:/vaults/documentaires:ro
+      - ${AFFAIRES_ROOT:?set AFFAIRES_ROOT to the Linux-mounted NAS AFFAIRES path}:/workspace/affaires:ro
       - workspace-cockpit-state:/state
     healthcheck:
       test:
