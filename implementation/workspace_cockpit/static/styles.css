@@ -88,6 +88,20 @@ h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp
 .card-action button { min-height: 2.6rem; border: 1px solid rgb(102 72 168 / 35%); border-radius: .8rem; background: white; color: var(--violet); font-weight: 850; }
 .card-action button:disabled { cursor: not-allowed; opacity: .72; }
 .card-action small { color: var(--muted); font-size: .72rem; line-height: 1.35; }
+.reconcile-action { display: grid; gap: .55rem; padding: .95rem 1.25rem 1.1rem; border-top: 1px solid var(--line); background: rgb(49 93 156 / 5%); }
+.reconcile-action label { display: grid; gap: .3rem; color: var(--muted); font-size: .72rem; font-weight: 800; }
+.reconcile-action input { width: 100%; min-height: 2.5rem; padding: .6rem .7rem; border: 1px solid var(--line); border-radius: .75rem; background: var(--surface); color: var(--ink); }
+.reconcile-action button { min-height: 2.6rem; border: 0; border-radius: .8rem; background: var(--blue); color: white; font-weight: 850; }
+.reconcile-action button:disabled { cursor: wait; opacity: .68; }
+.reconcile-action > small, .reconcile-result > small { color: var(--muted); font-size: .7rem; line-height: 1.35; }
+.reconcile-result { display: grid; gap: .6rem; padding-top: .65rem; border-top: 1px solid var(--line); }
+.reconcile-summary, .reconcile-empty, .reconcile-error { margin: 0; font-size: .82rem; line-height: 1.45; }
+.reconcile-error { color: var(--red); }
+.reconcile-findings { display: grid; gap: .6rem; margin: 0; padding-left: 1.2rem; }
+.reconcile-findings li { font-size: .78rem; line-height: 1.4; }
+.reconcile-findings p { margin: .18rem 0; }
+.reconcile-findings small { color: var(--muted); }
+.reconcile-suggestion { color: var(--blue); }
 .missing-cartouche { background: linear-gradient(180deg, rgb(102 72 168 / 4%), var(--surface) 38%); }
 .missing-source { background: linear-gradient(180deg, rgb(165 53 53 / 4%), var(--surface) 38%); }
 .folder-card { min-height: 18rem; }
