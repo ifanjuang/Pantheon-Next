@@ -378,7 +378,14 @@ class HermesReconciliationClient:
     def delete_session(self, session_id: str) -> None:
         if not session_id:
             raise ReconciliationResidencyError("Hermes session id is missing")
-        self._request_json("DELETE", f"/api/sessions/{quote(session_id, safe='')}")
+        payload, _headers = self._request_json(
+            "DELETE",
+            f"/api/sessions/{quote(session_id, safe='')}",
+        )
+        if payload.get("object") != "hermes.session.deleted" or payload.get("deleted") is not True:
+            raise ReconciliationResidencyError(
+                "Hermes did not explicitly confirm transient-session deletion"
+            )
 
 
 class MemoryReconciliationService:
