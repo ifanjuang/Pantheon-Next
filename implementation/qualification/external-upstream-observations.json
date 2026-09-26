@@ -16,10 +16,14 @@
     "hermes-agent": {
       "source": "github_releases_latest",
       "locator": "NousResearch/hermes-agent",
-      "latest_seen": "v2026.9.14",
-      "observed_on": "2026-09-15",
-      "delta": "none",
-      "note": "Observed from the stable GitHub release v2026.9.14 (Hermes Agent 0.21.3), published 2026-09-14; the annotated release tag resolves to commit 345cd2b057a452236de401d3534b8502a7465e8d. Pantheon's qualification pin follows the latest stable Hermes release. A future stable release therefore becomes the next qualification target rather than an optional lag decision. Selecting or following that release does not by itself prove deployment, runtime health, task authorization, Evidence, or professional validation."
+      "latest_seen": "v2026.9.24",
+      "observed_on": "2026-09-26",
+      "delta": {
+        "state": "open",
+        "reason": "Hermes Agent 0.21.5 / v2026.9.24 is the latest stable upstream release. Pantheon's selected/reviewed qualification target remains 0.21.3 until the existing #644/H5.9b live qualification owner evaluates the newer stable artifact; observing the release does not move the pin.",
+        "decided_on": "2026-09-26"
+      },
+      "note": "Observed from the stable GitHub release v2026.9.24 (Hermes Agent 0.21.5), published 2026-09-24; the annotated release tag resolves to commit f97608f178d1ffeca59860195ab7da295f7c8e5f. This is an upstream observation only. Pantheon's selected/reviewed Hermes target remains separately owned by external-pins.json and exact live qualification remains open under #644/H5.9b. Observed != adopted; selected/reviewed != live-qualified; release availability != deployment or task authorization."
     },
     "personal-ai-router": {
       "source": "github_releases_latest",
@@ -154,4 +158,4 @@
     "task_authorization": false,
     "evidence_admission": false
   }
-}
+}\n
