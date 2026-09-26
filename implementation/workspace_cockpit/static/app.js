@@ -62,6 +62,20 @@ function documentCardBody(card) {
       </div>`
     : "";
 
+  const reconcile = card.status === "COMPLETE"
+    && card.document_id
+    && card.hindsight_representation_candidate === "source"
+    ? `<div class="reconcile-action" data-reconcile-document="${escapeHtml(card.document_id)}">
+        <label>
+          <span>Focus optionnel</span>
+          <input type="text" maxlength="2000" data-reconcile-focus placeholder="Ex. vérifier les contradictions de dates">
+        </label>
+        <button type="button" data-reconcile-button>Réconcilier avec Hermes</button>
+        <small>Analyse transitoire de la mémoire Hindsight. La source NAS n’est pas ouverte.</small>
+        <div class="reconcile-result" data-reconcile-result hidden></div>
+      </div>`
+    : "";
+
   return `
     <div class="document-meta">
       <span class="file-type">${escapeHtml(card.extension || "FILE")}</span>
@@ -70,6 +84,7 @@ function documentCardBody(card) {
     ${summary}
     ${tagsTemplate(card.tags)}
     <div class="facts">${facts}</div>
+    ${reconcile}
     ${generate}
   `;
 }
