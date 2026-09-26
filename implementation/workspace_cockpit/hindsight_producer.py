@@ -140,6 +140,7 @@ class HindsightHTTPClient:
                         "document_id": document_id,
                         "tags": tags,
                         "metadata": metadata,
+                        "timestamp": "unset",
                     }
                 ],
             },
@@ -370,15 +371,19 @@ class HindsightProducer:
             ("project_hint", "project"),
             ("phase_hint", "phase"),
             ("document_type", "document_type"),
-            ("document_index", "index"),
-            ("document_date", "document_date"),
             ("issuer", "issuer"),
         ):
             value = _metadata_value(card.get(card_key))
             if value is not None:
                 metadata[target_key] = value
 
-        context_parts = ["AFFAIRES professional source document"]
+        context_parts = [
+            "AFFAIRES professional source document",
+            "extract explicit document date from the source when stated",
+            "extract explicit revision/index/version from the source when stated",
+            "extract explicit supersedes/replaces/annule-et-remplace relationships when stated",
+            "do not infer document date or revision from filename, upload time, filesystem mtime, or metadata",
+        ]
         if metadata.get("title"):
             context_parts.append(f"title={metadata['title']}")
         if metadata.get("document_type"):
