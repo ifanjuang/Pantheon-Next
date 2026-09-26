@@ -132,7 +132,7 @@ def test_hermes_client_uses_no_store_then_deletes_session() -> None:
             )
         if request.full_url.endswith("/api/sessions/session-123"):
             assert request.get_method() == "DELETE"
-            return _Response({"deleted": True})
+            return _Response({"object": "hermes.session.deleted", "deleted": True})
         raise AssertionError(request.full_url)
 
     client = module.HermesReconciliationClient(
@@ -188,7 +188,7 @@ def test_invalid_hermes_output_still_deletes_transient_session() -> None:
                 headers={"X-Hermes-Session-Id": "session-bad"},
             )
         if request.full_url.endswith("/api/sessions/session-bad"):
-            return _Response({"deleted": True})
+            return _Response({"object": "hermes.session.deleted", "deleted": True})
         raise AssertionError(request.full_url)
 
     client = module.HermesReconciliationClient("http://127.0.0.1:8642/p/reconciliation", "secret")
@@ -222,7 +222,7 @@ def test_hermes_tool_call_output_is_rejected_and_session_is_deleted() -> None:
             )
         if request.full_url.endswith("/api/sessions/session-tool"):
             deleted.append(True)
-            return _Response({"deleted": True})
+            return _Response({"object": "hermes.session.deleted", "deleted": True})
         raise AssertionError(request.full_url)
 
     client = module.HermesReconciliationClient("http://127.0.0.1:8642/p/reconciliation", "secret")
