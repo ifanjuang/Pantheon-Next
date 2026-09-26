@@ -107,6 +107,8 @@ def test_source_candidate_submits_then_completes_without_duplicate_retain(tmp_pa
     assert call["document_id"] == "doc-notice:source"
     assert call["metadata"]["pantheon_document_id"] == "doc-notice"
     assert call["metadata"]["project_hint"] == "LIEUREY"
+    assert "document_index" not in call["metadata"]
+    assert "document_date" not in call["metadata"]
     assert "summary" not in call["metadata"]
     assert "project_hint:lieurey" in call["tags"]
     assert "tag:ossature-bois" in call["tags"]
@@ -270,6 +272,7 @@ def test_http_client_matches_hindsight_0101_file_retain_multipart_contract(tmp_p
     assert b"EXACT-PDF-BYTES" in body
     assert b'"parser":"markitdown"' in body
     assert b'"document_id":"doc-notice:source"' in body
+    assert b'"timestamp":"unset"' in body
 
 
 def test_poll_error_is_persisted_without_resubmitting_active_operation(tmp_path: Path) -> None:
