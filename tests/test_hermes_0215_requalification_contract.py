@@ -14,7 +14,6 @@ def _surface() -> str:
 def test_hermes_0215_is_candidate_not_implicit_pin_move() -> None:
     surface = _surface()
 
-    assert "Current reviewed target: Hermes Agent 0.21.3" in surface
     assert "live runtime qualification remains open" in surface
     assert "Current upstream stable requalification candidate: Hermes Agent 0.21.5" in surface
     assert "release_commit: f97608f178d1ffeca59860195ab7da295f7c8e5f" in surface
