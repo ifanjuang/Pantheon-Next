@@ -455,6 +455,10 @@ class HindsightProducer:
 
     def reconcile(self, snapshot: dict[str, Any]) -> dict[str, Any]:
         states = self._states()
+        for key, row in list(states.items()):
+            if row.get("status") in ACTIVE_STATUSES:
+                states[key] = self._poll(row)
+
         candidates: dict[str, ProducerCandidate] = {}
         seen_document_ids: set[str] = set()
 
