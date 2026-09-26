@@ -270,3 +270,56 @@ def test_http_client_matches_hindsight_0101_file_retain_multipart_contract(tmp_p
     assert b"EXACT-PDF-BYTES" in body
     assert b'"parser":"markitdown"' in body
     assert b'"document_id":"doc-notice:source"' in body
+
+
+def test_poll_error_is_persisted_without_resubmitting_active_operation(tmp_path: Path) -> None:
+    module = _module()
+    (tmp_path / "Notice.pdf").write_bytes(b"%PDF")
+    db = tmp_path / "state.sqlite3"
+
+    class PollFailureClient(FakeClient):
+        def operation_status(self, operation_id: str):
+            self.polls.append(operation_id)
+            raise RuntimeError("temporary Hindsight outage")
+
+    client = PollFailureClient()
+    producer = module.HindsightProducer(
+        roots=[("Affaires", tmp_path)],
+        state_db=db,
+        client=client,
+    )
+
+    producer.reconcile(_snapshot(_card()))
+    state = producer.reconcile(_snapshot(_card()))
+
+    assert len(client.retains) == 1
+    assert client.polls == ["op-1"]
+    assert state["submitted"] == 1
+    assert _row(db)["last_error"] == "temporary Hindsight outage"
+
+
+def test_http_client_rejects_oversize_source_before_buffering_or_network(tmp_path: Path) -> None:
+    module = _module()
+    source = tmp_path / "Notice.pdf"
+    source.write_bytes(b"12345")
+    client = module.HindsightHTTPClient(
+        "http://127.0.0.1:8888",
+        "affaires",
+        max_file_bytes=4,
+    )
+
+    with patch.object(module, "urlopen") as mocked:
+        try:
+            client.retain_file(
+                source,
+                document_id="doc-notice:source",
+                context="AFFAIRES professional source document",
+                tags=["workspace:affaires"],
+                metadata={"pantheon_document_id": "doc-notice"},
+            )
+        except RuntimeError as exc:
+            assert "exceeds Hindsight upload bound" in str(exc)
+        else:
+            raise AssertionError("oversize source should be rejected")
+
+    mocked.assert_not_called()
