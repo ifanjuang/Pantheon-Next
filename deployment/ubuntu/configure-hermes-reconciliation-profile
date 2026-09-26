@@ -1,0 +1,271 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+STATE_ROOT="${PANTHEON_STATE_ROOT:-/srv/pantheon}"
+HERMES_ROOT="$STATE_ROOT/hermes"
+PROFILE="${HERMES_RECONCILIATION_PROFILE:-reconciliation}"
+CONTAINER="${HERMES_CONTAINER:-pantheon-hermes}"
+API_KEY="${HERMES_RECONCILIATION_API_KEY:-}"
+RUNTIME_URL=""
+APPLY=0
+
+log() { printf '[pantheon-hermes-reconciliation] %s\n' "$*"; }
+die() { printf '[pantheon-hermes-reconciliation] ERROR: %s\n' "$*" >&2; exit 1; }
+
+usage() {
+  cat <<'EOF'
+Usage:
+  deployment/ubuntu/configure-hermes-reconciliation-profile --check [--runtime-url URL]
+  HERMES_RECONCILIATION_API_KEY=<secret> \
+    sudo -E deployment/ubuntu/configure-hermes-reconciliation-profile --apply [--runtime-url URL]
+
+Creates or verifies the dedicated Hermes profile used only for transient
+Workspace/Hindsight memory reconciliation.
+
+The profile is deliberately not started, routed, multiplexed, or wired into
+Cockpit by this command. Runtime activation stays a separate operator action.
+
+--check            Read-only verification. This is the default.
+--apply            Create/configure the dedicated profile. Requires
+                   HERMES_RECONCILIATION_API_KEY when the profile has no key.
+--runtime-url URL  Optionally verify the live profile API surface, e.g.
+                   http://127.0.0.1:8642/p/reconciliation or a separately
+                   supervised profile base URL. Requires the same API key.
+EOF
+}
+
+while (($#)); do
+  case "$1" in
+    --check) APPLY=0 ;;
+    --apply) APPLY=1 ;;
+    --runtime-url)
+      shift
+      (($#)) || die "--runtime-url requires a value"
+      RUNTIME_URL="$1"
+      ;;
+    -h|--help) usage; exit 0 ;;
+    *) die "unknown argument: $1" ;;
+  esac
+  shift
+done
+
+command -v docker >/dev/null || die "docker is required"
+command -v python3 >/dev/null || die "python3 is required"
+docker inspect -f '{{.State.Running}}' "$CONTAINER" 2>/dev/null | grep -qx true \
+  || die "Hermes container is not running: $CONTAINER"
+
+hermes() {
+  docker exec "$CONTAINER" hermes "$@"
+}
+
+profile_exists() {
+  docker exec "$CONTAINER" test -d "/opt/data/profiles/$PROFILE"
+}
+
+profile_config_path() {
+  hermes -p "$PROFILE" config path 2>/dev/null | tail -n 1
+}
+
+profile_root() {
+  dirname "$(profile_config_path)"
+}
+
+get_optional_json() {
+  local key="$1" output status
+  set +e
+  output="$(hermes -p "$PROFILE" config get "$key" --json 2>&1)"
+  status=$?
+  set -e
+  if ((status == 0)); then
+    printf '%s' "$output"
+  elif [[ "$output" == *"Config key not set: $key"* ]]; then
+    printf 'null'
+  else
+    printf '%s\n' "$output" >&2
+    return "$status"
+  fi
+}
+
+profile_has_api_key() {
+  local root
+  root="$(profile_root)"
+  docker exec -e PANTHEON_PROFILE_ROOT="$root" "$CONTAINER" sh -eu -c '
+    test -f "$PANTHEON_PROFILE_ROOT/.env"
+    grep -Eq "^API_SERVER_KEY=.+$" "$PANTHEON_PROFILE_ROOT/.env"
+  '
+}
+
+profile_key_is_distinct_from_default() {
+  local root
+  root="$(profile_root)"
+  docker exec -e PANTHEON_PROFILE_ROOT="$root" "$CONTAINER" sh -eu -c '
+    profile_key="$(sed -n "s/^API_SERVER_KEY=//p" "$PANTHEON_PROFILE_ROOT/.env" | tail -n 1)"
+    test -n "$profile_key"
+    if test -n "${API_SERVER_KEY:-}" && test "$profile_key" = "$API_SERVER_KEY"; then
+      exit 42
+    fi
+  '
+}
+
+check_builtin_memory_empty() {
+  local root path
+  root="$(profile_root)"
+  for path in memories/MEMORY.md memories/USER.md MEMORY.md USER.md; do
+    if docker exec "$CONTAINER" test -s "$root/$path"; then
+      die "dedicated profile carries built-in memory content: $path"
+    fi
+  done
+}
+
+check_profile_config() {
+  local root toolsets plugins mcp context_engine provider tool_search
+  root="$(profile_root)"
+
+  docker exec "$CONTAINER" test -f "$root/.no-bundled-skills" \
+    || die "profile is not marked --no-skills"
+
+  toolsets="$(get_optional_json platform_toolsets.api_server)"
+  [[ "$toolsets" == '["no_mcp"]' ]] \
+    || die "platform_toolsets.api_server must be exactly [\"no_mcp\"]"
+
+  plugins="$(get_optional_json plugins.enabled)"
+  [[ "$plugins" == '[]' ]] \
+    || die "plugins.enabled must be explicitly empty"
+
+  mcp="$(get_optional_json mcp_servers)"
+  [[ "$mcp" == '{}' ]] \
+    || die "mcp_servers must be explicitly empty"
+
+  context_engine="$(get_optional_json context.engine)"
+  [[ "$context_engine" == '"compressor"' ]] \
+    || die "context.engine must be compressor"
+
+  provider="$(get_optional_json memory.provider)"
+  [[ "$provider" == "null" ]] \
+    || die "external memory provider must be disabled"
+
+  tool_search="$(get_optional_json tools.tool_search.enabled)"
+  [[ "$tool_search" == "false" ]] \
+    || die "tools.tool_search.enabled must be false"
+
+  check_builtin_memory_empty
+  profile_has_api_key || die "profile-specific API_SERVER_KEY is missing"
+  if ! profile_key_is_distinct_from_default; then
+    status=$?
+    if ((status == 42)); then
+      die "reconciliation API key must differ from the default Hermes API key"
+    fi
+    die "cannot verify reconciliation API key"
+  fi
+
+  log "profile configuration is bounded and memory-empty"
+}
+
+apply_profile_config() {
+  if ! profile_exists; then
+    log "creating dedicated profile: $PROFILE"
+    hermes profile create "$PROFILE" --no-skills --no-alias >/dev/null
+  fi
+
+  if ! profile_has_api_key; then
+    [[ -n "$API_KEY" ]] \
+      || die "set HERMES_RECONCILIATION_API_KEY before --apply"
+  fi
+
+  hermes -p "$PROFILE" config set platform_toolsets.api_server '["no_mcp"]' >/dev/null
+  hermes -p "$PROFILE" config set --force plugins.enabled '[]' >/dev/null
+  hermes -p "$PROFILE" config set --force mcp_servers '{}' >/dev/null
+  hermes -p "$PROFILE" config set context.engine compressor >/dev/null
+  hermes -p "$PROFILE" config set tools.tool_search.enabled false >/dev/null
+  hermes -p "$PROFILE" memory off >/dev/null
+
+  if [[ -n "$API_KEY" ]]; then
+    docker exec \
+      -e PANTHEON_RECONCILIATION_API_KEY="$API_KEY" \
+      -e PANTHEON_RECONCILIATION_PROFILE="$PROFILE" \
+      "$CONTAINER" sh -eu -c '
+        hermes -p "$PANTHEON_RECONCILIATION_PROFILE" config set \
+          API_SERVER_KEY "$PANTHEON_RECONCILIATION_API_KEY" >/dev/null
+      '
+  fi
+
+  check_profile_config
+  log "profile configured; no gateway was started and no routing was changed"
+}
+
+qualify_runtime() {
+  [[ -n "$RUNTIME_URL" ]] || {
+    log "runtime route not observed (no --runtime-url supplied)"
+    return 0
+  }
+  [[ -n "$API_KEY" ]] \
+    || die "--runtime-url requires HERMES_RECONCILIATION_API_KEY for authenticated observation"
+
+  HERMES_RECONCILIATION_CHECK_URL="$RUNTIME_URL" \
+  HERMES_RECONCILIATION_CHECK_KEY="$API_KEY" \
+  python3 - <<'PY'
+import json
+import os
+import sys
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
+
+base = os.environ["HERMES_RECONCILIATION_CHECK_URL"].rstrip("/")
+key = os.environ["HERMES_RECONCILIATION_CHECK_KEY"]
+
+def get(path):
+    request = Request(
+        base + path,
+        headers={
+            "Authorization": f"Bearer {key}",
+            "Accept": "application/json",
+            "User-Agent": "pantheon-reconciliation-qualification/1",
+        },
+    )
+    try:
+        with urlopen(request, timeout=10) as response:
+            return json.loads(response.read().decode("utf-8"))
+    except HTTPError as exc:
+        detail = exc.read(2048).decode("utf-8", errors="replace")
+        raise SystemExit(f"runtime HTTP {exc.code}: {detail}") from exc
+    except (OSError, URLError, UnicodeError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"runtime observation failed: {exc}") from exc
+
+toolsets = get("/v1/toolsets")
+if not isinstance(toolsets, list):
+    raise SystemExit("unexpected /v1/toolsets response")
+enabled = [
+    row.get("name")
+    for row in toolsets
+    if isinstance(row, dict) and row.get("enabled") is True
+]
+if enabled:
+    raise SystemExit("reconciliation profile exposes enabled toolsets: " + ", ".join(map(str, enabled)))
+
+caps = get("/v1/capabilities")
+if not isinstance(caps, dict):
+    raise SystemExit("unexpected /v1/capabilities response")
+features = caps.get("features") or {}
+endpoints = caps.get("endpoints") or {}
+if features.get("responses_api") is not True:
+    raise SystemExit("Hermes Responses API is not advertised")
+session_delete = endpoints.get("session_delete") or {}
+if session_delete.get("method") != "DELETE" or session_delete.get("path") != "/api/sessions/{session_id}":
+    raise SystemExit("Hermes session deletion endpoint is not advertised as expected")
+
+print("runtime no-tool surface qualified; Responses API + session deletion advertised")
+PY
+
+  log "runtime observation passed"
+}
+
+if ((APPLY == 1)); then
+  apply_profile_config
+else
+  profile_exists || die "dedicated profile is missing: $PROFILE"
+  check_profile_config
+fi
+
+qualify_runtime
+
+log "configured != activated; runtime observed != task authorized; reconciliation output != Evidence"
