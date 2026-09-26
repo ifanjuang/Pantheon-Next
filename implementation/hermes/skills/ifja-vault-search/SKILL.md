@@ -3,7 +3,7 @@ name: ifja-vault-search
 description: "Recherche les projets et documents dans les vaults IFJA."
 license: MIT
 metadata:
-  version: 0.8.0
+  version: 0.8.1
   author: IFJA
   hermes:
     tags: [ifja, hindsight, vaults, projects, documents]
@@ -73,6 +73,65 @@ change the answer, permitted action or consequence.
    report the candidate set and the missing type instead.
 3. Open the exact project page or requested document before returning a material
    identifier, date, status or contractual fact.
+
+### Latest document / revision resolution
+
+When the user asks for the latest, current, newest or applicable revision of a
+document family, do not use Hindsight relevance rank, retain time, filesystem
+mtime, upload time or a cartouche date/index as the freshness decision.
+
+Resolve at most five exact-family candidates, then inspect each candidate with
+Hindsight `get_document` so the retained `original_text` is available. Extract
+from the document content itself, when explicitly stated:
+
+```text
+source_revision
+source_document_date
+source_supersedes[]
+```
+
+Treat these as source observations, not metadata truth. Do not invent a revision
+or date when the source text does not state one.
+
+Selection order for one exact document family:
+
+```text
+explicit supersedes/replaces relationship
+> comparable source revision/index
+> source document date as tie-breaker/fallback
+```
+
+Rules:
+
+- If one source explicitly says it supersedes/replaces another candidate, prefer
+  the superseding source.
+- If revisions are comparable within the same scheme (for example A/B/C,
+  01/02/03, P1/P2/P3, REV01/REV02), prefer the higher revision.
+- The source document date is a consistency check for a revision decision, not
+  an automatic override.
+- If the higher revision carries an earlier date than the lower revision,
+  preserve the higher revision as the preferred candidate but emit
+  `revision_date_conflict`; keep the lower revision visible as a conflicting
+  candidate.
+- If two candidates have the same revision/index, prefer the later explicit
+  source document date and emit `duplicate_revision`. If their dates are also
+  equal or missing, do not silently collapse them.
+- If revisions are missing or not safely comparable, use an explicit source
+  document date only as `date_fallback`. Do not derive chronology from filename
+  ordering or filesystem timestamps.
+- If conflicting source signals remain unresolved, return the candidate set and
+  state that the current revision is ambiguous instead of asserting one as fact.
+
+A "latest" answer should therefore expose the basis used:
+
+```text
+selection_basis = explicit_supersession | revision | date_fallback | ambiguous
+revision_conflict = none | duplicate_revision | revision_date_conflict | incomparable_revision
+```
+
+The cartouche may help locate the family, but its declared index/date cannot
+silently win over the document content.
+
    If Hindsight returns no exact candidate but an admitted Workspace/vault path
    or filename is already known, treat this as an indexing gap: validate and
    open that exact local source (Docling for a file needing extraction) rather
