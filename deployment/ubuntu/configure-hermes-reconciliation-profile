@@ -121,7 +121,7 @@ check_profile_config() {
   local root toolsets plugins mcp context_engine provider tool_search
   root="$(profile_root)"
 
-  docker exec "$CONTAINER" test -f "$root/.no-bundled-skills" \
+  docker exec "$CONTAINER" test -f "$root/skills/.no-bundled-skills" \
     || die "profile is not marked --no-skills"
 
   toolsets="$(get_optional_json platform_toolsets.api_server)"
@@ -182,6 +182,18 @@ apply_profile_config() {
   hermes -p "$PROFILE" config set tools.tool_search.enabled false >/dev/null
 
   if [[ -n "$API_KEY" ]]; then
+    docker exec -e PANTHEON_RECONCILIATION_API_KEY="$API_KEY" "$CONTAINER" sh -eu -c '
+      if test -n "${API_SERVER_KEY:-}" && test "$PANTHEON_RECONCILIATION_API_KEY" = "$API_SERVER_KEY"; then
+        exit 42
+      fi
+    ' || {
+      key_status=$?
+      if ((key_status == 42)); then
+        die "reconciliation API key must differ from the default Hermes API key"
+      fi
+      die "cannot compare reconciliation API key with default Hermes API key"
+    }
+
     docker exec \
       -e PANTHEON_RECONCILIATION_API_KEY="$API_KEY" \
       -e PANTHEON_RECONCILIATION_PROFILE="$PROFILE" \
@@ -234,12 +246,21 @@ def get(path):
         raise SystemExit(f"runtime observation failed: {exc}") from exc
 
 toolsets = get("/v1/toolsets")
-if not isinstance(toolsets, list):
+if (
+    not isinstance(toolsets, dict)
+    or toolsets.get("object") != "list"
+    or toolsets.get("platform") != "api_server"
+    or not isinstance(toolsets.get("data"), list)
+    or not toolsets["data"]
+):
     raise SystemExit("unexpected /v1/toolsets response")
+rows = toolsets["data"]
+if any(not isinstance(row, dict) or not isinstance(row.get("enabled"), bool) for row in rows):
+    raise SystemExit("malformed /v1/toolsets row")
 enabled = [
-    row.get("name")
-    for row in toolsets
-    if isinstance(row, dict) and row.get("enabled") is True
+    str(row.get("name") or "unknown")
+    for row in rows
+    if row["enabled"]
 ]
 if enabled:
     raise SystemExit("reconciliation profile exposes enabled toolsets: " + ", ".join(map(str, enabled)))
