@@ -239,8 +239,13 @@ def _declared_source_size(metadata: dict[str, Any]) -> tuple[int | None, str | N
         return None, "source_size_bytes invalide"
     if isinstance(value, int) and value >= 0:
         return value, None
-    if isinstance(value, str) and value.strip().isdigit():
-        return int(value.strip()), None
+    if isinstance(value, str):
+        normalized = value.strip()
+        if normalized.isdigit() and len(normalized) <= 20:
+            try:
+                return int(normalized), None
+            except ValueError:
+                pass
     return None, "source_size_bytes invalide"
 
 
@@ -253,6 +258,7 @@ def _source_integrity(
 ) -> tuple[dict[str, Any], list[str]]:
     """Verify an explicitly declared source checksum without hashing every AFFAIRES source."""
     warnings: list[str] = []
+    declared_key_present = "source_sha256" in metadata
     declared = _meta_string(metadata, "source_sha256")
     declared_size, size_error = _declared_source_size(metadata)
     actual_size = _file_size(source)
@@ -267,6 +273,14 @@ def _source_integrity(
         )
 
     if declared is None:
+        if declared_key_present:
+            warnings.append("source_sha256 invalide : chaîne hexadécimale attendue")
+            return {
+                "source_sha256": None,
+                "source_sha256_verified": False,
+                "source_integrity": "INVALID",
+                "declared_source_size": declared_size,
+            }, warnings
         if require_digest:
             warnings.append("source_sha256 absent du cartouche")
         return {
