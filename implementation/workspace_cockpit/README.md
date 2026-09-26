@@ -212,7 +212,7 @@ document_id = doc_...:source
 
 The source file is opened directly from the admitted Linux-visible AFFAIRES root. Pantheon creates no local staging file. The HTTP adapter uses a bounded transient in-memory multipart buffer; the default source bound is 100 MiB, matching Hindsight 0.10.1's default file-conversion batch-size limit.
 
-Only descriptive cartouche fields are passed as bounded context/metadata. The cartouche body and derived summary are not injected as source claims.
+Only bounded orientation fields are passed as context/metadata. The first slice deliberately excludes `index`, `document_date`, `revision_mode` and `revision_of` from Hindsight file-retain extraction context because these labels may be wrong or incomplete. The cartouche body and derived summary are not injected as source claims.
 
 This slice does **not** close #659's A/B/C comparison:
 
