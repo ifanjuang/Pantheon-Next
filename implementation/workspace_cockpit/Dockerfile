@@ -11,4 +11,4 @@ COPY mvp_vertical/hermes_runtime_topology_projection.py /app/mvp_vertical/hermes
 COPY mvp_vertical/hermes_role_trace_relay.py /app/mvp_vertical/hermes_role_trace_relay.py
 
 ENTRYPOINT ["/opt/hermes/.venv/bin/python", "/app/server.py"]
-CMD ["--host", "0.0.0.0", "--port", "8189", "--max-depth", "2", "--root", "IFJA=/vaults/ifja", "--root", "Affaires=/vaults/affaires", "--root", "Documentaires=/vaults/documentaires"]
+CMD ["--host", "0.0.0.0", "--port", "8189", "--max-depth", "2", "--root", "Affaires=/workspace/affaires"]

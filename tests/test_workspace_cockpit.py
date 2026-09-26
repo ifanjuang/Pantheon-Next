@@ -868,12 +868,16 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     assert "StateDirectory=pantheon-workspace-cockpit" in text
     assert "--state-db /var/lib/pantheon-workspace-cockpit/index.sqlite3" in text
     assert "--reconcile-seconds 60" in text
-    assert "setfacl" in text
+    assert "--affaires-root" in text
+    assert "AFFAIRES_ROOT" in text
+    assert "setfacl" not in text
+    assert "vault mirror" not in text.lower()
     assert "pgvector" not in text.lower()
     compose = COMPOSE.read_text(encoding="utf-8")
-    # Slice 1 keeps the historical read-only mounts; deployment convergence is #660 Slice 4.
     assert "read_only: true" in compose
-    assert compose.count(":ro") == 3
+    assert "${AFFAIRES_ROOT:?set AFFAIRES_ROOT to the Linux-mounted NAS AFFAIRES path}:/workspace/affaires:ro" in compose
+    assert compose.count(":ro") == 1
+    assert "/srv/pantheon/obsidian" not in compose
     assert "workspace-cockpit-state:/state" in compose
     assert "WORKSPACE_INDEX_DB: /state/index.sqlite3" in compose
     assert "WORKSPACE_RECONCILE_SECONDS" in compose

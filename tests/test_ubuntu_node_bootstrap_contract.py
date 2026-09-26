@@ -55,7 +55,9 @@ def test_workspace_cockpit_compose_is_read_only_and_loopback_only() -> None:
     assert "read_only: true" in text
     assert "no-new-privileges:true" in text
     assert "cap_drop:" in text and "- ALL" in text
-    assert text.count(":ro") == 3
+    assert "${AFFAIRES_ROOT:?set AFFAIRES_ROOT to the Linux-mounted NAS AFFAIRES path}:/workspace/affaires:ro" in text
+    assert text.count(":ro") == 1
+    assert "/srv/pantheon/obsidian" not in text
     assert '127.0.0.1:${ROLE_TRACE_ATTACH_PORT:-8190}:8190' in text
     assert "HERMES_ROLE_TRACE_API_KEY" in text
     assert "ROLE_TRACE_ATTACH_KEY" in text

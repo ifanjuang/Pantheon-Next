@@ -10,22 +10,20 @@ BIND_ADDRESS="127.0.0.1"
 PORT="8189"
 ENABLE=0
 DOCTOR=0
-VAULTS=(
-  "IFJA=/srv/pantheon/obsidian"
-  "Affaires=/srv/pantheon/obsidian-affaires"
-  "Documentaires=/srv/pantheon/obsidian-documentaires"
-)
+AFFAIRES_ROOT="${AFFAIRES_ROOT:-}"
 
 usage() {
   cat <<'EOF'
 Usage: configure-workspace-cockpit-local [options]
 
-Install the read-only local Workspace Cockpit over LiveSync filesystem mirrors.
+Install the read-only local Workspace Cockpit over the Linux-mounted NAS AFFAIRES root.
 
 Options:
   --bind ADDRESS   Bind address (default 127.0.0.1)
   --port PORT      HTTP port (default 8189)
   --user USER      Unprivileged service user (default invoking sudo user)
+  --affaires-root PATH
+                   Linux-mounted NAS AFFAIRES root (or set AFFAIRES_ROOT)
   --enable         Enable and start the systemd service
   --doctor         Read-only prerequisite check
   -h, --help       Show this help
@@ -39,6 +37,7 @@ while (($#)); do
     --bind) BIND_ADDRESS="${2:?missing bind address}"; shift 2 ;;
     --port) PORT="${2:?missing port}"; shift 2 ;;
     --user) SERVICE_USER="${2:?missing service user}"; shift 2 ;;
+    --affaires-root) AFFAIRES_ROOT="${2:?missing AFFAIRES root}"; shift 2 ;;
     --enable) ENABLE=1; shift ;;
     --doctor) DOCTOR=1; shift ;;
     -h|--help) usage; exit 0 ;;
@@ -50,20 +49,24 @@ done
 [[ -f "$SOURCE_ROOT/server.py" && -f "$SOURCE_ROOT/static/index.html" ]] || die "workspace cockpit source is incomplete"
 command -v python3 >/dev/null || die "python3 is required"
 python3 -c 'import yaml' >/dev/null 2>&1 || die "python3-yaml is required"
-for vault in "${VAULTS[@]}"; do
-  path="${vault#*=}"
-  [[ -d "$path" ]] || die "vault mirror is missing: $path"
-done
+[[ -n "$AFFAIRES_ROOT" ]] || die "set --affaires-root PATH or AFFAIRES_ROOT"
+[[ "$AFFAIRES_ROOT" = /* ]] || die "AFFAIRES root must be an absolute Linux mount path"
+[[ -d "$AFFAIRES_ROOT" ]] || die "AFFAIRES mount is missing: $AFFAIRES_ROOT"
 
 if ((DOCTOR)); then
-  printf 'workspace-cockpit: prerequisites ready; bind=%s:%s; user=%s\n' "$BIND_ADDRESS" "$PORT" "$SERVICE_USER"
+  printf 'workspace-cockpit: prerequisites ready; bind=%s:%s; user=%s; affaires=%s\n' "$BIND_ADDRESS" "$PORT" "$SERVICE_USER" "$AFFAIRES_ROOT"
   exit 0
 fi
 
 ((EUID == 0)) || die "installation requires root"
 [[ -n "$SERVICE_USER" && "$SERVICE_USER" != root ]] || die "pass --user with an unprivileged Linux user"
 id "$SERVICE_USER" >/dev/null 2>&1 || die "unknown service user: $SERVICE_USER"
-command -v setfacl >/dev/null || die "setfacl is required"
+if ! runuser -u "$SERVICE_USER" -- test -r "$AFFAIRES_ROOT"; then
+  die "service user cannot read AFFAIRES mount: $AFFAIRES_ROOT"
+fi
+if ! runuser -u "$SERVICE_USER" -- test -x "$AFFAIRES_ROOT"; then
+  die "service user cannot traverse AFFAIRES mount: $AFFAIRES_ROOT"
+fi
 
 if [[ -d "$INSTALL_ROOT" ]]; then
   backup="${INSTALL_ROOT}.backup.$(date -u +%Y%m%dT%H%M%SZ)"
@@ -75,11 +78,7 @@ install -m 0644 "$SOURCE_ROOT/static/index.html" "$INSTALL_ROOT/static/index.htm
 install -m 0644 "$SOURCE_ROOT/static/styles.css" "$INSTALL_ROOT/static/styles.css"
 install -m 0644 "$SOURCE_ROOT/static/app.js" "$INSTALL_ROOT/static/app.js"
 
-for vault in "${VAULTS[@]}"; do
-  path="${vault#*=}"
-  setfacl -R -m "u:${SERVICE_USER}:rX" "$path"
-  find "$path" -type d -exec setfacl -m "d:u:${SERVICE_USER}:rX" {} +
-done
+# The installer never rewrites NAS ACLs. Access is owned by the host mount configuration.
 
 unit_tmp="$(mktemp)"
 trap 'rm -f "$unit_tmp"' EXIT
@@ -90,9 +89,7 @@ trap 'rm -f "$unit_tmp"' EXIT
   printf '\n%s\n' '[Service]'
   printf 'User=%s\n' "$SERVICE_USER"
   printf 'WorkingDirectory=%s\n' "$INSTALL_ROOT"
-  printf 'ExecStart=/usr/bin/python3 %s/server.py --host %s --port %s --max-depth 2 --state-db /var/lib/pantheon-workspace-cockpit/index.sqlite3 --reconcile-seconds 60 --watch-debounce-ms 500' "$INSTALL_ROOT" "$BIND_ADDRESS" "$PORT"
-  for vault in "${VAULTS[@]}"; do printf ' --root %s' "$vault"; done
-  printf '\n'
+  printf 'ExecStart=/usr/bin/python3 %s/server.py --host %s --port %s --max-depth 2 --state-db /var/lib/pantheon-workspace-cockpit/index.sqlite3 --reconcile-seconds 60 --watch-debounce-ms 500 --root Affaires=%s\n' "$INSTALL_ROOT" "$BIND_ADDRESS" "$PORT" "$AFFAIRES_ROOT"
   printf '%s\n' 'Restart=on-failure' 'RestartSec=3' 'UMask=0077'
   printf '%s\n' 'StateDirectory=pantheon-workspace-cockpit' 'StateDirectoryMode=0700'
   printf '%s\n' 'NoNewPrivileges=true' 'PrivateDevices=true' 'PrivateTmp=true'
