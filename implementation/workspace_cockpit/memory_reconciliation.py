@@ -15,6 +15,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import json
 import re
+import threading
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlparse
@@ -195,7 +196,11 @@ def _response_text(payload: dict[str, Any]) -> str:
         raise ReconciliationError("Hermes Responses payload has no output list")
     chunks: list[str] = []
     for item in output:
-        if not isinstance(item, dict) or item.get("type") != "message":
+        if not isinstance(item, dict):
+            raise ReconciliationError("Hermes response contains a malformed output item")
+        if item.get("type") in {"function_call", "function_call_output"}:
+            raise ReconciliationError("Hermes reconciliation attempted to use a tool")
+        if item.get("type") != "message":
             continue
         content = item.get("content")
         if not isinstance(content, list):
@@ -387,6 +392,7 @@ class MemoryReconciliationService:
         self.hindsight = hindsight_client
         self.hermes = hermes_client
         self.max_context_chars = max(8000, min(int(max_context_chars), 200000))
+        self._lock = threading.Lock()
 
     @staticmethod
     def _find_card(snapshot: dict[str, Any], document_id: str) -> dict[str, Any]:
@@ -483,6 +489,20 @@ class MemoryReconciliationService:
         if len(focus) > MAX_FOCUS_CHARS:
             raise ReconciliationError(f"Focus is limited to {MAX_FOCUS_CHARS} characters")
 
+        if not self._lock.acquire(blocking=False):
+            raise ReconciliationError("Another memory reconciliation is already running")
+        try:
+            return self._reconcile_locked(snapshot, document_id, focus=focus)
+        finally:
+            self._lock.release()
+
+    def _reconcile_locked(
+        self,
+        snapshot: dict[str, Any],
+        document_id: str,
+        *,
+        focus: str,
+    ) -> dict[str, Any]:
         card = self._find_card(snapshot, document_id)
         hindsight_id = f"{document_id}:source"
         document = self.hindsight.get_document(hindsight_id)
