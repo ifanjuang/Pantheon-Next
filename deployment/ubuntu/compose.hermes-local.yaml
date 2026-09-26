@@ -24,7 +24,7 @@ services:
       HINDSIGHT_API_LLM_BASE_URL: http://127.0.0.1:11434/v1
       HINDSIGHT_API_LLM_MODEL: qwen3.5:9b
       HINDSIGHT_API_RETAIN_MISSION: >-
-        Retain all significant facts as usual. For professional documents, always also
+        Pantheon document chronology v1. Retain all significant facts as usual. For professional documents, always also
         extract explicit document chronology stated in the source: the document date,
         revision/index/version token, and any explicit supersedes/replaces/annule-et-remplace
         relationship. Preserve the exact stated revision token and date. If the source
