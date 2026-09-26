@@ -117,6 +117,9 @@ type: CCTP
 index: C
 document_date: 2026-09-12
 issuer: FRONTSign
+# Optional and never inferred from index/date/name:
+revision_mode: supersedes
+revision_of: doc_previous
 tags:
   - structure
   - ossature-bois
@@ -149,9 +152,31 @@ In particular:
 project hint != governed project_id
 folder name != governed project_id
 index label != professional currentness
+document date != revision order
+filename similarity != revision order
 summary != source claim
-relation note != governed relation
+declared revision relation != governed professional decision
 ```
+
+Optional revision fields are structural declarations only:
+
+```yaml
+revision_mode: supersedes | supplements
+revision_of: doc_...
+```
+
+They are never generated from an index, a date or a filename.
+
+```text
+supersedes
+= this bundle explicitly declares that it replaces the referenced occurrence
+
+supplements
+= this bundle explicitly declares that it adds to the referenced occurrence;
+  the referenced occurrence remains independently relevant
+```
+
+If neither field is present, Pantheon records no revision relation. It does not guess one.
 
 ## 5. Identity
 
@@ -189,16 +214,53 @@ path != identity
 
 ### New index / new physical document
 
-If the user intentionally keeps the old file and creates a new indexed file:
+If the user intentionally keeps the old file and creates another file:
 
 ```text
 CCTP_IND_B.pdf + .CCTP_IND_B.pdf.md
 CCTP_IND_C.pdf + .CCTP_IND_C.pdf.md
 ```
 
-they are separate bundles with separate cartouche identities unless an explicit governed relation later links them.
+they are separate bundle occurrences with separate `document_id` values.
 
-Do not infer a hidden version chain merely from similar names or contents.
+This remains true even when:
+
+- both files carry the same index because of a human naming/indexing mistake;
+- the later-issued file carries a lexically lower index;
+- the higher index carries an earlier `document_date`;
+- the filenames look almost identical.
+
+```text
+document_id
+= identity of this filesystem document occurrence
+
+index
+= descriptive business label
+
+document_date
+= descriptive date supplied for the document
+
+revision_mode + revision_of
+= explicit declared relationship between occurrences
+```
+
+If the corrected bytes overwrite the same intended filesystem occurrence in place, the same `document_id` may remain and the changed source fingerprint drives a Hindsight replacement of that occurrence.
+
+If the old file is preserved and a new physical bundle is created, assign a new `document_id`. Link the two only when the relation is explicitly known:
+
+```yaml
+revision_mode: supersedes
+revision_of: doc_old
+```
+
+or:
+
+```yaml
+revision_mode: supplements
+revision_of: doc_base
+```
+
+Do not infer a hidden version chain from similar names, contents, indices or dates. A contradictory index/date does not override an explicit relation and does not create one when none exists.
 
 ## 6. Pairing
 
@@ -464,6 +526,10 @@ issuer
 document date
 stable tags
 ```
+
+`index` and `document_date` remain descriptive orientation only. They must not be used to decide which document is current or which one replaces another.
+
+Revision declarations may be exposed to Cockpit/reconciliation as explicit metadata, but they must not authorize deletion or be promoted into source evidence merely because the cartouche contains them.
 
 Do not silently feed a speculative/derived summary into source extraction as though it were source fact.
 
