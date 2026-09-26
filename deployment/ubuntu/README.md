@@ -189,6 +189,42 @@ sudo ./configure-livesync-local
 The command never prints the CouchDB password or LiveSync passphrase. Obsidian
 must initialize the new remote before the headless mirror service is enabled.
 
+## Dedicated Hermes reconciliation profile
+
+The transient Workspace/Hindsight reconciliation path uses a separate Hermes
+profile with no model tools. Provisioning that profile is explicit and remains
+separate from runtime activation:
+
+```bash
+export HERMES_RECONCILIATION_API_KEY="$(openssl rand -hex 32)"
+sudo -E bash deployment/ubuntu/configure-hermes-reconciliation-profile --apply
+```
+
+The configurator creates `reconciliation` with `--no-skills`, disables external
+memory and dynamic tool search, sets `platform_toolsets.api_server` to
+`[no_mcp]`, clears MCP/plugin bindings, and requires a profile-specific API key.
+It does not start a gateway, enable `gateway.multiplex_profiles`, change routing,
+or modify Cockpit settings.
+
+When an operator has separately activated either a multiplexed
+`/p/reconciliation` route or a separately supervised profile API, verify the
+actual runtime surface:
+
+```bash
+HERMES_RECONCILIATION_API_KEY=<same-profile-key> \
+  bash deployment/ubuntu/configure-hermes-reconciliation-profile --check \
+  --runtime-url http://127.0.0.1:8642/p/reconciliation
+```
+
+That live check fails if any Hermes toolset is enabled and also confirms the
+Responses API and session-deletion endpoint required by Cockpit.
+
+```text
+configured != activated
+runtime observed != task-authorized
+reconciliation candidate != Evidence
+```
+
 ## Local OCR for Obsidian
 
 Once LiveSync is active, install Marker 2.0.0, its local upload API, and the
