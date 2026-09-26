@@ -281,7 +281,7 @@ folder context != professional approval
 
 The existing `implementation/workspace_cockpit` is the component to evolve. Do not add a parallel filesystem Cockpit.
 
-The current implementation recursively scans LiveSync filesystem mirrors on each `/api/workspaces` request. That is acceptable as historical implementation evidence, but it is not the selected performance model for large AFFAIRES trees.
+Historical implementations scanned LiveSync filesystem mirrors. The selected implementation indexes the actual AFFAIRES root as mounted by Linux; no local source-tree mirror participates in the productive topology.
 
 Target behavior:
 
@@ -608,7 +608,7 @@ Current implementation facts after the Slice 1 candidate (#1112):
 - temp/lock/Revit-backup files are filtered and heavy professional binaries remain visible;
 - the Generate cartouche affordance is visible but has no write route in this slice;
 - it still scans on request rather than through the selected reconstructible index;
-- Ubuntu deployment still mounts historical LiveSync vault mirrors.
+- Ubuntu deployment must mount only the reviewed AFFAIRES root already mounted by Linux; historical LiveSync vault mirrors are retired from the active path.
 
 Migration sequence:
 
@@ -643,7 +643,7 @@ Migration sequence:
 
 ### Slice 4 — deployment convergence
 
-- mount the actual reviewed AFFAIRES root read-only/read-write only as required by explicit cartouche-generation posture;
+- mount the actual reviewed AFFAIRES root directly from the Linux-visible NAS path, read-only unless an explicit governed cartouche-write posture is enabled;
 - retire CouchDB/LiveSync/vault-mirror requirements from the active Workspace Cockpit baseline;
 - keep historical tooling only if another demonstrated workflow still uses it.
 
@@ -738,3 +738,22 @@ mount visible != mount healthy
 inotify observed != convergence proof
 reconcile success != professional validation
 ```
+
+## Source residency invariant
+
+The NAS-mounted AFFAIRES tree is the only durable professional source tree in this topology.
+
+```text
+NAS source
+→ Linux mount
+→ read in place
+
+NAS source
+↛ local AFFAIRES mirror
+↛ LiveSync mirror
+↛ Hindsight source authority
+```
+
+Local Linux persistence may contain only reconstructible technical state or derived memory. It must not silently become a second professional file repository.
+
+An on-demand Hermes analysis must not be implemented by copying the whole file tree locally or exposing unrestricted NAS browsing to the model. Exact source access, when enabled, must be bound to an explicitly admitted source reference and read from the mounted source in place.
