@@ -485,33 +485,94 @@ Those human-readable descriptive fields belong in the cartouche when this file-n
 
 #659 owns Hindsight runtime and retain/retrieval qualification.
 
-Candidate Hindsight mapping:
+The currently implemented productive candidate is deliberately the smallest source mapping:
 
 ```text
 bundle id = doc_...
 
 doc_...:source
-→ eligible source file
+→ COMPLETE + unique document_id + supported source representation
 → Hindsight files/retain
 → parsed source content
-
-doc_...:card
-→ cartouche Markdown
-→ optional lightweight retain/chunks/verbatim
-→ directly retrievable description
+→ chunks + derived memories
 ```
 
-Do not assume the second document is valuable until measured.
+Pantheon does not currently create a second Hindsight `doc_...:card` document. The
+cartouche is passed only as bounded orientation where explicitly qualified; descriptive
+index/date/revision labels are not allowed to establish source chronology.
 
-Qualification must compare:
+The earlier A/B/C alternatives remain historical qualification questions rather than
+three concurrent productive paths:
 
 ```text
-A = source only
-B = source + bounded cartouche metadata/context
-C = source + separately retrievable cartouche
+A = source only + bounded orientation     ← implemented
+B = richer cartouche context              ← not selected
+C = separately retrievable cartouche      ← not selected
 ```
 
-Select the smallest mapping that materially improves retrieval without confusing provenance or duplicating answers.
+Do not add B or C unless measured retrieval quality demonstrates a material need.
+
+### On-demand memory reconciliation
+
+Cockpit may ask Hermes to critique the Hindsight-derived state for one exact
+`doc_...:source`, but this remains a read-only candidate path:
+
+```text
+Workspace document_id
+        │
+        ├─ bounded cartouche projection
+        └─ exact Hindsight document
+              ├─ chunks
+              └─ memories filtered by document_id
+                         │
+                         ▼
+             dedicated no-tool Hermes profile
+                         │
+                         ▼
+       transient MemoryReconciliationCandidate-shaped response
+```
+
+No new governed owner is introduced by the response shape. The candidate is transient
+and is not persisted by this slice.
+
+Hard boundaries:
+
+```text
+Hindsight derived state != original NAS source
+cartouche relation != source truth
+Hermes finding != memory mutation
+Hermes finding != Evidence
+candidate != accepted correction
+```
+
+The reconciliation route must not receive the NAS path or Hindsight `original_text`.
+It may receive only sanitized chunks, sanitized memory units, bounded cartouche
+projection and an optional bounded user focus.
+
+Hermes must run through a dedicated profile whose API-server tool surface is disabled.
+For Hermes 0.21.3 the profile requires `platform_toolsets.api_server: [no_mcp]`; an
+empty list alone does not suppress globally enabled MCP servers. No plugins, hooks or
+project workspace are admitted for this profile.
+
+Defense in depth requires the Cockpit client to:
+
+1. inspect `GET /v1/toolsets` before every run and fail closed if any toolset is enabled;
+2. use Responses with `store:false`;
+3. reject any returned `function_call` / `function_call_output`;
+4. delete the Hermes session before returning a successful candidate;
+5. fail with an explicit residency error when that deletion cannot be proven.
+
+Exact source verification remains a later, separate path:
+
+```text
+document_id
+→ exact admitted workspace://source?sha256=...
+→ Pantheon path/root/hash checks
+→ read source in place from the NAS mount
+→ compare source against Hindsight
+```
+
+Do not collapse that future source-verification path into Hindsight-only reconciliation.
 
 ## 14. Context passed to source extraction
 

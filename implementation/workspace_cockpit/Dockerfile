@@ -4,6 +4,7 @@ FROM ${HERMES_IMAGE}
 WORKDIR /app
 COPY workspace_cockpit/server.py /app/server.py
 COPY workspace_cockpit/hindsight_producer.py /app/hindsight_producer.py
+COPY workspace_cockpit/memory_reconciliation.py /app/memory_reconciliation.py
 COPY workspace_cockpit/role_server.py /app/role_server.py
 COPY workspace_cockpit/static /app/static
 COPY mvp_vertical/__init__.py /app/mvp_vertical/__init__.py
