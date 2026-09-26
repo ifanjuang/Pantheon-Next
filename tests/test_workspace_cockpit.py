@@ -633,6 +633,57 @@ source_size_bytes: 12
     assert card["hindsight_representation_candidate"] is None
 
 
+def test_declared_non_string_sha256_is_invalid_and_blocks_producer(tmp_path: Path) -> None:
+    module = _module()
+    (tmp_path / "Notice.pdf").write_bytes(b"actual-bytes")
+    (tmp_path / ".Notice.pdf.md").write_text(
+        """---
+schema: pantheon/cartouche/v1
+document_id: doc-notice
+source: Notice.pdf
+source_sha256: true
+---
+# Notice
+""",
+        encoding="utf-8",
+    )
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=1)
+    card = next(card for card in _cards(result) if card["name"] == "Notice.pdf")
+
+    assert card["status"] == "CHECK"
+    assert card["source_integrity"] == "INVALID"
+    assert card["source_sha256_verified"] is False
+    assert card["hindsight_eligible"] is False
+
+
+def test_unreasonably_long_declared_source_size_is_check_not_reconcile_failure(tmp_path: Path) -> None:
+    module = _module()
+    source_bytes = b"exact-source-bytes"
+    digest = hashlib.sha256(source_bytes).hexdigest()
+    (tmp_path / "Notice.pdf").write_bytes(source_bytes)
+    (tmp_path / ".Notice.pdf.md").write_text(
+        f"""---
+schema: pantheon/cartouche/v1
+document_id: doc-notice
+source: Notice.pdf
+source_sha256: {digest}
+source_size_bytes: "{'9' * 5000}"
+---
+# Notice
+""",
+        encoding="utf-8",
+    )
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=1)
+    card = next(card for card in _cards(result) if card["name"] == "Notice.pdf")
+
+    assert card["status"] == "CHECK"
+    assert card["source_sha256_verified"] is True
+    assert any("source_size_bytes invalide" in warning for warning in card["warnings"])
+    assert card["hindsight_eligible"] is False
+
+
 def test_email_bundle_requires_verified_sha256_and_exact_size(tmp_path: Path) -> None:
     module = _module()
     raw = b"From: a@example.com\r\nTo: b@example.com\r\nSubject: Test\r\n\r\nBody\r\n"
