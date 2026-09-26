@@ -16,10 +16,11 @@ def test_latest_document_resolution_uses_source_chronology_not_ingest_metadata()
     assert "source_supersedes[]" in text
     assert "filesystem mtime" in text
     assert "cartouche date/index" in text
-    assert "explicit supersedes/replaces relationship" in text
-    assert "explicit coherent revision history/table" in text
-    assert "comparable source revision/index" in text
-    assert "source document date as tie-breaker/fallback" in text
+    assert "validated explicit Workspace supersedes relation" in text
+    assert "explicit supersedes/replaces statement in the source" in text
+    assert "explicit coherent revision history/table in the source" in text
+    assert "heuristic ordering by comparable source revision/index" in text
+    assert "source document date as heuristic tie-breaker/fallback" in text
 
 
 def test_revision_date_conflicts_do_not_hide_human_errors() -> None:
@@ -28,7 +29,9 @@ def test_revision_date_conflicts_do_not_hide_human_errors() -> None:
     assert "revision_date_conflict" in text
     assert "duplicate_revision" in text
     assert "incomparable_revision" in text
-    assert "preserve the higher revision as the preferred candidate" in text
-    assert "keep the lower revision visible as a conflicting candidate" in text
+    assert "keep it first only as the index-ranked candidate" in text
+    assert "keep the other candidate visible" in text
     assert "do not silently collapse them" in text
-    assert "current revision is ambiguous" in text
+    assert "currentness is unresolved" in text
+    assert "branching_lineage" in text
+    assert "invalid_lineage" in text
