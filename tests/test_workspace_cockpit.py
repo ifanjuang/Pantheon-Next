@@ -902,6 +902,8 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     assert "AFFAIRES" in html
     assert "CARTOUCHE_MISSING" in javascript
     assert "SOURCE_MISSING" in javascript
+    assert "Remplace" in javascript
+    assert "Complète" in javascript
     assert "Générer le cartouche" in javascript
     assert "Action visible, écriture non activée" in javascript
     assert "Cartouche dossier" in javascript
@@ -1059,6 +1061,7 @@ revision_of: doc-notice
     card = next(card for card in _cards(result) if card["kind"] == "document")
 
     assert card["status"] == "CHECK"
+    assert card["revision_target_status"] == "INVALID"
     assert card["hindsight_eligible"] is False
     assert any("ne peut pas référencer le document lui-même" in warning for warning in card["warnings"])
 
