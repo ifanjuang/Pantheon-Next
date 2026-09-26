@@ -205,6 +205,96 @@ async function load() {
   }
 }
 
+function reconciliationFindingNode(finding) {
+  const item = document.createElement("li");
+  const title = document.createElement("strong");
+  title.textContent = `${finding.category} — ${finding.summary || "Constat"}`;
+  const detail = document.createElement("p");
+  detail.textContent = finding.detail || "";
+  item.append(title, detail);
+  if (finding.suggestion) {
+    const suggestion = document.createElement("p");
+    suggestion.className = "reconcile-suggestion";
+    suggestion.textContent = `Proposition : ${finding.suggestion}`;
+    item.append(suggestion);
+  }
+  const refs = [...(finding.memory_refs || []), ...(finding.chunk_refs || [])];
+  if (refs.length) {
+    const ref = document.createElement("small");
+    ref.textContent = `Références : ${refs.join(", ")}`;
+    item.append(ref);
+  }
+  return item;
+}
+
+function renderReconciliationResult(container, result) {
+  container.replaceChildren();
+  const summary = document.createElement("p");
+  summary.className = "reconcile-summary";
+  summary.textContent = result.summary || "Analyse terminée.";
+  container.append(summary);
+  const findings = Array.isArray(result.findings) ? result.findings : [];
+  if (findings.length) {
+    const list = document.createElement("ol");
+    list.className = "reconcile-findings";
+    for (const finding of findings) list.append(reconciliationFindingNode(finding));
+    container.append(list);
+  } else {
+    const empty = document.createElement("p");
+    empty.className = "reconcile-empty";
+    empty.textContent = "Aucune incohérence bornée relevée dans les éléments transmis.";
+    container.append(empty);
+  }
+  const boundary = document.createElement("small");
+  const chunks = result.inputs?.hindsight_chunks_sent ?? 0;
+  const memories = result.inputs?.hindsight_memories_sent ?? 0;
+  boundary.textContent = `Hindsight uniquement · ${chunks} chunks · ${memories} mémoires · source NAS non ouverte · aucune écriture`;
+  container.append(boundary);
+  container.hidden = false;
+}
+
+async function runMemoryReconciliation(action) {
+  const button = action.querySelector("[data-reconcile-button]");
+  const input = action.querySelector("[data-reconcile-focus]");
+  const resultNode = action.querySelector("[data-reconcile-result]");
+  const documentId = action.dataset.reconcileDocument;
+  if (!button || !input || !resultNode || !documentId) return;
+  button.disabled = true;
+  button.textContent = "Analyse…";
+  resultNode.hidden = true;
+  resultNode.replaceChildren();
+  try {
+    const response = await fetch(`/api/documents/${encodeURIComponent(documentId)}/reconcile-memory`, {
+      method: "POST",
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Pantheon-Intent": "memory-reconcile",
+      },
+      body: JSON.stringify({ focus: input.value.trim() }),
+    });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.detail || payload.error || `HTTP ${response.status}`);
+    renderReconciliationResult(resultNode, payload);
+  } catch (error) {
+    const message = document.createElement("p");
+    message.className = "reconcile-error";
+    message.textContent = `Réconciliation impossible : ${error.message || error}`;
+    resultNode.replaceChildren(message);
+    resultNode.hidden = false;
+  } finally {
+    button.disabled = false;
+    button.textContent = "Réconcilier avec Hermes";
+  }
+}
+
+elements.cards.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-reconcile-button]");
+  if (!button) return;
+  const action = button.closest("[data-reconcile-document]");
+  if (action) void runMemoryReconciliation(action);
+});
+
 elements.search.addEventListener("input", (event) => { state.query = event.target.value; renderCards(); });
 elements.refresh.addEventListener("click", load);
 elements["workspace-tabs"].addEventListener("click", (event) => {
