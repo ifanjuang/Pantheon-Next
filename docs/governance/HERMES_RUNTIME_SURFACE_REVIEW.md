@@ -2,7 +2,7 @@
 
 Status: candidate external-runtime review and selected qualification target — not installed, observed, activated or task-authorized.
 Boundary profile: external_reference_review.
-Current qualified Pantheon baseline: Hermes Agent 0.21.3 (`v2026.9.14`).
+Current reviewed/selected Pantheon target: Hermes Agent 0.21.3 (`v2026.9.14`) — live runtime qualification remains open.
 Current upstream stable requalification candidate: Hermes Agent 0.21.5 (`v2026.9.24`).
 
 ## Responsibility
@@ -69,7 +69,7 @@ release_window: ~460 merged PRs since v0.21.4
 ```
 
 0.21.5 is the next stable **requalification candidate**. It does not silently
-replace the currently qualified Pantheon baseline. Pin movement remains:
+replace the currently reviewed/selected Pantheon target or prove either release live-qualified. Pin movement remains:
 
 ```text
 stable upstream artifact
