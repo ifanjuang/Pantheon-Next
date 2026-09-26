@@ -500,11 +500,11 @@ class HindsightProducer:
 
         for key, candidate in candidates.items():
             row = states.get(key)
+            # Active rows were already polled exactly once at the start of this reconcile.
+            # Never double-poll an operation in the same pass: a fast PENDING -> COMPLETED
+            # transition must not also trigger a replacement submit before the next snapshot.
             if row and row.get("status") in ACTIVE_STATUSES:
-                row = self._poll(row)
-                states[key] = row
-                if row.get("status") in ACTIVE_STATUSES:
-                    continue
+                continue
 
             if row and row.get("fingerprint") == candidate.fingerprint:
                 if row.get("status") in {"COMPLETED", "STALE", "BLOCKED"}:
