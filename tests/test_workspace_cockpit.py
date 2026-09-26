@@ -871,6 +871,7 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     assert "--affaires-root" in text
     assert "AFFAIRES_ROOT" in text
     assert "hindsight_producer.py" in text
+    assert "memory_reconciliation.py" in text
     assert "EnvironmentFile=-/etc/pantheon-workspace-cockpit.env" in text
     assert "setfacl" not in text
     assert "vault mirror" not in text.lower()
@@ -889,6 +890,9 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     assert "WORKSPACE_HINDSIGHT_PARSER" in compose
     assert "WORKSPACE_HINDSIGHT_MAX_SUBMITS_PER_RECONCILE" in compose
     assert "WORKSPACE_HINDSIGHT_MAX_FILE_MB" in compose
+    assert "WORKSPACE_RECONCILE_HERMES_URL" in compose
+    assert "WORKSPACE_RECONCILE_HERMES_KEY" in compose
+    assert "WORKSPACE_RECONCILE_MAX_CONTEXT_CHARS" in compose
     assert "127.0.0.1" in compose
     assert "role-trace:" in compose
     assert "ROLE_TRACE_ATTACH_KEY" in compose
@@ -905,6 +909,10 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     assert "Remplace" in javascript
     assert "Complète" in javascript
     assert "Générer le cartouche" in javascript
+    assert "Réconcilier avec Hermes" in javascript
+    assert "X-Pantheon-Intent" in javascript
+    assert "/reconcile-memory" in javascript
+    assert "source NAS non ouverte" in javascript
     assert "Action visible, écriture non activée" in javascript
     assert "Cartouche dossier" in javascript
     assert "Sans _folder.md" in javascript
