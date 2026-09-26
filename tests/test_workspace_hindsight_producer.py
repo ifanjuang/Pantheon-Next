@@ -99,7 +99,10 @@ def test_source_candidate_submits_then_completes_without_duplicate_retain(tmp_pa
         max_submits_per_reconcile=4,
     )
 
-    first = producer.reconcile(_snapshot(_card()))
+    card = _card()
+    card["revision_mode"] = "supersedes"
+    card["revision_of"] = "doc-older"
+    first = producer.reconcile(_snapshot(card))
     assert first["submitted"] == 1
     assert len(client.retains) == 1
     call = client.retains[0]
@@ -109,6 +112,8 @@ def test_source_candidate_submits_then_completes_without_duplicate_retain(tmp_pa
     assert call["metadata"]["project_hint"] == "LIEUREY"
     assert "document_index" not in call["metadata"]
     assert "document_date" not in call["metadata"]
+    assert "revision_mode" not in call["metadata"]
+    assert "revision_of" not in call["metadata"]
     assert "summary" not in call["metadata"]
     assert "project_hint:lieurey" in call["tags"]
     assert "tag:ossature-bois" in call["tags"]
