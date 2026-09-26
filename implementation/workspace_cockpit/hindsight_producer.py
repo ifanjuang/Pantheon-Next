@@ -86,12 +86,14 @@ class HindsightHTTPClient:
         authorization: str = "",
         timeout_seconds: float = 30.0,
         parser: str = "markitdown",
+        max_file_bytes: int = 100 * 1024 * 1024,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.bank_id = bank_id
         self.authorization = authorization.strip()
         self.timeout_seconds = float(timeout_seconds)
         self.parser = parser.strip() or "markitdown"
+        self.max_file_bytes = max(1, int(max_file_bytes))
         parsed = urlparse(self.base_url)
         if parsed.scheme not in {"http", "https"} or not parsed.netloc:
             raise ValueError("Hindsight URL must be an absolute HTTP(S) URL")
@@ -144,6 +146,14 @@ class HindsightHTTPClient:
             ensure_ascii=False,
             separators=(",", ":"),
         ).encode("utf-8")
+        try:
+            file_size = source.stat().st_size
+        except OSError as exc:
+            raise RuntimeError(f"Source unavailable before Hindsight upload: {exc}") from exc
+        if file_size > self.max_file_bytes:
+            raise RuntimeError(
+                f"Source exceeds Hindsight upload bound: {file_size} > {self.max_file_bytes} bytes"
+            )
         file_bytes = source.read_bytes()
         content_type = mimetypes.guess_type(source.name)[0] or "application/octet-stream"
 
@@ -430,6 +440,18 @@ class HindsightProducer:
             payload = self.client.operation_status(str(operation_id))
         except RuntimeError as exc:
             row["last_error"] = str(exc)
+            self._save(
+                None,
+                hindsight_document_id=row["hindsight_document_id"],
+                document_id=row["document_id"],
+                workspace=row["workspace"],
+                source_path=row["source_path"],
+                source_sha256=row["source_sha256"],
+                fingerprint=row["fingerprint"],
+                operation_id=row.get("operation_id"),
+                status=row["status"],
+                last_error=row["last_error"],
+            )
             return row
 
         mapped = str(payload["status"]).upper()
