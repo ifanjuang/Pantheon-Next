@@ -62,6 +62,21 @@ def test_workspace_cockpit_compose_is_read_only_and_loopback_only() -> None:
     assert "HERMES_ROLE_TRACE_API_KEY" in text
     assert "ROLE_TRACE_ATTACH_KEY" in text
     assert "ROLE_TRACE_READ_KEY" in text
+    assert "WORKSPACE_HINDSIGHT_URL" in text
+    assert "WORKSPACE_HINDSIGHT_BANK_ID" in text
+    assert "WORKSPACE_HINDSIGHT_MAX_FILE_MB" in text
+
+
+def test_hindsight_file_retain_runtime_posture_is_explicit() -> None:
+    text = _text(HERMES_LOCAL_COMPOSE)
+    assert "HINDSIGHT_API_FILE_PARSER: markitdown" in text
+    assert "HINDSIGHT_API_RETAIN_MISSION:" in text
+    assert "revision/index/version token" in text
+    assert "revision-history or revision-table entries" in text
+    assert "Never infer document chronology" in text
+    assert 'HINDSIGHT_API_FILE_DELETE_AFTER_RETAIN: "true"' in text
+    assert 'HINDSIGHT_API_FILE_PARSER_MARKITDOWN_OCR_ENABLED: "false"' in text
+    assert 'HINDSIGHT_API_STORE_DOCUMENT_TEXT: "true"' in text
 
 
 def test_workspace_cockpit_remote_access_uses_pinned_userspace_tailscale() -> None:

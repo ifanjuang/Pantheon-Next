@@ -46,7 +46,7 @@ while (($#)); do
 done
 
 [[ "$PORT" =~ ^[0-9]+$ ]] && ((PORT > 0 && PORT < 65536)) || die "invalid port: $PORT"
-[[ -f "$SOURCE_ROOT/server.py" && -f "$SOURCE_ROOT/static/index.html" ]] || die "workspace cockpit source is incomplete"
+[[ -f "$SOURCE_ROOT/server.py" && -f "$SOURCE_ROOT/hindsight_producer.py" && -f "$SOURCE_ROOT/static/index.html" ]] || die "workspace cockpit source is incomplete"
 command -v python3 >/dev/null || die "python3 is required"
 python3 -c 'import yaml' >/dev/null 2>&1 || die "python3-yaml is required"
 [[ -n "$AFFAIRES_ROOT" ]] || die "set --affaires-root PATH or AFFAIRES_ROOT"
@@ -74,6 +74,7 @@ if [[ -d "$INSTALL_ROOT" ]]; then
 fi
 install -d -m 0755 "$INSTALL_ROOT/static"
 install -m 0755 "$SOURCE_ROOT/server.py" "$INSTALL_ROOT/server.py"
+install -m 0644 "$SOURCE_ROOT/hindsight_producer.py" "$INSTALL_ROOT/hindsight_producer.py"
 install -m 0644 "$SOURCE_ROOT/static/index.html" "$INSTALL_ROOT/static/index.html"
 install -m 0644 "$SOURCE_ROOT/static/styles.css" "$INSTALL_ROOT/static/styles.css"
 install -m 0644 "$SOURCE_ROOT/static/app.js" "$INSTALL_ROOT/static/app.js"
@@ -89,6 +90,7 @@ trap 'rm -f "$unit_tmp"' EXIT
   printf '\n%s\n' '[Service]'
   printf 'User=%s\n' "$SERVICE_USER"
   printf 'WorkingDirectory=%s\n' "$INSTALL_ROOT"
+  printf '%s\n' 'EnvironmentFile=-/etc/pantheon-workspace-cockpit.env'
   printf 'ExecStart=/usr/bin/python3 %s/server.py --host %s --port %s --max-depth 2 --state-db /var/lib/pantheon-workspace-cockpit/index.sqlite3 --reconcile-seconds 60 --watch-debounce-ms 500 --root Affaires=%s\n' "$INSTALL_ROOT" "$BIND_ADDRESS" "$PORT" "$AFFAIRES_ROOT"
   printf '%s\n' 'Restart=on-failure' 'RestartSec=3' 'UMask=0077'
   printf '%s\n' 'StateDirectory=pantheon-workspace-cockpit' 'StateDirectoryMode=0700'

@@ -84,10 +84,11 @@ source_size_bytes: <exact source byte length>
 The checksum is verified only when it is declared. Ordinary AFFAIRES navigation therefore does not hash every large source.
 
 ```text
-document_id = logical document identity
+document_id = identity of this filesystem document occurrence
 path        = current location
 source_sha256 = observed byte identity
 
+index/date/name != revision order
 filename pairing != byte identity
 declared checksum != verified checksum
 verified source bytes != professional truth
@@ -111,6 +112,45 @@ verified COMPLETE .eml
 ```
 
 These fields are only structural candidates for the producer owned by #659. They do not select Hindsight's durable A/B/C mapping and do not authorize a retain/write.
+
+## Revision semantics
+
+Indices, dates and filenames are descriptive only. They may contain human errors and must never create a hidden version chain.
+
+Optional explicit relation:
+
+```yaml
+revision_mode: supersedes
+revision_of: doc_previous
+```
+
+or:
+
+```yaml
+revision_mode: supplements
+revision_of: doc_base
+```
+
+Rules:
+
+```text
+same index != same occurrence
+higher index != newer
+later date != replacement
+earlier date + higher index != error inferred by Pantheon
+similar filename != same document
+
+supersedes
+= explicit declaration that this occurrence replaces another
+
+supplements
+= explicit declaration that this occurrence adds to another;
+  both remain independently relevant
+```
+
+No relation fields means no known relation. A missing referenced historical document is exposed as an unresolved/missing relation but does not invalidate an otherwise valid source. Self-reference or malformed relation fields produce `CHECK`.
+
+If a source is corrected in place and remains the same intended filesystem occurrence, it may keep the same `document_id`; changed bytes then replace the same Hindsight `doc_...:source`. If the old file is retained and a second physical document is created—even with the same index—the new bundle gets a new `document_id` and any relationship must be declared explicitly.
 
 ## Authority boundaries
 
@@ -154,16 +194,97 @@ The container/native installers now require the Linux-visible AFFAIRES mount dir
 
 The Workspace Cockpit does not itself make retrieved material authoritative.
 
-Candidate mapping owned by #659:
+The first producer qualification implements only the smallest A mapping:
 
 ```text
-doc_...:source  → source file via Hindsight files/retain
-doc_...:card    → optional separately retrievable Markdown cartouche
+COMPLETE
++ unique document_id
++ Hindsight-supported source format
++ source representation candidate
+        │
+        ▼
+same Workspace reconcile owner
+        │
+        ▼
+Hindsight files/retain
+document_id = doc_...:source
 ```
 
-#659 must compare source-only, bounded cartouche context, and separately retrievable cartouche before the richer mapping is selected.
+The source file is opened directly from the admitted Linux-visible AFFAIRES root. Pantheon creates no local staging file. The HTTP adapter uses a bounded transient in-memory multipart buffer; the default source bound is 100 MiB, matching Hindsight 0.10.1's default file-conversion batch-size limit.
 
-No automatic OCR is part of the AFFAIRES baseline.
+Only bounded orientation fields are passed as context/metadata. The first slice deliberately excludes `index`, `document_date`, `revision_mode` and `revision_of` from Hindsight file-retain extraction context because these labels may be wrong or incomplete. The cartouche body and derived summary are not injected as source claims.
+
+This slice does **not** close #659's A/B/C comparison:
+
+```text
+A = source only + bounded descriptive context   ← implemented qualification slice
+B = richer bounded cartouche context            ← not selected
+C = separately retrievable cartouche            ← not selected
+```
+
+Verified `.eml` bundles currently project a cartouche representation candidate and therefore remain outside this source-only producer slice.
+
+The daemon records only reconstructible synchronization mechanics in the same SQLite state database:
+
+```text
+SUBMITTED / PENDING / PROCESSING
+→ poll Hindsight operation
+→ COMPLETED
+
+same document_id + changed source fingerprint
+→ wait for active operation to finish
+→ retain again with the same doc_...:source id
+→ Hindsight replaces the document
+
+bundle still present but no longer eligible
+→ BLOCKED
+
+bundle absent
+→ STALE
+→ no automatic remote delete in this slice
+```
+
+The delete boundary is deliberate. Hindsight observations are derived state, and document deletion requires a separate lifecycle qualification before Pantheon may treat source disappearance as authorization to destroy Hindsight state.
+
+No automatic OCR is part of the AFFAIRES baseline. The reviewed Hindsight deployment posture is:
+
+```text
+HINDSIGHT_API_RETAIN_MISSION=<professional-document chronology extraction mission>
+HINDSIGHT_API_FILE_PARSER=markitdown
+HINDSIGHT_API_FILE_DELETE_AFTER_RETAIN=true
+HINDSIGHT_API_FILE_PARSER_MARKITDOWN_OCR_ENABLED=false
+HINDSIGHT_API_STORE_DOCUMENT_TEXT=true
+```
+
+The retain mission asks Hindsight to preserve explicit chronology stated by the source itself: document date, revision/index/version token and explicit supersession relationships. It also tells Hindsight to preserve conflicting chronology statements rather than silently resolving them. The producer sends `timestamp: "unset"` for these reference documents so ingestion time is never presented to the extraction model as the document's event date.
+
+Cartouche-declared `index` and `document_date` remain useful Workspace hints, but they are deliberately not sent to Hindsight as the source revision/date. The source content must establish those observations.
+
+So uploaded source bytes are intended to be transient inside Hindsight after file conversion, while extracted document text/chunks and derived memories remain durable Hindsight state.
+
+### Producer configuration
+
+The producer is disabled unless both its URL and bank are configured.
+
+For the native systemd deployment, create `/etc/pantheon-workspace-cockpit.env` with reviewed values such as:
+
+```text
+WORKSPACE_HINDSIGHT_URL=http://127.0.0.1:8888
+WORKSPACE_HINDSIGHT_BANK_ID=<reviewed-bank-id>
+WORKSPACE_HINDSIGHT_PARSER=markitdown
+WORKSPACE_HINDSIGHT_MAX_SUBMITS_PER_RECONCILE=4
+WORKSPACE_HINDSIGHT_MAX_FILE_MB=100
+```
+
+`WORKSPACE_HINDSIGHT_AUTHORIZATION` may be supplied there when the selected Hindsight exposure requires it. The environment file is optional; absence keeps the producer inactive.
+
+```text
+filesystem present != professionally validated
+retain submitted != retain completed
+retain completed != truth
+memory != Evidence
+technical synchronization != authorization
+```
 
 
 ## Linux NAS mount qualification

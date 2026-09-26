@@ -23,3 +23,16 @@ services:
       HINDSIGHT_API_LLM_PROVIDER: ollama
       HINDSIGHT_API_LLM_BASE_URL: http://127.0.0.1:11434/v1
       HINDSIGHT_API_LLM_MODEL: qwen3.5:9b
+      HINDSIGHT_API_RETAIN_MISSION: >-
+        Pantheon document chronology v1. Retain all significant facts as usual. For professional documents, always also
+        extract explicit document chronology stated in the source: the document date,
+        revision/index/version token, revision-history or revision-table entries with their
+        stated dates/statuses, and any explicit supersedes/replaces/annule-et-remplace
+        relationship. Preserve the exact stated revision tokens and dates. If the source
+        contains conflicting chronology markers, retain the conflicting statements with
+        their context instead of choosing one. Never infer document chronology from the
+        filename, upload time, filesystem mtime, metadata, or ingestion time.
+      HINDSIGHT_API_FILE_PARSER: markitdown
+      HINDSIGHT_API_FILE_DELETE_AFTER_RETAIN: "true"
+      HINDSIGHT_API_FILE_PARSER_MARKITDOWN_OCR_ENABLED: "false"
+      HINDSIGHT_API_STORE_DOCUMENT_TEXT: "true"

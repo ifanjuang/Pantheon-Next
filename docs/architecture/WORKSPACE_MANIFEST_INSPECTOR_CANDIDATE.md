@@ -5,7 +5,7 @@ Status: selected target architecture; implementation remains bounded by #660 and
 Current decision baseline:
 
 ```text
-Pantheon-Next/main = c5860fe8750ca6c81d9b8dfb4e21e1427ff6e865
+Pantheon-Next/main = eeca9fd1f7b34f0b71307c01d5b57489ac24f570
 ```
 
 This document remains the architecture owner for the Workspace Cockpit filesystem projection. It supersedes the earlier productive target based on Obsidian + Self-hosted LiveSync + CouchDB + Ubuntu-local vault mirrors.
@@ -117,6 +117,9 @@ type: CCTP
 index: C
 document_date: 2026-09-12
 issuer: FRONTSign
+# Optional and never inferred from index/date/name:
+revision_mode: supersedes
+revision_of: doc_previous
 tags:
   - structure
   - ossature-bois
@@ -149,9 +152,31 @@ In particular:
 project hint != governed project_id
 folder name != governed project_id
 index label != professional currentness
+document date != revision order
+filename similarity != revision order
 summary != source claim
-relation note != governed relation
+declared revision relation != governed professional decision
 ```
+
+Optional revision fields are structural declarations only:
+
+```yaml
+revision_mode: supersedes | supplements
+revision_of: doc_...
+```
+
+They are never generated from an index, a date or a filename.
+
+```text
+supersedes
+= this bundle explicitly declares that it replaces the referenced occurrence
+
+supplements
+= this bundle explicitly declares that it adds to the referenced occurrence;
+  the referenced occurrence remains independently relevant
+```
+
+If neither field is present, Pantheon records no revision relation. It does not guess one.
 
 ## 5. Identity
 
@@ -189,16 +214,53 @@ path != identity
 
 ### New index / new physical document
 
-If the user intentionally keeps the old file and creates a new indexed file:
+If the user intentionally keeps the old file and creates another file:
 
 ```text
 CCTP_IND_B.pdf + .CCTP_IND_B.pdf.md
 CCTP_IND_C.pdf + .CCTP_IND_C.pdf.md
 ```
 
-they are separate bundles with separate cartouche identities unless an explicit governed relation later links them.
+they are separate bundle occurrences with separate `document_id` values.
 
-Do not infer a hidden version chain merely from similar names or contents.
+This remains true even when:
+
+- both files carry the same index because of a human naming/indexing mistake;
+- the later-issued file carries a lexically lower index;
+- the higher index carries an earlier `document_date`;
+- the filenames look almost identical.
+
+```text
+document_id
+= identity of this filesystem document occurrence
+
+index
+= descriptive business label
+
+document_date
+= descriptive date supplied for the document
+
+revision_mode + revision_of
+= explicit declared relationship between occurrences
+```
+
+If the corrected bytes overwrite the same intended filesystem occurrence in place, the same `document_id` may remain and the changed source fingerprint drives a Hindsight replacement of that occurrence.
+
+If the old file is preserved and a new physical bundle is created, assign a new `document_id`. Link the two only when the relation is explicitly known:
+
+```yaml
+revision_mode: supersedes
+revision_of: doc_old
+```
+
+or:
+
+```yaml
+revision_mode: supplements
+revision_of: doc_base
+```
+
+Do not infer a hidden version chain from similar names, contents, indices or dates. A contradictory index/date does not override an explicit relation and does not create one when none exists.
 
 ## 6. Pairing
 
@@ -459,11 +521,13 @@ The cartouche may supply bounded identification context such as:
 document type
 project/affaire hint
 phase
-index
 issuer
-document date
 stable tags
 ```
+
+The first Hindsight producer slice deliberately keeps `index`, `document_date`, `revision_mode` and `revision_of` out of the file-retain extraction context. They remain available to Cockpit/reconciliation, but they are not allowed to bias source fact extraction or decide which document is current.
+
+Revision declarations may later be used by a dedicated reconciliation/view layer, but they must not authorize deletion or be promoted into source evidence merely because the cartouche contains them.
 
 Do not silently feed a speculative/derived summary into source extraction as though it were source fact.
 
@@ -545,6 +609,8 @@ Hermes may propose:
 - important points;
 - limits;
 - semantic relations.
+
+Hermes must not populate `revision_mode` or `revision_of` merely from filename similarity, index ordering, dates or inferred chronology. A revision relationship must come from an explicit human declaration or another specifically admitted authoritative relation source.
 
 Hermes must not invent:
 

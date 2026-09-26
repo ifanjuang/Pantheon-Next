@@ -3,7 +3,7 @@ name: ifja-vault-search
 description: "Recherche les projets et documents dans les vaults IFJA."
 license: MIT
 metadata:
-  version: 0.8.0
+  version: 0.8.1
   author: IFJA
   hermes:
     tags: [ifja, hindsight, vaults, projects, documents]
@@ -73,6 +73,107 @@ change the answer, permitted action or consequence.
    report the candidate set and the missing type instead.
 3. Open the exact project page or requested document before returning a material
    identifier, date, status or contractual fact.
+
+### Latest document / revision resolution
+
+When the user asks for the latest, current, newest or applicable revision of a
+document family, do not use Hindsight relevance rank, retain time, filesystem
+mtime, upload time or a cartouche date/index as proof of currentness.
+
+Resolve at most five exact-family candidates. Preserve any validated Workspace
+revision projection carried by the candidate:
+
+```text
+revision_mode = supersedes | supplements
+revision_of   = document_id
+```
+
+A structurally resolved explicit `supersedes` relation is a declared lineage edge,
+not proof that the declaration is professionally correct. A `supplements` relation
+is not replacement and must not suppress the referenced document. Never manufacture
+either relation from index/date/name similarity.
+
+Then inspect each candidate with Hindsight `get_document` so the retained
+`original_text` is available. Extract from the document content itself, when
+explicitly stated:
+
+```text
+source_revision
+source_document_date
+source_revision_history[]
+source_supersedes[]
+```
+
+Treat these as source observations, not metadata truth. Do not invent a revision
+or date when the source text does not state one.
+
+Selection order for one exact document family:
+
+```text
+structurally resolved explicit Workspace supersedes relation
+> explicit supersedes/replaces statement in the source
+> explicit coherent revision history/table in the source
+> heuristic ordering by comparable source revision/index
+> source document date as heuristic tie-breaker/fallback
+```
+
+Rules:
+
+- A structurally resolved Workspace `supersedes` graph is a declared routing
+  lineage, not source truth. If it has one unambiguous head and the inspected
+  source chronology does not contradict it, use that head as the current
+  retrieval candidate. If it has multiple heads, cycles, unresolved targets, or
+  conflicts with explicit source supersession/revision-history evidence, return
+  the conflict instead of choosing silently.
+- If one source explicitly says it supersedes/replaces another candidate, prefer
+  the superseding source for this retrieval, but do not automatically write a
+  cartouche revision relation from that observation.
+- If a source contains an explicit revision history/table, use it to validate the
+  current revision token and chronology. A coherent revision history is stronger
+  evidence than an isolated date field.
+- Comparable isolated revisions (for example A/B/C, 01/02/03, P1/P2/P3,
+  REV01/REV02) may order candidates for retrieval convenience, but they do not by
+  themselves establish professional currentness or create a revision relation.
+- The source document date is a consistency check, not an automatic override.
+- If the higher isolated revision carries an earlier source date than the lower
+  revision, keep it first only as the index-ranked candidate and emit
+  `revision_date_conflict`; keep the other candidate visible.
+- If two candidates have the same revision/index, the later explicit source date
+  may order them for retrieval, but emit `duplicate_revision`. If their dates
+  are also equal or missing, do not silently collapse them.
+- If revisions are missing or not safely comparable, an explicit source date may
+  order candidates only as `date_fallback`. Do not derive chronology from
+  filename ordering or filesystem timestamps.
+- If no explicit lineage/source chronology resolves the candidates, return the
+  ordered candidate set and state that currentness is unresolved. The first item
+  is a retrieval preference, not a professional-currentness assertion.
+
+A "latest" answer should expose the basis used:
+
+```text
+selection_basis =
+  workspace_supersedes
+  | source_supersession
+  | source_revision_history
+  | heuristic_revision_order
+  | date_fallback
+  | ambiguous
+
+revision_conflict =
+  none
+  | duplicate_revision
+  | revision_date_conflict
+  | incomparable_revision
+  | branching_lineage
+  | invalid_lineage
+  | declared_source_conflict
+```
+
+The cartouche may help locate the family and may carry an explicit declared
+revision relation, but its descriptive `index` and `document_date` cannot
+silently establish currentness.
+
+
    If Hindsight returns no exact candidate but an admitted Workspace/vault path
    or filename is already known, treat this as an indexing gap: validate and
    open that exact local source (Docling for a file needing extraction) rather

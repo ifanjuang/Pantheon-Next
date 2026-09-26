@@ -48,6 +48,11 @@ function documentCardBody(card) {
     fact("Cartouche", card.cartouche_present ? card.cartouche : "Absent", card.cartouche_present ? "" : "fact-alert"),
     fact("Identité", card.document_id),
     fact("Émetteur", card.issuer),
+    fact(
+      card.revision_mode === "supersedes" ? "Remplace" : card.revision_mode === "supplements" ? "Complète" : "Relation",
+      card.revision_of,
+      card.revision_target_status === "MISSING" || card.revision_target_status === "AMBIGUOUS" ? "fact-alert" : "",
+    ),
   ].join("");
 
   const generate = card.can_generate_cartouche
@@ -133,6 +138,8 @@ function renderCards() {
       card.path,
       card.source,
       card.cartouche,
+      card.revision_mode,
+      card.revision_of,
       ...(card.tags || []),
     ].filter(Boolean).join(" ").toLocaleLowerCase("fr");
     return workspaceMatch && statusMatch && (!query || text.includes(query));
