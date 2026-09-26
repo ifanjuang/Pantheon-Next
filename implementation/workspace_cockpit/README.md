@@ -84,10 +84,11 @@ source_size_bytes: <exact source byte length>
 The checksum is verified only when it is declared. Ordinary AFFAIRES navigation therefore does not hash every large source.
 
 ```text
-document_id = logical document identity
+document_id = identity of this filesystem document occurrence
 path        = current location
 source_sha256 = observed byte identity
 
+index/date/name != revision order
 filename pairing != byte identity
 declared checksum != verified checksum
 verified source bytes != professional truth
@@ -111,6 +112,45 @@ verified COMPLETE .eml
 ```
 
 These fields are only structural candidates for the producer owned by #659. They do not select Hindsight's durable A/B/C mapping and do not authorize a retain/write.
+
+## Revision semantics
+
+Indices, dates and filenames are descriptive only. They may contain human errors and must never create a hidden version chain.
+
+Optional explicit relation:
+
+```yaml
+revision_mode: supersedes
+revision_of: doc_previous
+```
+
+or:
+
+```yaml
+revision_mode: supplements
+revision_of: doc_base
+```
+
+Rules:
+
+```text
+same index != same occurrence
+higher index != newer
+later date != replacement
+earlier date + higher index != error inferred by Pantheon
+similar filename != same document
+
+supersedes
+= explicit declaration that this occurrence replaces another
+
+supplements
+= explicit declaration that this occurrence adds to another;
+  both remain independently relevant
+```
+
+No relation fields means no known relation. A missing referenced historical document is exposed as an unresolved/missing relation but does not invalidate an otherwise valid source. Self-reference or malformed relation fields produce `CHECK`.
+
+If a source is corrected in place and remains the same intended filesystem occurrence, it may keep the same `document_id`; changed bytes then replace the same Hindsight `doc_...:source`. If the old file is retained and a second physical document is created—even with the same index—the new bundle gets a new `document_id` and any relationship must be declared explicitly.
 
 ## Authority boundaries
 
