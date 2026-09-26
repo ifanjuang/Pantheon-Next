@@ -22,7 +22,7 @@ import re
 import sqlite3
 from typing import Any
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote, urlparse
+from urllib.parse import quote, urlencode, urlparse
 from urllib.request import Request, urlopen
 import uuid
 
@@ -202,6 +202,52 @@ class HindsightHTTPClient:
         if status not in {"pending", "processing", "completed", "failed", "cancelled"}:
             raise RuntimeError(f"Unexpected Hindsight operation status: {status!r}")
         return payload
+
+    def get_document(self, document_id: str) -> dict[str, Any]:
+        """Read one exact retained document. This method performs no mutation."""
+        path = (
+            f"/v1/default/banks/{quote(self.bank_id, safe='')}/documents/"
+            f"{quote(document_id, safe='')}"
+        )
+        request = Request(f"{self.base_url}{path}", headers=self._headers(), method="GET")
+        return self._json_response(request)
+
+    def list_document_chunks(
+        self,
+        document_id: str,
+        *,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> dict[str, Any]:
+        """Read chunks for one exact retained document, never a bank-wide search."""
+        query = urlencode({"limit": max(1, min(int(limit), 100)), "offset": max(0, int(offset))})
+        path = (
+            f"/v1/default/banks/{quote(self.bank_id, safe='')}/documents/"
+            f"{quote(document_id, safe='')}/chunks?{query}"
+        )
+        request = Request(f"{self.base_url}{path}", headers=self._headers(), method="GET")
+        return self._json_response(request)
+
+    def list_memories(
+        self,
+        document_id: str,
+        *,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> dict[str, Any]:
+        """Read memory units linked by Hindsight to one exact source document."""
+        query = urlencode(
+            {
+                "document_id": document_id,
+                "limit": max(1, min(int(limit), 100)),
+                "offset": max(0, int(offset)),
+            }
+        )
+        path = (
+            f"/v1/default/banks/{quote(self.bank_id, safe='')}/memories/list?{query}"
+        )
+        request = Request(f"{self.base_url}{path}", headers=self._headers(), method="GET")
+        return self._json_response(request)
 
 
 class HindsightProducer:
