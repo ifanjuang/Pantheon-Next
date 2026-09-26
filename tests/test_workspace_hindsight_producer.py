@@ -4,6 +4,7 @@ import importlib.util
 import json
 from pathlib import Path
 import sqlite3
+import sys
 from unittest.mock import patch
 
 
@@ -15,6 +16,7 @@ def _module():
     spec = importlib.util.spec_from_file_location("workspace_hindsight_producer", PRODUCER)
     assert spec and spec.loader
     module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
 
