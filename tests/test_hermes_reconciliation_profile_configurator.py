@@ -43,7 +43,7 @@ def test_reconciliation_profile_configurator_keeps_memory_packet_local() -> None
     assert 'config set memory.provider ""' in text
     assert "memories/MEMORY.md memories/USER.md MEMORY.md USER.md" in text
     assert "dedicated profile carries built-in memory content" in text
-    assert '[[ "$provider" == '\"\"' || "$provider" == "null" ]]' in text
+    assert "[[ \\\"$provider\\\" == '\"\"' || \\\"$provider\\\" == \\\"null\\\" ]]" in text
     assert "external memory provider must be disabled" in text
 
 
