@@ -5,7 +5,7 @@ Status: selected target architecture; implementation remains bounded by #660 and
 Current decision baseline:
 
 ```text
-Pantheon-Next/main = c5860fe8750ca6c81d9b8dfb4e21e1427ff6e865
+Pantheon-Next/main = eeca9fd1f7b34f0b71307c01d5b57489ac24f570
 ```
 
 This document remains the architecture owner for the Workspace Cockpit filesystem projection. It supersedes the earlier productive target based on Obsidian + Self-hosted LiveSync + CouchDB + Ubuntu-local vault mirrors.
