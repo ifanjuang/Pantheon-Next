@@ -583,6 +583,52 @@ def test_check_mode_returns_affaires_projection_without_database(tmp_path: Path)
     assert payload["item_count"] == 1
 
 
+def test_duplicate_document_id_preserves_source_missing_status(tmp_path: Path) -> None:
+    module = _module()
+    for folder_name in ("A", "B"):
+        folder = tmp_path / folder_name
+        folder.mkdir()
+        (folder / ".Missing.pdf.md").write_text(
+            """---
+schema: pantheon/cartouche/v1
+document_id: doc-orphan-shared
+source: Missing.pdf
+---
+# Missing
+""",
+            encoding="utf-8",
+        )
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=2)
+    cards = [
+        card for card in _cards(result)
+        if card.get("document_id") == "doc-orphan-shared"
+    ]
+
+    assert len(cards) == 2
+    assert all(card["status"] == "SOURCE_MISSING" for card in cards)
+    assert all(card["identity_conflict"] == "DUPLICATE_DOCUMENT_ID" for card in cards)
+
+
+def test_mount_probe_keep_mode_qualifies_without_cleanup(tmp_path: Path) -> None:
+    result = subprocess.run(
+        ["python3", str(MOUNT_QUALIFIER), "--root", str(tmp_path), "--keep"],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    payload = json.loads(result.stdout)
+    assert payload["qualified_core"] is True
+    assert payload["qualified"] is True
+    assert payload["cleanup"] is False
+
+    probe = Path(payload["probe"])
+    assert probe.is_dir()
+    subprocess.run(["rm", "-rf", str(probe)], check=True)
+
+
 def test_linux_affaires_mount_qualification_probe_runs_on_local_filesystem(tmp_path: Path) -> None:
     result = subprocess.run(
         ["python3", str(MOUNT_QUALIFIER), "--root", str(tmp_path)],

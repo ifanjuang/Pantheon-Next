@@ -545,7 +545,9 @@ def scan_workspaces(roots: list[tuple[str, Path]], max_depth: int = 2) -> dict[s
         if len(duplicates) < 2:
             continue
         for card in duplicates:
-            card["status"] = "CHECK"
+            # Preserve a more specific broken-pair state such as SOURCE_MISSING.
+            if card.get("status") == "COMPLETE":
+                card["status"] = "CHECK"
             card["identity_conflict"] = "DUPLICATE_DOCUMENT_ID"
             card["warnings"].append(f"document_id dupliqué dans AFFAIRES: {document_id}")
 
