@@ -407,3 +407,73 @@ def test_service_rejects_non_complete_or_non_source_representation() -> None:
         assert "COMPLETE" in str(exc)
     else:
         raise AssertionError("CHECK document must not reconcile")
+
+
+def test_cockpit_post_route_requires_explicit_intent_and_passes_only_document_id_focus() -> None:
+    server_module = _load(SERVER_PATH, "workspace_cockpit_server_reconcile_route")
+
+    class FakeIndex:
+        def snapshot(self):
+            return {"workspaces": []}
+
+        def health(self):
+            return {"mode": "test"}
+
+    class FakeService:
+        def __init__(self):
+            self.calls = []
+
+        def reconcile(self, snapshot, document_id, *, focus=""):
+            self.calls.append((snapshot, document_id, focus))
+            return {
+                "kind": "memory_reconciliation_candidate",
+                "status": "candidate_only",
+                "document_id": document_id,
+                "summary": "ok",
+                "findings": [],
+                "inputs": {"hindsight_chunks_sent": 0, "hindsight_memories_sent": 0},
+            }
+
+    service = FakeService()
+    handler = server_module.CockpitHandler
+    handler.workspace_index = FakeIndex()
+    handler.memory_reconciliation = service
+    httpd = server_module.ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+    thread.start()
+    host, port = httpd.server_address
+
+    try:
+        body = json.dumps({"focus": "dates"}).encode("utf-8")
+        missing_intent = Request(
+            f"http://{host}:{port}/api/documents/doc-1/reconcile-memory",
+            data=body,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            urlopen(missing_intent, timeout=2)
+        except Exception as exc:
+            assert getattr(exc, "code", None) == 403
+        else:
+            raise AssertionError("explicit reconciliation intent header must be required")
+
+        request = Request(
+            f"http://{host}:{port}/api/documents/doc-1/reconcile-memory",
+            data=body,
+            headers={
+                "Content-Type": "application/json",
+                "X-Pantheon-Intent": "memory-reconcile",
+            },
+            method="POST",
+        )
+        with urlopen(request, timeout=2) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+        assert payload["kind"] == "memory_reconciliation_candidate"
+        assert service.calls == [({"workspaces": []}, "doc-1", "dates")]
+    finally:
+        httpd.shutdown()
+        httpd.server_close()
+        thread.join(timeout=2)
+        handler.memory_reconciliation = None
+        handler.workspace_index = None
