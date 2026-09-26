@@ -920,3 +920,171 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     assert 'caused_by' not in javascript
     assert '.role-graph-lane' in graph_css
     assert '.role-graph-node[data-projection="derived_transient"]' in graph_css
+
+
+def test_revision_relation_is_explicit_and_never_inferred_from_index_or_date(tmp_path: Path) -> None:
+    module = _module()
+    (tmp_path / "Plan_IND_B.pdf").write_bytes(b"%PDF-old")
+    (tmp_path / ".Plan_IND_B.pdf.md").write_text(
+        """---
+schema: pantheon/cartouche/v1
+document_id: doc-plan-old
+source: Plan_IND_B.pdf
+index: B
+document_date: 2026-09-20
+---
+# Plan ancien
+""",
+        encoding="utf-8",
+    )
+    (tmp_path / "Plan_CORRIGE_IND_B.pdf").write_bytes(b"%PDF-new")
+    (tmp_path / ".Plan_CORRIGE_IND_B.pdf.md").write_text(
+        """---
+schema: pantheon/cartouche/v1
+document_id: doc-plan-new
+source: Plan_CORRIGE_IND_B.pdf
+index: B
+document_date: 2026-09-10
+revision_mode: supersedes
+revision_of: doc-plan-old
+---
+# Plan corrigé
+""",
+        encoding="utf-8",
+    )
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=1)
+    documents = {card["document_id"]: card for card in _cards(result) if card["kind"] == "document"}
+
+    old = documents["doc-plan-old"]
+    new = documents["doc-plan-new"]
+    assert old["status"] == "COMPLETE"
+    assert old["revision_mode"] is None
+    assert old["revision_target_status"] == "NONE"
+    assert new["status"] == "COMPLETE"
+    assert new["index"] == "B"
+    assert new["document_date"] == "2026-09-10"
+    assert new["revision_mode"] == "supersedes"
+    assert new["revision_of"] == "doc-plan-old"
+    assert new["revision_target_present"] is True
+    assert new["revision_target_status"] == "RESOLVED"
+    assert new["hindsight_eligible"] is True
+
+
+def test_higher_index_and_earlier_date_do_not_create_or_change_revision_semantics(tmp_path: Path) -> None:
+    module = _module()
+    for filename, document_id, index, document_date in (
+        ("Notice_IND_B.pdf", "doc-b", "B", "2026-09-20"),
+        ("Notice_IND_C.pdf", "doc-c", "C", "2026-09-01"),
+    ):
+        (tmp_path / filename).write_bytes(b"%PDF")
+        (tmp_path / f".{filename}.md").write_text(
+            f"""---
+schema: pantheon/cartouche/v1
+document_id: {document_id}
+source: {filename}
+index: {index}
+document_date: {document_date}
+---
+# {filename}
+""",
+            encoding="utf-8",
+        )
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=1)
+    documents = [card for card in _cards(result) if card["kind"] == "document"]
+
+    assert len(documents) == 2
+    assert all(card["status"] == "COMPLETE" for card in documents)
+    assert all(card["revision_mode"] is None for card in documents)
+    assert all(card["revision_of"] is None for card in documents)
+    assert all(card["revision_target_status"] == "NONE" for card in documents)
+
+
+def test_supplement_relation_keeps_both_documents_independent_and_resolved(tmp_path: Path) -> None:
+    module = _module()
+    (tmp_path / "CCTP.pdf").write_bytes(b"%PDF-base")
+    (tmp_path / ".CCTP.pdf.md").write_text(
+        """---
+schema: pantheon/cartouche/v1
+document_id: doc-cctp
+source: CCTP.pdf
+index: A
+---
+# CCTP
+""",
+        encoding="utf-8",
+    )
+    (tmp_path / "ADDENDUM.pdf").write_bytes(b"%PDF-add")
+    (tmp_path / ".ADDENDUM.pdf.md").write_text(
+        """---
+schema: pantheon/cartouche/v1
+document_id: doc-addendum
+source: ADDENDUM.pdf
+index: A
+revision_mode: supplements
+revision_of: doc-cctp
+---
+# Addendum
+""",
+        encoding="utf-8",
+    )
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=1)
+    documents = {card["document_id"]: card for card in _cards(result) if card["kind"] == "document"}
+
+    assert documents["doc-cctp"]["status"] == "COMPLETE"
+    assert documents["doc-addendum"]["status"] == "COMPLETE"
+    assert documents["doc-addendum"]["revision_mode"] == "supplements"
+    assert documents["doc-addendum"]["revision_target_status"] == "RESOLVED"
+
+
+def test_invalid_or_self_revision_relation_is_check(tmp_path: Path) -> None:
+    module = _module()
+    (tmp_path / "Notice.pdf").write_bytes(b"%PDF")
+    (tmp_path / ".Notice.pdf.md").write_text(
+        """---
+schema: pantheon/cartouche/v1
+document_id: doc-notice
+source: Notice.pdf
+revision_mode: supersedes
+revision_of: doc-notice
+---
+# Notice
+""",
+        encoding="utf-8",
+    )
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=1)
+    card = next(card for card in _cards(result) if card["kind"] == "document")
+
+    assert card["status"] == "CHECK"
+    assert card["hindsight_eligible"] is False
+    assert any("ne peut pas référencer le document lui-même" in warning for warning in card["warnings"])
+
+
+def test_missing_revision_target_is_observable_but_does_not_block_valid_document(tmp_path: Path) -> None:
+    module = _module()
+    (tmp_path / "Notice.pdf").write_bytes(b"%PDF")
+    (tmp_path / ".Notice.pdf.md").write_text(
+        """---
+schema: pantheon/cartouche/v1
+document_id: doc-notice
+source: Notice.pdf
+revision_mode: supersedes
+revision_of: doc-archived-elsewhere
+index: Z
+document_date: 1999-01-01
+---
+# Notice
+""",
+        encoding="utf-8",
+    )
+
+    result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=1)
+    card = next(card for card in _cards(result) if card["kind"] == "document")
+
+    assert card["status"] == "COMPLETE"
+    assert card["revision_target_present"] is False
+    assert card["revision_target_status"] == "MISSING"
+    assert card["hindsight_eligible"] is True
