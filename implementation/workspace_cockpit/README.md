@@ -286,6 +286,114 @@ memory != Evidence
 technical synchronization != authorization
 ```
 
+## On-demand Hindsight memory reconciliation
+
+Cockpit may expose one explicit action for a `COMPLETE` source-backed document:
+
+```text
+[ Réconcilier avec Hermes ]
+Focus optionnel: [...]
+```
+
+This first reconciliation slice is intentionally Hindsight-only:
+
+```text
+exact Workspace document_id
+        │
+        ├─ bounded cartouche projection
+        └─ Hindsight <document_id>:source
+              ├─ exact document identity/hash/count metadata
+              ├─ exact document chunks
+              └─ memory units filtered by exact document_id
+                         │
+                         ▼
+              dedicated no-tool Hermes profile
+                         │
+                         ▼
+              transient candidate-only result
+```
+
+It does **not** read the original NAS source, does not send the source path to Hermes,
+does not send Hindsight `original_text` or arbitrary document/memory metadata, and
+does not write to Hindsight, Workspace, NAS or a Pantheon governed owner.
+
+The result categories are bounded to:
+
+```text
+missing
+inconsistent
+too_general
+contradictory
+organization
+```
+
+The optional focus is untrusted orientation text, limited to 2000 characters. The
+whole serialized Hindsight/cartouche packet is bounded by
+`WORKSPACE_RECONCILE_MAX_CONTEXT_CHARS` (48000 by default).
+
+### Dedicated Hermes profile contract
+
+Do not point this route at the normal Hermes profile. Hermes 0.21.3 does not treat an
+OpenAI request `tools: []` as a per-request tool deny-list; the effective tools come
+from the profile's `platform_toolsets.api_server`.
+
+The reconciliation profile must be a blank/dedicated profile with no added hooks or
+project workspace and this tool posture:
+
+```yaml
+platform_toolsets:
+  api_server:
+    - no_mcp
+plugins:
+  enabled: []
+```
+
+`no_mcp` is material. An explicit empty `api_server: []` list does not suppress
+globally enabled MCP servers in Hermes 0.21.3.
+
+Defense in depth:
+
+```text
+managed dedicated profile with api_server: [no_mcp]
+        +
+Cockpit GET /v1/toolsets before every analysis
+        +
+fail closed if any toolset reports enabled=true
+        +
+fail closed if Responses output contains a function_call
+```
+
+Cockpit calls the Hermes Responses API with `store:false`. Hermes still creates an
+internal agent session for the turn, so Cockpit requires the returned
+`X-Hermes-Session-Id` and deletes that session before returning a successful
+candidate. If session cleanup cannot be proven, the candidate is withheld and the
+request returns a residency failure.
+
+Configuration is disabled by default:
+
+```text
+WORKSPACE_RECONCILE_HERMES_URL=http://127.0.0.1:8642/p/reconciliation
+WORKSPACE_RECONCILE_HERMES_KEY=<profile-specific API_SERVER_KEY>
+WORKSPACE_RECONCILE_HERMES_MODEL=
+WORKSPACE_RECONCILE_HERMES_TIMEOUT_SECONDS=120
+WORKSPACE_RECONCILE_MAX_CONTEXT_CHARS=48000
+```
+
+The URL may target a separately supervised profile or a multiplexed
+`/p/<profile>` API surface, but it must resolve to the dedicated no-tool profile.
+The API key is profile-specific.
+
+```text
+reconciliation candidate != memory update
+declared inconsistency != proven source defect
+Hindsight chunk != original source
+Hindsight memory != Evidence
+Hermes analysis != authorization
+candidate returned != candidate persisted
+```
+
+Exact NAS-source verification remains a later, separate path through a bounded admitted
+source reference. It is deliberately not hidden inside this button.
 
 ## Linux NAS mount qualification
 
