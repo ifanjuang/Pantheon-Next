@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import ctypes
+import hashlib
 from datetime import date, datetime, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -41,6 +42,7 @@ TEMP_SUFFIXES = {".bak", ".lock", ".lck", ".swp", ".tmp", ".temp", ".autosave"}
 MAX_CARTOUCHE_BYTES = 512 * 1024
 MAX_ITEMS = 10_000
 STATUS_NAMES = ("COMPLETE", "CHECK", "CARTOUCHE_MISSING", "SOURCE_MISSING", "FOLDER")
+SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 
 
 def _visible(path: Path) -> bool:
@@ -217,6 +219,94 @@ def _file_size(path: Path) -> int | None:
         return None
 
 
+def _file_sha256(path: Path) -> tuple[str | None, str | None]:
+    """Hash source bytes only when a cartouche explicitly requests integrity verification."""
+    try:
+        digest = hashlib.sha256()
+        with path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(chunk)
+        return digest.hexdigest(), None
+    except OSError:
+        return None, "Source illisible pendant la vérification SHA-256"
+
+
+def _declared_source_size(metadata: dict[str, Any]) -> tuple[int | None, str | None]:
+    value = metadata.get("source_size_bytes")
+    if value is None:
+        return None, None
+    if isinstance(value, bool):
+        return None, "source_size_bytes invalide"
+    if isinstance(value, int) and value >= 0:
+        return value, None
+    if isinstance(value, str) and value.strip().isdigit():
+        return int(value.strip()), None
+    return None, "source_size_bytes invalide"
+
+
+def _source_integrity(
+    metadata: dict[str, Any],
+    source: Path,
+    *,
+    require_digest: bool = False,
+    require_size: bool = False,
+) -> tuple[dict[str, Any], list[str]]:
+    """Verify an explicitly declared source checksum without hashing every AFFAIRES source."""
+    warnings: list[str] = []
+    declared = _meta_string(metadata, "source_sha256")
+    declared_size, size_error = _declared_source_size(metadata)
+    actual_size = _file_size(source)
+
+    if size_error:
+        warnings.append(size_error)
+    elif require_size and declared_size is None:
+        warnings.append("source_size_bytes absent du cartouche")
+    elif declared_size is not None and actual_size is not None and declared_size != actual_size:
+        warnings.append(
+            f"source_size_bytes différent de la source : déclaré {declared_size}, observé {actual_size}"
+        )
+
+    if declared is None:
+        if require_digest:
+            warnings.append("source_sha256 absent du cartouche")
+        return {
+            "source_sha256": None,
+            "source_sha256_verified": None,
+            "source_integrity": "UNDECLARED",
+            "declared_source_size": declared_size,
+        }, warnings
+
+    if not SHA256_RE.fullmatch(declared):
+        warnings.append("source_sha256 invalide : 64 caractères hexadécimaux attendus")
+        return {
+            "source_sha256": declared,
+            "source_sha256_verified": False,
+            "source_integrity": "INVALID",
+            "declared_source_size": declared_size,
+        }, warnings
+
+    normalized = declared.casefold()
+    observed, hash_error = _file_sha256(source)
+    if hash_error or observed is None:
+        warnings.append(hash_error or "Vérification SHA-256 impossible")
+        return {
+            "source_sha256": normalized,
+            "source_sha256_verified": False,
+            "source_integrity": "UNREADABLE",
+            "declared_source_size": declared_size,
+        }, warnings
+
+    verified = observed == normalized
+    if not verified:
+        warnings.append("source_sha256 ne correspond pas aux octets exacts de la source")
+    return {
+        "source_sha256": normalized,
+        "source_sha256_verified": verified,
+        "source_integrity": "VERIFIED" if verified else "MISMATCH",
+        "declared_source_size": declared_size,
+    }, warnings
+
+
 def _safe_source_ref(value: str | None) -> tuple[str | None, str | None]:
     if not value:
         return None, None
@@ -268,7 +358,13 @@ def _document_card(workspace: str, root: Path, source: Path, cartouche: Path | N
             "tags": [],
             "extension": extension.removeprefix(".").upper() or "FILE",
             "source_size": size,
-            "hindsight_eligible": extension in HINDSIGHT_ELIGIBLE_EXTENSIONS,
+            "source_sha256": None,
+            "source_sha256_verified": None,
+            "source_integrity": "UNDECLARED",
+            "declared_source_size": None,
+            "hindsight_format_supported": extension in HINDSIGHT_ELIGIBLE_EXTENSIONS,
+            "hindsight_eligible": False,
+            "hindsight_representation_candidate": None,
             "heavy_binary": extension in HEAVY_VISIBLE_EXTENSIONS,
             "modified_at": _mtime_iso(source),
             "warnings": [],
@@ -295,8 +391,25 @@ def _document_card(workspace: str, root: Path, source: Path, cartouche: Path | N
     if not document_id:
         warnings.append("document_id absent du cartouche")
 
+    integrity, integrity_warnings = _source_integrity(
+        metadata,
+        source,
+        require_digest=extension == ".eml",
+        require_size=extension == ".eml",
+    )
+    warnings.extend(integrity_warnings)
+
     title = _meta_string(metadata, "title") or _first_heading(body) or source.stem
     status = "CHECK" if warnings else "COMPLETE"
+    source_format_supported = extension in HINDSIGHT_ELIGIBLE_EXTENSIONS
+    email_cartouche_candidate = (
+        extension == ".eml"
+        and status == "COMPLETE"
+        and integrity.get("source_sha256_verified") is True
+    )
+    producer_eligible = status == "COMPLETE" and (
+        source_format_supported or email_cartouche_candidate
+    )
     return {
         "workspace": workspace,
         "kind": "document",
@@ -322,7 +435,14 @@ def _document_card(workspace: str, root: Path, source: Path, cartouche: Path | N
         "tags": _meta_tags(metadata),
         "extension": extension.removeprefix(".").upper() or "FILE",
         "source_size": size,
-        "hindsight_eligible": extension in HINDSIGHT_ELIGIBLE_EXTENSIONS,
+        **integrity,
+        "hindsight_format_supported": source_format_supported,
+        "hindsight_eligible": producer_eligible,
+        "hindsight_representation_candidate": (
+            "cartouche" if email_cartouche_candidate
+            else "source" if source_format_supported and status == "COMPLETE"
+            else None
+        ),
         "heavy_binary": extension in HEAVY_VISIBLE_EXTENSIONS,
         "modified_at": max(
             (value for value in (_mtime_iso(source), _mtime_iso(cartouche)) if value),
@@ -364,6 +484,21 @@ def _orphan_cartouche_card(workspace: str, root: Path, cartouche: Path) -> dict[
     if not document_id:
         warnings.append("document_id absent du cartouche")
 
+    integrity = {
+        "source_sha256": _meta_string(metadata, "source_sha256"),
+        "source_sha256_verified": None,
+        "source_integrity": "SOURCE_MISSING" if not source_present else "UNVERIFIED",
+        "declared_source_size": _declared_source_size(metadata)[0],
+    }
+    if source_present and source_path is not None:
+        integrity, integrity_warnings = _source_integrity(
+            metadata,
+            source_path,
+            require_digest=source_path.suffix.casefold() == ".eml",
+            require_size=source_path.suffix.casefold() == ".eml",
+        )
+        warnings.extend(integrity_warnings)
+
     fallback_title = cartouche.name[1:-3] if _is_document_cartouche(cartouche) else cartouche.stem
     title = _meta_string(metadata, "title") or _first_heading(body) or fallback_title
     status = "CHECK" if source_present else "SOURCE_MISSING"
@@ -392,7 +527,12 @@ def _orphan_cartouche_card(workspace: str, root: Path, cartouche: Path) -> dict[
         "tags": _meta_tags(metadata),
         "extension": source_path.suffix.removeprefix(".").upper() if source_path else None,
         "source_size": _file_size(source_path) if source_path else None,
-        "hindsight_eligible": bool(source_path and source_path.suffix.casefold() in HINDSIGHT_ELIGIBLE_EXTENSIONS),
+        **integrity,
+        "hindsight_format_supported": bool(
+            source_path and source_path.suffix.casefold() in HINDSIGHT_ELIGIBLE_EXTENSIONS
+        ),
+        "hindsight_eligible": False,
+        "hindsight_representation_candidate": None,
         "heavy_binary": bool(source_path and source_path.suffix.casefold() in HEAVY_VISIBLE_EXTENSIONS),
         "modified_at": max(
             (value for value in (_mtime_iso(cartouche), _mtime_iso(source_path) if source_path else None) if value),
@@ -474,6 +614,8 @@ def _directory_document_cards(workspace: str, root: Path, folder: Path) -> list[
             for card in group:
                 card["status"] = "CHECK"
                 card["name_conflict"] = "CASE_OR_UNICODE_COLLISION"
+                card["hindsight_eligible"] = False
+                card["hindsight_representation_candidate"] = None
                 card["warnings"].append("Collision potentielle de nom sur stockage case-insensitive/normalisé")
 
     for cartouche in cartouches:
@@ -548,6 +690,8 @@ def scan_workspaces(roots: list[tuple[str, Path]], max_depth: int = 2) -> dict[s
             # Preserve a more specific broken-pair state such as SOURCE_MISSING.
             if card.get("status") == "COMPLETE":
                 card["status"] = "CHECK"
+            card["hindsight_eligible"] = False
+            card["hindsight_representation_candidate"] = None
             card["identity_conflict"] = "DUPLICATE_DOCUMENT_ID"
             card["warnings"].append(f"document_id dupliqué dans AFFAIRES: {document_id}")
 
