@@ -87,6 +87,7 @@ from the document content itself, when explicitly stated:
 ```text
 source_revision
 source_document_date
+source_revision_history[]
 source_supersedes[]
 ```
 
@@ -97,6 +98,7 @@ Selection order for one exact document family:
 
 ```text
 explicit supersedes/replaces relationship
+> explicit coherent revision history/table
 > comparable source revision/index
 > source document date as tie-breaker/fallback
 ```
@@ -105,6 +107,9 @@ Rules:
 
 - If one source explicitly says it supersedes/replaces another candidate, prefer
   the superseding source.
+- If a source contains an explicit revision history/table, use it to validate the
+  current revision token and chronology. A coherent revision history is stronger
+  evidence than an isolated date field.
 - If revisions are comparable within the same scheme (for example A/B/C,
   01/02/03, P1/P2/P3, REV01/REV02), prefer the higher revision.
 - The source document date is a consistency check for a revision decision, not
