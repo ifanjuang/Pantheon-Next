@@ -14,6 +14,7 @@ import mimetypes
 import os
 import re
 import stat as stat_module
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Mapping
@@ -48,7 +49,21 @@ class WorkspaceConfigurationError(WorkspaceCollectionReadError):
     """The server-side workspace mapping is invalid."""
 
 
+@dataclass(frozen=True)
+class ExactWorkspaceFileRead:
+    """Transient exact bytes from one explicitly configured Workspace root."""
+
+    workspace_ref: str
+    relative_path: str
+    filename: str
+    media_type: str
+    byte_size: int
+    digest_sha256: str
+    content: bytes
+
+
 _WINDOWS_DRIVE = re.compile(r"^[A-Za-z]:(?:/|$)")
+_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
 def parse_workspace_roots_config(raw_config: str | None) -> dict[str, str]:
@@ -375,6 +390,94 @@ def _exact_file_metadata(root: Path, relative_path: str) -> dict:
     observed = _metadata_from_stat(entry_path, relative_path, after)
     observed["digest_sha256"] = digest.hexdigest()
     return observed
+
+
+def read_exact_workspace_file(
+    workspace_roots: Mapping[str, Path],
+    workspace_ref: str,
+    relative_path: str,
+    *,
+    expected_sha256: str,
+    max_bytes: int,
+) -> ExactWorkspaceFileRead:
+    """Read one exact admitted file from a configured Workspace root.
+
+    The file is opened component-by-component with O_NOFOLLOW, bounded before
+    reading, hashed from the same descriptor, and re-opened afterward to prove
+    that the path still names the same stable file. No directory scan or sibling
+    discovery occurs.
+    """
+    root = workspace_roots.get(workspace_ref)
+    if root is None:
+        raise WorkspaceNotFound(f"unknown workspace_ref: {workspace_ref!r}")
+    normalized = normalize_relative_path(relative_path)
+    expected = str(expected_sha256 or "").strip().casefold()
+    if not _SHA256_RE.fullmatch(expected):
+        raise WorkspaceCollectionReadError("expected workspace SHA-256 is invalid")
+    if not isinstance(max_bytes, int) or isinstance(max_bytes, bool) or max_bytes < 1:
+        raise WorkspaceCollectionReadError("max_bytes must be a positive integer")
+
+    file_fd = _secure_open_workspace_file(root, normalized)
+    digest = hashlib.sha256()
+    chunks: list[bytes] = []
+    try:
+        with os.fdopen(file_fd, "rb", closefd=True) as stream:
+            before = os.fstat(stream.fileno())
+            if before.st_size > max_bytes:
+                raise WorkspaceCollectionReadError(
+                    f"workspace file exceeds exact-read bound: {before.st_size} > {max_bytes}"
+                )
+            total = 0
+            while True:
+                block = stream.read(min(1024 * 1024, max_bytes - total + 1))
+                if not block:
+                    break
+                total += len(block)
+                if total > max_bytes:
+                    raise WorkspaceCollectionReadError(
+                        f"workspace file exceeds exact-read bound: > {max_bytes}"
+                    )
+                digest.update(block)
+                chunks.append(block)
+            after = os.fstat(stream.fileno())
+    except WorkspaceCollectionReadError:
+        raise
+    except OSError as exc:
+        raise WorkspaceCollectionReadError(
+            f"workspace file cannot be read safely: {normalized!r}"
+        ) from exc
+
+    if _stat_identity(before) != _stat_identity(after):
+        raise WorkspaceFileChanged(
+            f"workspace file changed while reading: {normalized!r}"
+        )
+
+    verify_fd = _secure_open_workspace_file(root, normalized)
+    try:
+        current = os.fstat(verify_fd)
+    finally:
+        os.close(verify_fd)
+    if _stat_identity(after) != _stat_identity(current):
+        raise WorkspaceFileChanged(
+            f"workspace file was replaced while reading: {normalized!r}"
+        )
+
+    observed_digest = digest.hexdigest()
+    if observed_digest != expected:
+        raise WorkspaceFileChanged(
+            "workspace file SHA-256 no longer matches the admitted source_ref"
+        )
+
+    path = root / normalized
+    return ExactWorkspaceFileRead(
+        workspace_ref=workspace_ref,
+        relative_path=normalized,
+        filename=PurePosixPath(normalized).name,
+        media_type=_media_type(path),
+        byte_size=after.st_size,
+        digest_sha256=observed_digest,
+        content=b"".join(chunks),
+    )
 
 
 def observe_workspace_file(
