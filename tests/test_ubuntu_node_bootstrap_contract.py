@@ -72,6 +72,7 @@ def test_hindsight_file_retain_runtime_posture_is_explicit() -> None:
     assert "HINDSIGHT_API_FILE_PARSER: markitdown" in text
     assert "HINDSIGHT_API_RETAIN_MISSION:" in text
     assert "revision/index/version token" in text
+    assert "revision-history or revision-table entries" in text
     assert "Never infer document chronology" in text
     assert 'HINDSIGHT_API_FILE_DELETE_AFTER_RETAIN: "true"' in text
     assert 'HINDSIGHT_API_FILE_PARSER_MARKITDOWN_OCR_ENABLED: "false"' in text
