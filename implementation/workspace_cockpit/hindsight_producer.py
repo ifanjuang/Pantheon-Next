@@ -377,13 +377,7 @@ class HindsightProducer:
             if value is not None:
                 metadata[target_key] = value
 
-        context_parts = [
-            "AFFAIRES professional source document",
-            "extract explicit document date from the source when stated",
-            "extract explicit revision/index/version from the source when stated",
-            "extract explicit supersedes/replaces/annule-et-remplace relationships when stated",
-            "do not infer document date or revision from filename, upload time, filesystem mtime, or metadata",
-        ]
+        context_parts = ["AFFAIRES professional source document"]
         if metadata.get("title"):
             context_parts.append(f"title={metadata['title']}")
         if metadata.get("document_type"):
