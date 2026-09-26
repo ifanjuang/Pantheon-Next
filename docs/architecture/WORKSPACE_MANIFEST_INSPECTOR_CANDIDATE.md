@@ -521,15 +521,13 @@ The cartouche may supply bounded identification context such as:
 document type
 project/affaire hint
 phase
-index
 issuer
-document date
 stable tags
 ```
 
-`index` and `document_date` remain descriptive orientation only. They must not be used to decide which document is current or which one replaces another.
+The first Hindsight producer slice deliberately keeps `index`, `document_date`, `revision_mode` and `revision_of` out of the file-retain extraction context. They remain available to Cockpit/reconciliation, but they are not allowed to bias source fact extraction or decide which document is current.
 
-Revision declarations may be exposed to Cockpit/reconciliation as explicit metadata, but they must not authorize deletion or be promoted into source evidence merely because the cartouche contains them.
+Revision declarations may later be used by a dedicated reconciliation/view layer, but they must not authorize deletion or be promoted into source evidence merely because the cartouche contains them.
 
 Do not silently feed a speculative/derived summary into source extraction as though it were source fact.
 
