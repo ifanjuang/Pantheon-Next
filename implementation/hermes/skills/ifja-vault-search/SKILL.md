@@ -119,9 +119,12 @@ structurally resolved explicit Workspace supersedes relation
 
 Rules:
 
-- If the validated explicit `supersedes` graph has one unambiguous head, that
-  head is the current retrieval candidate. If it has multiple heads, cycles or
-  unresolved targets, return the conflict instead of choosing silently.
+- A structurally resolved Workspace `supersedes` graph is a declared routing
+  lineage, not source truth. If it has one unambiguous head and the inspected
+  source chronology does not contradict it, use that head as the current
+  retrieval candidate. If it has multiple heads, cycles, unresolved targets, or
+  conflicts with explicit source supersession/revision-history evidence, return
+  the conflict instead of choosing silently.
 - If one source explicitly says it supersedes/replaces another candidate, prefer
   the superseding source for this retrieval, but do not automatically write a
   cartouche revision relation from that observation.
@@ -163,6 +166,7 @@ revision_conflict =
   | incomparable_revision
   | branching_lineage
   | invalid_lineage
+  | declared_source_conflict
 ```
 
 The cartouche may help locate the family and may carry an explicit declared
