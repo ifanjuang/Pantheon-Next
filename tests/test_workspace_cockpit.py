@@ -870,6 +870,8 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     assert "--reconcile-seconds 60" in text
     assert "--affaires-root" in text
     assert "AFFAIRES_ROOT" in text
+    assert "hindsight_producer.py" in text
+    assert "EnvironmentFile=-/etc/pantheon-workspace-cockpit.env" in text
     assert "setfacl" not in text
     assert "vault mirror" not in text.lower()
     assert "pgvector" not in text.lower()
@@ -882,6 +884,11 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     assert "WORKSPACE_INDEX_DB: /state/index.sqlite3" in compose
     assert "WORKSPACE_RECONCILE_SECONDS" in compose
     assert "WORKSPACE_WATCH_DEBOUNCE_MS" in compose
+    assert "WORKSPACE_HINDSIGHT_URL" in compose
+    assert "WORKSPACE_HINDSIGHT_BANK_ID" in compose
+    assert "WORKSPACE_HINDSIGHT_PARSER" in compose
+    assert "WORKSPACE_HINDSIGHT_MAX_SUBMITS_PER_RECONCILE" in compose
+    assert "WORKSPACE_HINDSIGHT_MAX_FILE_MB" in compose
     assert "127.0.0.1" in compose
     assert "role-trace:" in compose
     assert "ROLE_TRACE_ATTACH_KEY" in compose
