@@ -88,9 +88,10 @@ revision_mode = supersedes | supplements
 revision_of   = document_id
 ```
 
-A valid explicit `supersedes` relation is a declared lineage edge. A
-`supplements` relation is not replacement and must not suppress the referenced
-document. Never manufacture either relation from index/date/name similarity.
+A structurally resolved explicit `supersedes` relation is a declared lineage edge,
+not proof that the declaration is professionally correct. A `supplements` relation
+is not replacement and must not suppress the referenced document. Never manufacture
+either relation from index/date/name similarity.
 
 Then inspect each candidate with Hindsight `get_document` so the retained
 `original_text` is available. Extract from the document content itself, when
@@ -109,7 +110,7 @@ or date when the source text does not state one.
 Selection order for one exact document family:
 
 ```text
-validated explicit Workspace supersedes relation
+structurally resolved explicit Workspace supersedes relation
 > explicit supersedes/replaces statement in the source
 > explicit coherent revision history/table in the source
 > heuristic ordering by comparable source revision/index
