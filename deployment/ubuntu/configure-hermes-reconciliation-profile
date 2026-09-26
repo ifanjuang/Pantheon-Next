@@ -141,7 +141,7 @@ check_profile_config() {
     || die "context.engine must be compressor"
 
   provider="$(get_optional_json memory.provider)"
-  [[ "$provider" == "null" ]] \
+  [[ "$provider" == '""' || "$provider" == "null" ]] \
     || die "external memory provider must be disabled"
 
   tool_search="$(get_optional_json tools.tool_search.enabled)"
@@ -174,7 +174,7 @@ apply_profile_config() {
       || die "set HERMES_RECONCILIATION_API_KEY before --apply"
   fi
 
-  hermes -p "$PROFILE" memory off >/dev/null
+  hermes -p "$PROFILE" config set memory.provider "" >/dev/null
   hermes -p "$PROFILE" config set platform_toolsets.api_server '["no_mcp"]' >/dev/null
   hermes -p "$PROFILE" config set --force plugins.enabled '[]' >/dev/null
   hermes -p "$PROFILE" config set --force mcp_servers '{}' >/dev/null
