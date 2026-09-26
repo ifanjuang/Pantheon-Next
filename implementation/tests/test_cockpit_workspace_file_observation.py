@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
 from fastapi.testclient import TestClient
+import pytest
 
+from mvp_vertical import workspace_collection_read
 from mvp_vertical.cockpit_composed import create_composed_cockpit_app
 
 
@@ -153,3 +156,63 @@ def test_workspace_observation_keeps_non_pdf_files_generic(tmp_path: Path) -> No
     assert card["workspace_file"]["media_type"] in {"text/markdown", "text/plain"}
     assert card["workspace_file"]["file_kind"] == "file"
     assert card["qualification"]["automatic_document_admission"] is False
+
+
+
+def test_exact_workspace_read_returns_only_digest_bound_bytes(tmp_path: Path) -> None:
+    source = tmp_path / "Plan.pdf"
+    payload = b"%PDF-1.4\nexact-source\n%%EOF\n"
+    source.write_bytes(payload)
+    roots = workspace_collection_read.prepare_workspace_roots({"affaires": tmp_path})
+    digest = hashlib.sha256(payload).hexdigest()
+
+    exact = workspace_collection_read.read_exact_workspace_file(
+        roots,
+        "affaires",
+        "Plan.pdf",
+        expected_sha256=digest,
+        max_bytes=1024,
+    )
+
+    assert exact.workspace_ref == "affaires"
+    assert exact.relative_path == "Plan.pdf"
+    assert exact.filename == "Plan.pdf"
+    assert exact.digest_sha256 == digest
+    assert exact.byte_size == len(payload)
+    assert exact.content == payload
+
+
+def test_exact_workspace_read_fails_closed_on_digest_size_and_symlink(tmp_path: Path) -> None:
+    source = tmp_path / "Plan.pdf"
+    payload = b"%PDF-1.4\nexact-source\n%%EOF\n"
+    source.write_bytes(payload)
+    roots = workspace_collection_read.prepare_workspace_roots({"affaires": tmp_path})
+    digest = hashlib.sha256(payload).hexdigest()
+
+    with pytest.raises(workspace_collection_read.WorkspaceFileChanged):
+        workspace_collection_read.read_exact_workspace_file(
+            roots,
+            "affaires",
+            "Plan.pdf",
+            expected_sha256="0" * 64,
+            max_bytes=1024,
+        )
+
+    with pytest.raises(workspace_collection_read.WorkspaceCollectionReadError):
+        workspace_collection_read.read_exact_workspace_file(
+            roots,
+            "affaires",
+            "Plan.pdf",
+            expected_sha256=digest,
+            max_bytes=4,
+        )
+
+    (tmp_path / "link.pdf").symlink_to(source)
+    with pytest.raises(workspace_collection_read.WorkspaceCollectionReadError):
+        workspace_collection_read.read_exact_workspace_file(
+            roots,
+            "affaires",
+            "link.pdf",
+            expected_sha256=digest,
+            max_bytes=1024,
+        )
