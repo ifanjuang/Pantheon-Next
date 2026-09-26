@@ -23,7 +23,7 @@ import time
 import unicodedata
 from typing import Any, Callable, Iterable
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 from urllib.request import Request, urlopen
 
 import yaml
@@ -35,6 +35,12 @@ _MODULE_ROOT = Path(__file__).resolve().parent
 if str(_MODULE_ROOT) not in sys.path:
     sys.path.insert(0, str(_MODULE_ROOT))
 from hindsight_producer import HindsightHTTPClient, HindsightProducer
+from memory_reconciliation import (
+    HermesReconciliationClient,
+    MemoryReconciliationService,
+    ReconciliationError,
+    ReconciliationResidencyError,
+)
 
 
 APP_ROOT = _MODULE_ROOT
@@ -1231,6 +1237,7 @@ class CockpitHandler(BaseHTTPRequestHandler):
     workspace_index: WorkspaceIndex | None = None
     role_trace_url = ""
     role_trace_key = ""
+    memory_reconciliation: MemoryReconciliationService | None = None
 
     def _headers(self, status: HTTPStatus, content_type: str) -> None:
         self.send_response(status)
@@ -1281,6 +1288,69 @@ class CockpitHandler(BaseHTTPRequestHandler):
                 if stream:
                     self.wfile.flush()
 
+    def do_POST(self) -> None:  # noqa: N802 - stdlib handler API
+        path = urlparse(self.path).path
+        match = re.fullmatch(r"/api/documents/([^/]+)/reconcile-memory", path)
+        if not match:
+            self._json({"error": "not_found"}, HTTPStatus.NOT_FOUND)
+            return
+        if self.memory_reconciliation is None:
+            self._json({"error": "memory_reconciliation_not_configured"}, HTTPStatus.NOT_FOUND)
+            return
+        if self.headers.get("X-Pantheon-Intent", "").strip() != "memory-reconcile":
+            self._json({"error": "explicit_intent_required"}, HTTPStatus.FORBIDDEN)
+            return
+        content_type = self.headers.get("Content-Type", "").split(";", 1)[0].strip().casefold()
+        if content_type != "application/json":
+            self._json({"error": "application_json_required"}, HTTPStatus.UNSUPPORTED_MEDIA_TYPE)
+            return
+        try:
+            content_length = int(self.headers.get("Content-Length", "0"))
+        except ValueError:
+            self._json({"error": "invalid_content_length"}, HTTPStatus.BAD_REQUEST)
+            return
+        if content_length < 0 or content_length > 8192:
+            self._json({"error": "request_too_large"}, HTTPStatus.REQUEST_ENTITY_TOO_LARGE)
+            return
+        try:
+            raw = self.rfile.read(content_length)
+            body = json.loads(raw.decode("utf-8") or "{}")
+        except (UnicodeError, json.JSONDecodeError):
+            self._json({"error": "invalid_json"}, HTTPStatus.BAD_REQUEST)
+            return
+        if not isinstance(body, dict):
+            self._json({"error": "json_object_required"}, HTTPStatus.BAD_REQUEST)
+            return
+        focus = body.get("focus", "")
+        if not isinstance(focus, str):
+            self._json({"error": "focus_must_be_string"}, HTTPStatus.BAD_REQUEST)
+            return
+        document_id = unquote(match.group(1))
+        snapshot = (
+            self.workspace_index.snapshot()
+            if self.workspace_index is not None
+            else scan_workspaces(self.roots, self.max_depth)
+        )
+        try:
+            result = self.memory_reconciliation.reconcile(
+                snapshot,
+                document_id,
+                focus=focus,
+            )
+        except ReconciliationResidencyError as exc:
+            self._json(
+                {"error": "memory_reconciliation_residency_failure", "detail": str(exc)},
+                HTTPStatus.BAD_GATEWAY,
+            )
+            return
+        except ReconciliationError as exc:
+            self._json(
+                {"error": "memory_reconciliation_failed", "detail": str(exc)},
+                HTTPStatus.CONFLICT,
+            )
+            return
+        self._json(result, HTTPStatus.OK)
+
     def do_GET(self) -> None:  # noqa: N802 - stdlib handler API
         path = urlparse(self.path).path
         if path == "/api/health":
@@ -1291,6 +1361,7 @@ class CockpitHandler(BaseHTTPRequestHandler):
                     "projection": PROJECTION_ID,
                     "read_only": True,
                     "role_trace": bool(self.role_trace_url),
+                    "memory_reconciliation": self.memory_reconciliation is not None,
                     "index": index_state,
                 }
             )
@@ -1393,6 +1464,22 @@ def build_parser() -> argparse.ArgumentParser:
         default=int(os.getenv("WORKSPACE_HINDSIGHT_MAX_FILE_MB", "100")),
         help="reject a source before buffering it when larger than this many MiB",
     )
+    parser.add_argument(
+        "--reconcile-hermes-url",
+        default=os.getenv("WORKSPACE_RECONCILE_HERMES_URL", ""),
+        help="dedicated no-tool Hermes profile base URL for on-demand memory reconciliation",
+    )
+    parser.add_argument(
+        "--reconcile-hermes-model",
+        default=os.getenv("WORKSPACE_RECONCILE_HERMES_MODEL", ""),
+        help="optional model/model-route override for the dedicated reconciliation profile",
+    )
+    parser.add_argument(
+        "--reconcile-max-context-chars",
+        type=int,
+        default=int(os.getenv("WORKSPACE_RECONCILE_MAX_CONTEXT_CHARS", "48000")),
+        help="maximum serialized Hindsight/cartouche context sent to Hermes",
+    )
     parser.add_argument("--check", action="store_true", help="scan once, print summary, and exit")
     return parser
 
@@ -1414,14 +1501,17 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit("--hindsight-max-submits-per-reconcile must be >= 1")
     if args.hindsight_max_file_mb < 1:
         raise SystemExit("--hindsight-max-file-mb must be >= 1")
+    if args.reconcile_max_context_chars < 8000:
+        raise SystemExit("--reconcile-max-context-chars must be >= 8000")
     if bool(args.hindsight_url.strip()) != bool(args.hindsight_bank_id.strip()):
         raise SystemExit("--hindsight-url and --hindsight-bank-id must be configured together")
     if any(_path_is_within(state_db, root) for _, root in args.root):
         raise SystemExit("--state-db must remain outside every watched workspace root")
 
     producer: HindsightProducer | None = None
+    hindsight_client: HindsightHTTPClient | None = None
     if args.hindsight_url.strip():
-        client = HindsightHTTPClient(
+        hindsight_client = HindsightHTTPClient(
             args.hindsight_url.strip(),
             args.hindsight_bank_id.strip(),
             authorization=os.getenv("WORKSPACE_HINDSIGHT_AUTHORIZATION", "").strip(),
@@ -1432,12 +1522,36 @@ def main(argv: list[str] | None = None) -> int:
         producer = HindsightProducer(
             roots=args.root,
             state_db=state_db,
-            client=client,
+            client=hindsight_client,
             max_submits_per_reconcile=args.hindsight_max_submits_per_reconcile,
         )
 
+    reconcile_hermes_url = args.reconcile_hermes_url.strip().rstrip("/")
+    reconcile_hermes_key = os.getenv("WORKSPACE_RECONCILE_HERMES_KEY", "").strip()
+    if bool(reconcile_hermes_url) != bool(reconcile_hermes_key):
+        raise SystemExit(
+            "WORKSPACE_RECONCILE_HERMES_URL and WORKSPACE_RECONCILE_HERMES_KEY must be configured together"
+        )
+    if reconcile_hermes_url and hindsight_client is None:
+        raise SystemExit("memory reconciliation requires the configured Hindsight producer/client")
+    if reconcile_hermes_url and not reconcile_hermes_url.startswith(("http://", "https://")):
+        raise SystemExit("WORKSPACE_RECONCILE_HERMES_URL must be HTTP(S)")
+
     CockpitHandler.roots = args.root
     CockpitHandler.max_depth = args.max_depth
+    CockpitHandler.memory_reconciliation = None
+    if reconcile_hermes_url and hindsight_client is not None:
+        CockpitHandler.memory_reconciliation = MemoryReconciliationService(
+            hindsight_client=hindsight_client,
+            hermes_client=HermesReconciliationClient(
+                reconcile_hermes_url,
+                reconcile_hermes_key,
+                model=args.reconcile_hermes_model,
+                timeout_seconds=float(os.getenv("WORKSPACE_RECONCILE_HERMES_TIMEOUT_SECONDS", "120")),
+            ),
+            max_context_chars=args.reconcile_max_context_chars,
+        )
+
     workspace_index = WorkspaceIndex(
         args.root,
         args.max_depth,
