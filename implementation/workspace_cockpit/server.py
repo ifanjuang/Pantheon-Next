@@ -199,18 +199,21 @@ def _revision_relation(
         }, warnings
 
     normalized_mode = mode.casefold()
+    invalid = False
     if normalized_mode not in REVISION_MODES:
+        invalid = True
         warnings.append(
             "revision_mode invalide (attendu: supersedes ou supplements)"
         )
     if document_id and target == document_id:
+        invalid = True
         warnings.append("revision_of ne peut pas référencer le document lui-même")
 
     return {
         "revision_mode": normalized_mode,
         "revision_of": target,
         "revision_target_present": None,
-        "revision_target_status": "UNRESOLVED",
+        "revision_target_status": "INVALID" if invalid else "UNRESOLVED",
     }, warnings
 
 
