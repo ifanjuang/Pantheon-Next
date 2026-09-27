@@ -353,6 +353,8 @@ secrets in an ignored local env file and load it after the release lock:
 ```bash
 umask 077
 cat > .env.workspace-cockpit <<'EOF'
+AFFAIRES_ROOT=/mnt/pantheon-affaires
+AFFAIRES_GID=replace-with-affaires-mount-group-id
 WORKSPACE_COCKPIT_BIND=192.0.2.10
 WORKSPACE_COCKPIT_PORT=8189
 HERMES_ROLE_TRACE_BASE_URL=http://192.0.2.10:8642/p/pantheon-governed
@@ -360,6 +362,8 @@ HERMES_ROLE_TRACE_API_KEY=replace-with-governed-runs-key
 ROLE_TRACE_ATTACH_KEY=replace-with-random-attach-key
 ROLE_TRACE_READ_KEY=replace-with-random-read-key
 EOF
+# Use the group recorded on the qualified mount, for example:
+# sed -i "s/replace-with-affaires-mount-group-id/$(stat -c %g /mnt/pantheon-affaires)/" .env.workspace-cockpit
 docker compose --env-file release.env --env-file .env.workspace-cockpit \
   -f compose.workspace-cockpit-local.yaml up -d --build
 ```
