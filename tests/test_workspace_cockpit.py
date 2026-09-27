@@ -899,6 +899,8 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     compose = COMPOSE.read_text(encoding="utf-8")
     assert "read_only: true" in compose
     assert "${AFFAIRES_ROOT:?set AFFAIRES_ROOT to the Linux-mounted NAS AFFAIRES path}:/workspace/affaires:ro" in compose
+    assert "${AFFAIRES_GID:?set AFFAIRES_GID to the Linux-mounted NAS AFFAIRES group id}" in compose
+    assert "group_add:" in compose
     assert compose.count(":ro") == 1
     assert "/srv/pantheon/obsidian" not in compose
     assert "workspace-cockpit-state:/state" in compose
@@ -913,6 +915,9 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     assert "WORKSPACE_RECONCILE_HERMES_URL" in compose
     assert "WORKSPACE_RECONCILE_HERMES_KEY" in compose
     assert "WORKSPACE_RECONCILE_MAX_CONTEXT_CHARS" in compose
+    readme = (ROOT / "deployment" / "ubuntu" / "README.md").read_text(encoding="utf-8")
+    assert "AFFAIRES_ROOT=/mnt/pantheon-affaires" in readme
+    assert "AFFAIRES_GID=replace-with-affaires-mount-group-id" in readme
     assert "127.0.0.1" in compose
     assert "role-trace:" in compose
     assert "ROLE_TRACE_ATTACH_KEY" in compose
