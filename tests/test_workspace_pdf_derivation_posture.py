@@ -27,19 +27,21 @@ def test_manual_marker_workspace_path_does_not_become_second_structural_owner() 
     assert "SourceDown = historical prior workspace choice, not the current selected daily conversion surface" in text
 
 
-def test_hindsight_keeps_one_markdown_producer_and_does_not_require_native_pdf_ingestion() -> None:
+def test_hindsight_keeps_one_affaires_producer_with_bounded_native_source_ingestion() -> None:
     ocr = OCR_PIPELINE.read_text(encoding="utf-8")
     obsidian = OBSIDIAN.read_text(encoding="utf-8")
 
     for invariant in (
-        "Hindsight native file retain = not selected in the current qualified workspace producer path",
-        "Do not simultaneously activate a second native-PDF Hindsight producer for the same source",
-        "Obsidian Markdown\n-> designated hindsight-obsidian-sync producer\n-> Hindsight derived bank",
+        "Hindsight native file retain = selected for eligible AFFAIRES sources through the bounded Workspace producer",
+        "automatic OCR = disabled on the productive AFFAIRES route",
+        "one productive AFFAIRES producer != one source format",
+        "NAS / AFFAIRES source\n-> Workspace Hindsight producer\n-> Hindsight derived bank",
     ):
         assert invariant in ocr
 
-    assert "hindsight-obsidian-sync  = qualified designated ingestion producer" in obsidian
-    assert "Hindsight\n= derived retrieval / associative memory" in obsidian
+    assert "hindsight-obsidian-sync  = historical designated producer for this reference only" in obsidian
+    assert "Hindsight\n= derived retrieval / associative memory in this reference profile" in obsidian
+    assert "not the selected productive AFFAIRES topology" in obsidian
 
 
 def test_workspace_metadata_remains_distinct_from_document_authority() -> None:
