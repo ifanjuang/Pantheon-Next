@@ -132,14 +132,46 @@ request, manifest and admitted runtime bindings; they do not redefine the
 profile identity.
 
 `--with-ifja-adapter` adds `ifja-project-context` and `ifja-vault-search` as
-contextual modules. With that explicit adapter, `--bind-local-mcp` copies no secrets and no arbitrary server. It merges only the
+contextual modules. With that explicit adapter, `--bind-local-mcp` copies no
+arbitrary server. It merges only the
 already configured local `Doclin`, `hindsight-affaires`,
 `hindsight-documentaires` and `pantheon-policy` entries from the default profile
-into the governed profile. The copied Pantheon Policy entry is narrowed to the
+into the governed profile and adds the separately installed, loopback-only
+`ifja-vault-read` binding with its dedicated bearer credential. The copied
+Pantheon Policy entry is narrowed to the
 reviewed read-only consultation, request classification/preflight, candidate
 skeleton and Context Pack tools. It derives a recall-only `hindsight-memory` binding
 from the already configured local Hindsight endpoint and refuses a partial result
 when either required professional Hindsight binding is absent.
+
+### IFJA exact-source fallback
+
+The optional IFJA reader resolves a project directory before topic keywords,
+lists bounded `.md`/PDF candidates within that project, and provides
+line-located, capped reads of exact Markdown files. It can also read an exact
+DOCUMENTAIRES Markdown path. It cannot write files or open arbitrary host paths;
+AFFAIRES reads require a matching project reference. PDF content still goes
+through Docling. Inventory matches and search previews are not source
+inspection or Evidence.
+
+The reader runs as the existing `pantheon-docling` service user, which already
+has the vault ACL. Do not broaden the Hermes container user's filesystem ACL.
+Installation and profile binding are separate explicit steps:
+
+```bash
+deployment/ubuntu/configure-ifja-vault-read-local --check
+sudo deployment/ubuntu/configure-ifja-vault-read-local \
+  --apply --affaires-root /path/to/mounted/AFFAIRES --enable
+deployment/ubuntu/configure-hermes-activity-projection --check \
+  --with-ifja-adapter --bind-local-mcp
+sudo deployment/ubuntu/configure-hermes-activity-projection --apply --restart \
+  --with-ifja-adapter --bind-local-mcp
+```
+
+The service binds only `127.0.0.1:8021` and requires a retained token under
+`/srv/pantheon/docling`; the token is not printed. The configurator puts only
+this credential and the four reviewed read-only tool names in the governed
+profile's MCP binding. A configuration checkpoint precedes profile changes.
 
 `--with-curated-default-skills` retains the profile's `.no-bundled-skills`
 boundary and copies only architecture diagrams, Excalidraw, Obsidian, PDF,
@@ -286,11 +318,10 @@ Docling `2.126.0` and Docling MCP `3.2.0` run as the restricted
 writes a reviewable Hermes fragment to `/srv/pantheon/hermes/docling-mcp.yaml`;
 it does not silently modify Hermes' active configuration or authorize a new
 tool. Merge that fragment into Hermes after reviewing the active MCP policy.
-The Hermes container mounts `/srv/pantheon/obsidian`,
-`/srv/pantheon/obsidian-affaires` and `/srv/pantheon/obsidian-documentaires` at
-the same paths so Docling can process PDF paths passed by Hermes without
-translation. LiveSync state and Hindsight indexes remain outside Hermes' file
-surface.
+The host Docling service and the bounded source reader must receive the same
+operator-selected `AFFAIRES_ROOT`. Hermes passes an admitted source path as tool
+input; it does not need the NAS mounted inside its container. LiveSync state and
+Hindsight indexes remain outside Hermes' file surface.
 
 The qualified LiveSync CLI source is built with a pinned npm 11 build tool.
 This avoids the npm 10.9.8 Arborist `edgesOut` crash in `node:22-slim` while
@@ -366,13 +397,8 @@ alternative is available when container deployment is unwanted:
 sudo ./configure-workspace-cockpit-local --user <linux-user> --enable
 ```
 
-The service binds to `127.0.0.1:8189` by default and reads these mirrors:
-
-```text
-/srv/pantheon/obsidian
-/srv/pantheon/obsidian-affaires
-/srv/pantheon/obsidian-documentaires
-```
+The service binds to `127.0.0.1:8189` by default and reads only the
+operator-selected Linux-mounted NAS `AFFAIRES_ROOT`.
 
 It recognizes `document.yaml`, checks for a Markdown representation bearing
 the same name as its folder, counts PDF/image/table resources, and exposes the
@@ -493,10 +519,25 @@ Those can be added only when their actual configuration and qualification needs 
 
 The productive Workspace/Hindsight topology is evaluated from this Linux host against the NAS path as mounted here. Hindsight remains local to Linux; the AFFAIRES daemon is the filesystem watcher and Hindsight producer.
 
+Create the SMB credentials file locally as root with mode `0600`; never put its
+contents in Git, shell arguments or chat. Install `cifs-utils`, then configure a
+persistent mount without embedding site-specific names in the repository:
+
+```bash
+sudo deployment/ubuntu/configure-affaires-nas-mount \
+  --apply --source //HOST/SHARE --prefix-path RELATIVE/PATH \
+  --target /mnt/pantheon-affaires --enable
+```
+
+The host, share, relative path and credentials are operator inputs. Consumers
+still bind the resulting mount read-only even though the host mount permits the
+explicit cartouche write workflow.
+
 Before enabling the producer, run:
 
 ```bash
-python3 deployment/ubuntu/qualify-affaires-linux-mount.py --root /path/to/mounted/AFFAIRES
+python3 deployment/ubuntu/qualify-affaires-linux-mount.py \
+  --root /path/to/mounted/AFFAIRES --require-network-mount
 ```
 
 The probe is self-cleaning by default. It requires write access because future cartouche generation also requires the Linux service to create `.SOURCE.ext.md` files. Use `--keep` only for manual inspection.
