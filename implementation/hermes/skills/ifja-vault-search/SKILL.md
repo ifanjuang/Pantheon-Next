@@ -65,7 +65,7 @@ change the answer, permitted action or consequence.
    AFFAIRES inventory fallback have also been attempted.
    If these do not return an exact file, use the `ifja-vault-read` binding:
    `find_ifja_projects` on the user-provided designation, then
-   `list_ifja_project_sources` on the selected `_Projets/<name>` directory.
+   `list_ifja_project_sources` on the selected direct AFFAIRES project directory.
    Resolve the project before adding topic words; a filename need not contain
    `permis` to be relevant to a permit question. The inventory ranks explicit
    topic tokens and nearby document families such as `Urbanisme`, `PLUi`, `PC`
@@ -299,10 +299,9 @@ The same rule applies to Hindsight resource/introspection calls: use
 identified knowledge page. A `read_resource` result is not a document
 consultation and must not be cited as one.
 
-The `source` path is resolved by the Docling service, not by the model. Use a
-path shared with that service, such as the reviewed `/srv/pantheon/obsidian`,
-`/srv/pantheon/obsidian-affaires` or `/srv/pantheon/obsidian-documentaires`
-mounts. A WebUI upload path under `/home/hermeswebui/.hermes/webui/attachments`
+The `source` path is resolved by the Docling service, not by the model. Use the
+operator-configured NAS root shared with that service or another reviewed
+shared mount. A WebUI upload path under `/home/hermeswebui/.hermes/webui/attachments`
 is not assumed to be visible there. If no shared path or URL exists, report a
 Capability Gap and request a supported source location; do not retry the same
 conversion with guessed paths.

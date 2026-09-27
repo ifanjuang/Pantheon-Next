@@ -13,7 +13,7 @@ sources:
     hindsight_bank: IFJA_AFFAIRES
     purpose: dossier-specific professional material
     project_path_hints:
-      - "_Projets/{designation}"
+      - "{designation}"
       - "Projets/{designation}"
       - "Notion/_Affaires/{designation}.md"
     local_reader_binding: ifja-vault-read
@@ -43,7 +43,7 @@ retrieval:
 documents:
   textual_analysis_binding: docling
   visual_analysis_binding: marker
-  physical_affaires_root: /srv/pantheon/obsidian-affaires
+  physical_affaires_root: operator-configured AFFAIRES_ROOT
   physical_documentaires_root: /srv/pantheon/obsidian-documentaires
   markdown_reader_tools:
     - find_ifja_projects

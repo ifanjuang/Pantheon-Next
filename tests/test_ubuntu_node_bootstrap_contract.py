@@ -21,6 +21,7 @@ CONFIGURE_MARKER = DEPLOY / "configure-marker-local"
 MARKER_IDLE_WRAPPER = DEPLOY / "marker_idle_vram.py"
 CONFIGURE_DOCLING = DEPLOY / "configure-docling-local"
 CONFIGURE_WORKSPACE_COCKPIT = DEPLOY / "configure-workspace-cockpit-local"
+CONFIGURE_AFFAIRES_NAS_MOUNT = DEPLOY / "configure-affaires-nas-mount"
 CONFIGURE_HERMES_ACTIVITY = DEPLOY / "configure-hermes-activity-projection"
 EXTERNAL_PINS = ROOT / "implementation" / "qualification" / "external-pins.json"
 
@@ -42,11 +43,24 @@ def test_bootstrap_scripts_are_shell_syntax_valid() -> None:
         CONFIGURE_MARKER,
         CONFIGURE_DOCLING,
         CONFIGURE_WORKSPACE_COCKPIT,
+        CONFIGURE_AFFAIRES_NAS_MOUNT,
         CONFIGURE_HERMES_ACTIVITY,
     )
     for script in scripts:
         assert script.exists()
         subprocess.run(["bash", "-n", str(script)], check=True)
+
+
+def test_affaires_mount_configuration_is_generic_and_keeps_secrets_external() -> None:
+    text = _text(CONFIGURE_AFFAIRES_NAS_MOUNT)
+    assert "--source //HOST/SHARE" in text
+    assert "--prefix-path RELATIVE/PATH" in text
+    assert "credentials file must be owned by root with mode 0600" in text
+    assert "Options=credentials=%s" in text
+    assert "Type=cifs" in text
+    assert "prefixpath=%s" in text
+    assert "nosuid,nodev,noexec" in text
+    assert "No hostname, share, project name or folder name is built into this script" in text
 
 
 def test_workspace_cockpit_compose_is_read_only_and_loopback_only() -> None:

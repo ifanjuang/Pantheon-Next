@@ -1,4 +1,4 @@
-"""Bounded, read-only discovery and Markdown inspection for IFJA vault mirrors.
+"""Bounded, read-only discovery and Markdown inspection for IFJA source roots.
 
 Hindsight results are discovery leads. This module resolves physical project
 sources independently, without granting a document any governance status.
@@ -46,18 +46,21 @@ def _bounded(value: int, maximum: int, name: str) -> int:
 
 class VaultSources:
     def __init__(self, affaires_root: Path, documentaires_root: Path):
+        if affaires_root.is_symlink() or documentaires_root.is_symlink():
+            raise VaultSourceError("configured source roots must not be symbolic links")
         self.affaires_root = affaires_root.resolve(strict=True)
         self.documentaires_root = documentaires_root.resolve(strict=True)
         if not self.affaires_root.is_dir() or not self.documentaires_root.is_dir():
             raise VaultSourceError("configured vault roots must be directories")
-        self.projects_root = self.affaires_root / "_Projets"
-        if not self.projects_root.is_dir() or self.projects_root.is_symlink():
-            raise VaultSourceError("AFFAIRES/_Projets is unavailable")
+        self.projects_root = self.affaires_root
 
     @classmethod
     def from_environment(cls) -> VaultSources:
+        affaires_root = os.environ.get("IFJA_AFFAIRES_ROOT")
+        if not affaires_root:
+            raise VaultSourceError("IFJA_AFFAIRES_ROOT must select the mounted NAS root")
         return cls(
-            Path(os.environ.get("IFJA_AFFAIRES_ROOT", "/srv/pantheon/obsidian-affaires")),
+            Path(affaires_root),
             Path(os.environ.get("IFJA_DOCUMENTAIRES_ROOT", "/srv/pantheon/obsidian-documentaires")),
         )
 
@@ -78,14 +81,14 @@ class VaultSources:
             else:
                 continue
             candidates.append({
-                "project_ref": f"_Projets/{directory.name}",
+                "project_ref": directory.name,
                 "name": directory.name,
                 "match": match,
             })
         candidates.sort(key=lambda item: (item["match"] != "exact_name", item["name"].casefold()))
         return {
-            "status": "candidates" if candidates else "no_name_match_in_mirror",
-            "scope": "AFFAIRES/_Projets",
+            "status": "candidates" if candidates else "no_name_match_in_affaires",
+            "scope": "AFFAIRES",
             "count": min(len(candidates), limit),
             "truncated": len(candidates) > limit,
             "items": candidates[:limit],
@@ -94,9 +97,9 @@ class VaultSources:
 
     def _project(self, project_ref: str) -> Path:
         parts = Path(project_ref).parts
-        if len(parts) != 2 or parts[0] != "_Projets" or parts[1] in {".", ".."}:
-            raise VaultSourceError("project_ref must be _Projets/<one project directory>")
-        path = self.projects_root / parts[1]
+        if len(parts) != 1 or parts[0] in {".", ".."}:
+            raise VaultSourceError("project_ref must be one direct AFFAIRES project directory")
+        path = self.projects_root / parts[0]
         if path.is_symlink() or not path.is_dir() or path.resolve() != path:
             raise VaultSourceError("project directory is absent or redirected")
         return path
@@ -148,7 +151,7 @@ class VaultSources:
                 break
         items.sort(key=lambda item: (-item["score"], item["relative_path"].casefold()))
         return {
-            "status": "source_candidates" if items else "no_supported_files_in_project_mirror",
+            "status": "source_candidates" if items else "no_supported_files_in_project",
             "project_ref": project_ref,
             "topic": topic,
             "scanned_files": min(scanned, MAX_SCANNED_FILES),

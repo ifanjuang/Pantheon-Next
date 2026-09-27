@@ -17,6 +17,7 @@ import importlib.util
 import json
 from pathlib import Path
 import shutil
+import subprocess
 import tempfile
 import threading
 import time
@@ -25,6 +26,7 @@ import uuid
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SERVER = REPO_ROOT / "implementation" / "workspace_cockpit" / "server.py"
+NETWORK_FILESYSTEMS = {"cifs", "nfs", "nfs4"}
 
 
 def _module():
@@ -52,10 +54,39 @@ Temporary probe generated from the Linux host.
     )
 
 
+def _mount_observation(root: Path) -> dict[str, object]:
+    result = subprocess.run(
+        ["findmnt", "--json", "--target", str(root), "--output", "TARGET,SOURCE,FSTYPE,OPTIONS"],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    filesystems = json.loads(result.stdout).get("filesystems", [])
+    if not filesystems:
+        raise RuntimeError("cannot identify the filesystem containing AFFAIRES")
+    # Sandboxed test runners can expose the same target twice (outer read-only
+    # view, then the writable workspace overlay). The last entry is the view
+    # used by this process.
+    observed = filesystems[-1]
+    filesystem = str(observed.get("fstype") or "")
+    return {
+        "target": str(observed.get("target") or ""),
+        "source": str(observed.get("source") or ""),
+        "filesystem": filesystem,
+        "read_only": "ro" in str(observed.get("options") or "").split(","),
+        "network_mount": filesystem in NETWORK_FILESYSTEMS,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", required=True, help="Linux path of the mounted NAS AFFAIRES root")
     parser.add_argument("--keep", action="store_true", help="keep the probe directory for inspection")
+    parser.add_argument(
+        "--require-network-mount",
+        action="store_true",
+        help="refuse local filesystems and per-session GVFS/FUSE mounts",
+    )
     args = parser.parse_args()
 
     root = Path(args.root).expanduser().resolve()
@@ -67,11 +98,13 @@ def main() -> int:
     probe = root / probe_name
     document_id = f"probe-{uuid.uuid4().hex}"
     state_dir = Path(tempfile.mkdtemp(prefix="pantheon-affaires-qualification-state-"))
+    mount = _mount_observation(root)
 
     report: dict[str, object] = {
         "root": str(root),
         "probe": str(probe),
         "projection": module.PROJECTION_ID,
+        "mount": mount,
         "dotfile_roundtrip": False,
         "initial_projection": False,
         "rename_projection": False,
@@ -80,6 +113,14 @@ def main() -> int:
         "inotify": "not-tested",
         "cleanup": False,
     }
+
+    if args.require_network_mount and not mount["network_mount"]:
+        shutil.rmtree(state_dir, ignore_errors=True)
+        report["qualified_core"] = False
+        report["qualified"] = False
+        report["reason"] = "AFFAIRES is not on a system CIFS/NFS mount"
+        print(json.dumps(report, indent=2, ensure_ascii=False))
+        return 1
 
     try:
         probe.mkdir()

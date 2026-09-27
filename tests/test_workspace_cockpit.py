@@ -841,6 +841,7 @@ def test_linux_affaires_mount_qualification_probe_runs_on_local_filesystem(tmp_p
     assert result.returncode == 0, result.stderr
     payload = json.loads(result.stdout)
     assert payload["qualified"] is True
+    assert payload["mount"]["network_mount"] is False
     assert payload["dotfile_roundtrip"] is True
     assert payload["initial_projection"] is True
     assert payload["rename_projection"] is True
@@ -852,6 +853,25 @@ def test_linux_affaires_mount_qualification_probe_runs_on_local_filesystem(tmp_p
         "not-observed-reconcile-required",
         "unavailable-reconcile-required",
     }
+
+
+def test_mount_probe_rejects_local_or_session_mount_in_production_mode(tmp_path: Path) -> None:
+    result = subprocess.run(
+        [
+            "python3", str(MOUNT_QUALIFIER), "--root", str(tmp_path),
+            "--require-network-mount",
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    payload = json.loads(result.stdout)
+    assert payload["qualified"] is False
+    assert payload["qualified_core"] is False
+    assert payload["mount"]["network_mount"] is False
+    assert not Path(payload["probe"]).exists()
 
 
 def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:

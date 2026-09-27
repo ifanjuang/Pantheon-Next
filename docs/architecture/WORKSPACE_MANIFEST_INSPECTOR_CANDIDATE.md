@@ -847,7 +847,8 @@ Linux host
 The mount qualification must exercise the mounted path itself:
 
 ```bash
-python3 deployment/ubuntu/qualify-affaires-linux-mount.py --root /path/to/mounted/AFFAIRES
+python3 deployment/ubuntu/qualify-affaires-linux-mount.py \
+  --root /path/to/mounted/AFFAIRES --require-network-mount
 ```
 
 The probe verifies:

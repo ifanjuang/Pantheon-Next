@@ -425,7 +425,8 @@ source reference. It is deliberately not hidden inside this button.
 From the Linux host that mounts AFFAIRES and runs the Workspace/Hindsight stack:
 
 ```bash
-python3 deployment/ubuntu/qualify-affaires-linux-mount.py --root /path/to/mounted/AFFAIRES
+python3 deployment/ubuntu/qualify-affaires-linux-mount.py \
+  --root /path/to/mounted/AFFAIRES --require-network-mount
 ```
 
 The probe writes and removes one temporary pair, validates hidden cartouche persistence, exact pairing, rename identity and reconcile rebuild. It also reports whether inotify events propagate through the mount; periodic reconcile remains mandatory even when they do.

@@ -24,7 +24,7 @@ pas active, et non une instruction à inventer un outil terminal dans Hermes :
 ```bash
 SKILL_ROOT="${HERMES_HOME:-$HOME/.hermes}/skills/ifja-vault-search"
 python3 "$SKILL_ROOT/scripts/list_project_files.py" \
-  /srv/pantheon/obsidian-affaires --under chemin/du/projet --extension .pdf
+  "$IFJA_AFFAIRES_ROOT" --under chemin/du/projet --extension .pdf
 ```
 
 Ne pas lancer une recherche non bornée sur tout le système. Le chemin passé à

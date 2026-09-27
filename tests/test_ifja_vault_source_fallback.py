@@ -25,16 +25,16 @@ from ifja_vault_sources import VaultSourceError, VaultSources  # noqa: E402
 def vaults(tmp_path: Path) -> tuple[VaultSources, dict[str, Path]]:
     affaires = tmp_path / "affaires"
     documentaires = tmp_path / "documentaires"
-    floquet = affaires / "_Projets" / "Floquet"
-    longueil = affaires / "_Projets" / "Longueil"
-    cerfa = floquet / "Production" / "Permis" / "cerfa_PC_FLOQUET" / "cerfa_PC_FLOQUET.md"
-    visit = longueil / "LONGUEIL VISITE 260917.md"
-    plui = longueil / "Urbanisme" / "PLUi Terroir de Caux UB1 extrait.md"
+    alpha = affaires / "Project Alpha"
+    beta = affaires / "Project Beta"
+    cerfa = alpha / "Production" / "Permis" / "cerfa_project_alpha" / "cerfa_project_alpha.md"
+    visit = beta / "PROJECT BETA VISIT.md"
+    plui = beta / "Urbanisme" / "PLUi synthetic zone extract.md"
     maf = documentaires / "MAF" / "PERMIS" / "MAF_OUTILS_PERMIS.md"
     for path in (cerfa, visit, plui, maf):
         path.parent.mkdir(parents=True, exist_ok=True)
-    cerfa.write_text("# CERFA Floquet\nSurface déclarée : exemple fictif.\n", encoding="utf-8")
-    visit.write_text("# Visite Longueil\nTerrain observé : exemple fictif.\n", encoding="utf-8")
+    cerfa.write_text("# Synthetic CERFA\nSurface déclarée : exemple fictif.\n", encoding="utf-8")
+    visit.write_text("# Synthetic visit\nTerrain observé : exemple fictif.\n", encoding="utf-8")
     plui.write_text("# Zone UB1\nRègle à vérifier sur le projet.\n", encoding="utf-8")
     maf.write_text("# Outil MAF\nConseil général, sans fait de projet.\n", encoding="utf-8")
     return VaultSources(affaires, documentaires), {
@@ -42,13 +42,13 @@ def vaults(tmp_path: Path) -> tuple[VaultSources, dict[str, Path]]:
     }
 
 
-def test_project_is_resolved_before_permit_terms_and_longueil_is_not_absent(vaults) -> None:
+def test_project_is_resolved_before_permit_terms_and_beta_is_not_absent(vaults) -> None:
     reader, files = vaults
-    found = reader.find_projects("Longueil")
+    found = reader.find_projects("Project Beta")
     assert found["items"] == [{
-        "project_ref": "_Projets/Longueil", "name": "Longueil", "match": "exact_name"
+        "project_ref": "Project Beta", "name": "Project Beta", "match": "exact_name"
     }]
-    inventory = reader.list_project_sources("_Projets/Longueil", "permis")
+    inventory = reader.list_project_sources("Project Beta", "permis")
     paths = {item["source_path"] for item in inventory["items"]}
     assert paths == {str(files["visit"]), str(files["plui"])}
     assert {item["source_path"] for item in inventory["items"][:2]} == {
@@ -58,18 +58,18 @@ def test_project_is_resolved_before_permit_terms_and_longueil_is_not_absent(vaul
     assert str(files["cerfa"]) not in paths
 
 
-def test_nested_floquet_cerfa_is_read_at_exact_lines_not_from_a_directory(vaults) -> None:
+def test_nested_alpha_cerfa_is_read_at_exact_lines_not_from_a_directory(vaults) -> None:
     reader, files = vaults
-    inventory = reader.list_project_sources("_Projets/Floquet", "permis CERFA")
+    inventory = reader.list_project_sources("Project Alpha", "permis CERFA")
     assert inventory["items"][0]["source_path"] == str(files["cerfa"])
-    hit = reader.search_markdown(str(files["cerfa"]), "surface", "_Projets/Floquet")
+    hit = reader.search_markdown(str(files["cerfa"]), "surface", "Project Alpha")
     assert hit["hits"][0]["line"] == 2
     assert hit["search_hit_is_source_inspection"] is False
-    passage = reader.read_markdown_lines(str(files["cerfa"]), 2, 1, "_Projets/Floquet")
+    passage = reader.read_markdown_lines(str(files["cerfa"]), 2, 1, "Project Alpha")
     assert passage["lines"] == [{"line": 2, "text": "Surface déclarée : exemple fictif."}]
     assert passage["source_family"] == "AFFAIRES"
     with pytest.raises(VaultSourceError, match="Markdown file"):
-        reader.read_markdown_lines(str(files["cerfa"].parent), project_ref="_Projets/Floquet")
+        reader.read_markdown_lines(str(files["cerfa"].parent), project_ref="Project Alpha")
 
 
 def test_maf_stays_documentary_and_cross_project_reads_are_rejected(vaults) -> None:
@@ -78,11 +78,11 @@ def test_maf_stays_documentary_and_cross_project_reads_are_rejected(vaults) -> N
     assert maf["source_family"] == "DOCUMENTAIRES"
     assert maf["evidence_admitted"] is False
     with pytest.raises(VaultSourceError, match="must not be presented as a project"):
-        reader.read_markdown_lines(str(files["maf"]), project_ref="_Projets/Longueil")
+        reader.read_markdown_lines(str(files["maf"]), project_ref="Project Beta")
     with pytest.raises(VaultSourceError, match="does not belong"):
-        reader.read_markdown_lines(str(files["cerfa"]), project_ref="_Projets/Longueil")
+        reader.read_markdown_lines(str(files["cerfa"]), project_ref="Project Beta")
     with pytest.raises(VaultSourceError, match="does not belong"):
-        reader.search_markdown(str(files["visit"]), "terrain", project_ref="_Projets/Floquet")
+        reader.search_markdown(str(files["visit"]), "terrain", project_ref="Project Alpha")
 
 
 def test_reader_rejects_escape_symlinks_and_unbounded_results(vaults, tmp_path: Path) -> None:
@@ -94,12 +94,17 @@ def test_reader_rejects_escape_symlinks_and_unbounded_results(vaults, tmp_path: 
     with pytest.raises(VaultSourceError, match="outside"):
         reader.read_markdown_lines(str(outside))
     with pytest.raises(VaultSourceError, match="not a directory or link"):
-        reader.read_markdown_lines(str(link), project_ref="_Projets/Longueil")
+        reader.read_markdown_lines(str(link), project_ref="Project Beta")
     with pytest.raises(VaultSourceError, match="project_ref"):
-        reader.list_project_sources("_Projets/Longueil/../Floquet")
+        reader.list_project_sources("Project Beta/../Project Alpha")
     with pytest.raises(VaultSourceError, match="between 1 and"):
         reader.read_markdown_lines(str(files["visit"]), max_lines=1000,
-                                   project_ref="_Projets/Longueil")
+                                   project_ref="Project Beta")
+
+    redirected_root = tmp_path / "redirected-affaires"
+    redirected_root.symlink_to(reader.affaires_root, target_is_directory=True)
+    with pytest.raises(VaultSourceError, match="source roots"):
+        VaultSources(redirected_root, reader.documentaires_root)
 
 
 def test_runtime_binding_is_explicitly_read_only_and_bounded() -> None:
@@ -127,7 +132,10 @@ def test_local_service_keeps_vault_acl_off_hermes_and_authenticates_http() -> No
     )
     assert "User=pantheon-docling" in installer
     assert "Group=pantheon-docling" in installer
-    assert "--apply [--enable]" in installer
+    assert "--apply --affaires-root PATH [--enable]" in installer
+    assert "--affaires-root" in installer
+    assert "AFFAIRES_ROOT" in installer
+    assert "/srv/pantheon/obsidian-affaires" not in installer
     assert "openssl rand -hex 32" in installer
     assert "ProtectSystem=strict" in installer
     assert "setfacl" not in installer
@@ -196,25 +204,25 @@ def test_stdio_mcp_opens_only_the_selected_synthetic_project(vaults) -> None:
         async with stdio_client(parameters) as (receive, send):
             async with ClientSession(receive, send) as session:
                 await session.initialize()
-                projects = await session.call_tool("find_ifja_projects", {"designation": "Longueil"})
+                projects = await session.call_tool("find_ifja_projects", {"designation": "Project Beta"})
                 found = json.loads(projects.content[0].text)
-                assert found["items"][0]["project_ref"] == "_Projets/Longueil"
+                assert found["items"][0]["project_ref"] == "Project Beta"
                 inventory = await session.call_tool("list_ifja_project_sources", {
-                    "project_ref": "_Projets/Longueil", "topic": "permis"
+                    "project_ref": "Project Beta", "topic": "permis"
                 })
                 listed = json.loads(inventory.content[0].text)
                 assert {item["source_path"] for item in listed["items"]} == {
                     str(files["visit"]), str(files["plui"])
                 }
                 crossing = await session.call_tool("read_ifja_markdown_lines", {
-                    "source_path": str(files["cerfa"]), "project_ref": "_Projets/Longueil"
+                    "source_path": str(files["cerfa"]), "project_ref": "Project Beta"
                 })
                 assert json.loads(crossing.content[0].text)["status"] == "error"
 
     asyncio.run(exercise())
 
 
-def test_authenticated_http_mcp_reads_longueil_but_not_floquet(vaults, tmp_path: Path) -> None:
+def test_authenticated_http_mcp_reads_beta_but_not_alpha(vaults, tmp_path: Path) -> None:
     pytest.importorskip("mcp")
     import httpx2 as httpx
     from mcp import ClientSession
@@ -260,7 +268,7 @@ def test_authenticated_http_mcp_reads_longueil_but_not_floquet(vaults, tmp_path:
                     async with ClientSession(receive, send) as session:
                         await session.initialize()
                         inventory = await session.call_tool("list_ifja_project_sources", {
-                            "project_ref": "_Projets/Longueil", "topic": "permis",
+                            "project_ref": "Project Beta", "topic": "permis",
                         })
                         listed = json.loads(inventory.content[0].text)
                         assert {item["source_path"] for item in listed["items"]} == {
@@ -268,7 +276,7 @@ def test_authenticated_http_mcp_reads_longueil_but_not_floquet(vaults, tmp_path:
                         }
                         crossing = await session.call_tool("read_ifja_markdown_lines", {
                             "source_path": str(files["cerfa"]),
-                            "project_ref": "_Projets/Longueil",
+                            "project_ref": "Project Beta",
                         })
                         assert json.loads(crossing.content[0].text)["status"] == "error"
 

@@ -11,6 +11,7 @@ APP_ROOT="/opt/pantheon-node/ifja-vault-read"
 UV="/opt/pantheon-node/uv/bin/uv"
 TOKEN_FILE="/srv/pantheon/docling/ifja-vault-read.token"
 UNIT_FILE="/etc/systemd/system/pantheon-ifja-vault-read.service"
+AFFAIRES_ROOT="${AFFAIRES_ROOT:-}"
 APPLY=0
 ENABLE=0
 
@@ -21,9 +22,10 @@ usage() {
   cat <<'USAGE'
 Usage:
   deployment/ubuntu/configure-ifja-vault-read-local --check
-  sudo deployment/ubuntu/configure-ifja-vault-read-local --apply [--enable]
+  sudo deployment/ubuntu/configure-ifja-vault-read-local --apply --affaires-root PATH [--enable]
 
 Stages a pinned, read-only, authenticated IFJA vault MCP service on loopback.
+PATH is the Linux-mounted NAS AFFAIRES root (or set AFFAIRES_ROOT).
 --enable is explicit. No Hermes profile or project document is changed here.
 USAGE
 }
@@ -32,6 +34,7 @@ while (($#)); do
   case "$1" in
     --check) APPLY=0 ;;
     --apply) APPLY=1 ;;
+    --affaires-root) AFFAIRES_ROOT="${2:?missing AFFAIRES root}"; shift ;;
     --enable) ENABLE=1 ;;
     -h|--help) usage; exit 0 ;;
     *) die "unknown argument: $1" ;;
@@ -48,6 +51,8 @@ if ((APPLY == 0)); then
     || log "isolated runtime absent"
   [[ -f "$TOKEN_FILE" ]] && log "bearer token present (not displayed)" \
     || log "bearer token absent"
+  [[ -n "$AFFAIRES_ROOT" ]] && log "AFFAIRES root selected" \
+    || log "AFFAIRES root not selected"
   if systemctl is-active --quiet pantheon-ifja-vault-read.service; then
     log "loopback service active"
   else
@@ -61,8 +66,13 @@ fi
 id -u pantheon-docling >/dev/null 2>&1 \
   || die "pantheon-docling service user is required; install Docling first"
 [[ -x "$UV" ]] || die "managed uv is missing: $UV"
-[[ -d /srv/pantheon/obsidian-affaires/_Projets ]] \
-  || die "AFFAIRES project mirror is missing"
+[[ -n "$AFFAIRES_ROOT" && "$AFFAIRES_ROOT" = /* ]] \
+  || die "set --affaires-root to an absolute Linux-mounted NAS path"
+[[ -d "$AFFAIRES_ROOT" ]] || die "AFFAIRES mount is missing"
+runuser -u pantheon-docling -- test -r "$AFFAIRES_ROOT" \
+  || die "pantheon-docling cannot read AFFAIRES mount"
+runuser -u pantheon-docling -- test -x "$AFFAIRES_ROOT" \
+  || die "pantheon-docling cannot traverse AFFAIRES mount"
 [[ -d /srv/pantheon/obsidian-documentaires ]] \
   || die "DOCUMENTAIRES mirror is missing"
 
@@ -103,7 +113,7 @@ Type=simple
 User=pantheon-docling
 Group=pantheon-docling
 WorkingDirectory=$APP_ROOT
-Environment=IFJA_AFFAIRES_ROOT=/srv/pantheon/obsidian-affaires
+Environment=IFJA_AFFAIRES_ROOT=$AFFAIRES_ROOT
 Environment=IFJA_DOCUMENTAIRES_ROOT=/srv/pantheon/obsidian-documentaires
 Environment=IFJA_VAULT_TOKEN_FILE=$TOKEN_FILE
 ExecStart=$APP_ROOT/.venv/bin/python $APP_ROOT/ifja_vault_mcp.py --http
@@ -113,7 +123,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectHome=true
 ProtectSystem=strict
-ReadOnlyPaths=/srv/pantheon/obsidian-affaires /srv/pantheon/obsidian-documentaires $TOKEN_FILE
+ReadOnlyPaths=$AFFAIRES_ROOT /srv/pantheon/obsidian-documentaires $TOKEN_FILE
 
 [Install]
 WantedBy=multi-user.target
