@@ -17,6 +17,8 @@ def test_docling_route_uses_conversion_source_and_shared_workspace_paths() -> No
     assert "source_not_visible_to_docling" in text
     assert "/home/hermeswebui/.hermes/webui/attachments" in text
     assert "Do not silently copy a" in text
+    assert "call `get_document`" in text
+    assert "Do not repeat" in text and "list the bank again" in text
 
 
 def test_pdf_reference_and_organization_binding_match_docling_route() -> None:

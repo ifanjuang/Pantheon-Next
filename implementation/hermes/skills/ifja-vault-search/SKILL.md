@@ -81,6 +81,10 @@ change the answer, permitted action or consequence.
    report the candidate set and the missing type instead.
 3. Open the exact project page or requested document before returning a material
    identifier, date, status or contractual fact.
+   When a recall result already contains an exact document ID or an exact
+   Workspace path whose family matches the request, call `get_document` (or open
+   that path through the admitted local binding) immediately. Do not repeat
+   Mnemosyne, run Tool Search/Describe, or list the bank again before this open.
 
 ### Latest document / revision resolution
 

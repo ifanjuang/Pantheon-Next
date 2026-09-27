@@ -93,6 +93,13 @@ conversation continuity != governed persistence
 For a context-only question about an affaire or project (for example “what do
 we know about this project?”), use this bounded sequence:
 
+**Exact-hit stop condition (mandatory):** if any Mnemosyne or Hindsight result
+already contains a matching document ID, vault path, or filename, stop discovery
+and open that exact source next with `get_document` (or the admitted local-file
+binding). Do not repeat Mnemosyne, invoke `Tool Search`/`Tool Describe`, or call
+`list_documents` before opening it. A conclusion such as “the document was
+found” must therefore be followed by the exact-document read, not a new search.
+
 ```text
 1. Hindsight Memory — one fast Mnemosyne lead
 2. Hindsight AFFAIRES — confirm dossier-specific facts and identity with one
@@ -158,6 +165,9 @@ as separate candidates; a shared project name does not establish document type.
 Prefer an exact document-family match over a generic project-name match and
 retain the candidate set when no exact match exists. Never call a permit,
 estimate or plan a CCTP solely because it contains the same project label.
+If a recall already returns an exact matching document ID or Workspace path,
+open it immediately; do not repeat memory recall, introspection or inventory
+listing before that source open.
 If an exact Workspace/vault path or filename is already known but Hindsight has
 no exact candidate, classify the result as an indexing gap and open that source
 through the admitted local binding (Docling when extraction is required) rather
