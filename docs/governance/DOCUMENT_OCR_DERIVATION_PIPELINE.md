@@ -197,7 +197,7 @@ Current split after #1131/#660:
 exact PDF / office source = preserved professional source on NAS / AFFAIRES
 Hindsight native file retain = selected for eligible AFFAIRES sources through the bounded Workspace producer
 automatic OCR = disabled on the productive AFFAIRES route
-OCR-AI / L3-N0X/obsidian-marker = optional/manual human-facing PDF-to-Markdown convenience surface
+OCR-AI / L3-N0X/obsidian-marker = selected optional/manual workspace PDF-to-Markdown convenience surface
 Docling = preferred document_structural_analysis candidate under #662
 SourceDown = historical prior workspace choice, not the current selected daily conversion surface
 ```
