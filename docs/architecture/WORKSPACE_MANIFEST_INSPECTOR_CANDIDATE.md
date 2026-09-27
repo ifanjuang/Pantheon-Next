@@ -10,6 +10,8 @@ Current decision baseline:
 - #1133 added the dedicated reconciliation-profile deployment seam;
 - #1135 qualified the concrete Linux NAS mount and kept the bounded IFJA reader separate.
 
+#1134 remains open to repair the existing reconciliation-profile qualification helper. It changes neither ownership, routing nor authority: configured still does not mean activated, and a reconciliation candidate is not Evidence.
+
 This list records the decisions that define the current target; it is intentionally not a frozen `main` SHA. Always verify the current branch, open PRs and qualification issues before changing the topology.
 
 This document remains the architecture owner for the Workspace Cockpit filesystem projection. It supersedes the earlier productive target based on Obsidian + Self-hosted LiveSync + CouchDB + Ubuntu-local vault mirrors.
