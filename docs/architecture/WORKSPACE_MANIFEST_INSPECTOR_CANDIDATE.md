@@ -4,9 +4,13 @@ Status: selected target architecture; implementation remains bounded by #660 and
 
 Current decision baseline:
 
-```text
-Pantheon-Next/main = eeca9fd1f7b34f0b71307c01d5b57489ac24f570
-```
+- #1129 selected the direct NAS-mounted AFFAIRES topology;
+- #1131 added the bounded Hindsight source producer and explicit revision-chronology handling;
+- #1132 added transient, read-only memory reconciliation;
+- #1133 added the dedicated reconciliation-profile deployment seam;
+- #1135 qualified the concrete Linux NAS mount and kept the bounded IFJA reader separate.
+
+This list records the decisions that define the current target; it is intentionally not a frozen `main` SHA. Always verify the current branch, open PRs and qualification issues before changing the topology.
 
 This document remains the architecture owner for the Workspace Cockpit filesystem projection. It supersedes the earlier productive target based on Obsidian + Self-hosted LiveSync + CouchDB + Ubuntu-local vault mirrors.
 
