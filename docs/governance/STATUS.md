@@ -56,7 +56,7 @@ Hermes Web/dashboard     -> selected chat / sessions / runtime interaction basel
 Pantheon Cockpit         -> governed projections / Cards / navigation / decisions / status
 NAS / AFFAIRES           -> selected productive professional source tree
 Workspace daemon         -> reconstructible index + bounded Hindsight producer
-Obsidian/LiveSync/CouchDB-> historical qualification / optional tools, not productive AFFAIRES topology
+Obsidian/LiveSync/CouchDB -> historical qualification / optional tools, not productive AFFAIRES topology
 Hindsight                -> optional derived memory / retrieval
 professional sources     -> Source / Document identity and provenance owners
 ```
@@ -77,7 +77,7 @@ implementation/             = executable candidate / co-located / not adopted
 Pantheon Cockpit            = executable candidate / tested / not adopted
 Workspace AFFAIRES route    = executable candidate / direct NAS mount selected / not adopted
 Hindsight source producer   = executable candidate / bounded / #659 qualification open
-Hermes reconciliation path  = executable candidate / transient / no governed write
+Hermes reconciliation path  = implemented candidate / transient / profile qualification repair open (#1134)
 Hermes Agent                = external execution runtime
 Hermes Web/dashboard        = selected interaction baseline
 OpenWebUI                   = refused / no target role
