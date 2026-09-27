@@ -1,6 +1,6 @@
-# Obsidian / Hindsight Reference Implementation
+# Obsidian / Hindsight Historical Reference Implementation
 
-Status: qualified recommended reference implementation profile — not a Pantheon architecture owner, dependency or mandatory binding.
+Status: historically qualified optional reference — not the selected productive AFFAIRES topology and not a Pantheon architecture owner, dependency or mandatory binding.
 
 Authority note: generic memory selection remains owned by `HERMES_CAPABILITY_BINDINGS.md` and the machine-checkable `catalog/bindings/external-runtime-memory-unbound.yaml`. Generic source, Knowledge, Evidence and Project identities remain owned by their existing Pantheon contracts.
 
@@ -8,7 +8,7 @@ Qualification record: Pantheon-Next #655, #659, #660, #714 and merged qualificat
 
 ## Purpose
 
-Record the currently best-demonstrated external workspace / synchronization / retrieval composition without turning those products into Pantheon prerequisites.
+Preserve the demonstrated Obsidian / synchronization / retrieval composition as historical capability evidence without turning those products into Pantheon prerequisites or the current AFFAIRES target.
 
 ```text
 Obsidian / Markdown
@@ -19,7 +19,7 @@ Obsidian / Markdown
 -> bounded Hermes consumers
 ```
 
-This composition is the current external recommendation because it has real qualification evidence and working regression coverage. It is not the only valid composition.
+This composition has real qualification evidence and working regression coverage. The selected professional AFFAIRES route now uses the direct NAS-mounted Workspace topology owned by `docs/architecture/WORKSPACE_MANIFEST_INSPECTOR_CANDIDATE.md`; #660 and #659 track its remaining operational qualification.
 
 A user may instead use Hermes-native context/files/memory only, another note workspace, another synchronization mechanism, another retrieval engine or another memory provider when the same boundaries are preserved.
 
@@ -183,7 +183,7 @@ source Markdown
 
 The Q5 qualification specifically demonstrated that Hermes file writes did not appear in Hindsight until the designated `hindsight-obsidian-sync` reconcile step ran.
 
-That separation is part of why this composition is recommended: it keeps the workspace source and the derived retrieval/memory index legible. Pantheon does not require this exact producer implementation; a replacement stack must avoid ambiguous concurrent authorities.
+That separation remains useful qualification evidence because it keeps the workspace source and the derived retrieval/memory index legible. The productive AFFAIRES route now preserves the same authority distinction through one direct-NAS Workspace producer instead of this LiveSync path. A replacement stack must avoid ambiguous concurrent authorities.
 
 ## Hermes-native alternative
 
@@ -200,7 +200,7 @@ session history/search
 
 Those facilities remain Hermes runtime state/context. They do not become Pantheon Evidence or governed Knowledge automatically.
 
-Choosing the native path does not invalidate or deprecate the qualified Obsidian/Hindsight stack; it simply avoids extra components when their capabilities are not needed.
+Choosing another path does not erase the historical qualification evidence of this Obsidian/Hindsight stack. For professional AFFAIRES, however, the direct NAS route has superseded it as the selected productive topology.
 
 ## Optional Hermes Obsidian skill and second-brain behavior
 
@@ -388,12 +388,12 @@ Do not reproduce Obsidian/Hindsight-specific bank, tag or folder conventions in 
 ## Final classification
 
 ```text
-Obsidian                 = qualified/recommended optional workspace
-Self-hosted LiveSync     = qualified/recommended optional synchronization path when multi-client sync is needed
-CouchDB                  = synchronization state in that qualified reference
-filesystem mirror        = qualified materialized representation
-hindsight-obsidian-sync  = qualified designated ingestion producer
-Hindsight                = qualified/recommended optional retrieval/memory provider
+Obsidian                 = historically qualified optional workspace; not selected AFFAIRES route
+Self-hosted LiveSync     = historically qualified optional synchronization path
+CouchDB                  = synchronization state in that historical reference
+filesystem mirror        = historical qualified materialization pattern; not selected AFFAIRES route
+hindsight-obsidian-sync  = historical designated producer for this reference only
+Hindsight                = selected derived retrieval/memory candidate; live AFFAIRES qualification remains open
 Hermes native facilities = valid zero-extra-provider alternative
 Hermes Obsidian skill    = optional runtime workspace capability
 second-brain behavior    = optional knowledge-maintenance profile, subordinate to workspace governance
@@ -401,4 +401,4 @@ Word-Smith               = optional Obsidian authoring / document-assembly UX
 Pantheon                 = provider-agnostic governance boundary
 ```
 
-This file preserves what has been demonstrated and currently works. It recommends that composition when an external workspace/retrieval stack is desired, without defining it as the Pantheon stack.
+This file preserves what has been demonstrated by the earlier composition. It remains useful as optional capability evidence and replacement criteria, while the direct NAS AFFAIRES topology is the selected productive target.
