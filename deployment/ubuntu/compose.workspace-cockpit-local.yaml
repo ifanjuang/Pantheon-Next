@@ -8,6 +8,19 @@ services:
     image: pantheon/workspace-cockpit:local
     container_name: pantheon-workspace-cockpit
     restart: unless-stopped
+    network_mode: host
+    ports: !reset []
+    extra_hosts: !reset []
+    command:
+      - --host
+      - ${WORKSPACE_COCKPIT_BIND:-127.0.0.1}
+      - --port
+      - ${WORKSPACE_COCKPIT_PORT:-8189}
+      - --max-depth
+      - "8"
+      - --no-watch
+      - --root
+      - Kroqi=/workspace/affaires
     read_only: true
     cap_drop:
       - ALL
@@ -17,19 +30,22 @@ services:
       - no-new-privileges:true
     tmpfs:
       - /tmp:size=16m,mode=1777
-    ports:
-      - "${WORKSPACE_COCKPIT_BIND:-127.0.0.1}:${WORKSPACE_COCKPIT_PORT:-8189}:8189"
     environment:
-      WORKSPACE_ROLE_TRACE_URL: http://role-trace:8190
+      WORKSPACE_COCKPIT_BIND: ${WORKSPACE_COCKPIT_BIND:-127.0.0.1}
+      WORKSPACE_COCKPIT_PORT: ${WORKSPACE_COCKPIT_PORT:-8189}
+      WORKSPACE_ROLE_TRACE_URL: http://127.0.0.1:${ROLE_TRACE_ATTACH_PORT:-8190}
       WORKSPACE_ROLE_TRACE_KEY: ${ROLE_TRACE_READ_KEY:?set ROLE_TRACE_READ_KEY outside the repository}
       WORKSPACE_INDEX_DB: /state/index.sqlite3
-      WORKSPACE_RECONCILE_SECONDS: ${WORKSPACE_RECONCILE_SECONDS:-60}
+      WORKSPACE_RECONCILE_SECONDS: ${WORKSPACE_RECONCILE_SECONDS:-3600}
       WORKSPACE_WATCH_DEBOUNCE_MS: ${WORKSPACE_WATCH_DEBOUNCE_MS:-500}
-      WORKSPACE_HINDSIGHT_URL: ${WORKSPACE_HINDSIGHT_URL:-}
-      WORKSPACE_HINDSIGHT_BANK_ID: ${WORKSPACE_HINDSIGHT_BANK_ID:-}
+      WORKSPACE_EXCLUDED_FOLDERS: ${WORKSPACE_EXCLUDED_FOLDERS:-Archive,Archives,RATP,IFJA_RATP}
+      WORKSPACE_HINDSIGHT_URL: ${WORKSPACE_HINDSIGHT_URL:-http://127.0.0.1:8888}
+      WORKSPACE_HINDSIGHT_BANK_ID: ${WORKSPACE_HINDSIGHT_BANK_ID:-IFJA_KROQI}
       WORKSPACE_HINDSIGHT_PARSER: ${WORKSPACE_HINDSIGHT_PARSER:-markitdown}
-      WORKSPACE_HINDSIGHT_MAX_SUBMITS_PER_RECONCILE: ${WORKSPACE_HINDSIGHT_MAX_SUBMITS_PER_RECONCILE:-4}
+      WORKSPACE_HINDSIGHT_MAX_SUBMITS_PER_RECONCILE: ${WORKSPACE_HINDSIGHT_MAX_SUBMITS_PER_RECONCILE:-100}
       WORKSPACE_HINDSIGHT_MAX_FILE_MB: ${WORKSPACE_HINDSIGHT_MAX_FILE_MB:-100}
+      WORKSPACE_HINDSIGHT_SETTLE_OBSERVATIONS: ${WORKSPACE_HINDSIGHT_SETTLE_OBSERVATIONS:-2}
+      WORKSPACE_HINDSIGHT_SOURCE_KIND: ${WORKSPACE_HINDSIGHT_SOURCE_KIND:-kroqi-sync}
       WORKSPACE_HINDSIGHT_AUTHORIZATION: ${WORKSPACE_HINDSIGHT_AUTHORIZATION:-}
       WORKSPACE_RECONCILE_HERMES_URL: ${WORKSPACE_RECONCILE_HERMES_URL:-}
       WORKSPACE_RECONCILE_HERMES_KEY: ${WORKSPACE_RECONCILE_HERMES_KEY:-}
@@ -44,10 +60,11 @@ services:
       - workspace-cockpit-state:/state
     healthcheck:
       test:
-        - CMD
-        - /opt/hermes/.venv/bin/python
-        - -c
-        - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8189/api/health', timeout=2)
+        - CMD-SHELL
+        - >-
+          /opt/hermes/.venv/bin/python -c "import os,urllib.request;
+          urllib.request.urlopen('http://' + os.environ.get('WORKSPACE_COCKPIT_BIND','127.0.0.1')
+          + ':' + os.environ.get('WORKSPACE_COCKPIT_PORT','8189') + '/api/health', timeout=2)"
       interval: 15s
       timeout: 3s
       retries: 5

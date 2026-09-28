@@ -406,21 +406,37 @@ class MemoryReconciliationService:
         matches: list[dict[str, Any]] = []
         for workspace in snapshot.get("workspaces") or []:
             for card in workspace.get("cards") or []:
+                declared_id = card.get("document_id") if isinstance(card, dict) else None
+                technical_id = (
+                    card.get("technical_document_id") if isinstance(card, dict) else None
+                )
                 if (
                     isinstance(card, dict)
                     and card.get("kind") == "document"
-                    and card.get("document_id") == document_id
+                    and document_id in {declared_id, technical_id}
                 ):
                     matches.append(card)
         if len(matches) != 1:
             raise ReconciliationError(
                 "Document must resolve to exactly one Workspace card before reconciliation"
             )
-        card = matches[0]
-        if card.get("status") != "COMPLETE":
-            raise ReconciliationError("Only a COMPLETE document can be reconciled")
+        card = dict(matches[0])
+        declared_complete = card.get("status") == "COMPLETE"
+        retained_technical_source = (
+            card.get("document_id") is None
+            and card.get("technical_document_id") == document_id
+            and card.get("hindsight_eligible") is True
+            and card.get("hindsight_status") == "COMPLETED"
+        )
+        if not declared_complete and not retained_technical_source:
+            raise ReconciliationError(
+                "Only a COMPLETE document or a completed eligible technical source can be reconciled"
+            )
         if card.get("hindsight_representation_candidate") != "source":
             raise ReconciliationError("This document has no qualified source-only Hindsight representation")
+        # Downstream packet construction uses one resolved identity regardless of
+        # whether it came from a cartouche or from the producer's stable identity table.
+        card["document_id"] = document_id
         return card
 
     def _packet(

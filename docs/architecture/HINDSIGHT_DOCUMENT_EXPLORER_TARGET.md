@@ -143,8 +143,12 @@ NAS present + Hindsight error
 = ingestion failure to inspect
 
 NAS absent + Hindsight retained state
-= stale derived state; no automatic remote deletion
+= first observation quarantines derived state from active recall
+= second observation deletes the exact derived Hindsight document
 ```
+
+This lifecycle runs only while the source workspace is available and includes a
+mass-disappearance circuit breaker. It never deletes the NAS source.
 
 Cockpit may expose an **Open file** action. The browser must never supply an arbitrary
 filesystem path that is trusted directly. The server resolves only a source that already

@@ -12,6 +12,9 @@ services:
 
   hindsight:
     network_mode: host
+    # pg0/PostgreSQL vector-index creation may request about 512 MiB of POSIX
+    # shared memory. Docker's 64 MiB default makes new banks fail with ENOSPC.
+    shm_size: 1gb
     stop_grace_period: 40s
     ports: !reset []
     extra_hosts: !reset []
@@ -32,6 +35,11 @@ services:
         contains conflicting chronology markers, retain the conflicting statements with
         their context instead of choosing one. Never infer document chronology from the
         filename, upload time, filesystem mtime, metadata, or ingestion time.
+        When a source explicitly cites, responds to, supplements, supersedes, replaces,
+        or annuls another document, retain the relationship as a separate fact with the
+        exact cited title, identifier, date, and page or section when stated. Keep the
+        source document date distinct from dates stated for cited documents. If the target
+        cannot be resolved exactly, preserve an unresolved reference instead of guessing.
       HINDSIGHT_API_FILE_PARSER: markitdown
       HINDSIGHT_API_FILE_DELETE_AFTER_RETAIN: "true"
       HINDSIGHT_API_FILE_PARSER_MARKITDOWN_OCR_ENABLED: "false"
