@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only Cockpit projection for AFFAIRES source + Markdown cartouche bundles."""
+"""Optional Hindsight/NAS explorer over one AFFAIRES producer projection."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ import time
 import unicodedata
 from typing import Any, Callable, Iterable
 from urllib.error import HTTPError, URLError
-from urllib.parse import unquote, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 from urllib.request import Request, urlopen
 
 import yaml
@@ -45,7 +45,7 @@ from memory_reconciliation import (
 
 APP_ROOT = _MODULE_ROOT
 STATIC_ROOT = APP_ROOT / "static"
-PROJECTION_ID = "affaires_source_cartouche_v3"
+PROJECTION_ID = "affaires_hindsight_explorer_v4"
 CARTOUCHE_SCHEMA = "pantheon/cartouche/v1"
 FOLDER_CONTEXT_SCHEMA = "pantheon/folder-context/v1"
 MARKDOWN_EXTENSIONS = {".md", ".markdown"}
@@ -55,7 +55,7 @@ HEAVY_VISIBLE_EXTENSIONS = {".rvt", ".rfa", ".rte", ".psd", ".psb"}
 TEMP_SUFFIXES = {".bak", ".lock", ".lck", ".swp", ".tmp", ".temp", ".autosave"}
 MAX_CARTOUCHE_BYTES = 512 * 1024
 MAX_ITEMS = 10_000
-STATUS_NAMES = ("COMPLETE", "CHECK", "CARTOUCHE_MISSING", "SOURCE_MISSING", "FOLDER")
+STATUS_NAMES = ("COMPLETE", "SOURCE_ONLY", "CHECK", "SOURCE_MISSING", "FOLDER")
 REVISION_MODES = {"supersedes", "supplements"}
 SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 
@@ -416,15 +416,15 @@ def _document_card(workspace: str, root: Path, source: Path, cartouche: Path | N
             "parent_path": source.parent.relative_to(root).as_posix() if source.parent != root else "",
             "name": source.name,
             "title": source.name,
-            "subtitle": "Cartouche manquant",
+            "subtitle": "Source sans enrichissement",
             "summary": "",
-            "status": "CARTOUCHE_MISSING",
+            "status": "SOURCE_ONLY",
             "document_id": None,
             "source": source.name,
             "source_present": True,
             "cartouche": None,
             "cartouche_present": False,
-            "can_generate_cartouche": True,
+            "can_generate_cartouche": False,
             "project": None,
             "phase": None,
             "document_type": None,
@@ -443,8 +443,10 @@ def _document_card(workspace: str, root: Path, source: Path, cartouche: Path | N
             "source_integrity": "UNDECLARED",
             "declared_source_size": None,
             "hindsight_format_supported": extension in HINDSIGHT_ELIGIBLE_EXTENSIONS,
-            "hindsight_eligible": False,
-            "hindsight_representation_candidate": None,
+            "hindsight_eligible": extension in HINDSIGHT_ELIGIBLE_EXTENSIONS,
+            "hindsight_representation_candidate": (
+                "source" if extension in HINDSIGHT_ELIGIBLE_EXTENSIONS else None
+            ),
             "heavy_binary": extension in HEAVY_VISIBLE_EXTENSIONS,
             "modified_at": _mtime_iso(source),
             "warnings": [],
@@ -1351,8 +1353,75 @@ class CockpitHandler(BaseHTTPRequestHandler):
             return
         self._json(result, HTTPStatus.OK)
 
+    def _resolve_indexed_source(self, workspace_name: str, relative_path: str) -> Path | None:
+        snapshot = (
+            self.workspace_index.snapshot()
+            if self.workspace_index is not None
+            else scan_workspaces(self.roots, self.max_depth)
+        )
+        matched = any(
+            card.get("kind") == "document"
+            and card.get("source_present") is True
+            and card.get("path") == relative_path
+            for workspace in snapshot.get("workspaces") or []
+            if workspace.get("name") == workspace_name
+            for card in workspace.get("cards") or []
+        )
+        if not matched:
+            return None
+        root = dict(self.roots).get(workspace_name)
+        if root is None:
+            return None
+        try:
+            root_resolved = root.resolve(strict=True)
+            candidate = (root / relative_path).resolve(strict=True)
+            candidate.relative_to(root_resolved)
+            if not candidate.is_file() or candidate.is_symlink():
+                return None
+        except (OSError, RuntimeError, ValueError):
+            return None
+        return candidate
+
+    def _serve_indexed_source(self, workspace_name: str, relative_path: str) -> None:
+        source = self._resolve_indexed_source(workspace_name, relative_path)
+        if source is None:
+            self._json({"error": "source_not_available"}, HTTPStatus.NOT_FOUND)
+            return
+        try:
+            size = source.stat().st_size
+            handle = source.open("rb")
+        except OSError:
+            self._json({"error": "source_unavailable"}, HTTPStatus.NOT_FOUND)
+            return
+        filename = source.name.replace('"', "_").replace("\r", "_").replace("\n", "_")
+        content_type = mimetypes.guess_type(source.name)[0] or "application/octet-stream"
+        self.send_response(HTTPStatus.OK)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(size))
+        self.send_header("Content-Disposition", f'inline; filename="{filename}"')
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Referrer-Policy", "no-referrer")
+        self.end_headers()
+        with handle:
+            while True:
+                chunk = handle.read(1024 * 1024)
+                if not chunk:
+                    break
+                self.wfile.write(chunk)
+
     def do_GET(self) -> None:  # noqa: N802 - stdlib handler API
-        path = urlparse(self.path).path
+        parsed = urlparse(self.path)
+        path = parsed.path
+        if path == "/api/source":
+            query = parse_qs(parsed.query, keep_blank_values=False)
+            workspace_name = (query.get("workspace") or [""])[0]
+            relative_path = (query.get("path") or [""])[0]
+            if not workspace_name or not relative_path:
+                self._json({"error": "workspace_and_path_required"}, HTTPStatus.BAD_REQUEST)
+                return
+            self._serve_indexed_source(workspace_name, relative_path)
+            return
         if path == "/api/health":
             index_state = self.workspace_index.health() if self.workspace_index else {"mode": "direct-scan"}
             self._json(
