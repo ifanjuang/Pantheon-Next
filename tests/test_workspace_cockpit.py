@@ -62,7 +62,7 @@ CCTP du lot structure pour la consultation DCE.
     document = next(card for card in cards if card["kind"] == "document")
     folder = next(card for card in cards if card["kind"] == "folder")
 
-    assert result["projection"] == "affaires_source_cartouche_v3"
+    assert result["projection"] == "affaires_hindsight_explorer_v4"
     assert document["status"] == "COMPLETE"
     assert document["document_id"] == "doc-cctp-c"
     assert document["source"] == "CCTP_IND_C.pdf"
@@ -130,7 +130,7 @@ def test_plain_markdown_with_matching_stem_is_never_treated_as_pdf_cartouche(tmp
     )
 
     assert [card["name"] for card in documents] == ["CCTP.md", "CCTP.pdf"]
-    assert all(card["status"] == "CARTOUCHE_MISSING" for card in documents)
+    assert all(card["status"] == "SOURCE_ONLY" for card in documents)
     assert all(card["cartouche_present"] is False for card in documents)
 
 
@@ -259,13 +259,13 @@ def test_source_without_cartouche_is_visible_with_generate_affordance(tmp_path: 
 
     assert card["kind"] == "document"
     assert card["name"] == "Notice.pdf"
-    assert card["status"] == "CARTOUCHE_MISSING"
+    assert card["status"] == "SOURCE_ONLY"
     assert card["source_present"] is True
     assert card["cartouche_present"] is False
-    assert card["can_generate_cartouche"] is True
+    assert card["can_generate_cartouche"] is False
     assert card["hindsight_format_supported"] is True
-    assert card["hindsight_eligible"] is False
-    assert card["hindsight_representation_candidate"] is None
+    assert card["hindsight_eligible"] is True
+    assert card["hindsight_representation_candidate"] == "source"
 
 
 def test_cartouche_without_source_is_explicitly_missing(tmp_path: Path) -> None:
@@ -367,7 +367,7 @@ def test_workspace_index_persists_reconstructible_snapshot_and_detects_changes(t
     assert state.is_file()
     first_doc = next(card for card in first["workspaces"][0]["cards"] if card["kind"] == "document")
     first_folder = next(card for card in first["workspaces"][0]["cards"] if card["kind"] == "folder")
-    assert first_doc["status"] == "CARTOUCHE_MISSING"
+    assert first_doc["status"] == "SOURCE_ONLY"
     assert first_folder["folder_context_present"] is False
     assert first["index_state"]["last_reconcile_reason"] == "test-initial"
 
@@ -428,7 +428,7 @@ def test_workspace_index_dirty_signal_reconciles_without_ui_scan(tmp_path: Path)
         snapshot = index.snapshot()
         assert snapshot["item_count"] == 1
         assert snapshot["index_state"]["last_reconcile_reason"] == "watch"
-        assert snapshot["workspaces"][0]["cards"][0]["status"] == "CARTOUCHE_MISSING"
+        assert snapshot["workspaces"][0]["cards"][0]["status"] == "SOURCE_ONLY"
     finally:
         index.stop()
 
@@ -549,7 +549,7 @@ def test_heavy_sources_stay_visible_and_temp_backups_are_ignored(tmp_path: Path)
     documents = [card for card in _cards(result) if card["kind"] == "document"]
 
     assert {card["name"] for card in documents} == {"Maquette.rvt", "Perspective.psd"}
-    assert all(card["status"] == "CARTOUCHE_MISSING" for card in documents)
+    assert all(card["status"] == "SOURCE_ONLY" for card in documents)
     assert all(card["heavy_binary"] is True for card in documents)
     assert all(card["hindsight_eligible"] is False for card in documents)
 
@@ -779,7 +779,7 @@ def test_check_mode_returns_affaires_projection_without_database(tmp_path: Path)
     assert result.returncode == 0
     payload = json.loads(result.stdout)
     assert payload["read_only"] is True
-    assert payload["projection"] == "affaires_source_cartouche_v3"
+    assert payload["projection"] == "affaires_hindsight_explorer_v4"
     assert payload["totals"]["FOLDER"] == 1
     assert payload["item_count"] == 1
 
@@ -929,16 +929,17 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     graph_css = (ROOT / "implementation" / "workspace_cockpit" / "static" / "role_trace_graph.css").read_text(encoding="utf-8")
 
     assert "AFFAIRES" in html
-    assert "CARTOUCHE_MISSING" in javascript
+    assert "SOURCE_ONLY" in javascript
     assert "SOURCE_MISSING" in javascript
     assert "Remplace" in javascript
     assert "Complète" in javascript
-    assert "Générer le cartouche" in javascript
+    assert "Ouvrir le fichier" in javascript
+    assert "/api/source?workspace=" in javascript
     assert "Réconcilier avec Hermes" in javascript
     assert "X-Pantheon-Intent" in javascript
     assert "/reconcile-memory" in javascript
     assert "source NAS non ouverte" in javascript
-    assert "Action visible, écriture non activée" in javascript
+    assert "Ouverture depuis le chemin NAS validé par le producer." in javascript
     assert "Cartouche dossier" in javascript
     assert "Sans _folder.md" in javascript
     assert 'href="role_trace_graph.css"' in html

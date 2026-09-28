@@ -30,6 +30,7 @@ import uuid
 ACTIVE_STATUSES = {"SUBMITTED", "PENDING", "PROCESSING"}
 TERMINAL_STATUSES = {"COMPLETED", "FAILED", "CANCELLED"}
 SYNC_TABLE = "hindsight_sync"
+IDENTITY_TABLE = "workspace_document_identity"
 TAG_SAFE_RE = re.compile(r"[^a-z0-9._-]+")
 
 
@@ -306,6 +307,17 @@ class HindsightProducer:
                 )
                 """
             )
+            connection.execute(
+                f"""
+                CREATE TABLE IF NOT EXISTS {IDENTITY_TABLE} (
+                    document_id TEXT PRIMARY KEY,
+                    workspace TEXT NOT NULL,
+                    source_path TEXT NOT NULL,
+                    source_sha256 TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                )
+                """
+            )
             connection.commit()
         finally:
             connection.close()
@@ -317,6 +329,96 @@ class HindsightProducer:
             return {row["hindsight_document_id"]: dict(row) for row in rows}
         finally:
             connection.close()
+
+    def _identity_rows(self) -> list[dict[str, Any]]:
+        connection = self._connect()
+        try:
+            rows = connection.execute(f"SELECT * FROM {IDENTITY_TABLE}").fetchall()
+            return [dict(row) for row in rows]
+        finally:
+            connection.close()
+
+    def _save_identity(
+        self,
+        *,
+        document_id: str,
+        workspace: str,
+        source_path: str,
+        source_sha256: str,
+    ) -> None:
+        connection = self._connect()
+        try:
+            with connection:
+                connection.execute(
+                    f"""
+                    INSERT INTO {IDENTITY_TABLE}(
+                        document_id, workspace, source_path, source_sha256, updated_at
+                    ) VALUES (?, ?, ?, ?, ?)
+                    ON CONFLICT(document_id) DO UPDATE SET
+                        workspace=excluded.workspace,
+                        source_path=excluded.source_path,
+                        source_sha256=excluded.source_sha256,
+                        updated_at=excluded.updated_at
+                    """,
+                    (document_id, workspace, source_path, source_sha256, _utc_now()),
+                )
+        finally:
+            connection.close()
+
+    def _resolve_document_id(
+        self,
+        *,
+        workspace: str,
+        relative_path: str,
+        source_sha256: str,
+        declared_document_id: str | None,
+        current_paths: set[tuple[str, str]],
+        claimed_auto_ids: set[str],
+    ) -> tuple[str, str]:
+        if declared_document_id:
+            return declared_document_id, "declared"
+
+        rows = self._identity_rows()
+        exact = next(
+            (
+                row
+                for row in rows
+                if row["workspace"] == workspace and row["source_path"] == relative_path
+            ),
+            None,
+        )
+        if exact is not None:
+            document_id = str(exact["document_id"])
+            claimed_auto_ids.add(document_id)
+            self._save_identity(
+                document_id=document_id,
+                workspace=workspace,
+                source_path=relative_path,
+                source_sha256=source_sha256,
+            )
+            return document_id, "technical"
+
+        move_candidates = [
+            row
+            for row in rows
+            if row["workspace"] == workspace
+            and row["source_sha256"] == source_sha256
+            and (workspace, row["source_path"]) not in current_paths
+            and row["document_id"] not in claimed_auto_ids
+        ]
+        document_id = (
+            str(move_candidates[0]["document_id"])
+            if len(move_candidates) == 1
+            else f"doc_auto_{uuid.uuid4().hex}"
+        )
+        claimed_auto_ids.add(document_id)
+        self._save_identity(
+            document_id=document_id,
+            workspace=workspace,
+            source_path=relative_path,
+            source_sha256=source_sha256,
+        )
+        return document_id, "technical"
 
     def _save(
         self,
@@ -368,23 +470,27 @@ class HindsightProducer:
         finally:
             connection.close()
 
-    def _candidate(self, card: dict[str, Any]) -> ProducerCandidate | None:
+    def _candidate(
+        self,
+        card: dict[str, Any],
+        *,
+        current_paths: set[tuple[str, str]],
+        claimed_auto_ids: set[str],
+    ) -> ProducerCandidate | None:
         if card.get("kind") != "document":
             return None
-        if card.get("status") != "COMPLETE":
+        if card.get("status") not in {"COMPLETE", "SOURCE_ONLY"}:
             return None
         if card.get("hindsight_eligible") is not True:
             return None
-        # Slice A is intentionally source-only. EML/cartouche-derived candidates remain deferred.
+        # The productive route is source-only. A cartouche can enrich context but is
+        # no longer an admission gate for an otherwise supported source.
         if card.get("hindsight_representation_candidate") != "source":
             return None
 
         workspace = card.get("workspace")
-        document_id = card.get("document_id")
         relative_path = card.get("path")
         if not isinstance(workspace, str) or workspace not in self.roots:
-            return None
-        if not isinstance(document_id, str) or not document_id.strip():
             return None
         if not isinstance(relative_path, str) or not relative_path:
             return None
@@ -406,8 +512,27 @@ class HindsightProducer:
         else:
             source_sha256 = _sha256(source)
 
+        raw_document_id = card.get("document_id")
+        declared_document_id = (
+            raw_document_id.strip()
+            if isinstance(raw_document_id, str) and raw_document_id.strip()
+            else None
+        )
+        document_id, identity_origin = self._resolve_document_id(
+            workspace=workspace,
+            relative_path=relative_path,
+            source_sha256=source_sha256,
+            declared_document_id=declared_document_id,
+            current_paths=current_paths,
+            claimed_auto_ids=claimed_auto_ids,
+        )
+        card["technical_document_id"] = document_id
+        card["hindsight_document_id"] = f"{document_id}:source"
+        card["identity_origin"] = identity_origin
+
         metadata: dict[str, str] = {
             "pantheon_document_id": document_id,
+            "identity_origin": identity_origin,
             "workspace": workspace,
             "source_path": relative_path,
             "source_sha256": source_sha256,
@@ -528,17 +653,34 @@ class HindsightProducer:
 
         candidates: dict[str, ProducerCandidate] = {}
         seen_document_ids: set[str] = set()
+        current_paths: set[tuple[str, str]] = set()
 
+        for workspace in snapshot.get("workspaces") or []:
+            for card in workspace.get("cards") or []:
+                if (
+                    card.get("kind") == "document"
+                    and isinstance(card.get("workspace"), str)
+                    and isinstance(card.get("path"), str)
+                    and card.get("source_present") is True
+                ):
+                    current_paths.add((card["workspace"], card["path"]))
+
+        claimed_auto_ids: set[str] = set()
         for workspace in snapshot.get("workspaces") or []:
             for card in workspace.get("cards") or []:
                 document_id = card.get("document_id")
                 if isinstance(document_id, str) and document_id:
                     seen_document_ids.add(document_id)
                 try:
-                    candidate = self._candidate(card)
+                    candidate = self._candidate(
+                        card,
+                        current_paths=current_paths,
+                        claimed_auto_ids=claimed_auto_ids,
+                    )
                 except OSError:
                     candidate = None
                 if candidate is not None:
+                    seen_document_ids.add(candidate.document_id)
                     candidates[candidate.hindsight_document_id] = candidate
 
         submitted = 0
@@ -676,6 +818,27 @@ class HindsightProducer:
                 row["status"] = desired
 
         states = self._states()
+        state_by_path = {
+            (row.get("workspace"), row.get("source_path")): row
+            for row in states.values()
+        }
+        for workspace in snapshot.get("workspaces") or []:
+            for card in workspace.get("cards") or []:
+                if card.get("kind") != "document":
+                    continue
+                row = state_by_path.get((card.get("workspace"), card.get("path")))
+                if row is None:
+                    card["hindsight_status"] = (
+                        "NOT_ELIGIBLE"
+                        if card.get("hindsight_eligible") is not True
+                        else "NOT_RETAINED"
+                    )
+                    continue
+                card["technical_document_id"] = row.get("document_id")
+                card["hindsight_document_id"] = row.get("hindsight_document_id")
+                card["hindsight_status"] = row.get("status")
+                card["hindsight_last_error"] = row.get("last_error")
+
         counts = {
             "submitted": 0,
             "completed": 0,

@@ -331,3 +331,100 @@ def test_http_client_rejects_oversize_source_before_buffering_or_network(tmp_pat
             raise AssertionError("oversize source should be rejected")
 
     mocked.assert_not_called()
+
+
+
+def test_source_only_file_gets_technical_identity_and_is_retained(tmp_path: Path) -> None:
+    module = _module()
+    source = tmp_path / "Notice.pdf"
+    source.write_bytes(b"%PDF-source-only")
+    db = tmp_path / "state.sqlite3"
+    client = FakeClient()
+    producer = module.HindsightProducer(
+        roots=[("Affaires", tmp_path)],
+        state_db=db,
+        client=client,
+    )
+
+    card = _card(status="SOURCE_ONLY")
+    card["document_id"] = None
+    card["hindsight_eligible"] = True
+    card["hindsight_representation_candidate"] = "source"
+    producer.reconcile(_snapshot(card))
+
+    assert len(client.retains) == 1
+    technical_id = card["technical_document_id"]
+    assert technical_id.startswith("doc_auto_")
+    assert card["identity_origin"] == "technical"
+    assert client.retains[0]["document_id"] == f"{technical_id}:source"
+    assert client.retains[0]["metadata"]["identity_origin"] == "technical"
+
+
+def test_source_only_move_reuses_unique_technical_identity(tmp_path: Path) -> None:
+    module = _module()
+    source = tmp_path / "Notice.pdf"
+    source.write_bytes(b"%PDF-same-bytes")
+    db = tmp_path / "state.sqlite3"
+    client = FakeClient(["completed"])
+    producer = module.HindsightProducer(
+        roots=[("Affaires", tmp_path)],
+        state_db=db,
+        client=client,
+    )
+
+    first = _card(status="SOURCE_ONLY")
+    first["document_id"] = None
+    first["hindsight_eligible"] = True
+    first["hindsight_representation_candidate"] = "source"
+    producer.reconcile(_snapshot(first))
+    first_id = first["technical_document_id"]
+
+    source.rename(tmp_path / "Renamed.pdf")
+    moved = _card("Renamed.pdf", status="SOURCE_ONLY")
+    moved["document_id"] = None
+    moved["hindsight_eligible"] = True
+    moved["hindsight_representation_candidate"] = "source"
+    producer.reconcile(_snapshot(moved))
+
+    assert moved["technical_document_id"] == first_id
+    assert moved["hindsight_document_id"] == f"{first_id}:source"
+
+
+def test_identical_simultaneous_copy_gets_distinct_technical_identity(tmp_path: Path) -> None:
+    module = _module()
+    (tmp_path / "Notice.pdf").write_bytes(b"%PDF-identical")
+    db = tmp_path / "state.sqlite3"
+    client = FakeClient(["completed"])
+    producer = module.HindsightProducer(
+        roots=[("Affaires", tmp_path)],
+        state_db=db,
+        client=client,
+        max_submits_per_reconcile=4,
+    )
+
+    first = _card(status="SOURCE_ONLY")
+    first["document_id"] = None
+    first["hindsight_eligible"] = True
+    first["hindsight_representation_candidate"] = "source"
+    producer.reconcile(_snapshot(first))
+    first_id = first["technical_document_id"]
+
+    (tmp_path / "Copy.pdf").write_bytes(b"%PDF-identical")
+    original = _card(status="SOURCE_ONLY")
+    original["document_id"] = None
+    original["hindsight_eligible"] = True
+    original["hindsight_representation_candidate"] = "source"
+    copy = _card("Copy.pdf", status="SOURCE_ONLY")
+    copy["document_id"] = None
+    copy["hindsight_eligible"] = True
+    copy["hindsight_representation_candidate"] = "source"
+    snapshot = {
+        "workspaces": [
+            {"name": "Affaires", "available": True, "cards": [original, copy], "errors": []}
+        ]
+    }
+    producer.reconcile(snapshot)
+
+    assert original["technical_document_id"] == first_id
+    assert copy["technical_document_id"] != first_id
+    assert copy["technical_document_id"].startswith("doc_auto_")

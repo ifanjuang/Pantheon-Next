@@ -1,7 +1,7 @@
 const STATUS = {
   COMPLETE: { label: "Complet", color: "#287652" },
   CHECK: { label: "À vérifier", color: "#a76800" },
-  CARTOUCHE_MISSING: { label: "Cartouche manquant", color: "#6648a8" },
+  SOURCE_ONLY: { label: "Source seule", color: "#6648a8" },
   SOURCE_MISSING: { label: "Source manquante", color: "#a53535" },
   FOLDER: { label: "Dossier", color: "#315d9c" },
 };
@@ -45,8 +45,10 @@ function documentCardBody(card) {
   const facts = [
     fact("Chemin", card.path),
     fact("Source", card.source_present ? (card.source || card.name) : "Manquante", card.source_present ? "" : "fact-alert"),
-    fact("Cartouche", card.cartouche_present ? card.cartouche : "Absent", card.cartouche_present ? "" : "fact-alert"),
-    fact("Identité", card.document_id),
+    fact("Cartouche", card.cartouche_present ? card.cartouche : "Optionnelle", "fact-muted"),
+    fact("Identité déclarée", card.document_id),
+    fact("Identité technique", card.technical_document_id),
+    fact("Hindsight", card.hindsight_status || (card.hindsight_eligible ? "Non synchronisé" : "Non éligible"), card.hindsight_last_error ? "fact-alert" : ""),
     fact("Émetteur", card.issuer),
     fact(
       card.revision_mode === "supersedes" ? "Remplace" : card.revision_mode === "supplements" ? "Complète" : "Relation",
@@ -55,10 +57,10 @@ function documentCardBody(card) {
     ),
   ].join("");
 
-  const generate = card.can_generate_cartouche
+  const openSource = card.source_present
     ? `<div class="card-action">
-        <button type="button" disabled title="La route d’écriture du cartouche n’est pas encore qualifiée">Générer le cartouche</button>
-        <small>Action visible, écriture non activée dans cette tranche.</small>
+        <a href="/api/source?workspace=${encodeURIComponent(card.workspace)}&path=${encodeURIComponent(card.path)}" target="_blank" rel="noopener">Ouvrir le fichier</a>
+        <small>Ouverture depuis le chemin NAS validé par le producer.</small>
       </div>`
     : "";
 
@@ -85,7 +87,7 @@ function documentCardBody(card) {
     ${tagsTemplate(card.tags)}
     <div class="facts">${facts}</div>
     ${reconcile}
-    ${generate}
+    ${openSource}
   `;
 }
 
@@ -118,7 +120,7 @@ function cardTemplate(card) {
   const classes = [
     "card",
     card.kind === "folder" ? "folder-card" : "document-card",
-    card.status === "CARTOUCHE_MISSING" ? "missing-cartouche" : "",
+    card.status === "SOURCE_ONLY" ? "source-only" : "",
     card.status === "SOURCE_MISSING" ? "missing-source" : "",
   ].filter(Boolean).join(" ");
 
