@@ -939,7 +939,7 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     assert "X-Pantheon-Intent" in javascript
     assert "/reconcile-memory" in javascript
     assert "source NAS non ouverte" in javascript
-    assert "Action visible, écriture non activée" in javascript
+    assert "Ouverture depuis le chemin NAS validé par le producer." in javascript
     assert "Cartouche dossier" in javascript
     assert "Sans _folder.md" in javascript
     assert 'href="role_trace_graph.css"' in html
