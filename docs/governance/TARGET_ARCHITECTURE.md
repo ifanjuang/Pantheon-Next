@@ -79,30 +79,44 @@ Hermes native context/memory sufficient
 
 External providers are justified only by a demonstrated capability need.
 
-## Reference implementations, not prerequisites
+## Selected source/retrieval route and historical references
 
-The repository contains qualification evidence for a useful reference composition:
+Pantheon still does not require one particular workspace, synchronization product, RAG stack or memory engine. For the current professional AFFAIRES deployment candidate, however, one productive route has been selected to avoid parallel producers:
+
+```text
+NAS / AFFAIRES
+  -> Linux-mounted professional source tree
+  -> one Workspace indexer / sync producer
+  -> Hindsight derived retrieval / document memory
+  -> strict project-scoped Hermes / Cockpit consumers
+```
+
+This is a target-selection decision, not authority transfer or production adoption.
+
+```text
+selected implementation != architecture prerequisite
+retrieval provider != source authority
+memory != Evidence
+folder/path != governed identity
+```
+
+The repository also retains historical qualification evidence for:
 
 ```text
 Obsidian / Markdown
-  -> workspace example
+  -> optional human-authored workspace
 
 Self-hosted LiveSync / CouchDB
-  -> synchronization example
+  -> historical optional synchronization pattern
+
+hindsight-obsidian-sync
+  -> historical designated producer for that reference
 
 Hindsight
-  -> retrieval / external-memory example
+  -> replaceable derived retrieval / external-memory provider
 ```
 
-These are recommendations and qualification targets, not Pantheon prerequisites.
-
-```text
-qualified implementation != architecture requirement
-recommended binding != mandatory dependency
-working integration != authority transfer
-```
-
-A user may prefer Hermes-native context and memory, Obsidian plus Hindsight, or another compatible implementation. Pantheon should care about the contract and governance boundary, not the product name.
+Those historical components may still be chosen when their capabilities are specifically wanted, but they no longer define the productive AFFAIRES topology. A user may also prefer Hermes-native context and memory when those facilities are sufficient.
 
 ## RAG posture
 
