@@ -326,6 +326,15 @@ def compare_observations(
         if baseline[field] != candidate[field]:
             errors.append(f"{field} differs between arms")
     for field in (
+        "stream_case",
+        "cancellation_case",
+        "ambiguous_submission_case",
+        "transient_file_case",
+        "artifact_case",
+    ):
+        if baseline[field] != candidate[field]:
+            errors.append(f"{field} differs between arms")
+    for field in (
         "runtime_identity",
         "hermes_identity",
         "profile_identity",
@@ -336,6 +345,11 @@ def compare_observations(
             errors.append(mismatch)
         elif baseline[field] is None or candidate[field] is None:
             unknowns.append(f"{field} parity is unknown")
+
+    if baseline["result_status"] != "complete":
+        unknowns.append(
+            f"native baseline result_status={baseline['result_status']} is not complete"
+        )
 
     if candidate["result_status"] in {"blocked", "failed"}:
         failures.append(f"UHP arm result_status={candidate['result_status']}")
@@ -393,6 +407,11 @@ def compare_observations(
             )
 
     if candidate["transient_file_case"]:
+        if (
+            baseline["transient_file_sha256"]
+            != candidate["transient_file_sha256"]
+        ):
+            errors.append("transient_file_sha256 differs between arms")
         if candidate["extended_conformance"] is False:
             failures.append("tested UHP server failed Extended conformance")
         elif candidate["extended_conformance"] is None:
@@ -420,6 +439,8 @@ def compare_observations(
                 unknowns.append(f"{field} is unknown")
 
     if candidate["artifact_case"]:
+        if baseline["artifact_sha256"] != candidate["artifact_sha256"]:
+            errors.append("artifact_sha256 differs between arms")
         if candidate["extended_conformance"] is False:
             failures.append("tested UHP server failed Extended conformance")
         elif candidate["extended_conformance"] is None:
