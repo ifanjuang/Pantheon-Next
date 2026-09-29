@@ -403,7 +403,7 @@ def test_uhp_file_upload_uses_user_data_multipart_contract(
     def handler(request: httpx.Request) -> httpx.Response:
         seen["path"] = request.url.path
         seen["content_type"] = request.headers["content-type"]
-        seen["body"] = request.content
+        seen["body"] = request.read()
         return httpx.Response(
             200,
             json={
