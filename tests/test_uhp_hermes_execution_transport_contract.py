@@ -12,7 +12,9 @@ def test_uhp_remains_external_transport_candidate_not_pantheon_dispatch_owner() 
     assert "Pantheon does not become the UHP task client" in text
     assert "current: native Hermes Runs API" in text
     assert "candidate: UHP client -> UHP server -> Hermes" in text
+    assert "current qualification pin is UHP 2026-09-28" in text
     assert "UHP Full lifecycle management is outside the selected scope" in text
+    assert "two distinct one-shot Execution Admissions" in text
 
 
 def test_uhp_candidate_preserves_identity_tool_and_ephemeral_context_boundaries() -> None:

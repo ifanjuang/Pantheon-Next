@@ -457,7 +457,7 @@ It does not install, enable, approve or activate the binding.
 
 ## Replaceable execution transport qualification — UHP #1141
 
-The native Hermes Runs binding remains the current baseline. Issue #1141 qualifies UHP 2026-09-12 as a possible replacement for the **external transport only**.
+The native Hermes Runs binding remains the current baseline. Issue #1141 qualifies UHP as a possible replacement for the **external transport only**. The current qualification pin is UHP 2026-09-28; the issue was initially characterized on UHP 2026-09-12.
 
 ```text
 Pantheon Execution Admission
@@ -473,6 +473,8 @@ external execution binding
 Pantheon does not become the UHP task client. The external binding remains the actor that materializes one already-admitted launch opportunity.
 
 Initial scope is UHP Core. Extended file/artifact surfaces may be qualified only where a demonstrated use case requires them. UHP Full lifecycle management is outside the selected scope.
+
+The matched A/B uses two distinct one-shot Execution Admissions derived from the same immutable Task Contract / Context Pack / execution-basis digest. A single admission is never consumed twice merely to manufacture comparability.
 
 The candidate must preserve several seams that the native binding currently makes explicit:
 
