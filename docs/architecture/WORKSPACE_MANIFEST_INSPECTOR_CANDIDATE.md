@@ -8,9 +8,13 @@ Current decision baseline:
 - #1131 added the bounded Hindsight source producer and explicit revision-chronology handling;
 - #1132 added transient, read-only memory reconciliation;
 - #1133 added the dedicated reconciliation-profile deployment seam;
-- #1135 qualified the concrete Linux NAS mount and kept the bounded IFJA reader separate.
+- #1135 qualified the concrete Linux NAS mount and kept the bounded IFJA reader separate;
+- #1139 made cartouches optional enrichment and source files first-class in the Hindsight explorer path;
+- #1144 added project-scoped Kroqi/Hindsight ingestion and strict project routing;
+- #1145 repaired the dedicated reconciliation-profile qualification helper;
+- #1146 split the standalone AFFAIRES producer from the optional Cockpit process.
 
-#1134 remains open to repair the existing reconciliation-profile qualification helper. It changes neither ownership, routing nor authority: configured still does not mean activated, and a reconciliation candidate is not Evidence.
+The #1134 repair attempt was closed without merge and is superseded by merged #1145. Configured still does not mean activated, and a reconciliation candidate is not Evidence.
 
 This list records the decisions that define the current target; it is intentionally not a frozen `main` SHA. Always verify the current branch, open PRs and qualification issues before changing the topology.
 
