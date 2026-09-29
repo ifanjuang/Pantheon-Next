@@ -465,3 +465,16 @@ def test_non_finite_elapsed_time_is_rejected() -> None:
                     elapsed_seconds=value,
                 )
             )
+
+
+def test_boolean_flags_fail_closed_instead_of_coercing_strings() -> None:
+    with pytest.raises(
+        QUAL.TransportQualificationError,
+        match="transient_file_case must be boolean",
+    ):
+        QUAL.normalize_observation(
+            _observation(
+                arm="uhp",
+                transient_file_case="false",
+            )
+        )
