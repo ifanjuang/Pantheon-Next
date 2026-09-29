@@ -110,6 +110,15 @@ The cartouche may contain YAML frontmatter because Markdown frontmatter is a con
 
 ## 4. Cartouche contract
 
+Machine-readable reserved-field contracts:
+
+```text
+schemas/workspace_cartouche.schema.yaml       = pantheon/cartouche/v1
+schemas/workspace_folder_context.schema.yaml  = pantheon/folder-context/v1
+```
+
+These schemas validate the existing frontmatter vocabulary; they do not create a second JSON/YAML business sidecar or turn cartouche fields into governed authority.
+
 Candidate minimal frontmatter:
 
 ```yaml
@@ -308,7 +317,9 @@ Cartouche manquant
 
 Do not silently invent business metadata from the filename.
 
-The first productive posture is that an uncartouched file is visible but not automatically promoted to the normal Hindsight document route.
+A supported source does not require a cartouche to enter the normal bounded Hindsight source route. Below an identified project directory it inherits the strict project scope; a root-level source remains in `PENDING_SCOPE` until identification. In both cases the source keeps technical identity/provenance and no business metadata is invented from its filename.
+
+A cartouche is optional enrichment. When present and valid it may contribute a declared `document_id`, descriptive project/type/phase metadata, source integrity binding and explicit relation declarations, but it is not an admission gate.
 
 ### Cartouche without source
 
@@ -491,32 +502,30 @@ Those human-readable descriptive fields belong in the cartouche when this file-n
 
 #659 owns Hindsight runtime and retain/retrieval qualification.
 
-The currently implemented productive candidate is deliberately the smallest source mapping:
+The selected productive mapping keeps one Hindsight document per eligible professional source:
 
 ```text
-bundle id = doc_...
-
-doc_...:source
-→ COMPLETE + unique document_id + supported source representation
-→ Hindsight files/retain
+NAS / AFFAIRES source
+→ standalone Workspace producer
+→ technical or declared document_id
+→ Hindsight files/retain as <document_id>:source
 → parsed source content
 → chunks + derived memories
 ```
 
-Pantheon does not currently create a second Hindsight `doc_...:card` document. The
-cartouche is passed only as bounded orientation where explicitly qualified; descriptive
-index/date/revision labels are not allowed to establish source chronology.
+A supported source without a cartouche is eligible when its project scope is identified or explicitly held in the pending-identification queue. A valid cartouche is optional enrichment, not an admission gate.
 
-The earlier A/B/C alternatives remain historical qualification questions rather than
-three concurrent productive paths:
+Pantheon does not create a second retrievable Hindsight `doc_...:card` document. Valid cartouche fields may be copied only as namespaced `cartouche_*` provenance metadata. They are not inserted into source text or extraction context, and descriptive index/date/revision labels are not allowed to establish source chronology.
+
+The historical A/B/C alternatives have converged to one productive route:
 
 ```text
-A = source only + bounded orientation     ← implemented
-B = richer cartouche context              ← not selected
-C = separately retrievable cartouche      ← not selected
+A = source + bounded identification context      ← implemented
+B = namespaced cartouche provenance metadata     ← implemented when a valid cartouche exists
+C = separately retrievable cartouche             ← not selected
 ```
 
-Do not add B or C unless measured retrieval quality demonstrates a material need.
+Do not add C unless measured retrieval quality demonstrates a material need.
 
 ### On-demand memory reconciliation
 
