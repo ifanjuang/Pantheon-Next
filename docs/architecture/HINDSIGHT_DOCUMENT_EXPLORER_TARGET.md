@@ -1,12 +1,6 @@
 # Hindsight document explorer target
 
-Status: selected convergence candidate for #659 / #660.
-
-Baseline reviewed before this change:
-
-```text
-Pantheon-Next/main = ca4bb499456915851a310628c78cc374e86616fc
-```
+Status: selected architecture target for #659 / #660.
 
 ## Objective
 
@@ -37,8 +31,9 @@ Hindsight
       +----> Cockpit (optional explorer)
 ```
 
-The Cockpit is not a document owner. Turning it off must not stop AFFAIRES ingestion,
-Hindsight synchronization or Hermes retrieval.
+The Cockpit is not a document owner. Productive deployment runs the AFFAIRES
+producer as a separate process/service. Turning the Cockpit off must not stop
+AFFAIRES scanning, Hindsight synchronization or Hermes retrieval.
 
 ## Ownership
 
@@ -46,8 +41,13 @@ Hindsight synchronization or Hermes retrieval.
 NAS / AFFAIRES
 = durable professional source files
 
-producer + reconstructible SQLite
-= technical synchronization mechanics only
+producer + technical SQLite
+= synchronization mechanics only
+
+SQLite loss
+= index can be rebuilt, but a previously generated technical occurrence id is
+  not claimed to be recoverable across a prior move unless another durable
+  declaration preserves that continuity
 
 Hindsight
 = derived document index, classification/retrieval metadata and memory
@@ -170,8 +170,10 @@ NAS path.
 
 ## Producer rule
 
-There remains exactly one AFFAIRES filesystem producer. Cockpit must not add another NAS
-watcher or Hindsight writer.
+There remains exactly one AFFAIRES filesystem producer. In productive deployment
+it is the standalone `workspace-producer` / `pantheon-affaires-producer.service`.
+Cockpit runs in persisted-projection mode and must not scan the NAS recursively,
+own the watcher or write to Hindsight.
 
 Watcher provides responsiveness. Periodic reconcile remains the convergence guarantee.
 
@@ -184,7 +186,8 @@ Live-node qualification remains required for:
 - one-active-producer proof;
 - Hindsight persistence/restore;
 - bank/project isolation regression;
-- stale Hindsight lifecycle and any future delete policy.
+- live quarantine/delete behavior against the productive bank, including recovery
+  after transient source disappearance.
 
 Those operational qualifications do not justify reintroducing Cockpit ownership or
 mandatory cartouches.

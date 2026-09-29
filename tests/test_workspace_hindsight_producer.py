@@ -188,7 +188,7 @@ def test_invalid_cartouche_fallback_does_not_emit_cartouche_metadata(tmp_path: P
 
     metadata = client.retains[0]["metadata"]
     assert not any(key.startswith("cartouche_") for key in metadata)
-    assert "scope:project:projet-alpha" in client.retains[0]["tags"]
+    assert f"scope:project:{module._project_scope_token('Projet Alpha')}" in client.retains[0]["tags"]
 
 
 def test_workspace_provenance_is_derived_instead_of_hardcoded(tmp_path: Path) -> None:
@@ -384,7 +384,7 @@ def test_folder_scoped_candidate_carries_project_and_ancestry_tags(tmp_path: Pat
     producer.reconcile(_snapshot(card))
 
     call = client.retains[0]
-    assert "scope:project:projet-alpha" in call["tags"]
+    assert f"scope:project:{module._project_scope_token('Projet Alpha')}" in call["tags"]
     assert "folder:projet-alpha" in call["tags"]
     assert "folder:projet-alpha-dce" in call["tags"]
     assert "folder:projet-alpha-dce-structure" in call["tags"]
@@ -420,8 +420,8 @@ def test_top_level_folder_scope_cannot_be_overridden_by_cartouche_project(tmp_pa
     producer.reconcile(_snapshot(card))
 
     call = client.retains[0]
-    assert "scope:project:projet-alpha" in call["tags"]
-    assert "scope:project:autre-projet" not in call["tags"]
+    assert f"scope:project:{module._project_scope_token('Projet Alpha')}" in call["tags"]
+    assert f"scope:project:{module._project_scope_token('Autre Projet')}" not in call["tags"]
     assert "project_hint:autre-projet" in call["tags"]
     assert call["metadata"]["scope_project"] == "Projet Alpha"
     assert call["metadata"]["project_declared"] == "Autre Projet"
@@ -915,7 +915,7 @@ def test_confirmed_cross_project_move_reuses_identity_and_reprocesses(tmp_path: 
     assert moved["technical_document_id"] == first_id
     assert len(client.retains) == 1
     assert client.tag_updates[-1]["document_id"] == f"{first_id}:source"
-    assert "scope:project:projet-beta" in client.tag_updates[-1]["tags"]
+    assert f"scope:project:{module._project_scope_token('Projet Beta')}" in client.tag_updates[-1]["tags"]
 
 
 def test_identical_simultaneous_copy_gets_distinct_technical_identity(tmp_path: Path) -> None:
@@ -956,3 +956,45 @@ def test_identical_simultaneous_copy_gets_distinct_technical_identity(tmp_path: 
     assert original["technical_document_id"] == first_id
     assert copy["technical_document_id"] != first_id
     assert copy["technical_document_id"].startswith("doc_auto_")
+
+
+
+def test_project_scope_tokens_disambiguate_lossy_slug_collisions() -> None:
+    module = _module()
+    assert module._tag_value("Projet A") == module._tag_value("Projet-A")
+    assert module._project_scope_token("Projet A") != module._project_scope_token("Projet-A")
+
+
+def test_replacement_quality_is_not_checked_against_previous_fingerprint(tmp_path: Path) -> None:
+    module = _module()
+    source = tmp_path / "Notice.pdf"
+    source.write_bytes(b"%PDF-old")
+    db = tmp_path / "state.sqlite3"
+
+    class ReplacementClient(FakeClient):
+        def __init__(self) -> None:
+            super().__init__(["completed", "completed"])
+            self.document_reads = 0
+
+        def get_document(self, document_id: str):
+            self.document_reads += 1
+            return {"id": document_id, "original_text": "Texte extrait."}
+
+    client = ReplacementClient()
+    producer = module.HindsightProducer(
+        roots=[("Affaires", tmp_path)],
+        state_db=db,
+        client=client,
+    )
+
+    producer.reconcile(_snapshot(_card()))
+    producer.reconcile(_snapshot(_card()))
+    assert client.document_reads == 1
+
+    source.write_bytes(b"%PDF-new")
+    producer.reconcile(_snapshot(_card()))
+    assert client.document_reads == 1
+    assert len(client.retains) == 2
+
+    producer.reconcile(_snapshot(_card()))
+    assert client.document_reads == 2

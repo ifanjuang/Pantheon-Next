@@ -22,8 +22,12 @@ query but never authorize a cross-project recall.
 The first-directory rule is evaluated below the admitted project root, currently
 `/mnt/pantheon-affaires/KROQI/AFFAIRES`, never from the broader NAS share.
 
-Tags are lowercase slugs. The producer removes accents/punctuation boundaries,
-uses `-` as the separator and limits each dynamic value to 96 characters.
+Ordinary navigation tags use lowercase slugs. Project boundary tags are stricter:
+the producer combines a readable slug (maximum 80 characters) with the first
+12 hexadecimal characters of SHA-256 over the exact NFKC/case-folded project
+name. The project router computes the same token. This prevents two distinct
+directory names such as `Projet A` and `Projet-A` from collapsing onto the
+same strict retrieval boundary.
 
 ## Tags emitted by the Workspace producer
 
@@ -31,7 +35,7 @@ uses `-` as the separator and limits each dynamic value to 96 characters.
 | --- | --- | --- | --- |
 | `workspace:<workspace>` | Linux-visible admitted workspace | `workspace:kroqi` | Origin/navigation |
 | `source:<kind>` | Source channel configured for the producer | `source:kroqi-sync` | Origin/navigation |
-| `scope:project:<project>` | Project inherited from the first directory; cartouche context is used only for a root-level document | `scope:project:mediatheque` | **Strict project boundary** |
+| `scope:project:<slug>-<12hex>` | Project inherited from the first directory; cartouche context is used only for a root-level document | `scope:project:mediatheque-<12hex>` | **Strict project boundary** |
 | `scope:pending-identification` | Document has no identified project | exact fixed tag | Separate identification queue only |
 | `folder:<cumulative-path>` | Cumulative folder ancestry | `folder:mediatheque-03-execution-plans` | Drill-down inside an already selected project |
 | `project_hint:<project>` | Descriptive project hint carried by the card | `project_hint:mediatheque` | Display/discovery; not a boundary |
@@ -49,7 +53,7 @@ Mediatheque/03 Execution/Plans/Plan CVC IND-B.pdf
 the producer emits:
 
 ```text
-scope:project:mediatheque
+scope:project:mediatheque-<12hex>
 folder:mediatheque
 folder:mediatheque-03-execution
 folder:mediatheque-03-execution-plans
@@ -67,7 +71,7 @@ material. A normal KROQI project recall uses:
 {
   "tags": [
     "source:kroqi-sync",
-    "scope:project:mediatheque"
+    "scope:project:mediatheque-<12hex>"
   ],
   "tags_match": "all_strict"
 }
@@ -107,7 +111,7 @@ candidate scopes. It must not fall back to a bank-wide document recall.
 Every project page or mental model uses the same strict scope selector as Hermes:
 
 ```text
-scope:project:<project>
+scope:project:<slug>-<12hex>
 ```
 
 A page may additionally select a folder or phase, but it cannot remove the

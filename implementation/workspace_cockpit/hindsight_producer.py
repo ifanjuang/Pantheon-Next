@@ -58,6 +58,13 @@ def _tag_value(value: str) -> str:
     return normalized[:96]
 
 
+def _project_scope_token(value: str) -> str:
+    canonical = unicodedata.normalize("NFKC", value.strip()).casefold()
+    slug = _tag_value(value) or "project"
+    digest = hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:12]
+    return f"{slug[:80]}-{digest}"
+
+
 def _metadata_value(value: Any) -> str | None:
     if value is None:
         return None
@@ -909,9 +916,7 @@ class HindsightProducer:
                 if normalized:
                     tags.append(f"{prefix}:{normalized}")
         if metadata.get("scope_project"):
-            normalized_project = _tag_value(metadata["scope_project"])
-            if normalized_project:
-                tags.append(f"scope:project:{normalized_project}")
+            tags.append(f"scope:project:{_project_scope_token(metadata['scope_project'])}")
         elif metadata.get("project_scope_source") == "pending_identification":
             tags.append("scope:pending-identification")
         if metadata.get("document_family_hint"):
@@ -1071,7 +1076,11 @@ class HindsightProducer:
             previous_quality = quality_states.get(key)
             if candidate.source_path.suffix.casefold() != ".pdf":
                 continue
-            if row is None or row.get("status") != "COMPLETED":
+            if (
+                row is None
+                or row.get("status") != "COMPLETED"
+                or row.get("fingerprint") != candidate.fingerprint
+            ):
                 continue
             if (
                 previous_quality

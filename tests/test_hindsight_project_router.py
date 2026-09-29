@@ -30,7 +30,7 @@ def test_recall_forces_source_project_and_all_strict() -> None:
             "text": "Décision projet Alpha",
             "document_id": "doc-1:source",
             "chunk_id": "chunk-1",
-            "tags": ["source:kroqi-sync", "scope:project:projet-alpha"],
+            "tags": ["source:kroqi-sync", f"scope:project:{module.project_scope_token('Projet Alpha')}"],
         }],
         "entities": {},
         "chunks": {"chunk-1": {"document_id": "doc-1:source"}},
@@ -39,12 +39,12 @@ def test_recall_forces_source_project_and_all_strict() -> None:
         result = client.recall_project("Projet Alpha", "Quelle décision ?")
 
     body = post.call_args.args[0]
-    assert body["tags"] == ["source:kroqi-sync", "scope:project:projet-alpha"]
+    assert body["tags"] == ["source:kroqi-sync", f"scope:project:{module.project_scope_token('Projet Alpha')}"]
     assert body["tags_match"] == "all_strict"
     assert body["types"] == ["world", "experience"]
     assert body["prefer_observations"] is False
     assert body["include"] == {"entities": None, "chunks": {}, "source_facts": None}
-    assert result["project_scope"] == "scope:project:projet-alpha"
+    assert result["project_scope"] == f"scope:project:{module.project_scope_token('Projet Alpha')}"
     assert result["mode"] == "source-grounded-evidence"
     assert result["results"][0]["document_id"] == "doc-1:source"
 
@@ -65,7 +65,7 @@ def test_folder_can_only_narrow_an_existing_project_scope() -> None:
             "chunk_id": "chunk-1",
             "tags": [
                 "source:kroqi-sync",
-                "scope:project:projet-alpha",
+                f"scope:project:{module.project_scope_token('Projet Alpha')}",
                 "folder:projet-alpha-dce-plans",
             ],
         }]
@@ -77,7 +77,7 @@ def test_folder_can_only_narrow_an_existing_project_scope() -> None:
 
     assert post.call_args.args[0]["tags"] == [
         "source:kroqi-sync",
-        "scope:project:projet-alpha",
+        f"scope:project:{module.project_scope_token('Projet Alpha')}",
         "folder:projet-alpha-dce-plans",
     ]
 
@@ -85,7 +85,7 @@ def test_folder_can_only_narrow_an_existing_project_scope() -> None:
 def test_recall_omits_unprovenanced_results_and_caps_evidence() -> None:
     module = _module()
     client = module.ProjectRecallClient("http://127.0.0.1:8888", "IFJA_KROQI")
-    tags = ["source:kroqi-sync", "scope:project:projet-alpha"]
+    tags = ["source:kroqi-sync", f"scope:project:{module.project_scope_token('Projet Alpha')}"]
     results = [{"id": "observation", "text": "lead", "tags": tags}]
     results.extend(
         {
@@ -124,7 +124,7 @@ def test_pending_or_empty_project_is_rejected_before_hindsight_call() -> None:
 def test_out_of_scope_or_untagged_result_fails_closed() -> None:
     module = _module()
     client = module.ProjectRecallClient("http://127.0.0.1:8888", "IFJA_KROQI")
-    for tags in ([], ["source:kroqi-sync", "scope:project:projet-beta"]):
+    for tags in ([], ["source:kroqi-sync", f"scope:project:{module.project_scope_token('Projet Beta')}"]):
         with patch.object(
             client,
             "_post",
@@ -132,3 +132,10 @@ def test_out_of_scope_or_untagged_result_fails_closed() -> None:
         ):
             with pytest.raises(module.ProjectRecallError):
                 client.recall_project("Projet Alpha", "question")
+
+
+
+def test_project_scope_token_disambiguates_slug_collisions() -> None:
+    module = _module()
+    assert module.tag_value("Projet A") == module.tag_value("Projet-A")
+    assert module.project_scope_token("Projet A") != module.project_scope_token("Projet-A")
