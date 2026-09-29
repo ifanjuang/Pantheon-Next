@@ -42,6 +42,7 @@ type: CCTP
 index: C
 document_date: 2026-09-12
 issuer: FRONTSign
+scope_move_confirmed: true
 tags:
   - structure
   - ossature-bois
@@ -62,7 +63,7 @@ CCTP du lot structure pour la consultation DCE.
     document = next(card for card in cards if card["kind"] == "document")
     folder = next(card for card in cards if card["kind"] == "folder")
 
-    assert result["projection"] == "affaires_hindsight_explorer_v4"
+    assert result["projection"] == "affaires_hindsight_project_scope_v5"
     assert document["status"] == "COMPLETE"
     assert document["document_id"] == "doc-cctp-c"
     assert document["source"] == "CCTP_IND_C.pdf"
@@ -78,6 +79,12 @@ CCTP du lot structure pour la consultation DCE.
     assert document["hindsight_format_supported"] is True
     assert document["hindsight_eligible"] is True
     assert document["hindsight_representation_candidate"] == "source"
+    assert document["project"] == "LIEUREY"
+    assert document["scope_project"] == "DCE"
+    assert document["project_declared"] == "LIEUREY"
+    assert document["project_scope_source"] == "top_level_folder"
+    assert document["project_scope_conflict"] is True
+    assert document["scope_move_confirmed"] is True
     assert document["warnings"] == []
     assert folder["status"] == "FOLDER"
     assert folder["folder_context_present"] is False
@@ -130,7 +137,7 @@ def test_plain_markdown_with_matching_stem_is_never_treated_as_pdf_cartouche(tmp
     )
 
     assert [card["name"] for card in documents] == ["CCTP.md", "CCTP.pdf"]
-    assert all(card["status"] == "SOURCE_ONLY" for card in documents)
+    assert all(card["status"] == "PENDING_SCOPE" for card in documents)
     assert all(card["cartouche_present"] is False for card in documents)
 
 
@@ -259,13 +266,138 @@ def test_source_without_cartouche_is_visible_with_generate_affordance(tmp_path: 
 
     assert card["kind"] == "document"
     assert card["name"] == "Notice.pdf"
-    assert card["status"] == "SOURCE_ONLY"
+    assert card["status"] == "PENDING_SCOPE"
     assert card["source_present"] is True
     assert card["cartouche_present"] is False
     assert card["can_generate_cartouche"] is False
     assert card["hindsight_format_supported"] is True
     assert card["hindsight_eligible"] is True
     assert card["hindsight_representation_candidate"] == "source"
+def test_nested_pdf_without_cartouche_inherits_project_and_folder_scope(tmp_path: Path) -> None:
+    module = _module()
+    structure = tmp_path / "Projet Alpha" / "DCE" / "Structure"
+    structure.mkdir(parents=True)
+    (structure / "Plan.pdf").write_bytes(b"%PDF-folder-scoped")
+
+    result = module.scan_workspaces([("Kroqi", tmp_path)], max_depth=3)
+    card = next(card for card in _cards(result) if card.get("name") == "Plan.pdf")
+
+    assert card["status"] == "FOLDER_SCOPED"
+    assert card["project"] == "Projet Alpha"
+    assert card["scope_project"] == "Projet Alpha"
+    assert card["project_declared"] is None
+    assert card["project_scope_conflict"] is False
+    assert card["project_scope_source"] == "top_level_folder"
+    assert card["folder_ancestry"] == ["Projet Alpha", "DCE", "Structure"]
+    assert card["document_identity_source"] == "technical"
+    assert card["document_id"] is None
+    assert card["cartouche_present"] is False
+    assert card["can_generate_cartouche"] is False
+    assert card["hindsight_eligible"] is True
+    assert card["hindsight_representation_candidate"] == "source"
+
+
+def test_archive_directories_and_all_descendants_are_excluded(tmp_path: Path) -> None:
+    module = _module()
+    active = tmp_path / "Projet Alpha" / "Plans"
+    archived = tmp_path / "Projet Alpha" / "_ARCHIVES" / "Ancien" / "Plans"
+    active.mkdir(parents=True)
+    archived.mkdir(parents=True)
+    (active / "registre-archives.pdf").write_bytes(b"%PDF-active")
+    (archived / "ancien-plan.pdf").write_bytes(b"%PDF-archived")
+
+    result = module.scan_workspaces([("Kroqi", tmp_path)], max_depth=5)
+    names = {card.get("name") for card in _cards(result)}
+
+    assert "registre-archives.pdf" in names
+    assert "ancien-plan.pdf" not in names
+    assert not any("ARCHIVES" in (card.get("path") or "") for card in _cards(result))
+    assert result["workspaces"][0]["excluded_folders"] == ["Projet Alpha/_ARCHIVES"]
+
+
+def test_archive_word_inside_directory_name_excludes_the_whole_subtree(tmp_path: Path) -> None:
+    module = _module()
+    archived = tmp_path / "Projet Alpha" / "PLANS ARCHIVES" / "Anciens indices"
+    archived.mkdir(parents=True)
+    (archived / "ancien-plan.pdf").write_bytes(b"%PDF-archived")
+    active = tmp_path / "Projet Alpha" / "Plans"
+    active.mkdir(parents=True)
+    (active / "registre-archives.pdf").write_bytes(b"%PDF-active")
+
+    result = module.scan_workspaces([("Kroqi", tmp_path)], max_depth=5)
+    paths = {card.get("path") for card in _cards(result)}
+
+    assert "Projet Alpha/Plans/registre-archives.pdf" in paths
+    assert not any("PLANS ARCHIVES" in (path or "") for path in paths)
+    assert result["workspaces"][0]["excluded_folders"] == [
+        "Projet Alpha/PLANS ARCHIVES"
+    ]
+
+
+def test_archive_backup_and_old_filename_markers_are_not_scanned(tmp_path: Path) -> None:
+    module = _module()
+    folder = tmp_path / "Projet Alpha" / "Plans"
+    folder.mkdir(parents=True)
+    for filename in (
+        "plan_archive.pdf",
+        "plan-bak.pdf",
+        "plan backup.pdf",
+        "plan_old.pdf",
+        "_archive.pdf",
+    ):
+        (folder / filename).write_bytes(b"%PDF-ignored")
+    (folder / "plan-actif.pdf").write_bytes(b"%PDF-active")
+
+    result = module.scan_workspaces([("Kroqi", tmp_path)], max_depth=3)
+    names = {card.get("name") for card in _cards(result)}
+
+    assert "plan-actif.pdf" in names
+    assert not names.intersection(
+        {"plan_archive.pdf", "plan-bak.pdf", "plan backup.pdf", "plan_old.pdf", "_archive.pdf"}
+    )
+
+
+def test_configured_ratp_directories_and_descendants_are_not_scanned(tmp_path: Path) -> None:
+    module = _module()
+    for folder_name in ("RATP", "IFJA_RATP"):
+        ratp = tmp_path / folder_name / "Sous-dossier"
+        ratp.mkdir(parents=True)
+        (ratp / "plan.pdf").write_bytes(b"%PDF-excluded")
+    active = tmp_path / "Projet Alpha" / "Plans"
+    active.mkdir(parents=True)
+    (active / "plan.pdf").write_bytes(b"%PDF-active")
+
+    result = module.scan_workspaces(
+        [("Kroqi", tmp_path)],
+        max_depth=5,
+        excluded_folder_names=("RATP", "IFJA_RATP"),
+    )
+    paths = {card.get("path") for card in _cards(result)}
+
+    assert "Projet Alpha/Plans/plan.pdf" in paths
+    assert not any("ratp" in Path(path).parts[0].casefold() for path in paths if path)
+    assert result["workspaces"][0]["excluded_folders"] == ["IFJA_RATP", "RATP"]
+
+
+def test_explicit_filename_indices_create_non_authoritative_family_hints(tmp_path: Path) -> None:
+    module = _module()
+    folder = tmp_path / "Projet Alpha" / "Plans"
+    folder.mkdir(parents=True)
+    for filename in ("Facade_IND_A.pdf", "Facade_IND_B.pdf", "Autre.pdf"):
+        (folder / filename).write_bytes(b"%PDF")
+
+    result = module.scan_workspaces([("Kroqi", tmp_path)], max_depth=2)
+    documents = {
+        card["name"]: card
+        for card in _cards(result)
+        if card.get("kind") == "document"
+    }
+
+    assert documents["Facade_IND_A.pdf"]["document_family_hint"] == documents["Facade_IND_B.pdf"]["document_family_hint"]
+    assert documents["Facade_IND_A.pdf"]["filename_revision_hint"] == "A"
+    assert documents["Facade_IND_B.pdf"]["filename_revision_hint"] == "B"
+    assert documents["Autre.pdf"]["document_family_hint"] is None
+    assert documents["Autre.pdf"]["filename_revision_hint"] is None
 
 
 def test_cartouche_without_source_is_explicitly_missing(tmp_path: Path) -> None:
@@ -367,7 +499,8 @@ def test_workspace_index_persists_reconstructible_snapshot_and_detects_changes(t
     assert state.is_file()
     first_doc = next(card for card in first["workspaces"][0]["cards"] if card["kind"] == "document")
     first_folder = next(card for card in first["workspaces"][0]["cards"] if card["kind"] == "folder")
-    assert first_doc["status"] == "SOURCE_ONLY"
+    assert first_doc["status"] == "FOLDER_SCOPED"
+    assert first_doc["hindsight_eligible"] is True
     assert first_folder["folder_context_present"] is False
     assert first["index_state"]["last_reconcile_reason"] == "test-initial"
 
@@ -428,7 +561,7 @@ def test_workspace_index_dirty_signal_reconciles_without_ui_scan(tmp_path: Path)
         snapshot = index.snapshot()
         assert snapshot["item_count"] == 1
         assert snapshot["index_state"]["last_reconcile_reason"] == "watch"
-        assert snapshot["workspaces"][0]["cards"][0]["status"] == "SOURCE_ONLY"
+        assert snapshot["workspaces"][0]["cards"][0]["status"] == "PENDING_SCOPE"
     finally:
         index.stop()
 
@@ -537,7 +670,7 @@ source: ../outside.pdf
     assert any("même dossier" in warning for warning in card["warnings"])
 
 
-def test_heavy_sources_stay_visible_and_temp_backups_are_ignored(tmp_path: Path) -> None:
+def test_unsupported_and_heavy_sources_are_not_scanned(tmp_path: Path) -> None:
     module = _module()
     (tmp_path / "Maquette.rvt").write_bytes(b"revit")
     (tmp_path / "Maquette.0001.rvt").write_bytes(b"revit-backup")
@@ -545,16 +678,17 @@ def test_heavy_sources_stay_visible_and_temp_backups_are_ignored(tmp_path: Path)
     (tmp_path / "~$Notice.docx").write_bytes(b"office-lock")
     (tmp_path / "cache.tmp").write_bytes(b"temp")
 
+    (tmp_path / "photo.jpg").write_bytes(b"jpeg")
+    (tmp_path / "application.log").write_text("log", encoding="utf-8")
+    (tmp_path / "archive.zip").write_bytes(b"zip")
+
     result = module.scan_workspaces([("Affaires", tmp_path)], max_depth=1)
     documents = [card for card in _cards(result) if card["kind"] == "document"]
 
-    assert {card["name"] for card in documents} == {"Maquette.rvt", "Perspective.psd"}
-    assert all(card["status"] == "SOURCE_ONLY" for card in documents)
-    assert all(card["heavy_binary"] is True for card in documents)
-    assert all(card["hindsight_eligible"] is False for card in documents)
+    assert documents == []
 
 
-def test_check_bundle_is_never_hindsight_producer_eligible(tmp_path: Path) -> None:
+def test_invalid_optional_cartouche_does_not_block_supported_source(tmp_path: Path) -> None:
     module = _module()
     (tmp_path / "Notice.pdf").write_bytes(b"%PDF")
     (tmp_path / ".Notice.pdf.md").write_text(
@@ -573,8 +707,12 @@ source: Notice.pdf
 
     assert card["status"] == "CHECK"
     assert card["hindsight_format_supported"] is True
-    assert card["hindsight_eligible"] is False
-    assert card["hindsight_representation_candidate"] is None
+    assert card["hindsight_eligible"] is True
+    assert card["hindsight_representation_candidate"] == "source"
+    assert card["document_identity_source"] == "workspace_path_fallback"
+    assert card["document_id"].startswith("path-")
+    assert card["scope_project"] is None
+    assert card["project_scope_source"] == "pending_identification"
 
 
 def test_declared_source_sha256_is_verified_when_present(tmp_path: Path) -> None:
@@ -629,8 +767,9 @@ source_size_bytes: 12
     assert card["status"] == "CHECK"
     assert card["source_sha256_verified"] is False
     assert card["source_integrity"] == "MISMATCH"
-    assert card["hindsight_eligible"] is False
-    assert card["hindsight_representation_candidate"] is None
+    assert card["hindsight_eligible"] is True
+    assert card["hindsight_representation_candidate"] == "source"
+    assert card["document_identity_source"] == "workspace_path_fallback"
 
 
 def test_declared_non_string_sha256_is_invalid_and_blocks_producer(tmp_path: Path) -> None:
@@ -654,7 +793,8 @@ source_sha256: true
     assert card["status"] == "CHECK"
     assert card["source_integrity"] == "INVALID"
     assert card["source_sha256_verified"] is False
-    assert card["hindsight_eligible"] is False
+    assert card["hindsight_eligible"] is True
+    assert card["hindsight_representation_candidate"] == "source"
 
 
 def test_unreasonably_long_declared_source_size_is_check_not_reconcile_failure(tmp_path: Path) -> None:
@@ -681,7 +821,8 @@ source_size_bytes: "{'9' * 5000}"
     assert card["status"] == "CHECK"
     assert card["source_sha256_verified"] is True
     assert any("source_size_bytes invalide" in warning for warning in card["warnings"])
-    assert card["hindsight_eligible"] is False
+    assert card["hindsight_eligible"] is True
+    assert card["hindsight_representation_candidate"] == "source"
 
 
 def test_email_bundle_requires_verified_sha256_and_exact_size(tmp_path: Path) -> None:
@@ -763,6 +904,9 @@ document_id: [
     assert card["status"] == "CHECK"
     assert card["source_present"] is True
     assert card["cartouche_present"] is True
+    assert card["hindsight_eligible"] is True
+    assert card["hindsight_representation_candidate"] == "source"
+    assert card["document_identity_source"] == "workspace_path_fallback"
     assert any("YAML" in warning for warning in card["warnings"])
 
 
@@ -779,7 +923,7 @@ def test_check_mode_returns_affaires_projection_without_database(tmp_path: Path)
     assert result.returncode == 0
     payload = json.loads(result.stdout)
     assert payload["read_only"] is True
-    assert payload["projection"] == "affaires_hindsight_explorer_v4"
+    assert payload["projection"] == "affaires_hindsight_project_scope_v5"
     assert payload["totals"]["FOLDER"] == 1
     assert payload["item_count"] == 1
 
@@ -912,6 +1056,8 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     assert "WORKSPACE_HINDSIGHT_PARSER" in compose
     assert "WORKSPACE_HINDSIGHT_MAX_SUBMITS_PER_RECONCILE" in compose
     assert "WORKSPACE_HINDSIGHT_MAX_FILE_MB" in compose
+    assert "WORKSPACE_HINDSIGHT_SETTLE_OBSERVATIONS" in compose
+    assert "WORKSPACE_HINDSIGHT_SOURCE_KIND" in compose
     assert "WORKSPACE_RECONCILE_HERMES_URL" in compose
     assert "WORKSPACE_RECONCILE_HERMES_KEY" in compose
     assert "WORKSPACE_RECONCILE_MAX_CONTEXT_CHARS" in compose
@@ -1096,7 +1242,9 @@ revision_of: doc-notice
 
     assert card["status"] == "CHECK"
     assert card["revision_target_status"] == "INVALID"
-    assert card["hindsight_eligible"] is False
+    assert card["hindsight_eligible"] is True
+    assert card["hindsight_representation_candidate"] == "source"
+    assert card["document_identity_source"] == "workspace_path_fallback"
     assert any("ne peut pas référencer le document lui-même" in warning for warning in card["warnings"])
 
 

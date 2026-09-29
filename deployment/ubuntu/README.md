@@ -523,6 +523,10 @@ Those can be added only when their actual configuration and qualification needs 
 
 The productive Workspace/Hindsight topology is evaluated from this Linux host against the NAS path as mounted here. Hindsight remains local to Linux; the AFFAIRES daemon is the filesystem watcher and Hindsight producer.
 
+On the current node, configure the Workspace source to the project-level subtree
+`/mnt/pantheon-affaires/KROQI/AFFAIRES`, not the broader NAS mount. Only there
+does the first directory reliably identify a project.
+
 Create the SMB credentials file locally as root with mode `0600`; never put its
 contents in Git, shell arguments or chat. Install `cifs-utils`, then configure a
 persistent mount without embedding site-specific names in the repository:
@@ -547,3 +551,15 @@ python3 deployment/ubuntu/qualify-affaires-linux-mount.py \
 The probe is self-cleaning by default. It requires write access because future cartouche generation also requires the Linux service to create `.SOURCE.ext.md` files. Use `--keep` only for manual inspection.
 
 If the probe reports `inotify: not-observed-reconcile-required`, the mount can still qualify for correctness: keep periodic reconcile enabled and treat watcher delivery only as an optimization.
+
+The private KROQI bank is converged separately after Hindsight is healthy:
+
+```bash
+deployment/ubuntu/configure-hindsight-kroqi-bank --check
+deployment/ubuntu/configure-hindsight-kroqi-bank --apply
+```
+
+Its project material is not exposed through the direct multi-bank Hindsight MCP.
+Hermes uses the authenticated project router installed by
+`configure-hindsight-project-router-local`, which always applies the exact
+`source:kroqi-sync` and `scope:project:*` tags with `all_strict` matching.

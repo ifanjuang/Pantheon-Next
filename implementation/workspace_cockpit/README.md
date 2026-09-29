@@ -25,14 +25,33 @@ one Linux AFFAIRES indexer/sync daemon
 
 Hindsight does not own a second filesystem watcher. The Workspace daemon watches/reconciles the mounted NAS path and is the only producer into Hindsight.
 
-A normal document bundle is:
+A document may still carry an optional enrichment cartouche:
 
 ```text
 source.ext
 .source.ext.md
 ```
 
-where the hidden Markdown file is the document cartouche and preserves the complete source filename. Optional `_folder.md` files may add useful folder context.
+where the hidden Markdown file preserves the complete source filename. KROQI-synchronized
+documents do not require one cartouche per file: the first directory below the admitted
+workspace root defines the project scope, and every descendant directory contributes a
+cumulative folder tag. Optional `_folder.md` files may stabilize or enrich folder context.
+
+Directories whose name contains the distinct word `Archive` or `Archives` are
+excluded recursively by default, case-insensitively. This covers `Archives`,
+`_ARCHIVES`, `01-Archives` and `PLANS ARCHIVES`, while a source file such as
+`registre-archives.pdf` remains admissible. Neither an excluded directory nor any
+descendant is scanned. Additional exact directory names may be configured with
+`WORKSPACE_EXCLUDED_FOLDERS`.
+The Linux KROQI profile additionally excludes every directory named `RATP` or
+`IFJA_RATP`, recursively (the latter is the current name observed on the NAS).
+Files ending in `_archive`, `_bak`, `_backup` or `_old` (with spaces, dots or hyphens
+accepted as separators) are also excluded. A missing source is removed from active recall
+on the first available scan and its derived Hindsight document is deleted on the second;
+the NAS source itself is never changed.
+The source scan is restricted to PDF, DOCX, XLSX, PPTX, TXT, Markdown, HTML and
+EML. RVT/RFA, logs, images, PSD, DWG, archives and other unsupported formats are
+not indexed or sent to Hindsight.
 
 The target does not require Obsidian, Self-hosted LiveSync, CouchDB, a LiveSync filesystem mirror, `hindsight-obsidian-sync`, or `document.yaml` as a business sidecar.
 
@@ -99,10 +118,19 @@ For `.eml` bundles, `source_sha256` and `source_size_bytes` are required because
 Producer eligibility is separate from parser-format support:
 
 ```text
-format supported + CARTOUCHE_MISSING/CHECK
+format supported + root-level file without project directory
 → visible in Cockpit
 → hindsight_format_supported = true
-→ hindsight_eligible = false
+→ PENDING_SCOPE
+→ scope:pending-identification
+→ eligible for ingestion but excluded from normal project recall
+
+format supported + file below a project directory + no cartouche
+→ FOLDER_SCOPED
+→ deterministic path identity
+→ project scope inherited from the first directory
+→ cumulative folder ancestry tags
+→ hindsight_representation_candidate = source
 
 COMPLETE source format supported
 → hindsight_representation_candidate = source
@@ -150,6 +178,28 @@ supplements
 
 No relation fields means no known relation. A missing referenced historical document is exposed as an unresolved/missing relation but does not invalidate an otherwise valid source. Self-reference or malformed relation fields produce `CHECK`.
 
+## Moves, copies and project reclassification
+
+An unchanged source moved inside the same project keeps its technical
+`document_id`. The producer patches the complete Hindsight tag set and updates
+the current path in Cockpit without retaining or extracting the source again.
+An identical simultaneous copy receives a new technical identity.
+
+A move across first-directory project scopes fails closed as
+`RECLASSIFICATION_REQUIRED`; the old Hindsight memories remain under their old
+project scope. To confirm the move explicitly, add a valid document cartouche
+that reuses the displayed technical `document_id` and declares:
+
+```yaml
+scope_move_confirmed: true
+```
+
+After confirmation, unchanged bytes keep their memories while Hindsight replaces
+their complete tag set. Hindsight invalidates and re-consolidates affected
+observations under the new project tag; it does not re-extract the source text.
+Cockpit remains authoritative for the current filesystem path because Hindsight
+0.10.1 can patch document tags but not document metadata such as `source_path`.
+
 If a source is corrected in place and remains the same intended filesystem occurrence, it may keep the same `document_id`; changed bytes then replace the same Hindsight `doc_...:source`. If the old file is retained and a second physical document is created—even with the same index—the new bundle gets a new `document_id` and any relationship must be declared explicitly.
 
 ## Authority boundaries
@@ -190,6 +240,17 @@ python3 implementation/workspace_cockpit/server.py \
 
 The container/native installers now require the Linux-visible AFFAIRES mount directly. They do not create, synchronize or maintain a local source-tree copy.
 
+For the current NAS layout, the admitted KROQI project root is specifically:
+
+```text
+/mnt/pantheon-affaires/KROQI/AFFAIRES
+```
+
+The broader `/mnt/pantheon-affaires` tree is not an admissible project root: it
+also contains ASSETS, BACKUP, SCAN3D, communication material, templates,
+prospection and recycle data. The first directory rule applies only below the
+selected `KROQI/AFFAIRES` root.
+
 ## Hindsight boundary
 
 The Workspace Cockpit does not itself make retrieved material authoritative.
@@ -197,8 +258,8 @@ The Workspace Cockpit does not itself make retrieved material authoritative.
 The first producer qualification implements only the smallest A mapping:
 
 ```text
-COMPLETE
-+ unique document_id
+COMPLETE or FOLDER_SCOPED
++ unique cartouche or deterministic workspace-path document_id
 + Hindsight-supported source format
 + source representation candidate
         │
@@ -212,13 +273,19 @@ document_id = doc_...:source
 
 The source file is opened directly from the admitted Linux-visible AFFAIRES root. Pantheon creates no local staging file. The HTTP adapter uses a bounded transient in-memory multipart buffer; the default source bound is 100 MiB, matching Hindsight 0.10.1's default file-conversion batch-size limit.
 
-Only bounded orientation fields are passed as context/metadata. The first slice deliberately excludes `index`, `document_date`, `revision_mode` and `revision_of` from Hindsight file-retain extraction context because these labels may be wrong or incomplete. The cartouche body and derived summary are not injected as source claims.
+Only bounded orientation fields are passed as extraction context. A valid optional
+cartouche also contributes namespaced `cartouche_*` provenance metadata, including
+its declared index, date and explicit revision relation. These declarations are not
+inserted into the source text or extraction context and therefore remain visibly
+distinct from facts extracted from the document. An absent or invalid cartouche
+contributes no enrichment and never blocks a supported source. The cartouche body
+and derived summary are not injected as source claims.
 
 This slice does **not** close #659's A/B/C comparison:
 
 ```text
-A = source only + bounded descriptive context   ← implemented qualification slice
-B = richer bounded cartouche context            ← not selected
+A = source + bounded descriptive context         ← implemented
+B = namespaced cartouche provenance metadata     ← implemented when valid
 C = separately retrievable cartouche            ← not selected
 ```
 
@@ -240,11 +307,18 @@ bundle still present but no longer eligible
 → BLOCKED
 
 bundle absent
-→ STALE
-→ no automatic remote delete in this slice
+→ first available scan: QUARANTINED, source/project recall tags removed
+→ second available scan: ARCHIVED, exact derived Hindsight document deleted
+→ source returns before deletion: tags restored without duplicate retention
 ```
 
-The delete boundary is deliberate. Hindsight observations are derived state, and document deletion requires a separate lifecycle qualification before Pantheon may treat source disappearance as authorization to destroy Hindsight state.
+The lifecycle is bounded to derived Hindsight state. It pauses when the workspace is
+unavailable and refuses a large disappearance affecting more than 25% of at least 20
+known sources. It never deletes or changes a mounted source file.
+
+The emitted tag vocabulary and the mandatory project-scoped Hermes query rules are
+defined in
+[`HINDSIGHT_TAG_TAXONOMY.md`](../../docs/governance/HINDSIGHT_TAG_TAXONOMY.md).
 
 No automatic OCR is part of the AFFAIRES baseline. The reviewed Hindsight deployment posture is:
 
@@ -255,6 +329,19 @@ HINDSIGHT_API_FILE_DELETE_AFTER_RETAIN=true
 HINDSIGHT_API_FILE_PARSER_MARKITDOWN_OCR_ENABLED=false
 HINDSIGHT_API_STORE_DOCUMENT_TEXT=true
 ```
+
+After a PDF retain completes, the producer performs one read-only quality check on
+Hindsight's extracted text. Empty text and characteristic `(cid:…)` corruption are
+projected as `OCR_NEEDED` in Cockpit. This is advisory and never blocks the source
+document, launches OCR, or replaces the retained source. Marker OCR remains an
+explicit per-file operator action; any resulting text is a derived representation,
+not the professional source of authority.
+
+A PDF conversion that terminates with an explicit `No content extracted` or
+`No text extracted` parser error is classified the same way as `OCR_NEEDED`, rather
+than as a generic producer failure. It is not automatically retried or OCR-processed.
+A transient document-read failure during the post-retain quality check remains
+`CHECK_ERROR` and is retried on the next reconcile without retaining the source again.
 
 The retain mission asks Hindsight to preserve explicit chronology stated by the source itself: document date, revision/index/version token and explicit supersession relationships. It also tells Hindsight to preserve conflicting chronology statements rather than silently resolving them. The producer sends `timestamp: "unset"` for these reference documents so ingestion time is never presented to the extraction model as the document's event date.
 
@@ -274,6 +361,8 @@ WORKSPACE_HINDSIGHT_BANK_ID=<reviewed-bank-id>
 WORKSPACE_HINDSIGHT_PARSER=markitdown
 WORKSPACE_HINDSIGHT_MAX_SUBMITS_PER_RECONCILE=4
 WORKSPACE_HINDSIGHT_MAX_FILE_MB=100
+WORKSPACE_HINDSIGHT_SETTLE_OBSERVATIONS=2
+WORKSPACE_HINDSIGHT_SOURCE_KIND=kroqi-sync
 ```
 
 `WORKSPACE_HINDSIGHT_AUTHORIZATION` may be supplied there when the selected Hindsight exposure requires it. The environment file is optional; absence keeps the producer inactive.
@@ -316,6 +405,13 @@ exact Workspace document_id
 It does **not** read the original NAS source, does not send the source path to Hermes,
 does not send Hindsight `original_text` or arbitrary document/memory metadata, and
 does not write to Hindsight, Workspace, NAS or a Pantheon governed owner.
+
+The project-scoped Hindsight router uses source-grounded evidence mode. It asks
+only for `world` and `experience` facts, disables consolidated observations, and
+returns at most eight distinct results. Every returned fact must carry both an
+exact `document_id` and `chunk_id`; unsourced observations are omitted. Project
+and source tags remain mandatory with `all_strict`, and an optional folder can
+only narrow that boundary.
 
 The result categories are bounded to:
 

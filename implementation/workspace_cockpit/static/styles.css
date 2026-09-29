@@ -71,6 +71,8 @@ h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp
 .card[data-status="COMPLETE"] { --state: var(--green); }
 .card[data-status="CHECK"] { --state: var(--amber); }
 .card[data-status="CARTOUCHE_MISSING"] { --state: var(--violet); }
+.card[data-status="FOLDER_SCOPED"] { --state: #247a67; }
+.card[data-status="PENDING_SCOPE"] { --state: #8a5a20; }
 .card[data-status="SOURCE_MISSING"] { --state: var(--red); }
 .card[data-status="FOLDER"] { --state: var(--blue); }
 .card-head { padding: 1.25rem 1.25rem .75rem; }

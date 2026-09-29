@@ -1,5 +1,7 @@
 const STATUS = {
   COMPLETE: { label: "Complet", color: "#287652" },
+  FOLDER_SCOPED: { label: "Contexte dossier", color: "#247a67" },
+  PENDING_SCOPE: { label: "Projet à identifier", color: "#8a5a20" },
   CHECK: { label: "À vérifier", color: "#a76800" },
   SOURCE_ONLY: { label: "Source seule", color: "#6648a8" },
   SOURCE_MISSING: { label: "Source manquante", color: "#a53535" },
@@ -49,6 +51,18 @@ function documentCardBody(card) {
     fact("Identité déclarée", card.document_id),
     fact("Identité technique", card.technical_document_id),
     fact("Hindsight", card.hindsight_status || (card.hindsight_eligible ? "Non synchronisé" : "Non éligible"), card.hindsight_last_error ? "fact-alert" : ""),
+    fact(
+      "Reclassement",
+      card.hindsight_reclassification_required
+        ? `${card.hindsight_previous_project || "sans projet"} → ${card.hindsight_requested_project || "sans projet"} — confirmation requise`
+        : "",
+      "fact-alert",
+    ),
+    fact(
+      "OCR",
+      card.hindsight_ocr_needed ? "À demander pour ce fichier" : card.hindsight_extraction_quality,
+      card.hindsight_ocr_needed ? "fact-alert" : "fact-muted",
+    ),
     fact("Émetteur", card.issuer),
     fact(
       card.revision_mode === "supersedes" ? "Remplace" : card.revision_mode === "supplements" ? "Complète" : "Relation",
