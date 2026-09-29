@@ -148,6 +148,14 @@
       "observed_on": "2026-09-01",
       "delta": "none",
       "note": "Observed from the current GitHub latest release v2.20.1, published 2026-09-01. The qualification pin targets package 2.20.1 at commit 4a9a9a3dd22b459c5e6a15d87af0997febad1703. This observation answers freshness only; it does not install, activate, authorize, admit Evidence, or adopt ISNAD."
+    },
+    "harnessrouter": {
+      "source": "github_releases_latest",
+      "locator": "HarnessRouter/harnessrouter",
+      "latest_seen": "v0.26.14",
+      "observed_on": "2026-09-30",
+      "delta": "none",
+      "note": "Observed stable HarnessRouter CE v0.26.14 at commit 7d0fa14bf70e81a2226d232bc519e729d32793d3. The newer v0.27.0-rc.1 is a prerelease and is not treated as the stable head. Source review of both v0.26.14 and v0.27.0-rc.1 shows their self-hosted entrypoint installs hermes-agent==0.19.0, while Pantheon's separately selected Hermes qualification pin is newer. This observation does not adopt HarnessRouter, authorize UHP, or establish runtime comparability."
     }
   },
   "authority": {
