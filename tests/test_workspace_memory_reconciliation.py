@@ -409,6 +409,31 @@ def test_service_rejects_non_complete_or_non_source_representation() -> None:
         raise AssertionError("CHECK document must not reconcile")
 
 
+def test_service_accepts_completed_eligible_technical_identity_without_cartouche() -> None:
+    module = _module()
+    snapshot = _snapshot()
+    card = snapshot["workspaces"][0]["cards"][0]
+    card.update(
+        status="FOLDER_SCOPED",
+        document_id=None,
+        technical_document_id="doc-auto-1",
+        hindsight_document_id="doc-auto-1:source",
+        hindsight_eligible=True,
+        hindsight_status="COMPLETED",
+    )
+    hermes = _FakeHermes()
+    service = module.MemoryReconciliationService(
+        hindsight_client=_FakeHindsight(),
+        hermes_client=hermes,
+    )
+
+    result = service.reconcile(snapshot, "doc-auto-1", focus="Organisation")
+
+    assert result["document_id"] == "doc-auto-1"
+    assert result["hindsight_document_id"] == "doc-auto-1:source"
+    assert hermes.packet["cartouche_projection"]["document_id"] == "doc-auto-1"
+
+
 def test_cockpit_post_route_requires_explicit_intent_and_passes_only_document_id_focus() -> None:
     server_module = _load(SERVER_PATH, "workspace_cockpit_server_reconcile_route")
 

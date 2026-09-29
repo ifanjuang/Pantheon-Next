@@ -81,6 +81,15 @@ def test_workspace_cockpit_compose_is_read_only_and_loopback_only() -> None:
     assert "WORKSPACE_HINDSIGHT_URL" in text
     assert "WORKSPACE_HINDSIGHT_BANK_ID" in text
     assert "WORKSPACE_HINDSIGHT_MAX_FILE_MB" in text
+    assert "WORKSPACE_HINDSIGHT_SETTLE_OBSERVATIONS" in text
+    assert "WORKSPACE_HINDSIGHT_SOURCE_KIND" in text
+    assert "WORKSPACE_EXCLUDED_FOLDERS" in text
+    assert "network_mode: host" in text
+    assert "Kroqi=/workspace/affaires" in text
+    assert 'WORKSPACE_RECONCILE_SECONDS:-3600' in text
+    assert 'WORKSPACE_HINDSIGHT_BANK_ID:-IFJA_KROQI' in text
+    assert 'WORKSPACE_HINDSIGHT_SETTLE_OBSERVATIONS:-2' in text
+    assert 'WORKSPACE_HINDSIGHT_SOURCE_KIND:-kroqi-sync' in text
 
 
 def test_hindsight_file_retain_runtime_posture_is_explicit() -> None:
@@ -90,9 +99,11 @@ def test_hindsight_file_retain_runtime_posture_is_explicit() -> None:
     assert "revision/index/version token" in text
     assert "revision-history or revision-table entries" in text
     assert "Never infer document chronology" in text
+    assert "preserve an unresolved reference instead of guessing" in text
     assert 'HINDSIGHT_API_FILE_DELETE_AFTER_RETAIN: "true"' in text
     assert 'HINDSIGHT_API_FILE_PARSER_MARKITDOWN_OCR_ENABLED: "false"' in text
     assert 'HINDSIGHT_API_STORE_DOCUMENT_TEXT: "true"' in text
+    assert "shm_size: 1gb" in text
 
 
 def test_workspace_cockpit_remote_access_uses_pinned_userspace_tailscale() -> None:
