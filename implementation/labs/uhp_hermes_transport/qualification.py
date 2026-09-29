@@ -54,6 +54,14 @@ def _bool_or_none(value: Any, field: str) -> bool | None:
     return value
 
 
+def _bool(value: Any, field: str, *, default: bool = False) -> bool:
+    if value is None:
+        return default
+    if not isinstance(value, bool):
+        raise TransportQualificationError(f"{field} must be boolean")
+    return value
+
+
 def _non_negative_int(value: Any, field: str) -> int:
     if isinstance(value, bool) or not isinstance(value, int) or value < 0:
         raise TransportQualificationError(f"{field} must be a non-negative integer")
@@ -134,11 +142,26 @@ def normalize_observation(raw: dict[str, Any]) -> dict[str, Any]:
             "retained_native_observer"
         )
 
-    transient_file_case = bool(raw.get("transient_file_case", False))
-    artifact_case = bool(raw.get("artifact_case", False))
-    stream_case = bool(raw.get("stream_case", False))
-    cancellation_case = bool(raw.get("cancellation_case", False))
-    ambiguous_submission_case = bool(raw.get("ambiguous_submission_case", False))
+    transient_file_case = _bool(
+        raw.get("transient_file_case"),
+        "transient_file_case",
+    )
+    artifact_case = _bool(
+        raw.get("artifact_case"),
+        "artifact_case",
+    )
+    stream_case = _bool(
+        raw.get("stream_case"),
+        "stream_case",
+    )
+    cancellation_case = _bool(
+        raw.get("cancellation_case"),
+        "cancellation_case",
+    )
+    ambiguous_submission_case = _bool(
+        raw.get("ambiguous_submission_case"),
+        "ambiguous_submission_case",
+    )
 
     out = {
         "schema": schema,
@@ -240,8 +263,9 @@ def normalize_observation(raw: dict[str, Any]) -> dict[str, Any]:
         "elapsed_seconds": _finite_number_or_none(
             raw.get("elapsed_seconds"), "elapsed_seconds"
         ),
-        "deletion_assessment_complete": bool(
-            raw.get("deletion_assessment_complete", False)
+        "deletion_assessment_complete": _bool(
+            raw.get("deletion_assessment_complete"),
+            "deletion_assessment_complete",
         ),
         "deletable_native_components": _string_list(
             raw.get("deletable_native_components"),
