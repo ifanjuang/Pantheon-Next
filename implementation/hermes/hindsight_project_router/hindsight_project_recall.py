@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from typing import Any
@@ -27,6 +28,13 @@ def tag_value(value: str) -> str:
     )
     normalized = TAG_SAFE_RE.sub("-", without_marks).strip("-")
     return normalized[:96]
+
+
+def project_scope_token(value: str) -> str:
+    canonical = unicodedata.normalize("NFKC", value.strip()).casefold()
+    slug = tag_value(value) or "project"
+    digest = hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:12]
+    return f"{slug[:80]}-{digest}"
 
 
 class ProjectRecallClient:
@@ -96,12 +104,13 @@ class ProjectRecallClient:
         project_slug = tag_value(project)
         if not project_slug or project_slug == "pending-identification":
             raise ProjectRecallError("A concrete project is required")
+        project_scope = project_scope_token(project)
         query = query.strip()
         if not query or len(query) > 2000:
             raise ProjectRecallError("Query must contain between 1 and 2000 characters")
 
         source_tag = f"source:{self.source_kind}"
-        scope_tag = f"scope:project:{project_slug}"
+        scope_tag = f"scope:project:{project_scope}"
         tags = [source_tag, scope_tag]
         folder_slug = tag_value(folder) if folder else ""
         if folder_slug:

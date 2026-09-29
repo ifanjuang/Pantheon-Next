@@ -1468,6 +1468,141 @@ class WorkspaceIndex:
         self._watcher.stop()
 
 
+class PersistedWorkspaceProjection:
+    """Read-only Cockpit view over the producer-owned SQLite projection."""
+
+    def __init__(self, roots: list[tuple[str, Path]], state_db: Path) -> None:
+        self.roots = roots
+        self.state_db = state_db
+        self._last_error: str | None = None
+
+    def start(self) -> None:
+        return
+
+    def stop(self) -> None:
+        return
+
+    def _empty(self, error: str | None = None) -> dict[str, Any]:
+        workspaces = [
+            {
+                "name": label,
+                "available": root.is_dir() and os.access(root, os.R_OK | os.X_OK),
+                "cards": [],
+                "errors": [error or "Projection producer non disponible"],
+            }
+            for label, root in self.roots
+        ]
+        return {
+            "generated_at": None,
+            "projection": PROJECTION_ID,
+            "read_only": True,
+            "totals": {status: 0 for status in STATUS_NAMES},
+            "workspace_count": len(workspaces),
+            "item_count": 0,
+            "package_count": 0,
+            "document_count": 0,
+            "folder_count": 0,
+            "workspaces": workspaces,
+            "index_state": {
+                "mode": "persisted-projection",
+                "watcher": "external-producer",
+                "last_reconcile_at": None,
+                "last_reconcile_reason": None,
+                "state_error": error,
+            },
+            "hindsight_producer": {"enabled": True, "mode": "external-producer"},
+        }
+
+    def snapshot(self) -> dict[str, Any]:
+        if not self.state_db.is_file():
+            self._last_error = "producer index absent"
+            return self._empty(self._last_error)
+        try:
+            connection = sqlite3.connect(self.state_db, timeout=2)
+            connection.row_factory = sqlite3.Row
+            try:
+                connection.execute("PRAGMA query_only=ON")
+                rows = connection.execute(
+                    "SELECT workspace, payload_json FROM workspace_entries ORDER BY workspace, path"
+                ).fetchall()
+                meta_rows = connection.execute(
+                    "SELECT key, value FROM workspace_meta"
+                ).fetchall()
+            finally:
+                connection.close()
+        except (OSError, sqlite3.Error) as exc:
+            self._last_error = f"{type(exc).__name__}: {exc}"
+            return self._empty(self._last_error)
+
+        metadata = {str(row["key"]): str(row["value"]) for row in meta_rows}
+        cards_by_workspace: dict[str, list[dict[str, Any]]] = {}
+        for row in rows:
+            try:
+                payload = json.loads(str(row["payload_json"]))
+            except json.JSONDecodeError:
+                continue
+            if isinstance(payload, dict):
+                cards_by_workspace.setdefault(str(row["workspace"]), []).append(payload)
+
+        workspaces: list[dict[str, Any]] = []
+        known = {label for label, _ in self.roots}
+        for label, root in self.roots:
+            workspaces.append(
+                {
+                    "name": label,
+                    "available": root.is_dir() and os.access(root, os.R_OK | os.X_OK),
+                    "cards": cards_by_workspace.pop(label, []),
+                    "errors": [],
+                }
+            )
+        for label, cards in sorted(cards_by_workspace.items()):
+            if label not in known:
+                workspaces.append(
+                    {"name": label, "available": False, "cards": cards, "errors": ["Workspace non configuré"]}
+                )
+
+        totals = {status: 0 for status in STATUS_NAMES}
+        document_count = 0
+        folder_count = 0
+        for workspace in workspaces:
+            for card in workspace["cards"]:
+                status = str(card.get("status") or "")
+                totals[status] = totals.get(status, 0) + 1
+                if card.get("kind") == "folder":
+                    folder_count += 1
+                else:
+                    document_count += 1
+        item_count = document_count + folder_count
+        generated_at = metadata.get("last_reconcile_at")
+        self._last_error = None
+        return {
+            "generated_at": generated_at,
+            "projection": metadata.get("projection", PROJECTION_ID),
+            "read_only": True,
+            "totals": totals,
+            "workspace_count": len(workspaces),
+            "item_count": item_count,
+            "package_count": item_count,
+            "document_count": document_count,
+            "folder_count": folder_count,
+            "workspaces": workspaces,
+            "index_state": {
+                "mode": "persisted-projection",
+                "watcher": "external-producer",
+                "last_reconcile_at": generated_at,
+                "last_reconcile_reason": metadata.get("last_reconcile_reason"),
+                "state_error": None,
+            },
+            "hindsight_producer": {"enabled": True, "mode": "external-producer"},
+        }
+
+    def health(self) -> dict[str, Any]:
+        snapshot = self.snapshot()
+        state = dict(snapshot.get("index_state") or {})
+        state["state_error"] = self._last_error
+        return state
+
+
 def _path_is_within(candidate: Path, root: Path) -> bool:
     try:
         candidate.resolve(strict=False).relative_to(root.resolve(strict=False))
@@ -1480,7 +1615,7 @@ class CockpitHandler(BaseHTTPRequestHandler):
     roots: list[tuple[str, Path]] = []
     max_depth = 2
     excluded_folder_names: tuple[str, ...] = DEFAULT_EXCLUDED_FOLDERS
-    workspace_index: WorkspaceIndex | None = None
+    workspace_index: WorkspaceIndex | PersistedWorkspaceProjection | None = None
     role_trace_url = ""
     role_trace_key = ""
     memory_reconciliation: MemoryReconciliationService | None = None
@@ -1761,6 +1896,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--no-watch", action="store_true", help="disable inotify acceleration; periodic reconcile remains")
     parser.add_argument(
+        "--projection-only",
+        action="store_true",
+        help="serve the producer-owned persisted projection without scanning or producing",
+    )
+    parser.add_argument(
         "--hindsight-url",
         default=os.getenv("WORKSPACE_HINDSIGHT_URL", ""),
         help="Hindsight base URL; producer stays disabled when omitted",
@@ -1863,14 +2003,15 @@ def main(argv: list[str] | None = None) -> int:
             parser=args.hindsight_parser,
             max_file_bytes=args.hindsight_max_file_mb * 1024 * 1024,
         )
-        producer = HindsightProducer(
-            roots=args.root,
-            state_db=state_db,
-            client=hindsight_client,
-            max_submits_per_reconcile=args.hindsight_max_submits_per_reconcile,
-            settle_observations=args.hindsight_settle_observations,
-            source_kind=args.hindsight_source_kind,
-        )
+        if not args.projection_only:
+            producer = HindsightProducer(
+                roots=args.root,
+                state_db=state_db,
+                client=hindsight_client,
+                max_submits_per_reconcile=args.hindsight_max_submits_per_reconcile,
+                settle_observations=args.hindsight_settle_observations,
+                source_kind=args.hindsight_source_kind,
+            )
 
     reconcile_hermes_url = args.reconcile_hermes_url.strip().rstrip("/")
     reconcile_hermes_key = os.getenv("WORKSPACE_RECONCILE_HERMES_KEY", "").strip()
@@ -1899,16 +2040,22 @@ def main(argv: list[str] | None = None) -> int:
             max_context_chars=args.reconcile_max_context_chars,
         )
 
-    workspace_index = WorkspaceIndex(
-        args.root,
-        args.max_depth,
-        state_db,
-        reconcile_seconds=args.reconcile_seconds,
-        debounce_seconds=args.watch_debounce_ms / 1000.0,
-        enable_watcher=not args.no_watch,
-        producer=producer,
-        excluded_folder_names=excluded_folder_names,
-    )
+    if args.projection_only:
+        workspace_index: WorkspaceIndex | PersistedWorkspaceProjection = PersistedWorkspaceProjection(
+            args.root,
+            state_db,
+        )
+    else:
+        workspace_index = WorkspaceIndex(
+            args.root,
+            args.max_depth,
+            state_db,
+            reconcile_seconds=args.reconcile_seconds,
+            debounce_seconds=args.watch_debounce_ms / 1000.0,
+            enable_watcher=not args.no_watch,
+            producer=producer,
+            excluded_folder_names=excluded_folder_names,
+        )
     workspace_index.start()
     CockpitHandler.workspace_index = workspace_index
 

@@ -17,13 +17,21 @@ The selected professional target is now:
 NAS / AFFAIRES
       │ mounted on Linux
       ▼
-one Linux AFFAIRES indexer/sync daemon
+standalone AFFAIRES producer
+scan / watcher / reconcile
       │
-      ├────────► Workspace Cockpit
-      └────────► Hindsight on Linux
+      ├────────► Hindsight on Linux
+      └────────► technical SQLite projection
+                         │
+                         ▼
+                  Workspace Cockpit
+                  optional / read-only
 ```
 
-Hindsight does not own a second filesystem watcher. The Workspace daemon watches/reconciles the mounted NAS path and is the only producer into Hindsight.
+Hindsight does not own a second filesystem watcher. The standalone Workspace
+producer watches/reconciles the mounted NAS path and is the only producer into
+Hindsight. The Cockpit reads the persisted SQLite projection with
+`--projection-only`; stopping the Cockpit does not stop ingestion.
 
 A document may still carry an optional enrichment cartouche:
 
@@ -75,9 +83,10 @@ The current implementation:
 - reads only bounded Markdown plus filesystem metadata during reconciliation;
 - keeps heavy source bytes unopened;
 - exposes a disabled Generate cartouche affordance without introducing a write path;
-- serves `/api/workspaces` from an in-memory indexed snapshot;
-- persists only reconstructible technical state in SQLite outside watched roots;
-- uses Linux inotify as an accelerator and a periodic full reconcile as the convergence guarantee;
+- serves `/api/workspaces` from the producer-owned persisted projection in productive deployment;
+- persists only technical synchronization state in SQLite outside watched roots;
+- uses Linux inotify in the standalone producer as an accelerator and a periodic full reconcile as the convergence guarantee;
+- keeps the Cockpit HTTP/UI process free of NAS recursion, filesystem watcher ownership and Hindsight producer writes;
 - is configured by the Ubuntu deployment against the reviewed AFFAIRES path mounted directly by Linux; no source-tree mirror is required.
 
 The remaining migration owned by #660 is:

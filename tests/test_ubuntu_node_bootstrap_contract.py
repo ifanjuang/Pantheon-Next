@@ -71,8 +71,12 @@ def test_workspace_cockpit_compose_is_read_only_and_loopback_only() -> None:
     assert "cap_drop:" in text and "- ALL" in text
     assert "group_add:" in text
     assert "${AFFAIRES_GID:?set AFFAIRES_GID to the Linux-mounted NAS AFFAIRES group id}" in text
-    assert "${AFFAIRES_ROOT:?set AFFAIRES_ROOT to the Linux-mounted NAS AFFAIRES path}:/workspace/affaires:ro" in text
-    assert text.count(":ro") == 1
+    affaires_mount = "${AFFAIRES_ROOT:?set AFFAIRES_ROOT to the Linux-mounted NAS AFFAIRES path}:/workspace/affaires:ro"
+    assert text.count(affaires_mount) == 2
+    assert "workspace-producer:" in text
+    assert 'entrypoint: ["/opt/hermes/.venv/bin/python", "/app/producer_daemon.py"]' in text
+    assert "--projection-only" in text
+    assert "workspace-cockpit-state:/state:ro" in text
     assert "/srv/pantheon/obsidian" not in text
     assert '127.0.0.1:${ROLE_TRACE_ATTACH_PORT:-8190}:8190' in text
     assert "HERMES_ROLE_TRACE_API_KEY" in text

@@ -1,10 +1,62 @@
 services:
-  workspace-cockpit:
+  workspace-producer:
     build:
       context: ../../implementation
       dockerfile: workspace_cockpit/Dockerfile
       args:
         HERMES_IMAGE: ${RELEASE_HERMES_IMAGE:?load deployment/ubuntu/release.env}
+    image: pantheon/workspace-cockpit:local
+    container_name: pantheon-workspace-producer
+    restart: unless-stopped
+    network_mode: host
+    ports: !reset []
+    extra_hosts: !reset []
+    entrypoint: ["/opt/hermes/.venv/bin/python", "/app/producer_daemon.py"]
+    command:
+      - --max-depth
+      - "8"
+      - --root
+      - Kroqi=/workspace/affaires
+    read_only: true
+    cap_drop:
+      - ALL
+    group_add:
+      - "${AFFAIRES_GID:?set AFFAIRES_GID to the Linux-mounted NAS AFFAIRES group id}"
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    environment:
+      WORKSPACE_INDEX_DB: /state/index.sqlite3
+      WORKSPACE_RECONCILE_SECONDS: ${WORKSPACE_RECONCILE_SECONDS:-3600}
+      WORKSPACE_WATCH_DEBOUNCE_MS: ${WORKSPACE_WATCH_DEBOUNCE_MS:-500}
+      WORKSPACE_EXCLUDED_FOLDERS: ${WORKSPACE_EXCLUDED_FOLDERS:-Archive,Archives,RATP,IFJA_RATP}
+      WORKSPACE_HINDSIGHT_URL: ${WORKSPACE_HINDSIGHT_URL:-http://127.0.0.1:8888}
+      WORKSPACE_HINDSIGHT_BANK_ID: ${WORKSPACE_HINDSIGHT_BANK_ID:-IFJA_KROQI}
+      WORKSPACE_HINDSIGHT_PARSER: ${WORKSPACE_HINDSIGHT_PARSER:-markitdown}
+      WORKSPACE_HINDSIGHT_MAX_SUBMITS_PER_RECONCILE: ${WORKSPACE_HINDSIGHT_MAX_SUBMITS_PER_RECONCILE:-100}
+      WORKSPACE_HINDSIGHT_MAX_FILE_MB: ${WORKSPACE_HINDSIGHT_MAX_FILE_MB:-100}
+      WORKSPACE_HINDSIGHT_SETTLE_OBSERVATIONS: ${WORKSPACE_HINDSIGHT_SETTLE_OBSERVATIONS:-2}
+      WORKSPACE_HINDSIGHT_SOURCE_KIND: ${WORKSPACE_HINDSIGHT_SOURCE_KIND:-kroqi-sync}
+      WORKSPACE_HINDSIGHT_AUTHORIZATION: ${WORKSPACE_HINDSIGHT_AUTHORIZATION:-}
+    volumes:
+      - ${AFFAIRES_ROOT:?set AFFAIRES_ROOT to the Linux-mounted NAS AFFAIRES path}:/workspace/affaires:ro
+      - workspace-cockpit-state:/state
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          /opt/hermes/.venv/bin/python -c "import os,sqlite3;
+          p=os.environ.get('WORKSPACE_INDEX_DB','/state/index.sqlite3');
+          c=sqlite3.connect('file:'+p+'?mode=ro',uri=True,timeout=2);
+          r=c.execute(\"select value from workspace_meta where key='last_reconcile_at'\").fetchone();
+          assert r and r[0]"
+      interval: 30s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  workspace-cockpit:
     image: pantheon/workspace-cockpit:local
     container_name: pantheon-workspace-cockpit
     restart: unless-stopped
@@ -18,7 +70,7 @@ services:
       - ${WORKSPACE_COCKPIT_PORT:-8189}
       - --max-depth
       - "8"
-      - --no-watch
+      - --projection-only
       - --root
       - Kroqi=/workspace/affaires
     read_only: true
@@ -36,16 +88,10 @@ services:
       WORKSPACE_ROLE_TRACE_URL: http://127.0.0.1:${ROLE_TRACE_ATTACH_PORT:-8190}
       WORKSPACE_ROLE_TRACE_KEY: ${ROLE_TRACE_READ_KEY:?set ROLE_TRACE_READ_KEY outside the repository}
       WORKSPACE_INDEX_DB: /state/index.sqlite3
-      WORKSPACE_RECONCILE_SECONDS: ${WORKSPACE_RECONCILE_SECONDS:-3600}
-      WORKSPACE_WATCH_DEBOUNCE_MS: ${WORKSPACE_WATCH_DEBOUNCE_MS:-500}
-      WORKSPACE_EXCLUDED_FOLDERS: ${WORKSPACE_EXCLUDED_FOLDERS:-Archive,Archives,RATP,IFJA_RATP}
       WORKSPACE_HINDSIGHT_URL: ${WORKSPACE_HINDSIGHT_URL:-http://127.0.0.1:8888}
       WORKSPACE_HINDSIGHT_BANK_ID: ${WORKSPACE_HINDSIGHT_BANK_ID:-IFJA_KROQI}
       WORKSPACE_HINDSIGHT_PARSER: ${WORKSPACE_HINDSIGHT_PARSER:-markitdown}
-      WORKSPACE_HINDSIGHT_MAX_SUBMITS_PER_RECONCILE: ${WORKSPACE_HINDSIGHT_MAX_SUBMITS_PER_RECONCILE:-100}
       WORKSPACE_HINDSIGHT_MAX_FILE_MB: ${WORKSPACE_HINDSIGHT_MAX_FILE_MB:-100}
-      WORKSPACE_HINDSIGHT_SETTLE_OBSERVATIONS: ${WORKSPACE_HINDSIGHT_SETTLE_OBSERVATIONS:-2}
-      WORKSPACE_HINDSIGHT_SOURCE_KIND: ${WORKSPACE_HINDSIGHT_SOURCE_KIND:-kroqi-sync}
       WORKSPACE_HINDSIGHT_AUTHORIZATION: ${WORKSPACE_HINDSIGHT_AUTHORIZATION:-}
       WORKSPACE_RECONCILE_HERMES_URL: ${WORKSPACE_RECONCILE_HERMES_URL:-}
       WORKSPACE_RECONCILE_HERMES_KEY: ${WORKSPACE_RECONCILE_HERMES_KEY:-}
@@ -57,7 +103,7 @@ services:
         condition: service_healthy
     volumes:
       - ${AFFAIRES_ROOT:?set AFFAIRES_ROOT to the Linux-mounted NAS AFFAIRES path}:/workspace/affaires:ro
-      - workspace-cockpit-state:/state
+      - workspace-cockpit-state:/state:ro
     healthcheck:
       test:
         - CMD-SHELL

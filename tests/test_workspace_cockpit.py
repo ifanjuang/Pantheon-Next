@@ -12,6 +12,7 @@ SERVER = ROOT / "implementation" / "workspace_cockpit" / "server.py"
 INSTALLER = ROOT / "deployment" / "ubuntu" / "configure-workspace-cockpit-local"
 COMPOSE = ROOT / "deployment" / "ubuntu" / "compose.workspace-cockpit-local.yaml"
 MOUNT_QUALIFIER = ROOT / "deployment" / "ubuntu" / "qualify-affaires-linux-mount.py"
+PRODUCER_DAEMON = ROOT / "implementation" / "workspace_cockpit" / "producer_daemon.py"
 
 
 def _module():
@@ -1021,6 +1022,7 @@ def test_mount_probe_rejects_local_or_session_mount_in_production_mode(tmp_path:
 def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     subprocess.run(["bash", "-n", str(INSTALLER)], check=True)
     subprocess.run(["python3", "-m", "py_compile", str(MOUNT_QUALIFIER)], check=True)
+    subprocess.run(["python3", "-m", "py_compile", str(PRODUCER_DAEMON)], check=True)
     subprocess.run(
         ["node", "--check", str(ROOT / "implementation" / "workspace_cockpit" / "static" / "app.js")],
         check=True,
@@ -1035,6 +1037,9 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     assert "--affaires-root" in text
     assert "AFFAIRES_ROOT" in text
     assert "hindsight_producer.py" in text
+    assert "producer_daemon.py" in text
+    assert "pantheon-affaires-producer.service" in text
+    assert "--projection-only" in text
     assert "memory_reconciliation.py" in text
     assert "EnvironmentFile=-/etc/pantheon-workspace-cockpit.env" in text
     assert "setfacl" not in text
@@ -1045,7 +1050,11 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     assert "${AFFAIRES_ROOT:?set AFFAIRES_ROOT to the Linux-mounted NAS AFFAIRES path}:/workspace/affaires:ro" in compose
     assert "${AFFAIRES_GID:?set AFFAIRES_GID to the Linux-mounted NAS AFFAIRES group id}" in compose
     assert "group_add:" in compose
-    assert compose.count(":ro") == 1
+    assert "workspace-producer:" in compose
+    assert 'entrypoint: ["/opt/hermes/.venv/bin/python", "/app/producer_daemon.py"]' in compose
+    assert "--projection-only" in compose
+    assert compose.count("${AFFAIRES_ROOT:?set AFFAIRES_ROOT to the Linux-mounted NAS AFFAIRES path}:/workspace/affaires:ro") == 2
+    assert "workspace-cockpit-state:/state:ro" in compose
     assert "/srv/pantheon/obsidian" not in compose
     assert "workspace-cockpit-state:/state" in compose
     assert "WORKSPACE_INDEX_DB: /state/index.sqlite3" in compose
@@ -1273,3 +1282,28 @@ document_date: 1999-01-01
     assert card["revision_target_present"] is False
     assert card["revision_target_status"] == "MISSING"
     assert card["hindsight_eligible"] is True
+
+
+
+def test_persisted_projection_reads_producer_owned_index_without_rescan(tmp_path: Path) -> None:
+    module = _module()
+    source = tmp_path / "Notice.pdf"
+    source.write_bytes(b"%PDF")
+    state = tmp_path.parent / f"{tmp_path.name}-projection.sqlite3"
+    index = module.WorkspaceIndex(
+        [("Affaires", tmp_path)],
+        2,
+        state,
+        enable_watcher=False,
+        producer=None,
+    )
+    written = index.reconcile("test-producer")
+    assert written["document_count"] == 1
+
+    projection = module.PersistedWorkspaceProjection([("Affaires", tmp_path)], state)
+    snapshot = projection.snapshot()
+
+    assert snapshot["document_count"] == 1
+    assert snapshot["index_state"]["mode"] == "persisted-projection"
+    assert snapshot["index_state"]["watcher"] == "external-producer"
+    assert snapshot["index_state"]["last_reconcile_reason"] == "test-producer"

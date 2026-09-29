@@ -22,7 +22,8 @@ def test_router_exposes_no_broad_or_write_tool() -> None:
     mcp = MCP.read_text(encoding="utf-8")
     assert '"tags_match": "all_strict"' in core
     assert 'source_tag = f"source:{self.source_kind}"' in core
-    assert 'scope_tag = f"scope:project:{project_slug}"' in core
+    assert "def project_scope_token(" in core
+    assert 'scope_tag = f"scope:project:{project_scope}"' in core
     assert '"types": ["world", "experience"]' in core
     assert '"mode": "source-grounded-evidence"' in core
     assert "MAX_EVIDENCE_RESULTS = 8" in core
