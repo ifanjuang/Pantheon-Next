@@ -19,7 +19,7 @@ The human decides admission and separately gated consequential effects.
 
 ## Current external implementation
 
-The executable candidate now lives in `ifanjuang/pantheon-mvp/main`.
+The executable candidate is now co-located under `Pantheon-Next/implementation/`. The former `ifanjuang/pantheon-mvp` repository is provenance only and is not an active execution owner.
 
 Merged slices:
 
@@ -267,7 +267,7 @@ access ends when the run is no longer running
 
 ## Candidate Hermes context plugin
 
-The merged executable repo contains the external candidate plugin `pantheon-context-bridge`.
+The co-located implementation contains the candidate plugin `implementation/hermes/plugins/pantheon-context-bridge`.
 
 It registers only:
 
@@ -292,10 +292,10 @@ The plugin derives admission identity from host-provided Hermes task/session con
 
 ## Operator-only synthetic live acceptance
 
-The merged executable repo also contains:
+The co-located implementation also contains:
 
 ```text
-scripts/hermes_live_binding_acceptance.py
+implementation/scripts/hermes_live_binding_acceptance.py
 ```
 
 Default mode observes only the Hermes Runs/toolset surfaces.
@@ -455,6 +455,53 @@ It does not install, enable, approve or activate the binding.
 - first live proof using a real professional dossier;
 - runtime success treated as Evidence or professional truth.
 
+## Replaceable execution transport qualification — UHP #1141
+
+The native Hermes Runs binding remains the current baseline. Issue #1141 qualifies UHP 2026-09-12 as a possible replacement for the **external transport only**.
+
+```text
+Pantheon Execution Admission
+        |
+        v
+external execution binding
+        |
+        +--> current: native Hermes Runs API
+        |
+        `--> candidate: UHP client -> UHP server -> Hermes
+```
+
+Pantheon does not become the UHP task client. The external binding remains the actor that materializes one already-admitted launch opportunity.
+
+Initial scope is UHP Core. Extended file/artifact surfaces may be qualified only where a demonstrated use case requires them. UHP Full lifecycle management is outside the selected scope.
+
+The candidate must preserve several seams that the native binding currently makes explicit:
+
+```text
+UHP configured harness != effective Hermes tool surface proven
+UHP session id != Pantheon admission identity
+UHP task accepted != Pantheon authorization
+UHP success != Evidence
+UHP input_file available != ephemeral source-context lease qualified
+UHP artifact produced != professional Source
+```
+
+In particular, the current context plugin derives the admission identity from host-provided Hermes task/session context. A model-visible prompt, instruction or arbitrary metadata field carrying `admission_id` is not a substitute. #1141 must prove a host-level correlation seam or classify that mismatch as blocking.
+
+Likewise, UHP `disabledTools` is not assumed to prove a hard runtime block: the protocol permits runtimes that can only convey the restriction as standing instruction. Existing target-local tool-surface qualification must remain until an equal or stronger effective-surface proof exists.
+
+#1125 is not superseded merely because UHP Extended can transport files. Its exact SHA-256 basis, immutable execution binding, bounded lifetime and fail-closed expiry semantics remain separate requirements until #1141 demonstrates equivalence.
+
+The adoption result from #1141 must be one of:
+
+```text
+replace_native_binding
+partial_transport_only
+watch
+reject
+```
+
+If UHP adds a layer while the native binding, native tool observer and admission-correlation plumbing all remain necessary, the transport is not adopted.
+
 ## Capability Slot
 
 ```text
@@ -490,9 +537,9 @@ Pantheon gates:
 ## Current implementation status
 
 ```text
-external observer implementation           merged in pantheon-mvp main
-external launch junction implementation    merged in pantheon-mvp main
-operator live acceptance helper            merged in pantheon-mvp main
+external observer implementation           co-located under Pantheon-Next/implementation
+external launch junction implementation    co-located under Pantheon-Next/implementation
+operator live acceptance helper            co-located under Pantheon-Next/implementation
 launch reservation persistence             implemented externally
 Launch Context Snapshot                    implemented externally
 launch_reserved / launch_expired state     implemented externally
