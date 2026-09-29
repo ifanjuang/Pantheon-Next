@@ -71,12 +71,14 @@ def _receipt_base(
     discovery: dict[str, Any],
     harness: dict[str, Any],
     admission_id: str | None,
+    requested_protocol_version: str,
 ) -> dict[str, Any]:
     return {
         "object_type": "uhp_transport_probe_receipt",
         "synthetic": True,
         "mode": mode,
-        "requested_protocol_version": discovery.get("default_version"),
+        "requested_protocol_version": requested_protocol_version,
+        "served_default_version": discovery.get("default_version"),
         "served_versions": discovery.get("versions"),
         "conformance_class": discovery.get("conformance_class"),
         "harness": {
@@ -185,6 +187,7 @@ def main() -> int:
             discovery=discovery,
             harness=harness,
             admission_id=args.admission_id,
+            requested_protocol_version=args.protocol_version,
         )
 
         if args.mode == "observe":
@@ -294,6 +297,7 @@ def main() -> int:
             receipt["response"] = response
             receipt["uhp_file_transport_observed"] = True
             receipt["ephemeral_lease_semantics_proven"] = False
+            receipt["affaires_hindsight_source_persistence"] = "not_measured"
 
         elif args.mode == "artifact":
             response = client.submit_task(
@@ -341,7 +345,7 @@ def main() -> int:
             receipt["response"] = response
             receipt["session_files"] = listed
             receipt["downloaded_artifacts"] = hashes
-            receipt["automatic_governance_promotion_observed"] = False
+            receipt["governance_promotion_status"] = "not_measured"
 
         receipt["elapsed_seconds"] = time.monotonic() - started
         print(
