@@ -478,3 +478,63 @@ def test_boolean_flags_fail_closed_instead_of_coercing_strings() -> None:
                 transient_file_case="false",
             )
         )
+
+
+def test_non_complete_native_baseline_cannot_support_transport_adoption() -> None:
+    report = QUAL.compare_observations(
+        _observation(
+            arm="native_runs",
+            result_status="partial",
+        ),
+        _observation(arm="uhp"),
+    )
+
+    assert report["decision"] == "inconclusive"
+    assert any(
+        "native baseline result_status=partial is not complete" in item
+        for item in report["qualification_unknowns"]
+    )
+
+
+def test_transient_file_sha_must_match_between_arms() -> None:
+    report = QUAL.compare_observations(
+        _observation(
+            arm="native_runs",
+            case_id="T6-transient-file",
+            transient_file_case=True,
+            transient_file_sha256="1" * 64,
+        ),
+        _observation(
+            arm="uhp",
+            case_id="T6-transient-file",
+            transient_file_case=True,
+            transient_file_sha256="2" * 64,
+            transient_file_basis_bound=True,
+            transient_file_expiry_fail_closed=True,
+            transient_file_persisted_to_affaires=False,
+            transient_file_persisted_to_hindsight=False,
+            transient_file_admitted_as_source=False,
+        ),
+    )
+
+    assert report["comparability"] == "fail"
+    assert "transient_file_sha256 differs between arms" in report[
+        "comparability_errors"
+    ]
+
+
+def test_feature_perimeter_must_match_between_ab_arms() -> None:
+    report = QUAL.compare_observations(
+        _observation(arm="native_runs", stream_case=False),
+        _observation(
+            arm="uhp",
+            stream_case=True,
+            stream_order_valid=True,
+            reconnect_read_valid=True,
+        ),
+    )
+
+    assert report["comparability"] == "fail"
+    assert "stream_case differs between arms" in report[
+        "comparability_errors"
+    ]
