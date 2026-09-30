@@ -207,6 +207,42 @@ Use synthetic/non-sensitive IFJA-style material requiring project context, bound
 
 Goal: measure real professional-work context pressure rather than coding-only performance.
 
+## CLM passive shadow-ranking slice
+
+A bounded Contrastive-LM experiment is prepared under the same #1047 lab because it asks an efficiency/selection question without changing Hermes execution.
+
+```text
+state + fixed candidate set
+        |
+        v
+local CLM /v1/rank
+        |
+        v
+shadow observation only
+```
+
+Files:
+
+```text
+clm_shadow_rank.py
+clm_shadow_cases.json
+CLM_SHADOW_RUNBOOK.md
+```
+
+The initial corpus is synthetic and short. It measures expected top-1 match and candidate-order stability across deterministic permutations. It intentionally does not use CLM's typed `score` mode and does not test long contexts.
+
+The slice is not a Q1/Q2/Q3 arm from #1093. CLM does not alter direct/delegation/goal/Kanban execution while those tactics are being causally compared.
+
+```text
+CLM rank != Hermes decision
+CLM rank != Pantheon authorization
+shadow observation != Evidence
+```
+
+A good first shadow result may justify a larger held-out shadow corpus. It does not justify a router, CandidateRanker abstraction, production service or Hermes wiring.
+
+See `CLM_SHADOW_RUNBOOK.md` for the Linux-node procedure and exact runtime receipt requirements.
+
 ## Decision order after measurement
 
 ```text
@@ -277,6 +313,7 @@ Not yet performed:
 - real Linux-node Hermes A/B runs;
 - dominant-cost classification from real traces;
 - any SoL-inspired prototype;
+- live CLM shadow-ranking run on the Linux node;
 - any runtime/deployment change.
 
 The lab remains open until issue #1047 records measured runs or closes with `native_sufficient` / `inconclusive` without adding architecture.
