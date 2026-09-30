@@ -39,7 +39,7 @@ repository presence != selected architecture
 | Hermes Web/dashboard | selected interaction baseline | Current target client for chat, sessions and runtime controls. Client operation does not create Pantheon governance state. |
 | `willscott-v2/hermes-mobile-pwa` | external client candidate / compatible by source review / not selected or installed by this repo | Thin mobile/PWA client using Hermes dashboard REST/WebSocket/auth surfaces. Replaceable client only; deployment/auth/network posture remains separate. |
 | NAS / AFFAIRES | selected professional source residency / external storage | Professional source files remain durably on the NAS and are mounted directly on the Linux compute host. Mounted/readable does not mean globally admitted to Hermes, and path/folder does not become governed identity. |
-| Obsidian workspace | historically qualified optional workspace / not selected for productive AFFAIRES | Useful capability evidence and optional human Markdown tooling remain, but Obsidian/LiveSync/CouchDB no longer define the selected professional AFFAIRES topology. |
+| Obsidian workspace | historically qualified optional workspace / not selected for productive AFFAIRES | Optional human Markdown tooling and historical capability evidence only. It does not define AFFAIRES synchronization or ingestion. |
 | Hindsight | selected derived-memory/index candidate / prior bounded evidence / live qualification open | The AFFAIRES producer path exists, while durable runtime behavior, recovery and exact deployed exposure remain under #659. Memory/retrieval does not become truth or Evidence. |
 
 ## Implemented/qualified candidate paths not proven in production
@@ -52,7 +52,6 @@ repository presence != selected architecture
 | Hindsight AFFAIRES producer | executable candidate / bounded | #659 remains open for exact deployed runtime identity/exposure, producer↔Hindsight behavior, restart/outage/restore, bank isolation and backup/restore. |
 | Hindsight memory reconciliation | implemented transient candidate / no governed write | #1145 repaired the dedicated Hermes-profile qualification helper on main. Configured still does not mean activated, runtime observation does not authorize a task, and the candidate is not Evidence. |
 | Pantheon Cockpit adoption | executable candidate / not adopted | Live deployment, data bindings and operational acceptance remain separate decisions. |
-| Obsidian/LiveSync/CouchDB reference topology | historically qualified optional reference / not selected productive route | Its behavioral evidence remains useful, but it no longer owns AFFAIRES materialization, synchronization or ingestion. |
 | Hermes external dashboard/plugin helpers | existing templates and candidates where present | Installation/enablement and live target state must be observed externally. |
 
 ## Refused target integrations and historical provenance
@@ -71,6 +70,23 @@ replacement responsibilities:
 The product-specific executable adapter has been removed after consumer verification. Native document/Knowledge APIs and Cockpit projections remain under `mvp_vertical`.
 
 Residual non-executable templates, documentation or compatibility pointers may still exist pending their own incoming-link audit; their presence is historical/reference material, not target architecture.
+
+### Self-hosted LiveSync / CouchDB
+
+```text
+architecture_status: retired
+current_target_role: none
+implementation_workflows: removed
+deployment_baseline: removed
+historical evidence: Git history / issues only
+replacement responsibilities:
+  professional source residency -> NAS / AFFAIRES
+  scan/watch/reconcile -> standalone AFFAIRES producer
+  derived recall -> Hindsight
+  optional projection -> Pantheon Cockpit
+```
+
+Self-hosted LiveSync, its headless CLI path and CouchDB are no longer active qualification or Ubuntu deployment dependencies. Their former S1–S6 qualification material remains available through Git history. Retirement does not make Hindsight, Obsidian or Cockpit a source authority.
 
 ### Paperless-ngx
 
@@ -133,7 +149,8 @@ Linux mount -> one Workspace indexer/sync owner
         |                      -> Hindsight derived recall
         -> Cockpit projection
 
-Obsidian/LiveSync/CouchDB -> historical qualified optional reference
+Obsidian -> optional historical/human tooling
+LiveSync/CouchDB -> retired; Git history only
 Hermes runtime memory -> separate optional runtime continuity
 Professional source files -> existing Source/document owners
 ```

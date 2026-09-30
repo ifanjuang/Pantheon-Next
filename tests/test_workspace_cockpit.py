@@ -1071,7 +1071,7 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     assert "WORKSPACE_RECONCILE_HERMES_KEY" in compose
     assert "WORKSPACE_RECONCILE_MAX_CONTEXT_CHARS" in compose
     readme = (ROOT / "deployment" / "ubuntu" / "README.md").read_text(encoding="utf-8")
-    assert "AFFAIRES_ROOT=/mnt/pantheon-affaires" in readme
+    assert "AFFAIRES_ROOT=/mnt/pantheon-affaires/KROQI/AFFAIRES" in readme
     assert "AFFAIRES_GID=replace-with-affaires-mount-group-id" in readme
     assert "127.0.0.1" in compose
     assert "role-trace:" in compose

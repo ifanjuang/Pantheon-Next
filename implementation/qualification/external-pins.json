@@ -52,25 +52,6 @@
         ]
       }
     },
-    "self-hosted-livesync": {
-      "kind": "git",
-      "env_prefix": "LIVESYNC",
-      "repository": "vrtmrz/obsidian-livesync",
-      "version": "1.0.21",
-      "ref": "f5f7aab11f03f62c6946d2fa296c50bb5df5b2a4",
-      "aliases": {
-        "ref": [
-          "LIVESYNC_COMMIT"
-        ]
-      }
-    },
-    "self-hosted-livesync-cli": {
-      "kind": "package",
-      "env_prefix": "LIVESYNC_CLI",
-      "package": "self-hosted-livesync-cli",
-      "version": "1.0.21-cli",
-      "source_pin": "self-hosted-livesync"
-    },
     "obsidian-desktop": {
       "kind": "release",
       "env_prefix": "OBSIDIAN",
@@ -98,13 +79,6 @@
       "package": "graphifyy",
       "version": "0.9.53",
       "ref": "33362d969292b57eda82f3fbd9eb5f3f5bc9bbc2"
-    },
-    "couchdb": {
-      "kind": "container",
-      "env_prefix": "COUCHDB",
-      "image": "couchdb",
-      "version": "3.5.2",
-      "digest": null
     },
     "mnemosyne-memory": {
       "kind": "package",
