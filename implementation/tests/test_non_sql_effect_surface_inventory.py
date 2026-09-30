@@ -23,6 +23,14 @@ EFFECT_INVENTORY: dict[tuple[str, str], dict[str, str]] = {
         "effect": "filesystem_and_sql",
         "reviewed": "retains exact uploaded bytes before the governed revision link; digest is reverified",
     },
+    ("hermes_ephemeral_context.py", "cleanup_expired"): {
+        "effect": "filesystem_transient_cleanup",
+        "reviewed": "deletes only local transient lease directories whose recorded expiry is already past; it touches neither AFFAIRES nor Hindsight and owns no scheduler",
+    },
+    ("hermes_ephemeral_context.py", "create_lease"): {
+        "effect": "filesystem_transient_context",
+        "reviewed": "the editor-authenticated handoff route is the production caller; the module bounds TTL/count/bytes, recomputes SHA-256 and writes only to the replaceable transient root",
+    },
     ("storage_retention.py", "retain_document_version"): {
         "effect": "filesystem_and_sql",
         "reviewed": "retains digest-addressed exact bytes and binds them to the technical version",
@@ -54,6 +62,10 @@ EFFECT_INVENTORY: dict[tuple[str, str], dict[str, str]] = {
     ("hermes_run_binding.py", "PantheonRunBridgeClient.reserve_launch"): {
         "effect": "external_control_write",
         "reviewed": "records one immutable launch reservation through the Pantheon execution seam",
+    },
+    ("hermes_run_binding.py", "PantheonRunBridgeClient.materialize_ephemeral_context"): {
+        "effect": "external_transient_context_read",
+        "reviewed": "POST is a bounded read/materialization request; the Pantheon server requires the exact live admission and launch reservation and performs no runtime dispatch or professional persistence",
     },
     ("hermes_run_binding.py", "PantheonRunBridgeClient.record_start"): {
         "effect": "external_control_write",
@@ -96,8 +108,8 @@ INDIRECT_EFFECT_INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("hermes_run_binding.py", "ExternalHermesRunBinding.launch"): {
         "effect": "external_runtime_execution",
-        "required_calls": {"submit", "reserve_launch", "record_start"},
-        "reviewed": "reserve -> one Hermes submit -> record start; ambiguous submission never auto-retries",
+        "required_calls": {"submit", "reserve_launch", "materialize_ephemeral_context", "record_start"},
+        "reviewed": "reserve -> optional exact transient materialization -> one Hermes submit -> record start; materialization failure prevents submission and ambiguous submission never auto-retries",
     },
     ("hermes_run_binding.py", "ExternalHermesRunBinding.reconcile_once"): {
         "effect": "external_control_write",
