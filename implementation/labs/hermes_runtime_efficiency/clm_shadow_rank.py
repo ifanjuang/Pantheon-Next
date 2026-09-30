@@ -22,6 +22,7 @@ from typing import Any
 SCHEMA_ID = "pantheon.clm_shadow_rank_cases"
 REPORT_SCHEMA_ID = "pantheon.clm_shadow_rank_report"
 REPORT_REVISION = 1
+DEFAULT_PIN_REGISTRY = Path(__file__).resolve().parents[2] / "qualification" / "external-pins.json"
 
 AUTHORITY = {
     "qualification_lab_only": True,
@@ -123,8 +124,51 @@ def load_runtime_metadata(path: Path) -> dict[str, str]:
     return {key: str(value) for key, value in raw.items()}
 
 
-def corpus_sha256(path: Path) -> str:
+
+def load_qualification_pin(path: Path) -> dict[str, str]:
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise CLMShadowQualificationError(f"cannot read qualification pin registry: {exc}") from exc
+    if raw.get("schema_id") != "pantheon.external_qualification_pins":
+        raise CLMShadowQualificationError("unexpected external qualification pin schema")
+    pin = (raw.get("pins") or {}).get("contrastive-lm")
+    if not isinstance(pin, dict):
+        raise CLMShadowQualificationError("contrastive-lm qualification pin is missing")
+    required = ("repository", "version", "ref", "encoder_model", "api_surface")
+    missing = [key for key in required if not isinstance(pin.get(key), str) or not pin[key].strip()]
+    if missing:
+        raise CLMShadowQualificationError(
+            f"contrastive-lm qualification pin missing fields: {', '.join(missing)}"
+        )
+    if pin["repository"] != "Contrastive-LM/CLM":
+        raise CLMShadowQualificationError("contrastive-lm qualification pin repository is unexpected")
+    if pin["api_surface"] != "/v1/rank":
+        raise CLMShadowQualificationError("contrastive-lm qualification pin must select /v1/rank")
+    return {key: str(value) for key, value in pin.items() if isinstance(value, (str, int, float, bool))}
+
+
+def validate_runtime_against_pin(runtime_metadata: dict[str, str], pin: dict[str, str]) -> None:
+    mismatches: list[str] = []
+    if runtime_metadata["clm_git_ref"] != pin["ref"]:
+        mismatches.append("clm_git_ref")
+    if runtime_metadata["clm_package_version"] != pin["version"]:
+        mismatches.append("clm_package_version")
+    if runtime_metadata["encoder_model"] != pin["encoder_model"]:
+        mismatches.append("encoder_model")
+    if mismatches:
+        raise CLMShadowQualificationError(
+            "runtime metadata does not match canonical contrastive-lm qualification pin: "
+            + ", ".join(mismatches)
+        )
+
+
+def file_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def corpus_sha256(path: Path) -> str:
+    return file_sha256(path)
 
 
 def is_loopback_base_url(value: str) -> bool:
@@ -225,6 +269,7 @@ def run_shadow(
     *,
     cases_path: Path,
     runtime_metadata_path: Path,
+    pin_registry_path: Path,
     base_url: str,
     model: str,
     api_key: str | None,
@@ -236,6 +281,8 @@ def run_shadow(
         raise CLMShadowQualificationError("remote CLM endpoint refused; use loopback or explicitly pass --allow-remote")
     corpus_meta, cases = load_cases(cases_path)
     runtime_metadata = load_runtime_metadata(runtime_metadata_path)
+    qualification_pin = load_qualification_pin(pin_registry_path)
+    validate_runtime_against_pin(runtime_metadata, qualification_pin)
     server = observe_server(base_url, model, api_key, timeout)
 
     observations: list[dict[str, Any]] = []
@@ -302,6 +349,14 @@ def run_shadow(
             "case_count": total,
         },
         "runtime_metadata": runtime_metadata,
+        "qualification_pin": {
+            "repository": qualification_pin["repository"],
+            "version": qualification_pin["version"],
+            "ref": qualification_pin["ref"],
+            "encoder_model": qualification_pin["encoder_model"],
+            "api_surface": qualification_pin["api_surface"],
+            "registry_sha256": file_sha256(pin_registry_path),
+        },
         "server_observation": server,
         "model": model,
         "summary": {
@@ -328,6 +383,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("cases", type=Path)
     parser.add_argument("--runtime-metadata", required=True, type=Path)
+    parser.add_argument("--pin-registry", type=Path, default=DEFAULT_PIN_REGISTRY)
     parser.add_argument("--base-url", default=os.environ.get("CLM_BASE_URL", "http://127.0.0.1:8700"))
     parser.add_argument("--model", default="clm-latest")
     parser.add_argument("--api-key-env", default="CLM_API_KEY")
@@ -342,6 +398,7 @@ def main() -> int:
         report = run_shadow(
             cases_path=args.cases,
             runtime_metadata_path=args.runtime_metadata,
+            pin_registry_path=args.pin_registry,
             base_url=args.base_url,
             model=args.model,
             api_key=api_key,
