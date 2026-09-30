@@ -4,18 +4,16 @@ Status: candidate qualification procedure for Pantheon issue #1047. This is not 
 
 ## Objective
 
-Run the published Contrastive-LM ranker locally on the Linux GPU node and compare its passive ranking against a small synthetic Pantheon decision corpus.
-
-The first slice is deliberately one-way:
+Run the reviewed Contrastive-LM candidate locally on the Linux GPU node and record passive rankings over a short synthetic Pantheon corpus.
 
 ```text
-synthetic state + candidate actions
-              |
-              v
-        local CLM ranker
-              |
-              v
-     shadow observation JSON
+synthetic state + fixed candidate actions
+                  |
+                  v
+          local CLM /v1/rank
+                  |
+                  v
+         shadow observation JSON
 
 CLM output -> never dispatched to Hermes
 CLM output -> never reaches an effect owner
@@ -23,45 +21,100 @@ CLM output -> never reaches an effect owner
 
 Do not wire CLM into Hermes, Pantheon admission, the PEP/effect chokepoint, Hindsight, Knowledge or Cockpit during this qualification.
 
-## Selected upstream candidate
+## Authority and artifact source
 
-The canonical qualification pin belongs in `implementation/qualification/external-pins.json`.
-
-At the time this runbook was added:
+All candidate identities come from the existing canonical qualification owner:
 
 ```text
-repository : Contrastive-LM/CLM
-package    : contrastive-lm 0.1.0
-git ref    : bb42c6c5bf914fd449bed2f6ca65be80602cb1f7
-encoder    : Qwen/Qwen3-8B
-API        : POST /v1/rank
+implementation/qualification/external-pins.json
+  -> pins.contrastive-lm
 ```
 
-The git ref is a reviewed qualification input, not deployment truth. Re-read the registry before running.
+The run must not resolve mutable upstream `main` / latest model state and then call it equivalent.
 
-Known qualification caution at this pin:
+The pin owns:
+
+```text
+CLM repository + exact git ref
+package version
+encoder model + exact revision
+public CLM head repository + exact revision + file + SHA-256
+API surface
+```
+
+The pin is qualification input only:
+
+```text
+selected candidate != installed
+installed != qualified
+qualified != activated
+shadow rank != Hermes decision
+```
+
+Known upstream cautions for this slice:
 
 - CLM is alpha software;
-- upstream reports exist for unexpected `score` behavior, so this slice uses `/v1/rank` only;
-- long-state truncation behavior is under upstream discussion, so the initial corpus intentionally stays short;
+- upstream reports exist for unexpected typed `score` behavior, so this slice uses `/v1/rank` only;
+- long-state truncation behavior is still a qualification concern, so the first corpus intentionally stays short;
 - a successful run does not qualify CLM for routing or activation.
 
-## 1. GPU preflight
+## 1. Repository and GPU preflight
 
-On the Linux node:
+Use a current checkout containing this qualification slice:
 
 ```bash
+git rev-parse HEAD
+git status --short
+
 nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv
 python3 --version
 ```
 
-Do not silently introduce quantization, a different encoder or CPU offload merely to make the reference run fit. Any such change creates a different experimental arm and must be recorded separately.
+Do not silently introduce quantization, a different encoder, CPU offload or another serving backend merely to make the reference run fit. Such a change is a different experimental arm and must be qualified separately.
 
-The upstream quickstart demonstrates the reference path on a 24 GB RTX 4090. If the Linux GPU cannot load Qwen3-8B with the selected serving configuration, record the run as blocked rather than calling a modified stack equivalent.
+If the selected reference stack cannot load on the Linux GPU, record this first run as blocked rather than treating a modified stack as equivalent.
 
-## 2. Create an isolated environment
+## 2. Export the canonical CLM candidate
 
-Use a dedicated environment outside the Hermes environment:
+From the Pantheon-Next repository root:
+
+```bash
+python3 - <<'PY' > /tmp/clm-shadow-pin.env
+import json
+import shlex
+from pathlib import Path
+
+registry = json.loads(
+    Path("implementation/qualification/external-pins.json").read_text(encoding="utf-8")
+)
+pin = registry["pins"]["contrastive-lm"]
+
+fields = {
+    "CLM_REPOSITORY": "repository",
+    "CLM_VERSION": "version",
+    "CLM_GIT_REF": "ref",
+    "CLM_ENCODER_MODEL": "encoder_model",
+    "CLM_ENCODER_REVISION": "encoder_revision",
+    "CLM_HEAD_REPOSITORY": "head_repository",
+    "CLM_HEAD_REVISION": "head_revision",
+    "CLM_HEAD_FILE": "head_file",
+    "CLM_HEAD_SHA256": "head_sha256",
+    "CLM_API_SURFACE": "api_surface",
+}
+for env_name, field in fields.items():
+    value = str(pin[field])
+    print(f"export {env_name}={shlex.quote(value)}")
+PY
+
+source /tmp/clm-shadow-pin.env
+cat /tmp/clm-shadow-pin.env
+```
+
+Do not hand-edit this file to make a run pass. A different candidate belongs in the qualification registry through a reviewed repository change.
+
+## 3. Create an isolated CLM environment
+
+Do not install CLM into the Hermes Python environment.
 
 ```bash
 python3 -m venv ~/.venvs/clm-shadow
@@ -69,39 +122,77 @@ source ~/.venvs/clm-shadow/bin/activate
 python -m pip install --upgrade pip
 
 python -m pip install \
-  "git+https://github.com/Contrastive-LM/CLM.git@bb42c6c5bf914fd449bed2f6ca65be80602cb1f7"
-python -m pip install huggingface_hub
+  "git+https://github.com/${CLM_REPOSITORY}.git@${CLM_GIT_REF}" \
+  huggingface_hub
 ```
 
-Record the resolved environment rather than assuming dependency versions:
+Verify the installed package identity:
 
 ```bash
-python -m pip freeze > /tmp/clm-shadow-pip-freeze.txt
-python - <<'PY'
+CLM_PACKAGE_OBSERVED="$(python - <<'PY'
 from importlib.metadata import version
-print("contrastive-lm", version("contrastive-lm"))
-print("vllm", version("vllm"))
+print(version("contrastive-lm"))
 PY
+)"
+VLLM_VERSION="$(python - <<'PY'
+from importlib.metadata import version
+print(version("vllm"))
+PY
+)"
+
+printf 'contrastive-lm=%s\nvllm=%s\n' "$CLM_PACKAGE_OBSERVED" "$VLLM_VERSION"
+
+test "$CLM_PACKAGE_OBSERVED" = "$CLM_VERSION" || {
+  echo "contrastive-lm package version differs from canonical pin" >&2
+  exit 1
+}
+
+python -m pip freeze > /tmp/clm-shadow-pip-freeze.txt
 ```
 
-Do not install CLM into the Hermes Python environment for this slice.
+## 4. Fetch and verify the exact CLM head
 
-## 3. Start the encoder on loopback only
+Download the exact Hugging Face artifact selected by the registry, not its mutable latest state:
+
+```bash
+source ~/.venvs/clm-shadow/bin/activate
+source /tmp/clm-shadow-pin.env
+
+python - <<'PY'
+import os
+from pathlib import Path
+from huggingface_hub import hf_hub_download
+
+path = hf_hub_download(
+    repo_id=os.environ["CLM_HEAD_REPOSITORY"],
+    filename=os.environ["CLM_HEAD_FILE"],
+    revision=os.environ["CLM_HEAD_REVISION"],
+)
+Path("/tmp/clm-shadow-head-path").write_text(path + "\n", encoding="utf-8")
+print(path)
+PY
+
+HEAD_PATH="$(cat /tmp/clm-shadow-head-path)"
+HEAD_SHA256="$(sha256sum "$HEAD_PATH" | awk '{print $1}')"
+
+printf 'head=%s\nsha256=%s\n' "$HEAD_PATH" "$HEAD_SHA256"
+
+test "$HEAD_SHA256" = "$CLM_HEAD_SHA256" || {
+  echo "CLM head SHA-256 differs from canonical pin" >&2
+  exit 1
+}
+```
+
+## 5. Start the exact encoder on loopback
 
 Terminal A:
 
 ```bash
 source ~/.venvs/clm-shadow/bin/activate
+source /tmp/clm-shadow-pin.env
 
-ENCODER_REVISION="$(python - <<'PY'
-from huggingface_hub import model_info
-print(model_info("Qwen/Qwen3-8B").sha)
-PY
-)"
-printf '%s\n' "$ENCODER_REVISION" > /tmp/clm-shadow-encoder-revision
-
-vllm serve Qwen/Qwen3-8B \
-  --revision "$ENCODER_REVISION" \
+vllm serve "$CLM_ENCODER_MODEL" \
+  --revision "$CLM_ENCODER_REVISION" \
   --served-model-name qwen3-8b \
   --runner pooling \
   --max-model-len 2048 \
@@ -109,14 +200,17 @@ vllm serve Qwen/Qwen3-8B \
   --port 8090
 ```
 
-Keep the initial state length at 2048 for this first bounded qualification. Do not infer that this setting is sufficient for later production workloads.
+The first qualification intentionally keeps the CLM state limit at 2048 tokens. This does not establish that 2048 is sufficient for later professional workloads.
 
-## 4. Start CLM on loopback only
+## 6. Start CLM with the verified head
 
 Terminal B:
 
 ```bash
 source ~/.venvs/clm-shadow/bin/activate
+source /tmp/clm-shadow-pin.env
+
+HEAD_PATH="$(cat /tmp/clm-shadow-head-path)"
 
 export CLM_API_KEY="$(openssl rand -hex 32)"
 printf '%s\n' "$CLM_API_KEY" > /tmp/clm-shadow-api-key
@@ -128,14 +222,19 @@ clm-serve \
   --emb-url http://127.0.0.1:8090/v1/embeddings \
   --emb-model qwen3-8b \
   --max-tokens 2048 \
+  --ckpt "$HEAD_PATH" \
+  --no-download \
   --no-ui
 ```
 
-The default CLM server host is not the desired qualification boundary here. Always pass `--host 127.0.0.1`.
+Always pass `--host 127.0.0.1`. The upstream server's general-purpose default is not the boundary selected for this local qualification.
 
-Check health from another shell using the same key:
+## 7. Verify the live local surface
+
+From another shell:
 
 ```bash
+source ~/.venvs/clm-shadow/bin/activate
 export CLM_API_KEY="$(cat /tmp/clm-shadow-api-key)"
 
 curl -fsS http://127.0.0.1:8700/health | python -m json.tool
@@ -153,18 +252,17 @@ health.mock     != true
 clm-latest      is exposed
 ```
 
-## 5. Record exact runtime identity
+A healthy process is only a technical observation.
 
-The shadow runner refuses an incomplete runtime receipt.
+## 8. Record exact runtime identity
 
-Create `/tmp/clm-runtime.json`:
+Create the runtime receipt from the exact values already used to serve:
 
 ```bash
 source ~/.venvs/clm-shadow/bin/activate
+source /tmp/clm-shadow-pin.env
 
-CLM_GIT_REF="bb42c6c5bf914fd449bed2f6ca65be80602cb1f7"
-ENCODER_REVISION="$(cat /tmp/clm-shadow-encoder-revision)"
-CLM_PACKAGE_VERSION="$(python - <<'PY'
+CLM_PACKAGE_OBSERVED="$(python - <<'PY'
 from importlib.metadata import version
 print(version("contrastive-lm"))
 PY
@@ -175,21 +273,24 @@ print(version("vllm"))
 PY
 )"
 DEVICE_NAME="$(nvidia-smi --query-gpu=name --format=csv,noheader | head -n1)"
-HEAD_PATH="${CLM_CKPT:-$HOME/.cache/clm/CLM_v0.1-8B.pt}"
+HEAD_PATH="$(cat /tmp/clm-shadow-head-path)"
 HEAD_SHA256="$(sha256sum "$HEAD_PATH" | awk '{print $1}')"
 
-python - <<PY
+export CLM_PACKAGE_OBSERVED VLLM_VERSION DEVICE_NAME HEAD_SHA256
+
+python - <<'PY'
 import json
+import os
 from pathlib import Path
 
 receipt = {
-    "clm_git_ref": "$CLM_GIT_REF",
-    "clm_package_version": "$CLM_PACKAGE_VERSION",
-    "encoder_model": "Qwen/Qwen3-8B",
-    "encoder_revision": "$ENCODER_REVISION",
-    "head_sha256": "$HEAD_SHA256",
-    "vllm_version": "$VLLM_VERSION",
-    "device_name": "$DEVICE_NAME",
+    "clm_git_ref": os.environ["CLM_GIT_REF"],
+    "clm_package_version": os.environ["CLM_PACKAGE_OBSERVED"],
+    "encoder_model": os.environ["CLM_ENCODER_MODEL"],
+    "encoder_revision": os.environ["CLM_ENCODER_REVISION"],
+    "head_sha256": os.environ["HEAD_SHA256"],
+    "vllm_version": os.environ["VLLM_VERSION"],
+    "device_name": os.environ["DEVICE_NAME"],
 }
 Path("/tmp/clm-runtime.json").write_text(
     json.dumps(receipt, indent=2) + "\n",
@@ -200,17 +301,11 @@ PY
 cat /tmp/clm-runtime.json
 ```
 
-This receipt describes the observed runtime only:
+The shadow runner independently compares this receipt against `external-pins.json`. A different CLM git ref, package version, encoder model/revision or head SHA-256 fails the run before ranking.
 
-```text
-installed != qualified
-runtime healthy != model useful
-model useful != activated
-```
+## 9. Run the passive corpus
 
-## 6. Run the passive corpus
-
-From a current Pantheon-Next checkout containing this lab:
+From the Pantheon-Next repository root:
 
 ```bash
 export CLM_API_KEY="$(cat /tmp/clm-shadow-api-key)"
@@ -218,58 +313,57 @@ export CLM_API_KEY="$(cat /tmp/clm-shadow-api-key)"
 python implementation/labs/hermes_runtime_efficiency/clm_shadow_rank.py \
   implementation/labs/hermes_runtime_efficiency/clm_shadow_cases.json \
   --runtime-metadata /tmp/clm-runtime.json \
+  --pin-registry implementation/qualification/external-pins.json \
   --base-url http://127.0.0.1:8700 \
   --max-orderings 4 \
   --output /tmp/clm-shadow-report.json
 ```
 
-Inspect only the observation summary first:
+Inspect the observation summary:
 
 ```bash
 python - <<'PY'
 import json
-report = json.load(open("/tmp/clm-shadow-report.json"))
+from pathlib import Path
+
+report = json.loads(Path("/tmp/clm-shadow-report.json").read_text(encoding="utf-8"))
 print(json.dumps(report["summary"], indent=2))
 PY
 ```
 
-The runner permutes candidate order. A case is `top_candidate_order_stable` only when the same candidate stays first across all tested orderings.
+The runner deliberately permutes candidate order. A case is `top_candidate_order_stable` only when the same candidate remains first across all tested orderings.
 
-The initial useful signals are:
+Initial signals:
 
 ```text
 expected_top1_all_orderings_rate
 top_candidate_order_stable_rate
-per-case rank probabilities
+per-case ranked probabilities
 CLM latency header
 transport elapsed time
 ```
 
-Do not collapse them into one universal quality score.
+Do not collapse them into one universal model score.
 
-## 7. Interpretation
-
-First-pass interpretation:
+## 10. First-pass interpretation
 
 ```text
 low expected-match rate
--> CLM is not useful for this decision family at the published head
+-> published CLM candidate is not useful for this decision family
 
-high match but low order stability
--> reject as a routing primitive; ranking is too presentation-sensitive
+high expected match + low order stability
+-> presentation sensitivity is material; do not use as a routing primitive
 
-high match + high order stability
+high expected match + high order stability
 -> candidate for a larger held-out shadow corpus only
 
-good shadow corpus
+good synthetic shadow result
 != permission to wire CLM into Hermes
 ```
 
-Only after a larger held-out corpus should a separate experiment ask whether CLM can reduce a real Hermes selection cost.
+Only after a larger held-out corpus should a separate experiment ask whether CLM can reduce real Hermes selection cost.
 
-## 8. Boundaries
-
-Always preserve:
+## 11. Preserved boundaries
 
 ```text
 CLM rank != Hermes decision
@@ -280,8 +374,8 @@ runtime success != model qualification
 model qualification != activation
 ```
 
-The Pantheon effect owner / PEP remains unchanged and CLM receives no consequential credential.
+CLM receives no consequential credential. The Pantheon effect owner / PEP remains unchanged.
 
-## 9. Removal
+## 12. Removal
 
-The experiment is removable by deleting the CLM-specific lab files and qualification pin. No product module imports the shadow runner, no schema migration is introduced, and no runtime route depends on it.
+The experiment remains removable. Deleting the CLM-specific lab files and qualification pin restores the previous #1047 lab behavior; no product module imports the shadow runner, no schema migration is introduced, and no runtime route depends on it.
