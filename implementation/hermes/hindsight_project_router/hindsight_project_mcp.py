@@ -54,7 +54,7 @@ def recall_project_memory(
     """Recall up to eight facts from one exact project.
 
     Put the resolved project hint or folder designation in ``project`` exactly
-    (for example ``leroux-lesage``); never put the generic word "project"
+    (for example ``resolved-project-slug``); never put the generic word "project"
     there. Put the user's complete factual question and the designation in
     ``query``. Resolve a partial or ambiguous designation with
     ``ifja-vault-read:find_ifja_projects`` before calling this tool.
