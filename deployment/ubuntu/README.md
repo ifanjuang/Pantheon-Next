@@ -140,7 +140,7 @@ into the governed profile and adds the separately installed, loopback-only
 `ifja-vault-read` binding with its dedicated bearer credential. The copied
 Pantheon Policy entry is narrowed to the
 reviewed read-only consultation, request classification/preflight, candidate
-skeleton and Context Pack tools. It derives a recall-only `hindsight-memory` binding
+skeleton and Context Pack tools. It uses the project-scoped `hindsight-kroqi-project` binding
 from the already configured local Hindsight endpoint and refuses a partial result
 when either required professional Hindsight binding is absent.
 

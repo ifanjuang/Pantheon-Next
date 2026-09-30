@@ -107,13 +107,11 @@ def test_governed_local_mcp_binding_is_explicit_filtered_and_fail_closed() -> No
     text = CONFIGURE.read_text(encoding="utf-8")
     assert "--bind-local-mcp" in text
     assert "get_profile_optional_config_json default mcp_servers" in text
-    for server in ("docling", "hindsight-memory", "hindsight-kroqi-project", "pantheon-policy"):
+    for server in ("docling", "hindsight-kroqi-project", "pantheon-policy"):
         assert server in text
     assert '"Doclin"' not in text
-    assert '"tools": {"include": ["recall"]}' in text
-    assert 'endswith("/mcp/hermes/")' in text
     assert "required local Hindsight bindings are absent; refusing partial inheritance" in text
-    assert 'del(."hindsight-affaires", ."hindsight-documentaires")' in text
+    assert 'del(."hindsight-affaires", ."hindsight-documentaires", ."hindsight-memory")' in text
     assert 'config set --force mcp_servers "$merged"' in text
     assert 'cp -a "$PROFILE_CONFIG_TARGET" "$backup_root/profile-config.yaml"' in text
     for tool in (
@@ -143,9 +141,7 @@ def test_hindsight_legacy_bindings_are_removed_from_governed_profile() -> None:
     text = CONFIGURE.read_text(encoding="utf-8")
     assert 'has("hindsight-affaires") | not' in text
     assert 'has("hindsight-documentaires") | not' in text
-    assert 'hindsight-affaires binding is absent from the local default profile' in text
-    assert '"url": ($source."hindsight-affaires".url | sub("IFJA_AFFAIRES/?$"; "hermes/"))' in text
-    assert '"tools": {"include": ["recall"]}' in text
+    assert 'has("hindsight-memory") | not' in text
     assert 'HINDSIGHT_KROQI_PROJECT_TOOLS_JSON=' in text
     assert '["recall_project_memory"]' in text
     assert 'has("hindsight-kroqi-project")' in text
