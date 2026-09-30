@@ -63,6 +63,10 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "Begin with one child\nat a time" in text
     assert "subagent result != source verification" in text
     assert "never compare its aggregate with a broader reference total" in text
+    assert "build the coverage matrix from the\nreference first" in text
+    assert "missing_candidate" in text
+    assert "Do not omit an unmatched reference item" in text
+    assert "Overall\nconformance requires complete material coverage" in text
     assert "## Visible plan before execution" in text
     assert "Before the first material source call" in text
     assert "plan displayed != worker dispatched" in text

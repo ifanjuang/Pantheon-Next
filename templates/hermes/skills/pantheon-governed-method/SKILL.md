@@ -188,6 +188,27 @@ never compare its aggregate with a broader reference total or infer an overall
 verdict from missing, unreadable or alternative amounts. Return
 `ready_with_limits` until every material perimeter is comparable.
 
+For any completeness or conformance review, build the coverage matrix from the
+reference first, not from the candidates found. Account for every material
+reference line or package with exactly one explicit state:
+
+```text
+matched_comparable
+matched_scope_difference
+combined_with_other_scope
+alternative_or_variant
+missing_candidate
+unreadable_or_unverified
+not_applicable_with_reason
+```
+
+Do not omit an unmatched reference item from the answer. A filename, directory
+match or candidate label does not establish scope coverage; verify the material
+description and amount. Report matched coverage, missing coverage and unresolved
+variants separately before any aggregate or readiness statement. Overall
+conformance requires complete material coverage or an explicit user-approved
+exclusion; otherwise state only item-level findings and `ready_with_limits`.
+
 ```text
 subagent result != source verification
 one child != a worker fleet
