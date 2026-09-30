@@ -146,33 +146,55 @@ test "$HEAD_SHA256" = "$CLM_HEAD_SHA256" || {
 }
 ```
 
-## 3. PC00/WSL: exact vLLM encoder
+## 3. Bind the operator-managed PC00/WSL SSH target
 
-Run these commands inside the WSL environment on PC00.
+Use an SSH target whose session terminates in the same WSL environment where vLLM will listen.
+
+Do not commit an IP address, username, private key or other host secret. Set the target locally, preferably through an SSH config alias:
 
 ```bash
+export CLM_ENCODER_SSH_TARGET="<operator-configured-PC00-WSL-ssh-target>"
+
+scp /tmp/clm-shadow-pin.env \
+  "$CLM_ENCODER_SSH_TARGET:/tmp/clm-shadow-pin.env"
+```
+
+The copied file contains only reviewed public qualification identities; it contains no credential.
+
+## 4. PC00/WSL: exact vLLM encoder
+
+Inside the WSL environment on PC00:
+
+```bash
+source /tmp/clm-shadow-pin.env
+
 python3 -m venv ~/.venvs/clm-encoder
 source ~/.venvs/clm-encoder/bin/activate
 python -m pip install --upgrade pip
-python -m pip install "vllm==0.30.0"
+python -m pip install "vllm==${CLM_VLLM_VERSION}"
 
 python - <<'PY'
+import os
 from importlib.metadata import version
-print("vllm", version("vllm"))
+
+observed = version("vllm")
+expected = os.environ["CLM_VLLM_VERSION"]
+print("vllm", observed)
+if observed != expected:
+    raise SystemExit(f"vLLM mismatch: observed={observed} expected={expected}")
 PY
 
 nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv
 ```
 
-The literal version above must match `CLM_VLLM_VERSION` from the current Pantheon pin before the run. If the pin changes, use the new pinned value.
-
-Start the exact encoder:
+Start the exact encoder from the same canonical pin:
 
 ```bash
 source ~/.venvs/clm-encoder/bin/activate
+source /tmp/clm-shadow-pin.env
 
-vllm serve Qwen/Qwen3-8B \
-  --revision b968826d9c46dd6066d109eabc6255188de91218 \
+vllm serve "$CLM_ENCODER_MODEL" \
+  --revision "$CLM_ENCODER_REVISION" \
   --served-model-name qwen3-8b \
   --runner pooling \
   --max-model-len 2048 \
@@ -180,19 +202,11 @@ vllm serve Qwen/Qwen3-8B \
   --port 8090
 ```
 
-The literal model and revision must also match the current Pantheon pin. The first run deliberately stays at 2048 tokens.
+The first run deliberately stays at 2048 tokens.
 
 Do not substitute Ollama, `qwen3-embedding`, quantization, CPU offload or another encoder in this arm.
 
-## 4. Linux: create an authenticated loopback tunnel to PC00/WSL
-
-Use an operator-managed SSH target whose SSH session terminates in the same WSL environment where vLLM is listening.
-
-Do not commit an IP address, username, private key or other host secret. Set the target locally, for example through an SSH config alias:
-
-```bash
-export CLM_ENCODER_SSH_TARGET="<operator-configured-PC00-WSL-ssh-target>"
-```
+## 5. Linux: create an authenticated loopback tunnel to PC00/WSL
 
 Start the forward in a dedicated terminal on Linux:
 
@@ -224,7 +238,7 @@ curl -fsS http://127.0.0.1:18090/v1/models | python -m json.tool
 
 The exposed model must include `qwen3-8b`.
 
-## 5. Linux: start CLM against the forwarded encoder
+## 6. Linux: start CLM against the forwarded encoder
 
 Run the CLM projection head explicitly on CPU so this first remote-encoder qualification depends on PC00 for the heavy Qwen encoder workload rather than on a second GPU.
 
@@ -272,7 +286,7 @@ health.mock     != true
 clm-latest      is exposed
 ```
 
-## 6. Record the exact remote topology
+## 7. Record the exact remote topology
 
 The report must distinguish model identity from physical placement.
 
@@ -337,7 +351,7 @@ cat /tmp/clm-runtime.json
 
 The runner rejects a non-loopback encoder endpoint for this qualification and rejects a remote placement that is not recorded as `ssh_local_forward`.
 
-## 7. Run the shadow corpus
+## 8. Run the shadow corpus
 
 ```bash
 export CLM_API_KEY="$(cat /tmp/clm-shadow-api-key)"
@@ -381,7 +395,7 @@ remote quality observation
 != local latency baseline
 ```
 
-## 8. Local encoder fallback
+## 9. Local encoder fallback
 
 The previous all-local topology remains valid as a separate arm:
 
@@ -394,7 +408,7 @@ encoder_node_label = linux-local
 
 It must use the same model revision, head, vLLM version and 2048-token limit. Do not mix local and PC00 observations in one causal latency comparison.
 
-## 9. Interpretation
+## 10. Interpretation
 
 ```text
 low expected-match rate
@@ -410,6 +424,6 @@ good shadow result
 != permission to wire CLM into Hermes
 ```
 
-## 10. Removal
+## 11. Removal
 
 Deleting the CLM-specific lab files and qualification pin restores the previous #1047 lab behavior. No product module imports this runner, no schema migration is introduced, and no production runtime route depends on PC00 or CLM.
