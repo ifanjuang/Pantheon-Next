@@ -107,6 +107,13 @@ def test_expired_or_lost_lease_fails_closed(tmp_path: Path) -> None:
             root=tmp_path,
             now=NOW + timedelta(seconds=61),
         )
+    assert lease_dir.exists()
+
+    removed = leases.cleanup_expired(
+        root=tmp_path,
+        now=NOW + timedelta(seconds=62),
+    )
+    assert removed == 1
     assert not lease_dir.exists()
 
     with pytest.raises(leases.EphemeralContextNotFound):
