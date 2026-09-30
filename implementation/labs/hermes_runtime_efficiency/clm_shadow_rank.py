@@ -135,18 +135,56 @@ def load_qualification_pin(path: Path) -> dict[str, str]:
     pin = (raw.get("pins") or {}).get("contrastive-lm")
     if not isinstance(pin, dict):
         raise CLMShadowQualificationError("contrastive-lm qualification pin is missing")
-    required = (\n        "repository",\n        "version",\n        "ref",\n        "encoder_model",\n        "encoder_revision",\n        "head_repository",\n        "head_revision",\n        "head_file",\n        "head_sha256",\n        "vllm_version",\n        "api_surface",\n    )
-    missing = [key for key in required if not isinstance(pin.get(key), str) or not pin[key].strip()]
+    required = (
+        "repository",
+        "version",
+        "ref",
+        "encoder_model",
+        "encoder_revision",
+        "head_repository",
+        "head_revision",
+        "head_file",
+        "head_sha256",
+        "vllm_version",
+        "api_surface",
+    )
+    missing = [
+        key
+        for key in required
+        if not isinstance(pin.get(key), str) or not pin[key].strip()
+    ]
     if missing:
         raise CLMShadowQualificationError(
             f"contrastive-lm qualification pin missing fields: {', '.join(missing)}"
         )
     if pin["repository"] != "Contrastive-LM/CLM":
-        raise CLMShadowQualificationError("contrastive-lm qualification pin repository is unexpected")
+        raise CLMShadowQualificationError(
+            "contrastive-lm qualification pin repository is unexpected"
+        )
     if pin["api_surface"] != "/v1/rank":
-        raise CLMShadowQualificationError("contrastive-lm qualification pin must select /v1/rank")
-    return {key: str(value) for key, value in pin.items() if isinstance(value, (str, int, float, bool))}
-
+        raise CLMShadowQualificationError(
+            "contrastive-lm qualification pin must select /v1/rank"
+        )
+    for field in ("ref", "encoder_revision", "head_revision"):
+        value = pin[field]
+        if len(value) != 40 or any(
+            char not in "0123456789abcdef" for char in value.lower()
+        ):
+            raise CLMShadowQualificationError(
+                f"contrastive-lm pin {field} must be an exact 40-character git SHA"
+            )
+    head_sha256 = pin["head_sha256"]
+    if len(head_sha256) != 64 or any(
+        char not in "0123456789abcdef" for char in head_sha256.lower()
+    ):
+        raise CLMShadowQualificationError(
+            "contrastive-lm pin head_sha256 must be an exact SHA-256 digest"
+        )
+    return {
+        key: str(value)
+        for key, value in pin.items()
+        if isinstance(value, (str, int, float, bool))
+    }
 
 def validate_runtime_against_pin(runtime_metadata: dict[str, str], pin: dict[str, str]) -> None:
     mismatches: list[str] = []
