@@ -2,7 +2,7 @@
 
 Status: operator convenience artifact — candidate, non-authoritative.
 
-Selection update (2026-09-22): the selected professional Workspace target is now `NAS / AFFAIRES → one AFFAIRES indexer/sync daemon → Cockpit + Hindsight` as owned by #660/#659 and `docs/architecture/WORKSPACE_MANIFEST_INSPECTOR_CANDIDATE.md`. The current installer still carries CouchDB/LiveSync/vault-mirror compatibility from the earlier qualification. Those components are migration-state tooling, not requirements of the selected AFFAIRES topology.
+Selection update (2026-09-30): the selected professional Workspace target is `NAS / AFFAIRES → one AFFAIRES producer → Cockpit + Hindsight` as owned by #660/#659. Self-hosted LiveSync and CouchDB have been retired from the active installer and qualification baseline; Git history preserves the former topology.
 
 This directory turns the existing manual installation runbook into a bounded convenience path for one Ubuntu compute node. It does not make Pantheon an installer, package manager, runtime owner, approval engine, or deployment authority.
 
@@ -12,22 +12,17 @@ The generic owners remain:
 - `docs/install/COMMON_BASELINE_RUNBOOK.md`;
 - `docs/governance/BOOTSTRAP_INSTALLATION_LADDER.md`.
 
-## Current installer profile during Workspace migration
+## Current installer profile
 
-The current installer still consolidates the previously qualified compute/runtime components on one Ubuntu host. This is observed installer behavior during migration, not the selected final Workspace topology:
+The current installer prepares the selected compute/runtime baseline on one Ubuntu host:
 
 ```text
 Ubuntu node
 ├── Docker / Compose
 ├── Hermes Agent + dashboard
-├── CouchDB
-├── Self-hosted LiveSync CLI daemon candidate
-├── local filesystem vault mirror
-├── read-only Workspace Cockpit over the local vault mirrors
-├── optional Marker 2 local API + OCR-AI Obsidian plugin
-├── optional local Docling MCP for Hermes
 ├── Ollama
 ├── ComfyUI
+├── optional Hindsight profile
 └── pinned Pantheon checkout + bounded policy/MCP package
 ```
 
@@ -43,7 +38,7 @@ The local Ollama service uses a 65,536-token effective context window. Hermes
 0.21 requires at least 64K; the model's larger advertised native window is not
 the effective runtime window unless Ollama is configured accordingly.
 
-Hermes execution itself does not make a NAS an authority dependency. However, the selected professional Workspace path uses the reviewed NAS `/AFFAIRES` tree as its source filesystem for the Cockpit/Hindsight producer. The historical Ubuntu-local LiveSync mirror remains compatibility state until #660 Slice 4 converges deployment. A filesystem path still does not become governed identity merely because it is mounted.
+Hermes execution itself does not make a NAS an authority dependency. The selected professional Workspace path uses the reviewed NAS `/AFFAIRES` tree as its source filesystem for the Cockpit/Hindsight producer. No local LiveSync mirror is part of that path. A filesystem path still does not become governed identity merely because it is mounted.
 
 ## Install
 
@@ -70,21 +65,14 @@ The installer is intentionally interactive unless `--yes` is supplied. If the Ub
 ## What starts automatically
 
 ```text
-CouchDB      yes, loopback/private bind selected by operator
 Ollama       yes
 ComfyUI      yes
 Hermes       only after its first-time setup exists
-LiveSync     no — installed as a daemon service but disabled until settings.json exists
 Hindsight    no — optional profile only, even with --with-hindsight
 Pantheon MCP installed/validated, but not exposed as an independently authorized service
 ```
 
-The optional Hindsight container alone is not a qualified AFFAIRES ingestion route.
-The earlier Obsidian topology used a separately installed
-`hindsight-obsidian-sync` producer; that is now historical compatibility rather
-than the selected target. #660 owns the single AFFAIRES producer and #659 owns
-Hindsight retain/retrieval qualification. This installer does not yet activate
-that new producer.
+The optional Hindsight container alone is not a qualified AFFAIRES ingestion route. #660 owns the single AFFAIRES producer and #659 owns Hindsight retain/retrieval qualification. Historical Obsidian integrations remain separate reference material and are not installed by this baseline.
 
 ## Governed visible Role milestones
 
@@ -208,19 +196,6 @@ URL and key are configured. The Workspace Cockpit on port 8189 can expose the
 same projection through an optional transient sidecar. The browser receives no
 Hermes credential, and neither component gains run-control or approval methods.
 
-### Historical / optional LiveSync compatibility
-
-For a localhost-only Self-hosted LiveSync deployment that is still deliberately
-needed by another workflow, provision the authenticated CouchDB posture, the
-`pantheon-obsidian` database, and a retained encryption secret with:
-
-```bash
-sudo ./configure-livesync-local
-```
-
-The command never prints the CouchDB password or LiveSync passphrase. Obsidian
-must initialize the new remote before the headless mirror service is enabled.
-
 ## Dedicated Hermes reconciliation profile
 
 The transient Workspace/Hindsight reconciliation path uses a separate Hermes
@@ -257,56 +232,9 @@ runtime observed != task-authorized
 reconciliation candidate != Evidence
 ```
 
-## Local OCR for Obsidian
-
-Once LiveSync is active, install Marker 2.0.0, its local upload API, and the
-`L3-N0X/obsidian-marker` 1.5.0 plugin without giving either component CouchDB
-credentials:
-
-```bash
-sudo ./configure-marker-local --enable
-```
-
-The installer selects the plugin's `Python Cloud API` mode. The PDF is uploaded
-to Marker at `http://127.0.0.1:8001/marker/upload`; Markdown and extracted
-images are written by the Obsidian plugin into the client vault and propagated
-normally by LiveSync. For an Obsidian client on another trusted machine, pass a
-specific private address with `--bind <private-address>` and use that same
-address in the plugin. Do not expose this unauthenticated API publicly.
-
-Marker 2 uses the Surya 2 VLM through a GPU vLLM container. The installer pins
-NVIDIA Container Toolkit 1.19.1 and vLLM 0.20.1. It also applies a bounded local
-patch to Surya 0.22.1 so the auto-spawned inference port binds to `127.0.0.1`
-instead of all host interfaces. If the toolkit was absent, Docker is restarted
-once during installation; the node's restart policies restore its containers.
-
-The API wrapper releases any models currently loaded by local Ollama before an
-OCR request. Ten minutes after the last Marker conversion finishes, it stops
-only the auto-spawned `surya-vllm-*` container recorded by Marker and clears the
-local inference handle. The next Obsidian conversion starts it again
-automatically. Every new conversion cancels and resets that idle delay, so a
-batch keeps one warm vLLM process for the whole run. This gives Hermes/Ollama
-the GPU while OCR is idle, at the cost of a cold-start delay on the next OCR.
-Set `MARKER_GPU_IDLE_SECONDS=0` in
-`/etc/pantheon-node/marker.env` to disable idle release.
-
-```text
-OCR-AI 1.5.0        -> POST PDF to Marker /marker/upload
-Marker 2.0.0        -> Markdown + base64 images
-OCR-AI              -> writes note and assets into the Obsidian vault
-LiveSync            -> CouchDB and the other Obsidian clients
-Hermes              -> reads the resulting Markdown through existing vault access
-```
-
-The plugin files are installed under `.obsidian/plugins/marker-api`, added to
-`community-plugins.json`, and preconfigured for French and English. In Obsidian,
-reload the application after LiveSync has received the files, then use
-right-click → **Convert to MD** on a PDF. Review Marker's model-weight licence
-before commercial use.
-
 ## Docling for Hermes
 
-Install the pinned Docling SDK and Docling MCP server separately from Marker:
+Install the pinned Docling SDK and Docling MCP server:
 
 ```bash
 sudo ./configure-docling-local --enable
@@ -323,110 +251,39 @@ operator-selected `AFFAIRES_ROOT`. Hermes passes an admitted source path as tool
 input; it does not need the NAS mounted inside its container. LiveSync state and
 Hindsight indexes remain outside Hermes' file surface.
 
-The qualified LiveSync CLI source is built with a pinned npm 11 build tool.
-This avoids the npm 10.9.8 Arborist `edgesOut` crash in `node:22-slim` while
-leaving the reviewed LiveSync source commit unchanged.
-
 ## Read-only Workspace Cockpit
 
-The executable Workspace Cockpit is currently the historical read-only slice: it
-does not require PostgreSQL or pgvector, reads the filesystem mirrors produced by
-LiveSync, and projects folders as Pantheon Cards without reading CouchDB directly.
+The executable Workspace Cockpit now follows the selected direct-NAS topology. It does not require PostgreSQL or pgvector for its bounded workspace projection, does not own a filesystem mirror, and does not read CouchDB.
 
-That is migration state. The selected target reuses the same
-`implementation/workspace_cockpit` owner and evolves it toward source/cartouche
-bundles over the reviewed AFFAIRES root, a reconstructible index, watcher +
-periodic reconcile, and one shared Hindsight producer. Do not add a parallel
-filesystem Cockpit to bypass that migration.
+```text
+NAS / AFFAIRES
+      |
+      v
+Linux-mounted AFFAIRES_ROOT
+      |
+      +--> one standalone Workspace producer
+      |      -> reconstructible SQLite technical state
+      |      -> bounded Hindsight producer operations
+      |
+      +--> optional Cockpit persisted projection
+```
 
-The recommended deployment reuses the locally cached, release-pinned Hermes
-Python image without sharing Hermes state or credentials:
+The recommended deployment reuses the locally cached, release-pinned Hermes Python image without sharing Hermes state or credentials:
 
 ```bash
 docker compose --env-file release.env \
   -f compose.workspace-cockpit-local.yaml up -d --build
 ```
 
-To bind to one reviewed LAN/private address, keep host-specific values and
-secrets in an ignored local env file and load it after the release lock:
+To bind to one reviewed LAN/private address, keep host-specific values and secrets in an ignored local env file and load it after the release lock. For authenticated access outside the LAN, the separate Tailscale candidate remains available.
 
-```bash
-umask 077
-cat > .env.workspace-cockpit <<'EOF'
-AFFAIRES_ROOT=/mnt/pantheon-affaires
-AFFAIRES_GID=replace-with-affaires-mount-group-id
-WORKSPACE_COCKPIT_BIND=192.0.2.10
-WORKSPACE_COCKPIT_PORT=8189
-HERMES_ROLE_TRACE_BASE_URL=http://192.0.2.10:8642/p/pantheon-governed
-HERMES_ROLE_TRACE_API_KEY=replace-with-governed-runs-key
-ROLE_TRACE_ATTACH_KEY=replace-with-random-attach-key
-ROLE_TRACE_READ_KEY=replace-with-random-read-key
-EOF
-# Use the group recorded on the qualified mount, for example:
-# sed -i "s/replace-with-affaires-mount-group-id/$(stat -c %g /mnt/pantheon-affaires)/" .env.workspace-cockpit
-docker compose --env-file release.env --env-file .env.workspace-cockpit \
-  -f compose.workspace-cockpit-local.yaml up -d --build
-```
-
-This is private/LAN publication, not authenticated Internet publication.
-
-For authenticated access outside the LAN, prepare the pinned Tailscale
-userspace container without granting `/dev/net/tun` or host network access:
-
-```bash
-docker compose --env-file release.env \
-  -f compose.workspace-cockpit-tailscale.yaml up -d
-docker logs pantheon-cockpit-tailscale
-```
-
-Visit the one-time login URL from the logs. Once the node is authorized, proxy
-the private Cockpit endpoint within the tailnet:
-
-```bash
-docker exec pantheon-cockpit-tailscale \
-  tailscale serve --bg http://192.168.50.135:8189
-```
-
-The named volume preserves the Tailscale node identity. No auth key belongs in
-Compose, Git or shell history.
-
-Both containers have read-only root filesystems and drop every Linux
-capability. The Cockpit publishes only on its configured host address
-(loopback by default) and mounts the three vaults read-only. The Role sidecar's
-attach route is published on host loopback only; it is the sole component that
-reads the configured public Hermes Runs stream. The native systemd
-alternative is available when container deployment is unwanted:
+The native systemd alternative is available when container deployment is unwanted:
 
 ```bash
 sudo ./configure-workspace-cockpit-local --user <linux-user> --enable
 ```
 
-The service binds to `127.0.0.1:8189` by default and reads only the
-operator-selected Linux-mounted NAS `AFFAIRES_ROOT`.
-
-It recognizes `document.yaml`, checks for a Markdown representation bearing
-the same name as its folder, counts PDF/image/table resources, and exposes the
-local presentation states `FREE`, `QUALIFIABLE`, `COHERENT`, `CHECK`, and
-`INVALID`. These are workspace-health labels, not governed Document status.
-
-The native installer grants the selected unprivileged service user read-only ACLs on
-the mirrors, installs a hardened systemd unit, and never receives CouchDB
-credentials. Bind to a private address only after a separate access review.
-
-The LiveSync composition preserves the executable qualification already carried by the repository:
-
-```text
-CouchDB
--> one long-running LiveSync CLI daemon
--> dedicated local DB
--> dedicated filesystem vault mirror
-```
-
-Repeated one-shot `sync` + `mirror` is not used.
-
-The Docker image entrypoint supplies its database-path argument. The node wrapper
-selects the dedicated database mount with `LIVESYNC_DB_PATH=/data/db` instead of
-passing a second positional database path.
+The service binds to `127.0.0.1:8189` by default and reads only the operator-selected Linux-mounted NAS `AFFAIRES_ROOT`. Cockpit is a projection; the standalone producer remains the only scan/watch/reconcile and Hindsight-write owner.
 
 ## Governed Hermes skills
 
@@ -466,7 +323,7 @@ Pantheon never follows `main` implicitly. A Pantheon change requires a reviewed 
 sudo PANTHEON_COMMIT_OVERRIDE=<40-char-sha> deployment/ubuntu/update-node --apply --component pantheon
 ```
 
-A stateful CouchDB/Hindsight version change is refused unless the operator first establishes a verified backup/rollback point and explicitly sets `STATEFUL_BACKUP_CONFIRMED=1`.
+A running Hindsight version change is refused unless the operator first establishes a verified backup/rollback point and explicitly sets `STATEFUL_BACKUP_CONFIRMED=1`.
 
 ## Version posture
 
