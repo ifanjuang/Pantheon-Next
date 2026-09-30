@@ -24,16 +24,17 @@ is_loopback_base_url = MODULE.is_loopback_base_url
 load_cases = MODULE.load_cases
 load_runtime_metadata = MODULE.load_runtime_metadata
 run_shadow = MODULE.run_shadow
+CANONICAL_PIN = MODULE.load_qualification_pin(PIN_REGISTRY)
 
 
 def _write_runtime_metadata(tmp_path: Path, **overrides) -> Path:
     raw = {
-        "clm_git_ref": "bb42c6c5bf914fd449bed2f6ca65be80602cb1f7",
-        "clm_package_version": "0.1.0",
-        "encoder_model": "Qwen/Qwen3-8B",
-        "encoder_revision": "b968826d9c46dd6066d109eabc6255188de91218",
-        "head_sha256": "b2b4a8c9c2d39263eff78a351eb909a342ce9b3bf21a3f07c1d1bf15f1c4eda5",
-        "vllm_version": "0.30.0",
+        "clm_git_ref": CANONICAL_PIN["ref"],
+        "clm_package_version": CANONICAL_PIN["version"],
+        "encoder_model": CANONICAL_PIN["encoder_model"],
+        "encoder_revision": CANONICAL_PIN["encoder_revision"],
+        "head_sha256": CANONICAL_PIN["head_sha256"],
+        "vllm_version": CANONICAL_PIN["vllm_version"],
         "clm_head_device_name": "cpu",
         "encoder_device_name": "NVIDIA GeForce RTX 4090",
         "encoder_placement": "remote",
@@ -117,8 +118,8 @@ def test_case_validation_rejects_duplicate_or_external_expected_candidates() -> 
 def test_runtime_metadata_requires_exact_clm_and_head_identities(tmp_path: Path) -> None:
     path = _write_runtime_metadata(tmp_path)
     loaded = load_runtime_metadata(path)
-    assert loaded["clm_git_ref"] == "bb42c6c5bf914fd449bed2f6ca65be80602cb1f7"
-    assert loaded["head_sha256"] == "b2b4a8c9c2d39263eff78a351eb909a342ce9b3bf21a3f07c1d1bf15f1c4eda5"
+    assert loaded["clm_git_ref"] == CANONICAL_PIN["ref"]
+    assert loaded["head_sha256"] == CANONICAL_PIN["head_sha256"]
 
     bad_ref = _write_runtime_metadata(tmp_path, clm_git_ref="main")
     with pytest.raises(CLMShadowQualificationError, match="40-character git SHA"):
@@ -164,7 +165,7 @@ def test_runtime_topology_requires_loopback_and_matching_transport(tmp_path: Pat
 def test_runtime_must_match_canonical_clm_pin(tmp_path: Path) -> None:
     good = _write_runtime_metadata(tmp_path)
     runtime = load_runtime_metadata(good)
-    pin = MODULE.load_qualification_pin(PIN_REGISTRY)
+    pin = CANONICAL_PIN
     MODULE.validate_runtime_against_pin(runtime, pin)
 
     for field, value in (
