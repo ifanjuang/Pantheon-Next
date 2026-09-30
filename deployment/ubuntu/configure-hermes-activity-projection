@@ -98,8 +98,8 @@ are not copied.
 
 --with-curated-default-skills copies a bounded document/research/diagram set
 from the bundled skills already pinned in the immutable Hermes image. It keeps
-.no-bundled-skills and enables automatic tool search instead of exposing the
-whole default skill catalogue in the prompt.
+.no-bundled-skills and keeps the admitted MCP tools directly visible to the
+local 9B model instead of relying on deferred tool discovery.
 
 --with-ifja-adapter adds the IFJA project/source-routing module. It is an
 optional contextual adapter; it does not change the generalist identity of the
@@ -362,8 +362,8 @@ check_curated_default_skills() {
     fi
   done
   search_mode="$(hermes_config -p "$PROFILE" config get tools.tool_search.enabled --json 2>/dev/null || true)"
-  [[ "$search_mode" == '"auto"' ]] && log "governed automatic tool search is enabled" \
-    || log "governed automatic tool search requires enabling"
+  [[ "$search_mode" == '"off"' ]] && log "governed MCP tools are directly visible" \
+    || log "governed direct MCP tool visibility requires configuration"
 }
 
 apply_curated_default_skills() {
@@ -379,10 +379,10 @@ apply_curated_default_skills() {
     rsync -a --delete --exclude '__pycache__/' "$source/" "$target/"
     chown -R "$profile_uid:$profile_gid" "$target"
   done
-  hermes_config -p "$PROFILE" config set tools.tool_search.enabled auto >/dev/null
-  [[ "$(hermes_config -p "$PROFILE" config get tools.tool_search.enabled --json)" == '"auto"' ]] \
-    || die "Hermes did not retain governed tools.tool_search.enabled=auto"
-  log "installed bounded image-derived skills and enabled automatic tool search"
+  hermes_config -p "$PROFILE" config set tools.tool_search.enabled off >/dev/null
+  [[ "$(hermes_config -p "$PROFILE" config get tools.tool_search.enabled --json)" == '"off"' ]] \
+    || die "Hermes did not retain governed tools.tool_search.enabled=off"
+  log "installed bounded image-derived skills and exposed admitted MCP tools directly"
 }
 
 apply_local_mcp_bindings() {
@@ -413,6 +413,7 @@ apply_local_mcp_bindings() {
     and (."pantheon-policy".sampling.enabled == false)
   ' >/dev/null || die "Hermes did not retain the governed local MCP bindings"
   hermes_config -p "$PROFILE" tools enable --platform cli hindsight-kroqi-project:recall_project_memory >/dev/null
+  hermes_config -p "$PROFILE" config set tools.tool_search.enabled off >/dev/null
   log "merged reviewed local MCP bindings and bounded Pantheon Policy tools into $PROFILE"
 }
 

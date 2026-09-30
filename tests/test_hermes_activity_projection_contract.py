@@ -191,9 +191,9 @@ def test_curated_default_capabilities_remain_bounded_and_searchable() -> None:
     assert 'source="$flat_name"' in text
     assert 'source="$CURATED_STAGE_ROOT/$name"' in text
     assert 'source="$HERMES_ROOT/skills/$path"' not in text
-    assert "tools.tool_search.enabled auto" in text
+    assert "tools.tool_search.enabled off" in text
     assert ".no-bundled-skills" in text
-    assert "whole default skill catalogue" in text
+    assert "deferred tool discovery" in text
 
 
 def test_optional_runtime_dependencies_are_preflighted_before_profile_mutation() -> None:
