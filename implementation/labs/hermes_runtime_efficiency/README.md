@@ -241,7 +241,13 @@ shadow observation != Evidence
 
 A good first shadow result may justify a larger held-out shadow corpus. It does not justify a router, CandidateRanker abstraction, production service or Hermes wiring.
 
-See `CLM_SHADOW_RUNBOOK.md` for the Linux-node procedure and exact runtime receipt requirements.
+See `CLM_SHADOW_RUNBOOK.md` for the exact runtime receipt requirements. The first prepared live topology keeps CLM on the Pantheon Linux node and serves the exact Qwen3-8B pooling encoder from PC00/WSL through an authenticated SSH local forward:
+
+```text
+Linux CLM -> 127.0.0.1:18090 -> SSH local forward -> PC00/WSL vLLM -> RTX 4090
+```
+
+The PC00 vLLM HTTP service remains loopback-only. Placement is recorded separately from model identity; quality/stability observations remain attributable to the pinned model candidate, while transport latency is topology-specific and must not be compared as if it were a local encoder baseline.
 
 ## Decision order after measurement
 
