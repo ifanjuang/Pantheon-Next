@@ -169,55 +169,35 @@ That record is deliberately `unbound`. No external-memory provider is required b
 
 ### Recommended external provider: Hindsight
 
-When an external memory/retrieval capability is wanted, Hindsight is the current recommended reference because Pantheon-Next has demonstrated the most complete working path with it.
-
-Observed/qualified evidence includes:
+When an external memory/retrieval capability is wanted, Hindsight remains the best-demonstrated replaceable provider in this repository. That recommendation must now distinguish two responsibilities:
 
 ```text
-Hindsight service                    = 0.9.1 in the qualified Synology campaign
-hindsight-obsidian code/assets       = 0.2.1 qualification target
-Hermes native Hindsight provider     = exercised
-Hermes bounded Hindsight recall      = exercised
-single-bank MCP read routing         = exercised
-bank isolation                       = exercised
-Obsidian/Markdown ingestion          = exercised
-producer separation                  = exercised
-source/path provenance on recall     = regression-tested
+professional document retrieval
+!= Hermes conversational/workstream memory
 ```
 
-The qualified reference topology is:
+The selected productive professional-document route is:
 
 ```text
-Obsidian / Markdown
--> designated synchronization path
--> filesystem vault representation
--> hindsight-obsidian-sync
--> isolated Hindsight bank
--> bounded Hermes consumer
+NAS / AFFAIRES
+-> one standalone Workspace producer
+-> Hindsight derived document bank
+-> strict project-scoped router
+-> bounded Hermes / Cockpit consumers
 ```
 
-The later Q5 qualification also proved the important producer separation:
+Current repository evidence includes direct source retain through the Workspace producer, source/path provenance, strict `scope:project:*` filtering with `all_strict`, source-grounded chunk results, project isolation checks and bounded Cockpit/Hermes read surfaces. #659 still owns live deployment hardening and persistence/recovery qualification.
+
+Earlier Obsidian / LiveSync / CouchDB / `hindsight-obsidian-sync` campaigns remain historical capability evidence. They no longer define the productive AFFAIRES materialization or ingestion topology.
+
+Using Hindsight for professional document retrieval does **not** bind the generic `external_runtime_memory` capability automatically. Hermes native memory remains a valid baseline for conversational/workstream continuity, and that machine-checkable binding remains deliberately `unbound` unless a separate decision selects an external runtime-memory provider.
 
 ```text
-Hermes file write
-!= immediate Hindsight write
-
-source Markdown change
--> designated hindsight-obsidian-sync reconcile
--> Hindsight materialization
--> Hermes recall with provenance
-```
-
-Therefore:
-
-```text
-Obsidian + Hindsight = qualified and recommended external reference composition
-Obsidian + Hindsight != mandatory Pantheon stack
-Hindsight recall != truth
+Hindsight document recall != source truth
 Hindsight memory != Evidence
+document-retrieval provider selected != runtime-memory binding selected
+provider selected != authority transfer
 ```
-
-If an external stack is desired and no contrary user/deployment requirement exists, this qualified composition is the default recommendation because it is already demonstrated rather than merely hypothetical.
 
 ### Hermes-native alternative
 
@@ -248,7 +228,21 @@ Detailed historical provider results remain in dated qualification logs/referenc
 
 Pantheon does not define a mandatory note application or RAG topology.
 
-A minimal deployment may use:
+The selected productive professional-source path is filesystem-native:
+
+```text
+NAS / AFFAIRES
+-> Linux-mounted admitted project root
+-> one Workspace indexer / sync producer
+-> Hindsight derived retrieval
+-> project-scoped bounded consumers
+```
+
+Cartouches are optional descriptive enrichment. Supported sources do not require one for the normal source route, and no folder, filename, cartouche or Hindsight bank becomes governed Project identity by implication.
+
+Obsidian, Self-hosted LiveSync, CouchDB and `hindsight-obsidian-sync` remain historically qualified optional workspace/synchronization patterns. They may still be useful when a human-authored Markdown workspace is actually wanted, but they are not the selected AFFAIRES route.
+
+A minimal deployment may still use only:
 
 ```text
 Hermes project/context files
@@ -256,19 +250,7 @@ Hermes project/context files
 + Hermes native memory/session search
 ```
 
-A richer deployment may add a workspace/retrieval stack. The currently recommended qualified reference is:
-
-```text
-Obsidian / Markdown
--> Self-hosted LiveSync / CouchDB where synchronization is needed
--> filesystem vault mirror
--> hindsight-obsidian-sync
--> Hindsight
-```
-
-`OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md` records that demonstrated composition and its remaining deployment-specific hardening gaps.
-
-A replacement is acceptable when it preserves the same generic invariants:
+All valid replacements preserve the same invariants:
 
 ```text
 folder != governed identity
@@ -334,8 +316,9 @@ provider implementation changes
 ## Final rule
 
 ```text
-Use native Hermes when sufficient.
-When an external workspace/retrieval/memory stack is wanted, prefer the already-qualified Obsidian + Hindsight composition unless another need justifies a different binding.
+Use native Hermes memory when sufficient.
+For productive AFFAIRES document retrieval, use the selected direct NAS / Workspace / Hindsight route until a demonstrated need justifies replacement.
+Treat Obsidian / LiveSync / CouchDB as historical qualified optional tooling, not the productive AFFAIRES default.
 Keep every external provider optional and replaceable.
 Pantheon governs the boundary, not the product choice.
 ```

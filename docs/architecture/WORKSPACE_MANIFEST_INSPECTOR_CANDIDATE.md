@@ -4,9 +4,19 @@ Status: selected target architecture; implementation remains bounded by #660 and
 
 Current decision baseline:
 
-```text
-Pantheon-Next/main = c5860fe8750ca6c81d9b8dfb4e21e1427ff6e865
-```
+- #1129 selected the direct NAS-mounted AFFAIRES topology;
+- #1131 added the bounded Hindsight source producer and explicit revision-chronology handling;
+- #1132 added transient, read-only memory reconciliation;
+- #1133 added the dedicated reconciliation-profile deployment seam;
+- #1135 qualified the concrete Linux NAS mount and kept the bounded IFJA reader separate;
+- #1139 made cartouches optional enrichment and source files first-class in the Hindsight explorer path;
+- #1144 added project-scoped Kroqi/Hindsight ingestion and strict project routing;
+- #1145 repaired the dedicated reconciliation-profile qualification helper;
+- #1146 split the standalone AFFAIRES producer from the optional Cockpit process.
+
+The #1134 repair attempt was closed without merge and is superseded by merged #1145. Configured still does not mean activated, and a reconciliation candidate is not Evidence.
+
+This list records the decisions that define the current target; it is intentionally not a frozen `main` SHA. Always verify the current branch, open PRs and qualification issues before changing the topology.
 
 This document remains the architecture owner for the Workspace Cockpit filesystem projection. It supersedes the earlier productive target based on Obsidian + Self-hosted LiveSync + CouchDB + Ubuntu-local vault mirrors.
 
@@ -104,6 +114,15 @@ The cartouche may contain YAML frontmatter because Markdown frontmatter is a con
 
 ## 4. Cartouche contract
 
+Machine-readable reserved-field contracts:
+
+```text
+schemas/workspace_cartouche.schema.yaml       = pantheon/cartouche/v1
+schemas/workspace_folder_context.schema.yaml  = pantheon/folder-context/v1
+```
+
+These schemas validate the existing frontmatter vocabulary; they do not create a second JSON/YAML business sidecar or turn cartouche fields into governed authority.
+
 Candidate minimal frontmatter:
 
 ```yaml
@@ -117,6 +136,9 @@ type: CCTP
 index: C
 document_date: 2026-09-12
 issuer: FRONTSign
+# Optional and never inferred from index/date/name:
+revision_mode: supersedes
+revision_of: doc_previous
 tags:
   - structure
   - ossature-bois
@@ -149,9 +171,31 @@ In particular:
 project hint != governed project_id
 folder name != governed project_id
 index label != professional currentness
+document date != revision order
+filename similarity != revision order
 summary != source claim
-relation note != governed relation
+declared revision relation != governed professional decision
 ```
+
+Optional revision fields are structural declarations only:
+
+```yaml
+revision_mode: supersedes | supplements
+revision_of: doc_...
+```
+
+They are never generated from an index, a date or a filename.
+
+```text
+supersedes
+= this bundle explicitly declares that it replaces the referenced occurrence
+
+supplements
+= this bundle explicitly declares that it adds to the referenced occurrence;
+  the referenced occurrence remains independently relevant
+```
+
+If neither field is present, Pantheon records no revision relation. It does not guess one.
 
 ## 5. Identity
 
@@ -189,16 +233,53 @@ path != identity
 
 ### New index / new physical document
 
-If the user intentionally keeps the old file and creates a new indexed file:
+If the user intentionally keeps the old file and creates another file:
 
 ```text
 CCTP_IND_B.pdf + .CCTP_IND_B.pdf.md
 CCTP_IND_C.pdf + .CCTP_IND_C.pdf.md
 ```
 
-they are separate bundles with separate cartouche identities unless an explicit governed relation later links them.
+they are separate bundle occurrences with separate `document_id` values.
 
-Do not infer a hidden version chain merely from similar names or contents.
+This remains true even when:
+
+- both files carry the same index because of a human naming/indexing mistake;
+- the later-issued file carries a lexically lower index;
+- the higher index carries an earlier `document_date`;
+- the filenames look almost identical.
+
+```text
+document_id
+= identity of this filesystem document occurrence
+
+index
+= descriptive business label
+
+document_date
+= descriptive date supplied for the document
+
+revision_mode + revision_of
+= explicit declared relationship between occurrences
+```
+
+If the corrected bytes overwrite the same intended filesystem occurrence in place, the same `document_id` may remain and the changed source fingerprint drives a Hindsight replacement of that occurrence.
+
+If the old file is preserved and a new physical bundle is created, assign a new `document_id`. Link the two only when the relation is explicitly known:
+
+```yaml
+revision_mode: supersedes
+revision_of: doc_old
+```
+
+or:
+
+```yaml
+revision_mode: supplements
+revision_of: doc_base
+```
+
+Do not infer a hidden version chain from similar names, contents, indices or dates. A contradictory index/date does not override an explicit relation and does not create one when none exists.
 
 ## 6. Pairing
 
@@ -240,7 +321,9 @@ Cartouche manquant
 
 Do not silently invent business metadata from the filename.
 
-The first productive posture is that an uncartouched file is visible but not automatically promoted to the normal Hindsight document route.
+A supported source does not require a cartouche to enter the normal bounded Hindsight source route. Below an identified project directory it inherits the strict project scope; a root-level source remains in `PENDING_SCOPE` until identification. In both cases the source keeps technical identity/provenance and no business metadata is invented from its filename.
+
+A cartouche is optional enrichment. When present and valid it may contribute a declared `document_id`, descriptive project/type/phase metadata, source integrity binding and explicit relation declarations, but it is not an admission gate.
 
 ### Cartouche without source
 
@@ -281,7 +364,7 @@ folder context != professional approval
 
 The existing `implementation/workspace_cockpit` is the component to evolve. Do not add a parallel filesystem Cockpit.
 
-The current implementation recursively scans LiveSync filesystem mirrors on each `/api/workspaces` request. That is acceptable as historical implementation evidence, but it is not the selected performance model for large AFFAIRES trees.
+Historical implementations scanned LiveSync filesystem mirrors. The selected implementation indexes the actual AFFAIRES root as mounted by Linux; no local source-tree mirror participates in the productive topology.
 
 Target behavior:
 
@@ -423,33 +506,92 @@ Those human-readable descriptive fields belong in the cartouche when this file-n
 
 #659 owns Hindsight runtime and retain/retrieval qualification.
 
-Candidate Hindsight mapping:
+The selected productive mapping keeps one Hindsight document per eligible professional source:
 
 ```text
-bundle id = doc_...
-
-doc_...:source
-→ eligible source file
-→ Hindsight files/retain
+NAS / AFFAIRES source
+→ standalone Workspace producer
+→ technical or declared document_id
+→ Hindsight files/retain as <document_id>:source
 → parsed source content
-
-doc_...:card
-→ cartouche Markdown
-→ optional lightweight retain/chunks/verbatim
-→ directly retrievable description
+→ chunks + derived memories
 ```
 
-Do not assume the second document is valuable until measured.
+A supported source without a cartouche is eligible when its project scope is identified or explicitly held in the pending-identification queue. A valid cartouche is optional enrichment, not an admission gate.
 
-Qualification must compare:
+Pantheon does not create a second retrievable Hindsight `doc_...:card` document. Valid cartouche fields may be copied only as namespaced `cartouche_*` provenance metadata. They are not inserted into source text or extraction context, and descriptive index/date/revision labels are not allowed to establish source chronology.
+
+The historical A/B/C alternatives have converged to one productive route:
 
 ```text
-A = source only
-B = source + bounded cartouche metadata/context
-C = source + separately retrievable cartouche
+A = source + bounded identification context      ← implemented
+B = namespaced cartouche provenance metadata     ← implemented when a valid cartouche exists
+C = separately retrievable cartouche             ← not selected
 ```
 
-Select the smallest mapping that materially improves retrieval without confusing provenance or duplicating answers.
+Do not add C unless measured retrieval quality demonstrates a material need.
+
+### On-demand memory reconciliation
+
+Cockpit may ask Hermes to critique the Hindsight-derived state for one exact
+`doc_...:source`, but this remains a read-only candidate path:
+
+```text
+Workspace document_id
+        │
+        ├─ bounded cartouche projection
+        └─ exact Hindsight document
+              ├─ chunks
+              └─ memories filtered by document_id
+                         │
+                         ▼
+             dedicated no-tool Hermes profile
+                         │
+                         ▼
+       transient MemoryReconciliationCandidate-shaped response
+```
+
+No new governed owner is introduced by the response shape. The candidate is transient
+and is not persisted by this slice.
+
+Hard boundaries:
+
+```text
+Hindsight derived state != original NAS source
+cartouche relation != source truth
+Hermes finding != memory mutation
+Hermes finding != Evidence
+candidate != accepted correction
+```
+
+The reconciliation route must not receive the NAS path or Hindsight `original_text`.
+It may receive only sanitized chunks, sanitized memory units, bounded cartouche
+projection and an optional bounded user focus.
+
+Hermes must run through a dedicated profile whose API-server tool surface is disabled.
+For Hermes 0.21.3 the profile requires `platform_toolsets.api_server: [no_mcp]`; an
+empty list alone does not suppress globally enabled MCP servers. No plugins, hooks or
+project workspace are admitted for this profile.
+
+Defense in depth requires the Cockpit client to:
+
+1. inspect `GET /v1/toolsets` before every run and fail closed if any toolset is enabled;
+2. use Responses with `store:false`;
+3. reject any returned `function_call` / `function_call_output`;
+4. delete the Hermes session before returning a successful candidate;
+5. fail with an explicit residency error when that deletion cannot be proven.
+
+Exact source verification remains a later, separate path:
+
+```text
+document_id
+→ exact admitted workspace://source?sha256=...
+→ Pantheon path/root/hash checks
+→ read source in place from the NAS mount
+→ compare source against Hindsight
+```
+
+Do not collapse that future source-verification path into Hindsight-only reconciliation.
 
 ## 14. Context passed to source extraction
 
@@ -459,11 +601,13 @@ The cartouche may supply bounded identification context such as:
 document type
 project/affaire hint
 phase
-index
 issuer
-document date
 stable tags
 ```
+
+The first Hindsight producer slice deliberately keeps `index`, `document_date`, `revision_mode` and `revision_of` out of the file-retain extraction context. They remain available to Cockpit/reconciliation, but they are not allowed to bias source fact extraction or decide which document is current.
+
+Revision declarations may later be used by a dedicated reconciliation/view layer, but they must not authorize deletion or be promoted into source evidence merely because the cartouche contains them.
 
 Do not silently feed a speculative/derived summary into source extraction as though it were source fact.
 
@@ -546,6 +690,8 @@ Hermes may propose:
 - limits;
 - semantic relations.
 
+Hermes must not populate `revision_mode` or `revision_of` merely from filename similarity, index ordering, dates or inferred chronology. A revision relationship must come from an explicit human declaration or another specifically admitted authoritative relation source.
+
 Hermes must not invent:
 
 - file digest;
@@ -608,7 +754,7 @@ Current implementation facts after the Slice 1 candidate (#1112):
 - temp/lock/Revit-backup files are filtered and heavy professional binaries remain visible;
 - the Generate cartouche affordance is visible but has no write route in this slice;
 - it still scans on request rather than through the selected reconstructible index;
-- Ubuntu deployment still mounts historical LiveSync vault mirrors.
+- Ubuntu deployment must mount only the reviewed AFFAIRES root already mounted by Linux; historical LiveSync vault mirrors are retired from the active path.
 
 Migration sequence:
 
@@ -643,7 +789,7 @@ Migration sequence:
 
 ### Slice 4 — deployment convergence
 
-- mount the actual reviewed AFFAIRES root read-only/read-write only as required by explicit cartouche-generation posture;
+- mount the actual reviewed AFFAIRES root directly from the Linux-visible NAS path, read-only unless an explicit governed cartouche-write posture is enabled;
 - retire CouchDB/LiveSync/vault-mirror requirements from the active Workspace Cockpit baseline;
 - keep historical tooling only if another demonstrated workflow still uses it.
 
@@ -720,7 +866,8 @@ Linux host
 The mount qualification must exercise the mounted path itself:
 
 ```bash
-python3 deployment/ubuntu/qualify-affaires-linux-mount.py --root /path/to/mounted/AFFAIRES
+python3 deployment/ubuntu/qualify-affaires-linux-mount.py \
+  --root /path/to/mounted/AFFAIRES --require-network-mount
 ```
 
 The probe verifies:
@@ -738,3 +885,22 @@ mount visible != mount healthy
 inotify observed != convergence proof
 reconcile success != professional validation
 ```
+
+## Source residency invariant
+
+The NAS-mounted AFFAIRES tree is the only durable professional source tree in this topology.
+
+```text
+NAS source
+→ Linux mount
+→ read in place
+
+NAS source
+↛ local AFFAIRES mirror
+↛ LiveSync mirror
+↛ Hindsight source authority
+```
+
+Local Linux persistence may contain only reconstructible technical state or derived memory. It must not silently become a second professional file repository.
+
+An on-demand Hermes analysis must not be implemented by copying the whole file tree locally or exposing unrestricted NAS browsing to the model. Exact source access, when enabled, must be bound to an explicitly admitted source reference and read from the mounted source in place.

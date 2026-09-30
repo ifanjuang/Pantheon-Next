@@ -1,7 +1,9 @@
 const STATUS = {
   COMPLETE: { label: "Complet", color: "#287652" },
+  FOLDER_SCOPED: { label: "Contexte dossier", color: "#247a67" },
+  PENDING_SCOPE: { label: "Projet à identifier", color: "#8a5a20" },
   CHECK: { label: "À vérifier", color: "#a76800" },
-  CARTOUCHE_MISSING: { label: "Cartouche manquant", color: "#6648a8" },
+  SOURCE_ONLY: { label: "Source seule", color: "#6648a8" },
   SOURCE_MISSING: { label: "Source manquante", color: "#a53535" },
   FOLDER: { label: "Dossier", color: "#315d9c" },
 };
@@ -45,15 +47,48 @@ function documentCardBody(card) {
   const facts = [
     fact("Chemin", card.path),
     fact("Source", card.source_present ? (card.source || card.name) : "Manquante", card.source_present ? "" : "fact-alert"),
-    fact("Cartouche", card.cartouche_present ? card.cartouche : "Absent", card.cartouche_present ? "" : "fact-alert"),
-    fact("Identité", card.document_id),
+    fact("Cartouche", card.cartouche_present ? card.cartouche : "Optionnelle", "fact-muted"),
+    fact("Identité déclarée", card.document_id),
+    fact("Identité technique", card.technical_document_id),
+    fact("Hindsight", card.hindsight_status || (card.hindsight_eligible ? "Non synchronisé" : "Non éligible"), card.hindsight_last_error ? "fact-alert" : ""),
+    fact(
+      "Reclassement",
+      card.hindsight_reclassification_required
+        ? `${card.hindsight_previous_project || "sans projet"} → ${card.hindsight_requested_project || "sans projet"} — confirmation requise`
+        : "",
+      "fact-alert",
+    ),
+    fact(
+      "OCR",
+      card.hindsight_ocr_needed ? "À demander pour ce fichier" : card.hindsight_extraction_quality,
+      card.hindsight_ocr_needed ? "fact-alert" : "fact-muted",
+    ),
     fact("Émetteur", card.issuer),
+    fact(
+      card.revision_mode === "supersedes" ? "Remplace" : card.revision_mode === "supplements" ? "Complète" : "Relation",
+      card.revision_of,
+      card.revision_target_status === "MISSING" || card.revision_target_status === "AMBIGUOUS" ? "fact-alert" : "",
+    ),
   ].join("");
 
-  const generate = card.can_generate_cartouche
+  const openSource = card.source_present
     ? `<div class="card-action">
-        <button type="button" disabled title="La route d’écriture du cartouche n’est pas encore qualifiée">Générer le cartouche</button>
-        <small>Action visible, écriture non activée dans cette tranche.</small>
+        <a href="/api/source?workspace=${encodeURIComponent(card.workspace)}&path=${encodeURIComponent(card.path)}" target="_blank" rel="noopener">Ouvrir le fichier</a>
+        <small>Ouverture depuis le chemin NAS validé par le producer.</small>
+      </div>`
+    : "";
+
+  const reconcile = card.status === "COMPLETE"
+    && card.document_id
+    && card.hindsight_representation_candidate === "source"
+    ? `<div class="reconcile-action" data-reconcile-document="${escapeHtml(card.document_id)}">
+        <label>
+          <span>Focus optionnel</span>
+          <input type="text" maxlength="2000" data-reconcile-focus placeholder="Ex. vérifier les contradictions de dates">
+        </label>
+        <button type="button" data-reconcile-button>Réconcilier avec Hermes</button>
+        <small>Analyse transitoire de la mémoire Hindsight. La source NAS n’est pas ouverte.</small>
+        <div class="reconcile-result" data-reconcile-result hidden></div>
       </div>`
     : "";
 
@@ -65,7 +100,8 @@ function documentCardBody(card) {
     ${summary}
     ${tagsTemplate(card.tags)}
     <div class="facts">${facts}</div>
-    ${generate}
+    ${reconcile}
+    ${openSource}
   `;
 }
 
@@ -98,7 +134,7 @@ function cardTemplate(card) {
   const classes = [
     "card",
     card.kind === "folder" ? "folder-card" : "document-card",
-    card.status === "CARTOUCHE_MISSING" ? "missing-cartouche" : "",
+    card.status === "SOURCE_ONLY" ? "source-only" : "",
     card.status === "SOURCE_MISSING" ? "missing-source" : "",
   ].filter(Boolean).join(" ");
 
@@ -133,6 +169,8 @@ function renderCards() {
       card.path,
       card.source,
       card.cartouche,
+      card.revision_mode,
+      card.revision_of,
       ...(card.tags || []),
     ].filter(Boolean).join(" ").toLocaleLowerCase("fr");
     return workspaceMatch && statusMatch && (!query || text.includes(query));
@@ -182,6 +220,96 @@ async function load() {
     elements.refresh.disabled = false;
   }
 }
+
+function reconciliationFindingNode(finding) {
+  const item = document.createElement("li");
+  const title = document.createElement("strong");
+  title.textContent = `${finding.category} — ${finding.summary || "Constat"}`;
+  const detail = document.createElement("p");
+  detail.textContent = finding.detail || "";
+  item.append(title, detail);
+  if (finding.suggestion) {
+    const suggestion = document.createElement("p");
+    suggestion.className = "reconcile-suggestion";
+    suggestion.textContent = `Proposition : ${finding.suggestion}`;
+    item.append(suggestion);
+  }
+  const refs = [...(finding.memory_refs || []), ...(finding.chunk_refs || [])];
+  if (refs.length) {
+    const ref = document.createElement("small");
+    ref.textContent = `Références : ${refs.join(", ")}`;
+    item.append(ref);
+  }
+  return item;
+}
+
+function renderReconciliationResult(container, result) {
+  container.replaceChildren();
+  const summary = document.createElement("p");
+  summary.className = "reconcile-summary";
+  summary.textContent = result.summary || "Analyse terminée.";
+  container.append(summary);
+  const findings = Array.isArray(result.findings) ? result.findings : [];
+  if (findings.length) {
+    const list = document.createElement("ol");
+    list.className = "reconcile-findings";
+    for (const finding of findings) list.append(reconciliationFindingNode(finding));
+    container.append(list);
+  } else {
+    const empty = document.createElement("p");
+    empty.className = "reconcile-empty";
+    empty.textContent = "Aucune incohérence bornée relevée dans les éléments transmis.";
+    container.append(empty);
+  }
+  const boundary = document.createElement("small");
+  const chunks = result.inputs?.hindsight_chunks_sent ?? 0;
+  const memories = result.inputs?.hindsight_memories_sent ?? 0;
+  boundary.textContent = `Hindsight uniquement · ${chunks} chunks · ${memories} mémoires · source NAS non ouverte · aucune écriture`;
+  container.append(boundary);
+  container.hidden = false;
+}
+
+async function runMemoryReconciliation(action) {
+  const button = action.querySelector("[data-reconcile-button]");
+  const input = action.querySelector("[data-reconcile-focus]");
+  const resultNode = action.querySelector("[data-reconcile-result]");
+  const documentId = action.dataset.reconcileDocument;
+  if (!button || !input || !resultNode || !documentId) return;
+  button.disabled = true;
+  button.textContent = "Analyse…";
+  resultNode.hidden = true;
+  resultNode.replaceChildren();
+  try {
+    const response = await fetch(`/api/documents/${encodeURIComponent(documentId)}/reconcile-memory`, {
+      method: "POST",
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Pantheon-Intent": "memory-reconcile",
+      },
+      body: JSON.stringify({ focus: input.value.trim() }),
+    });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.detail || payload.error || `HTTP ${response.status}`);
+    renderReconciliationResult(resultNode, payload);
+  } catch (error) {
+    const message = document.createElement("p");
+    message.className = "reconcile-error";
+    message.textContent = `Réconciliation impossible : ${error.message || error}`;
+    resultNode.replaceChildren(message);
+    resultNode.hidden = false;
+  } finally {
+    button.disabled = false;
+    button.textContent = "Réconcilier avec Hermes";
+  }
+}
+
+elements.cards.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-reconcile-button]");
+  if (!button) return;
+  const action = button.closest("[data-reconcile-document]");
+  if (action) void runMemoryReconciliation(action);
+});
 
 elements.search.addEventListener("input", (event) => { state.query = event.target.value; renderCards(); });
 elements.refresh.addEventListener("click", load);

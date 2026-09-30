@@ -21,6 +21,7 @@ CONFIGURE_MARKER = DEPLOY / "configure-marker-local"
 MARKER_IDLE_WRAPPER = DEPLOY / "marker_idle_vram.py"
 CONFIGURE_DOCLING = DEPLOY / "configure-docling-local"
 CONFIGURE_WORKSPACE_COCKPIT = DEPLOY / "configure-workspace-cockpit-local"
+CONFIGURE_AFFAIRES_NAS_MOUNT = DEPLOY / "configure-affaires-nas-mount"
 CONFIGURE_HERMES_ACTIVITY = DEPLOY / "configure-hermes-activity-projection"
 EXTERNAL_PINS = ROOT / "implementation" / "qualification" / "external-pins.json"
 
@@ -42,11 +43,24 @@ def test_bootstrap_scripts_are_shell_syntax_valid() -> None:
         CONFIGURE_MARKER,
         CONFIGURE_DOCLING,
         CONFIGURE_WORKSPACE_COCKPIT,
+        CONFIGURE_AFFAIRES_NAS_MOUNT,
         CONFIGURE_HERMES_ACTIVITY,
     )
     for script in scripts:
         assert script.exists()
         subprocess.run(["bash", "-n", str(script)], check=True)
+
+
+def test_affaires_mount_configuration_is_generic_and_keeps_secrets_external() -> None:
+    text = _text(CONFIGURE_AFFAIRES_NAS_MOUNT)
+    assert "--source //HOST/SHARE" in text
+    assert "--prefix-path RELATIVE/PATH" in text
+    assert "credentials file must be owned by root with mode 0600" in text
+    assert "Options=credentials=%s" in text
+    assert "Type=cifs" in text
+    assert "prefixpath=%s" in text
+    assert "nosuid,nodev,noexec" in text
+    assert "No hostname, share, project name or folder name is built into this script" in text
 
 
 def test_workspace_cockpit_compose_is_read_only_and_loopback_only() -> None:
@@ -55,11 +69,45 @@ def test_workspace_cockpit_compose_is_read_only_and_loopback_only() -> None:
     assert "read_only: true" in text
     assert "no-new-privileges:true" in text
     assert "cap_drop:" in text and "- ALL" in text
-    assert text.count(":ro") == 3
+    assert "group_add:" in text
+    assert "${AFFAIRES_GID:?set AFFAIRES_GID to the Linux-mounted NAS AFFAIRES group id}" in text
+    affaires_mount = "${AFFAIRES_ROOT:?set AFFAIRES_ROOT to the Linux-mounted NAS AFFAIRES path}:/workspace/affaires:ro"
+    assert text.count(affaires_mount) == 2
+    assert "workspace-producer:" in text
+    assert 'entrypoint: ["/opt/hermes/.venv/bin/python", "/app/producer_daemon.py"]' in text
+    assert "--projection-only" in text
+    assert "workspace-cockpit-state:/state:ro" in text
+    assert "/srv/pantheon/obsidian" not in text
     assert '127.0.0.1:${ROLE_TRACE_ATTACH_PORT:-8190}:8190' in text
     assert "HERMES_ROLE_TRACE_API_KEY" in text
     assert "ROLE_TRACE_ATTACH_KEY" in text
     assert "ROLE_TRACE_READ_KEY" in text
+    assert "WORKSPACE_HINDSIGHT_URL" in text
+    assert "WORKSPACE_HINDSIGHT_BANK_ID" in text
+    assert "WORKSPACE_HINDSIGHT_MAX_FILE_MB" in text
+    assert "WORKSPACE_HINDSIGHT_SETTLE_OBSERVATIONS" in text
+    assert "WORKSPACE_HINDSIGHT_SOURCE_KIND" in text
+    assert "WORKSPACE_EXCLUDED_FOLDERS" in text
+    assert "network_mode: host" in text
+    assert "Kroqi=/workspace/affaires" in text
+    assert 'WORKSPACE_RECONCILE_SECONDS:-3600' in text
+    assert 'WORKSPACE_HINDSIGHT_BANK_ID:-IFJA_KROQI' in text
+    assert 'WORKSPACE_HINDSIGHT_SETTLE_OBSERVATIONS:-2' in text
+    assert 'WORKSPACE_HINDSIGHT_SOURCE_KIND:-kroqi-sync' in text
+
+
+def test_hindsight_file_retain_runtime_posture_is_explicit() -> None:
+    text = _text(HERMES_LOCAL_COMPOSE)
+    assert "HINDSIGHT_API_FILE_PARSER: markitdown" in text
+    assert "HINDSIGHT_API_RETAIN_MISSION:" in text
+    assert "revision/index/version token" in text
+    assert "revision-history or revision-table entries" in text
+    assert "Never infer document chronology" in text
+    assert "preserve an unresolved reference instead of guessing" in text
+    assert 'HINDSIGHT_API_FILE_DELETE_AFTER_RETAIN: "true"' in text
+    assert 'HINDSIGHT_API_FILE_PARSER_MARKITDOWN_OCR_ENABLED: "false"' in text
+    assert 'HINDSIGHT_API_STORE_DOCUMENT_TEXT: "true"' in text
+    assert "shm_size: 1gb" in text
 
 
 def test_workspace_cockpit_remote_access_uses_pinned_userspace_tailscale() -> None:

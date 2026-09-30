@@ -3,6 +3,8 @@
 Status: candidate external-runtime review and selected qualification target — not installed, observed, activated or task-authorized.
 Boundary profile: external_reference_review.
 Current reviewed target: Hermes Agent 0.21.3 (`v2026.9.14`).
+Qualification status: live runtime qualification remains open.
+Current upstream stable requalification candidate: Hermes Agent 0.21.5 (`v2026.9.24`).
 
 ## Responsibility
 
@@ -53,6 +55,87 @@ session_correlation_reuse: forbidden
 ```
 
 Wire compatibility still requires observation against the exact installed artifact.
+
+## Upstream stable requalification candidate — 0.21.5
+
+Official upstream release/tag rechecked on 2026-09-26:
+
+```text
+repository: NousResearch/hermes-agent
+version: 0.21.5
+tag: v2026.9.24
+release_date: 2026-09-24
+release_commit: f97608f178d1ffeca59860195ab7da295f7c8e5f
+release_window: ~460 merged PRs since v0.21.4
+```
+
+0.21.5 is the next stable **requalification candidate**. It does not silently
+replace the currently reviewed/selected Pantheon target or prove either release live-qualified. Pin movement remains:
+
+```text
+stable upstream artifact
+-> exact runtime qualification (#644 / H5.9b)
+-> Pantheon acceptance
+-> only then update the selected deployment pin
+```
+
+The release window makes several previously observed `main` behaviors stable,
+including connector/webhook delivery mirrored into chat state, broader Connector
+surfaces and plugin tools/skills becoming live in already-open chats. Post-release
+upstream fixes additionally show concrete isolation failures around Profile-owned
+interactive authorization, secret prompting, disabled-toolset fold-in,
+workspace/cwd switching and delegate-session restoration. Those post-tag fixes
+are observations for the next stable or an explicit target-local qualification;
+they are not a reason to track upstream `main` implicitly.
+
+No new Pantheon runtime or governance abstraction follows. Requalification must
+preserve six existing boundaries regardless of Hermes implementation details:
+
+```text
+Hermes Profile A != Hermes Profile B
+parent session != delegated child session
+connector/webhook transcript input != Pantheon admitted input
+Hermes-visible tool != Pantheon admitted Capability / Binding
+Hermes runtime approval != Pantheon consequential-effect authorization
+Hermes/Hindsight memory or transcript != Evidence
+```
+
+Qualification interpretation:
+
+- Profile isolation must cover effective home, secrets, authorization context,
+  workspace/cwd, tool surface and session restoration, not only the Profile name;
+- a delegated child may return a Result Candidate but must not become the resumed
+  interactive owner or acquire a new Pantheon identity/authority;
+- transcript role, including `user`, is runtime state and never proves that the
+  content crossed Pantheon Context/Execution Admission;
+- dynamic MCP/plugin registration or tool availability may not widen the exact
+  admitted capability/tool envelope for an already admitted run;
+- Hermes approvals and hooks remain defense in depth under the effect boundary
+  fixed by #1109;
+- retained/recalled runtime material remains memory/context. Promotion to Evidence
+  still requires the existing Pantheon Evidence path.
+
+Owner routing remains deliberately unchanged:
+
+```text
+#644 / H5.9b -> exact Hermes runtime/Profile/context/tool requalification
+#1093        -> direct/delegate/goal/Kanban empirical strategy qualification
+#1109        -> consequential-effect authority invariant (merged doctrine)
+#660/#1129   -> AFFAIRES source/index/Hindsight producer topology
+```
+
+For AFFAIRES specifically, the direct NAS topology now strengthens the source
+boundary rather than changing Hermes ownership:
+
+```text
+NAS / AFFAIRES source
+-> Workspace observes/indexes
+-> Pantheon explicitly admits bounded source/context
+-> Hermes may consume only that admitted material
+
+NAS mounted/readable != Hermes globally admitted browsing surface
+Hindsight retained material != professional source != Evidence
+```
 
 ## Material 0.21.x qualification deltas
 

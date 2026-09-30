@@ -3,7 +3,7 @@
 Status: active support note — repository runtime-status map — implemented as documentation.
 Boundary profile: active_support_doctrine.
 
-Date: 2026-09-02
+Date: 2026-09-27
 
 This file distinguishes repository implementation, external observations, target selection and production adoption. It creates no runtime behavior or authorization.
 
@@ -26,6 +26,7 @@ repository presence != selected architecture
 | `mcp-server/` | implemented read-only / partial | Shared Pantheon policy/verification service with bounded consultation/preflight/decision-validation surfaces. It does not execute Hermes work, send, schedule, install, route providers or promote memory. |
 | `implementation/` | executable candidate implementation / co-located / not adopted | Co-located implementation contains persistence, APIs, Cockpit and Hermes seams. Co-location does not grant governance authority or production activation. |
 | Pantheon Cockpit under `implementation/mvp_vertical/cockpit/` | executable candidate / tested / not adopted | Registry-backed navigation, Card projection/renderer and bounded product projections exist. The Cockpit is not a second general-purpose Hermes chat frontend. |
+| AFFAIRES Workspace route under `implementation/workspace_cockpit/` | executable candidate / direct NAS target selected / not adopted | Reads the Linux-mounted professional source tree in place, maintains reconstructible technical state and emits bounded Hindsight producer operations. It is not a second source authority. |
 | Catalog/contracts | declarative / CI-checked / to verify per object | Capability/resource/binding/decision candidate records exist. A capability may remain intentionally unbound; a catalog record is not a live registry, installer or authorization. |
 | Architecture Project Understanding validation | implemented read-only / partial | Candidate structures can be validated where schemas and checkers exist. Schema validity does not canonize professional state. |
 | `ai_logs/` | validation/provenance trace | Historical intervention records exist. They are not doctrine or current architecture authority. |
@@ -37,8 +38,9 @@ repository presence != selected architecture
 | Hermes Agent | external execution runtime / target deployment state must be observed separately | Hermes owns runtime interaction/execution capabilities. Pantheon governs consequential status and admission boundaries; repository code does not prove target enforcement. |
 | Hermes Web/dashboard | selected interaction baseline | Current target client for chat, sessions and runtime controls. Client operation does not create Pantheon governance state. |
 | `willscott-v2/hermes-mobile-pwa` | external client candidate / compatible by source review / not selected or installed by this repo | Thin mobile/PWA client using Hermes dashboard REST/WebSocket/auth surfaces. Replaceable client only; deployment/auth/network posture remains separate. |
-| Obsidian workspace | selected workspace direction / external | Human-authored Markdown notes and editable working projections. Obsidian is not a DMS, Evidence store, governed Project identity or Registre Probatoire. |
-| Hindsight | external derived-memory/index candidate with prior bounded qualification | Recall/index layer only where selected. Memory/retrieval does not become truth or Evidence. |
+| NAS / AFFAIRES | selected professional source residency / external storage | Professional source files remain durably on the NAS and are mounted directly on the Linux compute host. Mounted/readable does not mean globally admitted to Hermes, and path/folder does not become governed identity. |
+| Obsidian workspace | historically qualified optional workspace / not selected for productive AFFAIRES | Useful capability evidence and optional human Markdown tooling remain, but Obsidian/LiveSync/CouchDB no longer define the selected professional AFFAIRES topology. |
+| Hindsight | selected derived-memory/index candidate / prior bounded evidence / live qualification open | The AFFAIRES producer path exists, while durable runtime behavior, recovery and exact deployed exposure remain under #659. Memory/retrieval does not become truth or Evidence. |
 
 ## Implemented/qualified candidate paths not proven in production
 
@@ -46,9 +48,11 @@ repository presence != selected architecture
 |---|---|---|
 | Hermes policy/PEP integration | co-located candidate / internal decision-client assembly exists / target enforcement not established | The Cockpit can assemble the real Pantheon decision client for one internal consequential Knowledge path. This does not establish mandatory invocation in the selected Hermes/runtime deployment. Demonstrate the target-runtime boundary, authenticated/qualified decision references and actual deployment configuration separately. |
 | Internal consequential-write chokepoint | code-complete — every entry point the inventory named as needing the gate is wired; wider deployment proof remains open | The mutation inventory now enumerates 92 entry points, and all 92 have been individually reviewed; the unreviewed backlog is closed and its ceiling is 0 — a newly discovered entry point is reviewed when it is added, not admitted to a backlog. The `gate_required_not_wired` backlog is also closed at ceiling 0: every entry the review found consequential now either routes through `enforce_consequential` or was closed by a local fix the review judged sufficient for that specific finding. Six write paths route through the chokepoint when a decision client is supplied: the Cockpit Knowledge UPDATE apply route; `human_access.bind_oidc_identity`, the write that makes an external OIDC identity able to act as a governed principal and the root of trust every authenticated request resolves against; `apu_owner.store_reviewed_dossier`, which installs a Project's whole canonical Architecture Project Understanding baseline; `knowledge.publish_knowledge`, gated only on the claim `review_status="reviewed"` — the far more common unreviewed-candidate write is unchanged; `knowledge.apply_edit_request`, gated unconditionally and reachable from three production call sites (the direct route and two internal calls inside `apply_selected_variant`), all three threading the same client; and `agency_information.act_working_information`, where the acting identity now lives in the decision record because the table itself has no actor column. `knowledge.complete_edit_request` was reviewed alongside `apply_edit_request` and closed by a local status guard instead — a decided request can no longer be silently overwritten by a late proposal — because the finding was a missing guard, not a missing decision. Every gated write's own production composition point (a CLI command or an HTTP route dependency) fails closed without a configured decision point unless `MVP_POLICY_ENFORCEMENT=disabled` is declared explicitly; every underlying primitive still accepts an optional policy client for bounded direct/test use, so the inventory continues to describe that function-level fact rather than overclaiming universal enforcement. When a client is supplied, each owner re-binds the effect it validates from what it itself observed — a digest of the exact content being decided on — rather than from what a caller supplied, so a caller-supplied candidate cannot broaden it. What none of this establishes: that a real Policy Decision Point is configured and reachable in any selected deployment, or what that PDP's actual rules decide beyond the shape `enforce_consequential` requires (a real `decision_id`, a matching scope, ceiling and content digest). Remaining proof: observe the selected deployment, and confirm a live decision point exists behind it. A validated decision is not the applied effect; the returned effect-binding trace is not Evidence, approval or production proof. |
-| Core local/NAS document ingestion | co-located implementation candidate | Prove selected target paths, permissions, real-dossier authorization and operational rollback before production use. |
+| Direct AFFAIRES Workspace route | executable candidate / source-card-index architecture implemented | #660 remains open for real mounted-NAS event ordering, restart/network convergence and proof that exactly one productive producer owns the route. |
+| Hindsight AFFAIRES producer | executable candidate / bounded | #659 remains open for exact deployed runtime identity/exposure, producer↔Hindsight behavior, restart/outage/restore, bank isolation and backup/restore. |
+| Hindsight memory reconciliation | implemented transient candidate / no governed write | #1145 repaired the dedicated Hermes-profile qualification helper on main. Configured still does not mean activated, runtime observation does not authorize a task, and the candidate is not Evidence. |
 | Pantheon Cockpit adoption | executable candidate / not adopted | Live deployment, data bindings and operational acceptance remain separate decisions. |
-| Obsidian/Hindsight synchronization topology | partially qualified / external stabilization work remains | Real client/offline/conflict and deployment hardening remain separate from repository CI. |
+| Obsidian/LiveSync/CouchDB reference topology | historically qualified optional reference / not selected productive route | Its behavioral evidence remains useful, but it no longer owns AFFAIRES materialization, synchronization or ingestion. |
 | Hermes external dashboard/plugin helpers | existing templates and candidates where present | Installation/enablement and live target state must be observed externally. |
 
 ## Refused target integrations and historical provenance
@@ -76,8 +80,8 @@ current_target_role: none
 implementation_adapter_status: retired
 replacement responsibilities:
   exact source/provenance -> existing Source/document owners
-  local/NAS intake -> bounded core ingestion path
-  Markdown workspace -> Obsidian
+  local/NAS intake -> direct NAS / AFFAIRES Workspace route
+  optional Markdown authoring -> replaceable workspace tooling
 ```
 
 The Paperless client, gateway, ingestion binding, Compose paths, catalog resource, SQL binding migration, Hermes Paperless skill and dedicated document-runtime observer path have been retired after consumer audit. No replacement DMS abstraction was introduced.
@@ -122,8 +126,15 @@ Pantheon governance/admission boundaries
         |
 Pantheon Cockpit for governed projections
 
-Obsidian -> human Markdown workspace
-Hindsight/runtime memory -> optional derived recall
+NAS / AFFAIRES -> durable professional source tree
+        |
+Linux mount -> one Workspace indexer/sync owner
+        |                     \
+        |                      -> Hindsight derived recall
+        -> Cockpit projection
+
+Obsidian/LiveSync/CouchDB -> historical qualified optional reference
+Hermes runtime memory -> separate optional runtime continuity
 Professional source files -> existing Source/document owners
 ```
 
