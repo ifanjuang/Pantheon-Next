@@ -41,7 +41,7 @@ def test_governed_profile_supplement_requires_progress_without_private_reasoning
     assert "load `pantheon-governed-method` before material\nwork" in text
     assert "`pantheon-activity-projection` when progress should be visible" in text
     assert "skills own procedure" in text
-    assert "optional observable labels, never\nagents, permissions or decorative prose" in text
+    assert "Pantheon viewpoints and delegated-intervenant labels are optional observable\nlabels, never agents, permissions or decorative prose" in text
     assert "retrieved source material, derived calculations, candidate\noutputs and authorization separate" in text
     assert len(text.split()) < 180
 

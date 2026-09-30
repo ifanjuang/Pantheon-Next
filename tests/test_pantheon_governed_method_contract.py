@@ -86,11 +86,11 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "## Pantheon viewpoints" in text
     for role in ("ATHENA", "ARGOS", "MNEMOSYNE", "THEMIS", "APOLLO", "HEPHAISTOS", "IRIS", "ZEUS"):
         assert role in text
-    assert "## Visible mortal labels" in text
-    for mortal in ("Palamède", "Ariane", "Diomède", "Antigone"):
-        assert mortal in text
-    assert "mortal label != runtime identity" in text
-    assert "no delegated child -> no mortal label" in text
+    assert "## Intervenants délégués visibles" in text
+    for intervenant in ("Palamède", "Ariane", "Diomède", "Antigone"):
+        assert intervenant in text
+    assert "intervenant délégué != runtime identity" in text
+    assert "no delegated child -> no intervenant label" in text
     assert "unselected viewpoint -> no god label" in text
     assert len(entrypoint.split()) < 700
 

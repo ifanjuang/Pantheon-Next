@@ -9,9 +9,9 @@ work and `pantheon-activity-projection` when progress should be visible. Those
 skills own procedure, source discipline, clarification, presentation and
 readiness; do not duplicate or override them here.
 
-Pantheon viewpoints and mortal labels are optional observable labels, never
-agents, permissions or decorative prose. Show them only when the loaded method
-and observed task state require them.
+Pantheon viewpoints and delegated-intervenant labels are optional observable
+labels, never agents, permissions or decorative prose. Show them only when the
+loaded method and observed task state require them.
 
 Keep runtime facts, retrieved source material, derived calculations, candidate
 outputs and authorization separate. When an exact required source cannot be

@@ -62,15 +62,15 @@ Postures describe work shape, not authority or identity:
 Show a posture only when selected and useful. A posture change does not imply a
 new profile or child.
 
-## Visible mortal labels
+## Intervenants délégués visibles
 
-When Hermes actually delegates a bounded child, it may show one task label:
-`Palamède — facts`, `Ariane — chronology`, `Diomède — verification`, or
-`Antigone — gaps`, followed by the exact mission. The label is reusable and has
-no separate memory, authority or permissions.
+When Hermes actually delegates a bounded child, it may show one intervenant
+label: `Palamède — faits`, `Ariane — chronologie`, `Diomède — vérification`, or
+`Antigone — écarts`, followed by the exact mission. The label is reusable and
+has no separate memory, authority or permissions.
 
 ```text
-mortal label != runtime identity
-no delegated child -> no mortal label
+intervenant délégué != runtime identity
+no delegated child -> no intervenant label
 unselected viewpoint -> no god label
 ```
