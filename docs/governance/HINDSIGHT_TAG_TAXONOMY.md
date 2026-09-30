@@ -19,8 +19,8 @@ page / mental model = derived synthesis
 Only `scope:*` tags define a project-memory boundary. Other tags may narrow a
 query but never authorize a cross-project recall.
 
-The first-directory rule is evaluated below the admitted project root, currently
-`/mnt/pantheon-affaires/KROQI/AFFAIRES`, never from the broader NAS share.
+The first-directory rule is evaluated below the locally configured admitted
+project root, never from a broader NAS share that mixes unrelated material.
 
 Ordinary navigation tags use lowercase slugs. Project boundary tags are stricter:
 the producer combines a readable slug (maximum 80 characters) with the first

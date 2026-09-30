@@ -1944,11 +1944,6 @@ def build_parser() -> argparse.ArgumentParser:
         help="dedicated no-tool Hermes profile base URL for on-demand memory reconciliation",
     )
     parser.add_argument(
-        "--reconcile-hermes-model",
-        default=os.getenv("WORKSPACE_RECONCILE_HERMES_MODEL", ""),
-        help="optional model/model-route override for the dedicated reconciliation profile",
-    )
-    parser.add_argument(
         "--reconcile-max-context-chars",
         type=int,
         default=int(os.getenv("WORKSPACE_RECONCILE_MAX_CONTEXT_CHARS", "48000")),
@@ -2034,7 +2029,6 @@ def main(argv: list[str] | None = None) -> int:
             hermes_client=HermesReconciliationClient(
                 reconcile_hermes_url,
                 reconcile_hermes_key,
-                model=args.reconcile_hermes_model,
                 timeout_seconds=float(os.getenv("WORKSPACE_RECONCILE_HERMES_TIMEOUT_SECONDS", "120")),
             ),
             max_context_chars=args.reconcile_max_context_chars,

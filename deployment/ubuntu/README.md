@@ -287,7 +287,8 @@ cat > .env.workspace-cockpit <<'EOF'
 AFFAIRES_ROOT=/mnt/pantheon-affaires/KROQI/AFFAIRES
 AFFAIRES_GID=replace-with-affaires-mount-group-id
 EOF
-
+# Use the group recorded on the qualified mount, for example:
+# sed -i "s/replace-with-affaires-mount-group-id/$(stat -c %g "$AFFAIRES_ROOT")/" .env.workspace-cockpit
 docker compose --env-file release.env --env-file .env.workspace-cockpit \
   -f compose.workspace-cockpit-local.yaml up -d --build
 ```
@@ -402,9 +403,9 @@ Those can be added only when their actual configuration and qualification needs 
 
 The productive Workspace/Hindsight topology is evaluated from this Linux host against the NAS path as mounted here. Hindsight remains local to Linux; the AFFAIRES daemon is the filesystem watcher and Hindsight producer.
 
-On the current node, configure the Workspace source to the project-level subtree
-`/mnt/pantheon-affaires/KROQI/AFFAIRES`, not the broader NAS mount. Only there
-does the first directory reliably identify a project.
+Set `AFFAIRES_ROOT` locally to the admitted source root whose direct children
+are project directories. The repository never assumes a NAS hostname, share,
+project name, or intermediary folder.
 
 Create the SMB credentials file locally as root with mode `0600`; never put its
 contents in Git, shell arguments or chat. Install `cifs-utils`, then configure a
@@ -413,7 +414,7 @@ persistent mount without embedding site-specific names in the repository:
 ```bash
 sudo deployment/ubuntu/configure-affaires-nas-mount \
   --apply --source //HOST/SHARE --prefix-path RELATIVE/PATH \
-  --target /mnt/pantheon-affaires --enable
+  --target /path/to/mounted/AFFAIRES --enable
 ```
 
 The host, share, relative path and credentials are operator inputs. Consumers

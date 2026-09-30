@@ -249,16 +249,10 @@ python3 implementation/workspace_cockpit/server.py \
 
 The container/native installers now require the Linux-visible AFFAIRES mount directly. They do not create, synchronize or maintain a local source-tree copy.
 
-For the current NAS layout, the admitted KROQI project root is specifically:
-
-```text
-/mnt/pantheon-affaires/KROQI/AFFAIRES
-```
-
-The broader `/mnt/pantheon-affaires` tree is not an admissible project root: it
-also contains ASSETS, BACKUP, SCAN3D, communication material, templates,
-prospection and recycle data. The first directory rule applies only below the
-selected `KROQI/AFFAIRES` root.
+The operator selects `AFFAIRES_ROOT` locally. It must be the admitted source
+root whose direct children are project directories. The repository does not
+encode a NAS hostname, share, project name, or intermediary folder; a broader
+NAS share is not an admissible root when it mixes unrelated material.
 
 ## Hindsight boundary
 
@@ -479,14 +473,17 @@ Configuration is disabled by default:
 ```text
 WORKSPACE_RECONCILE_HERMES_URL=http://127.0.0.1:8642/p/reconciliation
 WORKSPACE_RECONCILE_HERMES_KEY=<profile-specific API_SERVER_KEY>
-WORKSPACE_RECONCILE_HERMES_MODEL=
 WORKSPACE_RECONCILE_HERMES_TIMEOUT_SECONDS=120
 WORKSPACE_RECONCILE_MAX_CONTEXT_CHARS=48000
 ```
 
 The URL may target a separately supervised profile or a multiplexed
 `/p/<profile>` API surface, but it must resolve to the dedicated no-tool profile.
-The API key is profile-specific.
+The API key is profile-specific. The dedicated Hermes profile is also the sole
+authority for model selection. Cockpit deliberately does not send a per-request
+model override: Hermes ignores bare model requests unless its broader
+`direct_model_requests` surface is enabled, which is not appropriate for this
+private reconciliation profile.
 
 The Ubuntu operator helper can create or verify that profile without activating a
 gateway or changing profile routing:

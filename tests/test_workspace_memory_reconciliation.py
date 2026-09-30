@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import io
 import json
 from pathlib import Path
 import sys
@@ -46,6 +47,39 @@ class _Response:
 
     def read(self):
         return self.payload
+
+
+class _SseResponse:
+    def __init__(self, payload: dict, *, session_id: str) -> None:
+        event = json.dumps(
+            {"type": "response.completed", "response": payload},
+            ensure_ascii=False,
+        ).encode("utf-8")
+        self.stream = io.BytesIO(b"event: response.completed\n" + b"data: " + event + b"\n\n")
+        self.headers = {"X-Hermes-Session-Id": session_id}
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_args):
+        return False
+
+    def readline(self):
+        return self.stream.readline()
+
+
+class _TimeoutSseResponse:
+    def __init__(self, session_id: str) -> None:
+        self.headers = {"X-Hermes-Session-Id": session_id}
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_args):
+        return False
+
+    def readline(self):
+        raise TimeoutError("synthetic streaming timeout")
 
 
 def test_hindsight_exact_read_contracts_are_document_scoped() -> None:
@@ -116,10 +150,10 @@ def test_hermes_client_uses_no_store_then_deletes_session() -> None:
         if request.full_url.endswith("/v1/responses"):
             body = json.loads(request.data.decode("utf-8"))
             assert body["store"] is False
-            assert body["stream"] is False
+            assert body["stream"] is True
             assert "tools" not in body
             assert "model" not in body
-            return _Response(
+            return _SseResponse(
                 {
                     "output": [
                         {
@@ -128,7 +162,7 @@ def test_hermes_client_uses_no_store_then_deletes_session() -> None:
                         }
                     ]
                 },
-                headers={"X-Hermes-Session-Id": "session-123"},
+                session_id="session-123",
             )
         if request.full_url.endswith("/api/sessions/session-123"):
             assert request.get_method() == "DELETE"
@@ -183,9 +217,9 @@ def test_invalid_hermes_output_still_deletes_transient_session() -> None:
         if request.full_url.endswith("/v1/toolsets"):
             return _Response(_safe_toolsets())
         if request.full_url.endswith("/v1/responses"):
-            return _Response(
+            return _SseResponse(
                 {"output": [{"type": "message", "content": [{"type": "output_text", "text": "not-json"}]}]},
-                headers={"X-Hermes-Session-Id": "session-bad"},
+                session_id="session-bad",
             )
         if request.full_url.endswith("/api/sessions/session-bad"):
             return _Response({"object": "hermes.session.deleted", "deleted": True})
@@ -211,14 +245,14 @@ def test_hermes_tool_call_output_is_rejected_and_session_is_deleted() -> None:
         if request.full_url.endswith("/v1/toolsets"):
             return _Response(_safe_toolsets())
         if request.full_url.endswith("/v1/responses"):
-            return _Response(
+            return _SseResponse(
                 {
                     "output": [
                         {"type": "function_call", "name": "read_file", "call_id": "call-1", "arguments": "{}"},
                         {"type": "message", "content": [{"type": "output_text", "text": _candidate_text()}]},
                     ]
                 },
-                headers={"X-Hermes-Session-Id": "session-tool"},
+                session_id="session-tool",
             )
         if request.full_url.endswith("/api/sessions/session-tool"):
             deleted.append(True)
@@ -235,6 +269,34 @@ def test_hermes_tool_call_output_is_rejected_and_session_is_deleted() -> None:
             raise AssertionError("tool use must fail closed")
 
     assert deleted == [True]
+
+
+def test_stream_timeout_deletes_session_known_from_early_headers() -> None:
+    module = _module()
+    methods = []
+
+    def fake_urlopen(request, timeout):
+        methods.append(request.get_method())
+        if request.full_url.endswith("/v1/toolsets"):
+            return _Response(_safe_toolsets())
+        if request.full_url.endswith("/v1/responses"):
+            return _TimeoutSseResponse("session-timeout")
+        if request.full_url.endswith("/api/sessions/session-timeout"):
+            return _Response({"object": "hermes.session.deleted", "deleted": True})
+        raise AssertionError(request.full_url)
+
+    client = module.HermesReconciliationClient(
+        "http://127.0.0.1:8642/p/reconciliation", "secret"
+    )
+    with patch.object(module, "urlopen", fake_urlopen):
+        try:
+            client.reconcile({})
+        except module.ReconciliationError as exc:
+            assert "synthetic streaming timeout" in str(exc)
+        else:
+            raise AssertionError("stream timeout must fail")
+
+    assert methods == ["GET", "POST", "DELETE"]
 
 
 class _FakeHindsight:
