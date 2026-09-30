@@ -92,6 +92,17 @@ def test_workspace_cockpit_compose_is_read_only_and_loopback_only() -> None:
     assert 'WORKSPACE_HINDSIGHT_SOURCE_KIND:-kroqi-sync' in text
 
 
+def test_workspace_cockpit_systemd_installer_keeps_cockpit_optional() -> None:
+    text = _text(CONFIGURE_WORKSPACE_COCKPIT)
+    assert "--enable-producer" in text
+    assert "--enable-cockpit" in text
+    assert "Requires=pantheon-affaires-producer.service" in text
+    assert "systemctl enable --now pantheon-affaires-producer.service" in text
+    assert "systemctl enable --now pantheon-workspace-cockpit.service" in text
+    assert "if ((ENABLE_PRODUCER)); then" in text
+    assert "if ((ENABLE_COCKPIT)); then" in text
+
+
 def test_hindsight_file_retain_runtime_posture_is_explicit() -> None:
     text = _text(HERMES_LOCAL_COMPOSE)
     assert "HINDSIGHT_API_FILE_PARSER: markitdown" in text

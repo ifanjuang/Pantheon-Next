@@ -17,8 +17,6 @@ HERMES_IMAGE_SKILLS_ROOT="${HERMES_IMAGE_SKILLS_ROOT:-/opt/hermes/skills}"
 CURATED_STAGE_ROOT=""
 LOCAL_MCP_SELECTED=""
 PANTHEON_POLICY_TOOLS_JSON='["classify_request","find_relevant_sources","route_governed_request","read_doctrine","explain_governance_structure","get_consultation_catalog","explain_architecture","get_capability_status","evaluate_preflight","prepare_task_contract_skeleton","prepare_evidence_pack_skeleton","plan_context_pack","validate_context_pack"]'
-HINDSIGHT_AFFAIRES_TOOLS_JSON='["recall","search_knowledge_base","get_knowledge_page","list_documents","get_document","list_tags"]'
-HINDSIGHT_DOCUMENTAIRES_TOOLS_JSON='["recall","search_knowledge_base","get_knowledge_page","list_documents","get_document","list_tags"]'
 HINDSIGHT_KROQI_PROJECT_TOOLS_JSON='["recall_project_memory"]'
 IFJA_VAULT_TOOLS_JSON='["find_ifja_projects","list_ifja_project_sources","search_ifja_markdown","read_ifja_markdown_lines"]'
 IFJA_VAULT_MCP_URL="http://127.0.0.1:8021/mcp"
@@ -85,9 +83,11 @@ WhatsApp routing is opt-in. Prefer --whatsapp-chat-id. The broader
 --all-authorized-whatsapp form affects every chat already admitted by the
 WhatsApp adapter allowlist; it never widens that adapter allowlist.
 
---bind-local-mcp merges only the existing Docling, Hindsight AFFAIRES,
-Hindsight DOCUMENTAIRES and Pantheon Policy bindings from the local default
-profile, plus the repository-owned, read-only IFJA vault Markdown reader.
+--bind-local-mcp merges only the existing Docling and Pantheon Policy bindings
+from the local default profile, plus the repository-owned, read-only IFJA
+vault Markdown reader, the minimal Hindsight memory endpoint and the
+project-scoped Hindsight router. It removes the legacy direct multi-bank
+Hindsight AFFAIRES and DOCUMENTAIRES bindings from the governed profile.
 It restricts Pantheon Policy to the reviewed read-only consultation and
 governed-work tools. Missing required bindings fail closed; unrelated MCPs
 are not copied.
@@ -230,10 +230,10 @@ prepare_local_mcp_selection() {
     || die "cannot read local default-profile mcp_servers"
   source_mcp="$(printf '%s' "$source_raw" | normalize_json_object)" \
     || die "cannot parse local default-profile mcp_servers"
-  selected="$(printf '%s' "$source_mcp" | jq -ce --argjson policy_tools "$PANTHEON_POLICY_TOOLS_JSON" --argjson affaires_tools "$HINDSIGHT_AFFAIRES_TOOLS_JSON" --argjson documentaires_tools "$HINDSIGHT_DOCUMENTAIRES_TOOLS_JSON" --argjson kroqi_tools "$HINDSIGHT_KROQI_PROJECT_TOOLS_JSON" --argjson vault_tools "$IFJA_VAULT_TOOLS_JSON" --arg vault_url "$IFJA_VAULT_MCP_URL" --arg vault_token "$vault_token" --arg kroqi_url "$HINDSIGHT_PROJECT_MCP_URL" --arg kroqi_token "$hindsight_project_token" 'with_entries(select(
-    .key == "docling" or .key == "hindsight-affaires"
-    or .key == "hindsight-documentaires" or .key == "pantheon-policy"
-  ))
+  selected="$(printf '%s' "$source_mcp" | jq -ce --argjson policy_tools "$PANTHEON_POLICY_TOOLS_JSON" --argjson kroqi_tools "$HINDSIGHT_KROQI_PROJECT_TOOLS_JSON" --argjson vault_tools "$IFJA_VAULT_TOOLS_JSON" --arg vault_url "$IFJA_VAULT_MCP_URL" --arg vault_token "$vault_token" --arg kroqi_url "$HINDSIGHT_PROJECT_MCP_URL" --arg kroqi_token "$hindsight_project_token" '
+  . as $source
+  | with_entries(select(.key == "docling" or .key == "pantheon-policy"))
+  | if ($source | has("hindsight-affaires")) then . else error("hindsight-affaires binding is absent from the local default profile") end
   | if has("pantheon-policy") then . else error("pantheon-policy binding is absent") end
   | .docling.tools = (
       (if (.docling.tools | type) == "object" then .docling.tools else {} end)
@@ -248,8 +248,6 @@ prepare_local_mcp_selection() {
       + {"enabled": false}
     )
   | ."pantheon-policy".supports_parallel_tool_calls = false
-  | ."hindsight-affaires".tools = {"include": $affaires_tools}
-  | ."hindsight-documentaires".tools = {"include": $documentaires_tools}
   | . + {"ifja-vault-read": {
       "url": $vault_url,
       "headers": {"Authorization": ("Bearer " + $vault_token)},
@@ -258,7 +256,7 @@ prepare_local_mcp_selection() {
       "supports_parallel_tool_calls": false,
       "enabled": true
     }, "hindsight-memory": {
-      "url": (."hindsight-affaires".url | sub("IFJA_AFFAIRES/?$"; "hermes/")),
+      "url": ($source."hindsight-affaires".url | sub("IFJA_AFFAIRES/?$"; "hermes/")),
       "tools": {"include": ["recall"]},
       "enabled": true
     }, "hindsight-kroqi-project": {
@@ -269,8 +267,8 @@ prepare_local_mcp_selection() {
       "supports_parallel_tool_calls": false,
       "enabled": true
     }}')" || die "cannot select governed local MCP bindings"
-  printf '%s' "$selected" | jq -e --argjson policy_tools "$PANTHEON_POLICY_TOOLS_JSON" --argjson affaires_tools "$HINDSIGHT_AFFAIRES_TOOLS_JSON" --argjson documentaires_tools "$HINDSIGHT_DOCUMENTAIRES_TOOLS_JSON" --argjson kroqi_tools "$HINDSIGHT_KROQI_PROJECT_TOOLS_JSON" --argjson vault_tools "$IFJA_VAULT_TOOLS_JSON" --arg vault_url "$IFJA_VAULT_MCP_URL" --arg kroqi_url "$HINDSIGHT_PROJECT_MCP_URL" '
-    has("docling") and has("hindsight-affaires") and has("hindsight-documentaires")
+  printf '%s' "$selected" | jq -e --argjson policy_tools "$PANTHEON_POLICY_TOOLS_JSON" --argjson kroqi_tools "$HINDSIGHT_KROQI_PROJECT_TOOLS_JSON" --argjson vault_tools "$IFJA_VAULT_TOOLS_JSON" --arg vault_url "$IFJA_VAULT_MCP_URL" --arg kroqi_url "$HINDSIGHT_PROJECT_MCP_URL" '
+    has("docling") and (has("hindsight-affaires") | not) and (has("hindsight-documentaires") | not)
     and has("pantheon-policy")
     and (.docling.tools.prompts == false)
     and (.docling.tools.resources == false)
@@ -305,7 +303,7 @@ check_local_mcp_bindings() {
   current="$(printf '%s' "$current_raw" | normalize_json_object)" \
     || die "cannot parse governed mcp_servers"
   if printf '%s' "$current" | jq -e --argjson policy_tools "$PANTHEON_POLICY_TOOLS_JSON" --argjson kroqi_tools "$HINDSIGHT_KROQI_PROJECT_TOOLS_JSON" --argjson vault_tools "$IFJA_VAULT_TOOLS_JSON" --arg vault_url "$IFJA_VAULT_MCP_URL" --arg kroqi_url "$HINDSIGHT_PROJECT_MCP_URL" '
-    has("docling") and has("hindsight-affaires") and has("hindsight-documentaires") and has("hindsight-memory") and has("hindsight-kroqi-project")
+    has("docling") and (has("hindsight-affaires") | not) and (has("hindsight-documentaires") | not) and has("hindsight-memory") and has("hindsight-kroqi-project")
     and has("pantheon-policy") and has("ifja-vault-read")
     and (."ifja-vault-read".tools.include == $vault_tools)
     and (."ifja-vault-read".url == $vault_url)
@@ -401,13 +399,13 @@ apply_local_mcp_bindings() {
     || die "cannot read governed mcp_servers"
   current="$(printf '%s' "$current_raw" | normalize_json_object)" \
     || die "cannot parse governed mcp_servers"
-  merged="$(jq -cn --argjson current "$current" --argjson selected "$LOCAL_MCP_SELECTED" '$current + $selected')" \
+  merged="$(jq -cn --argjson current "$current" --argjson selected "$LOCAL_MCP_SELECTED" '($current | del(."hindsight-affaires", ."hindsight-documentaires")) + $selected')" \
     || die "cannot merge governed local MCP bindings"
   hermes_config -p "$PROFILE" config set --force mcp_servers "$merged" >/dev/null
 
   observed="$(get_profile_optional_config_json "$PROFILE" mcp_servers)"
   printf '%s' "$observed" | normalize_json_object | jq -e --argjson policy_tools "$PANTHEON_POLICY_TOOLS_JSON" --argjson kroqi_tools "$HINDSIGHT_KROQI_PROJECT_TOOLS_JSON" --argjson vault_tools "$IFJA_VAULT_TOOLS_JSON" --arg vault_url "$IFJA_VAULT_MCP_URL" --arg kroqi_url "$HINDSIGHT_PROJECT_MCP_URL" '
-    has("docling") and has("hindsight-affaires") and has("hindsight-documentaires") and has("hindsight-memory") and has("hindsight-kroqi-project")
+    has("docling") and (has("hindsight-affaires") | not) and (has("hindsight-documentaires") | not) and has("hindsight-memory") and has("hindsight-kroqi-project")
     and has("pantheon-policy") and has("ifja-vault-read")
     and (."ifja-vault-read".tools.include == $vault_tools)
     and (."ifja-vault-read".url == $vault_url)

@@ -295,10 +295,18 @@ docker compose --env-file release.env --env-file .env.workspace-cockpit \
 
 To bind to one reviewed LAN/private address, keep host-specific values and secrets in an ignored local env file and load it after the release lock. For authenticated access outside the LAN, the separate Tailscale candidate remains available.
 
-The native systemd alternative is available when container deployment is unwanted:
+The native systemd alternative is available when container deployment is
+unwanted. Install both units, then activate the Hindsight producer alone; the
+read-only Cockpit remains an explicit optional addition:
 
 ```bash
-sudo ./configure-workspace-cockpit-local --user <linux-user> --enable
+sudo ./configure-workspace-cockpit-local \
+  --user <linux-user> --affaires-root /mnt/pantheon-affaires/KROQI/AFFAIRES \
+  --enable-producer
+# Only if the local Cockpit interface is wanted:
+sudo ./configure-workspace-cockpit-local \
+  --user <linux-user> --affaires-root /mnt/pantheon-affaires/KROQI/AFFAIRES \
+  --enable-cockpit
 ```
 
 The service binds to `127.0.0.1:8189` by default and reads only the operator-selected Linux-mounted NAS `AFFAIRES_ROOT`. Cockpit is a projection; the standalone producer remains the only scan/watch/reconcile and Hindsight-write owner.

@@ -9,7 +9,8 @@ COCKPIT_UNIT_PATH="/etc/systemd/system/pantheon-workspace-cockpit.service"
 SERVICE_USER="${SUDO_USER:-${USER:-}}"
 BIND_ADDRESS="127.0.0.1"
 PORT="8189"
-ENABLE=0
+ENABLE_PRODUCER=0
+ENABLE_COCKPIT=0
 DOCTOR=0
 AFFAIRES_ROOT="${AFFAIRES_ROOT:-}"
 
@@ -25,7 +26,11 @@ Options:
   --user USER      Unprivileged service user (default invoking sudo user)
   --affaires-root PATH
                    Linux-mounted NAS AFFAIRES root (or set AFFAIRES_ROOT)
-  --enable         Enable and start the systemd service
+  --enable-producer
+                   Enable and start only the standalone Hindsight producer
+  --enable-cockpit Enable and start the optional read-only Cockpit (also starts
+                   its required producer)
+  --enable         Backward-compatible alias for --enable-producer --enable-cockpit
   --doctor         Read-only prerequisite check
   -h, --help       Show this help
 EOF
@@ -39,7 +44,9 @@ while (($#)); do
     --port) PORT="${2:?missing port}"; shift 2 ;;
     --user) SERVICE_USER="${2:?missing service user}"; shift 2 ;;
     --affaires-root) AFFAIRES_ROOT="${2:?missing AFFAIRES root}"; shift 2 ;;
-    --enable) ENABLE=1; shift ;;
+    --enable-producer) ENABLE_PRODUCER=1; shift ;;
+    --enable-cockpit) ENABLE_COCKPIT=1; shift ;;
+    --enable) ENABLE_PRODUCER=1; ENABLE_COCKPIT=1; shift ;;
     --doctor) DOCTOR=1; shift ;;
     -h|--help) usage; exit 0 ;;
     *) die "unknown option: $1" ;;
@@ -109,6 +116,7 @@ trap 'rm -f "$producer_unit_tmp" "$cockpit_unit_tmp"' EXIT
 {
   printf '%s\n' '[Unit]'
   printf '%s\n' 'Description=Pantheon optional read-only Workspace Cockpit'
+  printf '%s\n' 'Requires=pantheon-affaires-producer.service'
   printf '%s\n' 'After=network.target pantheon-affaires-producer.service'
   printf '\n%s\n' '[Service]'
   printf 'User=%s\n' "$SERVICE_USER"
@@ -128,8 +136,16 @@ install -m 0644 "$producer_unit_tmp" "$PRODUCER_UNIT_PATH"
 install -m 0644 "$cockpit_unit_tmp" "$COCKPIT_UNIT_PATH"
 systemctl daemon-reload
 
-if ((ENABLE)); then
+if ((ENABLE_PRODUCER)); then
   systemctl enable --now pantheon-affaires-producer.service
+  systemctl is-active --quiet pantheon-affaires-producer.service || {
+    systemctl --no-pager --full status pantheon-affaires-producer.service || true
+    die "producer did not become active"
+  }
+  printf '%s\n' 'workspace-producer: active'
+fi
+
+if ((ENABLE_COCKPIT)); then
   systemctl enable --now pantheon-workspace-cockpit.service
   for _ in $(seq 1 30); do
     if python3 -c "import urllib.request; urllib.request.urlopen('http://$BIND_ADDRESS:$PORT/api/health', timeout=1)" >/dev/null 2>&1; then
@@ -143,6 +159,8 @@ if ((ENABLE)); then
   die "services did not become healthy"
 fi
 
-systemctl disable pantheon-affaires-producer.service >/dev/null 2>&1 || true
-systemctl disable pantheon-workspace-cockpit.service >/dev/null 2>&1 || true
-printf 'workspace producer/cockpit installed but inactive; rerun with --enable to start them\n'
+if ((!ENABLE_PRODUCER && !ENABLE_COCKPIT)); then
+  systemctl disable pantheon-affaires-producer.service >/dev/null 2>&1 || true
+  systemctl disable pantheon-workspace-cockpit.service >/dev/null 2>&1 || true
+  printf '%s\n' 'workspace producer/cockpit installed but inactive; rerun with --enable-producer to start the producer, then optionally --enable-cockpit'
+fi
