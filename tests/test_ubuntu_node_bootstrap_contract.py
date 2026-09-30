@@ -16,9 +16,6 @@ README = DEPLOY / "README.md"
 HERMES_LOCAL_COMPOSE = DEPLOY / "compose.hermes-local.yaml"
 WORKSPACE_COCKPIT_COMPOSE = DEPLOY / "compose.workspace-cockpit-local.yaml"
 WORKSPACE_COCKPIT_TAILSCALE = DEPLOY / "compose.workspace-cockpit-tailscale.yaml"
-CONFIGURE_LIVESYNC = DEPLOY / "configure-livesync-local"
-CONFIGURE_MARKER = DEPLOY / "configure-marker-local"
-MARKER_IDLE_WRAPPER = DEPLOY / "marker_idle_vram.py"
 CONFIGURE_DOCLING = DEPLOY / "configure-docling-local"
 CONFIGURE_WORKSPACE_COCKPIT = DEPLOY / "configure-workspace-cockpit-local"
 CONFIGURE_AFFAIRES_NAS_MOUNT = DEPLOY / "configure-affaires-nas-mount"
@@ -40,7 +37,6 @@ def test_bootstrap_scripts_are_shell_syntax_valid() -> None:
         INSTALL,
         UPDATE,
         SKILL_SYNC,
-        CONFIGURE_MARKER,
         CONFIGURE_DOCLING,
         CONFIGURE_WORKSPACE_COCKPIT,
         CONFIGURE_AFFAIRES_NAS_MOUNT,
@@ -127,9 +123,8 @@ def test_install_defaults_fail_private_and_keep_optional_services_inactive() -> 
     assert 'NODE_BIND_ADDRESS="127.0.0.1"' in text
     assert 'COMFYUI_BIND_ADDRESS="127.0.0.1"' in text
     assert "ENABLE_HINDSIGHT=0" in text
-    assert "systemctl disable livesync-headless.service" in text
-    assert "ConditionPathExists=$STATE_ROOT/livesync/db/.livesync/settings.json" in text
-    assert "daemon --interval 30" in text
+    assert "livesync" not in text.lower()
+    assert "couchdb" not in text.lower()
     assert "installed != activated" in text
     assert "activated != task-authorized" in text
 
@@ -153,28 +148,15 @@ def test_install_apply_requires_reviewed_ubuntu_and_immutable_pantheon_commit() 
     assert "--apply will refuse this host" in text
 
 
-def test_release_lock_has_no_floating_latest_and_preserves_qualified_livesync_ref() -> None:
+def test_release_lock_has_no_floating_latest_and_tracks_active_runtime_pins() -> None:
     text = _text(RELEASE)
-    couchdb = _pin("couchdb")
-    livesync = _pin("self-hosted-livesync")
 
     assert ":latest" not in text
-    assert f"RELEASE_LIVESYNC_REF={livesync['ref']}" in text
-    assert f"RELEASE_COUCHDB_IMAGE={couchdb['image']}:{couchdb['version']}" in text
+    assert "RELEASE_LIVESYNC" not in text
+    assert "RELEASE_COUCHDB" not in text
 
-    # The Hindsight image and the LiveSync CLI image were unguarded, and the
-    # deployment target had already drifted ahead of its qualification: the
-    # release lock carried a newer Hindsight image than the registry pinned. A
-    # deployment target ahead of the qualification that is supposed to justify
-    # it is the same class of gap in the other direction. Versions are read from
-    # the registry here and never restated, so this guard cannot itself drift.
-    #
-    #     deployment target != qualified artifact
     hindsight = _pin("hindsight")
-    livesync_cli = _pin("self-hosted-livesync-cli")
     assert f"RELEASE_HINDSIGHT_IMAGE={hindsight['image']}:{hindsight['version']}" in text
-    assert f"livesync-cli:{livesync_cli['version']}" in text
-
 
 def test_release_lock_curates_governed_hermes_skills_without_exposing_all_templates() -> None:
     text = _text(RELEASE)
@@ -199,10 +181,9 @@ def test_bootstrap_scripts_have_one_reviewed_target_owner() -> None:
         assert 'RELEASE_LOCK="$SCRIPT_DIR/release.env"' in text
         assert 'source "$RELEASE_LOCK"' in text
         assert "reviewed deployment lock is missing" in text
-        assert "RELEASE_COUCHDB_IMAGE:-" not in text
         assert "RELEASE_HINDSIGHT_IMAGE:-" not in text
-        assert "RELEASE_LIVESYNC_REF:-" not in text
-        assert "RELEASE_LIVESYNC_IMAGE:-" not in text
+        assert "RELEASE_LIVESYNC" not in text
+        assert "RELEASE_COUCHDB" not in text
 
 
 def test_bootstrap_scripts_fail_closed_when_release_lock_is_missing(tmp_path: Path) -> None:
@@ -268,7 +249,7 @@ def test_updater_never_follows_main_or_silently_updates_stateful_services() -> N
 def test_operator_readme_preserves_authority_and_storage_boundaries() -> None:
     text = _text(README)
     assert "Hermes execution itself does not make a NAS an authority dependency." in text
-    assert "the selected professional Workspace path uses the reviewed NAS `/AFFAIRES` tree as its source filesystem" in text
+    assert "The selected professional Workspace path uses the reviewed NAS `/AFFAIRES` tree as its source filesystem" in text
     assert "filesystem mirror != governed identity" in text
     assert "installed != activated" in text
     assert "Syncthing" in text and "optional" in text

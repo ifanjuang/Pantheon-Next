@@ -56,25 +56,6 @@
       "observed_on": "2026-08-30",
       "delta": "none"
     },
-    "self-hosted-livesync": {
-      "source": "github_releases_latest",
-      "locator": "vrtmrz/obsidian-livesync",
-      "latest_seen": "1.0.21",
-      "observed_on": "2026-08-31",
-      "delta": "none",
-      "note": "Moved from 1.0.18 to the observed head on 2026-08-31 at commit f5f7aab11f03f62c6946d2fa296c50bb5df5b2a4, verified against both the release page and the tag's commit feed. The reason to move was not the version number: 1.0.20 corrects settings-page behaviour under Obsidian 1.13, the release line pinned beside it as `obsidian-desktop`, so the previous pin qualified a combination whose upstream documented an interaction defect. S1..S6 re-run against the new head on this change; their result is the qualification, and operational acceptance remains a separate human decision."
-    },
-    "self-hosted-livesync-cli": {
-      "source": "derived_from_source_pin",
-      "locator": "self-hosted-livesync",
-      "latest_seen": "1.0.21-cli",
-      "observed_on": "2026-08-31",
-      "delta": {
-        "state": "acknowledged",
-        "reason": "Not independently released; it follows whatever `self-hosted-livesync` resolves to. Its freshness question is that pin's question.",
-        "decided_on": "2026-08-31"
-      }
-    },
     "obsidian-desktop": {
       "source": "github_releases_latest",
       "locator": "obsidianmd/obsidian-releases",
@@ -108,14 +89,6 @@
       "observed_on": "2026-09-03",
       "delta": "none",
       "note": "Observed from Graphify 0.9.53 at commit 33362d969292b57eda82f3fbd9eb5f3f5bc9bbc2. This record answers freshness for the bounded structural qualification only. It does not install or activate Graphify in Pantheon, grant relation authority, qualify mutation gates, admit Evidence, or authorize persistence."
-    },
-    "couchdb": {
-      "source": "dockerhub_latest_semver",
-      "locator": "library/couchdb",
-      "latest_seen": "3.5.2",
-      "observed_on": "2026-08-31",
-      "delta": "none",
-      "note": "Moved to the observed head on 2026-08-31, together with `self-hosted-livesync` because CouchDB backs that topology. `apache/couchdb` publishes no GitHub releases, so the image registry tag list is the authoritative head for this pin."
     },
     "mnemosyne-memory": {
       "source": "pypi_latest",

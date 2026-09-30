@@ -56,14 +56,16 @@ Hermes Web/dashboard     -> selected chat / sessions / runtime interaction basel
 Pantheon Cockpit         -> governed projections / Cards / navigation / decisions / status
 NAS / AFFAIRES           -> selected productive professional source tree
 Workspace daemon         -> reconstructible index + bounded Hindsight producer
-Obsidian/LiveSync/CouchDB -> historical qualification / optional tools, not productive AFFAIRES topology
+Obsidian                -> optional historical/human tooling; not productive AFFAIRES topology
+Self-hosted LiveSync     -> retired / no current target role
+CouchDB                  -> retired with LiveSync / no current target role
 Hindsight                -> optional derived memory / retrieval
 professional sources     -> Source / Document identity and provenance owners
 ```
 
 OpenWebUI and Paperless-ngx are refused/retired target integrations. Historical references may remain only where they carry provenance or are still being removed through an incoming-link audit; they carry no current target responsibility.
 
-Docling, PostgreSQL, pgvector, Hindsight, Obsidian and individual clients are bindings or optional components, not universal architectural authorities. For the selected AFFAIRES route specifically, Obsidian/LiveSync/CouchDB no longer define the productive workspace topology.
+Docling, PostgreSQL, pgvector, Hindsight, Obsidian and individual clients are bindings or optional components, not universal architectural authorities. For the selected AFFAIRES route specifically, Obsidian is optional and Self-hosted LiveSync/CouchDB are retired.
 
 ## Runtime-status honesty
 
