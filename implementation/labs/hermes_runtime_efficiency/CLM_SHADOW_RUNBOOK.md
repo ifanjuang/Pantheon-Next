@@ -146,6 +146,10 @@ test "$CLM_PACKAGE_OBSERVED" = "$CLM_VERSION" || {
   echo "contrastive-lm package version differs from canonical pin" >&2
   exit 1
 }
+test "$VLLM_VERSION" = "$CLM_VLLM_VERSION" || {
+  echo "vLLM version differs from canonical pin" >&2
+  exit 1
+}
 
 python -m pip freeze > /tmp/clm-shadow-pip-freeze.txt
 ```
@@ -301,7 +305,7 @@ PY
 cat /tmp/clm-runtime.json
 ```
 
-The shadow runner independently compares this receipt against `external-pins.json`. A different CLM git ref, package version, encoder model/revision or head SHA-256 fails the run before ranking.
+The shadow runner independently compares this receipt against `external-pins.json`. A different CLM git ref, package version, encoder model/revision, head SHA-256 or vLLM version fails the run before ranking.
 
 ## 9. Run the passive corpus
 
