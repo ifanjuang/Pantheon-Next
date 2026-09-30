@@ -151,6 +151,102 @@ if [[ -d "$STATE_ROOT/hermes-governed-skills" ]]; then
   cp -a "$STATE_ROOT/hermes-governed-skills" "$checkpoint/hermes-governed-skills"
 fi
 
+retire_legacy_workspace_sync_runtime() {
+  # Retirement is state-preserving: stop executable services and remove their
+  # active composition, but keep old databases, vault mirrors, source checkouts,
+  # caches and credentials for explicit operator review/backup.
+  log "retiring legacy LiveSync/CouchDB workspace runtime if present"
+
+  for unit in livesync-headless.service pantheon-marker-api.service; do
+    if [[ -f "/etc/systemd/system/$unit" ]]; then
+      cp -a "/etc/systemd/system/$unit" "$checkpoint/$unit"
+      systemctl disable --now "$unit" >/dev/null 2>&1 \
+        || warn "could not stop/disable legacy $unit"
+      rm -f "/etc/systemd/system/$unit"
+    else
+      systemctl disable --now "$unit" >/dev/null 2>&1 || true
+    fi
+  done
+  systemctl daemon-reload
+
+  # Stop/remove only the containers owned by the retired baseline. Volumes and
+  # bind-mounted data are intentionally not deleted.
+  docker rm -f pantheon-livesync-headless >/dev/null 2>&1 || true
+  docker rm -f pantheon-couchdb >/dev/null 2>&1 || true
+
+  # Marker may have left one auto-spawned Surya vLLM container. Stop it only
+  # when the retained Marker sentinel proves the exact container identity.
+  local marker_sentinel="$STATE_ROOT/marker/.cache/datalab/surya/vllm_server.json"
+  if [[ -f "$marker_sentinel" ]]; then
+    local marker_container
+    marker_container="$(python3 - "$marker_sentinel" <<'PY'
+import json
+import re
+import sys
+from pathlib import Path
+
+try:
+    record = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+except (OSError, json.JSONDecodeError):
+    raise SystemExit(0)
+
+container = record.get("cleanup_id")
+if (
+    record.get("cleanup_kind") == "docker"
+    and isinstance(container, str)
+    and re.fullmatch(r"surya-vllm-[0-9]+", container)
+):
+    print(container)
+PY
+)"
+    if [[ -n "$marker_container" ]]; then
+      docker stop "$marker_container" >/dev/null 2>&1 || true
+    fi
+  fi
+
+  # Remove the retired CouchDB service from the installer-managed Compose file.
+  # The pre-migration file is already copied to the checkpoint above.
+  python3 - "$APP_ROOT/compose.yaml" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+out: list[str] = []
+skipping = False
+removed = False
+
+for line in lines:
+    if not skipping and line.startswith("  couchdb:"):
+        skipping = True
+        removed = True
+        continue
+    if skipping:
+        if line.strip() and (
+            not line.startswith(" ")
+            or (line.startswith("  ") and not line.startswith("    "))
+        ):
+            skipping = False
+            out.append(line)
+        continue
+    out.append(line)
+
+if removed:
+    path.write_text("".join(out), encoding="utf-8")
+PY
+
+  # Remove stale managed configuration keys while retaining historical secrets
+  # and all state directories. The former credentials remain root-only until an
+  # operator decides whether to archive/delete them.
+  sed -i '/^ENABLE_LIVESYNC=/d' "$CONFIG_ROOT/node.env" 2>/dev/null || true
+  sed -i -E '/^(COUCHDB_IMAGE|LIVESYNC_REF|LIVESYNC_IMAGE|LIVESYNC_BUILD_NPM_VERSION)=/d' \
+    "$CONFIG_ROOT/versions.env" 2>/dev/null || true
+  sed -i -E '/^(COUCHDB_IMAGE|COUCHDB_USER|COUCHDB_PASSWORD)=/d' \
+    "$APP_ROOT/compose-env" 2>/dev/null || true
+
+  log "legacy workspace runtime retired; data directories were preserved"
+}
+
 update_containers() {
   local hindsight_was_running=0
   if docker inspect -f '{{.State.Running}}' pantheon-hindsight 2>/dev/null | grep -qx true; then hindsight_was_running=1; fi
@@ -222,6 +318,8 @@ update_pantheon() {
   bash "$SCRIPT_DIR/sync-hermes-governed-skills" "$target"
   set_version PANTHEON_COMMIT "$PANTHEON_COMMIT_OVERRIDE"
 }
+
+retire_legacy_workspace_sync_runtime
 
 selected containers && update_containers
 selected ollama && update_ollama
