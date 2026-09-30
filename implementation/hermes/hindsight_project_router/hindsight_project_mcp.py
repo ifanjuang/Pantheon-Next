@@ -68,6 +68,16 @@ def recall_project_memory(
     return json.dumps(payload, ensure_ascii=False)
 
 
+@mcp.tool(annotations=READ_ONLY)
+def hindsight_project_list(limit: int = 100) -> str:
+    """List indexed project scopes and memory counts; does not read documents."""
+    try:
+        payload = _client().list_project_scopes(limit)
+    except (ProjectRecallError, OSError, ValueError) as exc:
+        payload = {"status": "error", "reason": str(exc)}
+    return json.dumps(payload, ensure_ascii=False)
+
+
 class BearerGuard:
     def __init__(self, app, token: str):
         self.app = app

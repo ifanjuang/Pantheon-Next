@@ -17,7 +17,7 @@ HERMES_IMAGE_SKILLS_ROOT="${HERMES_IMAGE_SKILLS_ROOT:-/opt/hermes/skills}"
 CURATED_STAGE_ROOT=""
 LOCAL_MCP_SELECTED=""
 PANTHEON_POLICY_TOOLS_JSON='["classify_request","find_relevant_sources","route_governed_request","read_doctrine","explain_governance_structure","get_consultation_catalog","explain_architecture","get_capability_status","evaluate_preflight","prepare_task_contract_skeleton","prepare_evidence_pack_skeleton","plan_context_pack","validate_context_pack"]'
-HINDSIGHT_KROQI_PROJECT_TOOLS_JSON='["recall_project_memory"]'
+HINDSIGHT_KROQI_PROJECT_TOOLS_JSON='["recall_project_memory","hindsight_project_list"]'
 IFJA_VAULT_TOOLS_JSON='["find_ifja_projects","list_ifja_project_sources","search_ifja_markdown","read_ifja_markdown_lines"]'
 IFJA_VAULT_MCP_URL="http://127.0.0.1:8021/mcp"
 IFJA_VAULT_TOKEN_FILE="/srv/pantheon/docling/ifja-vault-read.token"
@@ -408,7 +408,7 @@ apply_local_mcp_bindings() {
     and (."pantheon-policy".tools.resources == false)
     and (."pantheon-policy".sampling.enabled == false)
   ' >/dev/null || die "Hermes did not retain the governed local MCP bindings"
-  hermes_config -p "$PROFILE" tools enable --platform cli hindsight-kroqi-project:recall_project_memory >/dev/null
+  hermes_config -p "$PROFILE" tools enable --platform cli hindsight-kroqi-project:recall_project_memory hindsight-kroqi-project:hindsight_project_list >/dev/null
   hermes_config -p "$PROFILE" config set tools.tool_search.enabled off >/dev/null
   log "merged reviewed local MCP bindings and bounded Pantheon Policy tools into $PROFILE"
 }

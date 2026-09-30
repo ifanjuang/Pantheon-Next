@@ -146,7 +146,7 @@ def test_hindsight_legacy_bindings_are_removed_from_governed_profile() -> None:
     assert '."hindsight-affaires".tools.include' not in text
     assert '."hindsight-documentaires".tools.include' not in text
     assert 'HINDSIGHT_KROQI_PROJECT_TOOLS_JSON=' in text
-    assert '["recall_project_memory"]' in text
+    assert '["recall_project_memory","hindsight_project_list"]' in text
     assert 'has("hindsight-kroqi-project")' in text
     assert '."hindsight-kroqi-project".tools.include == $kroqi_tools' in text
     assert 'HINDSIGHT_PROJECT_MCP_URL="http://127.0.0.1:8022/mcp"' in text
