@@ -137,11 +137,30 @@ def test_docling_mcp_introspection_tools_are_hidden_from_governed_profile() -> N
     assert '.docling.tools.resources == false' in text
 
 
+def test_named_project_requests_use_the_project_router_before_memory_absence() -> None:
+    text = SOUL_APPEND.read_text(encoding="utf-8")
+    assert "hindsight-kroqi-project:recall_project_memory" in text
+    assert "Mnemosyne alone" in text
+
+
+def test_ifja_context_skills_prioritize_project_router_over_mnemosyne() -> None:
+    context = (ROOT / "templates" / "hermes" / "skills" / "ifja-project-context" / "SKILL.md").read_text(encoding="utf-8")
+    vault = (ROOT / "implementation" / "hermes" / "skills" / "ifja-vault-search" / "SKILL.md").read_text(encoding="utf-8")
+    assert "hindsight-kroqi-project:recall_project_memory" in context
+    assert "call that project router before" in context
+    assert "hindsight-kroqi-project:recall_project_memory" in vault
+    installer = CONFIGURE.read_text(encoding="utf-8")
+    assert '"$REPO_ROOT/templates/hermes/skills/ifja-project-context"' in installer
+    assert '"$REPO_ROOT/implementation/hermes/skills/ifja-vault-search"' in installer
+
+
 def test_hindsight_legacy_bindings_are_removed_from_governed_profile() -> None:
     text = CONFIGURE.read_text(encoding="utf-8")
     assert 'has("hindsight-affaires") | not' in text
     assert 'has("hindsight-documentaires") | not' in text
     assert 'has("hindsight-memory") | not' in text
+    assert '."hindsight-affaires".tools.include' not in text
+    assert '."hindsight-documentaires".tools.include' not in text
     assert 'HINDSIGHT_KROQI_PROJECT_TOOLS_JSON=' in text
     assert '["recall_project_memory"]' in text
     assert 'has("hindsight-kroqi-project")' in text

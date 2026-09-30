@@ -40,6 +40,20 @@ filesystem path is already known: Hindsight is the first continuity/location
 check, not the final source authority. The only exception is a pure
 transformation of content fully supplied in the current request.
 
+### Current IFJA binding override
+
+The deployed profile exposes `hindsight-kroqi-project:recall_project_memory`,
+not the historical direct multi-bank Hindsight bindings. For every named
+project, dossier, client project or operation, call that project router before
+Mnemosyne. Then resolve any candidate through `ifja-vault-read` and open an
+exact source when the answer is material. Mnemosyne is a continuity lead only;
+an empty Mnemosyne result never establishes project absence.
+
+```text
+project-router recall -> bounded vault resolution -> exact source open
+Mnemosyne -> optional continuity lead after the router
+```
+
 ### 1. Resolve context only when useful
 
 Ground the active affaire/project from the request and available context. When project identity or the target referent is ambiguous, preserve the unresolved possibilities as a bounded candidate set; do not silently merge or select an identity merely to make reasoning easier. If the distinction would materially change the answer, permitted action or consequence, request targeted clarification or return a safe non-conclusion. If it would not, continue only from supported shared facts while carrying the uncertainty explicitly.
@@ -67,9 +81,9 @@ required family must name the actual binding/tool, the exact source reference
 opened, any inspected locator and observed limitations. A search result or a
 memory lead without an opened exact source leaves the receipt incomplete.
 
-When dossier identity is ambiguous or continuity materially helps, consult the
-admitted conversation-memory binding first. Treat it only as a fast location or
-context lead. If interim assistant messages are supported, publish one compact
+When dossier identity is ambiguous or continuity materially helps after the
+project-router lookup, consult the admitted conversation-memory binding. Treat
+it only as a fast location or context lead. If interim assistant messages are supported, publish one compact
 `Mnemosyne` milestone as soon as that lead changes the user's understanding,
 label it `indice mémoire — non confirmé`, and continue immediately with exact
 source discovery. Do not wait for the final synthesis to disclose a useful lead,
@@ -101,14 +115,10 @@ binding). Do not repeat Mnemosyne, invoke `Tool Search`/`Tool Describe`, or call
 found” must therefore be followed by the exact-document read, not a new search.
 
 ```text
-1. Hindsight Memory — one fast Mnemosyne lead
-2. Hindsight AFFAIRES — confirm dossier-specific facts and identity with one
-   targeted semantic recall to find the dossier or document, followed by one
-   targeted keyword search and then one bounded listing fallback only when
-   recall has no usable candidate
-3. Hindsight DOCUMENTAIRES — only after the exact AFFAIRES source is opened and
-   a technical, regulatory, legal, standards or professional rule is actually
-   required
+1. hindsight-kroqi-project:recall_project_memory — one bounded project lead
+2. ifja-vault-read — resolve the project and inspect the exact source
+3. Docling — only when an identified source needs document extraction
+4. Mnemosyne — optional continuity lead after the project route, never proof
 ```
 
 For a known document, perform the same Hindsight-first check with its exact
@@ -142,7 +152,7 @@ confirmée` and preserve the uncertainty.
 Escalate only when the requested precision requires it:
 
 ```text
-orientation générale                         -> Mnemosyne only
+orientation générale                         -> project-router, then optional Mnemosyne lead
 exact dossier fact / date / budget / status   -> AFFAIRES
 technical / legal / regulatory / standard     -> DOCUMENTAIRES
 decision / recommendation / delivery / action -> source preflight + Pantheon

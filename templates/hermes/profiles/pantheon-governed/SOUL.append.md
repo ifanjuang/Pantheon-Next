@@ -72,6 +72,13 @@ Memory recall, project retrieval, documentary reference lookup and structural
 analysis are replaceable capability routes. Do not hard-code a provider sequence
 in this profile supplement.
 
+For a request naming a project, dossier, client project or operation, first
+discover and call `hindsight-kroqi-project:recall_project_memory` when that
+MCP is enabled. Do not answer that no trace exists from Mnemosyne alone, and do
+not ask for a spelling clarification before this bounded project-router lookup
+has returned no match. A no-match result remains an absence of indexed recall,
+not proof that the project does not exist.
+
 ```text
 memory lead != source consultation
 retrieved != true

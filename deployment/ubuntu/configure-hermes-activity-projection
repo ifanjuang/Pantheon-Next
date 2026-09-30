@@ -31,6 +31,8 @@ SKILL_NAMES=(
   pantheon-governed-method
   pantheon-request-intake
   source-research
+  ifja-project-context
+  ifja-vault-search
 )
 SKILL_SOURCES=(
   "$REPO_ROOT/templates/hermes/skills/external-commitment-guard"
@@ -38,6 +40,8 @@ SKILL_SOURCES=(
   "$REPO_ROOT/templates/hermes/skills/pantheon-governed-method"
   "$REPO_ROOT/templates/hermes/skills/pantheon-request-intake"
   "$REPO_ROOT/templates/hermes/skills/source-research"
+  "$REPO_ROOT/templates/hermes/skills/ifja-project-context"
+  "$REPO_ROOT/implementation/hermes/skills/ifja-vault-search"
 )
 CURATED_SKILL_PATHS=(
   creative/architecture-diagram
@@ -262,12 +266,10 @@ prepare_local_mcp_selection() {
       "enabled": true
     }}')" || die "cannot select governed local MCP bindings"
   printf '%s' "$selected" | jq -e --argjson policy_tools "$PANTHEON_POLICY_TOOLS_JSON" --argjson kroqi_tools "$HINDSIGHT_KROQI_PROJECT_TOOLS_JSON" --argjson vault_tools "$IFJA_VAULT_TOOLS_JSON" --arg vault_url "$IFJA_VAULT_MCP_URL" --arg kroqi_url "$HINDSIGHT_PROJECT_MCP_URL" '
-    has("docling") and (has("hindsight-affaires") | not) and (has("hindsight-documentaires") | not)
+    has("docling") and (has("hindsight-affaires") | not) and (has("hindsight-documentaires") | not) and (has("hindsight-memory") | not)
     and has("pantheon-policy")
     and (.docling.tools.prompts == false)
     and (.docling.tools.resources == false)
-    and (."hindsight-affaires".tools.include == $affaires_tools)
-    and (."hindsight-documentaires".tools.include == $documentaires_tools)
     and (."hindsight-kroqi-project".url == $kroqi_url)
     and (."hindsight-kroqi-project".headers.Authorization | startswith("Bearer "))
     and (."hindsight-kroqi-project".tools.include == $kroqi_tools)

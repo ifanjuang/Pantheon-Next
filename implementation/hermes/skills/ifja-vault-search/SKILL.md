@@ -3,7 +3,7 @@ name: ifja-vault-search
 description: "Recherche les projets et documents dans les vaults IFJA."
 license: MIT
 metadata:
-  version: 0.8.1
+  version: 0.9.0
   author: IFJA
   hermes:
     tags: [ifja, hindsight, vaults, projects, documents]
@@ -40,51 +40,20 @@ change the answer, permitted action or consequence.
 
 ## Search order
 
-0. For every project, dossier, client, document or professional-workspace
-   request, start with one fast Hindsight/Mnemosyne lookup. Emit at most one
-   interim `indice mémoire — non confirmé` when it materially helps locate the
-   dossier, then continue to the applicable Hindsight source. A known local
-   path does not bypass this first check. Do not repeat an identical Mnemosyne
-   query; a second recall is reserved for an observed freshness/synchronization
-   concern and must use a distinct bounded query.
-1. Use the applicable Hindsight source (AFFAIRES for situated work,
-   DOCUMENTAIRES for transversal professional material) to resolve the exact
-   project or document identity. For a semantic project/document question,
-   issue one targeted `recall` against AFFAIRES first; use `list_documents`
-   only for an explicit inventory/path request. If recall returns no usable
-   candidate, use one targeted `search_knowledge_base` keyword query before the
-   bounded `list_documents` fallback. For an exact name, alias, path or
-   inventory question, listing/get is sufficient.
-   When the configured MCP binding and function schema are already present in
-   the active profile, invoke that function directly. Do not repeat Tool Search
-   or Tool Describe calls for every step; use at most one schema inspection when
-   the required argument shape is genuinely unknown.
-2. Resolve the project page or exact source identity. A high-ranked semantic
-   result does not select a project, and a failed first recall does not establish
-   that the source is absent until the targeted keyword search and bounded
-   AFFAIRES inventory fallback have also been attempted.
-   If these do not return an exact file, use the `ifja-vault-read` binding:
-   `find_ifja_projects` on the user-provided designation, then
-   `list_ifja_project_sources` on the selected direct AFFAIRES project directory.
-   Resolve the project before adding topic words; a filename need not contain
-   `permis` to be relevant to a permit question. The inventory ranks explicit
-   topic tokens and nearby document families such as `Urbanisme`, `PLUi`, `PC`
-   and `CERFA`, but a path match remains only a lead. A Hindsight path naming
-   a directory is not a file: inventory the project to find the nested source.
-   For a document-family query, normalize the project/document terms and include
-   the relevant filename tokens and professional aliases in the bounded search
-   (for example, a CCTP may also be labelled CCAP, DCE or cahier des charges).
-   Rank candidates by exact document-family match first, then project-name
-   match, then revision/path evidence. Preserve candidates separately; a permit,
-   estimate or plan is not a CCTP merely because it shares the project name.
-   Never promote a lower-ranked document when an exact family match is absent;
-   report the candidate set and the missing type instead.
-3. Open the exact project page or requested document before returning a material
-   identifier, date, status or contractual fact.
-   When a recall result already contains an exact document ID or an exact
-   Workspace path whose family matches the request, call `get_document` (or open
-   that path through the admitted local binding) immediately. Do not repeat
-   Mnemosyne, run Tool Search/Describe, or list the bank again before this open.
+0. For a named project, dossier, client project or operation, call
+   `hindsight-kroqi-project:recall_project_memory` first. This is the only
+   admitted Hindsight project route. Do not substitute Mnemosyne for it and do
+   not report absence before this bounded lookup returns no match.
+1. Resolve the exact project identity with `ifja-vault-read`:
+   `find_ifja_projects` on the user designation, then
+   `list_ifja_project_sources` on the selected project. Preserve ambiguous
+   candidates separately and ask one targeted question only if selection would
+   change the answer.
+2. Open an exact Markdown source with `search_ifja_markdown` followed by
+   `read_ifja_markdown_lines`; use Docling for a source file requiring document
+   extraction. A router recall is an index lead, not an inspected source.
+3. Use Mnemosyne only as a bounded continuity lead after the project-router
+   lookup, never as proof that a professional project is absent or present.
 
 ### Latest document / revision resolution
 
@@ -105,8 +74,8 @@ not proof that the declaration is professionally correct. A `supplements` relati
 is not replacement and must not suppress the referenced document. Never manufacture
 either relation from index/date/name similarity.
 
-Then inspect each candidate with Hindsight `get_document` so the retained
-`original_text` is available. Extract from the document content itself, when
+Then inspect each candidate through the admitted vault reader or Docling so the
+source text is available. Extract from the document content itself, when
 explicitly stated:
 
 ```text
@@ -186,7 +155,7 @@ revision relation, but its descriptive `index` and `document_date` cannot
 silently establish currentness.
 
 
-   If Hindsight returns no exact candidate but an admitted Workspace/vault path
+   If the project router returns no exact candidate but an admitted Workspace/vault path
    or filename is already known, treat this as an indexing gap: validate and
    open that exact local source (Docling for a file needing extraction) rather
    than asking for an upload or declaring the document absent. Distinguish
@@ -199,15 +168,10 @@ silently establish currentness.
    Hindsight excerpt or internal `spillover` cache is not an inspected passage.
    Markdown extracted from a PDF is a derivative; use Docling on the original
    PDF when page, graphic, signature or source-original verification matters.
-4. Use one targeted recall when the request is conceptual, associative or the
-   exact source remains unknown.
-5. For a recent project or information possibly awaiting synchronization, use
-   the second and final recall against the configured conversation-memory
-   binding only when a freshness/synchronization concern is explicitly observed
-   and the distinct query can change the result. Never repeat Mnemosyne after an
-   exact AFFAIRES document has already been opened merely to enrich the answer.
-   Attribute memory-only information to recent conversation and mark it
-   unconfirmed until an admitted business source supports it.
+For a recent project or information possibly awaiting synchronization, use one
+distinct Mnemosyne recall only when a freshness concern is observed and it can
+change the result. Attribute memory-only information to recent conversation and
+mark it unconfirmed until an admitted business source supports it.
 
 For a material professional factual answer, the applicable source lookup is
 mandatory before final synthesis: `AFFAIRES` for dossier facts,
@@ -248,19 +212,9 @@ document opened != Evidence admitted
   and professional references.
 - Use both when a project-specific fact must be tested against a transversal
   rule. Keep their contributions distinguishable.
-- For a mixed document/compliance question, open the exact AFFAIRES document
-  first, then issue one targeted DOCUMENTAIRES recall for the rule families
-  needed to test the observed content. Do not list the entire DOCUMENTAIRES
-  bank before the project source is identified.
-- Once a technical or regulatory comparison is requested, a targeted
-  DOCUMENTAIRES recall and the relevant page/document must be opened before
-  presenting normative gaps. If no applicable reference is found, label the
-  item `à vérifier` rather than implying that the standard was consulted.
-- After the exact document is open, search DOCUMENTAIRES for only the
-  standards, regulations, contractual clauses or professional references that
-  correspond to observed gaps. Open the relevant knowledge pages and cite them
-  separately from the project document; do not present a generic catalogue as a
-  finding.
+- For a mixed document/compliance question, open the exact AFFAIRES source
+  first, then consult only the admitted transversal source needed for the rule
+  family. If none is available, label the item `à vérifier`.
 - Use the live source only when the user requests current state or indicates a
   change may not yet be indexed. Do not silently merge live and indexed state.
 
@@ -339,10 +293,9 @@ invented path.
 ## Limits and return
 
 - At most two recall calls across all bindings for one question.
-- For a single professional lookup, use at most one Mnemosyne recall, one
-  AFFAIRES semantic recall, one targeted `search_knowledge_base` query and one
-  bounded listing fallback. Repeating an identical query is not a search
-  strategy.
+- For a single professional lookup, use at most one project-router recall, one
+  bounded project inventory and one Mnemosyne continuity recall. Repeating an
+  identical query is not a search strategy.
 - Open at most five candidate documents unless the user requests an exhaustive
   inventory.
 - Stop widening retrieval when remaining unknowns cannot change the permitted

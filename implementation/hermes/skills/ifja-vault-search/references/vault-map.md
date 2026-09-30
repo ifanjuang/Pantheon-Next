@@ -2,7 +2,7 @@
 
 ## IFJA_AFFAIRES
 
-Serveur MCP Hermes : `hindsight-affaires`
+Serveur MCP Hermes : `hindsight-kroqi-project` (`recall_project_memory`)
 
 Banque Hindsight : `IFJA_AFFAIRES`
 
@@ -49,7 +49,7 @@ ancrage vérifiable. Une commune seule peut désigner plusieurs projets.
 
 ## IFJA_DOCUMENTAIRES
 
-Serveur MCP Hermes : `hindsight-documentaires`
+Serveur MCP Hermes : `ifja-vault-read` pour les sources accessibles localement
 
 Banque Hindsight : `IFJA_DOCUMENTAIRES`
 
