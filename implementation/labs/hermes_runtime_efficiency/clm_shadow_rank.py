@@ -42,7 +42,12 @@ REQUIRED_RUNTIME_FIELDS = (
     "encoder_revision",
     "head_sha256",
     "vllm_version",
-    "device_name",
+    "clm_head_device_name",
+    "encoder_device_name",
+    "encoder_placement",
+    "encoder_transport",
+    "encoder_endpoint",
+    "encoder_node_label",
 )
 
 
@@ -123,6 +128,35 @@ def load_runtime_metadata(path: Path) -> dict[str, str]:
         raise CLMShadowQualificationError("head_sha256 must be an exact SHA-256 digest")
     return {key: str(value) for key, value in raw.items()}
 
+
+
+def validate_runtime_topology(runtime_metadata: dict[str, str]) -> None:
+    placement = runtime_metadata["encoder_placement"]
+    transport = runtime_metadata["encoder_transport"]
+    endpoint = runtime_metadata["encoder_endpoint"]
+
+    if placement not in {"local", "remote"}:
+        raise CLMShadowQualificationError(
+            "encoder_placement must be one of: local, remote"
+        )
+    expected_transport = {
+        "local": "loopback_direct",
+        "remote": "ssh_local_forward",
+    }[placement]
+    if transport != expected_transport:
+        raise CLMShadowQualificationError(
+            f"encoder_transport must be {expected_transport!r} for {placement!r} placement"
+        )
+
+    parsed = urllib.parse.urlparse(endpoint)
+    if (
+        parsed.scheme != "http"
+        or parsed.hostname not in {"127.0.0.1", "localhost", "::1"}
+        or parsed.path != "/v1/embeddings"
+    ):
+        raise CLMShadowQualificationError(
+            "encoder_endpoint must be a loopback http /v1/embeddings endpoint"
+        )
 
 
 def load_qualification_pin(path: Path) -> dict[str, str]:
@@ -325,6 +359,7 @@ def run_shadow(
         raise CLMShadowQualificationError("remote CLM endpoint refused; use loopback or explicitly pass --allow-remote")
     corpus_meta, cases = load_cases(cases_path)
     runtime_metadata = load_runtime_metadata(runtime_metadata_path)
+    validate_runtime_topology(runtime_metadata)
     qualification_pin = load_qualification_pin(pin_registry_path)
     validate_runtime_against_pin(runtime_metadata, qualification_pin)
     server = observe_server(base_url, model, api_key, timeout)
