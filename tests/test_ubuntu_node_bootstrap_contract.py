@@ -131,6 +131,16 @@ def test_hindsight_file_retain_runtime_posture_is_explicit() -> None:
     assert "shm_size: 1gb" in text
 
 
+def test_local_hindsight_limits_llm_concurrency_for_single_ollama_model() -> None:
+    text = _text(HERMES_LOCAL_COMPOSE)
+    assert 'HINDSIGHT_API_WORKER_MAX_SLOTS: "2"' in text
+    assert 'HINDSIGHT_API_WORKER_CONSOLIDATION_RESERVED_SLOTS: "1"' in text
+    assert 'HINDSIGHT_API_LLM_MAX_CONCURRENT: "1"' in text
+    assert 'HINDSIGHT_API_RETAIN_LLM_MAX_CONCURRENT: "1"' in text
+    assert 'HINDSIGHT_API_CONSOLIDATION_LLM_MAX_CONCURRENT: "1"' in text
+    assert 'HINDSIGHT_API_MENTAL_MODEL_REFRESH_LLM_MAX_CONCURRENT: "1"' in text
+
+
 def test_workspace_cockpit_remote_access_uses_pinned_userspace_tailscale() -> None:
     release = _text(RELEASE)
     compose = _text(WORKSPACE_COCKPIT_TAILSCALE)
