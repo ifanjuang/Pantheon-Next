@@ -304,6 +304,13 @@ skill remains distinct from use, authorization, persistence and approval.
 
 ## Update
 
+On the first `--apply` after this retirement, `update-node` also converges nodes installed by the former baseline: it stops/disables the old LiveSync and Marker services, removes the retired CouchDB/LiveSync runtime containers and strips the CouchDB service from the installer-managed Compose file. The pre-change configuration is retained in the update checkpoint and historical state directories are not deleted automatically.
+
+```text
+runtime retired != historical data deleted
+checkpoint != complete database backup
+```
+
 Check only:
 
 ```bash
