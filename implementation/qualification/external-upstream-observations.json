@@ -156,6 +156,14 @@
       "observed_on": "2026-09-30",
       "delta": "none",
       "note": "Observed stable HarnessRouter CE v0.26.14 at commit 7d0fa14bf70e81a2226d232bc519e729d32793d3. The newer v0.27.0-rc.1 is a prerelease and is not treated as the stable head. Source review of both v0.26.14 and v0.27.0-rc.1 shows their self-hosted entrypoint installs hermes-agent==0.19.0, while Pantheon's separately selected Hermes qualification pin is newer. This observation does not adopt HarnessRouter, authorize UHP, or establish runtime comparability."
+    },
+    "contrastive-lm": {
+      "source": "not_observable",
+      "locator": "Contrastive-LM/CLM",
+      "latest_seen": "bb42c6c5bf914fd449bed2f6ca65be80602cb1f7",
+      "observed_on": "2026-09-30",
+      "delta": "none",
+      "note": "Contrastive-LM/CLM has no GitHub Release feed at this observation point, so the current default-branch commit was reviewed directly and pinned separately for the bounded #1047 shadow-ranking experiment. Package metadata at that ref reports contrastive-lm 0.1.0. Upstream issue #3 reports unexpected score behavior and PR #6 discusses long-state truncation semantics; this qualification therefore uses /v1/rank on short synthetic states only. Observation does not install, activate, route, authorize, admit Evidence, or adopt CLM."
     }
   },
   "authority": {
