@@ -68,6 +68,8 @@ def test_linux_configurator_is_idempotent_and_keeps_a_backup() -> None:
     assert 'config set display.interim_assistant_messages true' in text
     assert 'config set display.show_reasoning false' in text
     assert 'config set plugins.stream_reasoning_deltas false' in text
+    assert 'tools enable --platform cli skills delegation' in text
+    assert 'enabled[[:space:]]+skills' in text
     for skill in (
         "external-commitment-guard",
         "ifja-project-context",

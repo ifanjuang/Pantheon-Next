@@ -59,8 +59,10 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "## Bounded delegated source review" in text
     assert "mcp-ifja-vault-read" in text
     assert "mcp-hindsight-kroqi-project" in text
+    assert "mcp-docling" in text
     assert "Begin with one child\nat a time" in text
     assert "subagent result != source verification" in text
+    assert "never compare its aggregate with a broader reference total" in text
     assert "## Visible plan before execution" in text
     assert "Before the first material source call" in text
     assert "plan displayed != worker dispatched" in text

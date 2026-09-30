@@ -541,6 +541,12 @@ check_bounded_delegation_runtime() {
   else
     die "governed bounded delegation tool is not enabled"
   fi
+  if hermes_config -p "$PROFILE" tools list --platform cli 2>/dev/null \
+      | grep -Eq 'enabled[[:space:]]+skills'; then
+    log "governed method loading is enabled"
+  else
+    die "governed skills tool is not enabled"
+  fi
 }
 
 apply_bounded_delegation_runtime() {
@@ -560,7 +566,7 @@ apply_bounded_delegation_runtime() {
     }
   ')" || die "cannot prepare governed bounded delegation configuration"
   hermes_config -p "$PROFILE" config set delegation "$updated" >/dev/null
-  hermes_config -p "$PROFILE" tools enable --platform cli delegation >/dev/null
+  hermes_config -p "$PROFILE" tools enable --platform cli skills delegation >/dev/null
   check_bounded_delegation_runtime
 }
 

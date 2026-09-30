@@ -158,6 +158,7 @@ For an admitted source-review child, provide only the required source toolsets:
 ```text
 mcp-ifja-vault-read
 mcp-hindsight-kroqi-project
+mcp-docling — only after the parent supplies an exact bounded document list
 ```
 
 Do not allow a child to inherit unrelated MCPs, browser, terminal, writing,
@@ -179,6 +180,13 @@ Schema validity establishes only a well-formed return. The parent reopens the
 exact supporting passages for consequential claims. It may issue one corrective
 child request with the same scope when a concrete coverage gap remains; after
 that, surface the gap instead of retrying or widening autonomously.
+
+Before comparing candidates or declaring alignment, normalize their perimeter,
+included and excluded items, variants, tax basis, date and completeness. A
+partial set must be assessed item by item against the matching reference scope;
+never compare its aggregate with a broader reference total or infer an overall
+verdict from missing, unreadable or alternative amounts. Return
+`ready_with_limits` until every material perimeter is comparable.
 
 ```text
 subagent result != source verification
