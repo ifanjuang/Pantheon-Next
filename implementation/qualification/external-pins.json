@@ -151,7 +151,9 @@
       "package": "contrastive-lm",
       "version": "0.1.0",
       "ref": "bb42c6c5bf914fd449bed2f6ca65be80602cb1f7",
-      "tracking_policy": "reviewed_pin"
+      "tracking_policy": "reviewed_pin",
+      "encoder_model": "Qwen/Qwen3-8B",
+      "api_surface": "/v1/rank"
     }
   },
   "authority": {
