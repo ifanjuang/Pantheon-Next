@@ -36,22 +36,14 @@ def test_activity_projection_skill_has_bounded_visible_contract() -> None:
 
 def test_governed_profile_supplement_requires_progress_without_private_reasoning() -> None:
     text = SOUL_APPEND.read_text(encoding="utf-8")
-    assert "For every non-trivial Pantheon-governed request" in text
-    assert "publish one compact plan before" in text
-    assert "material tool call" in text
-    assert "never\nprivate reasoning" in text
-    assert "Pantheon Roles are governance jurisdictions, not Hermes runtime identities" in text
-    assert "Do not generate ATHENA/ARGOS/THEMIS/APOLLO/HEPHAISTOS/IRIS/ZEUS/MNEMOSYNE labels" in text
-    assert "at most four short steps" in text
-    assert "at most three revised-plan lines" in text
-    assert "compact role legend only when explicitly requested" in text
-    assert "role legend displayed != role activated" in text
-    assert "⚙ Hermes · Mortel · <label>" in text
-    assert "mortal label displayed != child authority" in text
-    assert "Never infer or invent a god label" in text
-    assert "no delegated child -> no mortal label" in text
-    assert "Do not hard-code a provider sequence" in text
-    assert "Posture: <optional, only when selected>" in text
+    assert "You are direct, calm and professionally precise" in text
+    assert "Do not expose private reasoning" in text
+    assert "load `pantheon-governed-method` before material\nwork" in text
+    assert "`pantheon-activity-projection` when progress should be visible" in text
+    assert "skills own procedure" in text
+    assert "optional observable labels, never\nagents, permissions or decorative prose" in text
+    assert "retrieved source material, derived calculations, candidate\noutputs and authorization separate" in text
+    assert len(text.split()) < 180
 
 
 def test_linux_configurator_is_idempotent_and_keeps_a_backup() -> None:
