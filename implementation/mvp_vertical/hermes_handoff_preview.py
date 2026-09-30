@@ -17,6 +17,7 @@ from .entity_ref import EntityRef, EntityRefError, unique_entity_refs
 MAX_CONTEXT_REFS = 250
 MAX_SOURCE_REFS = 500
 MAX_TAG_CONTEXT_ENTITIES = 250
+MAX_EPHEMERAL_CONTEXT_LEASES = 20
 
 
 class HandoffPreviewError(ValueError):
@@ -148,11 +149,114 @@ def _tag_context(values: Any) -> list[dict[str, Any]]:
     return output
 
 
+
+def _ephemeral_context_leases(values: Any) -> list[dict[str, Any]]:
+    if values is None:
+        return []
+    if not isinstance(values, list):
+        raise HandoffPreviewError("ephemeral_context_leases must be an array")
+    if len(values) > MAX_EPHEMERAL_CONTEXT_LEASES:
+        raise HandoffPreviewError(
+            f"ephemeral_context_leases exceeds {MAX_EPHEMERAL_CONTEXT_LEASES} entries"
+        )
+    output: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for index, raw in enumerate(values):
+        if not isinstance(raw, dict):
+            raise HandoffPreviewError(
+                f"ephemeral_context_leases[{index}] must be an object"
+            )
+        if "content_utf8" in raw or "content" in raw or "payload" in raw:
+            raise HandoffPreviewError(
+                "ephemeral context payload may not be persisted in the handoff preview"
+            )
+        lease_ref = str(raw.get("lease_ref") or "").strip()
+        lease_digest = str(raw.get("lease_digest") or "").strip().lower()
+        created_at = str(raw.get("created_at") or "").strip()
+        expires_at = str(raw.get("expires_at") or "").strip()
+        items = raw.get("items")
+        if not lease_ref or not lease_ref.startswith("ephemeral-context-"):
+            raise HandoffPreviewError("ephemeral context lease_ref is invalid")
+        if lease_ref in seen:
+            raise HandoffPreviewError("ephemeral_context_leases contains a duplicate lease")
+        seen.add(lease_ref)
+        if len(lease_digest) != 64 or any(
+            char not in "0123456789abcdef" for char in lease_digest
+        ):
+            raise HandoffPreviewError("ephemeral context lease_digest is invalid")
+        if not created_at or not expires_at:
+            raise HandoffPreviewError("ephemeral context lease timestamps are required")
+        if raw.get("transient") is not True or raw.get("professional_persistence") is not False:
+            raise HandoffPreviewError("ephemeral context lease posture is invalid")
+        if not isinstance(items, list) or not items:
+            raise HandoffPreviewError("ephemeral context lease items are required")
+        normalized_items: list[dict[str, Any]] = []
+        for item_index, item in enumerate(items):
+            if not isinstance(item, dict):
+                raise HandoffPreviewError("ephemeral context lease item must be an object")
+            if "content_utf8" in item or "content" in item or "payload" in item:
+                raise HandoffPreviewError(
+                    "ephemeral context item payload may not be persisted in the handoff preview"
+                )
+            item_id = str(item.get("item_id") or "").strip()
+            content_sha256 = str(item.get("content_sha256") or "").strip().lower()
+            byte_size = item.get("byte_size")
+            media_type = str(item.get("media_type") or "").strip()
+            representation_kind = str(item.get("representation_kind") or "").strip()
+            provenance = item.get("source_provenance")
+            if not item_id:
+                raise HandoffPreviewError("ephemeral context item_id is required")
+            if len(content_sha256) != 64 or any(
+                char not in "0123456789abcdef" for char in content_sha256
+            ):
+                raise HandoffPreviewError("ephemeral context item digest is invalid")
+            if (
+                isinstance(byte_size, bool)
+                or not isinstance(byte_size, int)
+                or byte_size <= 0
+            ):
+                raise HandoffPreviewError("ephemeral context item byte_size is invalid")
+            if not media_type or representation_kind != "utf8_text":
+                raise HandoffPreviewError("ephemeral context item representation is invalid")
+            if not isinstance(provenance, list):
+                raise HandoffPreviewError("ephemeral context source_provenance must be an array")
+            normalized_items.append(
+                {
+                    "item_id": item_id,
+                    "content_sha256": content_sha256,
+                    "byte_size": byte_size,
+                    "media_type": media_type,
+                    "representation_kind": representation_kind,
+                    "source_provenance": provenance,
+                }
+            )
+        item_count = raw.get("item_count")
+        total_bytes = raw.get("total_bytes")
+        if item_count != len(normalized_items):
+            raise HandoffPreviewError("ephemeral context item_count does not match items")
+        if total_bytes != sum(item["byte_size"] for item in normalized_items):
+            raise HandoffPreviewError("ephemeral context total_bytes does not match items")
+        output.append(
+            {
+                "lease_ref": lease_ref,
+                "lease_digest": lease_digest,
+                "created_at": created_at,
+                "expires_at": expires_at,
+                "item_count": item_count,
+                "total_bytes": total_bytes,
+                "items": normalized_items,
+                "transient": True,
+                "professional_persistence": False,
+            }
+        )
+    return output
+
 def build_preview(
     *,
     question: str,
     card_context_envelope: dict,
     selected_context: list[dict] | None = None,
+    ephemeral_context_leases: list[dict] | None = None,
 ) -> dict:
     intent = question.strip()
     if len(intent) < 3:
@@ -173,6 +277,7 @@ def build_preview(
     selected = _unique_refs(selected_context or [], label="selected_context")
     sources = _source_refs(card_context_envelope.get("source_refs") or [])
     tag_context = _tag_context(card_context_envelope.get("tag_context") or [])
+    transient_leases = _ephemeral_context_leases(ephemeral_context_leases)
 
     excluded_keys = {
         EntityRef.from_mapping(item, label="excluded_entity").key
@@ -195,6 +300,7 @@ def build_preview(
         "excluded_entities": explicit_exclusions,
         "source_refs": sources,
         "tag_context": tag_context,
+        "ephemeral_context_leases": transient_leases,
         "scope_widened_implicitly": False,
         "staleness_note": "runtime must re-read current owner records when freshness is consequential",
         "forbidden_assumptions": [
@@ -203,6 +309,7 @@ def build_preview(
             "a read-only question authorizes a write or external effect",
             "a tag description establishes truth, authority or professional validation",
             "an unregistered tag may be assigned an invented meaning",
+            "an ephemeral context lease is a durable Source, Evidence or Hindsight memory",
         ],
     }
     context_digest = _digest(context_core)
@@ -220,6 +327,7 @@ def build_preview(
             "surface missing, stale or contradictory information",
             "use tag descriptions only as contextual orientation",
             "do not infer a meaning for unregistered tags",
+            "treat ephemeral context as bounded transient input only",
         ],
         "approval_expectations": "a new gate is required before any consequential follow-up",
         "expected_evidence": ["source_refs", "trace_refs", "limitations", "assumptions"],
@@ -248,6 +356,8 @@ def build_preview(
             "preview != Task Contract admission",
             "context selection != Evidence",
             "tag context != source authority",
+            "ephemeral context lease != Source admission",
+            "ephemeral context lease != Hindsight memory",
             "execution_authorized=false",
             "handoff preview != Hermes run",
         ],
