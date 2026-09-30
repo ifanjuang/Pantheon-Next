@@ -72,7 +72,13 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "mcp-docling" in text
     assert "Do not export an entire Docling document to Markdown" in text
     assert "Hindsight memory != document storage" in text
-    assert "verified sibling such as `<source>.ocr.pdf`" in text
+    assert "list every selected source with its\nexact relative path" in text
+    assert "keep the OCR result only in the current session" in text
+    assert "adjacent Markdown sidecar for every listed source" in text
+    assert "additional searchable `.ocr.pdf`" in text
+    assert "decide file by file" in text
+    assert "in-place\nreplacement is never the default and never a batch action" in text
+    assert "do not overwrite it silently" in text
     assert "Begin with one child at a time" in flat
     assert "subagent result != source verification" in text
     assert "Never compare a partial aggregate with a broader reference total" in flat

@@ -31,12 +31,27 @@ at a time and keep only the extracts needed for the coverage matrix.
 
 A Docling conversion or OCR result is temporary analysis material by default;
 it is not a replacement for the source PDF and is not durable merely because
-Hindsight can recall extracted content. After successful OCR, ask about
-retention only when durable reuse would be useful and no preference was already
-given. Recommend a verified sibling such as `<source>.ocr.pdf` while preserving
-the original. Offer in-place replacement only on an explicit user choice and
-only through a bounded writer that creates a recoverable backup, verifies the
-rendered result and reports the final path.
+Hindsight can recall extracted content.
+
+Before proposing any persistent OCR output, list every selected source with its
+exact relative path, file type, page count when observed, OCR need or result,
+and any existing target-name collision. Do not write while building this list.
+Then ask once for the retention policy, with these four choices:
+
+1. keep the OCR result only in the current session and write no project file —
+   default when durable reuse was not requested;
+2. create one adjacent Markdown sidecar for every listed source;
+3. create one additional searchable `.ocr.pdf` beside every listed PDF while
+   preserving each original — recommended when page appearance matters;
+4. decide file by file, where in-place PDF replacement may be selected
+   explicitly for an individual file.
+
+Show the proposed output name for every file before execution. An in-place
+replacement is never the default and never a batch action. It requires an
+explicit per-file choice and a bounded writer that creates a recoverable backup,
+preserves relevant metadata, verifies page count and rendered readability, and
+reports both backup and final paths. A collision with an existing sidecar or OCR
+PDF requires a fresh choice; do not overwrite it silently.
 
 The current governed source tools are read-only and cannot persist that file.
 Once an authorized writer creates it inside an admitted project source,
@@ -46,6 +61,7 @@ Hindsight may index it only after reconciliation is observed.
 OCR result != source PDF replaced
 Hindsight memory != document storage
 file written != Hindsight reconciliation observed
+batch retention choice != in-place replacement authority
 ```
 
 ## Bounded delegated source review
