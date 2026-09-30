@@ -1,5 +1,5 @@
 schema_id: pantheon.hermes_distribution_lock
-revision: 3
+revision: 4
 distribution_id: pantheon-hermes-standard
 status: candidate
 source_pins:
@@ -18,17 +18,18 @@ components:
     kind: run_binding
     path: implementation/mvp_vertical/hermes_run_binding.py
     digest_mode: file
-    content_digest: sha256:65407df53d49ab4c0f8b6af1ac7369e5fe2d769185fb620ccfbbb38ad9b6fd03
+    content_digest: sha256:ac6a08949e8da4368a06ff37409c24cb6761f39a51f2110568023a81ee11922a
     required: true
     enabled_by_default: false
     capabilities:
       - reserve-admitted-launch
       - submit-one-external-run
+      - materialize-bounded-ephemeral-context
       - record-runtime-start
       - record-runtime-return
       - record-typed-project-variant-return
       - notify-role-trace-attachment
-    notes: Stateless one-shot external binding; the optional Role trace notification is display-only, and a structured Project variant return remains unselected candidate material. Neither adds a queue, scheduler, retry worker, memory header, provider router, run control or approval authority.
+    notes: Stateless one-shot external binding; after one exact launch reservation it may materialize already-bound ephemeral context before the single runtime submission. The optional Role trace notification is display-only, and a structured Project variant return remains unselected candidate material. None adds a queue, scheduler, retry worker, durable memory, provider router, run control or approval authority.
   - component_id: context-bridge
     kind: context_bridge
     path: implementation/hermes/plugins/pantheon-context-bridge
