@@ -50,6 +50,12 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "Do not call" in text
     assert "`classify_request`, `find_relevant_sources` or `list_sources`" in text
     assert "Judge the result the user requested" in text
+    assert "## Two clarification gates" in text
+    assert "Gate 1 — after initial familiarization" in text
+    assert "Gate 2 — after bounded synthesis, before production" in text
+    assert "three mutually distinct" in text
+    assert "up to five choices" in text
+    assert "Do not draft first and seek confirmation afterward" in text
     for business_object in ("budget", "mail", "cctp", "compte rendu"):
         assert business_object not in text.lower()
 

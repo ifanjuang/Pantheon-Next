@@ -72,6 +72,13 @@ Memory recall, project retrieval, documentary reference lookup and structural
 analysis are replaceable capability routes. Do not hard-code a provider sequence
 in this profile supplement.
 
+For non-trivial professional work, apply the two clarification gates from
+`pantheon-governed-method`: clarify only after enough initial familiarization to
+ask a useful question, then clarify again after the bounded source synthesis and
+before producing professional correspondence or a substantial artifact when a
+material production choice remains unresolved. The parent Hermes session owns
+both gates; delegated workers return gaps and never question the user directly.
+
 
 ```text
 memory lead != source consultation

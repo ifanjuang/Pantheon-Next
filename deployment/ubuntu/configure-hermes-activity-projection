@@ -12,6 +12,7 @@ ALL_AUTHORIZED_WHATSAPP=0
 BIND_LOCAL_MCP=0
 CURATED_DEFAULT_SKILLS=0
 IFJA_ADAPTER=0
+ENABLE_CLARIFY=0
 CONTAINER="${HERMES_CONTAINER:-pantheon-hermes}"
 HERMES_IMAGE_SKILLS_ROOT="${HERMES_IMAGE_SKILLS_ROOT:-/opt/hermes/skills}"
 CURATED_STAGE_ROOT=""
@@ -72,6 +73,7 @@ Usage:
   deployment/ubuntu/configure-hermes-activity-projection --check --route-whatsapp --whatsapp-chat-id <id>
   sudo deployment/ubuntu/configure-hermes-activity-projection --apply --route-whatsapp --whatsapp-chat-id <id> --with-curated-default-skills [--restart]
   sudo deployment/ubuntu/configure-hermes-activity-projection --apply --with-ifja-adapter --bind-local-mcp [--restart]
+  sudo deployment/ubuntu/configure-hermes-activity-projection --apply --enable-clarify [--restart]
   sudo deployment/ubuntu/configure-hermes-activity-projection --apply --route-whatsapp --all-authorized-whatsapp [--restart]
 
 Installs the minimal generalist governed method, external-effect guard,
@@ -100,6 +102,10 @@ local 9B model instead of relying on deferred tool discovery.
 --with-ifja-adapter adds the IFJA project/source-routing module. It is an
 optional contextual adapter; it does not change the generalist identity of the
 pantheon-governed profile. --bind-local-mcp requires this explicit adapter.
+
+--enable-clarify exposes Hermes' native clarification tool to the governed CLI,
+TUI and Desktop chat surface. The parent session owns user questions; delegated
+children remain unable to call clarify.
 USAGE
 }
 
@@ -118,6 +124,7 @@ while (($#)); do
     --bind-local-mcp) BIND_LOCAL_MCP=1 ;;
     --with-curated-default-skills) CURATED_DEFAULT_SKILLS=1 ;;
     --with-ifja-adapter) IFJA_ADAPTER=1 ;;
+    --enable-clarify) ENABLE_CLARIFY=1 ;;
     -h|--help) usage; exit 0 ;;
     *) die "unknown argument: $1" ;;
   esac
@@ -487,6 +494,22 @@ check_profile_display() {
     || log "governed reasoning deltas require disabling"
 }
 
+check_clarify_runtime() {
+  require_running_container
+  if hermes_config -p "$PROFILE" tools list --platform cli 2>/dev/null \
+      | grep -Eq 'enabled[[:space:]]+clarify'; then
+    log "governed parent clarification is enabled"
+  else
+    log "governed parent clarification requires enabling"
+  fi
+}
+
+apply_clarify_runtime() {
+  require_running_container
+  hermes_config -p "$PROFILE" tools enable --platform cli clarify >/dev/null
+  check_clarify_runtime
+}
+
 apply_profile_display() {
   require_running_container
   hermes_config -p "$PROFILE" config set display.show_reasoning false >/dev/null
@@ -494,6 +517,7 @@ apply_profile_display() {
   hermes_config -p "$PROFILE" config set display.interim_assistant_messages true >/dev/null
   hermes_config -p "$PROFILE" config set plugins.stream_reasoning_deltas false >/dev/null
   check_profile_display
+  if ((ENABLE_CLARIFY == 1)); then check_clarify_runtime; fi
   log "configured governed public milestone display (no private reasoning)"
 }
 
@@ -657,6 +681,9 @@ if ((BIND_LOCAL_MCP == 1)); then
 fi
 if ((CURATED_DEFAULT_SKILLS == 1)); then
   apply_curated_default_skills
+fi
+if ((ENABLE_CLARIFY == 1)); then
+  apply_clarify_runtime
 fi
 
 if ((RESTART == 1)); then

@@ -51,6 +51,57 @@ These are movements, not a mandatory linear pipeline. Skip an empty movement,
 combine adjacent movements when that stays legible, and loop back only when a
 material source, contradiction, scope, risk or completion condition changes.
 
+## Two clarification gates
+
+For non-trivial professional work, clarification follows enough inspection to
+make the question useful. Do not ask the user to restate information that the
+admitted sources can answer.
+
+### Gate 1 — after initial familiarization
+
+First establish the apparent subject, working referent, requested effect and
+available source route. Then use the parent session's `clarify` capability when
+an unresolved choice would materially change the research perimeter, the
+conclusion or the permitted action. If the next step is evident from the
+request and observed material, answer or continue directly. Otherwise ask one
+compact question with a supportable recommendation and three mutually distinct
+choices; use up to five choices only when the additional options are genuinely
+material. Include the observed context and why the choice matters.
+
+If the ambiguity does not materially change the bounded work, preserve it as a
+visible assumption and continue. A delegated child cannot question the user;
+it returns a structured gap to the parent, which owns any later clarification.
+
+### Gate 2 — after bounded synthesis, before production
+
+Before producing a professional communication or substantial artifact for an
+audience — including correspondence, report, dossier, note or submission —
+pause after source synthesis and present a compact pre-production brief:
+
+```text
+intended artifact and audience
+supported findings and exact-source coverage
+material contradictions or missing pieces
+proposed position, scope and exclusions
+decisions still required from the user
+```
+
+Use `clarify` to obtain the user's production choice when audience, purpose,
+position, tone, included claims, exclusions or treatment of a material gap is
+not already explicit. Do not draft first and seek confirmation afterward. If
+all production choices were explicitly supplied and remain supported, record
+that the gate is satisfied and proceed without asking a redundant question. If
+the choice is not evident, present a recommended production path and three
+distinct alternatives, extending to five only when each additional path has a
+materially different consequence.
+
+```text
+initial familiarization != sufficient production brief
+source synthesis complete != production choices confirmed
+draft requested != external transmission authorized
+child gap != child-user interaction
+```
+
 ## Postures
 
 The movements above are normally carried out inside the default governed
