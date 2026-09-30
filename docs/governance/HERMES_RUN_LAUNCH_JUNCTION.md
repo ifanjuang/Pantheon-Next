@@ -457,7 +457,7 @@ It does not install, enable, approve or activate the binding.
 
 ## Replaceable execution transport qualification — UHP #1141
 
-The native Hermes Runs binding remains the current baseline. Issue #1141 qualifies UHP as a possible replacement for the **external transport only**. The current qualification pin is UHP 2026-09-28; the issue was initially characterized on UHP 2026-09-12.
+The native Hermes Runs binding remains the current baseline. Issue #1141 qualified UHP as a possible replacement for the **external transport only** and closed with final posture `watch` because the stock HarnessRouter candidate did not match Pantheon's Hermes runtime. The last qualification pin was UHP 2026-09-28; the issue was initially characterized on UHP 2026-09-12.
 
 ```text
 Pantheon Execution Admission
@@ -493,7 +493,7 @@ Likewise, UHP `disabledTools` is not assumed to prove a hard runtime block: the 
 
 #1141 concluded with final posture `watch`: stock HarnessRouter remained runtime-mismatched against Pantheon's selected Hermes release, so no causal matched A/B was manufactured. UHP therefore does not supersede #1125. Exact SHA-256 basis, immutable execution binding, bounded lifetime and fail-closed expiry remain owned by the smallest Pantheon-side transient lease seam.
 
-The adoption result from #1141 must be one of:
+The decision vocabulary for #1141 was:
 
 ```text
 replace_native_binding
@@ -502,7 +502,7 @@ watch
 reject
 ```
 
-If UHP adds a layer while the native binding, native tool observer and admission-correlation plumbing all remain necessary, the transport is not adopted.
+The recorded result is `watch`. UHP is not adopted. External pin freshness may trigger a new bounded qualification if a future reference implementation reaches exact Hermes runtime comparability.
 
 
 ## Ephemeral source-context lease — #1125
