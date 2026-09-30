@@ -135,7 +135,7 @@ def load_qualification_pin(path: Path) -> dict[str, str]:
     pin = (raw.get("pins") or {}).get("contrastive-lm")
     if not isinstance(pin, dict):
         raise CLMShadowQualificationError("contrastive-lm qualification pin is missing")
-    required = (\n        "repository",\n        "version",\n        "ref",\n        "encoder_model",\n        "encoder_revision",\n        "head_repository",\n        "head_revision",\n        "head_file",\n        "head_sha256",\n        "api_surface",\n    )
+    required = (\n        "repository",\n        "version",\n        "ref",\n        "encoder_model",\n        "encoder_revision",\n        "head_repository",\n        "head_revision",\n        "head_file",\n        "head_sha256",\n        "vllm_version",\n        "api_surface",\n    )
     missing = [key for key in required if not isinstance(pin.get(key), str) or not pin[key].strip()]
     if missing:
         raise CLMShadowQualificationError(
@@ -160,6 +160,8 @@ def validate_runtime_against_pin(runtime_metadata: dict[str, str], pin: dict[str
         mismatches.append("encoder_revision")
     if runtime_metadata["head_sha256"] != pin["head_sha256"]:
         mismatches.append("head_sha256")
+    if runtime_metadata["vllm_version"] != pin["vllm_version"]:
+        mismatches.append("vllm_version")
     if mismatches:
         raise CLMShadowQualificationError(
             "runtime metadata does not match canonical contrastive-lm qualification pin: "
@@ -363,6 +365,7 @@ def run_shadow(
             "head_revision": qualification_pin["head_revision"],
             "head_file": qualification_pin["head_file"],
             "head_sha256": qualification_pin["head_sha256"],
+            "vllm_version": qualification_pin["vllm_version"],
             "api_surface": qualification_pin["api_surface"],
             "registry_sha256": file_sha256(pin_registry_path),
         },
