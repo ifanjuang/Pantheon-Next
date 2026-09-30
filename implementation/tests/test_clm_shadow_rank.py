@@ -31,8 +31,8 @@ def _write_runtime_metadata(tmp_path: Path, **overrides) -> Path:
         "clm_git_ref": "bb42c6c5bf914fd449bed2f6ca65be80602cb1f7",
         "clm_package_version": "0.1.0",
         "encoder_model": "Qwen/Qwen3-8B",
-        "encoder_revision": "c" * 40,
-        "head_sha256": "d" * 64,
+        "encoder_revision": "b968826d9c46dd6066d109eabc6255188de91218",
+        "head_sha256": "b2b4a8c9c2d39263eff78a351eb909a342ce9b3bf21a3f07c1d1bf15f1c4eda5",
         "vllm_version": "0.30.0",
         "device_name": "qualification-gpu",
     }
@@ -113,7 +113,7 @@ def test_runtime_metadata_requires_exact_clm_and_head_identities(tmp_path: Path)
     path = _write_runtime_metadata(tmp_path)
     loaded = load_runtime_metadata(path)
     assert loaded["clm_git_ref"] == "bb42c6c5bf914fd449bed2f6ca65be80602cb1f7"
-    assert loaded["head_sha256"] == "d" * 64
+    assert loaded["head_sha256"] == "b2b4a8c9c2d39263eff78a351eb909a342ce9b3bf21a3f07c1d1bf15f1c4eda5"
 
     bad_ref = _write_runtime_metadata(tmp_path, clm_git_ref="main")
     with pytest.raises(CLMShadowQualificationError, match="40-character git SHA"):
@@ -131,9 +131,14 @@ def test_runtime_must_match_canonical_clm_pin(tmp_path: Path) -> None:
     pin = MODULE.load_qualification_pin(PIN_REGISTRY)
     MODULE.validate_runtime_against_pin(runtime, pin)
 
-    bad = _write_runtime_metadata(tmp_path, clm_git_ref="a" * 40)
-    with pytest.raises(CLMShadowQualificationError, match="canonical contrastive-lm qualification pin"):
-        MODULE.validate_runtime_against_pin(load_runtime_metadata(bad), pin)
+    for field, value in (
+        ("clm_git_ref", "a" * 40),
+        ("encoder_revision", "e" * 40),
+        ("head_sha256", "f" * 64),
+    ):
+        bad = _write_runtime_metadata(tmp_path, **{field: value})
+        with pytest.raises(CLMShadowQualificationError, match="canonical contrastive-lm qualification pin"):
+            MODULE.validate_runtime_against_pin(load_runtime_metadata(bad), pin)
 
 
 def test_candidate_orderings_are_deterministic_and_bounded() -> None:
