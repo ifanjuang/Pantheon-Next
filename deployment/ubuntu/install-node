@@ -336,7 +336,7 @@ Environment="OLLAMA_MODELS=$AI_ROOT/models/ollama"
 Environment="OLLAMA_KEEP_ALIVE=1m"
 Environment="OLLAMA_NUM_PARALLEL=1"
 Environment="OLLAMA_MAX_LOADED_MODELS=1"
-Environment="OLLAMA_CONTEXT_LENGTH=65536"
+Environment="OLLAMA_CONTEXT_LENGTH=32768"
 EOF_OLLAMA
   install -d -m 0755 "$AI_ROOT/models/ollama"
   if id -u ollama >/dev/null 2>&1; then chown -R ollama:ollama "$AI_ROOT/models/ollama"; fi
