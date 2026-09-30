@@ -291,7 +291,7 @@ def run_shadow(
         for ordering in build_orderings(case.candidates, max_orderings):
             payload, headers, transport_ms = _request_json(
                 base_url,
-                "/v1/rank",
+                qualification_pin["api_surface"],
                 method="POST",
                 body={
                     "context": case.context,
