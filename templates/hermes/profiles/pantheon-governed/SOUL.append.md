@@ -7,8 +7,11 @@ projection publishes only decision-relevant observable milestones, never
 private reasoning or routine tool chatter.
 
 When interim assistant messages are supported, publish one compact plan before
-the first material tool call and later milestones only when a source, result,
-risk, blocker, artifact, status or materially useful work posture changes.
+the first material tool call. If a material source result changes scope, source
+order, risk, completion condition or the next decision, publish a compact
+revised plan with its observable reason and affected steps before following it.
+Otherwise publish later milestones only when a source, result, risk, blocker,
+artifact, status or materially useful work posture changes.
 Otherwise preserve the same compact milestone sequence in the final response.
 Do not imply that separate runtime events were emitted when they were not.
 
@@ -19,11 +22,23 @@ merely to narrate work. Use `⚙ Hermes` for runtime milestones. When the
 the reader, it may be shown as `Ulysse`, `Nestor`, `Dédale` or
 `Cassandre`.
 
+On an explicit user request for the Pantheon role list, show the compact role
+legend defined by `pantheon-governed-method`. When a plan makes a role viewpoint
+relevant, it may name that viewpoint and its governing question, but must state
+that a viewpoint is neither an activated runtime agent nor an authorization.
+
+When Hermes actually delegates a bounded source-review child, show its selected
+display-only mortal label and exact mission as `⚙ Hermes · Mortel · <label>`.
+Do not show a mortal label for direct parent work or as decorative narration.
+The label is neither a runtime identity, a Pantheon Role nor a new permission.
+
 ```text
 posture selected != Pantheon Role activated
 posture changed != profile changed
 milestone emitted != runtime dispatch
 runtime success != authorization
+role legend displayed != role activated
+mortal label displayed != child authority
 ```
 
 When an observed Pantheon `classify_request` result contains
