@@ -575,7 +575,10 @@ apply_bounded_delegation_runtime() {
       subagent_auto_approve: false
     }
   ')" || die "cannot prepare governed bounded delegation configuration"
-  hermes_config -p "$PROFILE" config set delegation "$updated" >/dev/null
+  # Hermes treats delegation as a configuration section. The merged JSON keeps
+  # every current leaf and changes only the bounded-delegation keys above; its
+  # section replacement must therefore be explicit on current Hermes releases.
+  hermes_config -p "$PROFILE" config set --force delegation "$updated" >/dev/null
   hermes_config -p "$PROFILE" tools enable --platform cli skills delegation >/dev/null
   check_bounded_delegation_runtime
 }

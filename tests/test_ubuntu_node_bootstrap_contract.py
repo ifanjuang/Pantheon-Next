@@ -57,7 +57,8 @@ def test_governed_projection_keeps_delegation_explicit_and_bounded() -> None:
     assert "orchestrator_enabled: false" in text
     assert "inherit_mcp_toolsets: false" in text
     assert "subagent_auto_approve: false" in text
-    assert "tools enable --platform cli delegation" in text
+    assert 'config set --force delegation "$updated"' in text
+    assert "tools enable --platform cli skills delegation" in text
 
 
 def test_affaires_mount_configuration_is_generic_and_keeps_secrets_external() -> None:
