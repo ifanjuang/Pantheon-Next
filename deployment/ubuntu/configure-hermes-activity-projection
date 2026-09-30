@@ -31,8 +31,6 @@ SKILL_NAMES=(
   pantheon-governed-method
   pantheon-request-intake
   source-research
-  ifja-project-context
-  ifja-vault-search
 )
 SKILL_SOURCES=(
   "$REPO_ROOT/templates/hermes/skills/external-commitment-guard"
@@ -40,8 +38,6 @@ SKILL_SOURCES=(
   "$REPO_ROOT/templates/hermes/skills/pantheon-governed-method"
   "$REPO_ROOT/templates/hermes/skills/pantheon-request-intake"
   "$REPO_ROOT/templates/hermes/skills/source-research"
-  "$REPO_ROOT/templates/hermes/skills/ifja-project-context"
-  "$REPO_ROOT/implementation/hermes/skills/ifja-vault-search"
 )
 CURATED_SKILL_PATHS=(
   creative/architecture-diagram
