@@ -34,7 +34,12 @@ def _write_runtime_metadata(tmp_path: Path, **overrides) -> Path:
         "encoder_revision": "b968826d9c46dd6066d109eabc6255188de91218",
         "head_sha256": "b2b4a8c9c2d39263eff78a351eb909a342ce9b3bf21a3f07c1d1bf15f1c4eda5",
         "vllm_version": "0.30.0",
-        "device_name": "qualification-gpu",
+        "clm_head_device_name": "cpu",
+        "encoder_device_name": "NVIDIA GeForce RTX 4090",
+        "encoder_placement": "remote",
+        "encoder_transport": "ssh_local_forward",
+        "encoder_endpoint": "http://127.0.0.1:18090/v1/embeddings",
+        "encoder_node_label": "PC00/WSL",
     }
     raw.update(overrides)
     path = tmp_path / "runtime.json"
@@ -125,6 +130,37 @@ def test_runtime_metadata_requires_exact_clm_and_head_identities(tmp_path: Path)
 
 
 
+def test_runtime_topology_requires_loopback_and_matching_transport(tmp_path: Path) -> None:
+    good = load_runtime_metadata(_write_runtime_metadata(tmp_path))
+    MODULE.validate_runtime_topology(good)
+
+    bad_transport = load_runtime_metadata(
+        _write_runtime_metadata(tmp_path, encoder_transport="loopback_direct")
+    )
+    with pytest.raises(CLMShadowQualificationError, match="ssh_local_forward"):
+        MODULE.validate_runtime_topology(bad_transport)
+
+    bad_endpoint = load_runtime_metadata(
+        _write_runtime_metadata(
+            tmp_path,
+            encoder_endpoint="http://pc00:8090/v1/embeddings",
+        )
+    )
+    with pytest.raises(CLMShadowQualificationError, match="loopback"):
+        MODULE.validate_runtime_topology(bad_endpoint)
+
+    local = load_runtime_metadata(
+        _write_runtime_metadata(
+            tmp_path,
+            encoder_placement="local",
+            encoder_transport="loopback_direct",
+            encoder_endpoint="http://127.0.0.1:8090/v1/embeddings",
+            encoder_node_label="linux-local",
+        )
+    )
+    MODULE.validate_runtime_topology(local)
+
+
 def test_runtime_must_match_canonical_clm_pin(tmp_path: Path) -> None:
     good = _write_runtime_metadata(tmp_path)
     runtime = load_runtime_metadata(good)
@@ -210,6 +246,9 @@ def test_shadow_run_records_ranking_without_selecting_or_authorizing(monkeypatch
     )
 
     assert report["status"] == "shadow_observation_only"
+    assert report["runtime_metadata"]["encoder_placement"] == "remote"
+    assert report["runtime_metadata"]["encoder_transport"] == "ssh_local_forward"
+    assert report["runtime_metadata"]["encoder_node_label"] == "PC00/WSL"
     assert report["summary"]["expected_top1_all_orderings_rate"] == 1.0
     assert report["summary"]["top_candidate_order_stable_rate"] == 1.0
     assert report["cases"][0]["orderings_observed"] == 3
