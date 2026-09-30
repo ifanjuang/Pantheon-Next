@@ -392,7 +392,6 @@ def _load_verified(
     current = (now or _utcnow()).astimezone(timezone.utc)
     expires_at = _parse_time(metadata.get("expires_at"), label="expires_at")
     if expires_at <= current:
-        shutil.rmtree(lease_dir, ignore_errors=True)
         raise EphemeralContextExpired(f"ephemeral context lease expired: {lease_ref}")
 
     items = metadata.get("items")
