@@ -1,80 +1,63 @@
-# CLM shadow-ranking qualification on the Linux node
+# CLM shadow-ranking qualification — Linux + PC00/WSL encoder
 
 Status: candidate qualification procedure for Pantheon issue #1047. This is not a production installation, Hermes route, authorization path or adoption decision.
 
 ## Objective
 
-Run the reviewed Contrastive-LM candidate locally on the Linux GPU node and record passive rankings over a short synthetic Pantheon corpus.
+Keep the CLM server and public projection head on the Pantheon Linux node while moving the exact Qwen3-8B pooling encoder to PC00/WSL.
 
 ```text
-synthetic state + fixed candidate actions
-                  |
-                  v
-          local CLM /v1/rank
-                  |
-                  v
-         shadow observation JSON
-
-CLM output -> never dispatched to Hermes
-CLM output -> never reaches an effect owner
+Pantheon Linux
+  CLM head on CPU
+  127.0.0.1:8700
+        |
+        | embeddings
+        v
+  127.0.0.1:18090
+        |
+        | authenticated local-forward tunnel
+        v
+PC00 / WSL
+  vLLM pooling
+  Qwen/Qwen3-8B exact revision
+  127.0.0.1:8090
+        |
+        v
+  RTX 4090
 ```
 
-Do not wire CLM into Hermes, Pantheon admission, the PEP/effect chokepoint, Hindsight, Knowledge or Cockpit during this qualification.
+The vLLM HTTP endpoint stays loopback-only on PC00/WSL. Do not expose port 8090 directly on the LAN for this experiment.
 
-## Authority and artifact source
+CLM remains passive:
 
-All candidate identities come from the existing canonical qualification owner:
+```text
+CLM rank != Hermes decision
+CLM rank != Pantheon authorization
+shadow observation != Evidence
+runtime success != model qualification
+model qualification != activation
+```
+
+## Canonical candidate
+
+All model/runtime identities come from:
 
 ```text
 implementation/qualification/external-pins.json
   -> pins.contrastive-lm
 ```
 
-The run must not resolve mutable upstream `main` / latest model state and then call it equivalent.
+The pin owns the exact:
 
-The pin owns:
+- CLM repository/ref and package version;
+- Qwen3-8B model/revision;
+- CLM public head repository/revision/file/SHA-256;
+- vLLM version;
+- CLM ranking API surface.
 
-```text
-CLM repository + exact git ref
-package version
-encoder model + exact revision
-public CLM head repository + exact revision + file + SHA-256
-API surface
-```
+Placement is an observed runtime property, not part of model identity.
 
-The pin is qualification input only:
-
-```text
-selected candidate != installed
-installed != qualified
-qualified != activated
-shadow rank != Hermes decision
-```
-
-Known upstream cautions for this slice:
-
-- CLM is alpha software;
-- upstream reports exist for unexpected typed `score` behavior, so this slice uses `/v1/rank` only;
-- long-state truncation behavior is still a qualification concern, so the first corpus intentionally stays short;
-- a successful run does not qualify CLM for routing or activation.
-
-## 1. Repository and GPU preflight
-
-Use a current checkout containing this qualification slice:
-
-```bash
-git rev-parse HEAD
-git status --short
-
-nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv
-python3 --version
-```
-
-Do not silently introduce quantization, a different encoder, CPU offload or another serving backend merely to make the reference run fit. Such a change is a different experimental arm and must be qualified separately.
-
-If the selected reference stack cannot load on the Linux GPU, record this first run as blocked rather than treating a modified stack as equivalent.
-
-## 2. Export the canonical CLM candidate
+## 1. Export the candidate pin on Linux
 
 From the Pantheon-Next repository root:
 
@@ -84,10 +67,9 @@ import json
 import shlex
 from pathlib import Path
 
-registry = json.loads(
+pin = json.loads(
     Path("implementation/qualification/external-pins.json").read_text(encoding="utf-8")
-)
-pin = registry["pins"]["contrastive-lm"]
+)["pins"]["contrastive-lm"]
 
 fields = {
     "CLM_REPOSITORY": "repository",
@@ -103,67 +85,44 @@ fields = {
     "CLM_API_SURFACE": "api_surface",
 }
 for env_name, field in fields.items():
-    value = str(pin[field])
-    print(f"export {env_name}={shlex.quote(value)}")
+    print(f"export {env_name}={shlex.quote(str(pin[field]))}")
 PY
 
 source /tmp/clm-shadow-pin.env
-cat /tmp/clm-shadow-pin.env
 ```
 
-Do not hand-edit this file to make a run pass. A different candidate belongs in the qualification registry through a reviewed repository change.
+Do not hand-edit these identities to make a run pass.
 
-## 3. Create an isolated CLM environment
+## 2. Linux: isolated CLM environment and exact head
 
-Do not install CLM into the Hermes Python environment.
+CLM itself declares vLLM as a package dependency, even though this topology uses the remote encoder. Keep the package environment exact rather than removing dependencies ad hoc.
 
 ```bash
 python3 -m venv ~/.venvs/clm-shadow
 source ~/.venvs/clm-shadow/bin/activate
-python -m pip install --upgrade pip
+source /tmp/clm-shadow-pin.env
 
+python -m pip install --upgrade pip
 python -m pip install \
   "git+https://github.com/${CLM_REPOSITORY}.git@${CLM_GIT_REF}" \
   "vllm==${CLM_VLLM_VERSION}" \
   huggingface_hub
-```
 
-Verify the installed package identity:
-
-```bash
 CLM_PACKAGE_OBSERVED="$(python - <<'PY'
 from importlib.metadata import version
 print(version("contrastive-lm"))
 PY
 )"
-VLLM_VERSION="$(python - <<'PY'
-from importlib.metadata import version
-print(version("vllm"))
-PY
-)"
-
-printf 'contrastive-lm=%s\nvllm=%s\n' "$CLM_PACKAGE_OBSERVED" "$VLLM_VERSION"
 
 test "$CLM_PACKAGE_OBSERVED" = "$CLM_VERSION" || {
   echo "contrastive-lm package version differs from canonical pin" >&2
   exit 1
 }
-test "$VLLM_VERSION" = "$CLM_VLLM_VERSION" || {
-  echo "vLLM version differs from canonical pin" >&2
-  exit 1
-}
-
-python -m pip freeze > /tmp/clm-shadow-pip-freeze.txt
 ```
 
-## 4. Fetch and verify the exact CLM head
-
-Download the exact Hugging Face artifact selected by the registry, not its mutable latest state:
+Fetch the exact public head:
 
 ```bash
-source ~/.venvs/clm-shadow/bin/activate
-source /tmp/clm-shadow-pin.env
-
 python - <<'PY'
 import os
 from pathlib import Path
@@ -181,24 +140,39 @@ PY
 HEAD_PATH="$(cat /tmp/clm-shadow-head-path)"
 HEAD_SHA256="$(sha256sum "$HEAD_PATH" | awk '{print $1}')"
 
-printf 'head=%s\nsha256=%s\n' "$HEAD_PATH" "$HEAD_SHA256"
-
 test "$HEAD_SHA256" = "$CLM_HEAD_SHA256" || {
   echo "CLM head SHA-256 differs from canonical pin" >&2
   exit 1
 }
 ```
 
-## 5. Start the exact encoder on loopback
+## 3. PC00/WSL: exact vLLM encoder
 
-Terminal A:
+Run these commands inside the WSL environment on PC00.
 
 ```bash
-source ~/.venvs/clm-shadow/bin/activate
-source /tmp/clm-shadow-pin.env
+python3 -m venv ~/.venvs/clm-encoder
+source ~/.venvs/clm-encoder/bin/activate
+python -m pip install --upgrade pip
+python -m pip install "vllm==0.30.0"
 
-vllm serve "$CLM_ENCODER_MODEL" \
-  --revision "$CLM_ENCODER_REVISION" \
+python - <<'PY'
+from importlib.metadata import version
+print("vllm", version("vllm"))
+PY
+
+nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv
+```
+
+The literal version above must match `CLM_VLLM_VERSION` from the current Pantheon pin before the run. If the pin changes, use the new pinned value.
+
+Start the exact encoder:
+
+```bash
+source ~/.venvs/clm-encoder/bin/activate
+
+vllm serve Qwen/Qwen3-8B \
+  --revision b968826d9c46dd6066d109eabc6255188de91218 \
   --served-model-name qwen3-8b \
   --runner pooling \
   --max-model-len 2048 \
@@ -206,11 +180,53 @@ vllm serve "$CLM_ENCODER_MODEL" \
   --port 8090
 ```
 
-The first qualification intentionally keeps the CLM state limit at 2048 tokens. This does not establish that 2048 is sufficient for later professional workloads.
+The literal model and revision must also match the current Pantheon pin. The first run deliberately stays at 2048 tokens.
 
-## 6. Start CLM with the verified head
+Do not substitute Ollama, `qwen3-embedding`, quantization, CPU offload or another encoder in this arm.
 
-Terminal B:
+## 4. Linux: create an authenticated loopback tunnel to PC00/WSL
+
+Use an operator-managed SSH target whose SSH session terminates in the same WSL environment where vLLM is listening.
+
+Do not commit an IP address, username, private key or other host secret. Set the target locally, for example through an SSH config alias:
+
+```bash
+export CLM_ENCODER_SSH_TARGET="<operator-configured-PC00-WSL-ssh-target>"
+```
+
+Start the forward in a dedicated terminal on Linux:
+
+```bash
+ssh \
+  -N \
+  -T \
+  -o ExitOnForwardFailure=yes \
+  -L 127.0.0.1:18090:127.0.0.1:8090 \
+  "$CLM_ENCODER_SSH_TARGET"
+```
+
+This means:
+
+```text
+Linux 127.0.0.1:18090
+  -> authenticated SSH transport
+  -> PC00/WSL 127.0.0.1:8090
+```
+
+If the available SSH target terminates on Windows rather than inside the WSL environment and cannot reach the WSL loopback service, stop. Do not solve that by exposing vLLM on `0.0.0.0` or creating an unreviewed LAN HTTP path. Use an authenticated tunnel that terminates inside WSL or fall back to the local-encoder arm.
+
+Verify the forwarded vLLM service from Linux:
+
+```bash
+curl -fsS http://127.0.0.1:18090/health
+curl -fsS http://127.0.0.1:18090/v1/models | python -m json.tool
+```
+
+The exposed model must include `qwen3-8b`.
+
+## 5. Linux: start CLM against the forwarded encoder
+
+Run the CLM projection head explicitly on CPU so this first remote-encoder qualification depends on PC00 for the heavy Qwen encoder workload rather than on a second GPU.
 
 ```bash
 source ~/.venvs/clm-shadow/bin/activate
@@ -225,22 +241,20 @@ chmod 600 /tmp/clm-shadow-api-key
 clm-serve \
   --host 127.0.0.1 \
   --port 8700 \
-  --emb-url http://127.0.0.1:8090/v1/embeddings \
+  --emb-url http://127.0.0.1:18090/v1/embeddings \
   --emb-model qwen3-8b \
   --max-tokens 2048 \
   --ckpt "$HEAD_PATH" \
   --no-download \
+  --device cpu \
   --no-ui
 ```
 
-Always pass `--host 127.0.0.1`. The upstream server's general-purpose default is not the boundary selected for this local qualification.
+CLM itself remains loopback-only.
 
-## 7. Verify the live local surface
-
-From another shell:
+Verify:
 
 ```bash
-source ~/.venvs/clm-shadow/bin/activate
 export CLM_API_KEY="$(cat /tmp/clm-shadow-api-key)"
 
 curl -fsS http://127.0.0.1:8700/health | python -m json.tool
@@ -258,11 +272,11 @@ health.mock     != true
 clm-latest      is exposed
 ```
 
-A healthy process is only a technical observation.
+## 6. Record the exact remote topology
 
-## 8. Record exact runtime identity
+The report must distinguish model identity from physical placement.
 
-Create the runtime receipt from the exact values already used to serve:
+On Linux, with `CLM_ENCODER_SSH_TARGET` set:
 
 ```bash
 source ~/.venvs/clm-shadow/bin/activate
@@ -273,16 +287,25 @@ from importlib.metadata import version
 print(version("contrastive-lm"))
 PY
 )"
-VLLM_VERSION="$(python - <<'PY'
-from importlib.metadata import version
-print(version("vllm"))
-PY
+
+ENCODER_VLLM_VERSION="$(
+  ssh "$CLM_ENCODER_SSH_TARGET" \
+    'source ~/.venvs/clm-encoder/bin/activate && python -c "from importlib.metadata import version; print(version(\"vllm\"))"'
 )"
-DEVICE_NAME="$(nvidia-smi --query-gpu=name --format=csv,noheader | head -n1)"
+
+ENCODER_DEVICE_NAME="$(
+  ssh "$CLM_ENCODER_SSH_TARGET" \
+    'nvidia-smi --query-gpu=name --format=csv,noheader | head -n1'
+)"
+
 HEAD_PATH="$(cat /tmp/clm-shadow-head-path)"
 HEAD_SHA256="$(sha256sum "$HEAD_PATH" | awk '{print $1}')"
 
-export CLM_PACKAGE_OBSERVED VLLM_VERSION DEVICE_NAME HEAD_SHA256
+export \
+  CLM_PACKAGE_OBSERVED \
+  ENCODER_VLLM_VERSION \
+  ENCODER_DEVICE_NAME \
+  HEAD_SHA256
 
 python - <<'PY'
 import json
@@ -295,8 +318,13 @@ receipt = {
     "encoder_model": os.environ["CLM_ENCODER_MODEL"],
     "encoder_revision": os.environ["CLM_ENCODER_REVISION"],
     "head_sha256": os.environ["HEAD_SHA256"],
-    "vllm_version": os.environ["VLLM_VERSION"],
-    "device_name": os.environ["DEVICE_NAME"],
+    "vllm_version": os.environ["ENCODER_VLLM_VERSION"],
+    "clm_head_device_name": "cpu",
+    "encoder_device_name": os.environ["ENCODER_DEVICE_NAME"],
+    "encoder_placement": "remote",
+    "encoder_transport": "ssh_local_forward",
+    "encoder_endpoint": "http://127.0.0.1:18090/v1/embeddings",
+    "encoder_node_label": "PC00/WSL",
 }
 Path("/tmp/clm-runtime.json").write_text(
     json.dumps(receipt, indent=2) + "\n",
@@ -307,11 +335,9 @@ PY
 cat /tmp/clm-runtime.json
 ```
 
-The shadow runner independently compares this receipt against `external-pins.json`. A different CLM git ref, package version, encoder model/revision, head SHA-256 or vLLM version fails the run before ranking.
+The runner rejects a non-loopback encoder endpoint for this qualification and rejects a remote placement that is not recorded as `ssh_local_forward`.
 
-## 9. Run the passive corpus
-
-From the Pantheon-Next repository root:
+## 7. Run the shadow corpus
 
 ```bash
 export CLM_API_KEY="$(cat /tmp/clm-shadow-api-key)"
@@ -325,7 +351,7 @@ python implementation/labs/hermes_runtime_efficiency/clm_shadow_rank.py \
   --output /tmp/clm-shadow-report.json
 ```
 
-Inspect the observation summary:
+Inspect:
 
 ```bash
 python - <<'PY'
@@ -333,11 +359,10 @@ import json
 from pathlib import Path
 
 report = json.loads(Path("/tmp/clm-shadow-report.json").read_text(encoding="utf-8"))
+print(json.dumps(report["runtime_metadata"], indent=2))
 print(json.dumps(report["summary"], indent=2))
 PY
 ```
-
-The runner deliberately permutes candidate order. A case is `top_candidate_order_stable` only when the same candidate remains first across all tested orderings.
 
 Initial signals:
 
@@ -349,39 +374,42 @@ CLM latency header
 transport elapsed time
 ```
 
-Do not collapse them into one universal model score.
+The quality/stability result is valid for the exact model candidate. Latency from this arm is explicitly topology-specific because embeddings cross the authenticated tunnel.
 
-## 10. First-pass interpretation
+```text
+remote quality observation
+!= local latency baseline
+```
+
+## 8. Local encoder fallback
+
+The previous all-local topology remains valid as a separate arm:
+
+```text
+encoder_placement  = local
+encoder_transport  = loopback_direct
+encoder_endpoint   = http://127.0.0.1:8090/v1/embeddings
+encoder_node_label = linux-local
+```
+
+It must use the same model revision, head, vLLM version and 2048-token limit. Do not mix local and PC00 observations in one causal latency comparison.
+
+## 9. Interpretation
 
 ```text
 low expected-match rate
--> published CLM candidate is not useful for this decision family
+-> CLM candidate is not useful for this decision family
 
 high expected match + low order stability
--> presentation sensitivity is material; do not use as a routing primitive
+-> presentation sensitivity is material
 
 high expected match + high order stability
--> candidate for a larger held-out shadow corpus only
+-> candidate for a larger held-out shadow corpus
 
-good synthetic shadow result
+good shadow result
 != permission to wire CLM into Hermes
 ```
 
-Only after a larger held-out corpus should a separate experiment ask whether CLM can reduce real Hermes selection cost.
+## 10. Removal
 
-## 11. Preserved boundaries
-
-```text
-CLM rank != Hermes decision
-CLM rank != Pantheon authorization
-fixture expected answer != professional truth
-shadow observation != Evidence
-runtime success != model qualification
-model qualification != activation
-```
-
-CLM receives no consequential credential. The Pantheon effect owner / PEP remains unchanged.
-
-## 12. Removal
-
-The experiment remains removable. Deleting the CLM-specific lab files and qualification pin restores the previous #1047 lab behavior; no product module imports the shadow runner, no schema migration is introduced, and no runtime route depends on it.
+Deleting the CLM-specific lab files and qualification pin restores the previous #1047 lab behavior. No product module imports this runner, no schema migration is introduced, and no production runtime route depends on PC00 or CLM.
