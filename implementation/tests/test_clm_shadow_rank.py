@@ -135,6 +135,7 @@ def test_runtime_must_match_canonical_clm_pin(tmp_path: Path) -> None:
         ("clm_git_ref", "a" * 40),
         ("encoder_revision", "e" * 40),
         ("head_sha256", "f" * 64),
+        ("vllm_version", "0.29.0"),
     ):
         bad = _write_runtime_metadata(tmp_path, **{field: value})
         with pytest.raises(CLMShadowQualificationError, match="canonical contrastive-lm qualification pin"):
