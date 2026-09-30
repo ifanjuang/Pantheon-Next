@@ -93,7 +93,11 @@ Terminal A:
 ```bash
 source ~/.venvs/clm-shadow/bin/activate
 
+ENCODER_REVISION="$(cat /tmp/clm-shadow-encoder-revision)"
+printf '%s\n' "$ENCODER_REVISION" > /tmp/clm-shadow-encoder-revision
+
 vllm serve Qwen/Qwen3-8B \
+  --revision "$ENCODER_REVISION" \
   --served-model-name qwen3-8b \
   --runner pooling \
   --max-model-len 2048 \
