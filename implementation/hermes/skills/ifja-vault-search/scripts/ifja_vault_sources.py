@@ -39,6 +39,24 @@ def tokens(value: str) -> set[str]:
     return set(normalized(value).split())
 
 
+def _ocr_family(relative: Path) -> tuple[str, str] | None:
+    """Return a stable sibling family key and representation for OCR-managed PDFs."""
+    name = relative.name
+    folded = name.casefold()
+    if folded.endswith(".ocr.md"):
+        stem = name[:-len(".ocr.md")]
+        representation = "ocr_markdown"
+    elif folded.endswith(".ocr.pdf"):
+        stem = name[:-len(".ocr.pdf")]
+        representation = "ocr_pdf"
+    elif relative.suffix.casefold() == ".pdf":
+        stem = relative.stem
+        representation = "original_pdf"
+    else:
+        return None
+    return str(relative.parent / stem), representation
+
+
 def _bounded(value: int, maximum: int, name: str) -> int:
     if not 1 <= value <= maximum:
         raise VaultSourceError(f"{name} must be between 1 and {maximum}")
@@ -162,6 +180,46 @@ class VaultSources:
                 })
             if scanned > MAX_SCANNED_FILES:
                 break
+        families: dict[str, list[dict]] = {}
+        standalone: list[dict] = []
+        for item in items:
+            family = _ocr_family(Path(item["relative_path"]))
+            if family is None:
+                item["representations"] = [{
+                    "kind": item["representation"],
+                    "source_path": item["source_path"],
+                    "relative_path": item["relative_path"],
+                }]
+                item["logical_document_family"] = None
+                standalone.append(item)
+                continue
+            family_key, representation = family
+            item["representation"] = representation
+            families.setdefault(family_key, []).append(item)
+
+        representation_rank = {"original_pdf": 0, "ocr_markdown": 1, "ocr_pdf": 2}
+        for family_key, members in families.items():
+            members.sort(key=lambda item: (
+                representation_rank[item["representation"]],
+                item["relative_path"].casefold(),
+            ))
+            canonical = dict(members[0])
+            canonical["logical_document_family"] = family_key
+            canonical["representation"] = "document_family" if len(members) > 1 else members[0]["representation"]
+            canonical["representations"] = [
+                {
+                    "kind": member["representation"],
+                    "source_path": member["source_path"],
+                    "relative_path": member["relative_path"],
+                }
+                for member in members
+            ]
+            canonical["derivative_count"] = sum(
+                member["representation"] != "original_pdf" for member in members
+            )
+            canonical["score"] = max(member["score"] for member in members)
+            standalone.append(canonical)
+        items = standalone
         items.sort(key=lambda item: (-item["score"], item["relative_path"].casefold()))
         return {
             "status": "source_candidates" if items else "no_supported_files_in_project",

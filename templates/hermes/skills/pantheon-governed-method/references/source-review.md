@@ -36,14 +36,17 @@ Hindsight can recall extracted content.
 Before proposing any persistent OCR output, list every selected source with its
 exact relative path, file type, page count when observed, OCR need or result,
 and any existing target-name collision. Do not write while building this list.
-Then ask once for the retention policy, with these four choices:
+Then ask once for the retention policy, with these five choices:
 
 1. keep the OCR result only in the current session and write no project file —
    default when durable reuse was not requested;
-2. create one adjacent Markdown sidecar for every listed source;
-3. create one additional searchable `.ocr.pdf` beside every listed PDF while
+2. update the searchable content of each corresponding existing Hindsight
+   document through the single designated producer, without creating a project
+   file — recommended for internal search;
+3. create one adjacent Markdown sidecar for every listed source;
+4. create one additional searchable `.ocr.pdf` beside every listed PDF while
    preserving each original — recommended when page appearance matters;
-4. decide file by file, where in-place PDF replacement may be selected
+5. decide file by file, where in-place PDF replacement may be selected
    explicitly for an individual file.
 
 Show the proposed output name for every file before execution. An in-place
@@ -53,15 +56,49 @@ preserves relevant metadata, verifies page count and rendered readability, and
 reports both backup and final paths. A collision with an existing sidecar or OCR
 PDF requires a fresh choice; do not overwrite it silently.
 
-The current governed source tools are read-only and cannot persist that file.
-Once an authorized writer creates it inside an admitted project source,
-Hindsight may index it only after reconciliation is observed.
+Use the reserved sibling names `<stem>.ocr.md` and `<stem>.ocr.pdf`. Treat the
+original and these derivatives as one logical document family in inventories,
+search and coverage counts. Show one result with its available representations;
+never count a derivative as another quote, letter, contract or revision.
+Hindsight must retain only one searchable representation for the family. A
+Hindsight-only OCR update reuses the existing `<document_id>:source`; the single
+producer replaces its searchable content while preserving the original PDF path
+and identity in metadata. When project-file derivatives exist, use this
+preference order: OCR Markdown, searchable OCR PDF, original. A normal
+`<stem>.md` without the `.ocr` marker remains an independent authored document
+and is not merged automatically.
+
+The producer owns durable OCR state and re-emits it on every reconciliation so
+ordinary source reconciliation cannot erase it. Use low-cardinality tags:
+
+```text
+ocr:status:needed | completed | stale | failed
+ocr:representation:hindsight-text | markdown | searchable-pdf | in-place-pdf
+```
+
+Keep detailed provenance in document metadata, not high-cardinality tags:
+`ocr_source_sha256`, `ocr_engine`, `ocr_pipeline_version`, `ocr_completed_at`
+and, when relevant, `ocr_output_path`. Hermes skips OCR only when status is
+`completed`, the recorded `ocr_source_sha256` equals the current PDF checksum,
+and the selected searchable representation is still available. A changed PDF
+becomes `stale`; an absent or failed representation becomes `needed`. Re-run an
+otherwise current OCR only after an explicit user request recorded as
+`force_ocr=true` for that operation.
+
+The current governed source tools are read-only and cannot persist a file or an
+OCR update. The future bounded retention route must address one already resolved
+document through the designated producer; Hermes must not receive arbitrary
+bank-write access. Once an authorized writer creates a project file, Hindsight
+may index it only after reconciliation is observed.
 
 ```text
 OCR result != source PDF replaced
 Hindsight memory != document storage
 file written != Hindsight reconciliation observed
 batch retention choice != in-place replacement authority
+three representations != three documents
+same Hindsight document id != duplicate document
+ocr:status:completed alone != current OCR proven
 ```
 
 ## Bounded delegated source review

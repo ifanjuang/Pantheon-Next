@@ -68,6 +68,32 @@ def test_project_discovery_accepts_partial_and_bounded_typo_candidates(vaults) -
     assert fuzzy["identity_confirmed"] is False
 
 
+def test_ocr_derivatives_are_one_logical_source_family(vaults) -> None:
+    reader, files = vaults
+    original = files["visit"].parent / "Site report.pdf"
+    markdown = files["visit"].parent / "Site report.ocr.md"
+    searchable = files["visit"].parent / "Site report.ocr.pdf"
+    authored = files["visit"].parent / "Site report.md"
+    original.write_bytes(b"%PDF-1.4 synthetic")
+    markdown.write_text("OCR text", encoding="utf-8")
+    searchable.write_bytes(b"%PDF-1.4 searchable synthetic")
+    authored.write_text("Independent authored note", encoding="utf-8")
+
+    inventory = reader.list_project_sources("Project Beta", "site report")
+    family = next(
+        item for item in inventory["items"]
+        if item["logical_document_family"] == "Site report"
+    )
+    assert family["source_path"] == str(original)
+    assert family["representation"] == "document_family"
+    assert family["derivative_count"] == 2
+    assert [row["kind"] for row in family["representations"]] == [
+        "original_pdf", "ocr_markdown", "ocr_pdf"
+    ]
+    assert any(item["source_path"] == str(authored) for item in inventory["items"])
+    assert sum("Site report.ocr" in item["source_path"] for item in inventory["items"]) == 0
+
+
 def test_nested_alpha_cerfa_is_read_at_exact_lines_not_from_a_directory(vaults) -> None:
     reader, files = vaults
     inventory = reader.list_project_sources("Project Alpha", "permis CERFA")
