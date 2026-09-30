@@ -51,7 +51,14 @@ def recall_project_memory(
     folder: str = "",
     max_tokens: int = 2048,
 ) -> str:
-    """Recall up to eight source-grounded facts from exactly one KROQI project."""
+    """Recall up to eight facts from one exact project.
+
+    Put the resolved project hint or folder designation in ``project`` exactly
+    (for example ``leroux-lesage``); never put the generic word "project"
+    there. Put the user's complete factual question and the designation in
+    ``query``. Resolve a partial or ambiguous designation with
+    ``ifja-vault-read:find_ifja_projects`` before calling this tool.
+    """
     try:
         payload = _client().recall_project(
             project, query, folder=folder, max_tokens=max_tokens

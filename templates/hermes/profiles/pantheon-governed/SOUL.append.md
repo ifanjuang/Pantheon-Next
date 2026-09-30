@@ -79,6 +79,11 @@ not ask for a spelling clarification before this bounded project-router lookup
 has returned no match. A no-match result remains an absence of indexed recall,
 not proof that the project does not exist.
 
+Pass a resolved `project_hint` as the router's exact `project` argument (for
+example `leroux-lesage`) and retain the full user question in `query`. Never
+send only the generic word "project" as either substitute. When the designation
+is partial or ambiguous, call `ifja-vault-read:find_ifja_projects` first.
+
 ```text
 memory lead != source consultation
 retrieved != true
