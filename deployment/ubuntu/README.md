@@ -267,10 +267,16 @@ Linux-mounted AFFAIRES_ROOT
       +--> optional Cockpit persisted projection
 ```
 
-The recommended deployment reuses the locally cached, release-pinned Hermes Python image without sharing Hermes state or credentials:
+The recommended deployment reuses the locally cached, release-pinned Hermes Python image without sharing Hermes state or credentials. Keep the selected NAS root and host group in an ignored local env file:
 
 ```bash
-docker compose --env-file release.env \
+umask 077
+cat > .env.workspace-cockpit <<'EOF'
+AFFAIRES_ROOT=/mnt/pantheon-affaires/KROQI/AFFAIRES
+AFFAIRES_GID=replace-with-affaires-mount-group-id
+EOF
+
+docker compose --env-file release.env --env-file .env.workspace-cockpit \
   -f compose.workspace-cockpit-local.yaml up -d --build
 ```
 
