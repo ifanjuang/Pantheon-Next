@@ -106,7 +106,9 @@ def run_http() -> None:
     token = token_file.read_text(encoding="ascii").strip()
     if len(token) < 32 or not token.isascii():
         raise RuntimeError("Hindsight project router token is missing or too short")
-    app = BearerGuard(mcp.streamable_http_app(host="127.0.0.1"), token)
+    app = BearerGuard(
+        mcp.streamable_http_app(host="127.0.0.1", stateless_http=True), token
+    )
     port = int(os.environ.get("HINDSIGHT_PROJECT_MCP_PORT", "8022"))
     uvicorn.run(app, host="127.0.0.1", port=port, log_level="warning")
 
