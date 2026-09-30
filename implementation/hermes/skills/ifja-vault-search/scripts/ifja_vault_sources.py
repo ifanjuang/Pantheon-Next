@@ -6,6 +6,7 @@ sources independently, without granting a document any governance status.
 
 from __future__ import annotations
 
+import difflib
 import os
 import re
 import unicodedata
@@ -70,10 +71,12 @@ class VaultSources:
         if len(query) < 3:
             raise VaultSourceError("designation needs at least three characters")
         candidates = []
+        available_names: list[tuple[str, str]] = []
         for directory in self.projects_root.iterdir():
             if not directory.is_dir() or directory.is_symlink():
                 continue
             name = normalized(directory.name)
+            available_names.append((name, directory.name))
             if name == query:
                 match = "exact_name"
             elif query in name:
@@ -85,7 +88,17 @@ class VaultSources:
                 "name": directory.name,
                 "match": match,
             })
-        candidates.sort(key=lambda item: (item["match"] != "exact_name", item["name"].casefold()))
+        if not candidates:
+            close_names = set(difflib.get_close_matches(
+                query, [name for name, _ in available_names], n=limit, cutoff=0.72
+            ))
+            candidates = [
+                {"project_ref": original, "name": original, "match": "fuzzy_name"}
+                for normalized_name, original in available_names
+                if normalized_name in close_names
+            ]
+        rank = {"exact_name": 0, "partial_name": 1, "fuzzy_name": 2}
+        candidates.sort(key=lambda item: (rank[item["match"]], item["name"].casefold()))
         return {
             "status": "candidates" if candidates else "no_name_match_in_affaires",
             "scope": "AFFAIRES",

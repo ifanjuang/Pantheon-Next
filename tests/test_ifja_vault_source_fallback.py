@@ -58,6 +58,16 @@ def test_project_is_resolved_before_permit_terms_and_beta_is_not_absent(vaults) 
     assert str(files["cerfa"]) not in paths
 
 
+def test_project_discovery_accepts_partial_and_bounded_typo_candidates(vaults) -> None:
+    reader, _ = vaults
+    assert reader.find_projects("Beta")["items"][0]["match"] == "partial_name"
+    fuzzy = reader.find_projects("Projevt Beta")
+    assert fuzzy["items"] == [{
+        "project_ref": "Project Beta", "name": "Project Beta", "match": "fuzzy_name"
+    }]
+    assert fuzzy["identity_confirmed"] is False
+
+
 def test_nested_alpha_cerfa_is_read_at_exact_lines_not_from_a_directory(vaults) -> None:
     reader, files = vaults
     inventory = reader.list_project_sources("Project Alpha", "permis CERFA")
