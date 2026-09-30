@@ -71,6 +71,9 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "mcp-hindsight-kroqi-project" in text
     assert "mcp-docling" in text
     assert "Do not export an entire Docling document to Markdown" in text
+    assert "A slow conversion is not an unavailable service." in text
+    assert "Do not invent an outage" in text
+    assert "Never use `terminal`" in text
     assert "Hindsight memory != document storage" in text
     assert "list every selected source with its\nexact relative path" in text
     assert "keep the OCR result only in the current session" in text
@@ -93,6 +96,12 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "missing_candidate" in text
     assert "Do not omit an unmatched reference item" in text
     assert "Overall conformance requires complete material coverage" in flat
+    cost_review = (
+        ROOT / "templates/hermes/skills/construction-cost-review/SKILL.md"
+    ).read_text(encoding="utf-8")
+    assert "enumerate the complete candidate-source\n   family" in cost_review
+    assert "all received quotes" in cost_review
+    assert "do not silently drop it" in cost_review
     assert "## Visible plan before execution" in text
     assert "Before the first material source call" in text
     assert "plan displayed != worker dispatched" in text

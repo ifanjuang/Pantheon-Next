@@ -27,6 +27,27 @@ persisted or spilled over, stay on the Docling route and repeat the request with
 targeted searches and bounded anchor reads. Process one consequential document
 at a time and keep only the extracts needed for the coverage matrix.
 
+### Docling latency and failure posture
+
+A slow conversion is not an unavailable service. A conversion taking tens of
+seconds, or a successful MCP response followed by a pause, remains a normal
+Docling route. Do not invent an outage, an estimated recovery delay, or a
+fallback merely because a conversion is slower than the other documents.
+
+When a Docling call reports a real transport or service error, retain the exact
+failed document reference and:
+
+1. wait only for a recovery delay explicitly returned by Docling, then retry
+   the same bounded call once;
+2. if the retry fails or no recovery delay was supplied, mark that source
+   `unreadable_or_unverified` and complete only the supported portion as
+   `ready_with_limits`.
+
+Never use `terminal`, generic filesystem access, a guessed parser, a browser
+download, or an alternative PDF extraction route as a Docling fallback. The
+governed profile has no such source authority. Do not claim that a comparison is
+complete when a material reference or quote remains unreadable.
+
 ## OCR retention boundary
 
 A Docling conversion or OCR result is temporary analysis material by default;

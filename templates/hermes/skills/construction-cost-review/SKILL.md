@@ -22,16 +22,28 @@ compatibility with its narrow versioned example manifest; do not load both.
    its date, revision, tax basis and included or excluded work.
    Read long documents through overview, targeted search and bounded anchors;
    never request a full Markdown export or use terminal/file access for a
-   spilled result.
+   spilled result. A slow successful Docling conversion is not an outage; on a
+   real Docling error, retry the same bounded call once only when the service
+   supplies a recovery delay, otherwise record the source as unreadable and
+   continue `ready_with_limits`.
 2. Build the lot and line coverage matrix from that reference before opening
    candidate totals. Use the states defined in
    `pantheon-governed-method/references/source-review.md`.
-3. For every offer or quote, verify issuer, date, validity, scope, quantities,
-   options, exclusions, allowances, tax and total from the exact document.
-4. Normalize only comparable items. Keep base, variant, option, provisional
+3. Before opening individual offers, enumerate the complete candidate-source
+   family in the selected project (including all quote/devis, ACT consultation,
+   revised offer and lot folders). State the count and exact paths selected.
+   A search hit, one opened quote or a remembered summary never establishes the
+   received-offer set. If the expected family cannot be enumerated, do not say
+   "all received quotes"; state the verified subset and use
+   `ready_with_limits`.
+4. For every enumerated offer or quote, verify issuer, date, validity, scope,
+   quantities, options, exclusions, allowances, tax and total from the exact
+   document. Record every candidate that cannot be opened as
+   `unreadable_or_unverified`; do not silently drop it.
+5. Normalize only comparable items. Keep base, variant, option, provisional
    sum and combined scope distinct. Never compare a partial aggregate with a
    broader reference total.
-5. Report supported deltas, scope differences, missing offers, unreadable
+6. Report supported deltas, scope differences, missing offers, unreadable
    material, commercial qualifications and decisions still required.
 
 ## Result contract
