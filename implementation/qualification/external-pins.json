@@ -143,6 +143,15 @@
       "release_tag": "v0.26.14",
       "protocol_version": "2026-09-28",
       "tracking_policy": "reviewed_pin"
+    },
+    "contrastive-lm": {
+      "kind": "git",
+      "env_prefix": "CLM",
+      "repository": "Contrastive-LM/CLM",
+      "package": "contrastive-lm",
+      "version": "0.1.0",
+      "ref": "bb42c6c5bf914fd449bed2f6ca65be80602cb1f7",
+      "tracking_policy": "reviewed_pin"
     }
   },
   "authority": {
