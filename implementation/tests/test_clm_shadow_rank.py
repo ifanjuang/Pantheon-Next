@@ -10,6 +10,7 @@ import pytest
 
 LAB = Path(__file__).resolve().parents[1] / "labs" / "hermes_runtime_efficiency" / "clm_shadow_rank.py"
 CORPUS = Path(__file__).resolve().parents[1] / "labs" / "hermes_runtime_efficiency" / "clm_shadow_cases.json"
+PIN_REGISTRY = Path(__file__).resolve().parents[1] / "qualification" / "external-pins.json"
 SPEC = importlib.util.spec_from_file_location("pantheon_clm_shadow_rank_1047", LAB)
 assert SPEC is not None and SPEC.loader is not None
 MODULE = importlib.util.module_from_spec(SPEC)
@@ -27,7 +28,7 @@ run_shadow = MODULE.run_shadow
 
 def _write_runtime_metadata(tmp_path: Path, **overrides) -> Path:
     raw = {
-        "clm_git_ref": "b" * 40,
+        "clm_git_ref": "bb42c6c5bf914fd449bed2f6ca65be80602cb1f7",
         "clm_package_version": "0.1.0",
         "encoder_model": "Qwen/Qwen3-8B",
         "encoder_revision": "c" * 40,
@@ -111,7 +112,7 @@ def test_case_validation_rejects_duplicate_or_external_expected_candidates() -> 
 def test_runtime_metadata_requires_exact_clm_and_head_identities(tmp_path: Path) -> None:
     path = _write_runtime_metadata(tmp_path)
     loaded = load_runtime_metadata(path)
-    assert loaded["clm_git_ref"] == "b" * 40
+    assert loaded["clm_git_ref"] == "bb42c6c5bf914fd449bed2f6ca65be80602cb1f7"
     assert loaded["head_sha256"] == "d" * 64
 
     bad_ref = _write_runtime_metadata(tmp_path, clm_git_ref="main")
@@ -121,6 +122,18 @@ def test_runtime_metadata_requires_exact_clm_and_head_identities(tmp_path: Path)
     bad_head = _write_runtime_metadata(tmp_path, head_sha256="not-a-digest")
     with pytest.raises(CLMShadowQualificationError, match="SHA-256"):
         load_runtime_metadata(bad_head)
+
+
+
+def test_runtime_must_match_canonical_clm_pin(tmp_path: Path) -> None:
+    good = _write_runtime_metadata(tmp_path)
+    runtime = load_runtime_metadata(good)
+    pin = MODULE.load_qualification_pin(PIN_REGISTRY)
+    MODULE.validate_runtime_against_pin(runtime, pin)
+
+    bad = _write_runtime_metadata(tmp_path, clm_git_ref="a" * 40)
+    with pytest.raises(CLMShadowQualificationError, match="canonical contrastive-lm qualification pin"):
+        MODULE.validate_runtime_against_pin(load_runtime_metadata(bad), pin)
 
 
 def test_candidate_orderings_are_deterministic_and_bounded() -> None:
@@ -181,6 +194,7 @@ def test_shadow_run_records_ranking_without_selecting_or_authorizing(monkeypatch
     report = run_shadow(
         cases_path=cases,
         runtime_metadata_path=runtime,
+        pin_registry_path=PIN_REGISTRY,
         base_url="http://127.0.0.1:8700",
         model="clm-latest",
         api_key=None,
@@ -235,6 +249,7 @@ def test_order_sensitive_ranker_is_exposed_not_hidden(monkeypatch, tmp_path: Pat
     report = run_shadow(
         cases_path=cases,
         runtime_metadata_path=runtime,
+        pin_registry_path=PIN_REGISTRY,
         base_url="http://127.0.0.1:8700",
         model="clm-latest",
         api_key=None,
@@ -252,6 +267,7 @@ def test_remote_endpoint_fails_closed_without_explicit_override(tmp_path: Path) 
         run_shadow(
             cases_path=_write_one_case(tmp_path),
             runtime_metadata_path=_write_runtime_metadata(tmp_path),
+            pin_registry_path=PIN_REGISTRY,
             base_url="https://example.com",
             model="clm-latest",
             api_key=None,
