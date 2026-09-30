@@ -491,7 +491,7 @@ In particular, the current context plugin derives the admission identity from ho
 
 Likewise, UHP `disabledTools` is not assumed to prove a hard runtime block: the protocol permits runtimes that can only convey the restriction as standing instruction. Existing target-local tool-surface qualification must remain until an equal or stronger effective-surface proof exists.
 
-#1125 is not superseded merely because UHP Extended can transport files. Its exact SHA-256 basis, immutable execution binding, bounded lifetime and fail-closed expiry semantics remain separate requirements until #1141 demonstrates equivalence.
+#1141 concluded with final posture `watch`: stock HarnessRouter remained runtime-mismatched against Pantheon's selected Hermes release, so no causal matched A/B was manufactured. UHP therefore does not supersede #1125. Exact SHA-256 basis, immutable execution binding, bounded lifetime and fail-closed expiry remain owned by the smallest Pantheon-side transient lease seam.
 
 The adoption result from #1141 must be one of:
 
@@ -503,6 +503,40 @@ reject
 ```
 
 If UHP adds a layer while the native binding, native tool observer and admission-correlation plumbing all remain necessary, the transport is not adopted.
+
+
+## Ephemeral source-context lease — #1125
+
+Ask-only transient material follows one bounded path:
+
+```text
+provider-normalized UTF-8 context
+→ server recomputes exact content SHA-256
+→ local ephemeral lease
+→ lease_ref + lease_digest + provenance + expiry in Context Pack
+→ Execution Admission
+→ launch reservation revalidates exact lease
+→ external binding materializes exact content
+→ one Hermes submission
+```
+
+The lease owner is deliberately not a Source, storage, memory or execution owner.
+
+```text
+ephemeral lease != Source admission
+ephemeral lease != AFFAIRES persistence
+ephemeral lease != Hindsight memory
+lease created != run authorized
+lease materialized != run started
+runtime success != Evidence
+```
+
+Only UTF-8 text is admitted in the first slice. Payload bytes live under a replaceable local transient root, are bounded by item/count/TTL limits and are checked on every read. Restart loss, expiry, deletion or digest drift fails closed and requires handoff re-preparation. No cleanup scheduler is introduced; expiry cleanup is lazy/best-effort.
+
+The persisted handoff and launch snapshot contain descriptors only. The payload is returned only through the Hermes-authenticated materialization route for the exact live `admission_id + launch_reservation_id`, before the one-shot external binding submits Hermes. After runtime start, the admission is consumed and the pre-run materialization seam is no longer valid.
+
+Provider credentials are not part of lease provenance. Provider-specific adapters such as Gmail remain responsible for verifying their own raw provider bytes before producing the bounded normalized lease representation.
+
 
 ## Capability Slot
 
@@ -547,6 +581,8 @@ Launch Context Snapshot                    implemented externally
 launch_reserved / launch_expired state     implemented externally
 Hermes Runs HTTP client                    implemented externally
 external one-shot launch binding           implemented externally
+ephemeral context lease owner               implemented externally
+reserved transient materialization seam     implemented externally
 active-context server resolver             implemented externally
 native Hermes context plugin               implemented externally
 live Hermes target                         not connected / not proven
