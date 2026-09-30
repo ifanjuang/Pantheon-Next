@@ -93,7 +93,11 @@ Terminal A:
 ```bash
 source ~/.venvs/clm-shadow/bin/activate
 
-ENCODER_REVISION="$(cat /tmp/clm-shadow-encoder-revision)"
+ENCODER_REVISION="$(python - <<'PY'
+from huggingface_hub import model_info
+print(model_info("Qwen/Qwen3-8B").sha)
+PY
+)"
 printf '%s\n' "$ENCODER_REVISION" > /tmp/clm-shadow-encoder-revision
 
 vllm serve Qwen/Qwen3-8B \
@@ -159,11 +163,7 @@ Create `/tmp/clm-runtime.json`:
 source ~/.venvs/clm-shadow/bin/activate
 
 CLM_GIT_REF="bb42c6c5bf914fd449bed2f6ca65be80602cb1f7"
-ENCODER_REVISION="$(python - <<'PY'
-from huggingface_hub import model_info
-print(model_info("Qwen/Qwen3-8B").sha)
-PY
-)"
+ENCODER_REVISION="$(cat /tmp/clm-shadow-encoder-revision)"
 CLM_PACKAGE_VERSION="$(python - <<'PY'
 from importlib.metadata import version
 print(version("contrastive-lm"))
