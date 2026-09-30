@@ -113,6 +113,7 @@ def test_governed_local_mcp_binding_is_explicit_filtered_and_fail_closed() -> No
     assert "required local Hindsight bindings are absent; refusing partial inheritance" in text
     assert 'del(."hindsight-affaires", ."hindsight-documentaires", ."hindsight-memory")' in text
     assert 'config set --force mcp_servers "$merged"' in text
+    assert 'tools enable --platform cli hindsight-kroqi-project:recall_project_memory' in text
     assert 'cp -a "$PROFILE_CONFIG_TARGET" "$backup_root/profile-config.yaml"' in text
     for tool in (
         "route_governed_request",
