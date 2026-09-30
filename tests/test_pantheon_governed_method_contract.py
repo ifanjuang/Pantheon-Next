@@ -76,18 +76,13 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "Never use `terminal`" in text
     assert "Hindsight memory != document storage" in text
     assert "list every selected source with its\nexact relative path" in text
-    assert "keep the OCR result only in the current session" in text
-    assert "existing Hindsight\n   document through the single designated producer" in text
-    assert "adjacent Markdown sidecar for every listed source" in text
-    assert "additional searchable `.ocr.pdf`" in text
-    assert "decide file by file" in text
-    assert "in-place\nreplacement is never the default and never a batch action" in text
-    assert "do not overwrite it silently" in text
-    assert "`<stem>.ocr.md` and `<stem>.ocr.pdf`" in text
-    assert "three representations != three documents" in text
+    assert "retrieve source-grounded Hindsight memory" in text
+    assert "keep a Docling result only in the current session" in text
+    assert "Never create an adjacent project file" in text
     assert "same Hindsight document id != duplicate document" in text
-    assert "ocr:status:needed | completed | stale | failed" in text
-    assert "`ocr_source_sha256` equals the current PDF checksum" in text
+    assert "ocr:raw" in text
+    assert "ocr:quality:poor" in text
+    assert "ocr_source_sha256" in text
     assert "`force_ocr=true`" in text
     assert "Begin with one child at a time" in flat
     assert "subagent result != source verification" in text

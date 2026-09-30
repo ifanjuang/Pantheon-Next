@@ -92,7 +92,7 @@ def _with_raw_ocr_status(tags: list[str]) -> list[str]:
     normalized = {tag for tag in tags if isinstance(tag, str) and tag}
     if any(tag.startswith("ocr:status:") for tag in normalized):
         return sorted(normalized)
-    normalized.add("ocr:status:raw")
+    normalized.add("ocr:raw")
     return sorted(normalized)
 
 

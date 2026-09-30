@@ -54,21 +54,15 @@ A Docling conversion or OCR result is temporary analysis material by default;
 it is not a replacement for the source PDF and is not durable merely because
 Hindsight can recall extracted content.
 
-Before proposing any persistent OCR output, list every selected source with its
-exact relative path, file type, page count when observed, OCR need or result,
-and any existing target-name collision. Do not write while building this list.
-Then ask once for the retention policy, with these five choices:
-
-1. keep the OCR result only in the current session and write no project file —
-   default when durable reuse was not requested;
-2. update the searchable content of each corresponding existing Hindsight
-   document through the single designated producer, without creating a project
-   file — recommended for internal search;
-3. create one adjacent Markdown sidecar for every listed source;
-4. create one additional searchable `.ocr.pdf` beside every listed PDF while
-   preserving each original — recommended when page appearance matters;
-5. decide file by file, where in-place PDF replacement may be selected
-   explicitly for an individual file.
+Before OCR, retrieve source-grounded Hindsight memory for the exact document.
+Usable retrieved content, or any `ocr:raw`, `ocr:partial` or `ocr:complete`
+tag, blocks ordinary OCR. Only `force_ocr=true` bypasses that gate. When no
+state exists and retrieved content is absent or insufficient, ask whether to
+keep a Docling result only in the current session (default) or enrich the
+corresponding existing Hindsight document through the designated producer.
+Never create an adjacent project file as part of this route.
+For a proposed Hindsight enrichment, list every selected source with its
+exact relative path and observed OCR result before requesting that choice.
 
 Show the proposed output name for every file before execution. An in-place
 replacement is never the default and never a batch action. It requires an
@@ -93,18 +87,17 @@ The producer owns durable OCR state and re-emits it on every reconciliation so
 ordinary source reconciliation cannot erase it. Use low-cardinality tags:
 
 ```text
-ocr:status:needed | completed | stale | failed
-ocr:representation:hindsight-text | markdown | searchable-pdf | in-place-pdf
+ocr:raw
+ocr:partial | ocr:complete
+ocr:quality:poor | ocr:quality:fair | ocr:quality:good | ocr:quality:excellent
 ```
 
 Keep detailed provenance in document metadata, not high-cardinality tags:
 `ocr_source_sha256`, `ocr_engine`, `ocr_pipeline_version`, `ocr_completed_at`
-and, when relevant, `ocr_output_path`. Hermes skips OCR only when status is
-`completed`, the recorded `ocr_source_sha256` equals the current PDF checksum,
-and the selected searchable representation is still available. A changed PDF
-becomes `stale`; an absent or failed representation becomes `needed`. Re-run an
-otherwise current OCR only after an explicit user request recorded as
-`force_ocr=true` for that operation.
+and Docling's available confidence grades. Hermes uses tags for routing and
+metadata for integrity. A changed PDF has no trusted OCR state until the user
+chooses a new action. Re-run an otherwise current OCR only after an explicit
+user request recorded as `force_ocr=true` for that operation.
 
 The current governed source tools are read-only and cannot persist a file or an
 OCR update. The future bounded retention route must address one already resolved
