@@ -15,6 +15,8 @@ The schema baseline can lag active doctrine while a reconciliation issue is open
 Implemented schema files include:
 
 - `document_knowledge_slice.schema.yaml` — transport-neutral source/extraction/chunk/Knowledge validation contract;
+- `workspace_cartouche.schema.yaml` — reserved frontmatter contract for optional `.SOURCE.ext.md` source cartouches;
+- `workspace_folder_context.schema.yaml` — reserved frontmatter contract for optional `_folder.md` navigation context;
 - `work_issue_slice.schema.yaml` — Work Issue, comments, external runs and material-event validation contract;
 - `task_contract.schema.yaml`;
 - `task_contract_revision.schema.yaml`;

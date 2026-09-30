@@ -171,8 +171,10 @@ def test_binding_registry_prefers_replaceable_components_over_platform_sprawl() 
     assert "`external_runtime_memory` | `unbound`" in bindings
     assert "Hermes native memory is a valid baseline" in bindings
     assert "Hindsight is the currently recommended external provider" in bindings
-    assert "Obsidian + Hindsight = qualified and recommended external reference composition" in bindings
-    assert "Obsidian + Hindsight != mandatory Pantheon stack" in bindings
+    assert "NAS / AFFAIRES\n-> one standalone Workspace producer\n-> Hindsight derived document bank" in bindings
+    assert "strict project-scoped router" in bindings
+    assert "Earlier Obsidian / LiveSync / CouchDB / `hindsight-obsidian-sync` campaigns remain historical capability evidence." in bindings
+    assert "document-retrieval provider selected != runtime-memory binding selected" in bindings
     assert "historically qualified != current default recommendation" in bindings
     assert "provider implementation changes\n!= Pantheon governance owner changes" in bindings
 

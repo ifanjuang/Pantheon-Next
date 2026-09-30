@@ -2,7 +2,7 @@
 
 Status: canonical — primary repository posture and active document index.
 
-Status date: 2026-08-27
+Status date: 2026-09-27
 
 Pantheon Next is the canonical governance repository and monorepo host for bounded candidate implementation surfaces. Repository presence, executable code and green CI do not establish installation, adoption, authorization, professional validation or Evidence.
 
@@ -38,7 +38,8 @@ The repository contains:
 - `mcp-server/`, a bounded read-only policy/verification service with local MCP and authenticated HTTP projections;
 - `implementation/`, the co-located executable candidate implementation imported from the former `ifanjuang/pantheon-mvp` repository at cutoff `d960862dd0e23b7003a0f3e4ee0ea630ffc12af9`;
 - PostgreSQL/pgvector, document-processing bindings such as Docling, generic Source intake and local/NAS paths where selected by implementation;
-- an executable candidate Pantheon Cockpit with registry-backed navigation and Card projections;
+- the selected AFFAIRES workspace target: professional source files remain durably on NAS, Linux mounts the tree directly, one Workspace daemon maintains a reconstructible technical index and emits bounded Hindsight producer operations;
+- an executable candidate Pantheon Cockpit with registry-backed navigation, Card projections and an explicit transient Hindsight-memory reconciliation control;
 - declarative Hermes templates and seams while Hermes runtime execution remains external;
 - historical `ai_logs/`, reviews and audits as provenance rather than current doctrine.
 
@@ -53,14 +54,16 @@ implementation/          -> bounded executable candidate implementation
 Hermes Agent             -> external runtime / execution
 Hermes Web/dashboard     -> selected chat / sessions / runtime interaction baseline
 Pantheon Cockpit         -> governed projections / Cards / navigation / decisions / status
-Obsidian/Markdown        -> optional human-authored workspace
+NAS / AFFAIRES           -> selected productive professional source tree
+Workspace daemon         -> reconstructible index + bounded Hindsight producer
+Obsidian/LiveSync/CouchDB -> historical qualification / optional tools, not productive AFFAIRES topology
 Hindsight                -> optional derived memory / retrieval
 professional sources     -> Source / Document identity and provenance owners
 ```
 
 OpenWebUI and Paperless-ngx are refused/retired target integrations. Historical references may remain only where they carry provenance or are still being removed through an incoming-link audit; they carry no current target responsibility.
 
-Docling, PostgreSQL, pgvector, Hindsight, Obsidian and individual clients are bindings or optional components, not universal architectural authorities.
+Docling, PostgreSQL, pgvector, Hindsight, Obsidian and individual clients are bindings or optional components, not universal architectural authorities. For the selected AFFAIRES route specifically, Obsidian/LiveSync/CouchDB no longer define the productive workspace topology.
 
 ## Runtime-status honesty
 
@@ -72,6 +75,9 @@ Current relevant classifications:
 mcp-server/                 = implemented read-only / partial
 implementation/             = executable candidate / co-located / not adopted
 Pantheon Cockpit            = executable candidate / tested / not adopted
+Workspace AFFAIRES route    = executable candidate / direct NAS mount selected / not adopted
+Hindsight source producer   = executable candidate / bounded / #659 qualification open
+Hermes reconciliation path  = implemented candidate / transient / profile helper repaired on main by #1145 / not activated by repository presence
 Hermes Agent                = external execution runtime
 Hermes Web/dashboard        = selected interaction baseline
 OpenWebUI                   = refused / no target role

@@ -200,6 +200,95 @@ def _chunk_refs(conn: psycopg.Connection, document: dict) -> list[str]:
         return [chunk_ref(document["compilation_id"], row[0]) for row in cur.fetchall()]
 
 
+def _split_chunk_ref(value: str) -> tuple[str, int]:
+    """Parse one immutable compiled chunk reference without widening scope."""
+    text = str(value or "").strip()
+    if not text.startswith("chunk."):
+        raise KnowledgeError(f"invalid Knowledge chunk reference: {value!r}")
+    body = text.removeprefix("chunk.")
+    if "." not in body:
+        raise KnowledgeError(f"invalid Knowledge chunk reference: {value!r}")
+    compilation_ref, ordinal_text = body.rsplit(".", 1)
+    if not compilation_ref or not ordinal_text.isdigit():
+        raise KnowledgeError(f"invalid Knowledge chunk reference: {value!r}")
+    return compilation_ref, int(ordinal_text)
+
+
+def _resolve_current_source_chunks(
+    conn: psycopg.Connection,
+    *,
+    parent_project_id: str,
+    source_chunk_refs: list[str],
+) -> dict[str, dict]:
+    """Resolve exact current chunks inside one already-selected Project scope.
+
+    Chunk references carry the immutable compilation identity.  The query still
+    requires that compilation to be the document's *current* binding and that
+    every document belongs to the primary Knowledge item's Project.  This makes
+    multi-source Knowledge additive without turning a chunk id into permission
+    to cross scope or cite a superseded technical capture silently.
+    """
+    if not source_chunk_refs:
+        raise KnowledgeError("Knowledge must cite one or more current source chunks")
+    if len(set(source_chunk_refs)) != len(source_chunk_refs):
+        raise KnowledgeError("Knowledge source chunk references must be unique")
+
+    parsed = [_split_chunk_ref(value) for value in source_chunk_refs]
+    compilation_refs = sorted({compilation_ref for compilation_ref, _ in parsed})
+    requested = set(source_chunk_refs)
+
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            """
+            SELECT d.document_id, d.parent_project_id, d.source_ref, d.source_digest,
+                   d.current_extraction_id AS extraction_id, d.analysis_status,
+                   cb.compilation_id, c.chunk_no, c.body,
+                   COALESCE(p.structural_locator, '') AS structural_locator,
+                   (
+                       SELECT v.version
+                         FROM document_versions v
+                        WHERE v.document_id = d.document_id
+                          AND v.source_digest = d.source_digest
+                        ORDER BY v.version DESC
+                        LIMIT 1
+                   ) AS source_version
+              FROM document_compilation_bindings cb
+              JOIN source_documents d ON d.document_id = cb.document_id
+              JOIN structured_compilations sc
+                ON sc.compilation_id = cb.compilation_id
+               AND sc.extraction_id = d.current_extraction_id
+              JOIN chunks c
+                ON c.dossier = d.dossier
+               AND c.source_ref = d.source_ref
+               AND c.source_digest = d.source_digest
+              LEFT JOIN retrieval_chunk_projections p
+                ON p.dossier = c.dossier
+               AND p.source_ref = c.source_ref
+               AND p.source_digest = c.source_digest
+               AND p.chunk_no = c.chunk_no
+             WHERE d.parent_project_id = %s
+               AND cb.compilation_id = ANY(%s)
+             ORDER BY d.document_id, c.chunk_no
+            """,
+            (parent_project_id, compilation_refs),
+        )
+        rows = [dict(row) for row in cur.fetchall()]
+
+    resolved: dict[str, dict] = {}
+    for row in rows:
+        reference = chunk_ref(row["compilation_id"], row["chunk_no"])
+        if reference in requested:
+            resolved[reference] = row
+
+    missing = [reference for reference in source_chunk_refs if reference not in resolved]
+    if missing:
+        raise KnowledgeError(
+            "Knowledge may cite only current chunks from documents inside the primary Project scope; "
+            f"unresolved: {', '.join(missing)}"
+        )
+    return resolved
+
+
 def _event_replay(
     conn: psycopg.Connection,
     *,
@@ -266,6 +355,177 @@ def list_knowledge_cards(conn: psycopg.Connection, parent_project_id: str) -> li
     return [_card_from_row(conn, row) for row in rows]
 
 
+def get_knowledge_source_state(conn: psycopg.Connection, knowledge_id: str) -> dict:
+    """Calculate whether frozen Knowledge provenance still matches current sources.
+
+    This is a read-only maintenance projection.  It does not revise, supersede,
+    review or republish Knowledge merely because a technical source changed.
+    """
+    item = _knowledge_row(conn, knowledge_id)
+    primary = _document_row(conn, item["document_id"])
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            """
+            SELECT ksc.chunk_ref, ksc.document_id,
+                   ksc.extraction_id AS bound_extraction_id,
+                   ksc.source_ref AS bound_source_ref,
+                   ksc.source_digest AS bound_source_digest,
+                   ksc.ordinal,
+                   d.source_ref AS current_source_ref,
+                   d.source_digest AS current_source_digest,
+                   d.current_extraction_id,
+                   d.analysis_status,
+                   (
+                       SELECT v.version
+                         FROM document_versions v
+                        WHERE v.document_id = ksc.document_id
+                          AND v.source_digest = ksc.source_digest
+                        ORDER BY v.version DESC
+                        LIMIT 1
+                   ) AS bound_source_version,
+                   (
+                       SELECT v.version
+                         FROM document_versions v
+                        WHERE v.document_id = d.document_id
+                          AND v.source_digest = d.source_digest
+                        ORDER BY v.version DESC
+                        LIMIT 1
+                   ) AS current_source_version
+              FROM knowledge_source_chunks ksc
+              JOIN source_documents d ON d.document_id = ksc.document_id
+             WHERE ksc.knowledge_id = %s
+             ORDER BY ksc.document_id, ksc.ordinal, ksc.chunk_ref
+            """,
+            (knowledge_id,),
+        )
+        rows = [dict(row) for row in cur.fetchall()]
+
+    if not rows:
+        raise KnowledgeError("Knowledge has no persisted source provenance")
+
+    grouped: dict[tuple[str, str, str], dict] = {}
+    for row in rows:
+        key = (
+            row["document_id"],
+            row["bound_extraction_id"],
+            row["bound_source_digest"],
+        )
+        dependency = grouped.setdefault(
+            key,
+            {
+                "document_id": row["document_id"],
+                "is_primary": row["document_id"] == item["document_id"],
+                "bound_source_ref": row["bound_source_ref"],
+                "bound_source_digest": row["bound_source_digest"],
+                "bound_source_version": row["bound_source_version"],
+                "bound_extraction_id": row["bound_extraction_id"],
+                "current_source_ref": row["current_source_ref"],
+                "current_source_digest": row["current_source_digest"],
+                "current_source_version": row["current_source_version"],
+                "current_extraction_id": row["current_extraction_id"],
+                "analysis_status": row["analysis_status"],
+                "chunk_refs": [],
+            },
+        )
+        dependency["chunk_refs"].append(row["chunk_ref"])
+
+    dependencies: list[dict] = []
+    for dependency in grouped.values():
+        source_changed = (
+            dependency["bound_source_digest"] != dependency["current_source_digest"]
+        )
+        extraction_changed = (
+            dependency["bound_extraction_id"] != dependency["current_extraction_id"]
+        )
+        analysis_status = dependency["analysis_status"]
+        if analysis_status == "failed":
+            state = "source_failed"
+        elif source_changed:
+            state = "source_changed"
+        elif extraction_changed:
+            state = "extraction_changed"
+        elif analysis_status == "needs_review":
+            state = "source_needs_review"
+        else:
+            state = "current"
+        dependency["source_changed"] = source_changed
+        dependency["extraction_changed"] = extraction_changed
+        dependency["state"] = state
+        dependencies.append(dependency)
+
+    dependencies.sort(
+        key=lambda value: (
+            not value["is_primary"],
+            value["document_id"],
+            value["bound_source_digest"],
+        )
+    )
+    needs_recompile = any(
+        dependency["source_changed"] or dependency["extraction_changed"]
+        for dependency in dependencies
+    )
+    has_failed_source = any(
+        dependency["state"] == "source_failed" for dependency in dependencies
+    )
+    has_review_source = any(
+        dependency["state"] == "source_needs_review" for dependency in dependencies
+    )
+    if has_failed_source:
+        status = "blocked_by_source"
+    elif needs_recompile:
+        status = "needs_recompile"
+    elif has_review_source:
+        status = "needs_review"
+    else:
+        status = "current"
+
+    return {
+        "knowledge_id": knowledge_id,
+        "parent_project_id": primary["parent_project_id"],
+        "knowledge_version": item["version"],
+        "status": status,
+        "needs_recompile": needs_recompile,
+        "dependency_count": len(dependencies),
+        "dependencies": dependencies,
+        "authority": {
+            "changes_knowledge": False,
+            "is_evidence": False,
+            "is_memory": False,
+        },
+    }
+
+
+def list_document_knowledge_impacts(
+    conn: psycopg.Connection, document_id: str
+) -> dict:
+    """List Knowledge items whose frozen provenance cites one technical document."""
+    document = _document_row(conn, document_id)
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT DISTINCT knowledge_id
+              FROM knowledge_source_chunks
+             WHERE document_id = %s
+             ORDER BY knowledge_id
+            """,
+            (document_id,),
+        )
+        knowledge_ids = [row[0] for row in cur.fetchall()]
+    return {
+        "document_id": document_id,
+        "parent_project_id": document["parent_project_id"],
+        "knowledge": [
+            get_knowledge_source_state(conn, knowledge_id)
+            for knowledge_id in knowledge_ids
+        ],
+        "authority": {
+            "changes_knowledge": False,
+            "is_evidence": False,
+            "is_memory": False,
+        },
+    }
+
+
 def _insert_event(
     conn: psycopg.Connection,
     *,
@@ -314,6 +574,13 @@ def publish_knowledge(
 ) -> dict:
     """Publish a Knowledge item; `review_status="reviewed"` is a claim, not a fact.
 
+    `document_id` remains the primary source anchor for compatibility, while
+    `source_chunk_refs` may cite additional current technical documents inside
+    that same Project.  Every cited chunk is frozen independently in
+    `knowledge_source_chunks`; at least one citation must belong to the primary
+    anchor.  This adds multi-source synthesis without creating a second source
+    graph or allowing cross-project citation by chunk identity alone.
+
     `family`, `actor_kind` and `review_status` are each checked only against a
     vocabulary of permitted strings. A holder of the editor key could
     otherwise publish a Knowledge item that already reads as professionally
@@ -345,9 +612,18 @@ def publish_knowledge(
         if replay is not None:
             return replay
         document = _document_row(conn, document_id)
-        current_refs = set(_chunk_refs(conn, document))
-        if not source_chunk_refs or not set(source_chunk_refs).issubset(current_refs):
-            raise KnowledgeError("Knowledge must cite one or more current chunks from its source document")
+        resolved_chunks = _resolve_current_source_chunks(
+            conn,
+            parent_project_id=document["parent_project_id"],
+            source_chunk_refs=source_chunk_refs,
+        )
+        if not any(
+            chunk["document_id"] == document_id
+            for chunk in resolved_chunks.values()
+        ):
+            raise KnowledgeError(
+                "Knowledge must cite at least one current chunk from its primary source document"
+            )
         with conn.cursor() as cur:
             cur.execute("SELECT 1 FROM knowledge_items WHERE knowledge_id = %s", (knowledge_id,))
             if cur.fetchone() is not None:
@@ -380,29 +656,9 @@ def publish_knowledge(
                 json.dumps(source_chunk_refs), review_status, created_by,
             ),
         )
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                SELECT c.chunk_no, c.body, p.structural_locator
-                  FROM chunks c
-                  LEFT JOIN retrieval_chunk_projections p
-                    ON p.dossier = c.dossier
-                   AND p.source_ref = c.source_ref
-                   AND p.source_digest = c.source_digest
-                   AND p.chunk_no = c.chunk_no
-                 WHERE c.dossier = %s
-                   AND c.source_ref = %s
-                   AND c.source_digest = %s
-                """,
-                (document["dossier"], document["source_ref"], document["source_digest"]),
-            )
-            chunks = {
-                chunk_ref(document["compilation_id"], number):
-                    (number, body, locator)
-                for number, body, locator in cur.fetchall()
-            }
         for chunk_reference in source_chunk_refs:
-            ordinal, body, locator = chunks[chunk_reference]
+            source_chunk = resolved_chunks[chunk_reference]
+            ordinal = int(source_chunk["chunk_no"])
             conn.execute(
                 """
                 INSERT INTO knowledge_source_chunks (
@@ -411,9 +667,15 @@ def publish_knowledge(
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                 (
-                    knowledge_id, chunk_reference, document_id, document["extraction_id"], ordinal,
-                    _digest(body), document["source_ref"], document["source_digest"],
-                    locator or f"chunk/{ordinal}",
+                    knowledge_id,
+                    chunk_reference,
+                    source_chunk["document_id"],
+                    source_chunk["extraction_id"],
+                    ordinal,
+                    _digest(source_chunk["body"]),
+                    source_chunk["source_ref"],
+                    source_chunk["source_digest"],
+                    source_chunk["structural_locator"] or f"chunk/{ordinal}",
                 ),
             )
         snapshot = get_knowledge_card(conn, knowledge_id)
@@ -820,7 +1082,19 @@ def build_document_knowledge_slice(conn: psycopg.Connection, knowledge_id: str) 
             "SELECT * FROM knowledge_source_chunks WHERE knowledge_id = %s ORDER BY ordinal",
             (knowledge_id,),
         )
-        chunk_rows = [dict(row) for row in cur.fetchall()]
+        all_chunk_rows = [dict(row) for row in cur.fetchall()]
+        # The transport-neutral Document -> Knowledge slice remains a
+        # single-primary-document compatibility view.  Cross-source dependencies
+        # are persisted and exposed by get_knowledge_source_state(); they are not
+        # misrepresented as fragments of the primary document structure.
+        chunk_rows = [
+            row for row in all_chunk_rows
+            if row["document_id"] == document["document_id"]
+        ]
+        if not chunk_rows:
+            raise KnowledgeError(
+                "Knowledge primary source anchor has no persisted source chunks"
+            )
         cur.execute(
             "SELECT * FROM knowledge_events WHERE aggregate_ref = %s ORDER BY occurred_at, event_id",
             (knowledge_id,),

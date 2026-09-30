@@ -13,7 +13,10 @@
       "version": "0.21.3",
       "ref": "345cd2b057a452236de401d3534b8502a7465e8d",
       "aliases": {
-        "ref": ["HERMES_RELEASE_COMMIT", "HERMES_COMMIT"]
+        "ref": [
+          "HERMES_RELEASE_COMMIT",
+          "HERMES_COMMIT"
+        ]
       }
     },
     "personal-ai-router": {
@@ -34,7 +37,7 @@
       "kind": "container",
       "env_prefix": "HINDSIGHT",
       "image": "ghcr.io/vectorize-io/hindsight",
-      "version": "0.9.2",
+      "version": "0.10.1",
       "digest": null
     },
     "hindsight-obsidian-sync": {
@@ -44,7 +47,9 @@
       "version": "0.2.1",
       "ref": "daf529aacad14a5b8f7db9f34a7f49c9e3629b61",
       "aliases": {
-        "ref": ["OBSIDIAN_SYNC_COMMIT"]
+        "ref": [
+          "OBSIDIAN_SYNC_COMMIT"
+        ]
       }
     },
     "self-hosted-livesync": {
@@ -54,7 +59,9 @@
       "version": "1.0.21",
       "ref": "f5f7aab11f03f62c6946d2fa296c50bb5df5b2a4",
       "aliases": {
-        "ref": ["LIVESYNC_COMMIT"]
+        "ref": [
+          "LIVESYNC_COMMIT"
+        ]
       }
     },
     "self-hosted-livesync-cli": {
@@ -126,6 +133,16 @@
       "package": "isnad",
       "version": "2.20.1",
       "ref": "4a9a9a3dd22b459c5e6a15d87af0997febad1703"
+    },
+    "harnessrouter": {
+      "kind": "git",
+      "env_prefix": "HARNESSROUTER",
+      "repository": "HarnessRouter/harnessrouter",
+      "version": "0.26.14",
+      "ref": "7d0fa14bf70e81a2226d232bc519e729d32793d3",
+      "release_tag": "v0.26.14",
+      "protocol_version": "2026-09-28",
+      "tracking_policy": "reviewed_pin"
     }
   },
   "authority": {

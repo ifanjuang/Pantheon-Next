@@ -1,0 +1,7 @@
+schema: pantheon/folder-context/v1
+title: Dossier de consultation
+project: LIEUREY
+phase: DCE
+tags:
+  - consultation
+  - structure

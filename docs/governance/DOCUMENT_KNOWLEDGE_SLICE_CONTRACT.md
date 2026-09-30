@@ -203,6 +203,63 @@ superseded
 
 Human validation is not required for initial publication as `generated_unreviewed`. That state must remain visible in search, retrieval, governed Cards/projections and editing surfaces.
 
+### Multi-source publication and primary-source compatibility
+
+A Knowledge publication may synthesize several already-extracted technical documents when every cited chunk belongs to the same governed Project scope.
+
+The existing `source_document` field remains the publication's primary source anchor for compatibility with the transport-neutral single-document slice. The complete provenance relation is owned by the existing Knowledge source-chunk binding:
+
+```text
+Knowledge
+├── primary source document + current chunk(s)
+├── supporting source document + current chunk(s)
+└── supporting source document + current chunk(s)
+```
+
+No second source graph is introduced.
+
+The publication must:
+
+- cite at least one current chunk from its primary source document;
+- resolve every additional chunk against the current compiled capture of a document in the same Project;
+- freeze the exact source digest, extraction identity, chunk digest and structural locator for every cited chunk;
+- refuse duplicate chunk references and cross-Project citations.
+
+The legacy Document → Knowledge slice continues to project the primary document structure and its cited primary chunks only. Cross-source dependencies remain explicitly available through the Knowledge provenance/freshness projection rather than being misrepresented as fragments of the primary document.
+
+```text
+primary compatibility view != complete multi-source provenance
+chunk identity != permission to cross Project scope
+multi-source Knowledge != Evidence
+```
+
+### Freshness and impact
+
+Source evolution is observed, not silently applied to Knowledge.
+
+For every frozen source dependency the implementation may calculate:
+
+```text
+current
+source_changed
+extraction_changed
+source_needs_review
+source_failed
+```
+
+and an aggregate maintenance posture such as `current`, `needs_recompile`, `needs_review` or `blocked_by_source`.
+
+This projection compares the frozen source digest/extraction identity used by Knowledge with the current technical capture. It may also list the Knowledge items impacted by one changed technical document.
+
+```text
+source changed != Knowledge rewritten
+needs_recompile != obsolete truth
+impact detected != update authorized
+freshness projection != Evidence
+```
+
+Any later recompile operation must produce a candidate/diff and reuse the existing governed Knowledge revision/apply path for the actual write.
+
 The authority block is always:
 
 ```text

@@ -278,7 +278,7 @@ Watch
 
 A reviewed UI, runtime, DMS, workspace, RAG engine, memory system or connector does not become Pantheon architecture merely because it works technically.
 
-OpenWebUI and Paperless are superseded integration candidates, not current target owners. Obsidian and Hindsight are currently useful qualified/recommended candidates, not mandatory owners.
+OpenWebUI and Paperless are superseded integration candidates, not current target owners. Obsidian/LiveSync/CouchDB remain useful historical qualification evidence and optional tooling, but they no longer define the selected productive AFFAIRES route. Hindsight remains the selected derived retrieval/memory candidate and is still replaceable.
 
 ## Stable reading path
 

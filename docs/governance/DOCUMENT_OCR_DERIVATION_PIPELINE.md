@@ -187,21 +187,22 @@ The co-located candidate implementation under `implementation/` already demonstr
 
 That existing slice is not a universal OCR/derivative authority. Extension requires demonstrated need and must reuse its deterministic compilation responsibility rather than creating a second cleaner/pipeline.
 
-## 11. Obsidian-facing conversion posture
+## 11. Optional Obsidian conversion and selected AFFAIRES ingestion posture
 
-The Obsidian workspace has a narrower human-facing need: preserve the exact source file, optionally produce readable Markdown when that is useful to a person or to the already-qualified Markdown ingestion path, and avoid turning every structured record into a note.
+The direct NAS-mounted AFFAIRES route selected by #660 supersedes the earlier productive Markdown-only Hindsight producer path. Obsidian remains optional human-facing tooling; it is no longer the materialization or ingestion owner for professional AFFAIRES.
 
-Current operator choice recorded on 2026-09-06:
+Current split after #1131/#660:
 
 ```text
-exact PDF / office source = preserved source representation
+exact PDF / office source = preserved professional source on NAS / AFFAIRES
+Hindsight native file retain = selected for eligible AFFAIRES sources through the bounded Workspace producer
+automatic OCR = disabled on the productive AFFAIRES route
 OCR-AI / L3-N0X/obsidian-marker = selected optional/manual workspace PDF-to-Markdown convenience surface
 Docling = preferred document_structural_analysis candidate under #662
-Hindsight native file retain = not selected in the current qualified workspace producer path
 SourceDown = historical prior workspace choice, not the current selected daily conversion surface
 ```
 
-This selection is intentionally narrow. It does **not** classify Marker as the winning structural-analysis provider, does not close #662, does not adopt Marker as a Pantheon dependency and does not require a Markdown derivative for every binary source.
+The 2026-09-06 Obsidian/Marker operator choice remains historical provenance for optional Markdown authoring. It no longer decides Hindsight ingestion for AFFAIRES.
 
 ```text
 Marker workspace selection != structural-analysis qualification
@@ -209,21 +210,33 @@ Marker conversion success != professionally validated
 Marker Markdown != original source
 Markdown present != source replacement
 no Markdown derivative != source unavailable
+native file retain selected != source authority
+one productive AFFAIRES producer != one source format
 ```
 
-The ordinary manual path is therefore:
+The ordinary productive Hindsight path is now:
 
 ```text
-exact PDF source
--> optional OCR-AI / Marker conversion in Obsidian
--> readable Markdown derivative
--> existing designated hindsight-obsidian-sync producer when that Markdown is inside admitted sync scope
--> Hindsight derived recall
+NAS / AFFAIRES source
+-> exact Workspace source/cartouche pairing
+-> one bounded Workspace Hindsight producer
+-> Hindsight files/retain for an eligible source representation
+-> parsed source content
+-> Hindsight derived chunks / memories
 ```
 
-Do not simultaneously activate a second native-PDF Hindsight producer for the same source merely because `/files/retain` exists. Native Hindsight file ingestion may be re-qualified later if it demonstrates a real simplification over the existing Markdown producer lifecycle.
+For scanned PDFs or images that need OCR:
 
-The earlier SourceDown qualification logs remain historical provenance and are not rewritten to pretend that the earlier operator choice never existed.
+```text
+source remains visible in Cockpit
+-> OCR needed / unavailable state
+-> explicit user/Pantheon action
+-> derived OCR result
+```
+
+Do not run NAS-wide OCR automatically. Do not create a second concurrent producer for the same AFFAIRES source merely because an optional Obsidian/Marker derivative exists. The selected single-producer invariant is about ownership of synchronization, not about forcing every source through Markdown.
+
+The earlier SourceDown and Obsidian/LiveSync/Hindsight qualification logs remain historical provenance and are not rewritten to pretend those earlier operator choices never existed.
 
 ## 12. Workspace metadata and human notes
 
@@ -296,14 +309,16 @@ optional Marker/OCR derivative
 optional reconstructible project narrative such as Projet.md
 ```
 
-The designated Hindsight reference path remains one-way:
+The selected productive Hindsight path remains one-way:
 
 ```text
-Obsidian Markdown
--> designated hindsight-obsidian-sync producer
+NAS / AFFAIRES source
+-> Workspace Hindsight producer
 -> Hindsight derived bank
 -> bounded read/recall consumers
 ```
+
+The earlier Obsidian Markdown -> `hindsight-obsidian-sync` path remains historical capability evidence only; it is not a second productive producer for AFFAIRES.
 
 ```text
 Hindsight recall != truth
