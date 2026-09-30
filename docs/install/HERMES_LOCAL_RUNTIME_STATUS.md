@@ -49,7 +49,7 @@ The persistent Hermes configuration now selects:
 model:
   default: qwen3.5:9b
   provider: custom:ollama@ifja
-  context_length: 32768
+  context_length: 65536
 ```
 
 The pre-change configuration is retained on the host as:
