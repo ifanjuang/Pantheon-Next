@@ -43,10 +43,7 @@ def test_external_pin_registry_is_bounded_and_non_authoritative() -> None:
         "hermes-agent",
         "hindsight",
         "hindsight-obsidian-sync",
-        "self-hosted-livesync",
-        "self-hosted-livesync-cli",
         "obsidian-desktop",
-        "couchdb",
         "mnemosyne-memory",
         "mnemosyne-hermes",
     }
@@ -85,10 +82,7 @@ def test_exporter_emits_registry_values_without_second_pin_authority() -> None:
         "hermes-agent",
         "hindsight",
         "hindsight-obsidian-sync",
-        "self-hosted-livesync",
-        "self-hosted-livesync-cli",
         "obsidian-desktop",
-        "couchdb",
         "harnessrouter",
     ]
     values = selected_exports(selected)
