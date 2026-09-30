@@ -53,15 +53,37 @@ def test_livesync_and_couchdb_are_not_active_qualification_pins() -> None:
     assert "hindsight-obsidian-sync" in pins
 
 
-def test_ubuntu_baseline_cannot_install_or_update_livesync() -> None:
-    for relative in (
-        "deployment/ubuntu/install-node",
-        "deployment/ubuntu/update-node",
-        "deployment/ubuntu/release.env",
-    ):
-        text = _read(relative).lower()
-        assert "livesync" not in text, relative
-        assert "couchdb" not in text, relative
+def test_ubuntu_baseline_cannot_install_or_select_retired_runtime() -> None:
+    install = _read("deployment/ubuntu/install-node").lower()
+    update = _read("deployment/ubuntu/update-node").lower()
+    release = _read("deployment/ubuntu/release.env").lower()
+
+    assert "livesync" not in install
+    assert "couchdb" not in install
+    assert "release_livesync" not in update
+    assert "release_couchdb" not in update
+    assert "--component all|pantheon|containers|ollama|comfyui|livesync" not in update
+    assert "update_livesync()" not in update
+    assert "release_livesync" not in release
+    assert "release_couchdb" not in release
+
+
+def test_existing_nodes_get_state_preserving_runtime_retirement() -> None:
+    update = _read("deployment/ubuntu/update-node")
+
+    assert "retire_legacy_workspace_sync_runtime" in update
+    assert 'systemctl disable --now "$unit"' in update
+    assert "livesync-headless.service" in update
+    assert "pantheon-marker-api.service" in update
+    assert "docker rm -f pantheon-livesync-headless" in update
+    assert "docker rm -f pantheon-couchdb" in update
+    assert 'line.startswith("  couchdb:")' in update
+    assert "data directories were preserved" in update
+
+    # Retirement must not destroy retained source/state as a side effect.
+    assert 'rm -rf "$STATE_ROOT/livesync' not in update
+    assert 'rm -rf "$STATE_ROOT/couchdb' not in update
+    assert 'rm -rf "$STATE_ROOT/obsidian' not in update
 
 
 def test_ubuntu_shell_entrypoints_remain_syntactically_valid() -> None:
