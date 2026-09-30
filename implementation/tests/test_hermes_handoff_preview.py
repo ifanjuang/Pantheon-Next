@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
+from pathlib import Path
+
 from fastapi.testclient import TestClient
 
 from mvp_vertical import card_scope, hermes_handoff_preview
@@ -233,3 +236,119 @@ def test_declared_descendants_are_added_only_when_explicitly_requested(monkeypat
     assert payload["scope_resolution"]["source_refs_added"] == 1
     assert len(payload["context_pack"]["included_entities"]) == 3
     assert payload["context_pack"]["source_refs"] == ["source:cctp.pdf"]
+
+
+def test_ephemeral_lease_descriptor_is_bound_into_context_digest_without_payload() -> None:
+    descriptor = {
+        "lease_ref": "ephemeral-context-0123456789abcdef",
+        "lease_digest": "a" * 64,
+        "created_at": "2026-09-30T01:00:00+00:00",
+        "expires_at": "2026-09-30T01:05:00+00:00",
+        "item_count": 1,
+        "total_bytes": 12,
+        "items": [
+            {
+                "item_id": "item-01-aaaaaaaaaaaa",
+                "content_sha256": "b" * 64,
+                "byte_size": 12,
+                "media_type": "text/plain; charset=utf-8",
+                "representation_kind": "utf8_text",
+                "source_provenance": [{"provider": "synthetic", "source_id": "one"}],
+            }
+        ],
+        "transient": True,
+        "professional_persistence": False,
+    }
+    base = hermes_handoff_preview.build_preview(
+        question="Analyse le contexte transitoire.",
+        card_context_envelope={
+            "root_entity": {"entity_id": "project:lieurey", "entity_type": "project"},
+            "descendants": [],
+            "source_refs": [],
+            "explicit_additions": [],
+            "explicit_exclusions": [],
+        },
+        selected_context=[],
+    )
+    with_lease = hermes_handoff_preview.build_preview(
+        question="Analyse le contexte transitoire.",
+        card_context_envelope={
+            "root_entity": {"entity_id": "project:lieurey", "entity_type": "project"},
+            "descendants": [],
+            "source_refs": [],
+            "explicit_additions": [],
+            "explicit_exclusions": [],
+        },
+        selected_context=[],
+        ephemeral_context_leases=[descriptor],
+    )
+
+    assert with_lease["context_pack"]["ephemeral_context_leases"] == [descriptor]
+    assert with_lease["context_pack"]["source_refs"] == []
+    assert with_lease["context_pack"]["digest"] != base["context_pack"]["digest"]
+    assert "content_utf8" not in str(with_lease)
+
+
+def test_ephemeral_lease_api_creates_then_preview_revalidates_exact_descriptor(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    _patch_scope_validation(monkeypatch)
+    monkeypatch.setenv("PANTHEON_EPHEMERAL_CONTEXT_ROOT", str(tmp_path))
+    client = TestClient(
+        create_cockpit_app(
+            connect_fn=_Connection,
+            api_key="read-key",
+            editor_api_key="edit-key",
+        )
+    )
+    text = "normalized synthetic email context"
+    digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    created = client.post(
+        "/cockpit/hermes-ephemeral-context-leases",
+        headers={
+            "Authorization": "Bearer edit-key",
+            "X-Pantheon-Human-Actor": "human:test",
+        },
+        json={
+            "ttl_seconds": 120,
+            "items": [
+                {
+                    "content_utf8": text,
+                    "content_sha256": digest,
+                    "media_type": "text/plain; charset=utf-8",
+                    "representation_kind": "utf8_text",
+                    "source_provenance": [
+                        {
+                            "provider": "gmail",
+                            "provider_account_ref": "mailbox:test",
+                            "gmail_message_id": "msg-1",
+                            "raw_sha256": "c" * 64,
+                        }
+                    ],
+                }
+            ],
+        },
+    )
+    assert created.status_code == 201
+    lease = created.json()
+    assert "content_utf8" not in str(lease)
+
+    body = _preview_body()
+    body["ephemeral_context_leases"] = [
+        {
+            "lease_ref": lease["lease_ref"],
+            "lease_digest": lease["lease_digest"],
+        }
+    ]
+    preview = client.post(
+        "/cockpit/hermes-handoffs/preview",
+        headers={"Authorization": "Bearer read-key"},
+        json=body,
+    )
+    assert preview.status_code == 200
+    payload = preview.json()
+    assert payload["scope_resolution"]["ephemeral_context_leases_validated"] == 1
+    assert payload["context_pack"]["ephemeral_context_leases"] == [lease]
+    assert payload["context_pack"]["source_refs"] == []
+    assert "content_utf8" not in str(payload)
