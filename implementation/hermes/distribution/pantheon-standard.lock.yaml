@@ -1,5 +1,5 @@
 schema_id: pantheon.hermes_distribution_lock
-revision: 4
+revision: 3
 distribution_id: pantheon-hermes-standard
 status: candidate
 source_pins:
