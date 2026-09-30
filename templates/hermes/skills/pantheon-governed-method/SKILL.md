@@ -102,6 +102,73 @@ draft requested != external transmission authorized
 child gap != child-user interaction
 ```
 
+## Visible plan before execution
+
+Before the first material source call, production step or delegated child in a
+non-trivial task, the parent publishes a compact execution plan. It states the
+objective, bounded steps, expected source/tool families, material limits and
+any decision point already known. It is an observable preview, not a hidden
+workflow, task dispatch or approval request.
+
+When the next path is evident, proceed after publishing the plan. When the plan
+contains a material unresolved choice, use Gate 1 clarification before executing
+the affected step. A later discovery may adjust the plan once, with the
+observable reason; do not narrate routine tool chatter as plan changes.
+
+```text
+plan displayed != user approval required
+plan displayed != worker dispatched
+obvious next step != clarification required
+material plan choice != silently assumed
+```
+
+## Bounded delegated source review
+
+Use Hermes-native `delegate_task` only when source work has an independent,
+well-bounded objective and would otherwise flood the parent context. A delegated
+child is a transient reader, not a Pantheon Role, durable identity or authority.
+
+The parent remains the sole user-facing coordinator. It completes both
+clarification gates, chooses the bounded task, passes the minimum working
+context and verifies the material result before synthesis. Begin with one child
+at a time; increase concurrency only after a measured qualification shows that
+the selected model/provider can serve it without degrading the parent turn.
+
+For an admitted source-review child, provide only the required source toolsets:
+
+```text
+mcp-ifja-vault-read
+mcp-hindsight-kroqi-project
+```
+
+Do not allow a child to inherit unrelated MCPs, browser, terminal, writing,
+messaging, memory, Kanban, clarification or further delegation. The child must
+receive a self-contained context containing the working referent, exact
+question, admitted source scope, requested language and stop condition.
+
+Require an `output_schema` with, at minimum:
+
+```text
+observed_facts
+exact_sources_and_locators
+contradictions
+missing_or_unreadable_material
+limits
+```
+
+Schema validity establishes only a well-formed return. The parent reopens the
+exact supporting passages for consequential claims. It may issue one corrective
+child request with the same scope when a concrete coverage gap remains; after
+that, surface the gap instead of retrying or widening autonomously.
+
+```text
+subagent result != source verification
+one child != a worker fleet
+format retry != factual verification
+scope gap != permission to broaden sources
+delegation completed != synthesis approved
+```
+
 ## Postures
 
 The movements above are normally carried out inside the default governed

@@ -56,6 +56,14 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "three mutually distinct" in text
     assert "up to five choices" in text
     assert "Do not draft first and seek confirmation afterward" in text
+    assert "## Bounded delegated source review" in text
+    assert "mcp-ifja-vault-read" in text
+    assert "mcp-hindsight-kroqi-project" in text
+    assert "Begin with one child\nat a time" in text
+    assert "subagent result != source verification" in text
+    assert "## Visible plan before execution" in text
+    assert "Before the first material source call" in text
+    assert "plan displayed != worker dispatched" in text
     for business_object in ("budget", "mail", "cctp", "compte rendu"):
         assert business_object not in text.lower()
 

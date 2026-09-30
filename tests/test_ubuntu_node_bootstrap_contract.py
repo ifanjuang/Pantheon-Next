@@ -47,6 +47,19 @@ def test_bootstrap_scripts_are_shell_syntax_valid() -> None:
         subprocess.run(["bash", "-n", str(script)], check=True)
 
 
+def test_governed_projection_keeps_delegation_explicit_and_bounded() -> None:
+    text = _text(CONFIGURE_HERMES_ACTIVITY)
+    assert "--enable-bounded-delegation requires --enable-clarify" in text
+    assert "max_concurrent_children: 1" in text
+    assert "max_iterations: 12" in text
+    assert "child_timeout_seconds: 180" in text
+    assert "max_spawn_depth: 1" in text
+    assert "orchestrator_enabled: false" in text
+    assert "inherit_mcp_toolsets: false" in text
+    assert "subagent_auto_approve: false" in text
+    assert "tools enable --platform cli delegation" in text
+
+
 def test_affaires_mount_configuration_is_generic_and_keeps_secrets_external() -> None:
     text = _text(CONFIGURE_AFFAIRES_NAS_MOUNT)
     assert "--source //HOST/SHARE" in text
