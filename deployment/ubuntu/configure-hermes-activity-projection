@@ -532,7 +532,7 @@ apply_clarify_runtime() {
 }
 
 check_bounded_delegation_runtime() {
-  local delegation
+  local delegation toolset attempt
   require_running_container
   delegation="$(hermes_config -p "$PROFILE" config get delegation --json)" \
     || die "cannot read governed delegation configuration"
@@ -545,18 +545,20 @@ check_bounded_delegation_runtime() {
     and .inherit_mcp_toolsets == false
     and .subagent_auto_approve == false
   ' >/dev/null || die "governed bounded delegation configuration differs"
-  if hermes_config -p "$PROFILE" tools list --platform cli 2>/dev/null \
-      | grep -Eq 'enabled[[:space:]]+delegation'; then
-    log "governed bounded delegation is enabled"
-  else
-    die "governed bounded delegation tool is not enabled"
-  fi
-  if hermes_config -p "$PROFILE" tools list --platform cli 2>/dev/null \
-      | grep -Eq 'enabled[[:space:]]+skills'; then
-    log "governed method loading is enabled"
-  else
-    die "governed skills tool is not enabled"
-  fi
+  for toolset in delegation skills; do
+    for attempt in 1 2 3; do
+      if hermes_config -p "$PROFILE" tools list --platform cli 2>/dev/null \
+          | grep -Eq "enabled[[:space:]]+${toolset}([[:space:]]|$)"; then
+        break
+      fi
+      [[ "$attempt" == 3 ]] || sleep 1
+    done
+    if [[ "$attempt" == 3 ]] && ! hermes_config -p "$PROFILE" tools list --platform cli 2>/dev/null \
+        | grep -Eq "enabled[[:space:]]+${toolset}([[:space:]]|$)"; then
+      die "governed ${toolset} tool is not enabled"
+    fi
+    log "governed ${toolset} tool is enabled"
+  done
 }
 
 apply_bounded_delegation_runtime() {
