@@ -1,0 +1,46 @@
+---
+name: construction-cost-review
+description: "Use for construction estimates, bids, quotes, invoices, change proposals or lot-cost comparisons that require scope coverage, exclusions, variants, tax basis and price comparability to be checked before any overall conclusion."
+metadata:
+  owner_layer: hermes
+  status: candidate_template_only
+  pantheon_role: HEPHAISTOS
+  governed_by: docs/domain-packs/architecture/FINANCIAL_LOT_INSURANCE_REVIEW.md
+  compatibility_alias: quote-variation-review
+---
+
+# Construction cost review
+
+Own the economic comparison; do not infer acceptance, execution, insurance,
+payment entitlement or approval from the presence of a price document.
+This is the general owner. The older `quote-variation-review` remains only for
+compatibility with its narrow versioned example manifest; do not load both.
+
+## Required method
+
+1. Identify the reference estimate, DPGF, CCTP or user-declared perimeter and
+   its date, revision, tax basis and included or excluded work.
+2. Build the lot and line coverage matrix from that reference before opening
+   candidate totals. Use the states defined in
+   `pantheon-governed-method/references/source-review.md`.
+3. For every offer or quote, verify issuer, date, validity, scope, quantities,
+   options, exclusions, allowances, tax and total from the exact document.
+4. Normalize only comparable items. Keep base, variant, option, provisional
+   sum and combined scope distinct. Never compare a partial aggregate with a
+   broader reference total.
+5. Report supported deltas, scope differences, missing offers, unreadable
+   material, commercial qualifications and decisions still required.
+
+## Result contract
+
+Return: reference perimeter; coverage matrix; comparable amounts and deltas;
+scope or assumption differences; missing or unresolved lots; sources and
+locators; readiness. If a material reference lot has no received offer, label
+it `missing_candidate`; do not call the whole consultation conforming.
+
+```text
+received != accepted
+priced != included
+comparable != conforming
+offer present != lot covered
+```

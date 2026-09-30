@@ -63,13 +63,18 @@ def test_linux_configurator_is_idempotent_and_keeps_a_backup() -> None:
     assert 'tools enable --platform cli skills delegation' in text
     assert 'enabled[[:space:]]+skills' in text
     for skill in (
+        "administrative-form-review",
+        "construction-cost-review",
+        "construction-schedule-review",
         "external-commitment-guard",
         "ifja-project-context",
- "ifja-vault-search",
+        "ifja-vault-search",
         "pantheon-activity-projection",
         "pantheon-governed-method",
         "pantheon-request-intake",
+        "site-report-review",
         "source-research",
+        "technical-standard-review",
     ):
         assert skill in text
     assert "rsync -a --delete --exclude '__pycache__/'" in text

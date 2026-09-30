@@ -127,6 +127,11 @@ the provider source and image are not patched.
 The governed profile remains generalist: its stable repository-owned core is
 `pantheon-governed-method`, `pantheon-activity-projection`,
 `pantheon-request-intake`, `external-commitment-guard` and `source-research`.
+Five progressively loaded domain owners cover construction cost and offer
+review, site reports, administrative forms, technical standards and works
+schedules. They are selected by the reasoning required and do not redefine the
+profile identity. Drafting and correspondence remain production forms rather
+than catch-all specialist identities.
 Capabilities and organization adapters are available modules selected from the
 request, manifest and admitted runtime bindings; they do not redefine the
 profile identity.

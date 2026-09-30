@@ -7,9 +7,14 @@ metadata:
   pantheon_capability_id: quote-variation-review
   governed_by: docs/examples/vertical_devis_reprise/workflow_manifest.devis-reprise.yaml
   upstream: agentskills.io SKILL.md standard; loadable by Hermes Agent (NousResearch) >= 0.18
+  compatibility_target: construction-cost-review
 ---
 
 # Quote variation review (governed candidate)
+
+Compatibility adapter for the versioned `devis-reprise` example. When
+`construction-cost-review` is installed, use that general owner and do not load
+both skills.
 
 Non-executable candidate skill in the `agentskills.io` / `SKILL.md` standard, so a
 Hermes Agent can load it. Pantheon governs; Hermes executes outside the repo.

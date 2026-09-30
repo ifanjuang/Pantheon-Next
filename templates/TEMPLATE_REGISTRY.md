@@ -29,6 +29,11 @@ Pantheon Cockpit     -> governed Cards/navigation/decision/status projections
 | Pantheon governed method skill candidate | `templates/hermes/skills/pantheon-governed-method/SKILL.md` | Hermes | generalist method coordination skill candidate | externally installable; no workflow engine |
 | Pantheon activity projection skill candidate | `templates/hermes/skills/pantheon-activity-projection/SKILL.md` | Hermes | conversation projection skill candidate | externally installable; no persistence |
 | External commitment guard skill candidate | `templates/hermes/skills/external-commitment-guard/SKILL.md` | Hermes | external-effect guard skill candidate | externally installable; authorizes no effect |
+| Construction cost review skill candidate | `templates/hermes/skills/construction-cost-review/SKILL.md` | Hermes | estimates, offers and lot coverage | externally installable; no financial approval |
+| Site report review skill candidate | `templates/hermes/skills/site-report-review/SKILL.md` | Hermes | site observations and report continuity | externally installable; no instruction or transmission |
+| Administrative form review skill candidate | `templates/hermes/skills/administrative-form-review/SKILL.md` | Hermes | sourced field preparation | externally installable; no signature or filing |
+| Technical standard review skill candidate | `templates/hermes/skills/technical-standard-review/SKILL.md` | Hermes | exact-edition applicability review | externally installable; bounded conclusions only |
+| Construction schedule review skill candidate | `templates/hermes/skills/construction-schedule-review/SKILL.md` | Hermes | works sequencing and replanning | externally installable; no contractor instruction |
 | IFJA project context skill candidate | `templates/hermes/skills/ifja-project-context/SKILL.md` | Hermes | skill candidate | externally installable; no authority |
 | Source research skill candidate | `templates/hermes/skills/source-research/SKILL.md` | Hermes | skill candidate | non-executable |
 | Source research summary Workflow Manifest | `templates/source_research_summary_workflow_manifest.template.yaml` | Pantheon | workflow governance candidate | non-executable |

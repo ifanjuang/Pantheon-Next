@@ -7,14 +7,24 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "templates/hermes/skills/pantheon-governed-method/SKILL.md"
+REFERENCES = SKILL.parent / "references"
 RECEIPT = ROOT / "templates/hermes/returns/source_preflight_receipt.template.yaml"
 
 
-def test_governed_method_is_general_condition_driven_and_bounded() -> None:
-    text = SKILL.read_text(encoding="utf-8")
+def _method_text() -> str:
+    return "\n".join(
+        [SKILL.read_text(encoding="utf-8")]
+        + [path.read_text(encoding="utf-8") for path in sorted(REFERENCES.glob("*.md"))]
+    )
 
-    assert "name: pantheon-governed-method" in text
-    assert "not a workflow engine" in text
+
+def test_governed_method_is_general_condition_driven_and_bounded() -> None:
+    entrypoint = SKILL.read_text(encoding="utf-8")
+    text = _method_text()
+    flat = " ".join(text.split())
+
+    assert "name: pantheon-governed-method" in entrypoint
+    assert "not a workflow engine" in entrypoint
     for movement in (
         "Frame / Cadrer",
         "Admit / Admettre",
@@ -42,11 +52,11 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
         "blocked",
     ):
         assert readiness in text
-    assert "Classify by material conditions, not by object names" in text
+    assert "Classify by material conditions, not by object names" in entrypoint
     assert "one primary method" in text
     assert "one guardrail method" in text
     assert "one verification method" in text
-    assert "one such MCP function per `tool_call`" in text
+    assert "only one deferred MCP function per `tool_call`" in text
     assert "Do not call" in text
     assert "`classify_request`, `find_relevant_sources` or `list_sources`" in text
     assert "Judge the result the user requested" in text
@@ -54,36 +64,94 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "Gate 1 — after initial familiarization" in text
     assert "Gate 2 — after bounded synthesis, before production" in text
     assert "three mutually distinct" in text
-    assert "up to five choices" in text
-    assert "Do not draft first and seek confirmation afterward" in text
+    assert "use up to five choices" in flat
+    assert "Do not draft first and seek confirmation afterward" in flat
     assert "## Bounded delegated source review" in text
     assert "mcp-ifja-vault-read" in text
     assert "mcp-hindsight-kroqi-project" in text
     assert "mcp-docling" in text
-    assert "Begin with one child\nat a time" in text
+    assert "Begin with one child at a time" in flat
     assert "subagent result != source verification" in text
-    assert "never compare its aggregate with a broader reference total" in text
-    assert "build the coverage matrix from the\nreference first" in text
+    assert "Never compare a partial aggregate with a broader reference total" in flat
+    assert "Build the coverage matrix from the reference first" in flat
     assert "missing_candidate" in text
     assert "Do not omit an unmatched reference item" in text
-    assert "Overall\nconformance requires complete material coverage" in text
+    assert "Overall conformance requires complete material coverage" in flat
     assert "## Visible plan before execution" in text
     assert "Before the first material source call" in text
     assert "plan displayed != worker dispatched" in text
     assert "material observation != silent replanning" in text
     assert "no more than four short steps" in text
     assert "at most three lines" in text
-    assert "## Pantheon role legend" in text
+    assert "## Pantheon viewpoints" in text
     for role in ("ATHENA", "ARGOS", "MNEMOSYNE", "THEMIS", "APOLLO", "HEPHAISTOS", "IRIS", "ZEUS"):
         assert role in text
-    assert "### Visible mortal labels" in text
+    assert "## Visible mortal labels" in text
     for mortal in ("Palamède", "Ariane", "Diomède", "Antigone"):
         assert mortal in text
     assert "mortal label != runtime identity" in text
     assert "no delegated child -> no mortal label" in text
     assert "unselected viewpoint -> no god label" in text
-    for business_object in ("budget", "mail", "cctp", "compte rendu"):
-        assert business_object not in text.lower()
+    assert len(entrypoint.split()) < 700
+
+
+def test_governed_method_routes_by_reasoning_and_keeps_workers_distinct() -> None:
+    text = SKILL.read_text(encoding="utf-8")
+    for owner in (
+        "construction-cost-review",
+        "site-report-review",
+        "administrative-form-review",
+        "technical-standard-review",
+        "construction-schedule-review",
+        "source-research",
+    ):
+        assert owner in text
+    assert "Select by the reasoning required, not by the requested file format" in text
+    assert "Drafting, reports and correspondence\nare production forms" in text
+    assert "not a separate catch-all skill" in text
+    assert "not_reviewed" in text
+
+
+def test_domain_owner_skills_have_distinct_claim_boundaries() -> None:
+    skill_root = ROOT / "templates/hermes/skills"
+    contracts = {
+        "construction-cost-review": (
+            "missing_candidate",
+            "offer present != lot covered",
+            "do not call the whole consultation conforming",
+        ),
+        "site-report-review": (
+            "continuity table",
+            "photographed != conforming",
+            "proposed action != instruction",
+        ),
+        "administrative-form-review": (
+            "field/source ledger",
+            "field populated != field proven",
+            "form candidate != signed filing",
+        ),
+        "technical-standard-review": (
+            "exact standard identity",
+            "rule exists != rule applicable",
+            "bounded check != global conformity",
+        ),
+        "construction-schedule-review": (
+            "schedule state and status date",
+            "reported progress != observed progress",
+            "proposed sequence != contractor instruction",
+        ),
+    }
+    for name, required_phrases in contracts.items():
+        text = (skill_root / name / "SKILL.md").read_text(encoding="utf-8")
+        assert f"name: {name}" in text
+        assert "status: candidate_template_only" in text
+        for phrase in required_phrases:
+            assert phrase in text
+        assert len(text.split()) < 500
+
+    legacy = (skill_root / "quote-variation-review/SKILL.md").read_text(encoding="utf-8")
+    assert "compatibility_target: construction-cost-review" in legacy
+    assert "do not load\nboth skills" in legacy
 
 
 def test_source_preflight_receipt_requires_exact_sources_and_keeps_boundaries() -> None:
@@ -108,7 +176,19 @@ def test_source_preflight_receipt_requires_exact_sources_and_keeps_boundaries() 
     }
 
 
-def test_generic_contract_contains_no_project_or_deliverable_specific_identity() -> None:
-    text = (SKILL.read_text(encoding="utf-8") + RECEIPT.read_text(encoding="utf-8")).lower()
-    for specific_identity in ("floquet", "annola"):
-        assert specific_identity not in text
+def test_generic_contract_contains_no_private_project_or_storage_identity() -> None:
+    domain_root = ROOT / "templates/hermes/skills"
+    domain_skills = (
+        "construction-cost-review",
+        "site-report-review",
+        "administrative-form-review",
+        "technical-standard-review",
+        "construction-schedule-review",
+    )
+    text = (
+        _method_text()
+        + RECEIPT.read_text(encoding="utf-8")
+        + "".join((domain_root / name / "SKILL.md").read_text(encoding="utf-8") for name in domain_skills)
+    ).lower()
+    for private_identity in ("project_hint:", "/srv/pantheon/", "nas.local", "ifja_prod"):
+        assert private_identity not in text

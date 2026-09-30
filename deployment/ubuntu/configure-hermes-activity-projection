@@ -28,18 +28,28 @@ HINDSIGHT_PROJECT_TOKEN_FILE="/srv/pantheon/hindsight-project-router/token"
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "$SCRIPT_DIR/../.." && pwd)"
 SKILL_NAMES=(
+  administrative-form-review
+  construction-cost-review
+  construction-schedule-review
   external-commitment-guard
   pantheon-activity-projection
   pantheon-governed-method
   pantheon-request-intake
+  site-report-review
   source-research
+  technical-standard-review
 )
 SKILL_SOURCES=(
+  "$REPO_ROOT/templates/hermes/skills/administrative-form-review"
+  "$REPO_ROOT/templates/hermes/skills/construction-cost-review"
+  "$REPO_ROOT/templates/hermes/skills/construction-schedule-review"
   "$REPO_ROOT/templates/hermes/skills/external-commitment-guard"
   "$REPO_ROOT/templates/hermes/skills/pantheon-activity-projection"
   "$REPO_ROOT/templates/hermes/skills/pantheon-governed-method"
   "$REPO_ROOT/templates/hermes/skills/pantheon-request-intake"
+  "$REPO_ROOT/templates/hermes/skills/site-report-review"
   "$REPO_ROOT/templates/hermes/skills/source-research"
+  "$REPO_ROOT/templates/hermes/skills/technical-standard-review"
 )
 CURATED_SKILL_PATHS=(
   creative/architecture-diagram
