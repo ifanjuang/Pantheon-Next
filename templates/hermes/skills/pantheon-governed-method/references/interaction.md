@@ -64,10 +64,12 @@ new profile or child.
 
 ## Intervenants délégués visibles
 
-When Hermes actually delegates a bounded child, it may show one intervenant
-label: `Palamède — faits`, `Ariane — chronologie`, `Diomède — vérification`, or
-`Antigone — écarts`, followed by the exact mission. The label is reusable and
-has no separate memory, authority or permissions.
+When Hermes actually delegates a bounded child, show only a natural task
+sentence, for example: `Ariane reconstitue la chronologie des échanges.` Use
+Palamède for facts, Ariane for chronology, Diomède for verification and
+Antigone for gaps. Never prefix the sentence with a category such as
+"intervenant", "figure" or "rôle". The name is reusable and has no separate
+memory, authority or permissions.
 
 ```text
 intervenant délégué != runtime identity

@@ -89,6 +89,8 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "## Intervenants délégués visibles" in text
     for intervenant in ("Palamède", "Ariane", "Diomède", "Antigone"):
         assert intervenant in text
+    assert "Ariane reconstitue la chronologie des échanges." in text
+    assert 'Never prefix the sentence with a category such as\n"intervenant", "figure" or "rôle"' in text
     assert "intervenant délégué != runtime identity" in text
     assert "no delegated child -> no intervenant label" in text
     assert "unselected viewpoint -> no god label" in text
