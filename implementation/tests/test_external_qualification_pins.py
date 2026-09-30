@@ -89,6 +89,7 @@ def test_exporter_emits_registry_values_without_second_pin_authority() -> None:
         "self-hosted-livesync-cli",
         "obsidian-desktop",
         "couchdb",
+        "harnessrouter",
     ]
     values = selected_exports(selected)
 
@@ -103,6 +104,8 @@ def test_exporter_emits_registry_values_without_second_pin_authority() -> None:
             "image": "IMAGE",
             "package": "PACKAGE",
             "source_pin": "SOURCE_PIN",
+            "release_tag": "RELEASE_TAG",
+            "protocol_version": "PROTOCOL_VERSION",
         }.items():
             if pin.get(field) is not None:
                 assert values[f"{prefix}_{suffix}"] == str(pin[field])

@@ -37,6 +37,8 @@ def exports_for(pin_id: str, pin: dict) -> dict[str, str]:
         "digest": "DIGEST",
         "package": "PACKAGE",
         "source_pin": "SOURCE_PIN",
+        "release_tag": "RELEASE_TAG",
+        "protocol_version": "PROTOCOL_VERSION",
     }
     for field, suffix in fields.items():
         value = pin.get(field)
