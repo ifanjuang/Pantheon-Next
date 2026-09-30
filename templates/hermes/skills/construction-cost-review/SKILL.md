@@ -46,6 +46,12 @@ compatibility with its narrow versioned example manifest; do not load both.
 6. Report supported deltas, scope differences, missing offers, unreadable
    material, commercial qualifications and decisions still required.
 
+## Claim level
+
+Read [references/claim-level.md](references/claim-level.md) when the request
+distinguishes an opinion on the available quotes from a complete consultation
+analysis, or when source coverage is incomplete.
+
 ## Result contract
 
 Return: reference perimeter; coverage matrix; comparable amounts and deltas;

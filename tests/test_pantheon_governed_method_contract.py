@@ -102,6 +102,12 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "enumerate the complete candidate-source\n   family" in cost_review
     assert "all received quotes" in cost_review
     assert "do not silently drop it" in cost_review
+    claim_level = (
+        ROOT / "templates/hermes/skills/construction-cost-review/references/claim-level.md"
+    ).read_text(encoding="utf-8")
+    assert "Claim level: point versus complete analysis" in claim_level
+    assert "partial_review" in claim_level
+    assert "do not give an overall conformity conclusion" in claim_level
     assert "## Visible plan before execution" in text
     assert "Before the first material source call" in text
     assert "plan displayed != worker dispatched" in text
