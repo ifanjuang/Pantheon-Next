@@ -34,7 +34,9 @@ EXECUTION_TRACE_CORRELATION_FIELDS = (
     "run_id",
 )
 RUN_INSTRUCTIONS = """You are executing one Pantheon-admitted read-only work item.
-Use only the supplied immutable launch context snapshot for the initial task.
+Use only the supplied immutable launch context snapshot and any explicitly
+materialized ephemeral context for the initial task. Ephemeral context is transient
+input, not Source, Evidence or durable memory.
 Do not widen scope, mutate Agency Data, transmit externally, install or activate
 capabilities, promote memory, admit Evidence, or treat runtime success as truth.
 Any consequential follow-up requires a separate Pantheon effect gate.
@@ -261,6 +263,18 @@ class PantheonRunBridgeClient:
             body={"idempotency_key": idempotency_key},
         )
 
+    def materialize_ephemeral_context(
+        self,
+        *,
+        admission_id: str,
+        launch_reservation_id: str,
+    ) -> dict[str, Any]:
+        return self._request(
+            "POST",
+            f"/hermes/execution-admissions/{admission_id}/ephemeral-context/materialize",
+            body={"launch_reservation_id": launch_reservation_id},
+        )
+
     def record_start(
         self,
         *,
@@ -430,16 +444,54 @@ class ExternalHermesRunBinding:
         snapshot = reservation.get("snapshot")
         if not isinstance(snapshot, dict):
             raise HermesRunBindingError("Pantheon launch reservation is missing its snapshot")
-        input_text = json.dumps(
-            {
-                "pantheon_launch": {
-                    "admission_id": admission_id,
-                    "launch_reservation_id": reservation_id,
-                    "snapshot_digest": reservation.get("snapshot_digest"),
-                    "governance_note": "This immutable snapshot bootstraps one read-only admitted run.",
-                },
-                "launch_context_snapshot": snapshot,
+
+        context_manifest = snapshot.get("context_manifest") or {}
+        if not isinstance(context_manifest, dict):
+            raise HermesRunBindingError("Pantheon launch snapshot has an invalid context manifest")
+        ephemeral_descriptors = context_manifest.get("ephemeral_context_leases") or []
+        if not isinstance(ephemeral_descriptors, list):
+            raise HermesRunBindingError("Pantheon launch snapshot has invalid ephemeral lease descriptors")
+
+        ephemeral_context: dict[str, Any] | None = None
+        if ephemeral_descriptors:
+            materialized = self._pantheon.materialize_ephemeral_context(
+                admission_id=admission_id,
+                launch_reservation_id=reservation_id,
+            )
+            if (
+                materialized.get("admission_id") != admission_id
+                or materialized.get("launch_reservation_id") != reservation_id
+            ):
+                raise HermesRunBindingError(
+                    "Pantheon ephemeral context materialization identity mismatch"
+                )
+            leases = materialized.get("leases")
+            if not isinstance(leases, list) or len(leases) != len(ephemeral_descriptors):
+                raise HermesRunBindingError(
+                    "Pantheon ephemeral context materialization is incomplete"
+                )
+            ephemeral_context = {
+                "kind": "bounded_ephemeral_context",
+                "leases": leases,
+                "governance_note": (
+                    "Transient input only; not Source, Evidence, AFFAIRES or Hindsight memory."
+                ),
+            }
+
+        run_input = {
+            "pantheon_launch": {
+                "admission_id": admission_id,
+                "launch_reservation_id": reservation_id,
+                "snapshot_digest": reservation.get("snapshot_digest"),
+                "governance_note": "This immutable snapshot bootstraps one read-only admitted run.",
             },
+            "launch_context_snapshot": snapshot,
+        }
+        if ephemeral_context is not None:
+            run_input["ephemeral_context"] = ephemeral_context
+
+        input_text = json.dumps(
+            run_input,
             ensure_ascii=False,
             sort_keys=True,
         )
@@ -502,6 +554,8 @@ class ExternalHermesRunBinding:
             "session_id": admission_id,
             "session_memory_header_sent": False,
             "runtime_submission_performed": True,
+            "ephemeral_context_materialized": ephemeral_context is not None,
+            "ephemeral_context_lease_count": len(ephemeral_descriptors),
             "automatic_retry_performed": False,
             "provider_routing_performed": False,
             "model_override_performed": False,
@@ -509,6 +563,7 @@ class ExternalHermesRunBinding:
             "observation": observation,
             "non_equivalences": [
                 "launch reservation != dispatch",
+                "ephemeral context materialized != Source admission",
                 "runtime submission != Evidence",
                 "Hermes run started != task success",
                 "session_id correlation != memory promotion",
