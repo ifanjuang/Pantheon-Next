@@ -207,7 +207,7 @@ After confirmation, unchanged bytes keep their memories while Hindsight replaces
 their complete tag set. Hindsight invalidates and re-consolidates affected
 observations under the new project tag; it does not re-extract the source text.
 Cockpit remains authoritative for the current filesystem path because Hindsight
-0.10.1 can patch document tags but not document metadata such as `source_path`.
+0.10.2 can patch document tags but not document metadata such as `source_path`.
 
 If a source is corrected in place and remains the same intended filesystem occurrence, it may keep the same `document_id`; changed bytes then replace the same Hindsight `doc_...:source`. If the old file is retained and a second physical document is created—even with the same index—the new bundle gets a new `document_id` and any relationship must be declared explicitly.
 
@@ -274,7 +274,7 @@ Hindsight files/retain
 document_id = doc_...:source
 ```
 
-The source file is opened directly from the admitted Linux-visible AFFAIRES root. Pantheon creates no local staging file. The HTTP adapter uses a bounded transient in-memory multipart buffer; the default source bound is 100 MiB, matching Hindsight 0.10.1's default file-conversion batch-size limit.
+The source file is opened directly from the admitted Linux-visible AFFAIRES root. Pantheon creates no local staging file. The HTTP adapter uses a bounded transient in-memory multipart buffer; the default source bound is 100 MiB, matching Hindsight 0.10.2's default file-conversion batch-size limit.
 
 Only bounded orientation fields are passed as extraction context. A valid optional
 cartouche also contributes namespaced `cartouche_*` provenance metadata, including

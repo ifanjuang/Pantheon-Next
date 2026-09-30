@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-closed project-scoped recall adapter for Hindsight 0.10.1."""
+"""Fail-closed project-scoped recall adapter for Hindsight 0.10.2."""
 
 from __future__ import annotations
 

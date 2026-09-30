@@ -121,7 +121,7 @@ class ProducerCandidate:
 
 
 class HindsightHTTPClient:
-    """Small Hindsight 0.10.1 HTTP adapter with no third-party dependency."""
+    """Small Hindsight 0.10.2 HTTP adapter with no third-party dependency."""
 
     def __init__(
         self,
