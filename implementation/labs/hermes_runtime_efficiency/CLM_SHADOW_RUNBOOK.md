@@ -99,6 +99,7 @@ fields = {
     "CLM_HEAD_REVISION": "head_revision",
     "CLM_HEAD_FILE": "head_file",
     "CLM_HEAD_SHA256": "head_sha256",
+    "CLM_VLLM_VERSION": "vllm_version",
     "CLM_API_SURFACE": "api_surface",
 }
 for env_name, field in fields.items():
@@ -123,6 +124,7 @@ python -m pip install --upgrade pip
 
 python -m pip install \
   "git+https://github.com/${CLM_REPOSITORY}.git@${CLM_GIT_REF}" \
+  "vllm==${CLM_VLLM_VERSION}" \
   huggingface_hub
 ```
 
