@@ -42,11 +42,14 @@ def test_governed_profile_supplement_requires_progress_without_private_reasoning
     assert "never\nprivate reasoning" in text
     assert "Pantheon Roles are governance jurisdictions, not Hermes runtime identities" in text
     assert "Do not generate ATHENA/ARGOS/THEMIS/APOLLO/HEPHAISTOS/IRIS/ZEUS/MNEMOSYNE labels" in text
-    assert "compact\nrevised plan" in text
-    assert "role\nlegend defined by `pantheon-governed-method`" in text
+    assert "at most four short steps" in text
+    assert "at most three revised-plan lines" in text
+    assert "compact role legend only when explicitly requested" in text
     assert "role legend displayed != role activated" in text
     assert "⚙ Hermes · Mortel · <label>" in text
     assert "mortal label displayed != child authority" in text
+    assert "Never infer or invent a god label" in text
+    assert "no delegated child -> no mortal label" in text
     assert "Do not hard-code a provider sequence" in text
     assert "Posture: <optional, only when selected>" in text
 

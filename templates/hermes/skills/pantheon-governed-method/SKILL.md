@@ -105,19 +105,20 @@ child gap != child-user interaction
 ## Visible plan before execution
 
 Before the first material source call, production step or delegated child in a
-non-trivial task, the parent publishes a compact execution plan. It states the
-objective, bounded steps, expected source/tool families, material limits and
-any decision point already known. It is an observable preview, not a hidden
+non-trivial task, the parent publishes a compact execution plan: one objective
+line, no more than four short steps, one active-viewpoints line and, only when
+needed, one limit or decision line. Name source/tool families only when that
+helps the user follow the work. This is an observable preview, not a hidden
 workflow, task dispatch or approval request.
 
 When the next path is evident, proceed after publishing the plan. When the plan
 contains a material unresolved choice, use Gate 1 clarification before executing
 the affected step. A later source result may revise the plan when it changes the
 scope, source order, risk, completion condition or next decision. Publish a
-compact revised plan with its observable reason, affected steps and unchanged
-limits before taking the changed path. Revisions may recur only in response to
-a material observation; never silently widen scope or narrate routine tool
-chatter as plan changes.
+compact revised plan of at most three lines: cause, changed next step, and any
+changed limit or decision. Revisions may recur only in response to a material
+observation; never repeat unchanged steps, silently widen scope or narrate
+routine tool chatter as plan changes.
 
 ```text
 plan displayed != user approval required
@@ -130,24 +131,15 @@ revised plan != a new authorization
 
 ## Pantheon role legend
 
-Pantheon roles are enduring governance viewpoints, not Hermes agents, workers,
-model profiles or permissions. On an explicit user request for the role list,
-or when a visible plan names a selected viewpoint, show this compact legend:
-
-| Role | Governing question | Does not do |
-| --- | --- | --- |
-| ATHENA | How should the work be structured and sequenced? | execute or approve |
-| ARGOS | What source, provenance and support does the claim have? | declare truth alone |
-| MNEMOSYNE | What prior state, version or continuity matters? | promote memory alone |
-| THEMIS | What risk, boundary or approval condition applies? | authorize itself |
-| APOLLO | Is the candidate clear, complete and presentable? | conceal an evidence gap |
-| HEPHAISTOS | How can an admitted candidate artifact be made? | validate or deliver it |
-| IRIS | Is the recipient, channel and formulation appropriate? | transmit without authorization |
-| ZEUS | What status and next procedure follows from the record? | decree truth or replace human approval |
-
-The legend makes the governing frame visible; it does not activate a role,
-create a handoff or grant a new capability. Show only the role names relevant
-to the current plan after the legend, and call them `viewpoints`, never agents.
+Pantheon roles are governance viewpoints, not agents, profiles or permissions.
+Use this canonical shorthand: `ATHENA structure · ARGOS sources · MNEMOSYNE
+continuity · THEMIS limits · APOLLO quality · HEPHAISTOS fabrication · IRIS
+transmission · ZEUS procedure`. Show the full shorthand only when explicitly
+requested. In a plan, show at most four relevant names on one line and call
+them `viewpoints`, never agents. A role name may appear in task activity only
+when the current governed classification, Task Contract or method selection
+actually selected that viewpoint. Do not infer, decorate or invent a role from
+the topic alone. Display does not activate a role or grant a capability.
 
 ## Bounded delegated source review
 
@@ -199,14 +191,8 @@ delegation completed != synthesis approved
 ### Visible mortal labels
 
 A delegated child may be given one display-only mortal label so its bounded
-mission is legible in the plan and in its return. The available labels are:
-
-| Mortal label | Suitable bounded mission |
-| --- | --- |
-| Palamède | locate and extract source-supported facts |
-| Ariane | reconstruct chronology, versions and links |
-| Diomède | test contradictions, coverage and source locators |
-| Antigone | identify gaps, limits and unresolved questions |
+mission is legible in the plan and return. Use `Palamède — facts`, `Ariane —
+chronology`, `Diomède — verification`, or `Antigone — gaps`.
 
 The parent selects the label that best explains the present task, displays it
 as `⚙ Hermes · Mortel · <label>`, and includes the exact bounded objective.
@@ -220,6 +206,8 @@ mortal label != runtime identity
 mortal label != Pantheon Role
 mortal label != new permission
 displayed mortal != concurrent worker fleet
+no delegated child -> no mortal label
+unselected viewpoint -> no god label
 ```
 
 ## Postures

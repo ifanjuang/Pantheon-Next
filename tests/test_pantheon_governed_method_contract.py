@@ -65,6 +65,8 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "Before the first material source call" in text
     assert "plan displayed != worker dispatched" in text
     assert "material observation != silent replanning" in text
+    assert "no more than four short steps" in text
+    assert "at most three lines" in text
     assert "## Pantheon role legend" in text
     for role in ("ATHENA", "ARGOS", "MNEMOSYNE", "THEMIS", "APOLLO", "HEPHAISTOS", "IRIS", "ZEUS"):
         assert role in text
@@ -72,6 +74,8 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     for mortal in ("Palamède", "Ariane", "Diomède", "Antigone"):
         assert mortal in text
     assert "mortal label != runtime identity" in text
+    assert "no delegated child -> no mortal label" in text
+    assert "unselected viewpoint -> no god label" in text
     for business_object in ("budget", "mail", "cctp", "compte rendu"):
         assert business_object not in text.lower()
 

@@ -7,12 +7,13 @@ projection publishes only decision-relevant observable milestones, never
 private reasoning or routine tool chatter.
 
 When interim assistant messages are supported, publish one compact plan before
-the first material tool call. If a material source result changes scope, source
-order, risk, completion condition or the next decision, publish a compact
-revised plan with its observable reason and affected steps before following it.
-Otherwise publish later milestones only when a source, result, risk, blocker,
-artifact, status or materially useful work posture changes.
-Otherwise preserve the same compact milestone sequence in the final response.
+the first material tool call: one objective, at most four short steps, one line
+of active viewpoints, and an optional limit or decision. If a material result
+changes the path, publish at most three revised-plan lines: cause, changed next
+step, and changed limit or decision. Do not repeat unchanged steps. Otherwise
+publish later milestones only when a source, result, risk, blocker, artifact,
+status or materially useful work posture changes. If interim messages are not
+supported, preserve the same compact sequence in the final response.
 Do not imply that separate runtime events were emitted when they were not.
 
 Pantheon Roles are governance jurisdictions, not Hermes runtime identities.
@@ -22,10 +23,11 @@ merely to narrate work. Use `⚙ Hermes` for runtime milestones. When the
 the reader, it may be shown as `Ulysse`, `Nestor`, `Dédale` or
 `Cassandre`.
 
-On an explicit user request for the Pantheon role list, show the compact role
-legend defined by `pantheon-governed-method`. When a plan makes a role viewpoint
-relevant, it may name that viewpoint and its governing question, but must state
-that a viewpoint is neither an activated runtime agent nor an authorization.
+Show the compact role legend only when explicitly requested. In a plan, show at
+most four active role names on one line; do not repeat their definitions. A
+role name is active only when an observed governed classification, Task Contract
+or selected method actually names it. Never infer or invent a god label merely
+from the subject matter.
 
 When Hermes actually delegates a bounded source-review child, show its selected
 display-only mortal label and exact mission as `⚙ Hermes · Mortel · <label>`.
@@ -39,6 +41,8 @@ milestone emitted != runtime dispatch
 runtime success != authorization
 role legend displayed != role activated
 mortal label displayed != child authority
+no delegated child -> no mortal label
+unselected viewpoint -> no god label
 ```
 
 When an observed Pantheon `classify_request` result contains
