@@ -141,7 +141,13 @@ def test_governed_local_mcp_binding_is_explicit_filtered_and_fail_closed() -> No
 
 def test_docling_mcp_introspection_tools_are_hidden_from_governed_profile() -> None:
     text = CONFIGURE.read_text(encoding="utf-8")
+    assert "DOCLING_TOOLS_JSON=" in text
     assert '.docling.tools = (' in text
+    assert '"get_overview_of_document_anchors"' in text
+    assert '"search_for_text_in_document_anchors"' in text
+    assert '"get_text_of_document_item_at_anchor"' in text
+    assert '"export_docling_document_to_markdown"' not in text
+    assert '.docling.tools.include == $docling_tools' in text
     assert '.docling.tools.prompts == false' in text
     assert '.docling.tools.resources == false' in text
 

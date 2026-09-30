@@ -70,6 +70,9 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "mcp-ifja-vault-read" in text
     assert "mcp-hindsight-kroqi-project" in text
     assert "mcp-docling" in text
+    assert "Do not export an entire Docling document to Markdown" in text
+    assert "Hindsight memory != document storage" in text
+    assert "verified sibling such as `<source>.ocr.pdf`" in text
     assert "Begin with one child at a time" in flat
     assert "subagent result != source verification" in text
     assert "Never compare a partial aggregate with a broader reference total" in flat

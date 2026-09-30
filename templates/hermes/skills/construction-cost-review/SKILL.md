@@ -20,6 +20,9 @@ compatibility with its narrow versioned example manifest; do not load both.
 
 1. Identify the reference estimate, DPGF, CCTP or user-declared perimeter and
    its date, revision, tax basis and included or excluded work.
+   Read long documents through overview, targeted search and bounded anchors;
+   never request a full Markdown export or use terminal/file access for a
+   spilled result.
 2. Build the lot and line coverage matrix from that reference before opening
    candidate totals. Use the states defined in
    `pantheon-governed-method/references/source-review.md`.

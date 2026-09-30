@@ -9,6 +9,45 @@ Inventory what is available, absent, stale, partial, unreadable or contradictory
 Memory and retrieval provide leads; consequential claims require an exact source
 and useful locator opened through an admitted route.
 
+## Bounded Docling reading
+
+For long PDFs, tables or specifications, use Docling progressively:
+
+```text
+convert when needed
+-> overview of anchors
+-> targeted text search
+-> smallest relevant anchor reads
+```
+
+Do not export an entire Docling document to Markdown for source review. Large
+exports can spill to a runtime file that the governed profile cannot and should
+not reopen through `terminal` or generic file access. If a result is reported as
+persisted or spilled over, stay on the Docling route and repeat the request with
+targeted searches and bounded anchor reads. Process one consequential document
+at a time and keep only the extracts needed for the coverage matrix.
+
+## OCR retention boundary
+
+A Docling conversion or OCR result is temporary analysis material by default;
+it is not a replacement for the source PDF and is not durable merely because
+Hindsight can recall extracted content. After successful OCR, ask about
+retention only when durable reuse would be useful and no preference was already
+given. Recommend a verified sibling such as `<source>.ocr.pdf` while preserving
+the original. Offer in-place replacement only on an explicit user choice and
+only through a bounded writer that creates a recoverable backup, verifies the
+rendered result and reports the final path.
+
+The current governed source tools are read-only and cannot persist that file.
+Once an authorized writer creates it inside an admitted project source,
+Hindsight may index it only after reconciliation is observed.
+
+```text
+OCR result != source PDF replaced
+Hindsight memory != document storage
+file written != Hindsight reconciliation observed
+```
+
 ## Bounded delegated source review
 
 Use `delegate_task` only for an independent, bounded source question that would
@@ -23,9 +62,9 @@ mcp-hindsight-kroqi-project
 mcp-docling — only after the parent supplies an exact bounded document list
 ```
 
-Do not give browser, terminal, writing, messaging, memory, Kanban,
-clarification, unrelated MCPs or further delegation. Provide the referent,
-question, admitted scope, language and stop condition. Require structured:
+Do not give browser, terminal, generic file access, writing, messaging, memory,
+Kanban, clarification, unrelated MCPs or further delegation. Provide the
+referent, question, admitted scope, language and stop condition. Require structured:
 
 ```text
 observed_facts
