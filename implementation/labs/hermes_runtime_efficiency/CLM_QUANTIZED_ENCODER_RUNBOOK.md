@@ -143,6 +143,7 @@ Keep it loopback-only and preserve the CLM training pooling geometry:
 ```bash
 ~/src/llama.cpp/build/bin/llama-server \
   --model "$Q8_PATH" \
+  --alias qwen3-8b \
   --embedding \
   --pooling last \
   -ngl 1024 \
@@ -157,6 +158,7 @@ Verify the embeddings endpoint before starting CLM.
 The candidate must use:
 
 ```text
+served model alias = qwen3-8b
 pooling = last
 context = 2048
 source model = Qwen/Qwen3-8B exact canonical revision
