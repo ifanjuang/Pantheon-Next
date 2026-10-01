@@ -35,6 +35,17 @@ AUTHORITY = {
     "owns_persistence": False,
 }
 
+QUANTIZED_RUNTIME_FIELDS = (
+    "encoder_backend",
+    "encoder_backend_version",
+    "encoder_backend_ref",
+    "encoder_artifact_repository",
+    "encoder_artifact_file",
+    "encoder_artifact_sha256",
+    "encoder_quantization",
+    "encoder_pooling",
+)
+
 REQUIRED_RUNTIME_FIELDS = (
     "clm_git_ref",
     "clm_package_version",
@@ -126,6 +137,41 @@ def load_runtime_metadata(path: Path) -> dict[str, str]:
         raise CLMShadowQualificationError("clm_git_ref must be an exact 40-character git SHA")
     if len(raw["head_sha256"]) != 64 or any(c not in "0123456789abcdef" for c in raw["head_sha256"].lower()):
         raise CLMShadowQualificationError("head_sha256 must be an exact SHA-256 digest")
+
+    quantized_present = [key for key in QUANTIZED_RUNTIME_FIELDS if key in raw]
+    if quantized_present:
+        missing_quantized = [
+            key
+            for key in QUANTIZED_RUNTIME_FIELDS
+            if not isinstance(raw.get(key), str) or not raw[key].strip()
+        ]
+        if missing_quantized:
+            raise CLMShadowQualificationError(
+                "quantized runtime metadata missing exact fields: "
+                + ", ".join(missing_quantized)
+            )
+        if raw["encoder_backend"] != "llama.cpp":
+            raise CLMShadowQualificationError(
+                "quantized encoder backend must be llama.cpp"
+            )
+        if raw["encoder_pooling"] != "last":
+            raise CLMShadowQualificationError(
+                "quantized encoder pooling must be last"
+            )
+        if raw["encoder_quantization"] not in {"Q8_0", "Q4_K_M"}:
+            raise CLMShadowQualificationError(
+                "quantized encoder must be one of: Q8_0, Q4_K_M"
+            )
+        backend_ref = raw["encoder_backend_ref"].lower()
+        if len(backend_ref) != 40 or any(c not in "0123456789abcdef" for c in backend_ref):
+            raise CLMShadowQualificationError(
+                "encoder_backend_ref must be an exact 40-character git SHA"
+            )
+        artifact_sha = raw["encoder_artifact_sha256"].lower()
+        if len(artifact_sha) != 64 or any(c not in "0123456789abcdef" for c in artifact_sha):
+            raise CLMShadowQualificationError(
+                "encoder_artifact_sha256 must be an exact SHA-256 digest"
+            )
     return {key: str(value) for key, value in raw.items()}
 
 
@@ -181,6 +227,14 @@ def load_qualification_pin(path: Path) -> dict[str, str]:
         "head_sha256",
         "vllm_version",
         "api_surface",
+        "experimental_quantized_encoder_repository",
+        "experimental_q8_file",
+        "experimental_q8_sha256",
+        "experimental_q4_file",
+        "experimental_q4_sha256",
+        "experimental_encoder_backend_repository",
+        "experimental_encoder_backend_version",
+        "experimental_encoder_backend_ref",
     )
     missing = [
         key
@@ -234,6 +288,37 @@ def validate_runtime_against_pin(runtime_metadata: dict[str, str], pin: dict[str
         mismatches.append("head_sha256")
     if runtime_metadata["vllm_version"] != pin["vllm_version"]:
         mismatches.append("vllm_version")
+
+    if any(key in runtime_metadata for key in QUANTIZED_RUNTIME_FIELDS):
+        if runtime_metadata["encoder_placement"] != "local":
+            mismatches.append("encoder_placement")
+        if runtime_metadata["encoder_transport"] != "loopback_direct":
+            mismatches.append("encoder_transport")
+        if runtime_metadata["encoder_backend"] != "llama.cpp":
+            mismatches.append("encoder_backend")
+        if runtime_metadata["encoder_backend_version"] != pin["experimental_encoder_backend_version"]:
+            mismatches.append("encoder_backend_version")
+        if runtime_metadata["encoder_backend_ref"] != pin["experimental_encoder_backend_ref"]:
+            mismatches.append("encoder_backend_ref")
+        if runtime_metadata["encoder_artifact_repository"] != pin["experimental_quantized_encoder_repository"]:
+            mismatches.append("encoder_artifact_repository")
+        quantization = runtime_metadata["encoder_quantization"]
+        if quantization == "Q8_0":
+            expected_file = pin["experimental_q8_file"]
+            expected_sha = pin["experimental_q8_sha256"]
+        elif quantization == "Q4_K_M":
+            expected_file = pin["experimental_q4_file"]
+            expected_sha = pin["experimental_q4_sha256"]
+        else:
+            expected_file = ""
+            expected_sha = ""
+            mismatches.append("encoder_quantization")
+        if runtime_metadata["encoder_artifact_file"] != expected_file:
+            mismatches.append("encoder_artifact_file")
+        if runtime_metadata["encoder_artifact_sha256"] != expected_sha:
+            mismatches.append("encoder_artifact_sha256")
+        if runtime_metadata["encoder_pooling"] != "last":
+            mismatches.append("encoder_pooling")
     if mismatches:
         raise CLMShadowQualificationError(
             "runtime metadata does not match canonical contrastive-lm qualification pin: "
@@ -440,6 +525,14 @@ def run_shadow(
             "head_sha256": qualification_pin["head_sha256"],
             "vllm_version": qualification_pin["vllm_version"],
             "api_surface": qualification_pin["api_surface"],
+            "experimental_quantized_encoder_repository": qualification_pin["experimental_quantized_encoder_repository"],
+            "experimental_q8_file": qualification_pin["experimental_q8_file"],
+            "experimental_q8_sha256": qualification_pin["experimental_q8_sha256"],
+            "experimental_q4_file": qualification_pin["experimental_q4_file"],
+            "experimental_q4_sha256": qualification_pin["experimental_q4_sha256"],
+            "experimental_encoder_backend_repository": qualification_pin["experimental_encoder_backend_repository"],
+            "experimental_encoder_backend_version": qualification_pin["experimental_encoder_backend_version"],
+            "experimental_encoder_backend_ref": qualification_pin["experimental_encoder_backend_ref"],
             "registry_sha256": file_sha256(pin_registry_path),
         },
         "server_observation": server,
