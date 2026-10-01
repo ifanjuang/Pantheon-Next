@@ -1025,6 +1025,27 @@ class HindsightProducer:
 
     def reconcile(self, snapshot: dict[str, Any]) -> dict[str, Any]:
         states = self._states()
+
+        # One project name may move between admitted roots, but simultaneous
+        # active+archive occurrences must never collapse into one strict
+        # Hindsight project scope. Folder/path remains technical routing, not
+        # governed Project identity, so ambiguity fails closed.
+        project_workspaces: dict[str, set[str]] = {}
+        for workspace in snapshot.get("workspaces") or []:
+            for card in workspace.get("cards") or []:
+                scope_project = _metadata_value(card.get("scope_project"))
+                workspace_name = card.get("workspace")
+                if (
+                    card.get("kind") == "document"
+                    and card.get("source_present") is True
+                    and scope_project is not None
+                    and isinstance(workspace_name, str)
+                ):
+                    key = unicodedata.normalize("NFKC", scope_project.strip()).casefold()
+                    project_workspaces.setdefault(key, set()).add(workspace_name)
+        collided_projects = {
+            key for key, workspaces in project_workspaces.items() if len(workspaces) > 1
+        }
         for key, row in list(states.items()):
             if row.get("status") in ACTIVE_STATUSES:
                 states[key] = self._poll(row)
@@ -1049,6 +1070,20 @@ class HindsightProducer:
                 document_id = card.get("document_id")
                 if isinstance(document_id, str) and document_id:
                     seen_document_ids.add(document_id)
+                scope_project = _metadata_value(card.get("scope_project"))
+                scope_key = (
+                    unicodedata.normalize("NFKC", scope_project.strip()).casefold()
+                    if scope_project is not None
+                    else None
+                )
+                if scope_key is not None and scope_key in collided_projects:
+                    card["hindsight_status"] = "PROJECT_SCOPE_COLLISION"
+                    card["hindsight_project_scope_collision"] = True
+                    card["hindsight_error"] = (
+                        "same project directory name is present in more than one admitted root"
+                    )
+                    candidate = None
+                    continue
                 try:
                     candidate = self._candidate(
                         card,
