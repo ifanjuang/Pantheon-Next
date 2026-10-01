@@ -48,40 +48,31 @@ download, or an alternative PDF extraction route as a Docling fallback. The
 governed profile has no such source authority. Do not claim that a comparison is
 complete when a material reference or quote remains unreadable.
 
-## OCR retention boundary
+## Representations and derived analysis
 
-A Docling conversion or OCR result is temporary analysis material by default;
-it is not a replacement for the source PDF and is not durable merely because
-Hindsight can recall extracted content.
+A derived representation is temporary analysis material by default. It never
+replaces the original source or becomes durable merely because Hindsight can
+recall it.
 
-Before OCR, retrieve source-grounded Hindsight memory for the exact document.
-Usable retrieved content, or any `ocr:raw`, `ocr:partial` or `ocr:complete`
-tag, blocks ordinary OCR. Only `force_ocr=true` bypasses that gate. When no
-state exists and retrieved content is absent or insufficient, ask whether to
-keep a Docling result only in the current session (default) or enrich the
-corresponding existing Hindsight document through the designated producer.
-Never create an adjacent project file as part of this route.
-For a proposed Hindsight enrichment, list every selected source with its
-exact relative path and observed OCR result before requesting that choice.
+Retrieve source-grounded Hindsight memory for the exact source before deriving
+anything. Use the least costly suitable representation: native text, structured
+data, or metadata for orientation; then an admitted method appropriate to the
+missing information (for example OCR, structure-aware extraction, a bounded
+visual inspection, or transcription). Do not infer evidence from filename or
+metadata alone. Do not claim that a vision or transcription capability exists
+when no admitted runtime tool exposes it.
 
-Show the proposed output name for every file before execution. An in-place
-replacement is never the default and never a batch action. It requires an
-explicit per-file choice and a bounded writer that creates a recoverable backup,
-preserves relevant metadata, verifies page count and rendered readability, and
-reports both backup and final paths. A collision with an existing sidecar or OCR
-PDF requires a fresh choice; do not overwrite it silently.
-
-Use the reserved sibling names `<stem>.ocr.md` and `<stem>.ocr.pdf`. Treat the
-original and these derivatives as one logical document family in inventories,
-search and coverage counts. Show one result with its available representations;
-never count a derivative as another quote, letter, contract or revision.
-Hindsight must retain only one searchable representation for the family. A
-Hindsight-only OCR update reuses the existing `<document_id>:source`; the single
-producer replaces its searchable content while preserving the original PDF path
-and identity in metadata. When project-file derivatives exist, use this
-preference order: OCR Markdown, searchable OCR PDF, original. A normal
-`<stem>.md` without the `.ocr` marker remains an independent authored document
-and is not merged automatically.
+Usable retrieved content blocks a new derived analysis. For OCR, any
+`ocr:raw`, `ocr:partial` or `ocr:complete` tag also blocks ordinary OCR; only
+`force_ocr=true` bypasses it. When no usable representation exists, explain the
+selected method and ask whether its result stays in the current session
+(default) or enriches the corresponding existing Hindsight document through the
+designated producer. Never create an adjacent project file as part of this
+route, and never run a broad derived analysis where a bounded question would
+suffice.
+For any proposed enrichment, list every selected source with its
+exact relative path and the observed representation result before requesting
+that choice.
 
 The producer owns durable OCR state and re-emits it on every reconciliation so
 ordinary source reconciliation cannot erase it. Use low-cardinality tags:
@@ -112,7 +103,7 @@ file written != Hindsight reconciliation observed
 batch retention choice != in-place replacement authority
 three representations != three documents
 same Hindsight document id != duplicate document
-ocr:status:completed alone != current OCR proven
+derived analysis != source artifact replaced
 ```
 
 ## Bounded delegated source review

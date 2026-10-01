@@ -76,8 +76,9 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "Never use `terminal`" in text
     assert "Hindsight memory != document storage" in text
     assert "list every selected source with its\nexact relative path" in text
-    assert "retrieve source-grounded Hindsight memory" in text
-    assert "keep a Docling result only in the current session" in text
+    assert "Retrieve source-grounded Hindsight memory" in text
+    assert "A derived representation is temporary analysis material" in text
+    assert "Do not claim that a vision or transcription capability exists" in text
     assert "Never create an adjacent project file" in text
     assert "same Hindsight document id != duplicate document" in text
     assert "ocr:raw" in text

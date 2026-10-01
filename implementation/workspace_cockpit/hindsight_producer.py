@@ -90,7 +90,7 @@ def _needs_ocr(text: str) -> bool:
 def _with_raw_ocr_status(tags: list[str]) -> list[str]:
     """Mark usable native text once, without replacing an OCR result."""
     normalized = {tag for tag in tags if isinstance(tag, str) and tag}
-    if any(tag.startswith("ocr:status:") for tag in normalized):
+    if normalized.intersection({"ocr:raw", "ocr:partial", "ocr:complete"}):
         return sorted(normalized)
     normalized.add("ocr:raw")
     return sorted(normalized)
