@@ -5,7 +5,7 @@ metadata:
   owner_layer: hermes
   status: candidate_template_only
   governed_by: docs/governance/HERMES_INTEGRATION.md
-  related_skills: [pantheon-governed-method, pantheon-request-intake, source-research]
+  related_skills: [pantheon-governed-method, pantheon-activity-projection, pantheon-request-intake, source-research]
 ---
 
 # IFJA project context
@@ -14,6 +14,18 @@ Use one document-neutral route for project material: Hindsight locates and
 reuses known content; the vault resolves the exact source; an admitted
 inspection method reads only what the question needs. The source format does
 not decide the method or the authority of the result.
+
+## Conversation projection
+
+For non-trivial IFJA work, when `pantheon-activity-projection` is available,
+load and apply it before substantial execution. It does not prescribe the runtime tool sequence.
+If unavailable, report a presentation capability gap
+without inventing an equivalent governance layer.
+
+```text
+projection plan != runtime dispatch plan
+visible milestone != MCP-prescribed tool sequence
+```
 
 ## Core route
 
