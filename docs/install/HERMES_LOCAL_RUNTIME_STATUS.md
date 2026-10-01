@@ -3,6 +3,14 @@
 This note records the observed local deployment state on 2026-09-10. It is an
 operational snapshot, not a portable architecture requirement.
 
+> Superseded target note (2026-10-01): this file remains historical runtime
+> evidence. The current qualification target is documented in
+> `HERMES_MODEL_AVAILABILITY_TARGET.md`: qwen3.5:27b is the PC00 quality-tier
+> primary, qwen3.5:9b is the always-available Linux fallback, and the switch is
+> delegated to Hermes' native `fallback_providers` mechanism. The statements
+> below about the absence of a true inter-model fallback describe the configuration
+> observed on 2026-09-10, not a missing capability in Hermes 0.21.3.
+
 ## Working path
 
 The following path is currently working:

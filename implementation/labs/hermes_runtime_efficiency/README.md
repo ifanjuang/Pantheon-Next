@@ -249,6 +249,23 @@ Linux CLM -> 127.0.0.1:18090 -> SSH local forward -> PC00/WSL vLLM -> RTX 4090
 
 The PC00 vLLM HTTP service remains loopback-only. Placement is recorded separately from model identity; quality/stability observations remain attributable to the pinned model candidate, while transport latency is topology-specific and must not be compared as if it were a local encoder baseline.
 
+
+### Quantized Linux encoder arm
+
+The merged reference arm remains the exact Qwen3-8B/vLLM encoder used by the published CLM head. A separate bounded arm now qualifies a Linux-local GGUF encoder without redefining that reference:
+
+```text
+PC00 / BF16 / vLLM
+= numerical reference
+
+Linux / Q8_0 or Q4_K_M / llama.cpp
+= experimental deployment candidate
+```
+
+`CLM_QUANTIZED_ENCODER_RUNBOOK.md` reuses the same corpus, public CLM head and `/v1/rank` observer. `compare_clm_shadow_reports.py` compares identical case/order observations and reports top-1 agreement, full-rank agreement, probability drift and order-stability regressions. It selects no encoder and creates no activation decision.
+
+The Linux target is not accepted merely because a GGUF fits in 16 GiB. After ranking comparison it must also demonstrate real co-residency/reload behavior beside the 9B fallback and Hindsight workload. If Q8 is faithful but cannot satisfy the node envelope, Q4_K_M is tested as a distinct candidate rather than silently substituted.
+
 ## Decision order after measurement
 
 ```text

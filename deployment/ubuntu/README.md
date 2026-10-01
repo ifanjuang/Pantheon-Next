@@ -38,6 +38,18 @@ The local Ollama service uses a 65,536-token effective context window. Hermes
 0.21 requires at least 64K; the model's larger advertised native window is not
 the effective runtime window unless Ollama is configured accordingly.
 
+The current availability **qualification target**, distinct from this installer lock,
+is documented in `docs/install/HERMES_MODEL_AVAILABILITY_TARGET.md`: PC00 serves
+the 27B quality tier when available and Hermes' native fallback chain requests the
+always-available Linux 9B tier on a qualifying primary-model failure. PAIR routes
+the model Hermes requests; Pantheon does not become a model router. Model names
+remain runtime/operator configuration rather than release-lock dependencies.
+
+The same Linux node is also the target for the quantized CLM encoder experiment
+under #1047. That co-residency is not assumed: the lab must observe whether CLM,
+the 9B fallback and Hindsight can share/reload within the real 16 GiB GPU/runtime
+envelope before any productive activation.
+
 Hermes execution itself does not make a NAS an authority dependency. The selected professional Workspace path uses the reviewed NAS `/AFFAIRES` tree as its source filesystem for the Cockpit/Hindsight producer. No local LiveSync mirror is part of that path. A filesystem path still does not become governed identity merely because it is mounted.
 
 ## Install

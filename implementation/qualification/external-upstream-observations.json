@@ -134,9 +134,9 @@
       "source": "not_observable",
       "locator": "Contrastive-LM/CLM",
       "latest_seen": "bb42c6c5bf914fd449bed2f6ca65be80602cb1f7",
-      "observed_on": "2026-09-30",
+      "observed_on": "2026-10-01",
       "delta": "none",
-      "note": "Contrastive-LM/CLM has no GitHub Release feed at this observation point, so the current default-branch commit was reviewed directly and pinned separately for the bounded #1047 shadow-ranking experiment. Package metadata at that ref reports contrastive-lm 0.1.0. Upstream issue #3 reports unexpected score behavior and PR #6 discusses long-state truncation semantics; this qualification therefore uses /v1/rank on short synthetic states only. Observation does not install, activate, route, authorize, admit Evidence, or adopt CLM."
+      "note": "Contrastive-LM/CLM has no GitHub Release feed at this observation point, so the current default-branch commit was reviewed directly and pinned separately for the bounded #1047 shadow-ranking experiment. Package metadata at that ref reports contrastive-lm 0.1.0. Upstream issue #3 reports unexpected score behavior and PR #6 discusses long-state truncation semantics; this qualification therefore uses /v1/rank on short synthetic states only. Observation does not install, activate, route, authorize, admit Evidence, or adopt CLM. Quantized-encoder qualification additionally records the official Qwen/Qwen3-8B-GGUF Q8_0 and Q4_K_M artifacts by exact SHA-256 and llama.cpp v0.5.0 at commit 7fe450e19305b828c199d602c23a8337aaa1f03b. These are experimental encoder variants only; the pinned Qwen3-8B/vLLM path remains the numerical reference and no quantized variant is activated by registry presence."
     }
   },
   "authority": {
