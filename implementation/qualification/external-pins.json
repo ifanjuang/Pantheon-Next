@@ -141,7 +141,8 @@
       "experimental_q4_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
       "experimental_encoder_backend_repository": "ggml-org/llama.cpp",
       "experimental_encoder_backend_version": "0.5.0",
-      "experimental_encoder_backend_ref": "7fe450e19305b828c199d602c23a8337aaa1f03b"
+      "experimental_encoder_backend_ref": "7fe450e19305b828c199d602c23a8337aaa1f03b",
+      "experimental_quantized_encoder_revision": "86e51c53be47cd9d82e0acb3ca6b4faedb51171d"
     }
   },
   "authority": {
