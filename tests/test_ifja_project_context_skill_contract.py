@@ -29,13 +29,13 @@ def test_ifja_project_context_routes_existing_sources_without_new_authority():
     assert "### Fast context path for project questions" in text
     assert "Exact-hit stop condition (mandatory)" in text
     assert "must therefore be followed by the exact-document read" in text
-    assert "Hindsight Memory — one fast Mnemosyne lead" in text
-    assert "Hindsight AFFAIRES — confirm dossier-specific facts" in text
+    assert "hindsight-kroqi-project:recall_project_memory — one bounded project lead" in text
+    assert "ifja-vault-read — resolve the project and inspect the exact source" in text
     assert "Do not call the three Hindsight bindings in parallel" in text
     assert "Do not use Web Search before this local path" in text
     assert "ask one targeted clarification" in text
     assert "### Memory sufficiency gate" in text
-    assert "orientation générale                         -> Mnemosyne only" in text
+    assert "orientation générale                         -> project-router, then optional Mnemosyne lead" in text
     assert "exact dossier fact / date / budget / status   -> AFFAIRES" in text
     assert "Do not escalate every project question" in text
     assert "open it immediately; do not repeat memory recall" in text
