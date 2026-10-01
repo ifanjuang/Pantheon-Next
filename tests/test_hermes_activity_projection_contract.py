@@ -27,6 +27,7 @@ def test_activity_projection_skill_has_bounded_visible_contract() -> None:
     assert "Posture: Dédale" in text
     assert "Posture: Cassandre" in text
     assert "posture selected != Pantheon Role activated" in text
+    assert "complex-presentation.md" in text
     for legacy_label in (
         "🦉 Athena", "🔎 Argos", "⚖ Themis", "☀ Apollo",
         "🛠 Hephaistos", "📨 Iris", "⚡ Zeus", "🧠 Mnemosyne",
