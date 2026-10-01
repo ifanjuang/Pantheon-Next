@@ -36,6 +36,7 @@ def _report(*, quantized: bool, corpus_sha: str = "a" * 64, head_sha: str = "b" 
                 "encoder_backend_version": "0.5.0",
                 "encoder_backend_ref": "c" * 40,
                 "encoder_artifact_repository": "Qwen/Qwen3-8B-GGUF",
+                "encoder_artifact_revision": "a" * 40,
                 "encoder_artifact_file": "Qwen3-8B-Q8_0.gguf",
                 "encoder_artifact_sha256": "d" * 64,
                 "encoder_quantization": "Q8_0",
