@@ -179,6 +179,43 @@ def test_runtime_must_match_canonical_clm_pin(tmp_path: Path) -> None:
             MODULE.validate_runtime_against_pin(load_runtime_metadata(bad), pin)
 
 
+def test_quantized_runtime_receipt_is_exact_and_pinned(tmp_path: Path) -> None:
+    quantized = load_runtime_metadata(
+        _write_runtime_metadata(
+            tmp_path,
+            encoder_placement="local",
+            encoder_transport="loopback_direct",
+            encoder_endpoint="http://127.0.0.1:8091/v1/embeddings",
+            encoder_node_label="linux-local",
+            encoder_backend="llama.cpp",
+            encoder_backend_version=CANONICAL_PIN["experimental_encoder_backend_version"],
+            encoder_backend_ref=CANONICAL_PIN["experimental_encoder_backend_ref"],
+            encoder_artifact_repository=CANONICAL_PIN["experimental_quantized_encoder_repository"],
+            encoder_artifact_file=CANONICAL_PIN["experimental_q8_file"],
+            encoder_artifact_sha256=CANONICAL_PIN["experimental_q8_sha256"],
+            encoder_quantization="Q8_0",
+            encoder_pooling="last",
+        )
+    )
+    MODULE.validate_runtime_topology(quantized)
+    MODULE.validate_runtime_against_pin(quantized, CANONICAL_PIN)
+
+    bad_artifact = dict(quantized)
+    bad_artifact["encoder_artifact_sha256"] = "f" * 64
+    with pytest.raises(CLMShadowQualificationError, match="canonical contrastive-lm qualification pin"):
+        MODULE.validate_runtime_against_pin(bad_artifact, CANONICAL_PIN)
+
+
+def test_partial_quantized_runtime_receipt_fails_closed(tmp_path: Path) -> None:
+    path = _write_runtime_metadata(
+        tmp_path,
+        encoder_backend="llama.cpp",
+        encoder_quantization="Q8_0",
+    )
+    with pytest.raises(CLMShadowQualificationError, match="quantized runtime metadata missing exact fields"):
+        load_runtime_metadata(path)
+
+
 def test_candidate_orderings_are_deterministic_and_bounded() -> None:
     candidates = ("a", "b", "c", "d")
     first = build_orderings(candidates, 4)
