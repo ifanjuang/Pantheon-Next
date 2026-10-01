@@ -125,6 +125,7 @@ def compare_reports(baseline: dict[str, Any], candidate: dict[str, Any]) -> dict
         "encoder_backend_version",
         "encoder_backend_ref",
         "encoder_artifact_repository",
+        "encoder_artifact_revision",
         "encoder_artifact_file",
         "encoder_artifact_sha256",
         "encoder_quantization",
