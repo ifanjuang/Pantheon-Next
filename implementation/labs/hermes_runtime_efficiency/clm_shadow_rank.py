@@ -168,6 +168,11 @@ def load_runtime_metadata(path: Path) -> dict[str, str]:
             raise CLMShadowQualificationError(
                 "encoder_backend_ref must be an exact 40-character git SHA"
             )
+        artifact_revision = raw["encoder_artifact_revision"].lower()
+        if len(artifact_revision) != 40 or any(c not in "0123456789abcdef" for c in artifact_revision):
+            raise CLMShadowQualificationError(
+                "encoder_artifact_revision must be an exact 40-character revision"
+            )
         artifact_sha = raw["encoder_artifact_sha256"].lower()
         if len(artifact_sha) != 64 or any(c not in "0123456789abcdef" for c in artifact_sha):
             raise CLMShadowQualificationError(
@@ -255,7 +260,13 @@ def load_qualification_pin(path: Path) -> dict[str, str]:
         raise CLMShadowQualificationError(
             "contrastive-lm qualification pin must select /v1/rank"
         )
-    for field in ("ref", "encoder_revision", "head_revision"):
+    for field in (
+        "ref",
+        "encoder_revision",
+        "head_revision",
+        "experimental_quantized_encoder_revision",
+        "experimental_encoder_backend_ref",
+    ):
         value = pin[field]
         if len(value) != 40 or any(
             char not in "0123456789abcdef" for char in value.lower()
@@ -263,13 +274,14 @@ def load_qualification_pin(path: Path) -> dict[str, str]:
             raise CLMShadowQualificationError(
                 f"contrastive-lm pin {field} must be an exact 40-character git SHA"
             )
-    head_sha256 = pin["head_sha256"]
-    if len(head_sha256) != 64 or any(
-        char not in "0123456789abcdef" for char in head_sha256.lower()
-    ):
-        raise CLMShadowQualificationError(
-            "contrastive-lm pin head_sha256 must be an exact SHA-256 digest"
-        )
+    for field in ("head_sha256", "experimental_q8_sha256", "experimental_q4_sha256"):
+        digest = pin[field]
+        if len(digest) != 64 or any(
+            char not in "0123456789abcdef" for char in digest.lower()
+        ):
+            raise CLMShadowQualificationError(
+                f"contrastive-lm pin {field} must be an exact SHA-256 digest"
+            )
     return {
         key: str(value)
         for key, value in pin.items()
