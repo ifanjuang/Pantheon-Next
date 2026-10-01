@@ -30,6 +30,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "$SCRIPT_DIR/../.." && pwd)"
 SKILL_NAMES=(
   administrative-form-review
+  contract-clause-review
   construction-cost-review
   construction-schedule-review
   external-commitment-guard
@@ -42,6 +43,7 @@ SKILL_NAMES=(
 )
 SKILL_SOURCES=(
   "$REPO_ROOT/templates/hermes/skills/administrative-form-review"
+  "$REPO_ROOT/templates/hermes/skills/contract-clause-review"
   "$REPO_ROOT/templates/hermes/skills/construction-cost-review"
   "$REPO_ROOT/templates/hermes/skills/construction-schedule-review"
   "$REPO_ROOT/templates/hermes/skills/external-commitment-guard"

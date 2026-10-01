@@ -152,6 +152,11 @@ def test_governed_method_routes_by_reasoning_and_keeps_workers_distinct() -> Non
 def test_domain_owner_skills_have_distinct_claim_boundaries() -> None:
     skill_root = ROOT / "templates/hermes/skills"
     contracts = {
+        "contract-clause-review": (
+            "keyword not found != clause absent",
+            "project clause != applicable law",
+            "draft clause != validated contractual wording",
+        ),
         "construction-cost-review": (
             "missing_candidate",
             "offer present != lot covered",

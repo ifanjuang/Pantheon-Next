@@ -65,6 +65,7 @@ def test_linux_configurator_is_idempotent_and_keeps_a_backup() -> None:
     assert 'for attempt in 1 2 3' in text
     for skill in (
         "administrative-form-review",
+        "contract-clause-review",
         "construction-cost-review",
         "construction-schedule-review",
         "external-commitment-guard",
