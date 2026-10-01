@@ -137,6 +137,32 @@ NAS mounted/readable != Hermes globally admitted browsing surface
 Hindsight retained material != professional source != Evidence
 ```
 
+## Native primary-model fallback in selected 0.21.3
+
+The exact selected 0.21.3 source already contains a first-class primary fallback chain. Its documented top-level `fallback_providers` configuration can switch to another provider/model pair after qualifying provider failures, supports custom OpenAI-compatible endpoints and applies to messaging gateway sessions as well as CLI sessions.
+
+This corrects an older local observation that described the deployed 9B configuration as lacking a *configured* inter-model fallback. The observation remains valid for that host state; it is not evidence that the selected Hermes release lacks the mechanism.
+
+For the IFJA local target, the smallest owner-preserving availability experiment is therefore:
+
+```text
+Hermes primary   -> qwen3.5:27b
+Hermes fallback  -> qwen3.5:9b
+PAIR             -> eligible-node routing for the model Hermes requested
+Pantheon         -> observes runtime identity / preserves admission and effect boundaries
+```
+
+Pantheon must not add a provider router or inference scheduler for this need. #644 owns the real-runtime qualification: exact requested/served model, a deliberate/observed 27B failure that reaches 9B, a bounded failure when the fallback is unavailable, and confirmation that the switch does not widen source, credential, memory or consequential-effect authority.
+
+```text
+PAIR node selection != inter-model fallback
+fallback success != result validity
+fallback success != authorization
+served model != Evidence
+```
+
+The operational target and live acceptance checklist are recorded in `docs/install/HERMES_MODEL_AVAILABILITY_TARGET.md`.
+
 ## Material 0.21.x qualification deltas
 
 Only deltas that change trust, state, tool, execution-host or administration boundaries are retained here.
