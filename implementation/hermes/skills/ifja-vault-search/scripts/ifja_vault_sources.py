@@ -6,6 +6,7 @@ sources independently, without granting a document any governance status.
 
 from __future__ import annotations
 
+import difflib
 import os
 import re
 import unicodedata
@@ -36,6 +37,24 @@ def normalized(value: str) -> str:
 
 def tokens(value: str) -> set[str]:
     return set(normalized(value).split())
+
+
+def _ocr_family(relative: Path) -> tuple[str, str] | None:
+    """Return a stable sibling family key and representation for OCR-managed PDFs."""
+    name = relative.name
+    folded = name.casefold()
+    if folded.endswith(".ocr.md"):
+        stem = name[:-len(".ocr.md")]
+        representation = "ocr_markdown"
+    elif folded.endswith(".ocr.pdf"):
+        stem = name[:-len(".ocr.pdf")]
+        representation = "ocr_pdf"
+    elif relative.suffix.casefold() == ".pdf":
+        stem = relative.stem
+        representation = "original_pdf"
+    else:
+        return None
+    return str(relative.parent / stem), representation
 
 
 def _bounded(value: int, maximum: int, name: str) -> int:
@@ -70,10 +89,12 @@ class VaultSources:
         if len(query) < 3:
             raise VaultSourceError("designation needs at least three characters")
         candidates = []
+        available_names: list[tuple[str, str]] = []
         for directory in self.projects_root.iterdir():
             if not directory.is_dir() or directory.is_symlink():
                 continue
             name = normalized(directory.name)
+            available_names.append((name, directory.name))
             if name == query:
                 match = "exact_name"
             elif query in name:
@@ -85,7 +106,17 @@ class VaultSources:
                 "name": directory.name,
                 "match": match,
             })
-        candidates.sort(key=lambda item: (item["match"] != "exact_name", item["name"].casefold()))
+        if not candidates:
+            close_names = set(difflib.get_close_matches(
+                query, [name for name, _ in available_names], n=limit, cutoff=0.72
+            ))
+            candidates = [
+                {"project_ref": original, "name": original, "match": "fuzzy_name"}
+                for normalized_name, original in available_names
+                if normalized_name in close_names
+            ]
+        rank = {"exact_name": 0, "partial_name": 1, "fuzzy_name": 2}
+        candidates.sort(key=lambda item: (rank[item["match"]], item["name"].casefold()))
         return {
             "status": "candidates" if candidates else "no_name_match_in_affaires",
             "scope": "AFFAIRES",
@@ -149,14 +180,64 @@ class VaultSources:
                 })
             if scanned > MAX_SCANNED_FILES:
                 break
+        families: dict[str, list[dict]] = {}
+        standalone: list[dict] = []
+        for item in items:
+            family = _ocr_family(Path(item["relative_path"]))
+            if family is None:
+                item["representations"] = [{
+                    "kind": item["representation"],
+                    "source_path": item["source_path"],
+                    "relative_path": item["relative_path"],
+                }]
+                item["logical_document_family"] = None
+                standalone.append(item)
+                continue
+            family_key, representation = family
+            item["representation"] = representation
+            families.setdefault(family_key, []).append(item)
+
+        representation_rank = {"original_pdf": 0, "ocr_markdown": 1, "ocr_pdf": 2}
+        for family_key, members in families.items():
+            members.sort(key=lambda item: (
+                representation_rank[item["representation"]],
+                item["relative_path"].casefold(),
+            ))
+            canonical = dict(members[0])
+            canonical["logical_document_family"] = family_key
+            canonical["representation"] = "document_family" if len(members) > 1 else members[0]["representation"]
+            canonical["representations"] = [
+                {
+                    "kind": member["representation"],
+                    "source_path": member["source_path"],
+                    "relative_path": member["relative_path"],
+                }
+                for member in members
+            ]
+            canonical["derivative_count"] = sum(
+                member["representation"] != "original_pdf" for member in members
+            )
+            canonical["score"] = max(member["score"] for member in members)
+            standalone.append(canonical)
+        items = standalone
         items.sort(key=lambda item: (-item["score"], item["relative_path"].casefold()))
+        returned = items[:limit]
+        topic_path_match_count = sum(
+            bool(item["path_terms_matched"] or item["family_hints"])
+            for item in items
+        )
+        scan_complete = scanned <= MAX_SCANNED_FILES
         return {
             "status": "source_candidates" if items else "no_supported_files_in_project",
             "project_ref": project_ref,
             "topic": topic,
             "scanned_files": min(scanned, MAX_SCANNED_FILES),
+            "scan_complete": scan_complete,
+            "logical_document_count_in_scanned_scope": len(items),
+            "returned_count": len(returned),
+            "topic_path_match_count": topic_path_match_count,
             "truncated": len(items) > limit or scanned > MAX_SCANNED_FILES,
-            "items": items[:limit],
+            "items": returned,
             "path_match_is_content_support": False,
         }
 

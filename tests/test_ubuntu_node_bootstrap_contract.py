@@ -47,6 +47,20 @@ def test_bootstrap_scripts_are_shell_syntax_valid() -> None:
         subprocess.run(["bash", "-n", str(script)], check=True)
 
 
+def test_governed_projection_keeps_delegation_explicit_and_bounded() -> None:
+    text = _text(CONFIGURE_HERMES_ACTIVITY)
+    assert "--enable-bounded-delegation requires --enable-clarify" in text
+    assert "max_concurrent_children: 1" in text
+    assert "max_iterations: 12" in text
+    assert "child_timeout_seconds: 180" in text
+    assert "max_spawn_depth: 1" in text
+    assert "orchestrator_enabled: false" in text
+    assert "inherit_mcp_toolsets: false" in text
+    assert "subagent_auto_approve: false" in text
+    assert 'config set --force delegation "$updated"' in text
+    assert "tools enable --platform cli skills delegation" in text
+
+
 def test_affaires_mount_configuration_is_generic_and_keeps_secrets_external() -> None:
     text = _text(CONFIGURE_AFFAIRES_NAS_MOUNT)
     assert "--source //HOST/SHARE" in text
@@ -92,6 +106,17 @@ def test_workspace_cockpit_compose_is_read_only_and_loopback_only() -> None:
     assert 'WORKSPACE_HINDSIGHT_SOURCE_KIND:-kroqi-sync' in text
 
 
+def test_workspace_cockpit_systemd_installer_keeps_cockpit_optional() -> None:
+    text = _text(CONFIGURE_WORKSPACE_COCKPIT)
+    assert "--enable-producer" in text
+    assert "--enable-cockpit" in text
+    assert "Requires=pantheon-affaires-producer.service" in text
+    assert "systemctl enable --now pantheon-affaires-producer.service" in text
+    assert "systemctl enable --now pantheon-workspace-cockpit.service" in text
+    assert "if ((ENABLE_PRODUCER)); then" in text
+    assert "if ((ENABLE_COCKPIT)); then" in text
+
+
 def test_hindsight_file_retain_runtime_posture_is_explicit() -> None:
     text = _text(HERMES_LOCAL_COMPOSE)
     assert "HINDSIGHT_API_FILE_PARSER: markitdown" in text
@@ -104,6 +129,16 @@ def test_hindsight_file_retain_runtime_posture_is_explicit() -> None:
     assert 'HINDSIGHT_API_FILE_PARSER_MARKITDOWN_OCR_ENABLED: "false"' in text
     assert 'HINDSIGHT_API_STORE_DOCUMENT_TEXT: "true"' in text
     assert "shm_size: 1gb" in text
+
+
+def test_local_hindsight_limits_llm_concurrency_for_single_ollama_model() -> None:
+    text = _text(HERMES_LOCAL_COMPOSE)
+    assert 'HINDSIGHT_API_WORKER_MAX_SLOTS: "2"' in text
+    assert 'HINDSIGHT_API_WORKER_CONSOLIDATION_RESERVED_SLOTS: "1"' in text
+    assert 'HINDSIGHT_API_LLM_MAX_CONCURRENT: "1"' in text
+    assert 'HINDSIGHT_API_RETAIN_LLM_MAX_CONCURRENT: "1"' in text
+    assert 'HINDSIGHT_API_CONSOLIDATION_LLM_MAX_CONCURRENT: "1"' in text
+    assert 'HINDSIGHT_API_MENTAL_MODEL_REFRESH_LLM_MAX_CONCURRENT: "1"' in text
 
 
 def test_workspace_cockpit_remote_access_uses_pinned_userspace_tailscale() -> None:

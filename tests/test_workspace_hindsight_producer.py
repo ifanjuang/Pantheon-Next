@@ -155,6 +155,17 @@ def test_source_candidate_submits_then_completes_without_duplicate_retain(tmp_pa
     assert client.polls == ["op-1"]
     assert len(client.retains) == 1
     assert _row(db)["status"] == "COMPLETED"
+    assert client.tag_updates[-1]["document_id"] == "doc-notice:source"
+    assert "ocr:raw" in client.tag_updates[-1]["tags"]
+
+
+def test_raw_status_preserves_existing_derived_ocr_state() -> None:
+    module = _module()
+    assert module._with_raw_ocr_status(["project:alpha", "ocr:partial"]) == [
+        "ocr:partial",
+        "project:alpha",
+    ]
+    assert module._with_raw_ocr_status(["ocr:complete"]) == ["ocr:complete"]
 
 
 def test_invalid_cartouche_fallback_does_not_emit_cartouche_metadata(tmp_path: Path) -> None:

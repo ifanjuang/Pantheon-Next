@@ -87,6 +87,15 @@ def _needs_ocr(text: str) -> bool:
     return len(text) >= 200 and alphanumeric / len(text) < 0.08
 
 
+def _with_raw_ocr_status(tags: list[str]) -> list[str]:
+    """Mark usable native text once, without replacing an OCR result."""
+    normalized = {tag for tag in tags if isinstance(tag, str) and tag}
+    if normalized.intersection({"ocr:raw", "ocr:partial", "ocr:complete"}):
+        return sorted(normalized)
+    normalized.add("ocr:raw")
+    return sorted(normalized)
+
+
 def _path_project(relative_path: str) -> str | None:
     parts = Path(relative_path).parts
     return parts[0] if len(parts) > 1 else None
@@ -121,7 +130,7 @@ class ProducerCandidate:
 
 
 class HindsightHTTPClient:
-    """Small Hindsight 0.10.1 HTTP adapter with no third-party dependency."""
+    """Small Hindsight 0.10.2 HTTP adapter with no third-party dependency."""
 
     def __init__(
         self,
@@ -1099,6 +1108,17 @@ class HindsightProducer:
                     if needs_ocr
                     else None
                 )
+                if not needs_ocr:
+                    existing_tags = retained.get("tags")
+                    preserved_tags = (
+                        existing_tags
+                        if isinstance(existing_tags, list)
+                        and all(isinstance(tag, str) for tag in existing_tags)
+                        else []
+                    )
+                    updated_tags = _with_raw_ocr_status(candidate.tags + preserved_tags)
+                    if sorted(set(preserved_tags)) != updated_tags:
+                        self.client.update_document_tags(key, updated_tags)
             except RuntimeError as exc:
                 quality_status = "CHECK_ERROR"
                 quality_detail = str(exc)

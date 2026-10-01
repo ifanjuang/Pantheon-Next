@@ -80,6 +80,63 @@ def test_completion_updates_same_node_without_exposing_output_tail() -> None:
     assert "output_tail" not in completed
 
 
+def test_projects_a_figure_only_when_the_delegation_explicitly_declares_one() -> None:
+    projector = HermesRuntimeTopologyProjector("run_12345678")
+    [started] = projector.feed(
+        {
+            "event": "subagent.start",
+            "run_id": "run_12345678",
+            "subagent_id": "sa-0-abcd1234",
+            "delegation_figure": "ariane",
+        }
+    )
+    [completed] = projector.feed(
+        {
+            "event": "subagent.complete",
+            "run_id": "run_12345678",
+            "subagent_id": "sa-0-abcd1234",
+        }
+    )
+
+    assert started["figure"] == {
+        "name": "Ariane",
+        "mission": "chronologie des échanges",
+    }
+    assert started["figure_basis"] == "explicit_delegation_metadata"
+    assert completed["figure"] == started["figure"]
+
+
+def test_rejects_unknown_or_changed_delegation_figure() -> None:
+    projector = HermesRuntimeTopologyProjector("run_12345678")
+    with pytest.raises(HermesRuntimeTopologyProjectionError, match="delegation_figure"):
+        projector.feed(
+            {
+                "event": "subagent.start",
+                "run_id": "run_12345678",
+                "subagent_id": "sa-0-abcd1234",
+                "delegation_figure": "Ulysse",
+            }
+        )
+
+    projector.feed(
+        {
+            "event": "subagent.start",
+            "run_id": "run_12345678",
+            "subagent_id": "sa-0-abcd1234",
+            "delegation_figure": "ariane",
+        }
+    )
+    with pytest.raises(HermesRuntimeTopologyProjectionError, match="changed"):
+        projector.feed(
+            {
+                "event": "subagent.complete",
+                "run_id": "run_12345678",
+                "subagent_id": "sa-0-abcd1234",
+                "delegation_figure": "diomede",
+            }
+        )
+
+
 def test_ignores_non_lifecycle_subagent_and_reasoning_events() -> None:
     projector = HermesRuntimeTopologyProjector("run_12345678")
 

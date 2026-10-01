@@ -203,7 +203,7 @@
     list.className = "v2-runtime-topology-fallback";
     for (const event of nodes.values()) {
       const item = document.createElement("li");
-      item.textContent = `${event.subagent_id}${event.parent_id ? ` ← ${event.parent_id}` : " · racine du run"}`;
+      item.textContent = `${event.figure?.name || event.subagent_id}${event.parent_id ? ` ← ${event.parent_id}` : " · racine du run"}`;
       list.append(item);
     }
     host.append(list);
@@ -219,7 +219,7 @@
     const head = document.createElement("div");
     head.className = "v2-runtime-topology-detail-head";
     const title = document.createElement("strong");
-    title.textContent = event.subagent_id;
+    title.textContent = event.figure?.name || event.subagent_id;
     const status = document.createElement("span");
     status.textContent = event.status || (event.phase === "completed" ? "completed" : "running");
     head.append(title, status);
@@ -230,6 +230,9 @@
     host.append(head, summary);
 
     const rows = [
+      ["Figure", event.figure?.name],
+      ["Mission affichée", event.figure?.mission],
+      ["Base de la figure", event.figure ? "délégation déclarée" : null],
       ["Parent runtime", event.parent_id],
       ["Délégation", event.delegation_id],
       ["Session enfant", event.child_session_id],

@@ -37,7 +37,7 @@
       "kind": "container",
       "env_prefix": "HINDSIGHT",
       "image": "ghcr.io/vectorize-io/hindsight",
-      "version": "0.10.1",
+      "version": "0.10.2",
       "digest": null
     },
     "hindsight-obsidian-sync": {

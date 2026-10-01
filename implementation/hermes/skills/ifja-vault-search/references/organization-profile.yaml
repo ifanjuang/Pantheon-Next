@@ -9,8 +9,8 @@ generic_skill:
 sources:
   affaires:
     logical_name: AFFAIRES
-    hermes_binding: hindsight-affaires
-    hindsight_bank: IFJA_AFFAIRES
+    hermes_binding: hindsight-kroqi-project
+    recall_tool: recall_project_memory
     purpose: dossier-specific professional material
     project_path_hints:
       - "{designation}"
@@ -19,8 +19,7 @@ sources:
     local_reader_binding: ifja-vault-read
   documentaires:
     logical_name: DOCUMENTAIRES
-    hermes_binding: hindsight-documentaires
-    hindsight_bank: IFJA_DOCUMENTAIRES
+    hermes_binding: ifja-vault-read
     purpose: transversal professional reference material
     local_reader_binding: ifja-vault-read
   conversation_memory:

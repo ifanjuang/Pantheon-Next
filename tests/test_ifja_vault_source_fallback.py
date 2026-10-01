@@ -55,7 +55,60 @@ def test_project_is_resolved_before_permit_terms_and_beta_is_not_absent(vaults) 
         str(files["visit"]), str(files["plui"])
     }
     assert inventory["path_match_is_content_support"] is False
+    assert inventory["scan_complete"] is True
+    assert inventory["logical_document_count_in_scanned_scope"] == 2
+    assert inventory["returned_count"] == 2
+    assert inventory["topic_path_match_count"] == 1
     assert str(files["cerfa"]) not in paths
+
+
+def test_project_discovery_accepts_partial_and_bounded_typo_candidates(vaults) -> None:
+    reader, _ = vaults
+    assert reader.find_projects("Beta")["items"][0]["match"] == "partial_name"
+    fuzzy = reader.find_projects("Projevt Beta")
+    assert fuzzy["items"] == [{
+        "project_ref": "Project Beta", "name": "Project Beta", "match": "fuzzy_name"
+    }]
+    assert fuzzy["identity_confirmed"] is False
+
+
+def test_ocr_derivatives_are_one_logical_source_family(vaults) -> None:
+    reader, files = vaults
+    original = files["visit"].parent / "Site report.pdf"
+    markdown = files["visit"].parent / "Site report.ocr.md"
+    searchable = files["visit"].parent / "Site report.ocr.pdf"
+    authored = files["visit"].parent / "Site report.md"
+    original.write_bytes(b"%PDF-1.4 synthetic")
+    markdown.write_text("OCR text", encoding="utf-8")
+    searchable.write_bytes(b"%PDF-1.4 searchable synthetic")
+    authored.write_text("Independent authored note", encoding="utf-8")
+
+    inventory = reader.list_project_sources("Project Beta", "site report")
+    family = next(
+        item for item in inventory["items"]
+        if item["logical_document_family"] == "Site report"
+    )
+    assert family["source_path"] == str(original)
+    assert family["representation"] == "document_family"
+    assert family["derivative_count"] == 2
+    assert [row["kind"] for row in family["representations"]] == [
+        "original_pdf", "ocr_markdown", "ocr_pdf"
+    ]
+    assert any(item["source_path"] == str(authored) for item in inventory["items"])
+    assert sum("Site report.ocr" in item["source_path"] for item in inventory["items"]) == 0
+
+
+def test_inventory_reports_counts_and_never_overstates_a_truncated_listing(vaults) -> None:
+    reader, files = vaults
+    for number in range(70):
+        (files["visit"].parent / f"Document {number:02d}.pdf").write_bytes(b"%PDF-1.4 synthetic")
+
+    inventory = reader.list_project_sources("Project Beta", max_items=5)
+
+    assert inventory["scan_complete"] is True
+    assert inventory["logical_document_count_in_scanned_scope"] == 72
+    assert inventory["returned_count"] == 5
+    assert inventory["truncated"] is True
 
 
 def test_nested_alpha_cerfa_is_read_at_exact_lines_not_from_a_directory(vaults) -> None:

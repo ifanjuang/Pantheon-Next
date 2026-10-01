@@ -85,6 +85,11 @@ services:
     environment:
       WORKSPACE_COCKPIT_BIND: ${WORKSPACE_COCKPIT_BIND:-127.0.0.1}
       WORKSPACE_COCKPIT_PORT: ${WORKSPACE_COCKPIT_PORT:-8189}
+      # Optional navigation only. The Cockpit never proxies these surfaces and
+      # hides each unset entry.
+      WORKSPACE_COCKPIT_HERMES_URL: ${WORKSPACE_COCKPIT_HERMES_URL:-}
+      WORKSPACE_COCKPIT_HINDSIGHT_URL: ${WORKSPACE_COCKPIT_HINDSIGHT_URL:-}
+      WORKSPACE_COCKPIT_MNEMOSYNE_URL: ${WORKSPACE_COCKPIT_MNEMOSYNE_URL:-}
       WORKSPACE_ROLE_TRACE_URL: http://127.0.0.1:${ROLE_TRACE_ATTACH_PORT:-8190}
       WORKSPACE_ROLE_TRACE_KEY: ${ROLE_TRACE_READ_KEY:?set ROLE_TRACE_READ_KEY outside the repository}
       WORKSPACE_INDEX_DB: /state/index.sqlite3
@@ -95,7 +100,6 @@ services:
       WORKSPACE_HINDSIGHT_AUTHORIZATION: ${WORKSPACE_HINDSIGHT_AUTHORIZATION:-}
       WORKSPACE_RECONCILE_HERMES_URL: ${WORKSPACE_RECONCILE_HERMES_URL:-}
       WORKSPACE_RECONCILE_HERMES_KEY: ${WORKSPACE_RECONCILE_HERMES_KEY:-}
-      WORKSPACE_RECONCILE_HERMES_MODEL: ${WORKSPACE_RECONCILE_HERMES_MODEL:-}
       WORKSPACE_RECONCILE_HERMES_TIMEOUT_SECONDS: ${WORKSPACE_RECONCILE_HERMES_TIMEOUT_SECONDS:-120}
       WORKSPACE_RECONCILE_MAX_CONTEXT_CHARS: ${WORKSPACE_RECONCILE_MAX_CONTEXT_CHARS:-48000}
     depends_on:
@@ -141,6 +145,35 @@ services:
         - /opt/hermes/.venv/bin/python
         - -c
         - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8190/health', timeout=2)
+      interval: 15s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  hindsight-enrichment-hook:
+    profiles: ["enrichment"]
+    image: pantheon/workspace-cockpit:local
+    container_name: pantheon-hindsight-enrichment-hook
+    restart: unless-stopped
+    network_mode: host
+    ports: !reset []
+    extra_hosts: !reset []
+    entrypoint: ["/opt/hermes/.venv/bin/python", "/app/hindsight_enrichment_hook.py"]
+    command: ["--host", "127.0.0.1", "--port", "8191", "--state-db", "/state/index.sqlite3"]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: [/tmp:size=16m,mode=1777]
+    # Created by configure-hindsight-enrichment-hook; it is deliberately
+    # outside the repository and contains only the HMAC signing secret.
+    env_file:
+      - /etc/pantheon-hindsight-enrichment-hook.env
+    environment:
+      HINDSIGHT_ENRICHMENT_BANK_ID: ${WORKSPACE_HINDSIGHT_BANK_ID:-IFJA_KROQI}
+    volumes:
+      - workspace-cockpit-state:/state
+    healthcheck:
+      test: ["CMD", "/opt/hermes/.venv/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8191/health', timeout=2)"]
       interval: 15s
       timeout: 3s
       retries: 5

@@ -12,6 +12,9 @@ metadata:
 
 Lightweight presentation adapter for non-trivial governed chat work.
 
+Read [references/complex-presentation.md](references/complex-presentation.md)
+when the task needs the full compact presentation shape.
+
 ```text
 projection != persistence
 posture label != Pantheon Role

@@ -19,8 +19,8 @@ page / mental model = derived synthesis
 Only `scope:*` tags define a project-memory boundary. Other tags may narrow a
 query but never authorize a cross-project recall.
 
-The first-directory rule is evaluated below the admitted project root, currently
-`/mnt/pantheon-affaires/KROQI/AFFAIRES`, never from the broader NAS share.
+The first-directory rule is evaluated below the locally configured admitted
+project root, never from a broader NAS share that mixes unrelated material.
 
 Ordinary navigation tags use lowercase slugs. Project boundary tags are stricter:
 the producer combines a readable slug (maximum 80 characters) with the first
@@ -125,6 +125,70 @@ project tag. Suggested projections are:
 
 Pages are derived summaries. Material claims remain traceable to the exact
 Hindsight document, source path and, when available, PDF page.
+
+### Native project-page contract
+
+Pantheon uses Hindsight's native knowledge page backed by a mental model. It
+does not write a second summary file into the project tree and does not ask a
+Hermes cron session to regenerate the page. This avoids duplicate documents in
+normal project search and leaves refresh state, history and source provenance in
+the memory system that produced the synthesis.
+
+Create the page lazily when a project is first opened or explicitly requested;
+do not pre-create one page for every directory. The first projection is one
+compact project overview. Split chronology, financial review or schedule into
+separate pages only when the overview has become too large to remain useful.
+
+The page source query asks for these bounded sections:
+
+1. object and current objectives;
+2. actors and stated responsibilities;
+3. contractual and administrative frame;
+4. dated chronology;
+5. lots, estimates, offers and comparison gaps;
+6. schedule and milestones;
+7. confirmed decisions;
+8. risks, contradictions and open questions;
+9. exact source references and freshness limits.
+
+Use this trigger posture with Hindsight 0.10.2 or later:
+
+```json
+{
+  "tags": [
+    "source:kroqi-sync",
+    "scope:project:<slug>-<12hex>"
+  ],
+  "trigger": {
+    "mode": "delta",
+    "fact_types": ["world", "experience", "observation"],
+    "exclude_mental_models": true,
+    "refresh_after_consolidation": true,
+    "min_refresh_interval_seconds": 1800,
+    "tags_match": "all_strict"
+  }
+}
+```
+
+The two tags above are filters, not display labels. Do not add `type:*`,
+`derived:*` or other descriptive tags unless the source memories carry the same
+tag, because the default strict matching would otherwise make the page empty.
+Including all three documentary fact types prevents the page from silently
+ignoring source facts that have not become consolidated observations. Excluding
+mental models prevents one derived page from becoming evidence for another.
+
+Automatic refresh is freshness maintenance, not approval. The page remains a
+candidate orientation aid and never becomes Evidence or a professional source.
+Before producing a consequential mail, report, contractual position or cost
+conclusion, Hermes reopens the cited source documents and reports missing or
+contradictory material.
+
+Hindsight's staleness check detects newer in-scope memories but not deletion by
+itself. A successful Workspace deletion or project-scope move must therefore
+queue an explicit refresh of the affected page after source reconciliation.
+Until that hook is qualified, deletion leaves the page `ready_with_limits` and
+requires a manual refresh. Use the dry-run refresh endpoint during qualification
+and reject a refresh that retrieved no source facts for a non-empty project.
 
 ## Information that is not a tag
 

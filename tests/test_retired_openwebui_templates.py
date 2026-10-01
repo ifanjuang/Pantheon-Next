@@ -40,3 +40,10 @@ def test_devis_reprise_example_uses_current_runtime_owners() -> None:
         assert "templates/openwebui/" not in text
 
     assert "Pantheon Cockpit does not become a second generic chat frontend" in runbook
+
+
+def test_devis_reprise_manifest_uses_the_canonical_cost_review_skill() -> None:
+    manifest = _read("templates/hermes/run_manifests/devis_reprise_run_manifest.template.yaml")
+    assert "skill_candidate: construction-cost-review" in manifest
+    assert "depends_on: [construction-cost-review]" in manifest
+    assert "skill_candidate: quote-variation-review" not in manifest

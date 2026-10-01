@@ -10,6 +10,27 @@
     "enable_text_search": true,
     "enable_temporal_retrieval": true,
     "enable_graph_retrieval": true,
-    "enable_reranking": true
+    "enable_reranking": true,
+    "entity_labels": [
+      {
+        "key": "entity_type",
+        "description": "Type d'entité explicitement cité dans une source. Cette étiquette aide la recherche ; elle ne crée ni identité professionnelle ni relation d'autorité.",
+        "type": "value",
+        "optional": true,
+        "tag": false,
+        "values": [
+          {"value": "person", "description": "Personne nommée"},
+          {"value": "organization", "description": "Organisation, entreprise ou administration"},
+          {"value": "project", "description": "Projet ou affaire explicitement nommé"},
+          {"value": "document", "description": "Document, pièce, plan ou annexe cité"},
+          {"value": "place", "description": "Lieu, adresse ou site"},
+          {"value": "contract", "description": "Contrat, marché, offre ou engagement"},
+          {"value": "work_lot", "description": "Lot, corps d'état ou poste de travaux"},
+          {"value": "standard", "description": "Norme, DTU, règlement ou référence technique"},
+          {"value": "asset", "description": "Ouvrage, équipement ou composant désigné"}
+        ]
+      }
+    ],
+    "entities_allow_free_form": true
   }
 }

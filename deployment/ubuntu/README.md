@@ -86,6 +86,22 @@ Pantheon MCP installed/validated, but not exposed as an independently authorized
 
 The optional Hindsight container alone is not a qualified AFFAIRES ingestion route. #660 owns the single AFFAIRES producer and #659 owns Hindsight retain/retrieval qualification. Historical Obsidian integrations remain separate reference material and are not installed by this baseline.
 
+## Private WireGuard DynHost update
+
+When the router cannot reliably update DynHost, the WireGuard host can maintain
+the endpoint DNS name itself. It prompts for the OVH DynHost credentials in the
+local terminal, stores them root-only outside Git, and updates the record at
+boot and every five minutes:
+
+```bash
+deployment/ubuntu/configure-ovh-dynhost-local --check
+sudo deployment/ubuntu/configure-ovh-dynhost-local --apply --hostname vpn.example.fr
+```
+
+Do not keep a second router DynHost updater enabled for the same hostname after
+the local updater succeeds. The router still forwards only WireGuard UDP 51820;
+do not publish application dashboards.
+
 ## Governed visible Role milestones
 
 After the `pantheon-governed` Hermes profile exists, install the versioned
@@ -127,6 +143,11 @@ the provider source and image are not patched.
 The governed profile remains generalist: its stable repository-owned core is
 `pantheon-governed-method`, `pantheon-activity-projection`,
 `pantheon-request-intake`, `external-commitment-guard` and `source-research`.
+Five progressively loaded domain owners cover construction cost and offer
+review, site reports, administrative forms, technical standards and works
+schedules. They are selected by the reasoning required and do not redefine the
+profile identity. Drafting and correspondence remain production forms rather
+than catch-all specialist identities.
 Capabilities and organization adapters are available modules selected from the
 request, manifest and admitted runtime bindings; they do not redefine the
 profile identity.
@@ -140,7 +161,7 @@ into the governed profile and adds the separately installed, loopback-only
 `ifja-vault-read` binding with its dedicated bearer credential. The copied
 Pantheon Policy entry is narrowed to the
 reviewed read-only consultation, request classification/preflight, candidate
-skeleton and Context Pack tools. It derives a recall-only `hindsight-memory` binding
+skeleton and Context Pack tools. It uses the project-scoped `hindsight-kroqi-project` binding
 from the already configured local Hindsight endpoint and refuses a partial result
 when either required professional Hindsight binding is absent.
 
@@ -287,17 +308,50 @@ cat > .env.workspace-cockpit <<'EOF'
 AFFAIRES_ROOT=/mnt/pantheon-affaires/KROQI/AFFAIRES
 AFFAIRES_GID=replace-with-affaires-mount-group-id
 EOF
-
+# Use the group recorded on the qualified mount, for example:
+# sed -i "s/replace-with-affaires-mount-group-id/$(stat -c %g "$AFFAIRES_ROOT")/" .env.workspace-cockpit
 docker compose --env-file release.env --env-file .env.workspace-cockpit \
   -f compose.workspace-cockpit-local.yaml up -d --build
 ```
 
 To bind to one reviewed LAN/private address, keep host-specific values and secrets in an ignored local env file and load it after the release lock. For authenticated access outside the LAN, the separate Tailscale candidate remains available.
 
-The native systemd alternative is available when container deployment is unwanted:
+### Hindsight retain-completed hook
+
+The optional enrichment receiver remains loopback-only. It receives a signed
+`retain.completed` event, validates the bank and queues the document identity;
+it does not access the NAS, change source files, infer dates, or re-retain a
+document. The HMAC secret is generated outside Git. Prepare it, start the
+service, then register the webhook in Hindsight:
 
 ```bash
-sudo ./configure-workspace-cockpit-local --user <linux-user> --enable
+sudo ./configure-hindsight-enrichment-hook --prepare
+docker compose --env-file release.env --env-file .env.workspace-cockpit \
+  -f compose.workspace-cockpit-local.yaml --profile enrichment \
+  up -d --build hindsight-enrichment-hook
+sudo ./configure-hindsight-enrichment-hook --apply
+```
+
+After the final command, **Settings → Webhooks** in the `IFJA_KROQI` bank shows
+one enabled `retain.completed` endpoint. The Hindsight bank configuration also
+defines a small controlled vocabulary of entity labels (person, organisation,
+project, document, place, contract, lot, standard and asset). Unknown entities
+remain allowed so that retrieval does not silently discard a source fact.
+
+The enrichment endpoint is private/LAN publication, not authenticated Internet publication.
+
+The native systemd alternative is available when container deployment is
+unwanted. Install both units, then activate the Hindsight producer alone; the
+read-only Cockpit remains an explicit optional addition:
+
+```bash
+sudo ./configure-workspace-cockpit-local \
+  --user <linux-user> --affaires-root /mnt/pantheon-affaires/KROQI/AFFAIRES \
+  --enable-producer
+# Only if the local Cockpit interface is wanted:
+sudo ./configure-workspace-cockpit-local \
+  --user <linux-user> --affaires-root /mnt/pantheon-affaires/KROQI/AFFAIRES \
+  --enable-cockpit
 ```
 
 The service binds to `127.0.0.1:8189` by default and reads only the operator-selected Linux-mounted NAS `AFFAIRES_ROOT`. Cockpit is a projection; the standalone producer remains the only scan/watch/reconcile and Hindsight-write owner.
@@ -351,7 +405,7 @@ A running Hindsight version change is refused unless the operator first establis
 
 ## Version posture
 
-The current Hindsight qualification/deployment candidate is 0.10.1. Upstream released it on 2026-09-21. The container digest remains deliberately unrecorded until the exact target image is pulled and observed on the qualification node; version selection is not runtime activation or qualification success.
+The current Hindsight qualification/deployment candidate is 0.10.2. Upstream released it on 2026-09-29. The container digest remains deliberately unrecorded until the exact target image is pulled and observed on the qualification node; version selection is not runtime activation or qualification success.
 
 `release.env` is a deployment-candidate lock, not the external qualification registry. It may intentionally differ from `implementation/qualification/external-pins.json` where a newer upstream stable release has been reviewed for installation but has not been promoted as a qualified Pantheon binding.
 
@@ -402,9 +456,9 @@ Those can be added only when their actual configuration and qualification needs 
 
 The productive Workspace/Hindsight topology is evaluated from this Linux host against the NAS path as mounted here. Hindsight remains local to Linux; the AFFAIRES daemon is the filesystem watcher and Hindsight producer.
 
-On the current node, configure the Workspace source to the project-level subtree
-`/mnt/pantheon-affaires/KROQI/AFFAIRES`, not the broader NAS mount. Only there
-does the first directory reliably identify a project.
+Set `AFFAIRES_ROOT` locally to the admitted source root whose direct children
+are project directories. The repository never assumes a NAS hostname, share,
+project name, or intermediary folder.
 
 Create the SMB credentials file locally as root with mode `0600`; never put its
 contents in Git, shell arguments or chat. Install `cifs-utils`, then configure a
@@ -413,7 +467,7 @@ persistent mount without embedding site-specific names in the repository:
 ```bash
 sudo deployment/ubuntu/configure-affaires-nas-mount \
   --apply --source //HOST/SHARE --prefix-path RELATIVE/PATH \
-  --target /mnt/pantheon-affaires --enable
+  --target /path/to/mounted/AFFAIRES --enable
 ```
 
 The host, share, relative path and credentials are operator inputs. Consumers

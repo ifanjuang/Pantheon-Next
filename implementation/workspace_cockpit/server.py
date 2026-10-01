@@ -76,9 +76,36 @@ FILENAME_REVISION_RE = re.compile(
     re.IGNORECASE,
 )
 
+# The Cockpit is a local navigation surface, not a reverse proxy. Links are
+# deliberately opt-in: an absent or malformed URL is not rendered.
+NAVIGATION_LINKS = (
+    ("WORKSPACE_COCKPIT_HERMES_URL", "Hermes", "Assistant gouverné"),
+    ("WORKSPACE_COCKPIT_HINDSIGHT_URL", "Hindsight", "Mémoire et documents indexés"),
+    ("WORKSPACE_COCKPIT_MNEMOSYNE_URL", "Mnemosyne", "Mémoire locale"),
+)
+
 
 def _visible(path: Path) -> bool:
     return not path.name.startswith(".") and not path.is_symlink()
+
+
+def configured_navigation() -> list[dict[str, str]]:
+    """Return explicitly configured, credential-free HTTP(S) navigation links."""
+    links: list[dict[str, str]] = []
+    for variable, label, description in NAVIGATION_LINKS:
+        raw_url = os.getenv(variable, "").strip()
+        parsed = urlparse(raw_url)
+        if (
+            parsed.scheme not in {"http", "https"}
+            or not parsed.netloc
+            or parsed.username is not None
+            or parsed.password is not None
+            or parsed.query
+            or parsed.fragment
+        ):
+            continue
+        links.append({"label": label, "description": description, "url": raw_url})
+    return links
 
 
 def _direct_files(path: Path) -> list[Path]:
@@ -1619,6 +1646,7 @@ class CockpitHandler(BaseHTTPRequestHandler):
     role_trace_url = ""
     role_trace_key = ""
     memory_reconciliation: MemoryReconciliationService | None = None
+    navigation: list[dict[str, str]] = []
 
     def _headers(self, status: HTTPStatus, content_type: str) -> None:
         self.send_response(status)
@@ -1814,6 +1842,9 @@ class CockpitHandler(BaseHTTPRequestHandler):
                 }
             )
             return
+        if path == "/api/navigation":
+            self._json({"links": self.navigation})
+            return
         if path == "/api/workspaces":
             if self.workspace_index:
                 self._json(self.workspace_index.snapshot())
@@ -1944,11 +1975,6 @@ def build_parser() -> argparse.ArgumentParser:
         help="dedicated no-tool Hermes profile base URL for on-demand memory reconciliation",
     )
     parser.add_argument(
-        "--reconcile-hermes-model",
-        default=os.getenv("WORKSPACE_RECONCILE_HERMES_MODEL", ""),
-        help="optional model/model-route override for the dedicated reconciliation profile",
-    )
-    parser.add_argument(
         "--reconcile-max-context-chars",
         type=int,
         default=int(os.getenv("WORKSPACE_RECONCILE_MAX_CONTEXT_CHARS", "48000")),
@@ -2034,7 +2060,6 @@ def main(argv: list[str] | None = None) -> int:
             hermes_client=HermesReconciliationClient(
                 reconcile_hermes_url,
                 reconcile_hermes_key,
-                model=args.reconcile_hermes_model,
                 timeout_seconds=float(os.getenv("WORKSPACE_RECONCILE_HERMES_TIMEOUT_SECONDS", "120")),
             ),
             max_context_chars=args.reconcile_max_context_chars,
@@ -2067,6 +2092,7 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit("WORKSPACE_ROLE_TRACE_URL must be HTTP(S)")
     CockpitHandler.role_trace_url = role_trace_url
     CockpitHandler.role_trace_key = role_trace_key
+    CockpitHandler.navigation = configured_navigation()
     server = ThreadingHTTPServer((args.host, args.port), CockpitHandler)
     print(f"workspace-cockpit listening on http://{args.host}:{args.port}", flush=True)
     try:

@@ -267,12 +267,10 @@ class HermesReconciliationClient:
         base_url: str,
         api_key: str,
         *,
-        model: str = "",
         timeout_seconds: float = 120.0,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key.strip()
-        self.model = model.strip()
         self.timeout_seconds = float(timeout_seconds)
         parsed = urlparse(self.base_url)
         if parsed.scheme not in {"http", "https"} or not parsed.netloc:
@@ -340,22 +338,105 @@ class HermesReconciliationClient:
                 "Hermes reconciliation profile exposes toolsets: " + ", ".join(sorted(enabled))
             )
 
+    def _stream_response(self, payload: dict[str, Any]) -> tuple[dict[str, Any], str]:
+        """Read Responses SSE so the cleanup session id is known before inference ends."""
+        data = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+        headers = self._headers(json_body=True)
+        headers["Accept"] = "text/event-stream"
+        request = Request(
+            f"{self.base_url}/v1/responses",
+            data=data,
+            headers=headers,
+            method="POST",
+        )
+        session_id = ""
+        terminal: dict[str, Any] | None = None
+        try:
+            with urlopen(request, timeout=self.timeout_seconds) as response:
+                session_id = str(response.headers.get("X-Hermes-Session-Id") or "").strip()
+                if not session_id:
+                    raise ReconciliationResidencyError(
+                        "Hermes did not return a session id before streaming inference"
+                    )
+                event_name = ""
+                data_lines: list[str] = []
+                while True:
+                    raw_line = response.readline()
+                    if not raw_line:
+                        break
+                    try:
+                        line = raw_line.decode("utf-8").rstrip("\r\n")
+                    except UnicodeError as exc:
+                        raise ReconciliationError("Hermes returned invalid SSE text") from exc
+                    if line.startswith("event:"):
+                        event_name = line[6:].strip()
+                    elif line.startswith("data:"):
+                        data_lines.append(line[5:].lstrip())
+                    elif not line and data_lines:
+                        try:
+                            event = json.loads("\n".join(data_lines))
+                        except json.JSONDecodeError as exc:
+                            raise ReconciliationError("Hermes returned invalid SSE JSON") from exc
+                        event_type = event.get("type") if isinstance(event, dict) else None
+                        event_type = event_type or event_name
+                        if event_type == "response.completed":
+                            candidate = event.get("response")
+                            if not isinstance(candidate, dict):
+                                raise ReconciliationError(
+                                    "Hermes completed SSE event has no response object"
+                                )
+                            terminal = candidate
+                            break
+                        if event_type == "response.failed":
+                            detail = event.get("response") if isinstance(event, dict) else None
+                            raise ReconciliationError(
+                                "Hermes streaming response failed: "
+                                + json.dumps(detail, ensure_ascii=False)[:2000]
+                            )
+                        event_name = ""
+                        data_lines = []
+        except HTTPError as exc:
+            detail = exc.read(4096).decode("utf-8", errors="replace")
+            raise ReconciliationError(f"Hermes HTTP {exc.code}: {detail}") from exc
+        except ReconciliationResidencyError:
+            raise
+        except (OSError, URLError) as exc:
+            if session_id:
+                try:
+                    self.delete_session(session_id)
+                except ReconciliationError as cleanup_exc:
+                    raise ReconciliationResidencyError(
+                        "Hermes streaming failed and its session could not be deleted"
+                    ) from cleanup_exc
+            raise ReconciliationError(f"Hermes unavailable: {exc}") from exc
+        except Exception:
+            if session_id:
+                try:
+                    self.delete_session(session_id)
+                except ReconciliationError as cleanup_exc:
+                    raise ReconciliationResidencyError(
+                        "Hermes streaming failed and its session could not be deleted"
+                    ) from cleanup_exc
+            raise
+        if terminal is None:
+            try:
+                self.delete_session(session_id)
+            except ReconciliationError as cleanup_exc:
+                raise ReconciliationResidencyError(
+                    "Hermes stream ended and its session could not be deleted"
+                ) from cleanup_exc
+            raise ReconciliationError("Hermes stream ended without a terminal response")
+        return terminal, session_id
+
     def reconcile(self, packet: dict[str, Any]) -> HermesCallResult:
         self.assert_no_tools()
         body: dict[str, Any] = {
             "input": json.dumps(packet, ensure_ascii=False, separators=(",", ":")),
             "instructions": SYSTEM_INSTRUCTIONS,
             "store": False,
-            "stream": False,
+            "stream": True,
         }
-        if self.model:
-            body["model"] = self.model
-        payload, headers = self._request_json("POST", "/v1/responses", body)
-        session_id = str(headers.get("X-Hermes-Session-Id") or "").strip()
-        if not session_id:
-            raise ReconciliationResidencyError(
-                "Hermes did not return a session id, so transient-session cleanup cannot be proven"
-            )
+        payload, session_id = self._stream_response(body)
         candidate_error: Exception | None = None
         candidate: dict[str, Any] | None = None
         try:

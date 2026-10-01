@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-closed project-scoped recall adapter for Hindsight 0.10.1."""
+"""Fail-closed project-scoped recall adapter for Hindsight 0.10.2."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ import re
 from typing import Any
 import unicodedata
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote, urlparse
+from urllib.parse import quote, urlencode, urlparse
 from urllib.request import Request, urlopen
 
 
@@ -92,6 +92,31 @@ class ProjectRecallClient:
         if not isinstance(payload, dict) or not isinstance(payload.get("results"), list):
             raise ProjectRecallError("Hindsight returned an unexpected recall response")
         return payload
+
+    def list_project_scopes(self, limit: int = 100) -> dict[str, Any]:
+        """List bounded project-scope tags and their observed memory counts."""
+        path = f"/v1/default/banks/{quote(self.bank_id, safe='')}/tags?" + urlencode({
+            "q": "scope:project:*", "limit": max(1, min(int(limit), 250)),
+        })
+        headers = {"Accept": "application/json", "User-Agent": "pantheon-hindsight-project-router/1"}
+        if self.authorization:
+            headers["Authorization"] = self.authorization
+        try:
+            with urlopen(Request(f"{self.base_url}{path}", headers=headers), timeout=self.timeout_seconds) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+        except (HTTPError, OSError, URLError, UnicodeError, json.JSONDecodeError) as exc:
+            raise ProjectRecallError(f"Hindsight project list unavailable: {exc}") from exc
+        items = payload.get("items") if isinstance(payload, dict) else None
+        if not isinstance(items, list):
+            raise ProjectRecallError("Hindsight returned an unexpected project-tag response")
+        projects = [
+            {"scope": item["tag"], "memory_count": item["count"]}
+            for item in items
+            if isinstance(item, dict) and isinstance(item.get("tag"), str)
+            and isinstance(item.get("count"), int) and item["tag"].startswith("scope:project:")
+        ]
+        return {"status": "ok", "source_scope": f"source:{self.source_kind}", "projects": projects,
+                "total": payload.get("total", len(projects)), "scope_is_indexed_not_identity": True}
 
     def recall_project(
         self,

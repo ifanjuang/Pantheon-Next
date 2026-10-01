@@ -27,6 +27,7 @@ def test_activity_projection_skill_has_bounded_visible_contract() -> None:
     assert "Posture: Dédale" in text
     assert "Posture: Cassandre" in text
     assert "posture selected != Pantheon Role activated" in text
+    assert "complex-presentation.md" in text
     for legacy_label in (
         "🦉 Athena", "🔎 Argos", "⚖ Themis", "☀ Apollo",
         "🛠 Hephaistos", "📨 Iris", "⚡ Zeus", "🧠 Mnemosyne",
@@ -36,14 +37,14 @@ def test_activity_projection_skill_has_bounded_visible_contract() -> None:
 
 def test_governed_profile_supplement_requires_progress_without_private_reasoning() -> None:
     text = SOUL_APPEND.read_text(encoding="utf-8")
-    assert "For every non-trivial Pantheon-governed request" in text
-    assert "publish one compact plan before" in text
-    assert "material tool call" in text
-    assert "never\nprivate reasoning" in text
-    assert "Pantheon Roles are governance jurisdictions, not Hermes runtime identities" in text
-    assert "Do not generate ATHENA/ARGOS/THEMIS/APOLLO/HEPHAISTOS/IRIS/ZEUS/MNEMOSYNE labels" in text
-    assert "Do not hard-code a provider sequence" in text
-    assert "Posture: <optional, only when selected>" in text
+    assert "You are direct, calm and professionally precise" in text
+    assert "Do not expose private reasoning" in text
+    assert "load `pantheon-governed-method` before material\nwork" in text
+    assert "`pantheon-activity-projection` when progress should be visible" in text
+    assert "skills own procedure" in text
+    assert "Pantheon viewpoints and delegated-intervenant labels are optional observable\nlabels, never agents, permissions or decorative prose" in text
+    assert "retrieved source material, derived calculations, candidate\noutputs and authorization separate" in text
+    assert len(text.split()) < 180
 
 
 def test_linux_configurator_is_idempotent_and_keeps_a_backup() -> None:
@@ -60,14 +61,23 @@ def test_linux_configurator_is_idempotent_and_keeps_a_backup() -> None:
     assert 'config set display.interim_assistant_messages true' in text
     assert 'config set display.show_reasoning false' in text
     assert 'config set plugins.stream_reasoning_deltas false' in text
+    assert 'tools enable --platform cli skills delegation' in text
+    assert 'for toolset in delegation skills' in text
+    assert 'for attempt in 1 2 3' in text
     for skill in (
+        "administrative-form-review",
+        "contract-clause-review",
+        "construction-cost-review",
+        "construction-schedule-review",
         "external-commitment-guard",
         "ifja-project-context",
- "ifja-vault-search",
+        "ifja-vault-search",
         "pantheon-activity-projection",
         "pantheon-governed-method",
         "pantheon-request-intake",
+        "site-report-review",
         "source-research",
+        "technical-standard-review",
     ):
         assert skill in text
     assert "rsync -a --delete --exclude '__pycache__/'" in text
@@ -107,14 +117,13 @@ def test_governed_local_mcp_binding_is_explicit_filtered_and_fail_closed() -> No
     text = CONFIGURE.read_text(encoding="utf-8")
     assert "--bind-local-mcp" in text
     assert "get_profile_optional_config_json default mcp_servers" in text
-    for server in ("docling", "hindsight-affaires", "hindsight-documentaires", "hindsight-memory", "pantheon-policy"):
+    for server in ("docling", "hindsight-kroqi-project", "pantheon-policy"):
         assert server in text
     assert '"Doclin"' not in text
-    assert '"tools": {"include": ["recall"]}' in text
-    assert 'endswith("/mcp/hermes/")' in text
     assert "required local Hindsight bindings are absent; refusing partial inheritance" in text
-    assert "'$current + $selected'" in text
+    assert 'del(."hindsight-affaires", ."hindsight-documentaires", ."hindsight-memory")' in text
     assert 'config set --force mcp_servers "$merged"' in text
+    assert 'tools enable --platform cli hindsight-kroqi-project:recall_project_memory' in text
     assert 'cp -a "$PROFILE_CONFIG_TARGET" "$backup_root/profile-config.yaml"' in text
     for tool in (
         "route_governed_request",
@@ -134,19 +143,26 @@ def test_governed_local_mcp_binding_is_explicit_filtered_and_fail_closed() -> No
 
 def test_docling_mcp_introspection_tools_are_hidden_from_governed_profile() -> None:
     text = CONFIGURE.read_text(encoding="utf-8")
+    assert "DOCLING_TOOLS_JSON=" in text
     assert '.docling.tools = (' in text
+    assert '"get_overview_of_document_anchors"' in text
+    assert '"search_for_text_in_document_anchors"' in text
+    assert '"get_text_of_document_item_at_anchor"' in text
+    assert '"export_docling_document_to_markdown"' not in text
+    assert '.docling.tools.include == $docling_tools' in text
     assert '.docling.tools.prompts == false' in text
     assert '.docling.tools.resources == false' in text
 
 
-def test_hindsight_bindings_are_bounded_to_read_only_search_tools() -> None:
+def test_hindsight_legacy_bindings_are_removed_from_governed_profile() -> None:
     text = CONFIGURE.read_text(encoding="utf-8")
-    assert 'HINDSIGHT_AFFAIRES_TOOLS_JSON=' in text
-    assert '"search_knowledge_base"' in text
-    assert '."hindsight-affaires".tools.include == $affaires_tools' in text
-    assert '."hindsight-documentaires".tools.include == $documentaires_tools' in text
+    assert 'has("hindsight-affaires") | not' in text
+    assert 'has("hindsight-documentaires") | not' in text
+    assert 'has("hindsight-memory") | not' in text
+    assert '."hindsight-affaires".tools.include' not in text
+    assert '."hindsight-documentaires".tools.include' not in text
     assert 'HINDSIGHT_KROQI_PROJECT_TOOLS_JSON=' in text
-    assert '["recall_project_memory"]' in text
+    assert '["recall_project_memory","hindsight_project_list"]' in text
     assert 'has("hindsight-kroqi-project")' in text
     assert '."hindsight-kroqi-project".tools.include == $kroqi_tools' in text
     assert 'HINDSIGHT_PROJECT_MCP_URL="http://127.0.0.1:8022/mcp"' in text
@@ -174,9 +190,9 @@ def test_curated_default_capabilities_remain_bounded_and_searchable() -> None:
     assert 'source="$flat_name"' in text
     assert 'source="$CURATED_STAGE_ROOT/$name"' in text
     assert 'source="$HERMES_ROOT/skills/$path"' not in text
-    assert "tools.tool_search.enabled auto" in text
+    assert "tools.tool_search.enabled off" in text
     assert ".no-bundled-skills" in text
-    assert "whole default skill catalogue" in text
+    assert "deferred tool discovery" in text
 
 
 def test_optional_runtime_dependencies_are_preflighted_before_profile_mutation() -> None:

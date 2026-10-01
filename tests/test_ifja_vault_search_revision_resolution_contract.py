@@ -10,7 +10,7 @@ def test_latest_document_resolution_uses_source_chronology_not_ingest_metadata()
     normalized = " ".join(text.split())
 
     assert "Latest document / revision resolution" in text
-    assert "Hindsight `get_document`" in text
+    assert "admitted vault reader or Docling" in text
     assert "source_revision" in text
     assert "source_document_date" in text
     assert "source_revision_history[]" in text

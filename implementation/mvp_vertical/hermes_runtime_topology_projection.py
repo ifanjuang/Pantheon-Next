@@ -31,6 +31,17 @@ _NUMERIC_FIELDS = (
     "cost_usd",
 )
 
+# A figure is only a display label for an explicitly declared, bounded
+# delegation.  It is neither a separate agent identity nor a source of
+# authority.  Keeping the allow-list here prevents a prompt or an upstream
+# free-text field from inventing a person in the cockpit.
+DELEGATION_FIGURES = {
+    "palamede": {"name": "Palamède", "mission": "analyse factuelle"},
+    "ariane": {"name": "Ariane", "mission": "chronologie des échanges"},
+    "diomede": {"name": "Diomède", "mission": "vérification"},
+    "antigone": {"name": "Antigone", "mission": "lacunes et contradictions"},
+}
+
 
 class HermesRuntimeTopologyProjectionError(ValueError):
     """A public subagent event cannot be projected without crossing a boundary."""
@@ -79,6 +90,32 @@ class HermesRuntimeTopologyProjector:
         if not self.run_id:
             raise HermesRuntimeTopologyProjectionError("run_id is required")
         self._subagent_ids: set[str] = set()
+        self._figures: dict[str, dict[str, str]] = {}
+
+    def _figure(self, event: dict[str, Any], *, subagent_id: str) -> dict[str, str] | None:
+        """Return only an explicitly declared, known delegation figure.
+
+        A completion may omit the field: it inherits the declaration observed
+        at start.  Supplying a different value is rejected rather than being
+        silently rewritten into a plausible narrative.
+        """
+
+        declared = event.get("delegation_figure")
+        remembered = self._figures.get(subagent_id)
+        if declared is None:
+            return remembered
+        key = _bounded(declared, limit=80)
+        if key is None or key.casefold() not in DELEGATION_FIGURES:
+            raise HermesRuntimeTopologyProjectionError(
+                "delegation_figure must be one of the declared Pantheon figures"
+            )
+        figure = dict(DELEGATION_FIGURES[key.casefold()])
+        if remembered is not None and remembered != figure:
+            raise HermesRuntimeTopologyProjectionError(
+                "delegation_figure changed during one subagent lifecycle"
+            )
+        self._figures[subagent_id] = figure
+        return figure
 
     def feed(self, event: dict[str, Any]) -> list[dict[str, Any]]:
         if not isinstance(event, dict):
@@ -102,6 +139,7 @@ class HermesRuntimeTopologyProjector:
             raise HermesRuntimeTopologyProjectionError(
                 f"subagent count exceeds {MAX_SUBAGENTS} for one run"
             )
+        figure = self._figure(event, subagent_id=subagent_id)
 
         phase = "started" if event_type == "subagent.start" else "completed"
         metrics = {
@@ -134,6 +172,10 @@ class HermesRuntimeTopologyProjector:
             "persistence": "none",
             "authority_effect": "none",
             "governed_identity": False,
+            "figure": figure,
+            "figure_basis": (
+                "explicit_delegation_metadata" if figure is not None else "not_declared"
+            ),
             "private_reasoning_included": False,
         }
         return [projection]

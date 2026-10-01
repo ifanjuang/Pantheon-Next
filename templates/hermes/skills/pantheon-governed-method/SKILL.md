@@ -12,30 +12,21 @@ metadata:
 
 # Pantheon governed method
 
-General-purpose coordination adapter for non-trivial professional work. It
-supports any bounded candidate output or action without encoding the object's
-business label or creating an object-specific workflow.
+General coordination adapter for non-trivial professional work. It selects the
+smallest justified method and returns a bounded, sourced readiness statement.
+It never derives authority from a project name, document label, installed tool
+or model confidence.
 
 ```text
-method movement != runtime stage
 viewpoint != autonomous agent
-policy guidance != execution
+retrieved != true
 candidate complete != approved or transmitted
-technical receipt != Evidence
 ```
 
-## When to use
+## Core movement
 
-Use when the request materially depends on scope, sources, professional risk,
-several operations, a produced artifact, a delivery boundary or an observable
-acceptance criterion. Keep trivial questions and harmless transformations quiet.
-
-Never select a procedure from a client, project, object or deliverable label. Select only
-from material conditions observed in the current request and task state.
-
-## Seven movements
-
-Apply the smallest useful form of the governed method:
+Use only the movements that add value; loop back when a material source,
+contradiction, scope, risk or completion condition changes.
 
 ```text
 1. Frame / Cadrer
@@ -47,304 +38,58 @@ Apply the smallest useful form of the governed method:
 7. Status / Statuer
 ```
 
-These are movements, not a mandatory linear pipeline. Skip an empty movement,
-combine adjacent movements when that stays legible, and loop back only when a
-material source, contradiction, scope, risk or completion condition changes.
-
-## Postures
-
-The movements above are normally carried out inside the default governed
-runtime envelope. A posture names how the current step of work is being done;
-it is not a Pantheon Role, does not by itself create a Hermes profile and does
-not change the runtime envelope.
-
-```text
-posture selected != Pantheon Role
-posture changed != profile changed
-posture output != judgment
-default governed profile != only possible profile
-```
-
-Use the governed default for normal work. Only a genuine runtime boundary — a
-different model, memory posture, credential set, tool surface, material data
-exposure or execution-isolation requirement — can justify a separate profile.
-A different cognitive function alone cannot. See
-`hermes/profiles/PROFILE_CONSTITUTION.md`.
-
-### Ulysse — lead (default posture)
-
-Trigger: every non-trivial request, by default; holds the Task Contract and
-the thread of the work end to end.
-Receives: the Task Contract and the current Context Pack.
-Returns: the composed movement sequence, the synthesized candidate, and the
-next proposed movement within the admitted boundary.
-Never: widen the admitted scope, decide what is authorized next, grant
-approval, convert a result into Evidence, persist memory canonically, or
-authorize an external effect.
-
-```text
-next proposed movement != next authorized action
-coordination != authorization
-candidate synthesis != judgment
-```
-
-### Nestor — investigator
-
-Trigger: a source, version or prior state is missing, contested or unclear.
-Receives: a bounded question and the sources admitted for the task.
-Returns: facts found, source references, versions, contradictions, missing
-material.
-Never: declare a source Evidence or true by itself.
-
-### Dédale — maker
-
-Trigger: an artifact, document, table, calculation or patch must be
-produced.
-Receives: an explicit production brief and its constraints.
-Returns: a Result Candidate.
-Never: declare its own output approved, complete, or ready for delivery.
-
-### Cassandre — critic
-
-Trigger: a bounded candidate needs contradiction, unsupported-claim or
-adversarial review. This posture may be used as a normal verification method.
-If `AUTOCRITIQUE_CONTRADICTOIRE` is separately qualified and activated through
-the governed Rite path, Cassandre may provide the bounded critical work used by
-that Rite; selecting the posture does not activate or complete the Rite.
-Receives: the frozen candidate, bounded evidence, and the review question.
-Returns: contradictions, unsupported claims, analogous occurrences, or
-`no issue found within tested scope`.
-Never: repair the candidate it is reviewing, return an approval verdict, or
-activate/close a Rite.
-
-```text
-Cassandre selected != AUTOCRITIQUE_CONTRADICTOIRE activated
-critic posture completed != Rite completed
-Rite condition observed != Rite authorized
-```
-
-Each posture is realized through the smallest sufficient mechanism: usually
-the same context as Ulysse; a `delegate_task` child carrying its own
-`output_schema` when a bounded child task, fresh conversation or strict output
-contract adds real value; a separate profile only when a genuine runtime
-boundary applies. A delegated worker remains a transient runtime identity, not
-a named governed actor. Whether isolation is real, and not only a fresh
-conversation, remains a separately qualified question.
-
-```text
-subagent_id != Mortel
-Mortel != runtime identity
-delegate_task available != delegation required
-fresh child conversation != fully isolated reviewer
-```
-
-## Adaptive task flow
-
-Select the lightest coordination surface that can represent the request:
-
-```text
-simple question or single transformation
-  -> direct response; no task board and no synthetic milestones
-material bounded request
-  -> compact Hermes milestones and one final readiness status
-complex request (multiple subgoals, dependencies, artifacts or sessions)
-  -> Task Contract plus an optional Kanban projection over its task items
-```
-
-Treat a request as complex when at least two material signals are observed:
-multiple independently checkable subgoals, a dependency between steps, more
-than one deliverable, work expected across sessions, a human decision gate, or
-an external-effect boundary. One long prompt is not by itself a complexity
-signal. For a complex request, prepare a Task Contract skeleton through the
-admitted Pantheon policy binding before creating cards; the contract names the
-scope, roles, constraints, expected evidence and stop conditions.
-
-The optional Kanban view is not a second source of truth. It projects the
-structured task contract using the candidate statuses `backlog`, `todo`,
-`in_progress`, `to_verify`, `blocked`, `done`, `cancelled` and `superseded`.
-Move a card only when an observable result, dependency, source, decision or
-blocker changes. Independent items may proceed in parallel; dependent items
-remain waiting until their prerequisite is ready. A loop returns to the
-smallest affected movement rather than restarting the whole task.
-
-Do not create a board merely because the request contains several sentences.
-Do not close a professional task, transmit an artifact or infer approval from a
-Kanban `done` status. Pantheon readiness and external-action gates remain
-independent of the projected board.
-
-When a complex task is resumed, reconstruct the board from the current Task
-Contract and observed receipts rather than trusting an old visual snapshot.
-Unknown or contradictory card state is `to_verify`, not `done`.
-
-### 1. Frame
-
-Preserve the requested effect, audience, scope and output. Use
-`pantheon-request-intake` to emit only supported conditions, coordination
-relations and observable completion requirements.
-
-### 2. Admit
-
-Inventory what is actually available, referenced but absent, stale, partial or
-contradictory. User-provided material, memory recall and retrieved results enter
-as bounded working material, never as truth or Evidence by default.
-
-### 3. Qualify
-
-For a consequential boundary, call the exposed read-only Pantheon policy tools
-instead of reproducing policy locally:
-
-```text
-classify_request
-evaluate_preflight
-prepare_task_contract_skeleton
-prepare_evidence_pack_skeleton
-plan_context_pack
-validate_context_pack
-```
-
-Call only the subset justified by the returned handling. Candidate preparation
-does not execute work, and validation does not authorize an effect.
-
-Hermes currently represents deferred MCP functions as local tools. Invoke only
-one such MCP function per `tool_call`; do not batch several local MCP calls in a
-single call envelope. Sequence dependent policy calls. This runtime constraint
-overrides the general preference to batch independent reads.
-
-When professional factual claims require workspace sources, complete the
-source-preflight receipt described below before presenting them as supported.
-
-For Pantheon doctrine, prefer the compact progressive route:
-
-```text
-route_governed_request(request YAML or plain request text, source_limit <= 3)
--> read_doctrine(exact selected key)
--> source-preflight receipt
-```
-
-The route operation combines request classification and doctrine shortlisting
-so Hermes does not batch dependent deferred MCP functions. Do not call
-`classify_request`, `find_relevant_sources` or `list_sources` on the normal
-answer path. Those lower-level and catalog primitives are reserved for explicit
-administration, compatibility or diagnosis outside the governed runtime
-profile. A shortlist is not a source consultation: only `read_doctrine` opens
-the selected doctrine source.
-
-Hermes may pass the user's request as `request_text` when a structured candidate
-has not already been prepared. Do not ask the user to write YAML solely to use
-this tool; the MCP adapter converts plain text into a bounded candidate.
-
-### 4. Compose
-
-Select the smallest set of existing capabilities. A normal task has at most:
-
-```text
-one primary method;
-one guardrail method;
-one verification method.
-```
-
-Examples of condition-driven selection:
-
-| Material condition | Typical composition |
-|---|---|
-| source-dependent claim | source admission + assertion/probative review |
-| candidate crosses an audience or system boundary | productive method + external commitment guard |
-| derived quantitative claim | applicable source route + quantitative reconciliation |
-| structured output must be produced | admitted production skill + output verification |
-| several independent checks | parallel retrieval/checks + one synthesis |
-
-These are selection patterns, not fixed workflows. Load specialist skills only
-when their exact trigger is present. Availability is neither use nor authority.
-
-### 5. Produce Candidate
-
-Hermes executes admitted search, reading, comparison, calculation, drafting and
-artifact production through existing skills and tools. Preserve provenance,
-assumptions, contradictions and the distinction between sourced and derived
-content.
-
-### 6. Test
-
-Test against the completion requirements returned by policy or explicitly
-stated by the task. Use observable checks: source opened, components reconciled,
-artifact rendered, requested sections present, tests passed, wording reviewed or
-external gate opened. Do not use `looks correct` as a test.
-
-If a material condition changes, return to Frame/Qualify. Do not rerun policy
-after every routine tool call.
-
-### 7. Status
-
-First name the bounded result whose readiness is being judged. Close each
-materially shown responsibility with one of the existing readiness decisions:
-
-```text
-ready
-ready_with_limits
-needs_revision
-needs_user_input
-blocked
-```
-
-Apply the decisions consistently:
-
-| Decision | Meaning for the requested result |
-|---|---|
-| `ready` | produced and observably checked for its declared internal use |
-| `ready_with_limits` | produced and usable for that use with bounded explicit limits |
-| `needs_revision` | produced but an observed defect prevents declared use |
-| `needs_user_input` | cannot be produced without a decision or datum unavailable to tools |
-| `blocked` | cannot be produced because a required technical, access or authority dependency is unavailable |
-
-Attach the smallest useful result, evidence/source references, limitations and
-next safe action. Judge the result the user requested, not whether the method
-itself ran successfully. A method explanation may be `ready_with_limits` while
-the absent professional result is `needs_user_input`; name which one is being
-reported. This is readiness for the bounded candidate, not whole-task approval.
-A draft may be `ready` for internal review while remaining blocked for external
-transmission.
-
-## Source-preflight receipt
-
-For a material professional factual answer, record a compact task-local receipt
-using `templates/hermes/returns/source_preflight_receipt.template.yaml`.
-
-The receipt must identify:
-
-- each source family required by the admitted contextual adapter;
-- the actual binding/tool used for each consultation;
-- the exact source reference opened and, when useful, its inspected locator;
-- observed source metadata and limitations without invented values;
-- whether memory supplied only an unconfirmed lead;
-- the Context Pack validation result when a Context Pack was required;
-- the completion result for each required source family.
-- an observed runtime trace reference when the active surface exposes one.
-
-A required family is not complete when only search snippets, conversation
-memory, model recall or a guessed filename were observed. If the exact source
-cannot be opened, use `needs_user_input` or `blocked`; do not fabricate a
-supported answer.
-
-```text
-memory lead != source consultation
-search hit != exact source opened
-receipt complete != source true
-Context Pack valid != Evidence or approval
-model-declared tool use != observed runtime trace
-```
-
-## Presentation
-
-Use `pantheon-activity-projection` for non-trivial work. Show only materially
-established Role viewpoints, actual tools and meaningful milestones. Never
-expose private chain-of-thought or invent role theatre.
-
-## Final invariant
-
-```text
-Classify by material conditions, not by object names.
-Compose existing capabilities proportionately.
-Produce and test an explicitly bounded candidate.
-State readiness, evidence limits and the next safe action.
+Classify by material conditions, not by object names. A normal composition has
+at most one primary method, one guardrail method and one verification method.
 Pantheon governs; Hermes executes; the human decides consequential effects.
-```
+
+## Load only what the task needs
+
+- Read [references/interaction.md](references/interaction.md) when the task
+  needs a visible plan, clarification, a selected Pantheon viewpoint, a work
+  posture, delegation or a revised plan.
+- Read [references/source-review.md](references/source-review.md) when factual
+  claims depend on workspace sources, candidates must be compared, completeness
+  must be established, or a source-review child may be useful.
+- Read [references/execution.md](references/execution.md) for consequential
+  policy routing, Task Contracts, Context Packs, production, verification,
+  source-preflight receipts or final readiness.
+
+Do not load every reference merely because the skill was selected. For a simple
+bounded factual review, `source-review.md` plus the relevant portions of
+`execution.md` are normally sufficient.
+
+## Route to one domain owner when justified
+
+Select by the reasoning required, not by the requested file format:
+
+- `construction-cost-review` for estimates, bids, quotes, invoices, variants,
+  lot coverage and financial comparability;
+- `site-report-review` for site observations, prior minutes, photographs,
+  decisions, reservations and open-point continuity;
+- `administrative-form-review` for CERFA or another filing form whose fields
+  must each be supported and uncertainty-preserving;
+- `technical-standard-review` for DTU or another technical standard whose
+  exact edition, applicability and normative force must be established;
+- `construction-schedule-review` for works sequencing, dependencies,
+  constraints, milestones, buffers and replanning.
+
+`source-research` owns bounded research. Drafting, reports and correspondence
+are production forms: the selected domain owner supplies the supported content,
+then `external-commitment-guard` is used when an external effect is possible.
+An overall project analysis composes only the owners actually triggered; it is
+not a separate catch-all skill. If a required owner is unavailable, mark that
+dimension `not_reviewed` instead of improvising expertise.
+
+## Universal stop rules
+
+- Do not widen admitted scope silently.
+- Do not turn memory, search hits or filenames into source authority.
+- Do not claim a check, role, skill, tool or delegated child that was not used.
+- Do not conceal missing coverage, contradictory material or an unreadable
+  consequential source.
+- Do not transmit, publish, persist canonical memory or cause another external
+  effect without the applicable explicit authorization.
+
+Finish with the smallest useful result, sources, limits, readiness and next safe
+action. Use only: `ready`, `ready_with_limits`, `needs_revision`,
+`needs_user_input`, or `blocked`.

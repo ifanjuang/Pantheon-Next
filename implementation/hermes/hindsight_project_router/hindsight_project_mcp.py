@@ -51,11 +51,28 @@ def recall_project_memory(
     folder: str = "",
     max_tokens: int = 2048,
 ) -> str:
-    """Recall up to eight source-grounded facts from exactly one KROQI project."""
+    """Recall up to eight facts from one exact project.
+
+    Put the resolved project hint or folder designation in ``project`` exactly
+    (for example ``resolved-project-slug``); never put the generic word "project"
+    there. Put the user's complete factual question and the designation in
+    ``query``. Resolve a partial or ambiguous designation with
+    ``ifja-vault-read:find_ifja_projects`` before calling this tool.
+    """
     try:
         payload = _client().recall_project(
             project, query, folder=folder, max_tokens=max_tokens
         )
+    except (ProjectRecallError, OSError, ValueError) as exc:
+        payload = {"status": "error", "reason": str(exc)}
+    return json.dumps(payload, ensure_ascii=False)
+
+
+@mcp.tool(annotations=READ_ONLY)
+def hindsight_project_list(limit: int = 100) -> str:
+    """List indexed project scopes and memory counts; does not read documents."""
+    try:
+        payload = _client().list_project_scopes(limit)
     except (ProjectRecallError, OSError, ValueError) as exc:
         payload = {"status": "error", "reason": str(exc)}
     return json.dumps(payload, ensure_ascii=False)
@@ -89,7 +106,9 @@ def run_http() -> None:
     token = token_file.read_text(encoding="ascii").strip()
     if len(token) < 32 or not token.isascii():
         raise RuntimeError("Hindsight project router token is missing or too short")
-    app = BearerGuard(mcp.streamable_http_app(host="127.0.0.1"), token)
+    app = BearerGuard(
+        mcp.streamable_http_app(host="127.0.0.1", stateless_http=True), token
+    )
     port = int(os.environ.get("HINDSIGHT_PROJECT_MCP_PORT", "8022"))
     uvicorn.run(app, host="127.0.0.1", port=port, log_level="warning")
 
