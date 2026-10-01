@@ -28,7 +28,9 @@ from . import (
     site_manifest_preview,
     site_navigation_profile,
     source_intake,
+    storage_retention,
     store,
+    workspace_email_archive,
     work_issue_read,
     work_issues,
 )
@@ -38,6 +40,7 @@ from .hermes_handoff_api import install_hermes_handoff_preview_routes
 from .information_projection_api import install_information_projection_routes
 from .policy_gate import HttpPolicyClient, PolicyClient
 from .source_intake_api import install_source_intake_routes
+from .workspace_email_action_api import install_workspace_email_action_routes
 
 COCKPIT = Path(__file__).resolve().parent / "cockpit"
 _DEFAULT_INITIALIZER = object()
@@ -100,6 +103,8 @@ def initialize_cockpit_schema() -> None:
         conn.execute(agency_data.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(agency_data.CLAIM_MIGRATION.read_text(encoding="utf-8"))
         conn.execute(source_intake.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(storage_retention.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(workspace_email_archive.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(information_projection.MIGRATION.read_text(encoding="utf-8"))
         conn.commit()
     finally:
@@ -493,6 +498,13 @@ def create_cockpit_app(
         require_read_key=require_agency_read_key,
         require_writer_kind=require_agency_writer_kind,
         require_actor=require_agency_actor,
+    )
+    install_workspace_email_action_routes(
+        app,
+        require_read_key=require_read_key,
+        require_editor_key=require_editor_key,
+        require_human_actor=require_human_actor,
+        with_connection=with_connection,
     )
     install_hermes_handoff_preview_routes(
         app,
