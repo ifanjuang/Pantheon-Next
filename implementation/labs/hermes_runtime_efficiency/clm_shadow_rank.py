@@ -40,6 +40,7 @@ QUANTIZED_RUNTIME_FIELDS = (
     "encoder_backend_version",
     "encoder_backend_ref",
     "encoder_artifact_repository",
+    "encoder_artifact_revision",
     "encoder_artifact_file",
     "encoder_artifact_sha256",
     "encoder_quantization",
@@ -228,6 +229,7 @@ def load_qualification_pin(path: Path) -> dict[str, str]:
         "vllm_version",
         "api_surface",
         "experimental_quantized_encoder_repository",
+        "experimental_quantized_encoder_revision",
         "experimental_q8_file",
         "experimental_q8_sha256",
         "experimental_q4_file",
@@ -302,6 +304,8 @@ def validate_runtime_against_pin(runtime_metadata: dict[str, str], pin: dict[str
             mismatches.append("encoder_backend_ref")
         if runtime_metadata["encoder_artifact_repository"] != pin["experimental_quantized_encoder_repository"]:
             mismatches.append("encoder_artifact_repository")
+        if runtime_metadata.get("encoder_artifact_revision") != pin["experimental_quantized_encoder_revision"]:
+            mismatches.append("encoder_artifact_revision")
         quantization = runtime_metadata["encoder_quantization"]
         if quantization == "Q8_0":
             expected_file = pin["experimental_q8_file"]
@@ -526,6 +530,7 @@ def run_shadow(
             "vllm_version": qualification_pin["vllm_version"],
             "api_surface": qualification_pin["api_surface"],
             "experimental_quantized_encoder_repository": qualification_pin["experimental_quantized_encoder_repository"],
+            "experimental_quantized_encoder_revision": qualification_pin["experimental_quantized_encoder_revision"],
             "experimental_q8_file": qualification_pin["experimental_q8_file"],
             "experimental_q8_sha256": qualification_pin["experimental_q8_sha256"],
             "experimental_q4_file": qualification_pin["experimental_q4_file"],
