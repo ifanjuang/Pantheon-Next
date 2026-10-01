@@ -331,6 +331,154 @@ def _storage_object_projection(conn: psycopg.Connection, storage_object_id: str)
     return pantheon_contracts.validate("storage_object", payload)
 
 
+
+def retain_bytes(
+    conn: psycopg.Connection,
+    *,
+    data: bytes,
+    media_type: str,
+    retention_root: Path,
+    storage_provider_ref: str,
+    expected_sha256: str | None = None,
+) -> dict[str, Any]:
+    """Retain exact arbitrary bytes without inventing a technical Document identity.
+
+    The returned Storage Object is exact-content identity only. Callers may bind
+    their own Source/provenance record separately. Physical deduplication does
+    not merge Source identity, project scope, access scope or professional meaning.
+    """
+    if not isinstance(data, (bytes, bytearray)):
+        raise StorageRetentionError("data must be bytes")
+    payload = bytes(data)
+    if not payload:
+        raise StorageRetentionError("data must be non-empty")
+    provider_ref = _required(storage_provider_ref, "storage_provider_ref")
+    media = _required(media_type, "media_type")
+    digest = hashlib.sha256(payload).hexdigest()
+    if expected_sha256 is not None:
+        expected = str(expected_sha256).strip().lower()
+        if len(expected) != 64 or any(char not in "0123456789abcdef" for char in expected):
+            raise StorageRetentionError("expected_sha256 must be a SHA-256 hexadecimal digest")
+        if digest != expected:
+            raise SourceContentMismatch(
+                f"provided bytes SHA-256 mismatch: expected {expected}, found {digest}"
+            )
+
+    destination, locator, _ = _resolved_destination(retention_root, digest)
+    if destination.exists():
+        _verify_file(destination, expected_digest=digest, expected_size=len(payload))
+    else:
+        lock_path = destination.with_name(f".{digest}.lock")
+        try:
+            lock_fd = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+        except FileExistsError as exc:
+            raise StorageRetentionError(
+                f"retention already in progress for digest {digest}"
+            ) from exc
+        except OSError as exc:
+            raise StorageRetentionError(f"cannot acquire retention lock: {lock_path}") from exc
+        else:
+            os.close(lock_fd)
+
+        tmp_path: Path | None = None
+        try:
+            if destination.exists():
+                _verify_file(destination, expected_digest=digest, expected_size=len(payload))
+            else:
+                fd, name = tempfile.mkstemp(
+                    prefix=f".{digest}.",
+                    suffix=".tmp",
+                    dir=destination.parent,
+                )
+                tmp_path = Path(name)
+                with os.fdopen(fd, "wb") as handle:
+                    handle.write(payload)
+                    handle.flush()
+                    os.fsync(handle.fileno())
+                _verify_file(tmp_path, expected_digest=digest, expected_size=len(payload))
+                if destination.exists():
+                    _verify_file(destination, expected_digest=digest, expected_size=len(payload))
+                else:
+                    os.replace(tmp_path, destination)
+                    tmp_path = None
+                _verify_file(destination, expected_digest=digest, expected_size=len(payload))
+        finally:
+            if tmp_path is not None:
+                try:
+                    tmp_path.unlink()
+                except FileNotFoundError:
+                    pass
+            try:
+                lock_path.unlink()
+            except FileNotFoundError:
+                pass
+
+    requested_object_id = _object_id(digest)
+    location_id = _location_id(provider_ref, locator)
+    with conn.transaction():
+        conn.execute(
+            """
+            INSERT INTO storage_objects (
+                storage_object_id, content_sha256, byte_size, media_type
+            ) VALUES (%s, %s, %s, %s)
+            ON CONFLICT (content_sha256) DO NOTHING
+            """,
+            (requested_object_id, digest, len(payload), media),
+        )
+        with conn.cursor(row_factory=dict_row) as cur:
+            cur.execute(
+                """
+                SELECT storage_object_id, byte_size, media_type
+                  FROM storage_objects
+                 WHERE content_sha256 = %s
+                """,
+                (digest,),
+            )
+            obj = cur.fetchone()
+        if obj is None or int(obj["byte_size"]) != len(payload):
+            raise StorageBindingConflict(
+                "existing Storage Object has incompatible byte size"
+            )
+        storage_object_id = obj["storage_object_id"]
+        conn.execute(
+            """
+            INSERT INTO storage_object_locations (
+                location_id, storage_object_id, storage_provider_ref, locator,
+                retention_guarantee, location_status,
+                verification_method, verified_at
+            ) VALUES (%s, %s, %s, %s, 'content_addressed', 'verified', 'full_sha256', clock_timestamp())
+            ON CONFLICT (storage_provider_ref, locator) DO NOTHING
+            """,
+            (location_id, storage_object_id, provider_ref, locator),
+        )
+        with conn.cursor(row_factory=dict_row) as cur:
+            cur.execute(
+                """
+                SELECT storage_object_id, location_status, verification_method
+                  FROM storage_object_locations
+                 WHERE storage_provider_ref = %s AND locator = %s
+                """,
+                (provider_ref, locator),
+            )
+            location = cur.fetchone()
+        if (
+            location is None
+            or location["storage_object_id"] != storage_object_id
+            or location["location_status"] != "verified"
+            or location["verification_method"] != "full_sha256"
+        ):
+            raise StorageBindingConflict(
+                "existing Storage Object location conflicts with verified binding"
+            )
+        storage_object = _storage_object_projection(conn, storage_object_id)
+
+    return {
+        "storage_object": storage_object,
+        "authority": dict(AUTHORITY),
+        "document_binding_created": False,
+    }
+
+
 def retain_document_version(
     conn: psycopg.Connection,
     *,
