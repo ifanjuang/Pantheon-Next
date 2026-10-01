@@ -316,6 +316,30 @@ docker compose --env-file release.env --env-file .env.workspace-cockpit \
 
 To bind to one reviewed LAN/private address, keep host-specific values and secrets in an ignored local env file and load it after the release lock. For authenticated access outside the LAN, the separate Tailscale candidate remains available.
 
+### Hindsight retain-completed hook
+
+The optional enrichment receiver remains loopback-only. It receives a signed
+`retain.completed` event, validates the bank and queues the document identity;
+it does not access the NAS, change source files, infer dates, or re-retain a
+document. The HMAC secret is generated outside Git. Prepare it, start the
+service, then register the webhook in Hindsight:
+
+```bash
+sudo ./configure-hindsight-enrichment-hook --prepare
+docker compose --env-file release.env --env-file .env.workspace-cockpit \
+  -f compose.workspace-cockpit-local.yaml --profile enrichment \
+  up -d --build hindsight-enrichment-hook
+sudo ./configure-hindsight-enrichment-hook --apply
+```
+
+After the final command, **Settings → Webhooks** in the `IFJA_KROQI` bank shows
+one enabled `retain.completed` endpoint. The Hindsight bank configuration also
+defines a small controlled vocabulary of entity labels (person, organisation,
+project, document, place, contract, lot, standard and asset). Unknown entities
+remain allowed so that retrieval does not silently discard a source fact.
+
+The enrichment endpoint is private/LAN publication, not authenticated Internet publication.
+
 The native systemd alternative is available when container deployment is
 unwanted. Install both units, then activate the Hindsight producer alone; the
 read-only Cockpit remains an explicit optional addition:

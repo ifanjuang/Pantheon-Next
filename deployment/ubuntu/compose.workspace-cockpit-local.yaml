@@ -150,5 +150,34 @@ services:
       retries: 5
       start_period: 5s
 
+  hindsight-enrichment-hook:
+    profiles: ["enrichment"]
+    image: pantheon/workspace-cockpit:local
+    container_name: pantheon-hindsight-enrichment-hook
+    restart: unless-stopped
+    network_mode: host
+    ports: !reset []
+    extra_hosts: !reset []
+    entrypoint: ["/opt/hermes/.venv/bin/python", "/app/hindsight_enrichment_hook.py"]
+    command: ["--host", "127.0.0.1", "--port", "8191", "--state-db", "/state/index.sqlite3"]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: [/tmp:size=16m,mode=1777]
+    # Created by configure-hindsight-enrichment-hook; it is deliberately
+    # outside the repository and contains only the HMAC signing secret.
+    env_file:
+      - /etc/pantheon-hindsight-enrichment-hook.env
+    environment:
+      HINDSIGHT_ENRICHMENT_BANK_ID: ${WORKSPACE_HINDSIGHT_BANK_ID:-IFJA_KROQI}
+    volumes:
+      - workspace-cockpit-state:/state
+    healthcheck:
+      test: ["CMD", "/opt/hermes/.venv/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8191/health', timeout=2)"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
 volumes:
   workspace-cockpit-state:

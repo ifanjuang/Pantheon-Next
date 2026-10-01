@@ -13,6 +13,8 @@ INSTALLER = ROOT / "deployment" / "ubuntu" / "configure-workspace-cockpit-local"
 COMPOSE = ROOT / "deployment" / "ubuntu" / "compose.workspace-cockpit-local.yaml"
 MOUNT_QUALIFIER = ROOT / "deployment" / "ubuntu" / "qualify-affaires-linux-mount.py"
 PRODUCER_DAEMON = ROOT / "implementation" / "workspace_cockpit" / "producer_daemon.py"
+ENRICHMENT_HOOK = ROOT / "implementation" / "workspace_cockpit" / "hindsight_enrichment_hook.py"
+ENRICHMENT_INSTALLER = ROOT / "deployment" / "ubuntu" / "configure-hindsight-enrichment-hook"
 
 
 def _module():
@@ -21,6 +23,34 @@ def _module():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def _hook_module():
+    spec = importlib.util.spec_from_file_location("hindsight_enrichment_hook", ENRICHMENT_HOOK)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_hindsight_enrichment_hook_validates_and_deduplicates_completed_retains(tmp_path: Path) -> None:
+    hook = _hook_module()
+    payload = {
+        "event": "retain.completed",
+        "status": "completed",
+        "bank_id": "IFJA_KROQI",
+        "operation_id": "op-1",
+        "data": {"document_id": "doc-1", "memory_unit_count": 2},
+    }
+    state_db = tmp_path / "state.sqlite3"
+    hook._ensure_schema(state_db)
+    assert hook._queue(state_db, payload, "IFJA_KROQI") is True
+    assert hook._queue(state_db, payload, "IFJA_KROQI") is True
+    assert hook._queue(state_db, {**payload, "bank_id": "OTHER"}, "IFJA_KROQI") is False
+    body = b'{"event":"retain.completed"}'
+    signature = "sha256=" + hook.hmac.new(b"secret", body, hook.hashlib.sha256).hexdigest()
+    assert hook._valid_signature("secret", body, signature) is True
+    assert hook._valid_signature("secret", body, "sha256=invalid") is False
 
 
 def _cards(result: dict) -> list[dict]:
@@ -1078,6 +1108,12 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     assert "ROLE_TRACE_ATTACH_KEY" in compose
     assert "ROLE_TRACE_READ_KEY" in compose
     assert "HERMES_ROLE_TRACE_API_KEY" in compose
+    assert "hindsight-enrichment-hook:" in compose
+    assert 'profiles: ["enrichment"]' in compose
+    assert "HINDSIGHT_ENRICHMENT_BANK_ID" in compose
+    assert "/etc/pantheon-hindsight-enrichment-hook.env" in compose
+    assert ENRICHMENT_INSTALLER.exists()
+    assert "retain.completed" in ENRICHMENT_INSTALLER.read_text(encoding="utf-8")
 
     html = (ROOT / "implementation" / "workspace_cockpit" / "static" / "index.html").read_text(encoding="utf-8")
     javascript = (ROOT / "implementation" / "workspace_cockpit" / "static" / "app.js").read_text(encoding="utf-8")
