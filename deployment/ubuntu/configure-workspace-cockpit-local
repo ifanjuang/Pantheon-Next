@@ -12,6 +12,7 @@ PORT="8189"
 ENABLE=0
 DOCTOR=0
 AFFAIRES_ROOT="${AFFAIRES_ROOT:-}"
+ARCHIVE_PROJECT_ROOT="${ARCHIVE_PROJECT_ROOT:-}"
 
 usage() {
   cat <<'EOF'
@@ -25,6 +26,8 @@ Options:
   --user USER      Unprivileged service user (default invoking sudo user)
   --affaires-root PATH
                    Linux-mounted NAS AFFAIRES root (or set AFFAIRES_ROOT)
+  --archive-project-root PATH
+                   Linux-mounted KROQI ARCHIVES/PROJET root (or set ARCHIVE_PROJECT_ROOT)
   --enable         Enable and start the systemd service
   --doctor         Read-only prerequisite check
   -h, --help       Show this help
@@ -39,6 +42,7 @@ while (($#)); do
     --port) PORT="${2:?missing port}"; shift 2 ;;
     --user) SERVICE_USER="${2:?missing service user}"; shift 2 ;;
     --affaires-root) AFFAIRES_ROOT="${2:?missing AFFAIRES root}"; shift 2 ;;
+    --archive-project-root) ARCHIVE_PROJECT_ROOT="${2:?missing ARCHIVES/PROJET root}"; shift 2 ;;
     --enable) ENABLE=1; shift ;;
     --doctor) DOCTOR=1; shift ;;
     -h|--help) usage; exit 0 ;;
@@ -53,9 +57,13 @@ python3 -c 'import yaml' >/dev/null 2>&1 || die "python3-yaml is required"
 [[ -n "$AFFAIRES_ROOT" ]] || die "set --affaires-root PATH or AFFAIRES_ROOT"
 [[ "$AFFAIRES_ROOT" = /* ]] || die "AFFAIRES root must be an absolute Linux mount path"
 [[ -d "$AFFAIRES_ROOT" ]] || die "AFFAIRES mount is missing: $AFFAIRES_ROOT"
+if [[ -n "$ARCHIVE_PROJECT_ROOT" ]]; then
+  [[ "$ARCHIVE_PROJECT_ROOT" = /* ]] || die "ARCHIVES/PROJET root must be an absolute Linux mount path"
+  [[ -d "$ARCHIVE_PROJECT_ROOT" ]] || die "ARCHIVES/PROJET mount is missing: $ARCHIVE_PROJECT_ROOT"
+fi
 
 if ((DOCTOR)); then
-  printf 'workspace-cockpit: prerequisites ready; bind=%s:%s; user=%s; affaires=%s\n' "$BIND_ADDRESS" "$PORT" "$SERVICE_USER" "$AFFAIRES_ROOT"
+  printf 'workspace-cockpit: prerequisites ready; bind=%s:%s; user=%s; affaires=%s; archives_projet=%s\n' "$BIND_ADDRESS" "$PORT" "$SERVICE_USER" "$AFFAIRES_ROOT" "${ARCHIVE_PROJECT_ROOT:-disabled}"
   exit 0
 fi
 
@@ -67,6 +75,19 @@ if ! runuser -u "$SERVICE_USER" -- test -r "$AFFAIRES_ROOT"; then
 fi
 if ! runuser -u "$SERVICE_USER" -- test -x "$AFFAIRES_ROOT"; then
   die "service user cannot traverse AFFAIRES mount: $AFFAIRES_ROOT"
+fi
+if [[ -n "$ARCHIVE_PROJECT_ROOT" ]]; then
+  if ! runuser -u "$SERVICE_USER" -- test -r "$ARCHIVE_PROJECT_ROOT"; then
+    die "service user cannot read ARCHIVES/PROJET mount: $ARCHIVE_PROJECT_ROOT"
+  fi
+  if ! runuser -u "$SERVICE_USER" -- test -x "$ARCHIVE_PROJECT_ROOT"; then
+    die "service user cannot traverse ARCHIVES/PROJET mount: $ARCHIVE_PROJECT_ROOT"
+  fi
+fi
+
+ROOT_ARGS="--root KroqiActive=$AFFAIRES_ROOT"
+if [[ -n "$ARCHIVE_PROJECT_ROOT" ]]; then
+  ROOT_ARGS="$ROOT_ARGS --root KroqiArchive=$ARCHIVE_PROJECT_ROOT"
 fi
 
 if [[ -d "$INSTALL_ROOT" ]]; then
@@ -96,7 +117,7 @@ trap 'rm -f "$producer_unit_tmp" "$cockpit_unit_tmp"' EXIT
   printf 'User=%s\n' "$SERVICE_USER"
   printf 'WorkingDirectory=%s\n' "$INSTALL_ROOT"
   printf '%s\n' 'EnvironmentFile=-/etc/pantheon-workspace-cockpit.env'
-  printf 'ExecStart=/usr/bin/python3 %s/producer_daemon.py --max-depth 8 --state-db /var/lib/pantheon-workspace-cockpit/index.sqlite3 --reconcile-seconds 60 --watch-debounce-ms 500 --root Affaires=%s\n' "$INSTALL_ROOT" "$AFFAIRES_ROOT"
+  printf 'ExecStart=/usr/bin/python3 %s/producer_daemon.py --max-depth 8 --state-db /var/lib/pantheon-workspace-cockpit/index.sqlite3 --reconcile-seconds 60 --watch-debounce-ms 500 %s\n' "$INSTALL_ROOT" "$ROOT_ARGS"
   printf '%s\n' 'Restart=on-failure' 'RestartSec=3' 'UMask=0077'
   printf '%s\n' 'StateDirectory=pantheon-workspace-cockpit' 'StateDirectoryMode=0700'
   printf '%s\n' 'NoNewPrivileges=true' 'PrivateDevices=true' 'PrivateTmp=true'
@@ -114,7 +135,7 @@ trap 'rm -f "$producer_unit_tmp" "$cockpit_unit_tmp"' EXIT
   printf 'User=%s\n' "$SERVICE_USER"
   printf 'WorkingDirectory=%s\n' "$INSTALL_ROOT"
   printf '%s\n' 'EnvironmentFile=-/etc/pantheon-workspace-cockpit.env'
-  printf 'ExecStart=/usr/bin/python3 %s/server.py --projection-only --host %s --port %s --max-depth 8 --state-db /var/lib/pantheon-workspace-cockpit/index.sqlite3 --root Affaires=%s\n' "$INSTALL_ROOT" "$BIND_ADDRESS" "$PORT" "$AFFAIRES_ROOT"
+  printf 'ExecStart=/usr/bin/python3 %s/server.py --projection-only --host %s --port %s --max-depth 8 --state-db /var/lib/pantheon-workspace-cockpit/index.sqlite3 %s\n' "$INSTALL_ROOT" "$BIND_ADDRESS" "$PORT" "$ROOT_ARGS"
   printf '%s\n' 'Restart=on-failure' 'RestartSec=3' 'UMask=0077'
   printf '%s\n' 'StateDirectory=pantheon-workspace-cockpit' 'StateDirectoryMode=0700'
   printf '%s\n' 'NoNewPrivileges=true' 'PrivateDevices=true' 'PrivateTmp=true'
