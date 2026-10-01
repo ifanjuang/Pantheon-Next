@@ -274,6 +274,92 @@ def admitted_entity_refs(context_pack: dict[str, Any]) -> list[EntityRef]:
     return refs
 
 
+def admitted_ephemeral_leases(context_pack: dict[str, Any]) -> list[dict[str, Any]]:
+    values = context_pack.get("ephemeral_context") or []
+    if not isinstance(values, list):
+        raise ScopedContextConflict("stored Context Pack ephemeral_context is invalid")
+    output: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for raw in values:
+        if not isinstance(raw, dict):
+            raise ScopedContextConflict("stored Context Pack contains an invalid ephemeral lease")
+        lease_ref = str(raw.get("lease_ref") or "").strip()
+        digest = str(raw.get("content_sha256") or "").strip().lower()
+        byte_size = raw.get("byte_size")
+        media_type = str(raw.get("media_type") or "").strip()
+        expires_at = str(raw.get("expires_at") or "").strip()
+        if (
+            not lease_ref
+            or lease_ref in seen
+            or len(digest) != 64
+            or any(char not in "0123456789abcdef" for char in digest)
+            or not isinstance(byte_size, int)
+            or byte_size <= 0
+            or not media_type
+            or not expires_at
+        ):
+            raise ScopedContextConflict("stored Context Pack contains an invalid ephemeral lease")
+        seen.add(lease_ref)
+        output.append(
+            {
+                "lease_ref": lease_ref,
+                "content_sha256": digest,
+                "byte_size": byte_size,
+                "media_type": media_type,
+                "source_provenance": list(raw.get("source_provenance") or []),
+                "expires_at": expires_at,
+            }
+        )
+    return output
+
+
+def require_admitted_ephemeral_lease(
+    context_pack: dict[str, Any],
+    *,
+    lease_ref: str,
+) -> dict[str, Any]:
+    wanted = str(lease_ref or "").strip()
+    for item in admitted_ephemeral_leases(context_pack):
+        if item["lease_ref"] == wanted:
+            return item
+    raise ScopedContextConflict(
+        "requested ephemeral lease is outside the exact admitted Context Pack"
+    )
+
+
+def get_context_ephemeral_lease_descriptor(
+    conn: psycopg.Connection,
+    *,
+    admission_id: str,
+    run_id: str,
+    lease_ref: str,
+    actor: str,
+) -> dict[str, Any]:
+    if not actor.strip():
+        raise HermesScopedContextError("Hermes actor is required for scoped context access")
+    scope = _runtime_scope(conn, admission_id=admission_id, run_id=run_id)
+    descriptor = require_admitted_ephemeral_lease(
+        scope["context_pack"],
+        lease_ref=lease_ref,
+    )
+    return {
+        "kind": "hermes_scoped_ephemeral_context",
+        "admission_id": admission_id,
+        "run_id": run_id,
+        "context_pack_ref": scope["admission_context_pack_ref"],
+        "descriptor": descriptor,
+        "write_effect": False,
+        "observed_at": _now(),
+        "requested_by": actor.strip(),
+        "non_equivalences": [
+            "ephemeral lease != Source",
+            "ephemeral lease != Evidence",
+            "ephemeral lease != Hindsight memory",
+            "lease access != write authority",
+        ],
+    }
+
+
 def require_admitted_entity(
     context_pack: dict[str, Any],
     *,
@@ -457,7 +543,9 @@ def get_context_manifest(
         "field_projection_version": FIELD_PROJECTION_VERSION,
         "entities": entities,
         "source_refs": list(context_pack.get("source_refs") or []),
+        "ephemeral_context": admitted_ephemeral_leases(context_pack),
         "source_dereference_available": False,
+        "ephemeral_dereference_available": bool(context_pack.get("ephemeral_context")),
         "global_search_available": False,
         "global_listing_available": False,
         "write_effect": False,
@@ -469,6 +557,7 @@ def get_context_manifest(
             "Context Pack inclusion != Evidence",
             "current owner read != admission-time snapshot",
             "source_ref != source dereference authority",
+            "ephemeral lease != Source or persistence",
             "field projection != full owner record",
             "read access != write authority",
             "runtime success != Evidence",
