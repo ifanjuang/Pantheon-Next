@@ -83,6 +83,7 @@ fields = {
     "CLM_HEAD_SHA256": "head_sha256",
     "CLM_VLLM_VERSION": "vllm_version",
     "CLM_GGUF_REPOSITORY": "experimental_quantized_encoder_repository",
+    "CLM_GGUF_REVISION": "experimental_quantized_encoder_revision",
     "CLM_Q8_FILE": "experimental_q8_file",
     "CLM_Q8_SHA256": "experimental_q8_sha256",
     "CLM_Q4_FILE": "experimental_q4_file",
@@ -126,6 +127,7 @@ Use the Hugging Face CLI or another exact-byte download path. Example:
 ```bash
 mkdir -p ~/.cache/pantheon/clm
 hf download "$CLM_GGUF_REPOSITORY" "$CLM_Q8_FILE" \
+  --revision "$CLM_GGUF_REVISION" \
   --local-dir ~/.cache/pantheon/clm
 
 Q8_PATH="$HOME/.cache/pantheon/clm/$CLM_Q8_FILE"
@@ -212,6 +214,7 @@ receipt = {
     "encoder_backend_version": os.environ["CLM_LLAMA_CPP_VERSION"],
     "encoder_backend_ref": os.environ["CLM_LLAMA_CPP_REF"],
     "encoder_artifact_repository": os.environ["CLM_GGUF_REPOSITORY"],
+    "encoder_artifact_revision": os.environ["CLM_GGUF_REVISION"],
     "encoder_artifact_file": os.environ["CLM_Q8_FILE"],
     "encoder_artifact_sha256": os.environ["CLM_Q8_SHA256"],
     "encoder_quantization": "Q8_0",
