@@ -9,6 +9,7 @@ on:
       - "implementation/tests/test_hermes_runtime_efficiency_native_baseline.py"
       - "implementation/tests/test_hermes_kv_cache_qualification.py"
       - "implementation/tests/test_clm_shadow_rank.py"
+      - "implementation/tests/test_clm_quantized_compare.py"
   workflow_dispatch:
 
 permissions:
@@ -37,3 +38,4 @@ jobs:
           tests/test_hermes_runtime_efficiency_native_baseline.py
           tests/test_hermes_kv_cache_qualification.py
           tests/test_clm_shadow_rank.py
+          tests/test_clm_quantized_compare.py
