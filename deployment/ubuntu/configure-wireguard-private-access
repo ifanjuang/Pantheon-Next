@@ -10,6 +10,7 @@ WG_ADDRESS="10.77.0.1/24"
 CLIENT_ADDRESS="10.77.0.2/32"
 LISTEN_PORT="51820"
 ENDPOINT=""
+ENDPOINT_PORT="$LISTEN_PORT"
 CLIENT_NAME="operator-1"
 MODE="check"
 
@@ -17,11 +18,13 @@ usage() {
   cat <<EOF
 Usage:
   $PROGRAM_NAME --check
-  sudo $PROGRAM_NAME --apply --endpoint PUBLIC_IP_OR_DNS [--client-name NAME]
+  sudo $PROGRAM_NAME --apply --endpoint PUBLIC_IP_OR_DNS [--endpoint-port PORT] [--client-name NAME]
 
 Creates the WireGuard server configuration and one client profile locally.
 Keys are generated below $STATE_DIR with mode 0700/0600 and are never printed.
 The public endpoint is an IP address or DNS name only; it is not a credential.
+Use --endpoint-port when a temporary upstream NAT port differs from the local
+WireGuard listener, for example while another router-hosted VPN keeps 51820.
 
 This command does not expose application dashboards. Apply the dashboard
 publication stage only after this tunnel has been tested from the client.
@@ -48,6 +51,10 @@ valid_endpoint() {
   [[ "$1" =~ ^[^[:space:]/:]+$ || "$1" =~ ^[0-9a-fA-F:.]+$ ]]
 }
 
+valid_port() {
+  [[ "$1" =~ ^[0-9]{1,5}$ ]] && [ "$1" -ge 1 ] && [ "$1" -le 65535 ]
+}
+
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --check)
@@ -60,6 +67,11 @@ while [ "$#" -gt 0 ]; do
       shift
       [ "$#" -gt 0 ] || die "--endpoint needs an IP address or DNS name"
       ENDPOINT="$1"
+      ;;
+    --endpoint-port)
+      shift
+      [ "$#" -gt 0 ] || die "--endpoint-port needs a port number"
+      ENDPOINT_PORT="$1"
       ;;
     --client-name)
       shift
@@ -97,6 +109,7 @@ require_root
 [ -n "$ENDPOINT" ] || die "--endpoint is required for --apply"
 valid_client_name "$CLIENT_NAME" || die "client name must be lowercase letters, digits or hyphens"
 valid_endpoint "$ENDPOINT" || die "endpoint must be one IP address or DNS hostname"
+valid_port "$ENDPOINT_PORT" || die "--endpoint-port must be between 1 and 65535"
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
@@ -138,7 +151,7 @@ install -m 0600 /dev/null "/etc/wireguard/$WG_INTERFACE.conf"
   printf '\n\n[Peer]\n'
   printf 'PublicKey = '
   cat "$server_public"
-  printf '\nEndpoint = %s:%s\n' "$ENDPOINT" "$LISTEN_PORT"
+  printf '\nEndpoint = %s:%s\n' "$ENDPOINT" "$ENDPOINT_PORT"
   printf 'AllowedIPs = 10.77.0.1/32\n'
   printf 'PersistentKeepalive = 25\n'
 } >"$client_config"
@@ -151,7 +164,7 @@ fi
 
 systemctl enable --now "wg-quick@$WG_INTERFACE"
 
-printf 'WireGuard server enabled on UDP %s.\n' "$LISTEN_PORT"
+printf 'WireGuard server enabled locally on UDP %s; client endpoint uses UDP %s.\n' "$LISTEN_PORT" "$ENDPOINT_PORT"
 printf 'Client profile written locally: %s\n' "$client_config"
 printf 'Import that file on the intended device through a secure local channel.\n'
 printf 'Do not print, copy into chat, commit, or email the profile.\n'

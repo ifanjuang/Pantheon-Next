@@ -34,7 +34,11 @@ require_root() {
 }
 
 valid_hostname() {
-  [[ "$1" =~ ^([[:alnum:]]([[:alnum:]-]{0,61}[[:alnum:]])?\.)+[[:alpha:]]{2,63}$ ]]
+  # Keep this deliberately portable across the Bash versions used by Ubuntu.
+  # The updater needs a DNS token, not a complete DNS-zone validator.
+  [[ "$1" == *.* ]] \
+    && [[ "$1" != .* && "$1" != *..* && "$1" != *.-* && "$1" != *-. ]] \
+    && [[ "$1" != *[![:alnum:].-]* ]]
 }
 
 while [ "$#" -gt 0 ]; do
@@ -94,8 +98,12 @@ require_root
 command -v curl >/dev/null 2>&1 || die "curl is required"
 valid_hostname "$HOSTNAME_VALUE" || die "--hostname must be a fully qualified DNS hostname"
 
-read -r -p 'OVH DynHost identifier: ' dynhost_username
-read -r -s -p 'OVH DynHost password: ' dynhost_password
+# systemd uses --run without a terminal, but --apply is intentionally an
+# operator action. Read from the controlling terminal so a wrapper or a closed
+# stdin cannot turn a credential typed after the prompt into a shell command.
+[ -r /dev/tty ] || die "--apply needs an interactive terminal"
+IFS= read -r -p 'OVH DynHost identifier: ' dynhost_username </dev/tty
+IFS= read -r -s -p 'OVH DynHost password: ' dynhost_password </dev/tty
 printf '\n'
 [ -n "$dynhost_username" ] || die "DynHost identifier cannot be empty"
 [ -n "$dynhost_password" ] || die "DynHost password cannot be empty"
