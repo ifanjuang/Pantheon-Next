@@ -191,6 +191,7 @@ def test_quantized_runtime_receipt_is_exact_and_pinned(tmp_path: Path) -> None:
             encoder_backend_version=CANONICAL_PIN["experimental_encoder_backend_version"],
             encoder_backend_ref=CANONICAL_PIN["experimental_encoder_backend_ref"],
             encoder_artifact_repository=CANONICAL_PIN["experimental_quantized_encoder_repository"],
+            encoder_artifact_revision=CANONICAL_PIN["experimental_quantized_encoder_revision"],
             encoder_artifact_file=CANONICAL_PIN["experimental_q8_file"],
             encoder_artifact_sha256=CANONICAL_PIN["experimental_q8_sha256"],
             encoder_quantization="Q8_0",
