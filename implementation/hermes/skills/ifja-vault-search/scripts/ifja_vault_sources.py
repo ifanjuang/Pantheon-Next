@@ -221,13 +221,23 @@ class VaultSources:
             standalone.append(canonical)
         items = standalone
         items.sort(key=lambda item: (-item["score"], item["relative_path"].casefold()))
+        returned = items[:limit]
+        topic_path_match_count = sum(
+            bool(item["path_terms_matched"] or item["family_hints"])
+            for item in items
+        )
+        scan_complete = scanned <= MAX_SCANNED_FILES
         return {
             "status": "source_candidates" if items else "no_supported_files_in_project",
             "project_ref": project_ref,
             "topic": topic,
             "scanned_files": min(scanned, MAX_SCANNED_FILES),
+            "scan_complete": scan_complete,
+            "logical_document_count_in_scanned_scope": len(items),
+            "returned_count": len(returned),
+            "topic_path_match_count": topic_path_match_count,
             "truncated": len(items) > limit or scanned > MAX_SCANNED_FILES,
-            "items": items[:limit],
+            "items": returned,
             "path_match_is_content_support": False,
         }
 

@@ -54,6 +54,50 @@ parser success != professional validation
 inspection result != Evidence admission
 ```
 
+## Inventory fallback and coverage
+
+An index is a useful continuity surface, not an exhaustive file inventory. When
+an exact source is not located in the configured index, inspect the admitted
+project/workspace inventory before asking the user to search manually or
+declaring the source absent. This applies to every representation: document,
+image, plan, recording, form, message or attachment.
+
+Keep the lookup receipt proportionate but explicit whenever it changes the
+answer:
+
+```text
+index: matched | no_match | unavailable
+source inventory: exact_source_present | candidates_found | truncated | no_supported_source
+inspection: not_needed | opened | partial | not_readable
+```
+
+An inventory that reports a limit or incomplete scan supports only a bounded
+statement: report the returned candidates and its limit. It does not support
+"only these documents exist" or an absence conclusion. A path/filename match
+is a source candidate, never proof of the requested content.
+
+If the exact source is present in the admitted workspace but absent from the
+index, state `source_present_not_indexed` and use the suitable admitted
+inspection route. This is an indexing gap, not a reason to invent content or
+to require an upload of a source already available locally.
+
+## Session attachments and filing proposals
+
+An attachment in the current conversation is session input unless it has been
+explicitly admitted into a workspace. It may be inspected proportionately, but
+must remain distinct from a NAS/project source.
+
+Hermes may propose a classification and filing destination with the source
+indicators and uncertainty that support it. It must not copy, rename, move,
+reclassify or retain the attachment as a professional source without a selected
+destination and the applicable admitted write authorization.
+
+```text
+session attachment != workspace source
+classification proposal != filing performed
+index enrichment != source-file move
+```
+
 ## Return with provenance
 
 For material document-based conclusions, keep source identity and locator visible when available, and distinguish observed content from interpretation, inference and remaining uncertainty.

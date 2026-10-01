@@ -55,6 +55,60 @@ change the answer, permitted action or consequence.
 3. Use Mnemosyne only as a bounded continuity lead after the project-router
    lookup, never as proof that a professional project is absent or present.
 
+### Source coverage and inventory fallback
+
+Apply this same route to every professional document type and representation:
+PDF, native office file, Markdown, image, plan, audio, correspondence, form or
+attachment. A failed Hindsight lookup is never a reason to ask the user to
+search KROQI manually.
+
+When the router does not identify the requested exact source, automatically use
+the selected project's `list_ifja_project_sources` inventory before declaring a
+document absent. Use a focused topic for a normal request. For an explicit
+request to list, count or compare all matching documents, request the largest
+bounded inventory allowed by the binding. A filename/path match is a candidate
+only; it does not establish the document's content or type.
+
+For every material document lookup, return a short coverage receipt before the
+conclusion when it changes the result:
+
+```text
+Hindsight: matched | no_match | binding_unavailable
+NAS source: exact_source_present | candidates_found | inventory_truncated | no_supported_source
+Inspection: not_needed | exact_source_opened | partially_read | not_readable
+```
+
+State the returned and scanned logical-document counts when the inventory
+provides them. `truncated=true` or `scan_complete=false` means the inventory
+cannot support an exhaustive absence claim. Do not say "there are only N
+documents" unless the inventory is complete; say instead "N documents returned
+from the bounded inventory". Do not say a document is absent merely because its
+filename did not match the topic.
+
+When an exact source is present on the NAS but absent from Hindsight, label it
+`source_present_not_indexed`, open it through the admitted reader or document
+binding if needed, and include it in the coverage receipt. This is an indexing
+gap, not a user error and not permission to invent its content.
+
+### Session attachments and proposed filing
+
+A document dropped into the chat is session input by default. First identify
+what can be supported from the supplied file and keep its status distinct:
+
+```text
+attachment_session_only != NAS source
+proposed classification != performed filing
+Hindsight enrichment != source-file move
+```
+
+When useful, propose a project, document family, date/revision candidates and
+destination with the supporting indicators and uncertainty. Offer the smallest
+materially different choices: keep it only in the session; enrich an admitted
+index; or file/reclassify it in the selected workspace. Never copy, move,
+rename or classify a NAS source until the user selects a destination and an
+admitted write capability authorizes that effect. If no such capability is
+active, return a filing proposal rather than implying the file was reclassified.
+
 ### Latest document / revision resolution
 
 When the user asks for the latest, current, newest or applicable revision of a
@@ -186,7 +240,8 @@ connectivity test; an empty result is a search outcome and may indicate an
 indexing gap or an overly narrow query.
 
 Never report a project absent solely from an empty Hindsight result. Distinguish
-`no_name_match_in_mirror`, `project_present_source_not_found`,
+`no_name_match_in_mirror`, `source_present_not_indexed`,
+`project_present_source_not_found`, `source_inventory_truncated`,
 `source_present_but_not_readable`, and `source_inspected_requested_fact_not_found`
 within the scope actually checked. Do not silently substitute another project
 or infer that a missing permit file means no permit work has occurred.

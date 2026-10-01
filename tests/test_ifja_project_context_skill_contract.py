@@ -56,5 +56,8 @@ def test_document_inspection_separates_reference_presence_and_inspection() -> No
         "Hindsight recall != document inspected",
         "metadata != document content",
         "parser success != professional validation",
+        "source_present_not_indexed",
+        "session attachment != workspace source",
+        "classification proposal != filing performed",
     ):
         assert invariant in text
