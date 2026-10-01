@@ -14,7 +14,7 @@ metadata:
 
 Compatibility adapter for the versioned `devis-reprise` example. When
 `construction-cost-review` is installed, use that general owner and do not load
-both skills.
+both skills. Do not project this adapter into a current profile.
 
 Non-executable candidate skill in the `agentskills.io` / `SKILL.md` standard, so a
 Hermes Agent can load it. Pantheon governs; Hermes executes outside the repo.

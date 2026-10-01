@@ -5,7 +5,7 @@ template_id: devis_reprise_run_manifest
 owner_layer: hermes
 status: candidate_template_only
 purpose: >
-  Describe the bounded complementary-quote review, the two candidate skills and
+  Describe the bounded complementary-quote review, the canonical candidate skills and
   the exact return envelope expected by Pantheon read-only validation.
 
 governed_by:
@@ -16,13 +16,13 @@ governed_by:
 required_envelope: task_contract_in -> external_run_return
 
 steps:
-  - capability_id: quote-variation-review
-    skill_candidate: quote-variation-review
+  - capability_id: construction-cost-review
+    skill_candidate: construction-cost-review
     declared_scope: [the complementary quote, prior amendment]
     forbidden_scope: [approve, pay, send]
   - capability_id: external-commitment-guard
     skill_candidate: external-commitment-guard
-    depends_on: [quote-variation-review]
+    depends_on: [construction-cost-review]
     forbidden_scope: [send, sign, instruct enterprise]
 
 returns:
