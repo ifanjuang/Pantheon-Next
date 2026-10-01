@@ -16,7 +16,9 @@ services:
       - --max-depth
       - "8"
       - --root
-      - Kroqi=/workspace/affaires
+      - KroqiActive=/workspace/affaires
+      - --root
+      - KroqiArchive=/workspace/archives-projet
     read_only: true
     cap_drop:
       - ALL
@@ -41,6 +43,7 @@ services:
       WORKSPACE_HINDSIGHT_AUTHORIZATION: ${WORKSPACE_HINDSIGHT_AUTHORIZATION:-}
     volumes:
       - ${AFFAIRES_ROOT:?set AFFAIRES_ROOT to the Linux-mounted NAS AFFAIRES path}:/workspace/affaires:ro
+      - ${ARCHIVE_PROJECT_ROOT:?set ARCHIVE_PROJECT_ROOT to the Linux-mounted KROQI ARCHIVES/PROJET path}:/workspace/archives-projet:ro
       - workspace-cockpit-state:/state
     healthcheck:
       test:
@@ -72,7 +75,9 @@ services:
       - "8"
       - --projection-only
       - --root
-      - Kroqi=/workspace/affaires
+      - KroqiActive=/workspace/affaires
+      - --root
+      - KroqiArchive=/workspace/archives-projet
     read_only: true
     cap_drop:
       - ALL
@@ -103,6 +108,7 @@ services:
         condition: service_healthy
     volumes:
       - ${AFFAIRES_ROOT:?set AFFAIRES_ROOT to the Linux-mounted NAS AFFAIRES path}:/workspace/affaires:ro
+      - ${ARCHIVE_PROJECT_ROOT:?set ARCHIVE_PROJECT_ROOT to the Linux-mounted KROQI ARCHIVES/PROJET path}:/workspace/archives-projet:ro
       - workspace-cockpit-state:/state:ro
     healthcheck:
       test:
