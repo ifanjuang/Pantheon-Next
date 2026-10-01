@@ -132,6 +132,7 @@ def submit_handoff(
     card_context_envelope: dict,
     selected_context: list[dict],
     include_declared_descendants: bool,
+    case_ref_override: str | None = None,
 ) -> dict:
     if not actor or not actor.strip():
         raise HandoffSubmissionError("human actor is required")
@@ -161,6 +162,7 @@ def submit_handoff(
         "card_context_envelope": card_context_envelope,
         "selected_context": selected_context,
         "include_declared_descendants": bool(include_declared_descendants),
+        "case_ref_override": str(case_ref_override or "").strip() or None,
         "actor": actor.strip(),
     }
     request_digest = _digest(request_record)
@@ -169,7 +171,12 @@ def submit_handoff(
     # must happen inside the same explicit transaction as the handoff write rather
     # than starting an implicit outer transaction before conn.transaction().
     with conn.transaction():
-        case_ref = card_scope.resolve_case_ref(conn, root_entity=root)
+        if case_ref_override is not None:
+            case_ref = str(case_ref_override).strip()
+            if not case_ref or len(case_ref) > 500:
+                raise HandoffSubmissionError("case_ref_override is invalid")
+        else:
+            case_ref = card_scope.resolve_case_ref(conn, root_entity=root)
         existing = _existing_by_idempotency(conn, idempotency_key)
         if existing is not None:
             if existing["request_digest"] != request_digest:
