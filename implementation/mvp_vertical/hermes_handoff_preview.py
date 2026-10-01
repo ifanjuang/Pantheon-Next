@@ -17,6 +17,8 @@ from .entity_ref import EntityRef, EntityRefError, unique_entity_refs
 MAX_CONTEXT_REFS = 250
 MAX_SOURCE_REFS = 500
 MAX_TAG_CONTEXT_ENTITIES = 250
+MAX_EPHEMERAL_CONTEXT_ITEMS = 50
+MAX_EPHEMERAL_CONTEXT_BYTES = 8 * 1024 * 1024
 
 
 class HandoffPreviewError(ValueError):
@@ -148,11 +150,66 @@ def _tag_context(values: Any) -> list[dict[str, Any]]:
     return output
 
 
+def _ephemeral_context(values: Any) -> list[dict[str, Any]]:
+    if values is None:
+        return []
+    if not isinstance(values, list):
+        raise HandoffPreviewError("ephemeral_context must be an array")
+    if len(values) > MAX_EPHEMERAL_CONTEXT_ITEMS:
+        raise HandoffPreviewError(
+            f"ephemeral_context exceeds {MAX_EPHEMERAL_CONTEXT_ITEMS} entries"
+        )
+    output: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    total_bytes = 0
+    for raw in values:
+        if not isinstance(raw, dict):
+            raise HandoffPreviewError("ephemeral_context entries must be objects")
+        lease_ref = str(raw.get("lease_ref") or "").strip()
+        digest = str(raw.get("content_sha256") or "").strip().lower()
+        media_type = str(raw.get("media_type") or "").strip()
+        expires_at = str(raw.get("expires_at") or "").strip()
+        byte_size = raw.get("byte_size")
+        provenance = raw.get("source_provenance") or []
+        if not lease_ref or len(lease_ref) > 200:
+            raise HandoffPreviewError("ephemeral_context lease_ref is invalid")
+        if lease_ref in seen:
+            raise HandoffPreviewError("ephemeral_context contains a duplicate lease_ref")
+        seen.add(lease_ref)
+        if len(digest) != 64 or any(char not in "0123456789abcdef" for char in digest):
+            raise HandoffPreviewError("ephemeral_context content_sha256 must be SHA-256")
+        if not isinstance(byte_size, int) or byte_size <= 0:
+            raise HandoffPreviewError("ephemeral_context byte_size must be positive")
+        total_bytes += byte_size
+        if total_bytes > MAX_EPHEMERAL_CONTEXT_BYTES:
+            raise HandoffPreviewError(
+                f"ephemeral_context exceeds {MAX_EPHEMERAL_CONTEXT_BYTES} aggregate bytes"
+            )
+        if not media_type or len(media_type) > 200:
+            raise HandoffPreviewError("ephemeral_context media_type is invalid")
+        if not expires_at:
+            raise HandoffPreviewError("ephemeral_context expires_at is required")
+        if not isinstance(provenance, list):
+            raise HandoffPreviewError("ephemeral_context source_provenance must be an array")
+        output.append(
+            {
+                "lease_ref": lease_ref,
+                "content_sha256": digest,
+                "byte_size": byte_size,
+                "media_type": media_type,
+                "source_provenance": provenance,
+                "expires_at": expires_at,
+            }
+        )
+    return output
+
+
 def build_preview(
     *,
     question: str,
     card_context_envelope: dict,
     selected_context: list[dict] | None = None,
+    ephemeral_context: list[dict] | None = None,
 ) -> dict:
     intent = question.strip()
     if len(intent) < 3:
@@ -173,6 +230,7 @@ def build_preview(
     selected = _unique_refs(selected_context or [], label="selected_context")
     sources = _source_refs(card_context_envelope.get("source_refs") or [])
     tag_context = _tag_context(card_context_envelope.get("tag_context") or [])
+    leases = _ephemeral_context(ephemeral_context)
 
     excluded_keys = {
         EntityRef.from_mapping(item, label="excluded_entity").key
@@ -195,12 +253,14 @@ def build_preview(
         "excluded_entities": explicit_exclusions,
         "source_refs": sources,
         "tag_context": tag_context,
+        "ephemeral_context": leases,
         "scope_widened_implicitly": False,
         "staleness_note": "runtime must re-read current owner records when freshness is consequential",
         "forbidden_assumptions": [
             "selected context is Evidence",
             "runtime success establishes truth",
             "a read-only question authorizes a write or external effect",
+            "an ephemeral lease is a Source, Evidence, memory or persistence",
             "a tag description establishes truth, authority or professional validation",
             "an unregistered tag may be assigned an invented meaning",
         ],
@@ -222,7 +282,7 @@ def build_preview(
             "do not infer a meaning for unregistered tags",
         ],
         "approval_expectations": "a new gate is required before any consequential follow-up",
-        "expected_evidence": ["source_refs", "trace_refs", "limitations", "assumptions"],
+        "expected_evidence": ["source_refs", "ephemeral_context", "trace_refs", "limitations", "assumptions"],
         "allowed_outputs": ["answer_candidate", "source_references", "limitations", "open_questions"],
         "forbidden_outputs": ["external_effect", "canonical_effect", "memory_promotion", "agency_data_mutation"],
     }
@@ -250,6 +310,9 @@ def build_preview(
             "tag context != source authority",
             "execution_authorized=false",
             "handoff preview != Hermes run",
+            "ephemeral lease != Source admission",
+            "ephemeral lease != AFFAIRES persistence",
+            "ephemeral lease != Hindsight memory",
         ],
     }
     preview["preview_digest"] = _digest(preview)
