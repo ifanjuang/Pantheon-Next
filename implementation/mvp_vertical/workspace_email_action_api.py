@@ -119,6 +119,7 @@ def install_workspace_email_action_routes(
         )
     )
     lease_store = ephemeral_context.EphemeralContextStore(lease_root)
+    app.state.ephemeral_context_store = lease_store
 
     @app.get("/workspace/affaires")
     def get_affaires_catalogue(
