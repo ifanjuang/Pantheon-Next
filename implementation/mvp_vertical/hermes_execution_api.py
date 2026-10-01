@@ -12,12 +12,15 @@ from __future__ import annotations
 
 import hmac
 import inspect
+import os
+from pathlib import Path
 from typing import Any, Callable, Literal
 
-from fastapi import BackgroundTasks, Depends, FastAPI, Header, HTTPException
+from fastapi import BackgroundTasks, Depends, FastAPI, Header, HTTPException, Response
 from pydantic import BaseModel, ConfigDict, Field
 
 from . import (
+    ephemeral_context,
     hermes_active_context,
     hermes_execution,
     hermes_launch_context,
@@ -309,6 +312,79 @@ def install_hermes_execution_routes(
         except hermes_scoped_context.HermesScopedContextError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
+    def resolve_ephemeral_bytes(
+        *,
+        admission_id: str,
+        run_id: str,
+        lease_ref: str,
+        actor: str,
+    ) -> Response:
+        descriptor = use_connection(
+            lambda conn: hermes_scoped_context.get_context_ephemeral_lease_descriptor(
+                conn,
+                admission_id=admission_id,
+                run_id=run_id,
+                lease_ref=lease_ref,
+                actor=actor,
+            )
+        )
+        store = getattr(app.state, "ephemeral_context_store", None)
+        if store is None:
+            store = ephemeral_context.EphemeralContextStore(
+                Path(
+                    os.getenv(
+                        "MVP_EPHEMERAL_CONTEXT_ROOT",
+                        "/tmp/pantheon-ephemeral-context",
+                    )
+                )
+            )
+        try:
+            manifest, data = store.resolve(
+                lease_ref,
+                expected_digest=descriptor["descriptor"]["content_sha256"],
+            )
+        except ephemeral_context.LeaseNotFound as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except ephemeral_context.LeaseExpired as exc:
+            raise HTTPException(status_code=410, detail=str(exc)) from exc
+        except ephemeral_context.LeaseCorrupt as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        except ephemeral_context.EphemeralContextError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        return Response(
+            content=data,
+            media_type=manifest["media_type"],
+            headers={
+                "X-Pantheon-Lease-Ref": lease_ref,
+                "X-Pantheon-Content-SHA256": manifest["content_sha256"],
+                "Cache-Control": "no-store",
+            },
+        )
+
+    @app.get(
+        "/hermes/execution-admissions/{admission_id}/runs/{run_id}/context/leases/{lease_ref}"
+    )
+    def get_hermes_scoped_ephemeral_context(
+        admission_id: str,
+        run_id: str,
+        lease_ref: str,
+        _authorized: None = Depends(require_hermes_key),
+        actor: str = Depends(require_hermes_actor),
+    ) -> Response:
+        try:
+            return resolve_ephemeral_bytes(
+                admission_id=admission_id,
+                run_id=run_id,
+                lease_ref=lease_ref,
+                actor=actor,
+            )
+        except hermes_scoped_context.ScopedContextNotFound as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except hermes_scoped_context.ScopedContextConflict as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        except hermes_scoped_context.HermesScopedContextError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
     @app.get(
         "/hermes/execution-admissions/{admission_id}/runs/{run_id}/context/entities/{entity_type}/{entity_id}"
     )
@@ -353,6 +429,39 @@ def install_hermes_execution_routes(
                     admission_id=admission_id,
                     actor=actor,
                 )
+            )
+        except hermes_active_context.ActiveContextNotFound as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except (
+            hermes_active_context.ActiveContextConflict,
+            hermes_scoped_context.ScopedContextConflict,
+        ) as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        except hermes_scoped_context.HermesScopedContextError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    @app.get(
+        "/hermes/execution-admissions/{admission_id}/active-context/leases/{lease_ref}"
+    )
+    def get_hermes_active_ephemeral_context(
+        admission_id: str,
+        lease_ref: str,
+        _authorized: None = Depends(require_hermes_key),
+        actor: str = Depends(require_hermes_actor),
+    ) -> Response:
+        try:
+            active = use_connection(
+                lambda conn: hermes_active_context.get_active_context_manifest(
+                    conn,
+                    admission_id=admission_id,
+                    actor=actor,
+                )
+            )
+            return resolve_ephemeral_bytes(
+                admission_id=admission_id,
+                run_id=active["run_id"],
+                lease_ref=lease_ref,
+                actor=actor,
             )
         except hermes_active_context.ActiveContextNotFound as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
