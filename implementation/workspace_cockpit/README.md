@@ -33,6 +33,21 @@ producer watches/reconciles the mounted NAS path and is the only producer into
 Hindsight. The Cockpit reads the persisted SQLite projection with
 `--projection-only`; stopping the Cockpit does not stop ingestion.
 
+### Optional local-tool menu
+
+The Cockpit can be a private entry point without becoming a proxy or an
+authentication boundary. Set only URLs that are actually published for the
+operator; an unset or malformed entry remains hidden:
+
+```text
+WORKSPACE_COCKPIT_HERMES_URL=https://host.tailnet.ts.net/
+WORKSPACE_COCKPIT_HINDSIGHT_URL=https://host.tailnet.ts.net:8443/
+WORKSPACE_COCKPIT_MNEMOSYNE_URL=
+```
+
+Each link opens in a new tab. The menu never exposes the Hermes API and does
+not infer a dashboard from a service merely being installed.
+
 A document may still carry an optional enrichment cartouche:
 
 ```text

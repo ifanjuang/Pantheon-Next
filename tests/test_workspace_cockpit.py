@@ -1084,12 +1084,15 @@ def test_linux_installer_and_browser_assets_are_syntax_valid() -> None:
     graph_css = (ROOT / "implementation" / "workspace_cockpit" / "static" / "role_trace_graph.css").read_text(encoding="utf-8")
 
     assert "AFFAIRES" in html
+    assert 'id="tool-links"' in html
     assert "SOURCE_ONLY" in javascript
     assert "SOURCE_MISSING" in javascript
     assert "Remplace" in javascript
     assert "Complète" in javascript
     assert "Ouvrir le fichier" in javascript
     assert "/api/source?workspace=" in javascript
+    assert "/api/navigation" in javascript
+    assert "loadNavigation" in javascript
     assert "Réconcilier avec Hermes" in javascript
     assert "X-Pantheon-Intent" in javascript
     assert "/reconcile-memory" in javascript

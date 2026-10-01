@@ -10,7 +10,7 @@ const STATUS = {
 
 const state = { data: null, workspace: "all", status: "all", query: "" };
 const elements = Object.fromEntries(
-  ["package-count", "status-counts", "workspace-tabs", "status-filters", "search", "refresh", "loading", "error", "cards", "empty"]
+  ["package-count", "status-counts", "workspace-tabs", "status-filters", "search", "refresh", "loading", "error", "cards", "empty", "tool-links"]
     .map((id) => [id, document.getElementById(id)]),
 );
 
@@ -25,6 +25,27 @@ function tagTemplate(tag) {
 function tagsTemplate(tags) {
   if (!Array.isArray(tags) || tags.length === 0) return "";
   return `<div class="tags" aria-label="Tags">${tags.map(tagTemplate).join("")}</div>`;
+}
+
+async function loadNavigation() {
+  try {
+    const response = await fetch("/api/navigation", { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const { links } = await response.json();
+    if (!Array.isArray(links) || links.length === 0) return;
+    elements["tool-links"].replaceChildren(...links.map((link) => {
+      const anchor = document.createElement("a");
+      anchor.href = link.url;
+      anchor.target = "_blank";
+      anchor.rel = "noopener noreferrer";
+      anchor.textContent = link.label;
+      anchor.title = link.description || link.label;
+      return anchor;
+    }));
+    elements["tool-links"].hidden = false;
+  } catch (_error) {
+    // Navigation is optional and must never prevent document browsing.
+  }
 }
 
 function fact(label, value, stateClass = "") {
@@ -554,5 +575,6 @@ for (const button of document.querySelectorAll("[data-role-trace-view]")) {
   button.addEventListener("click", () => setRoleTraceView(button.dataset.roleTraceView));
 }
 setRoleTraceView("dialogue");
+void loadNavigation();
 void discoverLatestRoleTrace();
 window.setInterval(discoverLatestRoleTrace, 5000);
