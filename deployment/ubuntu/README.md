@@ -86,6 +86,22 @@ Pantheon MCP installed/validated, but not exposed as an independently authorized
 
 The optional Hindsight container alone is not a qualified AFFAIRES ingestion route. #660 owns the single AFFAIRES producer and #659 owns Hindsight retain/retrieval qualification. Historical Obsidian integrations remain separate reference material and are not installed by this baseline.
 
+## Private WireGuard DynHost update
+
+When the router cannot reliably update DynHost, the WireGuard host can maintain
+the endpoint DNS name itself. It prompts for the OVH DynHost credentials in the
+local terminal, stores them root-only outside Git, and updates the record at
+boot and every five minutes:
+
+```bash
+deployment/ubuntu/configure-ovh-dynhost-local --check
+sudo deployment/ubuntu/configure-ovh-dynhost-local --apply --hostname vpn.example.fr
+```
+
+Do not keep a second router DynHost updater enabled for the same hostname after
+the local updater succeeds. The router still forwards only WireGuard UDP 51820;
+do not publish application dashboards.
+
 ## Governed visible Role milestones
 
 After the `pantheon-governed` Hermes profile exists, install the versioned
