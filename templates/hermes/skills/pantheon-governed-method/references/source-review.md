@@ -27,6 +27,13 @@ persisted or spilled over, stay on the Docling route and repeat the request with
 targeted searches and bounded anchor reads. Process one consequential document
 at a time and keep only the extracts needed for the coverage matrix.
 
+For a comparison, resolve the reference source and its comparison perimeter
+before converting candidates. Do not launch several conversions in parallel.
+Complete and classify one bounded read before selecting the next; a tool result
+that merely names a document is not a read. Do not announce a provisional
+comparison, a future result, or an "in progress" table: return only completed
+observations, or state the remaining reads and `ready_with_limits`.
+
 ### Docling latency and failure posture
 
 A slow conversion is not an unavailable service. A conversion taking tens of
@@ -161,6 +168,14 @@ Do not omit an unmatched reference item. A filename, directory or candidate
 label does not prove scope coverage; verify material description and amount.
 Report matched, missing and unresolved coverage separately.
 
-Never compare a partial aggregate with a broader reference total. Overall
-conformance requires complete material coverage or an explicit user-approved
-exclusion. Otherwise state only item-level findings and `ready_with_limits`.
+Never compare a partial aggregate with a broader reference total. Normalize a
+common basis before any numerical comparison (scope, unit, date, tax/currency
+or any other material measurement basis). A candidate that cannot be tied to a
+reference item is `unreadable_or_unverified` or `missing_candidate`, not
+"conforme". A matching amount alone is not conformance: the material scope
+must also be verified.
+
+Overall conformance requires complete material coverage or an explicit
+user-approved exclusion. Otherwise state only bounded, source-located
+observations and `ready_with_limits`; do not label any result as conforming,
+non-conforming, complete, or exhaustive.

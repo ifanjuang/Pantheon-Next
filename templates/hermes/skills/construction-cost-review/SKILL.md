@@ -46,6 +46,13 @@ compatibility with its narrow versioned example manifest; do not load both.
 6. Report supported deltas, scope differences, missing offers, unreadable
    material, commercial qualifications and decisions still required.
 
+## Comparison gate
+
+Before displaying a delta or a status, verify the reference, candidate scope,
+common basis and readable locators. Otherwise return no conclusion. Read
+[references/claim-level.md](references/claim-level.md) for incomplete or
+garbled material.
+
 ## Claim level
 
 Read [references/claim-level.md](references/claim-level.md) when the request
@@ -64,4 +71,5 @@ received != accepted
 priced != included
 comparable != conforming
 offer present != lot covered
+amount extracted != amount comparable
 ```

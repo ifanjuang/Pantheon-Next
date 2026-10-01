@@ -71,6 +71,9 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "mcp-hindsight-kroqi-project" in text
     assert "mcp-docling" in text
     assert "Do not export an entire Docling document to Markdown" in text
+    assert "Do not launch several conversions in parallel." in text
+    assert "a tool result that merely names a document is not a read" in flat
+    assert "Do not announce a provisional" in text
     assert "A slow conversion is not an unavailable service." in text
     assert "Do not invent an outage" in text
     assert "Never use `terminal`" in text
@@ -88,6 +91,8 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "Begin with one child at a time" in flat
     assert "subagent result != source verification" in text
     assert "Never compare a partial aggregate with a broader reference total" in flat
+    assert "Normalize a\ncommon basis before any numerical comparison" in text
+    assert "A matching amount alone is not conformance" in text
     assert "Build the coverage matrix from the reference first" in flat
     assert "missing_candidate" in text
     assert "Do not omit an unmatched reference item" in text
@@ -104,6 +109,9 @@ def test_governed_method_is_general_condition_driven_and_bounded() -> None:
     assert "Claim level: point versus complete analysis" in claim_level
     assert "partial_review" in claim_level
     assert "do not give an overall conformity conclusion" in claim_level
+    assert "Do not calculate or display a delta" in claim_level
+    assert "If extraction is garbled, contradictory, truncated" in claim_level
+    assert "do not produce a provisional comparison table" in claim_level
     assert "## Visible plan before execution" in text
     assert "Before the first material source call" in text
     assert "plan displayed != worker dispatched" in text
