@@ -8,7 +8,7 @@ Hermes. This module never starts an Hermes run.
 from __future__ import annotations
 
 import hmac
-from typing import Callable
+from typing import Any, Callable
 
 from fastapi import Depends, FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field
 from . import (
     card_scope,
     card_tag_context,
+    hermes_ephemeral_context,
     hermes_handoff_preview,
     hermes_handoff_store,
 )
@@ -38,10 +39,49 @@ class CardContextEnvelopeBody(BaseModel):
     scope_widened_implicitly: bool = False
 
 
+class HermesEphemeralContextLeaseRefBody(BaseModel):
+    lease_ref: str = Field(min_length=20, max_length=200)
+    lease_digest: str = Field(
+        min_length=64,
+        max_length=64,
+        pattern=r"^[0-9a-f]{64}$",
+    )
+
+
+class HermesEphemeralContextItemBody(BaseModel):
+    content_utf8: str = Field(min_length=1, max_length=hermes_ephemeral_context.MAX_ITEM_BYTES)
+    content_sha256: str = Field(
+        min_length=64,
+        max_length=64,
+        pattern=r"^[0-9a-f]{64}$",
+    )
+    media_type: str = Field(default="text/plain; charset=utf-8", min_length=1, max_length=200)
+    representation_kind: str = Field(default=hermes_ephemeral_context.REPRESENTATION_KIND)
+    source_provenance: list[dict[str, Any]] = Field(
+        default_factory=list,
+        max_length=hermes_ephemeral_context.MAX_PROVENANCE_ITEMS,
+    )
+
+
+class HermesEphemeralContextLeaseCreateBody(BaseModel):
+    items: list[HermesEphemeralContextItemBody] = Field(
+        min_length=1,
+        max_length=hermes_ephemeral_context.MAX_LEASE_ITEMS,
+    )
+    ttl_seconds: int = Field(
+        ge=hermes_ephemeral_context.MIN_TTL_SECONDS,
+        le=hermes_ephemeral_context.MAX_TTL_SECONDS,
+    )
+
+
 class HermesHandoffPreviewBody(BaseModel):
     question: str = Field(min_length=3, max_length=8_000)
     card_context_envelope: CardContextEnvelopeBody
     selected_context: list[EntityRefBody] = Field(default_factory=list, max_length=250)
+    ephemeral_context_leases: list[HermesEphemeralContextLeaseRefBody] = Field(
+        default_factory=list,
+        max_length=hermes_ephemeral_context.MAX_LEASE_ITEMS,
+    )
     include_declared_descendants: bool = False
 
 
@@ -111,6 +151,20 @@ def install_hermes_handoff_preview_routes(
 
     def prepare(body: HermesHandoffPreviewBody) -> dict:
         requested = body.card_context_envelope
+        try:
+            ephemeral_context_leases = hermes_ephemeral_context.resolve_lease_refs(
+                [item.model_dump() for item in body.ephemeral_context_leases]
+            )
+        except hermes_ephemeral_context.EphemeralContextTooLarge as exc:
+            raise HTTPException(status_code=413, detail=str(exc)) from exc
+        except (
+            hermes_ephemeral_context.EphemeralContextNotFound,
+            hermes_ephemeral_context.EphemeralContextExpired,
+            hermes_ephemeral_context.EphemeralContextIntegrityError,
+        ) as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        except hermes_ephemeral_context.EphemeralContextError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
         if requested.scope_widened_implicitly:
             raise HTTPException(
                 status_code=422,
@@ -160,6 +214,7 @@ def install_hermes_handoff_preview_routes(
                 "selected_entities_validated": len(selected["entities"]),
                 "tagged_entities": 0,
                 "unregistered_tags": 0,
+                "ephemeral_context_leases_validated": len(ephemeral_context_leases),
                 "counts": {},
             }
             if body.include_declared_descendants:
@@ -219,6 +274,7 @@ def install_hermes_handoff_preview_routes(
                 question=body.question,
                 card_context_envelope=envelope,
                 selected_context=selected_context,
+                ephemeral_context_leases=ephemeral_context_leases,
             )
         except hermes_handoff_preview.HandoffPreviewError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
@@ -228,6 +284,26 @@ def install_hermes_handoff_preview_routes(
             "resolved_card_context_envelope": envelope,
             "resolved_selected_context": selected_context,
         }
+
+    @app.post("/cockpit/hermes-ephemeral-context-leases", status_code=201)
+    def create_hermes_ephemeral_context_lease(
+        body: HermesEphemeralContextLeaseCreateBody,
+        _authorized: None = Depends(require_editor_key),
+        actor: str = Depends(require_human_actor),
+    ) -> dict:
+        try:
+            return hermes_ephemeral_context.create_lease(
+                items=[item.model_dump() for item in body.items],
+                ttl_seconds=body.ttl_seconds,
+                actor=actor,
+            )
+        except hermes_ephemeral_context.EphemeralContextTooLarge as exc:
+            raise HTTPException(status_code=413, detail=str(exc)) from exc
+        except (
+            hermes_ephemeral_context.EphemeralContextIntegrityError,
+            hermes_ephemeral_context.EphemeralContextError,
+        ) as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @app.post("/cockpit/hermes-handoffs/preview")
     def preview_hermes_handoff(
@@ -246,6 +322,7 @@ def install_hermes_handoff_preview_routes(
             question=body.question,
             card_context_envelope=body.card_context_envelope,
             selected_context=body.selected_context,
+            ephemeral_context_leases=body.ephemeral_context_leases,
             include_declared_descendants=body.include_declared_descendants,
         )
         current = prepare(preview_body)

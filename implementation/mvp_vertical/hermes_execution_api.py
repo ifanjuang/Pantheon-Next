@@ -43,6 +43,10 @@ class HermesLaunchReservationBody(BaseModel):
     idempotency_key: str = Field(min_length=8, max_length=200)
 
 
+class HermesEphemeralContextMaterializeBody(BaseModel):
+    launch_reservation_id: str = Field(min_length=1, max_length=300)
+
+
 class HermesRuntimeStartBody(BaseModel):
     run_id: str = Field(min_length=1, max_length=300)
     expected_issue_version: int = Field(ge=1)
@@ -249,6 +253,32 @@ def install_hermes_execution_routes(
             raise HTTPException(status_code=409, detail=str(exc)) from exc
         except hermes_launch_context.LaunchContextTooLarge as exc:
             raise HTTPException(status_code=413, detail=str(exc)) from exc
+        except hermes_launch_context.HermesLaunchContextError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    @app.post(
+        "/hermes/execution-admissions/{admission_id}/ephemeral-context/materialize",
+        status_code=200,
+    )
+    def materialize_hermes_ephemeral_context(
+        admission_id: str,
+        body: HermesEphemeralContextMaterializeBody,
+        _authorized: None = Depends(require_hermes_key),
+        actor: str = Depends(require_hermes_actor),
+    ) -> dict:
+        del actor  # actor authenticates the external binding; materialization itself is read-only.
+        try:
+            return use_connection(
+                lambda conn: hermes_launch_context.materialize_ephemeral_context(
+                    conn,
+                    admission_id=admission_id,
+                    launch_reservation_id=body.launch_reservation_id,
+                )
+            )
+        except hermes_launch_context.LaunchReservationNotFound as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except hermes_launch_context.LaunchReservationConflict as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
         except hermes_launch_context.HermesLaunchContextError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 

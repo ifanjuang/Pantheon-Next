@@ -108,6 +108,7 @@ def test_distribution_components_keep_translation_observation_without_authority(
     expected_capabilities = {
         "run-binding": {
             "reserve-admitted-launch",
+            "materialize-bounded-ephemeral-context",
             "submit-one-external-run",
             "record-runtime-start",
             "record-runtime-return",

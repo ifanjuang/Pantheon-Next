@@ -33,10 +33,20 @@ class _Observer:
 
 
 class _Pantheon:
-    def __init__(self, *, replayed: bool = False, start_fails: bool = False):
+    def __init__(
+        self,
+        *,
+        replayed: bool = False,
+        start_fails: bool = False,
+        ephemeral_context: bool = False,
+        materialize_fails: bool = False,
+    ):
         self.replayed = replayed
         self.start_fails = start_fails
+        self.ephemeral_context = ephemeral_context
+        self.materialize_fails = materialize_fails
         self.reserve_calls = []
+        self.materialize_calls = []
         self.start_calls = []
         self.return_calls = []
 
@@ -52,8 +62,49 @@ class _Pantheon:
                 "kind": "hermes_launch_context_snapshot",
                 "question": "Analyse le projet.",
                 "field_projection_version": "scoped-context-v1",
+                "context_manifest": {
+                    "ephemeral_context_leases": (
+                        [
+                            {
+                                "lease_ref": "ephemeral-context-test",
+                                "lease_digest": "a" * 64,
+                            }
+                        ]
+                        if self.ephemeral_context
+                        else []
+                    )
+                },
                 "entities": [],
             },
+        }
+
+    def materialize_ephemeral_context(self, **kwargs):
+        self.materialize_calls.append(kwargs)
+        if self.materialize_fails:
+            raise RuntimeError("lease expired")
+        return {
+            "kind": "hermes_ephemeral_context_materialization",
+            "admission_id": kwargs["admission_id"],
+            "launch_reservation_id": kwargs["launch_reservation_id"],
+            "leases": [
+                {
+                    "lease_ref": "ephemeral-context-test",
+                    "lease_digest": "a" * 64,
+                    "items": [
+                        {
+                            "item_id": "item-01",
+                            "content_sha256": "b" * 64,
+                            "byte_size": 22,
+                            "media_type": "text/plain; charset=utf-8",
+                            "representation_kind": "utf8_text",
+                            "source_provenance": [],
+                            "content_utf8": "TRANSIENT=synthetic",
+                        }
+                    ],
+                    "materialized": True,
+                }
+            ],
+            "materialized": True,
         }
 
     def record_start(self, **kwargs):
@@ -277,3 +328,49 @@ def test_verified_http_clients_use_only_bounded_paths_and_no_model_provider_over
     assert pseen[0][1] == "/hermes/execution-admissions/admission-1/launch-reservations"
     assert pseen[1][1] == "/hermes/execution-admissions/admission-1/runs/start"
     assert all(actor == "hermes-run-binding" for _, _, actor in pseen)
+
+
+
+def test_launch_materializes_ephemeral_context_only_after_reservation_and_before_submit() -> None:
+    pantheon = _Pantheon(ephemeral_context=True)
+    hermes = _Hermes()
+    receipt = _binding(pantheon=pantheon, hermes=hermes).launch(
+        admission_id="admission-1",
+        idempotency_key="launch-key-ephemeral",
+    )
+
+    assert pantheon.materialize_calls == [
+        {
+            "admission_id": "admission-1",
+            "launch_reservation_id": "launch-reservation-1",
+        }
+    ]
+    assert len(hermes.submit_calls) == 1
+    material = json.loads(hermes.submit_calls[0]["input_text"])
+    assert material["ephemeral_context"]["kind"] == "bounded_ephemeral_context"
+    assert (
+        material["ephemeral_context"]["leases"][0]["items"][0]["content_utf8"]
+        == "TRANSIENT=synthetic"
+    )
+    assert receipt["ephemeral_context_materialized"] is True
+    assert receipt["ephemeral_context_lease_count"] == 1
+    assert "ephemeral_context" not in receipt
+
+
+def test_ephemeral_materialization_failure_prevents_hermes_submission() -> None:
+    pantheon = _Pantheon(
+        ephemeral_context=True,
+        materialize_fails=True,
+    )
+    hermes = _Hermes()
+    binding = _binding(pantheon=pantheon, hermes=hermes)
+
+    with pytest.raises(RuntimeError, match="lease expired"):
+        binding.launch(
+            admission_id="admission-1",
+            idempotency_key="launch-key-expired",
+        )
+
+    assert len(pantheon.reserve_calls) == 1
+    assert len(pantheon.materialize_calls) == 1
+    assert hermes.submit_calls == []

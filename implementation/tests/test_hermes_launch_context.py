@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import hashlib
+import shutil
 import uuid
 
 import pytest
 
 from mvp_vertical import (
     agency_data,
+    hermes_ephemeral_context,
     hermes_execution,
     hermes_handoff_preview,
     hermes_handoff_store,
@@ -217,3 +220,143 @@ def test_exact_reservation_links_real_run_and_current_reads_can_diverge_from_sna
     assert snapshot_project["record"]["description"] == "Description au moment de la réservation"
     assert current["record"]["description"] == "Description modifiée après snapshot"
     assert current["current_revision"] == 2
+
+
+
+def _admitted_with_ephemeral_context(conn, descriptor: dict) -> tuple[dict, dict, dict]:
+    project = agency_data.create_project(
+        conn,
+        project_id=_id("project"),
+        code=_id("CODE").upper(),
+        display_name="Projet transient lease",
+        description="Synthetic transient context acceptance",
+        actor="human-reviewer",
+        actor_kind="human",
+        idempotency_key=_id("project-create"),
+    )
+    envelope = {
+        "root_entity": {
+            "entity_id": f"project:{project['project_id']}",
+            "entity_type": "project",
+        },
+        "descendants": [],
+        "source_refs": [],
+        "explicit_additions": [],
+        "explicit_exclusions": [],
+        "scope_widened_implicitly": False,
+    }
+    preview = hermes_handoff_preview.build_preview(
+        question="Analyse le contexte transitoire sans le persister.",
+        card_context_envelope=envelope,
+        selected_context=[],
+        ephemeral_context_leases=[descriptor],
+    )
+    handoff = hermes_handoff_store.submit_handoff(
+        conn,
+        actor="ifan",
+        idempotency_key=_id("handoff"),
+        question="Analyse le contexte transitoire sans le persister.",
+        preview=preview,
+        card_context_envelope=envelope,
+        selected_context=[],
+        include_declared_descendants=False,
+    )
+    admission = hermes_execution.admit_handoff(
+        conn,
+        handoff_id=handoff["handoff_id"],
+        actor="ifan",
+        idempotency_key=_id("admit"),
+        ttl_seconds=900,
+    )
+    return project, handoff, admission
+
+
+def test_launch_reservation_verifies_ephemeral_lease_without_persisting_payload(
+    conn,
+    monkeypatch,
+    tmp_path,
+) -> None:
+    monkeypatch.setenv("PANTHEON_EPHEMERAL_CONTEXT_ROOT", str(tmp_path))
+    text = "TRANSIENT_CONTEXT=synthetic-1125"
+    descriptor = hermes_ephemeral_context.create_lease(
+        items=[
+            {
+                "content_utf8": text,
+                "content_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+                "media_type": "text/plain; charset=utf-8",
+                "representation_kind": "utf8_text",
+                "source_provenance": [
+                    {
+                        "provider": "synthetic",
+                        "source_id": "launch-test",
+                        "raw_sha256": "d" * 64,
+                    }
+                ],
+            }
+        ],
+        ttl_seconds=300,
+        actor="human:test",
+    )
+    _project, _handoff, admission = _admitted_with_ephemeral_context(conn, descriptor)
+
+    reservation = hermes_launch_context.reserve_launch(
+        conn,
+        admission_id=admission["admission_id"],
+        actor="hermes-run-binding",
+        idempotency_key=_id("reserve"),
+    )
+
+    assert reservation["snapshot"]["context_manifest"]["ephemeral_context_leases"] == [
+        descriptor
+    ]
+    assert reservation["snapshot"]["ephemeral_payload_included"] is False
+    assert "content_utf8" not in str(reservation["snapshot"])
+
+    materialized = hermes_launch_context.materialize_ephemeral_context(
+        conn,
+        admission_id=admission["admission_id"],
+        launch_reservation_id=reservation["launch_reservation_id"],
+    )
+    assert materialized["leases"][0]["items"][0]["content_utf8"] == text
+    assert materialized["dispatch_performed"] is False
+    assert materialized["source_admitted"] is False
+    assert materialized["evidence_admitted"] is False
+
+
+def test_missing_ephemeral_lease_blocks_reservation_without_consuming_admission(
+    conn,
+    monkeypatch,
+    tmp_path,
+) -> None:
+    monkeypatch.setenv("PANTHEON_EPHEMERAL_CONTEXT_ROOT", str(tmp_path))
+    text = "TRANSIENT_CONTEXT=will-disappear"
+    descriptor = hermes_ephemeral_context.create_lease(
+        items=[
+            {
+                "content_utf8": text,
+                "content_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+                "media_type": "text/plain; charset=utf-8",
+                "representation_kind": "utf8_text",
+                "source_provenance": [],
+            }
+        ],
+        ttl_seconds=300,
+        actor="human:test",
+    )
+    _project, _handoff, admission = _admitted_with_ephemeral_context(conn, descriptor)
+    shutil.rmtree(tmp_path / descriptor["lease_ref"])
+
+    with pytest.raises(
+        hermes_launch_context.LaunchReservationConflict,
+        match="reprepare the handoff",
+    ):
+        hermes_launch_context.reserve_launch(
+            conn,
+            admission_id=admission["admission_id"],
+            actor="hermes-run-binding",
+            idempotency_key=_id("reserve"),
+        )
+
+    state = hermes_execution.get_admission(conn, admission["admission_id"])
+    assert state["admission_state"] == "admitted"
+    assert state["launch_reservation_id"] is None

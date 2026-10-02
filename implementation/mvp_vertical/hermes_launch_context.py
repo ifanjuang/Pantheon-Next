@@ -21,7 +21,7 @@ from typing import Any
 import psycopg
 from psycopg.rows import dict_row
 
-from . import hermes_execution, hermes_scoped_context
+from . import hermes_ephemeral_context, hermes_execution, hermes_scoped_context
 from .hermes_execution_basis import HermesExecutionBasis, HermesExecutionBasisError
 
 MAX_LAUNCH_SNAPSHOT_CHARS = 120_000
@@ -238,6 +238,14 @@ def reserve_launch(
 
         context_pack = dict(handoff["context_pack"] or {})
         task_contract = dict(handoff["task_contract"] or {})
+        try:
+            ephemeral_context_leases = (
+                hermes_ephemeral_context.validate_context_pack_leases(context_pack)
+            )
+        except hermes_ephemeral_context.EphemeralContextError as exc:
+            raise LaunchReservationConflict(
+                "ephemeral context lease is unavailable or changed; reprepare the handoff"
+            ) from exc
         reserved_at = conn.execute("SELECT CURRENT_TIMESTAMP").fetchone()[0]
         launch_expires_at = min(
             admission["expires_at"],
@@ -265,9 +273,11 @@ def reserve_launch(
                 "included_entities": list(context_pack.get("included_entities") or []),
                 "excluded_entities": list(context_pack.get("excluded_entities") or []),
                 "source_refs": list(context_pack.get("source_refs") or []),
+                "ephemeral_context_leases": ephemeral_context_leases,
             },
             "entities": _materialize_snapshot_entities(conn, context_pack),
             "source_binary_included": False,
+            "ephemeral_payload_included": False,
             "global_search_available": False,
             "global_listing_available": False,
             "write_effect": False,
@@ -276,6 +286,8 @@ def reserve_launch(
                 "launch snapshot != Evidence",
                 "launch snapshot != global Agency Data",
                 "launch snapshot != source binary",
+                "launch snapshot != ephemeral context payload",
+                "ephemeral context lease != Source admission",
                 "snapshot revision != future current owner revision",
                 "read_only run admission != consequential effect authorization",
             ],
@@ -317,3 +329,89 @@ def reserve_launch(
         )
         assert row is not None
         return _reservation_projection(row, replayed=False)
+
+
+def materialize_ephemeral_context(
+    conn: psycopg.Connection,
+    *,
+    admission_id: str,
+    launch_reservation_id: str,
+) -> dict[str, Any]:
+    """Resolve exact transient bytes only for the currently reserved launch.
+
+    This is a read/materialization seam for the external binding. It does not
+    dispatch Hermes, start a run, write AFFAIRES/Hindsight or admit Source/Evidence.
+    """
+    admission_id = str(admission_id or "").strip()
+    launch_reservation_id = str(launch_reservation_id or "").strip()
+    if not admission_id or not launch_reservation_id:
+        raise HermesLaunchContextError(
+            "admission_id and launch_reservation_id are required"
+        )
+
+    current = hermes_execution.get_admission(conn, admission_id)
+    if current["admission_state"] != "launch_reserved":
+        raise LaunchReservationConflict(
+            "ephemeral context materialization requires a live launch reservation"
+        )
+    if current.get("launch_reservation_id") != launch_reservation_id:
+        raise LaunchReservationConflict(
+            "ephemeral context materialization requires the exact launch reservation"
+        )
+
+    reservation = _one(
+        conn,
+        """
+        SELECT * FROM hermes_run_launch_reservations
+         WHERE launch_reservation_id=%s AND admission_id=%s
+        """,
+        (launch_reservation_id, admission_id),
+    )
+    if reservation is None:
+        raise LaunchReservationNotFound(
+            f"unknown launch reservation: {launch_reservation_id}"
+        )
+    if reservation["launch_expires_at"] <= datetime.now(reservation["launch_expires_at"].tzinfo):
+        raise LaunchReservationConflict("launch reservation expired before context materialization")
+
+    admission = _one(
+        conn,
+        "SELECT * FROM hermes_execution_admissions WHERE admission_id=%s",
+        (admission_id,),
+    )
+    if admission is None:
+        raise LaunchReservationNotFound(f"unknown execution admission: {admission_id}")
+    handoff = _one(
+        conn,
+        "SELECT * FROM cockpit_hermes_handoffs WHERE handoff_id=%s",
+        (admission["handoff_id"],),
+    )
+    if handoff is None:
+        raise LaunchReservationConflict("immutable Hermes handoff is missing")
+
+    context_pack = dict(handoff["context_pack"] or {})
+    try:
+        leases = hermes_ephemeral_context.materialize_context_pack_leases(context_pack)
+    except hermes_ephemeral_context.EphemeralContextError as exc:
+        raise LaunchReservationConflict(
+            "ephemeral context lease is unavailable or changed; reprepare the handoff"
+        ) from exc
+
+    return {
+        "kind": "hermes_ephemeral_context_materialization",
+        "admission_id": admission_id,
+        "launch_reservation_id": launch_reservation_id,
+        "leases": leases,
+        "materialized": bool(leases),
+        "dispatch_performed": False,
+        "runtime_start_recorded": False,
+        "affaires_write_performed": False,
+        "hindsight_write_performed": False,
+        "source_admitted": False,
+        "evidence_admitted": False,
+        "non_equivalences": [
+            "ephemeral context materialized != Source admission",
+            "ephemeral context materialized != Hermes run started",
+            "ephemeral context materialized != Evidence",
+        ],
+    }
