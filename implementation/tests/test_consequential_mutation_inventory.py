@@ -1138,7 +1138,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge.py", "apply_edit_request"): {
         "gate": "enforce_consequential",
-        "local_guards": ("request status", "re-read under lock", "version and selection digest", "single transaction with audit", "idempotency", "chokepoint after the re-read under lock, expectation bound to a digest of the exact replacement", "unconditional: apply always needs a decision, not just a review_status=\"reviewed\" claim"),
+        "local_guards": ("request row locked before status/admission checks", "transaction owned before the first database read", "Knowledge row re-read under lock", "version and selection digest", "single transaction with audit", "idempotency", "stale conflict transition only updates a still-proposed request", "recompile source_documents and compilation-binding rows locked in stable order through admission and persistence", "recompile source-context digest, frozen-content integrity and allowed current source refs are rechecked after those locks", "chokepoint after all staleness checks, expectation bound to a digest of the exact replacement, recompile context and provenance when present", "unconditional: apply always needs a decision, not just a review_status=\"reviewed\" claim"),
         "reviewed": (
             "Wired, at the point this entry itself named: `create_edit_request` "
             "accepts `replacement_markdown` from its caller and sets `proposed` on "
@@ -1157,16 +1157,17 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "`_EditRequestConflict` handler untouched — refusal is not staleness, "
             "so the request stays `proposed` and retryable once a real decision "
             "exists, rather than being marked `conflict`. "
-            "Three production paths reach this function: the direct "
-            "`apply_intelligent_edit` route, and `apply_selected_variant`'s two "
-            "call sites (replay and real). All three thread `policy_client` "
-            "through; missing one would have reopened exactly the gap this entry "
-            "records."
+            "Two production adapters reach this function: the direct "
+            "`apply_intelligent_edit` route and `apply_selected_variant`. Both "
+            "thread `policy_client` through. The owner now opens its transaction "
+            "before its first database read; this matters with psycopg "
+            "autocommit=False, because reading first would make the apparent "
+            "transaction a savepoint that an API connection close could roll back."
         ),
     },
     ("knowledge.py", "complete_edit_request"): {
         "gate": "none",
-        "local_guards": ("non-empty replacement", "Hermes bearer key on the route", "version comparison against base_version", "status must be queued_for_hermes, or an identical replay of the same proposed replacement"),
+        "local_guards": ("non-empty replacement", "Hermes bearer key on the route", "request row locked across terminal-status check and proposal transition", "version comparison against base_version", "status must be queued_for_hermes, or an identical replay of the same proposed replacement", "recompile proposals must match the frozen source-context digest", "replacement source refs must stay inside the bounded context and retain a current primary-source chunk", "ordinary edits cannot replace provenance"),
         "reviewed": (
             "Corrected. Reads as Hermes filling in the proposal it was queued for. "
             "It took no actor, no idempotency key, wrote no event, and guarded no "
@@ -1205,6 +1206,29 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
             "rather than duplicated here."
         ),
     },
+    ("knowledge.py", "create_recompile_request"): {
+        "gate": "none",
+        "local_guards": (
+            "Knowledge source state must require recompilation",
+            "bounded recompile context must be complete and not source-blocked",
+            "full Markdown snapshot and exact base_version are delegated to create_edit_request",
+            "recompile_context_digest freezes the source-state candidate basis",
+            "idempotency is enforced by the existing edit-request owner",
+            "the outer transaction starts before source-context reads so the request commits rather than remaining inside an implicit-read savepoint",
+            "replay returns the durable request even after Knowledge/source state later changes",
+        ),
+        "reviewed": (
+            "Creates no Knowledge revision and authorizes no effect. It is a thin "
+            "candidate constructor over `create_edit_request`: first it computes the "
+            "bounded source context, refuses a current or incomplete Knowledge item, "
+            "then records a full-document edit request tied to the exact Knowledge "
+            "version and source-context digest. The live route requires the editor "
+            "key, while `requested_by` remains asserted attribution. Hermes can only "
+            "fill the resulting proposal; the existing `apply_edit_request` "
+            "chokepoint remains the place where Markdown and, for a recompile, exact "
+            "source provenance may change."
+        ),
+    },
     ("knowledge.py", "publish_knowledge"): {
         "gate": "enforce_consequential",
         "local_guards": ("non-empty knowledge_id, title and Markdown", "family membership", "expected_version must be 0", "idempotency", "chokepoint, only when review_status=\"reviewed\" is requested, expectation bound to the publish digest"),
@@ -1240,7 +1264,7 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge.py", "revise_knowledge"): {
         "gate": "none",
-        "local_guards": ("expected_version optimistic concurrency", "actor_kind membership", "idempotency with payload digest"),
+        "local_guards": ("expected_version optimistic concurrency", "actor_kind membership", "idempotency with payload digest", "optional provenance rebind resolves only current chunks in the primary Project and retains a primary-source chunk", "Markdown and provenance rebind share one transaction", "base and resulting content/provenance snapshots are persisted in knowledge_events", "knowledge_events is append-only at the PostgreSQL layer"),
         "reviewed": (
             "The revision primitive, not an entry point: its own route, "
             "`PUT /knowledge/{knowledge_id}`, is retired and raises 410. It holds as "
@@ -1256,26 +1280,26 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge_edit_variants.py", "apply_selected_variant"): {
         "gate": "none",
-        "local_guards": ("status re-checked under lock", "selection unchanged under lock", "variant ownership", "audit inside the apply transaction", "idempotent replay when already applied"),
+        "local_guards": ("top-level transaction owns request lock before variant validation", "status and selected_variant_id checked under that lock", "variant ownership", "replacement prepared with selected_variant_id/status predicate", "request lock is retained across delegated Knowledge apply", "Knowledge revision and variant_applied audit commit inside the same outer transaction", "idempotent replay when already applied"),
         "reviewed": (
-            "Reasoning rewritten, regime unchanged. It said the request had "
-            "already selected the variant, and selection is genuinely recorded "
-            "here — `selected_by`, an event, an idempotency key. What the "
-            "selection does not survive is a rejection: `reject_request` does not "
-            "clear `selected_variant_id`, and `knowledge.complete_edit_request` "
-            "returns a rejected request to `proposed`, after which this function "
-            "finds a `proposed` status and an intact selection and applies the "
-            "variant a human refused. The gate stays recorded at "
-            "`knowledge.apply_edit_request`, which this delegates to and which is "
-            "where the Knowledge changes; wiring it there covers this path, so "
-            "recording it twice would overstate what has to be wired. One caveat: "
-            "the `replacement_markdown` write here commits in its own transaction "
-            "before the delegation, so it would survive a refusal downstream."
+            "The consequential write remains delegated to "
+            "`knowledge.apply_edit_request`, but candidate preparation is no longer "
+            "a separately committed transaction. `apply_selected_variant` locks the "
+            "request row first, resolves the immutable variant currently selected, "
+            "prepares exactly that replacement with a selected-id/status predicate, "
+            "and keeps the lock while the Knowledge owner applies it. The delegated "
+            "owner may use a savepoint here because this wrapper deliberately owns "
+            "the top-level transaction. A competing select/reject/apply therefore "
+            "cannot change the selection between review and persistence, and the "
+            "`variant_applied` event cannot name a different candidate from the "
+            "Markdown that actually committed. If the delegated owner detects stale "
+            "Knowledge, the wrapper catches that signal inside the outer transaction "
+            "long enough to commit the owner's conflict transition, then re-raises it."
         ),
     },
     ("knowledge_edit_variants.py", "create_variant_request"): {
         "gate": "none",
-        "local_guards": ("status and replacement_markdown are literals in the INSERT", "locked snapshot with base_version equality", "selection range and text matched against the snapshot", "idempotency with payload digest"),
+        "local_guards": ("transaction owned before first database read", "status and replacement_markdown are literals in the INSERT", "locked snapshot with base_version equality", "selection range and text matched against the snapshot", "idempotency with payload digest"),
         "reviewed": (
             "The same table as `knowledge.create_edit_request`, and the "
             "instructive contrast with it: here the INSERT writes "
@@ -1288,14 +1312,15 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge_edit_variants.py", "project_execution_result_variant"): {
         "gate": "none",
-        "local_guards": ("status must be queued_for_hermes or proposed", "scope currency re-checked under lock", "candidate payload validated against the contract", "conflict persisted after the rollback", "idempotency with projection digest"),
+        "local_guards": ("transaction owned before the Execution Result read", "status must be queued_for_hermes or proposed", "scope currency re-checked under lock", "candidate payload validated against the contract", "conflict persisted in a fresh top-level transaction after rollback", "idempotency with projection digest"),
         "reviewed": (
             "Projects a Hermes candidate and declares its authority as data: "
             "CANDIDATE_AUTHORITY sets selects_variant, applies_edit, "
             "validates_knowledge, admits_evidence, promotes_memory and "
             "authorizes_task all False. It refuses any status outside "
-            "`{queued_for_hermes, proposed}` — the guard `complete_edit_request` "
-            "lacks — so a rejected request cannot receive a projection. The "
+            "`{queued_for_hermes, proposed}`, matching the terminal-status guard "
+            "now enforced by `complete_edit_request`; a rejected request cannot "
+            "receive a projection or be reopened through Hermes. The "
             "staleness conflict is written in its own transaction after the "
             "attempt unwinds, so discovering it does not depend on the attempt "
             "committing."
@@ -1303,20 +1328,20 @@ INVENTORY: dict[tuple[str, str], dict[str, object]] = {
     },
     ("knowledge_edit_variants.py", "reject_request"): {
         "gate": "none",
-        "local_guards": ("status must be queued_for_hermes or proposed", "row lock", "non-empty reason", "idempotency with payload digest", "event records the refusal"),
+        "local_guards": ("transaction owned before idempotency lookup", "status must be queued_for_hermes or proposed", "row lock", "non-empty reason", "idempotency with payload digest", "event records the refusal"),
         "reviewed": (
             "Refuses an edit, which is safety-increasing, and records why. The "
-            "finding is not in this function but in what happens after it: the "
-            "rejection it writes is reversible by `complete_edit_request`, and "
-            "this function clears no selection, so a rejected request can arrive "
-            "back at `proposed` with its selection intact. Recorded here so the "
-            "reversal is findable from the function that is supposed to be "
-            "terminal."
+            "request row is locked and only queued_for_hermes or proposed may "
+            "transition to rejected. The former reopen defect is closed in "
+            "`knowledge.complete_edit_request`: Hermes may complete only a request "
+            "still queued_for_hermes, with a narrow identical-proposal replay "
+            "exception after it is already proposed. A rejected request is now "
+            "terminal on both the variant and direct proposal paths."
         ),
     },
     ("knowledge_edit_variants.py", "select_variant"): {
         "gate": "none",
-        "local_guards": ("status must be proposed", "row lock", "variant ownership", "idempotency with payload digest", "event records the selection"),
+        "local_guards": ("transaction owned before idempotency lookup", "status must be proposed", "row lock", "variant ownership", "idempotency with payload digest", "event records the selection"),
         "reviewed": (
             "Records the human choice between two candidates; it mutates no "
             "Knowledge and the event says so explicitly "
