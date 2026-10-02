@@ -136,7 +136,7 @@ Roles are not runtime agents.
 Example:
 
 ```text
-athena-agent
+ATHENA
 ```
 
 In Pantheon governance, this means:
@@ -151,7 +151,9 @@ It does not mean:
 autonomous runtime worker
 ```
 
-Hermes may map a Pantheon role to an execution profile externally.
+Hermes executes admitted work inside its own runtime envelope, by default the
+single `pantheon-governed` profile. A Role is never a runtime identity, and the
+absence of a Role-named profile is the normal valid state.
 
 Pantheon does not execute the role.
 
